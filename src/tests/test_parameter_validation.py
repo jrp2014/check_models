@@ -623,3 +623,43 @@ class TestUpstreamCliParity:
             assert ours[option] != upstream[option], (
                 f"{option} no longer diverges from upstream; drop it from the allowlist ({reason})"
             )
+
+
+def test_dry_run_setup_writes_no_log_or_environment_files(
+    tmp_path: Path,
+    test_image: Path,
+) -> None:
+    """--dry-run must not overwrite the retained log/environment artifacts."""
+    log_path = tmp_path / "check_models.log"
+    env_path = tmp_path / "environment.log"
+    parser = check_models._build_cli_parser()
+    args = parser.parse_args(
+        [
+            "--dry-run",
+            "--image",
+            str(test_image),
+            "--output-log",
+            str(log_path),
+            "--output-env",
+            str(env_path),
+        ]
+    )
+
+    check_models.setup_environment(args)
+
+    assert not log_path.exists()
+    assert not env_path.exists()
+
+    args = parser.parse_args(
+        [
+            "--image",
+            str(test_image),
+            "--output-log",
+            str(log_path),
+            "--output-env",
+            str(env_path),
+        ]
+    )
+    check_models.setup_environment(args)
+    assert log_path.exists()
+    assert env_path.exists()

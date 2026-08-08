@@ -21,6 +21,7 @@ import pytest
 import yaml
 from packaging.requirements import Requirement
 
+import check_models
 from check_models_data import dependency_policy
 from tools import (
     bugtest,
@@ -766,8 +767,10 @@ def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
     """Report-specific markdownlint guards should stay centralized."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
 
-    assert 'MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD049"' in source
-    assert 'MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"' in source
+    # Behavioural checks on the live constants; exact source spelling is not
+    # asserted so harmless refactors (annotation style, quoting) stay legal.
+    assert check_models.MARKDOWNLINT_GALLERY_SUMMARY_RULES == "MD034 MD049"
+    assert check_models.MARKDOWNLINT_TABLE_PIPE_RULES == "MD060"
     assert "MARKDOWNLINT_MAIN_TABLE_RULES" not in source
     assert "MARKDOWNLINT_DETAILS_RULES" not in source
     assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" not in source
@@ -1656,8 +1659,11 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
 
-    assert "skylos>=4.27.0" in dev_deps
-    assert '"skylos>=4.27.0"' in setup_script
+    skylos_specs = [dep for dep in dev_deps if dep.startswith("skylos")]
+    assert len(skylos_specs) == 1
+    # The setup script must install the same spec pyproject declares,
+    # whatever that spec is (deliberately not pinned).
+    assert f'"{skylos_specs[0]}"' in setup_script
     assert (
         'quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"'
         in quality_script

@@ -116,7 +116,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - `install_precommit_hook.py`: Sets up git hooks.
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
-- **`output/`** - Generated reports (HTML/Markdown, git-ignored)
+- **`output/`** - Generated run artifacts; all are tracked in git except the append-only `results.history.jsonl`
 - **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via `make stubs`)
 - **Root `Makefile`** - User-friendly commands that orchestrate `src/` operations
 - **`README.md`** - Project overview and quick start guide (repo root)
@@ -1139,7 +1139,7 @@ Do not commit ephemeral caches or local environment files. This repository inclu
 
 If new tooling introduces a cache directory, add it to the appropriate `.gitignore`.
 
-Generated artifacts like `results.html` and `results.md` are acceptable to commit for sharing, but large binary caches from Hugging Face or MLX should remain local.
+All current-run artifacts under `src/output/` are committed each run so they are browsable on GitHub; only the append-only `results.history.jsonl` stays gitignored. Large binary caches from Hugging Face or MLX must remain local.
 
 ## Quick Checklist
 

@@ -1419,3 +1419,39 @@ def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: 
         )
 
     assert check_models._assess_result(result) == expected
+
+
+def test_console_cap_note_is_neutral_without_degradation_evidence(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A cap hit warns only when the assessment would also flag truncation."""
+    clean_text = "Title: Two boats\n\nDescription: Two boats at sea.\n\nKeywords: boats, sea, sky."
+    clean_cap = check_models.analyze_generation_text(
+        clean_text,
+        generated_tokens=500,
+        requested_max_tokens=500,
+    )
+    assert clean_cap.likely_capped
+    assert not clean_cap.token_cap_reasons
+
+    generation = _StubGeneration(text=clean_text, generation_tokens=500)
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        check_models._preview_generation(generation, analysis=clean_cap)
+
+    assert "Output used the full requested token budget" in caplog.text
+    assert "reached requested token limit" not in caplog.text
+
+    degraded = check_models.analyze_generation_text(
+        "boats boats boats boats boats boats boats boats boats boats boats boats",
+        generated_tokens=500,
+        requested_max_tokens=500,
+    )
+    assert degraded.likely_capped
+    assert degraded.token_cap_reasons
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        check_models._preview_generation(
+            _StubGeneration(text="boats boats", generation_tokens=500),
+            analysis=degraded,
+        )
+    assert "reached requested token limit" in caplog.text

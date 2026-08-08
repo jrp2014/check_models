@@ -12678,8 +12678,12 @@ def _preview_generation(
         log_warning_note("Instruction text appears in output")
     if analysis.unexpected_catalog_preamble:
         log_warning_note("Unexpected text appears before the Title section")
-    if analysis.likely_capped:
+    if analysis.likely_capped and analysis.token_cap_reasons:
         log_warning_note(f"Output reached requested token limit ({gen_tokens} tokens)")
+    elif analysis.likely_capped:
+        # Same gate as the token_cap_truncation observation: a cap hit without
+        # degradation evidence is neutral information, not a warning.
+        logger.info("Output used the full requested token budget (%s tokens)", gen_tokens)
     if analysis.unexpected_special_tokens:
         tokens = ", ".join(analysis.unexpected_special_tokens[:2])
         log_warning_note(f"Unexpected special token wrappers: {tokens}")
@@ -13193,22 +13197,26 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     )
     logger.addHandler(console_handler)
 
-    # File handler - write to specified log file (overwritten each run)
-    log_file: Path = args.output_log.resolve()
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-    file_handler: logging.FileHandler = logging.FileHandler(
-        log_file,
-        mode="w",
-        encoding="utf-8",
-    )
-    # File gets full timestamp + level always (no colors in file)
-    file_handler.setLevel(logging.DEBUG)
-    file_formatter: logging.Formatter = FileSafeFormatter(
-        "%(asctime)s - %(levelname)s - %(message)s",
-        datefmt=LOCAL_TIMESTAMP_FORMAT,
-    )
-    file_handler.setFormatter(file_formatter)
-    logger.addHandler(file_handler)
+    # File handler - write to specified log file (overwritten each run).
+    # Skipped for --dry-run: no models are invoked, and overwriting the
+    # retained log/environment artifacts of a real run would desynchronize
+    # them from the run's other tracked outputs.
+    if not args.dry_run:
+        log_file: Path = args.output_log.resolve()
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        file_handler: logging.FileHandler = logging.FileHandler(
+            log_file,
+            mode="w",
+            encoding="utf-8",
+        )
+        # File gets full timestamp + level always (no colors in file)
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter: logging.Formatter = FileSafeFormatter(
+            "%(asctime)s - %(levelname)s - %(message)s",
+            datefmt=LOCAL_TIMESTAMP_FORMAT,
+        )
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
 
     # Logger captures everything so file handler gets debug info
     logger.setLevel(logging.DEBUG)
@@ -13218,7 +13226,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         logger.debug("Verbose/debug mode enabled.")
 
     # Dump full environment to log file for reproducibility (after logging setup)
-    _dump_environment_to_log(args.output_env)
+    if not args.dry_run:
+        _dump_environment_to_log(args.output_env)
 
     # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(find_spec("sentence_transformers"))

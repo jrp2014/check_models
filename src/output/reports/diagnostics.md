@@ -6,9 +6,9 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 64    |
-| Conclusive outcomes | 64    |
-| Completed           | 63    |
+| Attempted           | 42    |
+| Conclusive outcomes | 42    |
+| Completed           | 41    |
 | Crashed             | 1     |
 | Indeterminate       | 0     |
 
@@ -17,83 +17,67 @@ Maintainer status counts
 | Maintainer status              | Count |
 |--------------------------------|-------|
 | actionable failure             | 1     |
-| none                           | 19    |
-| observation needs reproduction | 44    |
+| none                           | 12    |
+| observation needs reproduction | 29    |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
 | not evaluated       | 1     |
-| unusable            | 25    |
-| usable              | 19    |
-| usable with caveats | 19    |
+| unusable            | 16    |
+| usable              | 12    |
+| usable with caveats | 13    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
 | Conversation-role control tokens remain visible                                       | 1     |
-| Extra text appears before the Title field                                             | 7     |
-| Internal reasoning block appears incomplete                                           | 5     |
-| No response text was returned                                                         | 1     |
-| Required fields are missing or empty                                                  | 24    |
-| Response appears cut off at the token limit                                           | 11    |
-| Response repeats the same text                                                        | 5     |
-| Response repeats the task instructions instead of only returning the requested fields | 1     |
-| Title or keywords do not meet requested constraints                                   | 19    |
-| Title, Description and Keywords copy all supplied hints unchanged                     | 3     |
-| Unrecognised model control tokens remain visible                                      | 2     |
+| Extra text appears before the Title field                                             | 6     |
+| Internal reasoning block appears incomplete                                           | 3     |
+| Required fields are missing or empty                                                  | 15    |
+| Response appears cut off at the token limit                                           | 8     |
+| Response repeats the same text                                                        | 3     |
+| Response repeats the task instructions instead of only returning the requested fields | 2     |
+| Title or keywords do not meet requested constraints                                   | 13    |
+| Title, Description and Keywords copy all supplied hints unchanged                     | 1     |
+| Unrecognised model control tokens remain visible                                      | 1     |
 
 ## Triage
 
-| Model                                                                                                                      | Execution | Usability           | Maintainer status              | Observations                                                                                                       |
-|----------------------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                                   | crashed   | not_evaluated       | actionable_failure             | none                                                                                                               |
-| [mlx-community/gemma-4-31b-bf16](#diagnostic-mlx-community-gemma-4-31b-bf16)                                               | completed | unusable            | observation_needs_reproduction | empty response; missing required fields                                                                            |
-| [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                                     |
-| [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                             | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                                     |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                             | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                                     |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                           | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                            |
-| [mlx-community/GLM-4.6V-Flash-6bit](#diagnostic-mlx-community-glm-46v-flash-6bit)                                          | completed | unusable            | observation_needs_reproduction | control tokens visible; missing required fields; extra text before Title                                           |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                                    | completed | unusable            | observation_needs_reproduction | control tokens visible; missing required fields; extra text before Title                                           |
-| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | completed | unusable            | observation_needs_reproduction | missing required fields; echoes instructions; cut off at token limit                                               |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                                   |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                                   |
-| [mlx-community/FastVLM-0.5B-bf16](#diagnostic-mlx-community-fastvlm-05b-bf16)                                              | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                                   |
-| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                              | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                         |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                |
-| [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                             | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                         |
-| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                           | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                            | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                            | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                         |
-| [mlx-community/MolmoPoint-8B-fp16](#diagnostic-mlx-community-molmopoint-8b-fp16)                                           | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                            | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/paligemma2-10b-ft-docci-448-6bit](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/paligemma2-10b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/paligemma2-3b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                             | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit                                                                    |
-| [qnguyen3/nanoLLaVA](#diagnostic-qnguyen3-nanollava)                                                                       | completed | unusable            | observation_needs_reproduction | missing required fields                                                                                            |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                                 | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                                |
-| [HuggingFaceTB/SmolVLM-Instruct](#diagnostic-huggingfacetb-smolvlm-instruct)                                               | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed; draft hints copied unchanged                                                     |
-| [LiquidAI/LFM2.5-VL-450M-MLX-bf16](#diagnostic-liquidai-lfm25-vl-450m-mlx-bf16)                                            | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit](#diagnostic-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/gemma-3-27b-it-qat-4bit](#diagnostic-mlx-community-gemma-3-27b-it-qat-4bit)                                 | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/gemma-3n-E4B-it-bf16](#diagnostic-mlx-community-gemma-3n-e4b-it-bf16)                                       | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                                        | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/LFM2-VL-1.6B-8bit](#diagnostic-mlx-community-lfm2-vl-16b-8bit)                                              | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Ministral-3-14B-Instruct-2512-nvfp4](#diagnostic-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Molmo-7B-D-0924-8bit](#diagnostic-mlx-community-molmo-7b-d-0924-8bit)                                       | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Molmo-7B-D-0924-bf16](#diagnostic-mlx-community-molmo-7b-d-0924-bf16)                                       | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Ornith-1.0-35B-bf16](#diagnostic-mlx-community-ornith-10-35b-bf16)                                          | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Qwen2-VL-2B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-2b-instruct-4bit)                             | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed; draft hints copied unchanged                                                     |
-| [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)                             | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Qwen3.5-9B-MLX-4bit](#diagnostic-mlx-community-qwen35-9b-mlx-4bit)                                          | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/Qwen3.6-27B-mxfp8](#diagnostic-mlx-community-qwen36-27b-mxfp8)                                              | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [mlx-community/SmolVLM-Instruct-bf16](#diagnostic-mlx-community-smolvlm-instruct-bf16)                                     | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed; draft hints copied unchanged                                                     |
-| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)                            | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
-| [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                                         | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                                   |
+| Model                                                                                                                      | Execution | Usability           | Maintainer status              | Observations                                                                                        |
+|----------------------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-----------------------------------------------------------------------------------------------------|
+| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                                   | crashed   | not_evaluated       | actionable_failure             | none                                                                                                |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                      |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                             | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                      |
+| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                           | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                                    | completed | unusable            | observation_needs_reproduction | control tokens visible; missing required fields; extra text before Title                            |
+| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | completed | unusable            | observation_needs_reproduction | missing required fields; echoes instructions; cut off at token limit                                |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                    |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                    |
+| [mlx-community/FastVLM-0.5B-bf16](#diagnostic-mlx-community-fastvlm-05b-bf16)                                              | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title                                                    |
+| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                              | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                           | completed | unusable            | observation_needs_reproduction | missing required fields                                                                             |
+| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                            | completed | unusable            | observation_needs_reproduction | missing required fields                                                                             |
+| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                            | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                          |
+| [mlx-community/MolmoPoint-8B-fp16](#diagnostic-mlx-community-molmopoint-8b-fp16)                                           | completed | unusable            | observation_needs_reproduction | missing required fields                                                                             |
+| [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                            | completed | unusable            | observation_needs_reproduction | missing required fields                                                                             |
+| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                             | completed | unusable            | observation_needs_reproduction | missing required fields; echoes instructions; cut off at token limit                                |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                                 | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                 |
+| [LiquidAI/LFM2.5-VL-450M-MLX-bf16](#diagnostic-liquidai-lfm25-vl-450m-mlx-bf16)                                            | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit](#diagnostic-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/gemma-3-27b-it-qat-4bit](#diagnostic-mlx-community-gemma-3-27b-it-qat-4bit)                                 | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/gemma-3n-E4B-it-bf16](#diagnostic-mlx-community-gemma-3n-e4b-it-bf16)                                       | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                                        | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/Molmo-7B-D-0924-8bit](#diagnostic-mlx-community-molmo-7b-d-0924-8bit)                                       | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/Ornith-1.0-35B-bf16](#diagnostic-mlx-community-ornith-10-35b-bf16)                                          | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/Qwen2-VL-2B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-2b-instruct-4bit)                             | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed; draft hints copied unchanged                                      |
+| [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)                             | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/Qwen3.6-27B-mxfp8](#diagnostic-mlx-community-qwen36-27b-mxfp8)                                              | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)                            | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
+| [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                                         | completed | usable_with_caveats | observation_needs_reproduction | title/keyword constraints failed                                                                    |
 
 ## Crashes requiring action
 
@@ -129,7 +113,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.004375662
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -137,10 +121,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11995, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11841, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11349, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11318, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -536,7 +520,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12419, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12271, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -547,7 +531,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12010, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11856, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -924,107 +908,15 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3995.00it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3965.34it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[12:57:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[20:30:31] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
-
-<a id="diagnostic-mlx-community-gemma-4-31b-bf16"></a>
-
-<details>
-<summary>mlx-community/gemma-4-31b-bf16 — unusable — empty response; missing required fields</summary>
-
-### mlx-community/gemma-4-31b-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* empty_output, missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 19f0f1af698c51edaf1e93b3a3a5435b282de30f
-- *Processor class:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.018744564
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 576
-- *Generation tokens:* 1
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-(empty)
-```
-
-</details>
-
-<a id="diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-<details>
-<summary>jqlive/Kimi-VL-A3B-Thinking-2506-6bit — unusable — repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
-
-### jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation, unexpected_catalog_preamble, thinking_trace_incomplete
-- *Missing sections:* ["title"]
-- *Repeated fragment:* keyword: "uk"
-- *Unexpected text before Title:* ◁think▷Got it, let's tackle this. First, I
-  need to create a British-English catalogue metadata based on the image and
-  context provided. Let's start by analyzing the image and the hints.  The
-  context says the capture date/time is 2026-08-07 17:17:16 UTC+01:00, but we
-  don't need to claim it's visible. The descriptive hints include "Seafront,
-  Seaford, England, UK, GBR, Europe" so location is Seaford, UK. The image
-  shows two inflatable boats with outboard motors speeding across the ocean,
-  leaving white wakes, clear blue sky, distinct horizon. Keywords: Adobe
-  Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon,
-  Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK,
-  Vehicles, Water, action, beautiful.  First, the title: needs to be 5-10
-  words. Let's see, "Two inflatable motorboats speed across Seaford's sea with
-  people aboard, clear blue sky and horizon." That's 10 words.
-- *Thinking trace markers:* ["\u25c1think\u25b7"]
-- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
-  "incomplete_thinking_trace", "abrupt_tail"]
-- *Resolved model revision:* 4b3b11ce0874c36a99e13e17e355049042f8620a
-- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.0012299
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1313
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 163594
-- *Configured EOS token:* [EOS]
-
-#### Complete output
-
-```text
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and context provided. Let's start by analyzing the image and the hints.
-
-The context says the capture date/time is 2026-08-07 17:17:16 UTC+01:00, but we don't need to claim it's visible. The descriptive hints include "Seafront, Seaford, England, UK, GBR, Europe" so location is Seaford, UK. The image shows two inflatable boats with outboard motors speeding across the ocean, leaving white wakes, clear blue sky, distinct horizon. Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK, Vehicles, Water, action, beautiful.
-
-First, the title: needs to be 5-10 words. Let's see, "Two inflatable motorboats speed across Seaford's sea with people aboard, clear blue sky and horizon." That's 10 words.
-
-Description: Combine context and main elements. "Two inflatable motorboats with outboard motors speed across the ocean in Seaford, UK, under a clear blue sky, creating white wakes, with people aboard, against a distinct horizon line." That's a factual description.
-
-Keywords: Need 10-18 unique keywords. Let's list them: Seaford, UK, England, Europe, Blue sky, Horizon, Inflatable boat, Motorboat, People, Water, Action, Holiday, Sky, Vehicles, Adobe Stock, Any Vision, Driving, Speed, Waves, Ocean, Clear sky, Distinct horizon. Wait, check for uniqueness and relevance. Let's make sure they are comma-separated and unique. Let's adjust: Seaford, UK, England, Europe, Blue sky, Horizon, Inflatable boat, Motorboat, People, Water, Action, Sky, Vehicles, Adobe Stock, Any Vision, Driving, Speed, Waves, Ocean, Clear sky, Distinct horizon. That's 18 keywords. Wait, maybe "Driving" instead of "Driving" but "Speed" is better. Let's check: Seaford, UK, England, Europe, Blue sky, Horizon, Inflatable boat, Motorboat, People, Water, Action, Sky, Vehicles, Adobe Stock, Any Vision, Speed, Waves, Ocean, Clear
-```
-
-</details>
 
 <a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
@@ -1048,7 +940,7 @@ Keywords: Need 10-18 unique keywords. Let's list them: Seaford, UK, England, Eur
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.002557024
+- *Post-cleanup active memory (GB):* 0.001180718
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1590
 - *Generation tokens:* 500
@@ -1063,44 +955,6 @@ Alright, let's get to work. I've got the image and the hints, and the task is to
 Now, the description. I need to weave in the context and the hints. The date and time are important, so I'll start with that. "Captured on August 7th, 2026, at 17:17 UTC+01:00, this image shows two inflatable motorboats speeding across the seafront at Seaford, England." Then, I'll add the details from the hints: "Against a clear blue sky, the boats leave white wakes as they race across the water, with people visible on board." That's a solid, factual description.
 
 Finally, the keywords. I need to cover everything. I'll start with the obvious: "boats, water, sea, seafront, Seaford, England, UK, Europe, inflatable boat, motorboat, speeding, wake, white wake, blue sky, horizon, people, action, summer, holiday, outboard motor, racing, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat ride, boat trip, boat
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-gemma-3n-e2b-4bit"></a>
-
-<details>
-<summary>mlx-community/gemma-3n-E2B-4bit — unusable — repeated text; missing required fields; cut off at token limit</summary>
-
-### mlx-community/gemma-3n-E2B-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation
-- *Missing sections:* ["title", "description", "keywords"]
-- *Repeated fragment:* 17:17:16
-- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
-  "abrupt_tail"]
-- *Resolved model revision:* ec68dc186276e20e4bed30b96a2b5c667e0a81e3
-- *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.017155294
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 570
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-
-- 10-18-16 2016-08-07 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 17:17:16 
 ```
 
 </details>
@@ -1127,7 +981,7 @@ Finally, the keywords. I need to cover everything. I'll start with the obvious: 
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.024085772
+- *Post-cleanup active memory (GB):* 0.014140684
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4404
 - *Generation tokens:* 500
@@ -1255,7 +1109,7 @@ Finally, the keywords. I need to cover everything. I'll start with the obvious: 
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.01553323
+- *Post-cleanup active memory (GB):* 0.01029035
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16639
 - *Generation tokens:* 500
@@ -1272,46 +1126,6 @@ Description:
 Two inflatable motorboats, one labeled "Rapid," cruise across the open sea, leaving white wakes as they move, under a clear blue sky with a distinct horizon line, capturing a vibrant holiday scene.
 
 Keywords: Seaford, England, UK, Europe, Inflatable boat, Motorboat, People, Horizon, Blue sky, Clear, Ocean, Water, Action, Holiday, Vehicles, Speeding, White wake, Driver, Yamaha, Rigid Hull, Lady Maverick, Yamaha engine, Clear day, Open sea, Summer, Adventure, Travel, Tourism, Seaside, England, UK, Europe, GBR, Blue, Horizon line, Inflatable, Outboard motor, Speed boat, Seaford, England, UK, Europe, GBR, Blue sky, Clear, Open sea, Water, Action, Holiday, People, Horizon, Inflatable boat, Motorboat, Yamaha, Rigid Hull, Lady Maverick, White wake, Driver, Yamaha engine, Clear day, Open sea, Summer, Adventure, Travel, Tourism, Seaside, England, UK, Europe, GBR, Blue, Horizon line, Inflatable, Outboard motor, Speed boat, Seaford, England, UK, Europe, GBR, Blue sky, Clear, Open sea, Water, Action, Holiday, People, Horizon, Inflatable boat, Motorboat, Yamaha, Rigid Hull, Lady Maverick, White wake, Driver, Yamaha engine, Clear day, Open sea, Summer, Adventure, Travel, Tourism, Seaside, England, UK, Europe, GBR, Blue, Horizon line, Inflatable, Outboard motor, Speed boat, Seaford, England, UK, Europe, GBR, Blue sky, Clear, Open sea, Water, Action, Holiday, People, Horizon, Inflatable boat, Motorboat, Yamaha, Rigid Hull, Lady Maverick, White wake, Driver, Yamaha engine, Clear day, Open sea, Summer, Adventure, Travel, Tourism, Seaside, England, UK, Europe, GBR, Blue, Horizon line, Inflatable, Outboard motor, Speed boat, Seaford, England, UK, Europe, GBR, Blue sky, Clear, Open sea, Water, Action, Holiday, People, Horizon, Inflatable boat, Motorboat, Yamaha, Rigid Hull,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-flash-6bit"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-Flash-6bit — unusable — control tokens visible; missing required fields; extra text before Title</summary>
-
-### mlx-community/GLM-4.6V-Flash-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, unexpected_catalog_preamble,
-  unexpected_special_token
-- *Missing sections:* ["title"]
-- *Unexpected text before Title:* &lt;|begin_of_box|&gt;Title: Two Inflatable
-  Boats on the Sea
-- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
-  "&lt;|end_of_box|&gt;"]
-- *Resolved model revision:* df9464782d3452e0dfd86afe0984f1c9eca75ca1
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003490914
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6330
-- *Generation tokens:* 93
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-<|begin_of_box|>Title: Two Inflatable Boats on the Sea
-Description: Two inflatable motorboats with passengers speed across the blue ocean, leaving white wakes behind them under a clear sky with a distinct horizon line, captured on 2026-08-07.
-Keywords: inflatable boats, motorboats, sea, passengers, wakes, clear sky, horizon line, 2026-08-07, England, UK, Europe, holiday, action, water<|end_of_box|>
 ```
 
 </details>
@@ -1339,10 +1153,10 @@ Keywords: inflatable boats, motorboats, sea, passengers, wakes, clear sky, horiz
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.004113518
+- *Post-cleanup active memory (GB):* 0.002425916
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6330
-- *Generation tokens:* 106
+- *Generation tokens:* 92
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 
@@ -1350,8 +1164,8 @@ Keywords: inflatable boats, motorboats, sea, passengers, wakes, clear sky, horiz
 
 ```text
 <|begin_of_box|>Title: Two inflatable boats speeding across the ocean
-Description: Two inflatable boats with outboard motors speed across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line on 2026-08-07 at 17:17:16 UTC+01:00.
-Keywords: inflatable boat, motorboat, ocean, speed, white wake, clear blue sky, horizon line, people, England, UK, Europe, seafront, Seaford, action, water, vehicles<|end_of_box|>
+Description: Two inflatable boats with outboard motors speed across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line, with people aboard each vessel.
+Keywords: inflatable boat, motorboat, ocean, speeding, white wakes, clear blue sky, horizon line, people, boats, water, action, sea, seaford, england, uk, europe<|end_of_box|>
 ```
 
 </details>
@@ -1373,12 +1187,12 @@ Keywords: inflatable boat, motorboat, ocean, speed, white wake, clear blue sky, 
 - *Missing sections:* ["title", "description", "keywords"]
 - *Echoed instruction fragments:* ["title hint:", "description hint:",
   "keyword hints:", "british english catalogue metadata from the image and"]
-- *Token-cap degradation evidence:* ["missing_sections", "abrupt_tail"]
+- *Token-cap degradation evidence:* ["missing_sections", "dangling_markdown"]
 - *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
 - *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.002081888
+- *Post-cleanup active memory (GB):* 0.000705582
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2740
 - *Generation tokens:* 500
@@ -1393,11 +1207,11 @@ We need to produce British-English catalogue metadata from the image and supplie
 
 We need to produce:
 
-- a concrete 5-10-word title (so 5-10 words). Must be concrete, not hint. Should reflect the image: maybe "Inflatable boats racing on Seaford's horizon". That's 7 words. Or "Two speedboats carving wakes on Seaford sea". That's 9 words. Must be British English.
+- a concrete 5-10-word title (so 5-10 words). Should be British English. Should reflect the main subject. Possibly "Seaford Inflatable Boats Speeding Across the Sea". That's 7 words? Let's count: Seaford (1) Inflatable (2) Boats (3) Speeding (4) Across (5) the (6) Sea (7). That's 7 words. Good.
 
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Must be 1-2 sentences. Should mention capture date/time? The instruction: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate the date/time in description if relevant. But description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. So we can say: "On 7 August 2026, two inflatable motorboats speed across the calm blue sea off Seaford, leaving white wakes behind them under a clear sky and a sharp horizon." That's one sentence. Or two sentences: "Two inflatable motorboats race across the sea off Seaford on 7 August 2026, leaving white wakes. The scene is set against a clear blue sky and a distinct horizon." That's two sentences.
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Should be 1-2 sentences. Should mention capture date/time? The instruction: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate the date/time in description, but not claim it's visible. So we can say "Captured on 7 August 2026 at 17:17 UTC+01, the image shows two inflatable motorboats racing across the open sea off Seaford, leaving white wakes behind them under a clear blue sky with a distinct horizon." That's one sentence. Or two sentences: "Captured on 7 August 2026 at 17:17 UTC+01, the image shows two inflatable motorboats racing across the open sea off Seaford. They leave white wakes behind them under a clear blue sky with a distinct horizon." That's two sentences. That's fine.
 
-- 10-18 unique, comma-separated keywords covering relevant context and visible details. Must be 10-18 unique keywords. Use British English. Should include: Seaford
+-
 ```
 
 </details>
@@ -1417,15 +1231,15 @@ We need to produce:
 - *Observations:* missing_requested_sections, unexpected_catalog_preamble
 - *Missing sections:* ["title"]
 - *Unexpected text before Title:* Title: Two Inflatable Boats Speeding Across
-  Seaford Coast
+  the Seaford Coast
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.015533252
+- *Post-cleanup active memory (GB):* 0.010290372
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 584
-- *Generation tokens:* 81
+- *Generation tokens:* 83
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1433,9 +1247,9 @@ We need to produce:
 
 ```text
 <|channel>thought
-<channel|>Title: Two Inflatable Boats Speeding Across Seaford Coast
-Description: Two inflatable motorboats with outboard engines speed across the deep blue sea, leaving white wakes under a clear sky.
-Keywords: Seaford, England, UK, inflatable boat, motorboat, sea, water, action, people, people, horizon, sky, blue, vehicles, holiday, transport
+<channel|>Title: Two Inflatable Boats Speeding Across the Seaford Coast
+Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky. 
+Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action, sky, horizon, people, vehicles, travel, holiday, transport, transport
 ```
 
 </details>
@@ -1454,16 +1268,16 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, sea, water, action, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, unexpected_catalog_preamble
 - *Missing sections:* ["title"]
-- *Unexpected text before Title:* Title: Two Inflatable Boats Speeding Across
-  Seaford Sea
+- *Unexpected text before Title:* Title: Two Motorboats Speeding Across the
+  Sea at Seaford
 - *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.015533252
+- *Post-cleanup active memory (GB):* 0.010290372
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 584
-- *Generation tokens:* 80
+- *Generation tokens:* 85
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1471,9 +1285,9 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, sea, water, action, 
 
 ```text
 <|channel>thought
-<channel|>Title: Two Inflatable Boats Speeding Across Seaford Sea
-Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky. 
-Keywords: Seaford, England, UK, inflatable boat, motorboat, action, ocean, water, horizon, sky, people, holiday, vehicles, speed, Europe
+<channel|>Title: Two Motorboats Speeding Across the Sea at Seaford
+Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky. 
+Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, water, ocean, blue sky, horizon, holiday, vehicles, riding, sailing, Europe
 ```
 
 </details>
@@ -1502,7 +1316,7 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, action, ocean, water
 - *Processor class:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002868322
+- *Post-cleanup active memory (GB):* 0.001492016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 319
 - *Generation tokens:* 130
@@ -1522,7 +1336,7 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 <a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
 
 <details>
-<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — missing required fields; cut off at token limit; incomplete thinking block</summary>
+<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
 
 ### mlx-community/GLM-4.1V-9B-Thinking-8bit
 
@@ -1532,8 +1346,36 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  thinking_trace_incomplete
-- *Missing sections:* ["title", "description", "keywords"]
+  unexpected_catalog_preamble, thinking_trace_incomplete
+- *Missing sections:* ["description", "keywords"]
+- *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this task
+  step by step. First, the title needs to be 5-10 words, concrete. Looking at
+  the image: two inflatable boats, sea, action. So maybe "Inflatable Boats
+  Speeding Over Ocean".  Next, the description: need to combine context
+  (date/time, location) with main subject, setting, action, lighting,
+  distinctive details. The image has two inflatable boats, ocean, clear blue
+  sky, horizon, people. So something like "Two inflatable boats with outboard
+  motors speed across the ocean on 2026-08-07, leaving white wakes under a
+  clear blue sky with a distinct horizon." Wait, need to make sure it's 1-2
+  sentences. Let's check the hints: description hint says "Two inflatable
+  boats with outboard motors are speeding across the ocean, leaving white
+  wakes behind them, against a clear blue sky and a distinct horizon line." So
+  combine with context. So "On 2026-08-07, two inflatable boats with outboard
+  motors speed across the ocean, leaving white wakes behind them under a clear
+  blue sky with a distinct horizon."  Then keywords: need 10-18 unique,
+  comma-separated. From hints: Adobe Stock, Any Vision (maybe not, since it's
+  not visible), Blue sky, Driver, England, Europe, Holiday, Horizon,
+  Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK,
+  Vehicles, Water, action, beautiful. But need to pick unique ones. Let's
+  list: Inflatable boat, Motorboat, Ocean, Seaford, England, UK, Europe,
+  People, Blue sky, Horizon, Water, Action, Vehicles, Holiday, Sky, Driver,
+  Wakes. Wait, need to make sure they are unique. Let's check the hints and
+  image. The image has inflatable boats, motorboats, ocean, seaford, england,
+  uk, europe, people, blue sky, horizon, water, action, vehicles, holiday,
+  sky, driver. So keywords: Inflatable boat, Motorboat, Ocean, Seaford,
+  England, UK, Europe, People, Blue sky, Horizon, Water, Action, Vehicles,
+  Holiday, Sky, Driver, Wakes. That's around 16, which is within 10-18.  Now,
+  let's structure each part:
 - *Thinking trace markers:* ["&lt;think&gt;"]
 - *Token-cap degradation evidence:* ["missing_sections",
   "incomplete_thinking_trace", "abrupt_tail"]
@@ -1541,7 +1383,7 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.003179618
+- *Post-cleanup active memory (GB):* 0.001803312
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6326
 - *Generation tokens:* 500
@@ -1551,11 +1393,15 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 #### Complete output
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image: two inflatable boats, sea, action. So maybe "Inflatable Boats Speeding at Seafront". Wait, need to make it concise. Let's check the hints. The title hint was Seafront, Seaford, England... but the image shows two inflatable boats. So maybe "Speeding Inflatable Boats at Seafront". Wait, 5-10 words. Let's go with "Inflatable Boats Racing at Seaford Seafront" maybe, but need to be concise. Alternatively, "Two Inflatable Boats Speeding on the Sea". Hmm, let's pick a title that's clear. Maybe "Speeding Inflatable Boats at Sea".
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image: two inflatable boats, sea, action. So maybe "Inflatable Boats Speeding Over Ocean". 
 
-Next, the description: need 1-2 sentences. Combine context (capture date, setting) with main subject, setting, action, lighting, distinctive details. The image has two inflatable boats, speeding, white wakes, clear blue sky, distinct horizon. So: "Two inflatable boats speed across the seafront waters of Seaford, England, leaving white wakes behind them under a clear blue sky with a distinct horizon line, captured on 2026-08-07." Wait, need to make it factual. Let's structure: "Two inflatable motorboats speed across the sea, creating white wakes, under a clear blue sky with a distinct horizon, photographed on 2026-08-07." That's two sentences? Wait, 1-2 sentences. So maybe: "Two inflatable motorboats speed across the sea, leaving white wakes, under a clear blue sky with a distinct horizon, captured on 2026-08-07." That's one sentence. Wait, need to include relevant context (date) and main visible subject (inflatable boats), setting (sea, clear sky, horizon), action (speeding, leaving wakes), lighting (clear blue sky), distinctive details (two boats, people on board). So: "Two inflatable motorboats speed across the sea, creating white wakes, under a clear blue sky with a distinct horizon, photographed on 2026-08-07." That works.
+Next, the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The image has two inflatable boats, ocean, clear blue sky, horizon, people. So something like "Two inflatable boats with outboard motors speed across the ocean on 2026-08-07, leaving white wakes under a clear blue sky with a distinct horizon." Wait, need to make sure it's 1-2 sentences. Let's check the hints: description hint says "Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line." So combine with context. So "On 2026-08-07, two inflatable boats with outboard motors speed across the ocean, leaving white wakes behind them under a clear blue sky with a distinct horizon." 
 
-Then keywords: need 10-18 unique, comma-separated. From hints and image: Adobe Stock (maybe not, but hints include Adobe Stock), Any Vision (maybe
+Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (maybe not, since it's not visible), Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK, Vehicles, Water, action, beautiful. But need to pick unique ones. Let's list: Inflatable boat, Motorboat, Ocean, Seaford, England, UK, Europe, People, Blue sky, Horizon, Water, Action, Vehicles, Holiday, Sky, Driver, Wakes. Wait, need to make sure they are unique. Let's check the hints and image. The image has inflatable boats, motorboats, ocean, seaford, england, uk, europe, people, blue sky, horizon, water, action, vehicles, holiday, sky, driver. So keywords: Inflatable boat, Motorboat, Ocean, Seaford, England, UK, Europe, People, Blue sky, Horizon, Water, Action, Vehicles, Holiday, Sky, Driver, Wakes. That's around 16, which is within 10-18. 
+
+Now, let's structure each part:
+
+Title: "Inflatable Boats Speeding
 ```
 
 </details>
@@ -1601,7 +1447,7 @@ Then keywords: need 10-18 unique, comma-separated. From hints and image: Adobe S
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.005653614
+- *Post-cleanup active memory (GB):* 0.003654752
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1313
 - *Generation tokens:* 500
@@ -1626,61 +1472,6 @@ Wait, check the hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europ
 
 </details>
 
-<a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
-
-<details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-8bit — unusable — missing required fields; cut off at token limit; incomplete thinking block</summary>
-
-### mlx-community/Kimi-VL-A3B-Thinking-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation,
-  thinking_trace_incomplete
-- *Missing sections:* ["title", "description", "keywords"]
-- *Thinking trace markers:* ["\u25c1think\u25b7"]
-- *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace", "abrupt_tail"]
-- *Resolved model revision:* 85daf3dc2490c0f824143338f08ba45f475c9ce4
-- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.006308982
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1313
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 163594
-- *Configured EOS token:* [EOS]
-
-#### Complete output
-
-```text
-◁think▷Okay, let's tackle this query. The user wants me to create British-English catalogue metadata based on the image and the provided context. First, I need to parse the instructions carefully. The key points are:
-
-1. **Title**: A concrete 5-10 word title.
-2. **Description**: 1-2 sentences combining context, subject, setting, action, lighting, and details.
-3. **Keywords**: 10-18 unique keywords, covering context and visible details.
-
-The context given is:
-- Capture date/time: 2026-08-07 17:17:16 UTC+01:00
-- Location: Seafront, Seaford, England, UK, GBR, Europe
-- Descriptive hints include seafront, Seaford, England, UK, Europe, etc.
-- Keywords hints include inflatable boats, motorboats, people, etc.
-
-The image shows two motorboats on the ocean with people on board, moving at speed, creating wakes. The sky is clear blue, horizon visible. The image is likely taken at Seaford, England, as per the context.
-
-First, the title needs to be concise but descriptive. Maybe something like "Two Speedboats Racing Across Seaford's Clear Blue Waters" – that's 10 words. It includes the key elements: two boats, speed, location (Seaford), and the clear blue water.
-
-For the description, I need to combine the context and visible details. The date/time is given, so maybe mention the time of day. The boats are inflatable with outboard motors, people are riding, against a clear sky. So something like "Two motorboats with outboard engines speed across the ocean near Seaford, England, under a clear blue sky on 7th August 2026 at 17:17 UTC+01:00, creating white wakes as they race against the horizon." That covers the date, location, action, and key elements.
-
-Keywords should include all relevant terms from the context and image. From the context: Seafront, Seaford, England, UK, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Sky, UK, Vehicles, Water, action, beautiful. From the image: two motorboats, outboard motors, clear blue sky, white wakes, ocean, people on board. Need to make sure they are unique and relevant. Maybe
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-lfm25-vl-16b-bf16"></a>
 
 <details>
@@ -1699,7 +1490,7 @@ Keywords should include all relevant terms from the context and image. From the 
 - *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.006571126
+- *Post-cleanup active memory (GB):* 0.003785824
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 571
 - *Generation tokens:* 93
@@ -1732,7 +1523,7 @@ Seafoam Adventure, Two Inflatable Boats, Clear Sky, Horizon, People, Motorboat, 
 - *Processor class:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.019334392
+- *Post-cleanup active memory (GB):* 0.01248588
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2305
 - *Generation tokens:* 52
@@ -1769,7 +1560,7 @@ Seafront, Seaford, England, UK, GBR, Europe, Two inflatable boats with outboard 
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.007619704
+- *Post-cleanup active memory (GB):* 0.004834414
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 920
 - *Generation tokens:* 500
@@ -1830,7 +1621,7 @@ Now keywords: need 10-18 unique, covering relevant context and visible details. 
 - *Processor class:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.009651332
+- *Post-cleanup active memory (GB):* 0.006554746
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 3111
 - *Generation tokens:* 156
@@ -1867,7 +1658,7 @@ Inflatable boat, motorboat, Seaford, England, UK, Europe, open sea, horizon, blu
 - *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.019956984
+- *Post-cleanup active memory (GB):* 0.013108472
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 315
 - *Generation tokens:* 71
@@ -1883,109 +1674,10 @@ Description: A serene scene of two inflatable boats, one driving away from the o
 
 </details>
 
-<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-<details>
-<summary>mlx-community/paligemma2-10b-ft-docci-448-6bit — unusable — missing required fields</summary>
-
-### mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 1485fa9b3c7adb360cd354a29a401f0d441ec728
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.020989196
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1332
-- *Generation tokens:* 97
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A long shot of two inflatable boats speeding across the ocean, leaving white waves behind them. The boats are facing to the right, with the boat on the left slightly ahead of the boat on the right. The boats are both blue with white tops, and they both have people riding in them. The sky is clear and light blue, with no visible cloud coverage. The water is dark blue with small ripples on the surface. The boats are casting shadows on the water behind them.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-<details>
-<summary>mlx-community/paligemma2-10b-ft-docci-448-bf16 — unusable — missing required fields</summary>
-
-### mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 7c412694b919432784c730b62fadafb1c2e15d0d
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.022021388
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1332
-- *Generation tokens:* 107
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A long shot view of two inflatable boats speeding across the ocean, leaving white waves behind them. The boats are facing to the right, with the boat on the left slightly ahead of the boat on the right. The boats are both blue with white tops, and they both have people riding on them. The boat on the left has a person standing up at the front, and the boat on the right has a person standing up at the back. The water is blue, and the sky is clear blue with no clouds in sight.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-<details>
-<summary>mlx-community/paligemma2-3b-ft-docci-448-bf16 — unusable — missing required fields</summary>
-
-### mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* f66333527ce75342b09d4df81873f65272ec2f30
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.02305358
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1332
-- *Generation tokens:* 153
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A medium-close-up view of two white boats that are speeding through the ocean. The boat on the left is facing towards the right, and along the front portion of the boat there is a black engine that is running. Along the top portion of the boat, there are two black poles that run vertically, and along these poles there are people who are sitting. The boat on the right is facing towards the left, and along the front portion of the boat there is a black engine that is running. Along the top portion of the boat, there are two poles that run vertically, and along these poles there are people who are sitting. The ocean is a dark blue, and along the ocean there are white waves that are being created by the boats.
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/Qwen3-VL-2B-Thinking-bf16 — unusable — missing required fields; cut off at token limit</summary>
+<summary>mlx-community/Qwen3-VL-2B-Thinking-bf16 — unusable — missing required fields; echoes instructions; cut off at token limit</summary>
 
 ### mlx-community/Qwen3-VL-2B-Thinking-bf16
 
@@ -1994,14 +1686,16 @@ A medium-close-up view of two white boats that are speeding through the ocean. T
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation
+- *Observations:* missing_requested_sections, token_cap_truncation,
+  prompt_instruction_echo
 - *Missing sections:* ["title", "description", "keywords"]
+- *Echoed instruction fragments:* ["title hint:"]
 - *Token-cap degradation evidence:* ["missing_sections", "abrupt_tail"]
 - *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.011158672
+- *Post-cleanup active memory (GB):* 0.008062088
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16630
 - *Generation tokens:* 500
@@ -2015,42 +1709,9 @@ Got it, let's tackle this step by step. First, the title needs to be 5-10 words.
 
 Next, the description. It has to combine context with visible subject, setting, action, lighting, details. Context is capture date/time, but we don't claim that. The main subject is two inflatable boats with outboard motors, speeding, leaving wakes, clear blue sky, horizon line. So: "Two inflatable motorboats with outboard motors speed across the ocean, leaving white wakes, under a clear blue sky with distinct horizon line, on a calm sea."
 
-Wait, need to check if the context is included. The context says capture date/time is 2026-08-07 17:17:16 UTC+01:00, but we don't include that in the description. The description should be factual with visible details. The hints mention "Seafront, Seaford, England, UK, GBR, Europe" but the image doesn't show Seaford, so maybe omit that. The description should focus on what's visible: two inflatable boats (motorboats), speeding, wakes, blue sky, horizon. So: "Two inflatable motorboats with outboard motors speed across the ocean, leaving white wakes, under a clear blue sky with distinct horizon line, on a calm sea."
+Wait, the context says capture date/time is 2026-08-07 17:17:16 UTC+01:00, but we don't include that in the description. The descriptive hints mention "clear blue sky" which is visible, "distinct horizon line" – the image has a horizon line, so that's there. The boats are speeding, so "speeding" is key. Let's check the hints: "Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line." So the description should include that. Let's make it: "Two inflatable motorboats with outboard motors speed across the ocean, leaving white wakes, under a clear blue sky with a distinct horizon line, on a calm sea."
 
-Now keywords. Need 10-18 unique, comma-separated. From context: UK, Europe, England, Horizon, Water, action, Motorboat, Inflatable boat, People, Sailing, Holiday, Sky, Vehicles, Sea. Let's list: Inflatable boat, Motorboat, People, Sea, Ocean, Horizon, Blue sky, Action, UK, Europe, Holiday, Sailing, Vehicles, Water. Wait, need to check if they are visible. The image has two boats, people on them, blue sky, ocean. So keywords: Inflatable boat, Motorboat, People, Sea, Ocean, Horizon, Blue sky, Action, UK, Europe, Holiday, Sailing, Vehicles, Water. Let's count: 14. Let's make sure they are unique and
-```
-
-</details>
-
-<a id="diagnostic-qnguyen3-nanollava"></a>
-
-<details>
-<summary>qnguyen3/nanoLLaVA — unusable — missing required fields</summary>
-
-### qnguyen3/nanoLLaVA
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 13d60cec183a86755afed64da495fcc2c382ea80
-- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.02523266
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 315
-- *Generation tokens:* 19
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-A boat with outboard motors is driving across the ocean, leaving a wake behind it.
+Now keywords. Need 10-18 unique, comma-separated. From context: UK, Europe, England, Seafront, Seaford (but the title hint says Seaford, England, UK, GBR, Europe). Wait, the title hint is "Seafront, Seaford, England, UK, GBR, Europe". But the image doesn't show a seafront, just the ocean. Wait, the descriptive hints say "Title hint: Seafront, Seaford, England, UK, GBR, Europe". But the image is of two boats on the ocean, so maybe Seaford is a location, but the image doesn't show it. Wait, the problem says: "Descriptive hints: Title hint
 ```
 
 </details>
@@ -2073,10 +1734,10 @@ A boat with outboard motors is driving across the ocean, leaving a wake behind i
 - *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.004375662
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2608
-- *Generation tokens:* 121
+- *Generation tokens:* 130
 - *Configured EOS token ID:* 128001
 - *Configured EOS token:* &lt;|end_of_text|&gt;
 
@@ -2085,48 +1746,9 @@ A boat with outboard motors is driving across the ocean, leaving a wake behind i
 ```text
  Title: Inflatable Boats Speed Across the Ocean on a Clear Day.
 
-Description: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line. The boats are carrying several people, and the water is calm with no visible waves. The sky is clear with no clouds, and the sun is not visible, but the lighting suggests it is daytime.
+Description: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line. The boats are carrying several people, and the water is calm with no visible waves. The sky is clear with no clouds, and the sun is not visible, suggesting it might be early morning or late afternoon.
 
-Keywords: inflatable boats, ocean, outboard motors, white wakes, clear blue sky, horizon line, people, calm water, clear sky, daytime.<end_of_utterance>
-```
-
-</details>
-
-<a id="diagnostic-huggingfacetb-smolvlm-instruct"></a>
-
-<details>
-<summary>HuggingFaceTB/SmolVLM-Instruct — usable_with_caveats — title/keyword constraints failed; draft hints copied unchanged</summary>
-
-### HuggingFaceTB/SmolVLM-Instruct
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation, draft_returned_unchanged
-- *Title word count:* 6
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 20
-- *Requested keyword count range:* [10, 18]
-- *Draft fields returned unchanged:* ["title", "description", "keywords"]
-- *Resolved model revision:* 81cd9a775a4d644f2faf4e7becff4559b46b14c7
-- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00011573
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1510
-- *Generation tokens:* 104
-- *Configured EOS token ID:* 49154
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-
-#### Complete output
-
-```text
- Title: Seafront, Seaford, England, UK, GBR, Europe.
-Description: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.
-Keywords: adobe stock, any vision, blue sky, driver, england, europe, holiday, horizon, inflatable boat, motorboat, people, riding, sailing, seaford, sky, uk, vehicles, water, action, beautiful.
+Keywords: inflatable boats, ocean, outboard motors, white wakes, clear blue sky, horizon line, people, calm water, clear sky, no clouds, early morning, late afternoon.<end_of_utterance>
 ```
 
 </details>
@@ -2153,7 +1775,7 @@ Keywords: adobe stock, any vision, blue sky, driver, england, europe, holiday, h
 - *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.000263192
+- *Post-cleanup active memory (GB):* 0.00013212
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 385
 - *Generation tokens:* 107
@@ -2196,7 +1818,7 @@ Seafront, Seaford, England, UK, GBR, Europe, Inflatable boat, Motorboat, People,
 - *Processor class:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002344032
+- *Post-cleanup active memory (GB):* 0.000967726
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2045
 - *Generation tokens:* 110
@@ -2239,7 +1861,7 @@ Adobe Stock, inflatable boats, outboard motors, ocean, blue sky, horizon, speedi
 - *Processor class:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.016073924
+- *Post-cleanup active memory (GB):* 0.010831044
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 579
 - *Generation tokens:* 155
@@ -2279,7 +1901,7 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 - *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.017695966
+- *Post-cleanup active memory (GB):* 0.011371742
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 578
 - *Generation tokens:* 130
@@ -2313,16 +1935,16 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 - *Observations:* catalog_constraint_violation
 - *Title word count:* 3
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 13
+- *Keyword count:* 21
 - *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00380221
+- *Post-cleanup active memory (GB):* 0.002114608
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6330
-- *Generation tokens:* 83
+- *Generation tokens:* 104
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 
@@ -2330,89 +1952,8 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 
 ```text
 Title: Two Inflatable Boats
-Description: Two inflatable boats with outboard motors speed across the ocean, leaving white wakes behind them, under a clear blue sky with a distinct horizon line.
-Keywords: Two Inflatable Boats, outboard motors, ocean, white wakes, clear blue sky, distinct horizon line, Seaford, England, UK, Europe, holiday, action, beautiful.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-lfm2-vl-16b-8bit"></a>
-
-<details>
-<summary>mlx-community/LFM2-VL-1.6B-8bit — usable_with_caveats — title/keyword constraints failed</summary>
-
-### mlx-community/LFM2-VL-1.6B-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation
-- *Title word count:* 2
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 14
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* 294b90e5ae2389ecb61a9427b4572975eef614fe
-- *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.006440054
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 571
-- *Generation tokens:* 80
-- *Configured EOS token ID:* 7
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-Title: Seafront Adventure
 Description: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.
-Keywords: Seaford, England, UK, GBR, Europe, Inflatable boat, Motorboat, People, Horizon, Sky, Vehicles, Water, Action, Beautiful
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-<details>
-<summary>mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 — usable_with_caveats — title/keyword constraints failed</summary>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation
-- *Title word count:* 7
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 20
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
-- *Processor class:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.008143992
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2578
-- *Generation tokens:* 178
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-
-#### Complete output
-
-```text
-**Title:**
-*Inflatable Boats Racing Near Seaford, UK (2026-08-07)*
-
-**Description:**
-On **2026-08-07 at 17:17 UTC+01:00**, two inflatable motorboats speed across calm waters near **Seaford, England (UK)**, leaving pronounced white wakes. Against a clear blue sky and distinct horizon, passengers appear engaged, showcasing dynamic movement and bright daylight conditions.
-
-**Keywords:**
-inflatable motorboats, Seaford, England, UK, Europe, 2026-08-07, racing, ocean, white wakes, clear blue sky, horizon, passengers, bright daylight, outboard motors, coastal waters, dynamic movement, summer scene, horizon line, coastal holiday, motorboat action
+Keywords: Two Inflatable Boats, outboard motors, speeding across ocean, white wakes, clear blue sky, distinct horizon line, inflatable boat, motorboat, people, riding, Sailing, Seaford, England, UK, Europe, Holiday, Horizon, Sky, Water, action, beautiful
 ```
 
 </details>
@@ -2438,7 +1979,7 @@ inflatable motorboats, Seaford, England, UK, Europe, 2026-08-07, racing, ocean, 
 - *Processor class:* mlx_vlm.models.molmo.processing_molmo.MolmoProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.008717434
+- *Post-cleanup active memory (GB):* 0.005932144
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1498
 - *Generation tokens:* 105
@@ -2451,46 +1992,6 @@ inflatable motorboats, Seaford, England, UK, Europe, 2026-08-07, racing, ocean, 
  Title: Speedboats Raging on Seaford's Shores
 
 Description: Two inflatable motorboats race across the ocean, leaving white wakes behind them against a clear blue sky and distinct horizon, with passengers enjoying the thrilling ride on a sunny day in Seaford, England.
-
-Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Seaford, Sky, UK, Vehicles, Water, action, beautiful
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-<details>
-<summary>mlx-community/Molmo-7B-D-0924-bf16 — usable_with_caveats — title/keyword constraints failed</summary>
-
-### mlx-community/Molmo-7B-D-0924-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation
-- *Title word count:* 5
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 19
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* d871cbdb87a49b8071003098d6dbfd2a0f5a5b84
-- *Processor class:* mlx_vlm.models.molmo.processing_molmo.MolmoProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00902873
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1498
-- *Generation tokens:* 108
-- *Configured EOS token ID:* 151643
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
- Title: Speedboats Raging on Seaford's Shores
-
-Description: Two inflatable motorboats race across the calm ocean, leaving white wakes in their path, against a clear blue sky and horizon. Passengers enjoy the thrilling ride, with the sun casting a warm glow on the scene.
 
 Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Seaford, Sky, UK, Vehicles, Water, action, beautiful
 ```
@@ -2518,7 +2019,7 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01015924
+- *Post-cleanup active memory (GB):* 0.007062654
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16643
 - *Generation tokens:* 107
@@ -2559,7 +2060,7 @@ Keywords: inflatable boat, motorboat, sea, ocean, people, passengers, wake, spee
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01053608
+- *Post-cleanup active memory (GB):* 0.007439496
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16639
 - *Generation tokens:* 102
@@ -2596,17 +2097,17 @@ Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, In
 - *Observations:* catalog_constraint_violation
 - *Title word count:* 5
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 18
+- *Keyword count:* 20
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["action", "vehicles"]
+- *Duplicate keywords:* ["water"]
 - *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010847376
+- *Post-cleanup active memory (GB):* 0.007750792
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16628
-- *Generation tokens:* 86
+- *Generation tokens:* 90
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 
@@ -2615,52 +2116,9 @@ Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, In
 ```text
 Title: Two boats on the sea
 
-Description: Two inflatable motorboats speed across the ocean, leaving white wakes, under a clear blue sky with a distinct horizon line, in Seaford, England, UK.
+Description: Two inflatable motorboats speed across the blue sea, leaving white wakes, under a clear sky with a distinct horizon, with people on board enjoying the water.
 
-Keywords: inflatable boat, motorboat, sea, ocean, people, sky, horizon, action, water, England, UK, Seaford, vehicles, holiday, blue sky, vehicles, action, beautiful
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-9B-MLX-4bit — usable_with_caveats — title/keyword constraints failed</summary>
-
-### mlx-community/Qwen3.5-9B-MLX-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation
-- *Title word count:* 10
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 20
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014222482
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16643
-- *Generation tokens:* 112
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-Title:  
-Two inflatable motorboats speeding across the sea at Seaford, UK.
-
-Description:  
-Two inflatable motorboats with outboard motors speed across calm blue waters under a clear sky, leaving white wakes behind them, with people on board enjoying the ride near the horizon line.
-
-Keywords:  
-Inflatable boat, motorboat, outboard motor, people, sea, ocean, wake, horizon, blue sky, clear sky, Seaford, UK, England, Europe, holiday, action, riding, vehicles, water, beautiful
+Keywords: motorboat, inflatable boat, sea, people, sky, horizon, water, action, blue sky, England, UK, Europe, holiday, vehicles, seafront, Seaford, Sailing, Riding, Water, beautiful
 ```
 
 </details>
@@ -2686,7 +2144,7 @@ Inflatable boat, motorboat, outboard motor, people, sea, ocean, wake, horizon, b
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014730386
+- *Post-cleanup active memory (GB):* 0.009602186
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16643
 - *Generation tokens:* 87
@@ -2696,50 +2154,11 @@ Inflatable boat, motorboat, outboard motor, people, sea, ocean, wake, horizon, b
 #### Complete output
 
 ```text
-Title: Two Speedboats Racing Across the Ocean
+Title: Two Speedboats Racing Across the Sea
 
-Description: Two motorised inflatable boats carrying passengers speed across the blue sea, leaving white wakes behind them under a clear sky.
+Description: Two motorised inflatable boats carrying passengers speed across the blue ocean, leaving white wakes behind them under a clear sky.
 
 Keywords: Sea, Ocean, Boats, Motorboats, Inflatable boats, People, Passengers, Speeding, Wakes, Blue water, Clear sky, Horizon, Summer, Daytime, England, UK, Europe, Action, Water sports
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-smolvlm-instruct-bf16"></a>
-
-<details>
-<summary>mlx-community/SmolVLM-Instruct-bf16 — usable_with_caveats — title/keyword constraints failed; draft hints copied unchanged</summary>
-
-### mlx-community/SmolVLM-Instruct-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* catalog_constraint_violation, draft_returned_unchanged
-- *Title word count:* 6
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 20
-- *Requested keyword count range:* [10, 18]
-- *Draft fields returned unchanged:* ["title", "description", "keywords"]
-- *Resolved model revision:* cae61cdedd0602419b43b6102dc33cd9f1e929a6
-- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014845074
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1510
-- *Generation tokens:* 104
-- *Configured EOS token ID:* 49154
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-
-#### Complete output
-
-```text
- Title: Seafront, Seaford, England, UK, GBR, Europe.
-Description: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.
-Keywords: adobe stock, any vision, blue sky, driver, england, europe, holiday, horizon, inflatable boat, motorboat, people, riding, sailing, seaford, sky, uk, vehicles, water, action, beautiful.
 ```
 
 </details>
@@ -2765,7 +2184,7 @@ Keywords: adobe stock, any vision, blue sky, driver, england, europe, holiday, h
 - *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014959762
+- *Post-cleanup active memory (GB):* 0.009716874
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 411
 - *Generation tokens:* 125
@@ -2797,17 +2216,17 @@ Keywords: "Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, 
 - *Observations:* catalog_constraint_violation
 - *Title word count:* 5
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 18
+- *Keyword count:* 20
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["action", "vehicles"]
+- *Duplicate keywords:* ["water"]
 - *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.000574504
+- *Post-cleanup active memory (GB):* 0.000443432
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16628
-- *Generation tokens:* 86
+- *Generation tokens:* 90
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 
@@ -2816,9 +2235,9 @@ Keywords: "Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, 
 ```text
 Title: Two boats on the sea
 
-Description: Two inflatable motorboats speed across the ocean, leaving white wakes, under a clear blue sky with a distinct horizon line, in Seaford, England, UK.
+Description: Two inflatable motorboats speed across the blue sea, leaving white wakes, under a clear sky with a distinct horizon, with people on board enjoying the water.
 
-Keywords: inflatable boat, motorboat, sea, ocean, people, sky, horizon, action, water, England, UK, Seaford, vehicles, holiday, blue sky, vehicles, action, beautiful
+Keywords: motorboat, inflatable boat, sea, people, sky, horizon, water, action, blue sky, England, UK, Europe, holiday, vehicles, seafront, Seaford, Sailing, Riding, Water, beautiful
 ```
 
 </details>
@@ -2834,25 +2253,18 @@ None.
 
 | Model                                             | Runtime identity                                        | Performance                                                                               |
 |---------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| meta-llama/Llama-3.2-11B-Vision-Instruct          | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 298 prompt / 95 generated; 5.06 tok/s; 25 GB peak; cleanup 0.00175/0.0 GB active/cache    |
-| microsoft/Phi-3.5-vision-instruct                 | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 1112 prompt / 100 generated; 56.8 tok/s; 9.4 GB peak; cleanup 0.00182/0.0 GB active/cache |
-| mlx-community/gemma-3-27b-it-qat-8bit             | rev c408904bc9a0; Gemma3Processor; stop completed       | 579 prompt / 122 generated; 16.5 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 588 prompt / 96 generated; 127 tok/s; 16 GB peak; cleanup 0.0182/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 588 prompt / 83 generated; 25.8 tok/s; 20 GB peak; cleanup 0.0193/0.0 GB active/cache     |
-| mlx-community/InternVL3-14B-8bit                  | rev 50efc568c7df; InternVLChatProcessor; stop completed | 2610 prompt / 87 generated; 32.2 tok/s; 18 GB peak; cleanup 0.00469/0.0 GB active/cache   |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2610 prompt / 93 generated; 33.9 tok/s; 18 GB peak; cleanup 0.005/0.0 GB active/cache     |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed       | 297 prompt / 89 generated; 21.1 tok/s; 15 GB peak; cleanup 0.0071/0.0 GB active/cache     |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 2578 prompt / 121 generated; 67.2 tok/s; 12 GB peak; cleanup 0.00788/0.0 GB active/cache  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 2577 prompt / 117 generated; 185 tok/s; 6.4 GB peak; cleanup 0.00841/0.0 GB active/cache  |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 1112 prompt / 100 generated; 56.7 tok/s; 9.4 GB peak; cleanup 0.0102/0.0 GB active/cache  |
-| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 2649 prompt / 82 generated; 39.6 tok/s; 15 GB peak; cleanup 0.0243/0.0 GB active/cache    |
-| mlx-community/pixtral-12b-bf16                    | rev 378cf65efd79; PixtralProcessor; stop completed      | 2649 prompt / 88 generated; 20.1 tok/s; 27 GB peak; cleanup 0.0246/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-27B-4bit                    | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 16643 prompt / 104 generated; 30.5 tok/s; 26 GB peak; cleanup 0.0117/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-27B-mxfp8                   | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 16643 prompt / 107 generated; 14.9 tok/s; 38 GB peak; cleanup 0.0122/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16643 prompt / 94 generated; 110 tok/s; 26 GB peak; cleanup 0.0127/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-35B-A3B-6bit                | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 16643 prompt / 83 generated; 91.8 tok/s; 35 GB peak; cleanup 0.0132/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-35B-A3B-bf16                | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 16643 prompt / 102 generated; 65.9 tok/s; 76 GB peak; cleanup 0.0137/0.0 GB active/cache  |
-| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3478 prompt / 119 generated; 42.2 tok/s; 70 GB peak; cleanup 0.0152/0.0 GB active/cache   |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 588 prompt / 96 generated; 114 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 588 prompt / 83 generated; 18.5 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache     |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2610 prompt / 103 generated; 23.6 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed       | 297 prompt / 89 generated; 13.7 tok/s; 15 GB peak; cleanup 0.00431/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 2578 prompt / 121 generated; 59.2 tok/s; 12 GB peak; cleanup 0.0051/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 2578 prompt / 171 generated; 40.3 tok/s; 12 GB peak; cleanup 0.00536/0.0 GB active/cache  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 2577 prompt / 117 generated; 144 tok/s; 6.4 GB peak; cleanup 0.00562/0.0 GB active/cache  |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 1112 prompt / 100 generated; 55.8 tok/s; 9.4 GB peak; cleanup 0.00713/0.0 GB active/cache |
+| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 2649 prompt / 82 generated; 39.7 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache    |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16643 prompt / 79 generated; 94.0 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16643 prompt / 106 generated; 90.7 tok/s; 10 GB peak; cleanup 0.00909/0.0 GB active/cache |
+| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3478 prompt / 118 generated; 40.4 tok/s; 70 GB peak; cleanup 0.00998/0.0 GB active/cache  |
 
 </details>
 
@@ -2903,13 +2315,9 @@ original image before filing.
 | Model                                                 | Resolved revision                        |
 |-------------------------------------------------------|------------------------------------------|
 | mlx-community/Inkling-Small-mlx-4bit                  | f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612 |
-| mlx-community/gemma-4-31b-bf16                        | 19f0f1af698c51edaf1e93b3a3a5435b282de30f |
-| jqlive/Kimi-VL-A3B-Thinking-2506-6bit                 | 4b3b11ce0874c36a99e13e17e355049042f8620a |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16      | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
-| mlx-community/gemma-3n-E2B-4bit                       | ec68dc186276e20e4bed30b96a2b5c667e0a81e3 |
 | mlx-community/paligemma2-3b-pt-896-4bit               | a26bac48c7a661dfdafe1799c90177f818e79925 |
 | mlx-community/X-Reasoner-7B-8bit                      | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
-| mlx-community/GLM-4.6V-Flash-6bit                     | df9464782d3452e0dfd86afe0984f1c9eca75ca1 |
 | mlx-community/GLM-4.6V-nvfp4                          | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2 |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit          | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
@@ -2917,34 +2325,23 @@ original image before filing.
 | mlx-community/FastVLM-0.5B-bf16                       | 81ffe929046666c43de53691147b1669ba0f3a4c |
 | mlx-community/GLM-4.1V-9B-Thinking-8bit               | 9677807f106500eb7690391c27645d59f6855cfb |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16          | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
-| mlx-community/Kimi-VL-A3B-Thinking-8bit               | 85daf3dc2490c0f824143338f08ba45f475c9ce4 |
 | mlx-community/LFM2.5-VL-1.6B-bf16                     | 16a710cf8afca206ff16a95a4ad6fe657f876ce1 |
 | mlx-community/llava-v1.6-mistral-7b-8bit              | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
 | mlx-community/MiniCPM-V-4.6-8bit                      | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
 | mlx-community/MolmoPoint-8B-fp16                      | 0a60033b4e4813fb53df4c7523857d2ec972c7d9 |
 | mlx-community/nanoLLaVA-1.5-4bit                      | 5240204744963d72823e5de933c528c4aa82dfca |
-| mlx-community/paligemma2-10b-ft-docci-448-6bit        | 1485fa9b3c7adb360cd354a29a401f0d441ec728 |
-| mlx-community/paligemma2-10b-ft-docci-448-bf16        | 7c412694b919432784c730b62fadafb1c2e15d0d |
-| mlx-community/paligemma2-3b-ft-docci-448-bf16         | f66333527ce75342b09d4df81873f65272ec2f30 |
 | mlx-community/Qwen3-VL-2B-Thinking-bf16               | c325e5ea14c215bb08fa0d668c81fa2581f9050b |
-| qnguyen3/nanoLLaVA                                    | 13d60cec183a86755afed64da495fcc2c382ea80 |
 | mlx-community/Idefics3-8B-Llama3-bf16                 | 8c2a30c48864f3251701b7bde40f601d25535098 |
-| HuggingFaceTB/SmolVLM-Instruct                        | 81cd9a775a4d644f2faf4e7becff4559b46b14c7 |
 | LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | 6c33f49ebc0b50b75385f49ad3beddcb720d0c75 |
 | mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | 0a970d20ad7da57b0e2accc35c5b8628f5d02063 |
 | mlx-community/gemma-3-27b-it-qat-4bit                 | fc4e000f32af1b7b6779294e490a7d2a80bac611 |
 | mlx-community/gemma-3n-E4B-it-bf16                    | d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a |
 | mlx-community/GLM-4.6V-Flash-mxfp4                    | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
-| mlx-community/LFM2-VL-1.6B-8bit                       | 294b90e5ae2389ecb61a9427b4572975eef614fe |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | 28777b889d841a86369c736175cb77258c8134b2 |
 | mlx-community/Molmo-7B-D-0924-8bit                    | 90a14ed7a230088904c7556fbe6d67b295c33f5f |
-| mlx-community/Molmo-7B-D-0924-bf16                    | d871cbdb87a49b8071003098d6dbfd2a0f5a5b84 |
 | mlx-community/Ornith-1.0-35B-bf16                     | 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b |
 | mlx-community/Qwen2-VL-2B-Instruct-4bit               | 01af461cdb9574acc09084a0ef94e216e142b085 |
 | mlx-community/Qwen3-VL-2B-Instruct-bf16               | c8a67a84327484ba87f5ec4f8fb927cdafd791aa |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | 938d8919941c6e7efd3c7150eff7fe9d12afa631 |
 | mlx-community/Qwen3.6-27B-mxfp8                       | 5db9fd9c38ce083048ee12217eceed7482ca7ad4 |
-| mlx-community/SmolVLM-Instruct-bf16                   | cae61cdedd0602419b43b6102dc33cd9f1e929a6 |
 | mlx-community/SmolVLM2-2.2B-Instruct-mlx              | 844516024a1c4400d34489b89ee067d794e432ed |
 | Qwen/Qwen3-VL-2B-Instruct                             | 89644892e4d85e24eaac8bacfd4f463576704203 |
 
@@ -2953,7 +2350,7 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.11                                                                                                                                          |
-| mlx                        | 0.32.1.dev20260808+6539d1807                                                                                                                    |
+| mlx                        | 0.32.1.dev20260808+8d6662986                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.7                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -2983,5 +2380,5 @@ original image before filing.
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (165,577,880 bytes, sha256=0d3bca561dcf0924959abae6246546e2ad15baedff1ff9e418c7fd25d07b187e) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,720,768 bytes, sha256=e050432ff21c83cbced2ec7ef4484713a23824f41a53900772885e8453ba7830)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,720,768 bytes, sha256=67adf9bea8131724a4b573c7756226f950a068f84a5a61414988d8dac1e8c7de)  |
 | RAM                        | 128.0 GB                                                                                                                                        |

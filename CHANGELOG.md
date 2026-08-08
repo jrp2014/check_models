@@ -5,6 +5,25 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- `--dry-run` no longer writes `check_models.log` or `environment.log`: no
+  models are invoked, and overwriting the retained artifacts of a real run
+  would desynchronize them from the run's other tracked outputs.
+- Console token-cap note now uses the same gate as the
+  `token_cap_truncation` observation: a cap hit with degradation evidence
+  still warns, while a structurally sound response that merely used its full
+  budget logs as neutral information.
+- Documentation drift fixes: `IMPLEMENTATION_GUIDE.md` no longer claims
+  generated reports are gitignored (all current-run artifacts are tracked
+  except the append-only history), and the 0.9.0 changelog entry now states
+  the final output-tracking policy once instead of recording the
+  intermediate decisions separately.
+- Test durability: the Skylos dev-dependency sync check derives the spec
+  from `pyproject.toml` instead of hardcoding it, and the markdownlint
+  rule-set guard asserts the live constant values rather than exact source
+  spelling.
+
 ## [0.9.0] - 2026-08-08
 
 ### Added
@@ -91,13 +110,6 @@ Notable changes to this project will be documented in this file.
   runs (`captured_upstream_output`, bounded/deduplicated like the file-log
   copy; failures already kept `captured_output_on_fail`). Both are
   home-path-sanitized before serialization.
-- Track `check_models.log` in git as well, so the run timeline and verbatim
-  upstream console blocks are browsable on GitHub; only the append-only
-  `results.history.jsonl` remains gitignored/local-only.
-- Track `results.html` and `model_gallery.md` in git again so the rich human
-  reports are browsable on GitHub; report links to them are GitHub blob URLs
-  once more. Only the append-only `results.history.jsonl` and raw
-  `check_models.log` remain gitignored/local-only.
 - Exclude agent-managed `.worktrees/` checkouts from the repo-root Skylos
   danger gate: they hold third-party repositories (e.g. an upstream mlx-vlm
   checkout) whose GitHub workflows are not this repository's to gate, and
@@ -176,17 +188,14 @@ Notable changes to this project will be documented in this file.
   rebuild out of `save_run_json_report`. Reviewed-and-rejected merges (accessor
   chain, escaper classes, lib-name tuple derivation, 4-site metric-record
   unification) are documented inline where relevant.
-- Stop tracking the bulky regenerated run artifacts in git
-  (`results.history.jsonl`, `results.html`, `model_gallery.md`,
-  `check_models.log` — they remain on disk and gitignored) while keeping the
-  skimmable decision artifacts tracked (`index.md`, `diagnostics.md`,
-  `run.json`, `results.jsonl`, `environment.log`, `issues/`,
-  `reports/assets/`). Report links to local-only artifacts now always render
-  relative (never GitHub blob URLs that would 404), the output index labels
-  them "(local only, not tracked)", and paste-ready issue summaries name them
-  as producer-local text instead of linking. `environment.log` deliberately
-  stays tracked so issue drafts keep a resolvable environment-evidence link.
-  Existing git history is unchanged by design.
+- Output-tracking policy (final state after intermediate iterations during
+  this release cycle): every current-run artifact — `index.md`,
+  `reports/results.html`, `reports/model_gallery.md`,
+  `reports/diagnostics.md`, `results.jsonl`, `run.json`, `check_models.log`,
+  `environment.log`, `issues/`, and `reports/assets/` — is tracked in git and
+  browsable on GitHub via SHA-pinned links. Only the append-only
+  `results.history.jsonl` is gitignored/local-only, and no report links to
+  it. Existing git history is unchanged by design.
 - Persist tee'd live mlx-vlm console output (prompt, generated text, and upstream
   timing/memory lines) into `check_models.log` for every model attempt, success
   or failure, as a file-only log record so the durable log keeps the model text

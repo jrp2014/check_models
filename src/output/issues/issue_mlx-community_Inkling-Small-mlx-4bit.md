@@ -32,7 +32,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.004375662
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -40,10 +40,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11995, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11841, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11349, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11318, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -439,7 +439,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12419, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12271, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -450,7 +450,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12010, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11856, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -827,12 +827,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3995.00it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3965.34it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[12:57:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[20:30:31] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -882,7 +882,7 @@ original image before filing.
 | Component       | Value                                                           |
 |-----------------|-----------------------------------------------------------------|
 | mlx-vlm         | 0.6.11                                                          |
-| mlx             | 0.32.1.dev20260808+6539d1807                                    |
+| mlx             | 0.32.1.dev20260808+8d6662986                                    |
 | mlx-lm          | 0.31.3                                                          |
 | transformers    | 5.14.1                                                          |
 | tokenizers      | 0.22.2                                                          |
@@ -891,10 +891,10 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6                                                            |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.8.9; revision 32d71ddc969b3cbe8dd8c0ffb64ad6b00e419901; clean |
+| check_models    | 0.9.0; revision a5278f16d20d4ab8f0788b666ad3b30c1931e98a; dirty |
 
 ### Full environment evidence
 
 | Evidence | Link |
 | --- | --- |
-| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/32d71ddc969b3cbe8dd8c0ffb64ad6b00e419901/src/output/environment.log) |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |

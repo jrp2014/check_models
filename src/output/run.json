@@ -23,9 +23,9 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "32d71ddc969b3cbe8dd8c0ffb64ad6b00e419901",
+      "source_revision": "a5278f16d20d4ab8f0788b666ad3b30c1931e98a",
       "vcs_revision": null,
-      "version": "0.8.9"
+      "version": "0.9.0"
     },
     "huggingface-hub": {
       "direct_url": null,
@@ -39,9 +39,9 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "6539d180781112bc4e4f07c7b03c434bc0b46db8",
+      "source_revision": "8d666298652fdac2e7727ecdcf507b1d199bba16",
       "vcs_revision": null,
-      "version": "0.32.1.dev20260808+6539d1807"
+      "version": "0.32.1.dev20260808+8d6662986"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -101,17 +101,17 @@
     }
   },
   "counts": {
-    "models_attempted": 64,
-    "models_completed": 63,
+    "models_attempted": 42,
+    "models_completed": 41,
     "models_crashed": 1,
-    "models_evaluated": 64,
+    "models_evaluated": 42,
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-08 13:18:50 BST",
+  "generated_at": "2026-08-08 20:44:51 BST",
   "generation_settings": {
     "max_tokens": 500,
-    "prefill_step_size": 4096,
+    "prefill_step_size": 2048,
     "temperature": 0.0,
     "top_p": 1.0
   },
@@ -126,7 +126,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.27.0",
-    "mlx": "0.32.1.dev20260808+6539d1807",
+    "mlx": "0.32.1.dev20260808+8d6662986",
     "mlx-audio": "0.4.7",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -137,12 +137,6 @@
   },
   "metadata_exposed_to_prompt": true,
   "model_provenance": {
-    "HuggingFaceTB/SmolVLM-Instruct": {
-      "model": "HuggingFaceTB/SmolVLM-Instruct",
-      "requested_revision": null,
-      "resolved_revision": "81cd9a775a4d644f2faf4e7becff4559b46b14c7",
-      "snapshot_path": "~/.cache/huggingface/hub/models--HuggingFaceTB--SmolVLM-Instruct/snapshots/81cd9a775a4d644f2faf4e7becff4559b46b14c7"
-    },
     "LiquidAI/LFM2.5-VL-450M-MLX-bf16": {
       "model": "LiquidAI/LFM2.5-VL-450M-MLX-bf16",
       "requested_revision": null,
@@ -154,24 +148,6 @@
       "requested_revision": null,
       "resolved_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
       "snapshot_path": "~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203"
-    },
-    "jqlive/Kimi-VL-A3B-Thinking-2506-6bit": {
-      "model": "jqlive/Kimi-VL-A3B-Thinking-2506-6bit",
-      "requested_revision": null,
-      "resolved_revision": "4b3b11ce0874c36a99e13e17e355049042f8620a",
-      "snapshot_path": "~/.cache/huggingface/hub/models--jqlive--Kimi-VL-A3B-Thinking-2506-6bit/snapshots/4b3b11ce0874c36a99e13e17e355049042f8620a"
-    },
-    "meta-llama/Llama-3.2-11B-Vision-Instruct": {
-      "model": "meta-llama/Llama-3.2-11B-Vision-Instruct",
-      "requested_revision": null,
-      "resolved_revision": "9eb2daaa8597bf192a8b0e73f848f3a102794df5",
-      "snapshot_path": "~/.cache/huggingface/hub/models--meta-llama--Llama-3.2-11B-Vision-Instruct/snapshots/9eb2daaa8597bf192a8b0e73f848f3a102794df5"
-    },
-    "microsoft/Phi-3.5-vision-instruct": {
-      "model": "microsoft/Phi-3.5-vision-instruct",
-      "requested_revision": null,
-      "resolved_revision": "12b77fb40b63a2c73c68243d3f767aab688a1b2a",
-      "snapshot_path": "~/.cache/huggingface/hub/models--microsoft--Phi-3.5-vision-instruct/snapshots/12b77fb40b63a2c73c68243d3f767aab688a1b2a"
     },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
       "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
@@ -203,12 +179,6 @@
       "resolved_revision": "9677807f106500eb7690391c27645d59f6855cfb",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--GLM-4.1V-9B-Thinking-8bit/snapshots/9677807f106500eb7690391c27645d59f6855cfb"
     },
-    "mlx-community/GLM-4.6V-Flash-6bit": {
-      "model": "mlx-community/GLM-4.6V-Flash-6bit",
-      "requested_revision": null,
-      "resolved_revision": "df9464782d3452e0dfd86afe0984f1c9eca75ca1",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-6bit/snapshots/df9464782d3452e0dfd86afe0984f1c9eca75ca1"
-    },
     "mlx-community/GLM-4.6V-Flash-mxfp4": {
       "model": "mlx-community/GLM-4.6V-Flash-mxfp4",
       "requested_revision": null,
@@ -233,12 +203,6 @@
       "resolved_revision": "f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Inkling-Small-mlx-4bit/snapshots/f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612"
     },
-    "mlx-community/InternVL3-14B-8bit": {
-      "model": "mlx-community/InternVL3-14B-8bit",
-      "requested_revision": null,
-      "resolved_revision": "50efc568c7dfd1b91569365f1e6eb65e752f4125",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--InternVL3-14B-8bit/snapshots/50efc568c7dfd1b91569365f1e6eb65e752f4125"
-    },
     "mlx-community/InternVL3-8B-bf16": {
       "model": "mlx-community/InternVL3-8B-bf16",
       "requested_revision": null,
@@ -250,18 +214,6 @@
       "requested_revision": null,
       "resolved_revision": "fb254434d4026bee7aa840dea1c5d59feea8fd48",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48"
-    },
-    "mlx-community/Kimi-VL-A3B-Thinking-8bit": {
-      "model": "mlx-community/Kimi-VL-A3B-Thinking-8bit",
-      "requested_revision": null,
-      "resolved_revision": "85daf3dc2490c0f824143338f08ba45f475c9ce4",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-8bit/snapshots/85daf3dc2490c0f824143338f08ba45f475c9ce4"
-    },
-    "mlx-community/LFM2-VL-1.6B-8bit": {
-      "model": "mlx-community/LFM2-VL-1.6B-8bit",
-      "requested_revision": null,
-      "resolved_revision": "294b90e5ae2389ecb61a9427b4572975eef614fe",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--LFM2-VL-1.6B-8bit/snapshots/294b90e5ae2389ecb61a9427b4572975eef614fe"
     },
     "mlx-community/LFM2.5-VL-1.6B-bf16": {
       "model": "mlx-community/LFM2.5-VL-1.6B-bf16",
@@ -305,12 +257,6 @@
       "resolved_revision": "90a14ed7a230088904c7556fbe6d67b295c33f5f",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Molmo-7B-D-0924-8bit/snapshots/90a14ed7a230088904c7556fbe6d67b295c33f5f"
     },
-    "mlx-community/Molmo-7B-D-0924-bf16": {
-      "model": "mlx-community/Molmo-7B-D-0924-bf16",
-      "requested_revision": null,
-      "resolved_revision": "d871cbdb87a49b8071003098d6dbfd2a0f5a5b84",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Molmo-7B-D-0924-bf16/snapshots/d871cbdb87a49b8071003098d6dbfd2a0f5a5b84"
-    },
     "mlx-community/MolmoPoint-8B-fp16": {
       "model": "mlx-community/MolmoPoint-8B-fp16",
       "requested_revision": null,
@@ -347,35 +293,11 @@
       "resolved_revision": "c325e5ea14c215bb08fa0d668c81fa2581f9050b",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b"
     },
-    "mlx-community/Qwen3.5-27B-4bit": {
-      "model": "mlx-community/Qwen3.5-27B-4bit",
-      "requested_revision": null,
-      "resolved_revision": "45797d2985a12c55e6473686e9ea91b95e959553",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-27B-4bit/snapshots/45797d2985a12c55e6473686e9ea91b95e959553"
-    },
-    "mlx-community/Qwen3.5-27B-mxfp8": {
-      "model": "mlx-community/Qwen3.5-27B-mxfp8",
-      "requested_revision": null,
-      "resolved_revision": "2d6caf2325c24e7dd3074e76a6608e9facaee36f",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-27B-mxfp8/snapshots/2d6caf2325c24e7dd3074e76a6608e9facaee36f"
-    },
     "mlx-community/Qwen3.5-35B-A3B-4bit": {
       "model": "mlx-community/Qwen3.5-35B-A3B-4bit",
       "requested_revision": null,
       "resolved_revision": "1e20fd8d42056f870933bf98ca6211024744f7ec",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-4bit/snapshots/1e20fd8d42056f870933bf98ca6211024744f7ec"
-    },
-    "mlx-community/Qwen3.5-35B-A3B-6bit": {
-      "model": "mlx-community/Qwen3.5-35B-A3B-6bit",
-      "requested_revision": null,
-      "resolved_revision": "b729d115bb2cfea696e390dd6bb898528c66b6e9",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-6bit/snapshots/b729d115bb2cfea696e390dd6bb898528c66b6e9"
-    },
-    "mlx-community/Qwen3.5-35B-A3B-bf16": {
-      "model": "mlx-community/Qwen3.5-35B-A3B-bf16",
-      "requested_revision": null,
-      "resolved_revision": "731d09ba3597261e84c28881116558364bb8b97c",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-35B-A3B-bf16/snapshots/731d09ba3597261e84c28881116558364bb8b97c"
     },
     "mlx-community/Qwen3.5-9B-MLX-4bit": {
       "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
@@ -388,12 +310,6 @@
       "requested_revision": null,
       "resolved_revision": "5db9fd9c38ce083048ee12217eceed7482ca7ad4",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4"
-    },
-    "mlx-community/SmolVLM-Instruct-bf16": {
-      "model": "mlx-community/SmolVLM-Instruct-bf16",
-      "requested_revision": null,
-      "resolved_revision": "cae61cdedd0602419b43b6102dc33cd9f1e929a6",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--SmolVLM-Instruct-bf16/snapshots/cae61cdedd0602419b43b6102dc33cd9f1e929a6"
     },
     "mlx-community/SmolVLM2-2.2B-Instruct-mlx": {
       "model": "mlx-community/SmolVLM2-2.2B-Instruct-mlx",
@@ -431,18 +347,6 @@
       "resolved_revision": "fc4e000f32af1b7b6779294e490a7d2a80bac611",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611"
     },
-    "mlx-community/gemma-3-27b-it-qat-8bit": {
-      "model": "mlx-community/gemma-3-27b-it-qat-8bit",
-      "requested_revision": null,
-      "resolved_revision": "c408904bc9a0b7e996173d3cbe1bfe30e04e678d",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-8bit/snapshots/c408904bc9a0b7e996173d3cbe1bfe30e04e678d"
-    },
-    "mlx-community/gemma-3n-E2B-4bit": {
-      "model": "mlx-community/gemma-3n-E2B-4bit",
-      "requested_revision": null,
-      "resolved_revision": "ec68dc186276e20e4bed30b96a2b5c667e0a81e3",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E2B-4bit/snapshots/ec68dc186276e20e4bed30b96a2b5c667e0a81e3"
-    },
     "mlx-community/gemma-3n-E4B-it-bf16": {
       "model": "mlx-community/gemma-3n-E4B-it-bf16",
       "requested_revision": null,
@@ -454,12 +358,6 @@
       "requested_revision": null,
       "resolved_revision": "0d77464eeb233a2da68ebf9d7dc4edaac7db956d",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d"
-    },
-    "mlx-community/gemma-4-31b-bf16": {
-      "model": "mlx-community/gemma-4-31b-bf16",
-      "requested_revision": null,
-      "resolved_revision": "19f0f1af698c51edaf1e93b3a3a5435b282de30f",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-bf16/snapshots/19f0f1af698c51edaf1e93b3a3a5435b282de30f"
     },
     "mlx-community/gemma-4-31b-it-4bit": {
       "model": "mlx-community/gemma-4-31b-it-4bit",
@@ -479,24 +377,6 @@
       "resolved_revision": "5240204744963d72823e5de933c528c4aa82dfca",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--nanoLLaVA-1.5-4bit/snapshots/5240204744963d72823e5de933c528c4aa82dfca"
     },
-    "mlx-community/paligemma2-10b-ft-docci-448-6bit": {
-      "model": "mlx-community/paligemma2-10b-ft-docci-448-6bit",
-      "requested_revision": null,
-      "resolved_revision": "1485fa9b3c7adb360cd354a29a401f0d441ec728",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-6bit/snapshots/1485fa9b3c7adb360cd354a29a401f0d441ec728"
-    },
-    "mlx-community/paligemma2-10b-ft-docci-448-bf16": {
-      "model": "mlx-community/paligemma2-10b-ft-docci-448-bf16",
-      "requested_revision": null,
-      "resolved_revision": "7c412694b919432784c730b62fadafb1c2e15d0d",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-bf16/snapshots/7c412694b919432784c730b62fadafb1c2e15d0d"
-    },
-    "mlx-community/paligemma2-3b-ft-docci-448-bf16": {
-      "model": "mlx-community/paligemma2-3b-ft-docci-448-bf16",
-      "requested_revision": null,
-      "resolved_revision": "f66333527ce75342b09d4df81873f65272ec2f30",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--paligemma2-3b-ft-docci-448-bf16/snapshots/f66333527ce75342b09d4df81873f65272ec2f30"
-    },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
       "model": "mlx-community/paligemma2-3b-pt-896-4bit",
       "requested_revision": null,
@@ -508,37 +388,17 @@
       "requested_revision": null,
       "resolved_revision": "79e24b66302d4ac5e75491767f8914b2aa6ac1f8",
       "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8"
-    },
-    "mlx-community/pixtral-12b-bf16": {
-      "model": "mlx-community/pixtral-12b-bf16",
-      "requested_revision": null,
-      "resolved_revision": "378cf65efd79647fc324a079c141fd92cb29916e",
-      "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-bf16/snapshots/378cf65efd79647fc324a079c141fd92cb29916e"
-    },
-    "qnguyen3/nanoLLaVA": {
-      "model": "qnguyen3/nanoLLaVA",
-      "requested_revision": null,
-      "resolved_revision": "13d60cec183a86755afed64da495fcc2c382ea80",
-      "snapshot_path": "~/.cache/huggingface/hub/models--qnguyen3--nanoLLaVA/snapshots/13d60cec183a86755afed64da495fcc2c382ea80"
     }
   },
   "producer": {
-    "dirty": false,
-    "git_revision": "32d71ddc969b3cbe8dd8c0ffb64ad6b00e419901",
+    "dirty": true,
+    "git_revision": "a5278f16d20d4ab8f0788b666ad3b30c1931e98a",
     "install_type": "source-tree",
     "name": "check_models",
-    "version": "0.8.9"
+    "version": "0.9.0"
   },
   "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-07 17:17:16 UTC+01:00\n\nDescriptive hints:\n- Title hint: Seafront, Seaford, England, UK, GBR, Europe\n- Description hint: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.\n- Keyword hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK, Vehicles, Water, action, beautiful\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
   "prompt_burden": {
-    "HuggingFaceTB/SmolVLM-Instruct": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1276,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1510
-    },
     "LiquidAI/LFM2.5-VL-450M-MLX-bf16": {
       "image_patch_count": null,
       "nontext_tokens_est": 151,
@@ -554,30 +414,6 @@
       "processed_image_width": null,
       "text_tokens_est": 234,
       "total_tokens": 16628
-    },
-    "jqlive/Kimi-VL-A3B-Thinking-2506-6bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1079,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1313
-    },
-    "meta-llama/Llama-3.2-11B-Vision-Instruct": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 64,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 298
-    },
-    "microsoft/Phi-3.5-vision-instruct": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 878,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1112
     },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
       "image_patch_count": null,
@@ -619,14 +455,6 @@
       "text_tokens_est": 234,
       "total_tokens": 6326
     },
-    "mlx-community/GLM-4.6V-Flash-6bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 6096,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 6330
-    },
     "mlx-community/GLM-4.6V-Flash-mxfp4": {
       "image_patch_count": null,
       "nontext_tokens_est": 6096,
@@ -659,14 +487,6 @@
       "text_tokens_est": null,
       "total_tokens": null
     },
-    "mlx-community/InternVL3-14B-8bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 2376,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2610
-    },
     "mlx-community/InternVL3-8B-bf16": {
       "image_patch_count": null,
       "nontext_tokens_est": 2376,
@@ -682,22 +502,6 @@
       "processed_image_width": null,
       "text_tokens_est": 234,
       "total_tokens": 1313
-    },
-    "mlx-community/Kimi-VL-A3B-Thinking-8bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1079,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1313
-    },
-    "mlx-community/LFM2-VL-1.6B-8bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 337,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 571
     },
     "mlx-community/LFM2.5-VL-1.6B-bf16": {
       "image_patch_count": null,
@@ -755,14 +559,6 @@
       "text_tokens_est": 234,
       "total_tokens": 1498
     },
-    "mlx-community/Molmo-7B-D-0924-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1264,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1498
-    },
     "mlx-community/MolmoPoint-8B-fp16": {
       "image_patch_count": null,
       "nontext_tokens_est": 2877,
@@ -811,39 +607,7 @@
       "text_tokens_est": 234,
       "total_tokens": 16630
     },
-    "mlx-community/Qwen3.5-27B-4bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 16409,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
-    },
-    "mlx-community/Qwen3.5-27B-mxfp8": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 16409,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
-    },
     "mlx-community/Qwen3.5-35B-A3B-4bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 16409,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
-    },
-    "mlx-community/Qwen3.5-35B-A3B-6bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 16409,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
-    },
-    "mlx-community/Qwen3.5-35B-A3B-bf16": {
       "image_patch_count": null,
       "nontext_tokens_est": 16409,
       "processed_image_height": null,
@@ -866,14 +630,6 @@
       "processed_image_width": null,
       "text_tokens_est": 234,
       "total_tokens": 16643
-    },
-    "mlx-community/SmolVLM-Instruct-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1276,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1510
     },
     "mlx-community/SmolVLM2-2.2B-Instruct-mlx": {
       "image_patch_count": null,
@@ -923,22 +679,6 @@
       "text_tokens_est": 234,
       "total_tokens": 579
     },
-    "mlx-community/gemma-3-27b-it-qat-8bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 345,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 579
-    },
-    "mlx-community/gemma-3n-E2B-4bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 336,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 570
-    },
     "mlx-community/gemma-3n-E4B-it-bf16": {
       "image_patch_count": null,
       "nontext_tokens_est": 344,
@@ -954,14 +694,6 @@
       "processed_image_width": null,
       "text_tokens_est": 234,
       "total_tokens": 588
-    },
-    "mlx-community/gemma-4-31b-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 342,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 576
     },
     "mlx-community/gemma-4-31b-it-4bit": {
       "image_patch_count": null,
@@ -987,30 +719,6 @@
       "text_tokens_est": 234,
       "total_tokens": 315
     },
-    "mlx-community/paligemma2-10b-ft-docci-448-6bit": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1098,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1332
-    },
-    "mlx-community/paligemma2-10b-ft-docci-448-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1098,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1332
-    },
-    "mlx-community/paligemma2-3b-ft-docci-448-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 1098,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1332
-    },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
       "image_patch_count": null,
       "nontext_tokens_est": 4170,
@@ -1026,26 +734,10 @@
       "processed_image_width": null,
       "text_tokens_est": 234,
       "total_tokens": 2649
-    },
-    "mlx-community/pixtral-12b-bf16": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 2415,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2649
-    },
-    "qnguyen3/nanoLLaVA": {
-      "image_patch_count": null,
-      "nontext_tokens_est": 81,
-      "processed_image_height": null,
-      "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 315
     }
   },
   "prompt_sha256": "0267501520fd4ef0f4364bbdf44e72da686a3ec6b7e7653b9102e673ce7c4363",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1382.798,
+  "total_runtime_seconds": 1034.188,
   "trust_remote_code": true
 }
