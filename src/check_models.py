@@ -3105,6 +3105,9 @@ ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in 
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
+# File-log retention for live mlx-vlm console output (tee buffer). Keep large enough
+# for multi-paragraph model text while bounding pathological loops.
+MAX_FILE_STREAM_CAPTURE_CHARS: Final[int] = 250_000
 SELF_LOGGED_FAILURE_PREFIX_RE: Final[re.Pattern[str]] = re.compile(
     r"^\[\d{2}:\d{2}:\d{2}\]\s+ERROR\s+Failed to load model\b"
 )
@@ -12185,6 +12188,177 @@ def _sanitize_failure_stderr_capture(stderr_text: str) -> str:
     return "\n".join(line for line in kept if line.strip()).strip()
 
 
+def _normalize_stream_capture_text(text: str) -> str:
+    """Normalize live console capture for durable file-log retention."""
+    stripped = _strip_ansi(text)
+    # Progress bars rewrite the same line with CR; keep the final state of each write.
+    normalized = stripped.replace("\r\n", "\n")
+    if "\r" in normalized:
+        normalized = "\n".join(
+            segment.rsplit("\r", maxsplit=1)[-1] for segment in normalized.split("\n")
+        )
+    lines = [line.rstrip() for line in normalized.splitlines()]
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    return "\n".join(lines)
+
+
+def _compose_stream_capture_for_file_log(
+    *,
+    stdout_text: str,
+    stderr_text: str,
+) -> str | None:
+    """Build one file-log body from tee'd stdout/stderr without console re-echo."""
+    sections: list[str] = []
+    stdout_clean = _normalize_stream_capture_text(stdout_text)
+    if stdout_clean:
+        sections.append(stdout_clean)
+    stderr_clean = _sanitize_failure_stderr_capture(stderr_text)
+    # Avoid duplicating stdout when libraries write the same block to both streams.
+    if stderr_clean and (not stdout_clean or stderr_clean not in stdout_clean):
+        sections.append(f"=== STDERR ===\n{stderr_clean}")
+    if not sections:
+        return None
+    body = "\n\n".join(sections)
+    if len(body) <= MAX_FILE_STREAM_CAPTURE_CHARS:
+        return body
+    omitted = len(body) - MAX_FILE_STREAM_CAPTURE_CHARS
+    return (
+        body[:MAX_FILE_STREAM_CAPTURE_CHARS]
+        + f"\n...[truncated {omitted} characters for file-log size bound]"
+    )
+
+
+def _log_stream_capture_to_file(
+    *,
+    model_identifier: str,
+    stdout_text: str,
+    stderr_text: str,
+) -> None:
+    """Persist tee'd mlx-vlm console output to the file log only.
+
+    Live generation already reaches the terminal via ``_TeeCaptureStream``. Re-logging
+    to the console would duplicate that block; ``log_destination="file"`` keeps the
+    durable copy without a second terminal echo.
+    """
+    body = _compose_stream_capture_for_file_log(
+        stdout_text=stdout_text,
+        stderr_text=stderr_text,
+    )
+    if body is None:
+        return
+    logger.debug(
+        "Captured mlx-vlm console output for %s:\n%s",
+        model_identifier,
+        body,
+        extra={"log_destination": "file"},
+    )
+
+
+def _build_success_process_result(
+    *,
+    params: ProcessImageParams,
+    output: GenerationResult | SupportsGenerationResult,
+    phase_timer: PhaseTimer,
+    total_start_time: float,
+    upstream_boundary: UpstreamBoundary,
+) -> tuple[PerformanceResult, str | None]:
+    """Build the successful PerformanceResult and resolved stop reason."""
+    performance_data = _extract_generation_performance_data(output)
+    generation_time = performance_data.generation_time_s or phase_timer.duration("decode")
+    total_time = time.perf_counter() - total_start_time
+    model_load_time = phase_timer.duration("model_load")
+    first_token_latency_s = performance_data.first_token_latency_s
+    active_mem_gb = performance_data.active_memory_gb
+    cache_mem_gb = performance_data.cache_memory_gb
+    stop_reason = _resolve_generation_stop_reason(
+        performance_data,
+        requested_max_tokens=params.max_tokens,
+    )
+    result_payload = PerformanceResult(
+        model_name=params.model_identifier,
+        generation=output,
+        success=True,
+        upstream_boundary=upstream_boundary,
+        generation_time=generation_time,
+        model_load_time=model_load_time,
+        total_time=total_time,
+        active_memory=active_mem_gb if active_mem_gb > 0 else None,
+        cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
+        runtime_diagnostics=_build_runtime_diagnostics(
+            phase_timer,
+            first_token_latency_s=first_token_latency_s,
+            model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
+            stop_reason=stop_reason,
+        ),
+        requested_max_tokens=params.max_tokens,
+        prompt_diagnostics=_object_prompt_diagnostics(output),
+    )
+    result_payload = _populate_result_quality_analysis(
+        result_payload,
+        prompt=params.prompt,
+        requested_max_tokens=params.max_tokens,
+        context_marker=params.context_marker,
+    )
+    return result_payload, stop_reason
+
+
+def _build_exception_process_result(
+    *,
+    params: ProcessImageParams,
+    error: TimeoutError | OSError | ValueError | RuntimeError,
+    stdout_text: str,
+    stderr_text: str,
+    current_phase: str,
+    phase_timer: PhaseTimer,
+    total_start_time: float,
+    upstream_boundary: UpstreamBoundary,
+) -> tuple[PerformanceResult, str]:
+    """Build a failure PerformanceResult from tee buffers and the raised error."""
+    captured_sections: list[str] = []
+    stdout_clean = stdout_text.strip()
+    stderr_clean = _sanitize_failure_stderr_capture(stderr_text)
+    failure_quality_analysis: GenerationQualityAnalysis | None = None
+    failure_quality_issues: str | None = None
+    if stdout_clean:
+        captured_sections.append("=== STDOUT ===\n" + stdout_clean)
+        if (
+            len(stdout_clean) >= QUALITY.min_text_length
+            or len(stdout_clean.split()) >= QUALITY.min_token_count
+        ):
+            failure_quality_analysis, failure_quality_issues = _analyze_text_quality(
+                stdout_clean,
+                max(len(stdout_clean.split()), 1),
+                prompt=params.prompt,
+                requested_max_tokens=params.max_tokens,
+                context_marker=params.context_marker,
+            )
+    if stderr_clean:
+        captured_sections.append("=== STDERR ===\n" + stderr_clean)
+    captured_output = "\n\n".join(captured_sections) if captured_sections else None
+    stop_reason = "timeout" if isinstance(error, TimeoutError) else "exception"
+    result_payload = _build_failure_result(
+        model_name=params.model_identifier,
+        error=error,
+        captured_output=captured_output,
+        quality_issues=failure_quality_issues,
+        quality_analysis=failure_quality_analysis,
+        failure_phase=current_phase,
+        generation_time=phase_timer.duration("decode"),
+        model_load_time=phase_timer.duration("model_load"),
+        total_time=time.perf_counter() - total_start_time,
+        runtime_diagnostics=_build_runtime_diagnostics(
+            phase_timer,
+            stop_reason=stop_reason,
+        ),
+        requested_max_tokens=params.max_tokens,
+        upstream_boundary=upstream_boundary,
+    )
+    return result_payload, stop_reason
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     arch, gpu_info = get_system_info()
@@ -12238,88 +12412,32 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 "[verbose passthrough end] mlx-vlm.generate output for %s",
                 params.model_identifier,
             )
-
-        performance_data = _extract_generation_performance_data(output)
-        generation_time = performance_data.generation_time_s or phase_timer.duration("decode")
-        total_time = time.perf_counter() - total_start_time
-        model_load_time = phase_timer.duration("model_load")
-        first_token_latency_s = performance_data.first_token_latency_s
-
-        # Read memory metrics from GenerationResult (upstream plus local runtime snapshots).
-        active_mem_gb = performance_data.active_memory_gb
-        cache_mem_gb = performance_data.cache_memory_gb
-
-        stop_reason = _resolve_generation_stop_reason(
-            performance_data,
-            requested_max_tokens=params.max_tokens,
-        )
-
-        result_payload = PerformanceResult(
-            model_name=params.model_identifier,
-            generation=output,
-            success=True,
+        result_payload, stop_reason = _build_success_process_result(
+            params=params,
+            output=output,
+            phase_timer=phase_timer,
+            total_start_time=total_start_time,
             upstream_boundary=upstream_boundary,
-            generation_time=generation_time,
-            model_load_time=model_load_time,
-            total_time=total_time,
-            active_memory=active_mem_gb if active_mem_gb > 0 else None,
-            cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
-            runtime_diagnostics=_build_runtime_diagnostics(
-                phase_timer,
-                first_token_latency_s=first_token_latency_s,
-                model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
-                stop_reason=stop_reason,
-            ),
-            requested_max_tokens=params.max_tokens,
-            prompt_diagnostics=_object_prompt_diagnostics(output),
-        )
-        result_payload = _populate_result_quality_analysis(
-            result_payload,
-            prompt=params.prompt,
-            requested_max_tokens=params.max_tokens,
-            context_marker=params.context_marker,
         )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
-        captured_sections: list[str] = []
-        stdout_clean = stdout_capture.getvalue().strip()
-        stderr_clean = _sanitize_failure_stderr_capture(stderr_capture.getvalue())
-        failure_quality_analysis: GenerationQualityAnalysis | None = None
-        failure_quality_issues: str | None = None
-        if stdout_clean:
-            captured_sections.append("=== STDOUT ===\n" + stdout_clean)
-            if (
-                len(stdout_clean) >= QUALITY.min_text_length
-                or len(stdout_clean.split()) >= QUALITY.min_token_count
-            ):
-                failure_quality_analysis, failure_quality_issues = _analyze_text_quality(
-                    stdout_clean,
-                    max(len(stdout_clean.split()), 1),
-                    prompt=params.prompt,
-                    requested_max_tokens=params.max_tokens,
-                    context_marker=params.context_marker,
-                )
-        if stderr_clean:
-            captured_sections.append("=== STDERR ===\n" + stderr_clean)
-        captured_output = "\n\n".join(captured_sections) if captured_sections else None
-        stop_reason = "timeout" if isinstance(e, TimeoutError) else "exception"
-        result_payload = _build_failure_result(
-            model_name=params.model_identifier,
+        result_payload, stop_reason = _build_exception_process_result(
+            params=params,
             error=e,
-            captured_output=captured_output,
-            quality_issues=failure_quality_issues,
-            quality_analysis=failure_quality_analysis,
-            failure_phase=current_phase,
-            generation_time=phase_timer.duration("decode"),
-            model_load_time=phase_timer.duration("model_load"),
-            total_time=time.perf_counter() - total_start_time,
-            runtime_diagnostics=_build_runtime_diagnostics(
-                phase_timer,
-                stop_reason=stop_reason,
-            ),
-            requested_max_tokens=params.max_tokens,
+            stdout_text=stdout_capture.getvalue(),
+            stderr_text=stderr_capture.getvalue(),
+            current_phase=current_phase,
+            phase_timer=phase_timer,
+            total_start_time=total_start_time,
             upstream_boundary=upstream_boundary,
         )
     finally:
+        # Always retain tee'd model console output in the file log (success and failure).
+        # This is independent of --verbose: the terminal already saw the live stream.
+        _log_stream_capture_to_file(
+            model_identifier=params.model_identifier,
+            stdout_text=stdout_capture.getvalue(),
+            stderr_text=stderr_capture.getvalue(),
+        )
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
             _cleanup_runtime_resources(synchronize_first=cleanup_requires_sync)

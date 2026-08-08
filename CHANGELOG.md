@@ -25,6 +25,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Persist tee'd live mlx-vlm console output (prompt, generated text, and upstream
+  timing/memory lines) into `check_models.log` for every model attempt, success
+  or failure, as a file-only log record so the durable log keeps the model text
+  that already appears on the terminal without a second console echo. Bound very
+  large captures and keep this independent of `--verbose`.
 - Consolidate mechanical observation metadata into one display registry, derive
   run-issue assessment vocabularies from the canonical Literals, compact large
   unexpected-parameter lists in diagnostics and crash drafts as well as the

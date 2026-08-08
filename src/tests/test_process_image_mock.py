@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import logging
 import sys
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
@@ -1237,6 +1238,58 @@ class TestProcessImageWithModelMock:
         assert result.runtime_diagnostics is not None
         assert result.runtime_diagnostics.post_cleanup_active_memory_gb == 0.125
         assert result.runtime_diagnostics.post_cleanup_cache_memory_gb == 0.25
+
+    def test_process_image_logs_teed_console_output_to_file_only(
+        self,
+        test_image: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Live mlx-vlm stdout should land in the file log without a second console echo."""
+        params = _build_params(test_image)
+        live_block = (
+            "==========\n"
+            "Prompt: <image>Describe this image\n"
+            "A top-down view of two cats laying on a pink blanket.\n"
+            "==========\n"
+            "Prompt: 1029 tokens, 915.573 tokens-per-sec\n"
+            "Generation: 159 tokens, 5.341 tokens-per-sec\n"
+            "Peak memory: 25.836 GB\n"
+        )
+
+        def _run_and_print(*_args: object, **_kwargs: object) -> _FakeGenerationResult:
+            sys.stdout.write(live_block)
+            return _FakeGenerationResult(
+                text="A top-down view of two cats laying on a pink blanket."
+            )
+
+        with (
+            patch.object(check_models, "_run_model_generation", side_effect=_run_and_print),
+            caplog.at_level(logging.DEBUG, logger=check_models.LOGGER_NAME),
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is True
+        capture_records = [
+            record
+            for record in caplog.records
+            if "Captured mlx-vlm console output for" in record.getMessage()
+        ]
+        assert len(capture_records) == 1
+        message = capture_records[0].getMessage()
+        assert "two cats laying on a pink blanket" in message
+        assert "Peak memory: 25.836 GB" in message
+        assert getattr(capture_records[0], "log_destination", None) == "file"
+
+    def test_compose_stream_capture_for_file_log_bounds_size(self) -> None:
+        """Pathological tee buffers should truncate rather than inflate the log unboundedly."""
+        huge = "x" * (check_models.MAX_FILE_STREAM_CAPTURE_CHARS + 50)
+        body = check_models._compose_stream_capture_for_file_log(
+            stdout_text=huge,
+            stderr_text="",
+        )
+        assert body is not None
+        assert "truncated 50 characters for file-log size bound" in body
+        assert len(body) < len(huge) + 80
 
     def test_log_perf_block_reads_cache_memory_field(self) -> None:
         """Compact memory logging should use the stored cache_memory field name."""
