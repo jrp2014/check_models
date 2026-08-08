@@ -47,6 +47,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Docs/Makefile/packaging hygiene: root `README.md` output list now matches
+  the real artifact set (removed nonexistent `results.md`/`results.tsv`,
+  annotated tracked vs local-only); root `make help` is auto-generated from
+  `##` comments (11 previously invisible targets now listed); `stubs-clear`
+  aliases `clean-stubs`; `check_models-demo` actually differs from
+  `check_models`; `validate-env` delegates to `tools.validate_env` instead of
+  duplicating its probes; new `make update-full` wires the previously
+  make-unreachable `tools/update.sh`; the `subprocess` pytest marker is
+  declared in `pyproject.toml`; `pip-audit` ships in the dev extras so
+  `make audit` stops installing at runtime; `AGENTS.md`/`CLAUDE.md` parity is
+  guarded by a test; duplicated dependency/make-target doc sections in
+  `CONTRIBUTING.md`/`IMPLEMENTATION_GUIDE.md` now carry canonical-source
+  pointers; `check_models.py` gains an architectural module docstring
+  (report-block AST, observation registry, artifact fan-out, discovery) and
+  three drifted sub-banners are renamed to match their contents (the 13
+  `SECTION:` landmarks are unchanged).
 - Merge the gallery's three redundant chooser tables into one: the sortable
   Current-run Chooser remains the single row set, and the former
   "Lowest-memory"/"Fastest Usable Models" re-listing tables collapse into a

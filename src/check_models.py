@@ -1,5 +1,35 @@
 #!/usr/bin/env python3
-"""Image analysis and caption generation using MLX Vision Language Models."""
+"""Image analysis and caption generation using MLX Vision Language Models.
+
+Assesses locally-cached Hugging Face VLMs (via mlx-vlm) for image-metadata
+generation quality and produces maintainer-ready diagnostics for mlx-vlm,
+mlx, and transformers. Intentionally a single-file monolith; navigate with
+the ``SECTION:`` banner landmarks (documented in
+``.github/copilot-instructions.md`` §3).
+
+Architecture at a glance:
+
+- **Report-block AST** (``ReportSection``/``ReportTable``/``ReportDetails``/
+  ``ReportModelOutput`` etc., near ``render_report_markdown`` /
+  ``render_report_html``): one typed block tree rendered to both Markdown and
+  HTML so paired report surfaces cannot drift.
+- **Observation registry** (``_OBSERVATION_DISPLAY_SPECS``): every mechanical
+  output observation (repetition, thinking-trace issues, token leakage,
+  catalog-contract violations, ...) is declared once with its code, label,
+  and usability impact; ``_assess_result`` projects results onto it. There is
+  deliberately no semantic scoring — only reproducible mechanical facts.
+- **Artifact fan-out** (``_build_report_artifact_specs`` /
+  ``finalize_execution``): one run emits the console dashboard plus
+  ``index.md`` (dashboard + links), ``reports/results.html``,
+  ``reports/model_gallery.md``, ``reports/diagnostics.md``,
+  ``results.jsonl`` (canonical, schema 2.0), ``run.json``, append-only
+  ``results.history.jsonl``, and paste-ready issue drafts under ``issues/``.
+  The run-issue summary re-reads validated ``results.jsonl`` rather than
+  trusting in-memory state.
+- **Discovery** mirrors mlx-vlm's server ``/v1/models`` cache filter
+  (``get_cached_model_ids``) and adds an architecture pre-check against the
+  installed ``mlx_vlm/models`` packages (``_model_arch_precheck``).
+"""
 
 from __future__ import annotations
 
@@ -3219,7 +3249,8 @@ def format_field_label(field_name: str) -> str:
 
 
 # =============================================================================
-# TEXT ESCAPING - Unified strategy for HTML/Markdown escaping
+# TEXT ESCAPING & MECHANICAL OUTPUT DETECTORS - escaping strategy plus
+# repetition/reasoning/echo/cutoff detectors and catalog contract checks
 # =============================================================================
 
 
@@ -4046,7 +4077,7 @@ def _detect_minimal_output(
 
 
 # =============================================================================
-# CATALOGING-SPECIFIC QUALITY METRICS
+# CATALOGING QUALITY METRICS, LIBRARY VERSIONS & PROVENANCE SNAPSHOTS
 # =============================================================================
 
 
@@ -5412,7 +5443,8 @@ def print_version_info(versions: LibraryVersionDict) -> None:
 
 
 # =============================================================================
-# IMAGE & EXIF METADATA PROCESSING (File handling, GPS, EXIF extraction)
+# IMAGE & EXIF METADATA PROCESSING (file handling, GPS, EXIF) plus HTML
+# helpers, runtime analysis, artifact URLs, and the observation registry
 # =============================================================================
 
 

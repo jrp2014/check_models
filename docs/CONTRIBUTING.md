@@ -385,6 +385,11 @@ Your PR must:
 
 ## Dependency Management
 
+> [!NOTE]
+> Canonical source: [.github/copilot-instructions.md](../.github/copilot-instructions.md)
+> (dependency policy) and `src/pyproject.toml`. If this section disagrees with
+> those, they win.
+
 ### Dependency Structure
 
 The project organizes dependencies into groups:

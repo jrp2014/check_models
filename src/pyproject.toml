@@ -95,6 +95,8 @@ dev = [
     "types-PyYAML",
     "types-defusedxml",
     "pre-commit",
+    "pip-audit>=2.7.0", # make audit
+
     "nanobind==2.13.0",
 ]
 
@@ -384,6 +386,7 @@ addopts = "-q"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "e2e: marks tests as end-to-end integration tests requiring model inference",
+    "subprocess: marks tests that spawn subprocesses (build/tooling integration)",
 ]
 
 [tool.pyrefly]

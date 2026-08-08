@@ -8,31 +8,8 @@ help: ## Show this help message
 	@echo "  MLX VLM Check - Vision-Language Model Benchmarking  "
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo ""
-	@echo "🚀 Getting Started:"
-	@echo "  make install          Install the package"
-	@echo "  make run              Show usage help"
-	@echo ""
-	@echo "📊 Common Tasks:"
-	@echo "  make demo             Run on example (if you have images)"
-	@echo "  make clean            Remove generated files"
-	@echo ""
-	@echo "🛠️  Development:"
-	@echo "  make dev              Bootstrap dev environment"
-	@echo "  make update           Update conda environment and project dependencies"
-	@echo "  make test             Run tests"
-	@echo "  make check            Run format, lint, typecheck, and tests"
-	@echo "  make quality          Run full quality checks (ruff+typing+vulture+Skylos+pytest+shellcheck+markdownlint)"
-	@echo "  make skylos-danger    Run advisory Skylos danger scan for workflow/security findings"
-	@echo "                        Current repo-root danger scan is clean; this could be promoted later"
-	@echo "  make skylos-danger-llm  Write the advisory Skylos danger scan in LLM-friendly format"
-	@echo "  make skylos-verify    Run the Skylos verifier on a file/range (pass ARGS='--file ... --range ...')"
-	@echo "  make vulture          Run the configured dead-code scan"
-	@echo "  make check-outdated   Check for outdated managed dependencies"
-	@echo "  make audit            Run dependency vulnerability audit"
-	@echo "  make ty               Run Ty type checking with the resolved mlx-vlm interpreter"
-	@echo "  make ci               Run full CI pipeline (strict)"
-	@echo "  make format           Format code with ruff"
-	@echo "  make stubs            Generate type stubs for mlx-vlm (typings/)"
+	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 	@echo "📚 Documentation: See docs/CONTRIBUTING.md for details"
 
@@ -145,6 +122,10 @@ update: ## Update conda environment and reinstall project dependencies
 
 .PHONY: update-env
 update-env: update ## Alias for 'update' target
+
+.PHONY: update-full
+update-full: ## Full updater: conda/brew, local MLX repo builds, stubs, smoke (tools/update.sh)
+	$(MAKE) -C $(SRC) update-full
 
 
 .PHONY: deps-sync

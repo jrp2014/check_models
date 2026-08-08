@@ -1166,6 +1166,11 @@ Potential future enhancements (not required now):
 
 ## Dependency Management Strategy
 
+> [!NOTE]
+> Canonical source: [.github/copilot-instructions.md](../.github/copilot-instructions.md)
+> and `src/pyproject.toml`. This project installs with conda + pip; treat any
+> tooling mentioned below that disagrees with those files as historical.
+
 ### Philosophy: Easy Updates + Reproducible Builds
 
 This project uses **pip-tools** to balance two goals:
@@ -1341,6 +1346,10 @@ mlx>=0.31.2,<0.32.0
 ```
 
 ## Makefile Targets Reference
+
+> [!NOTE]
+> Canonical, always-current list: run `make help` (auto-generated from the
+> Makefiles' `##` comments). This table covers only dependency-related targets.
 
 | Command | Purpose | When to Use |
 | ------- | ------- | ----------- |

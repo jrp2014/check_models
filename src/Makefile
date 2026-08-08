@@ -128,14 +128,9 @@ install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js/npm
 
 # Environment validation
 .PHONY: validate-env
-validate-env: ## Validate that required packages are installed in the environment
+validate-env: ## Validate the environment via tools.validate_env (single source of truth)
 	@echo "🔍 Validating environment: $(ENV_NAME) ($(ENV_TYPE))"
-	@$(RUN_PY) -c "import sys; print(f'Python: {sys.version.split()[0]}')"
-	@$(RUN_PY) -c "import mlx; print('MLX: ✓')" || (echo "❌ mlx not found - run 'make install'" && exit 1)
-	@$(RUN_PY) -c "import mlx_vlm; v=getattr(mlx_vlm,'__version__','installed'); print(f'MLX-VLM: {v}')" || (echo "❌ mlx-vlm not found - run 'make install'" && exit 1)
-	@$(RUN_PY) -c "import PIL; print(f'Pillow: {PIL.__version__}')" || (echo "❌ Pillow not found - run 'make install'" && exit 1)
-	@echo "✓ Core runtime dependencies present"
-	@$(RUN_PY) -m tools.validate_env 2>/dev/null || echo "ℹ️  Run 'python -m tools.validate_env' for detailed validation"
+	@$(RUN_PY) -m tools.validate_env
 
 # Stubs
 .PHONY: stubs
@@ -143,8 +138,7 @@ stubs: ## Generate/update local type stubs into ../typings/
 	$(RUN_PY) tools/generate_stubs.py
 
 .PHONY: stubs-clear
-stubs-clear: ## Remove all generated stubs
-	rm -rf ../typings
+stubs-clear: clean-stubs ## Alias for 'clean-stubs'
 
 # ------------------------
 # Run script
@@ -154,8 +148,8 @@ check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <
 	$(RUN_PY) -m check_models $(ARGS)
 
 .PHONY: check_models-demo
-check_models-demo: ## Demo run with minimal flags (override via ARGS to customize)
-	$(RUN_PY) -m check_models $(ARGS)
+check_models-demo: ## Demo run with verbose output (override via ARGS to customize)
+	$(RUN_PY) -m check_models --verbose $(ARGS)
 
 .PHONY: analyze-quality
 analyze-quality: ## Run output quality diagnostic script (pass args via ARGS='--text "..."' or ARGS='--file ...')
@@ -213,6 +207,10 @@ update: ## Update conda environment and reinstall project with all dependencies
 .PHONY: update-env
 update-env: update ## Alias for 'update' target
 
+.PHONY: update-full
+update-full: ## Full updater: conda/brew, local MLX repo builds, stubs, smoke (tools/update.sh)
+	bash tools/update.sh
+
 # Aggregates
 .PHONY: check
 check: format lint typecheck test ## Core quality pipeline
@@ -258,8 +256,7 @@ check-outdated: ## Check for outdated dependencies
 	$(RUN_PY) tools/check_outdated.py
 
 .PHONY: audit
-audit: ## Run security audit on dependencies
-	@$(RUN_PY) -m pip install pip-audit --quiet || (echo "[audit] pip-audit installation failed"; exit 1)
+audit: ## Run security audit on dependencies (pip-audit ships in the dev extras)
 	$(RUN_PY) -m pip_audit
 
 # Cleanup

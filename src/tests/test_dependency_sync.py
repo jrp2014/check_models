@@ -2171,3 +2171,19 @@ def test_run_for_finding_uses_active_python_for_ruff(
 
     assert result is not None
     assert recorded_args[:4] == [sys.executable, "-m", "ruff", "check"]
+
+
+def test_agents_and_claude_docs_stay_in_sync() -> None:
+    """AGENTS.md and CLAUDE.md must stay byte-identical below their H1 titles."""
+
+    def body_below_title(path: Path) -> str:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        return "\n".join(lines[1:])
+
+    agents = REPO_ROOT / "AGENTS.md"
+    claude = REPO_ROOT / "CLAUDE.md"
+    assert agents.is_file()
+    assert claude.is_file()
+    assert body_below_title(agents) == body_below_title(claude), (
+        "AGENTS.md and CLAUDE.md have drifted; apply edits to both files"
+    )

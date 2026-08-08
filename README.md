@@ -1,6 +1,6 @@
 # MLX VLM Check
 
-Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML/Markdown/gallery Markdown/TSV/JSONL reports and captures performance metrics (tokens/sec, memory, timings).
+Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML, Markdown, and JSONL reports plus maintainer-ready diagnostics, and captures performance metrics (tokens/sec, memory, timings).
 
 > [!NOTE]
 > This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs cached models that pass the `mlx-vlm` server-supported cache filter; use `--models` to specify explicit model IDs.
@@ -26,18 +26,24 @@ python -m check_models --image /path/to/photo.jpg
 python -m check_models --image ~/Pictures/sample.jpg
 ```
 
-Expected outputs (default location: src/output/):
+Expected outputs (default location: `src/output/`):
 
-- results.html
-- results.md
-- model_gallery.md
-- results.tsv
-- results.jsonl
-- results.history.jsonl
-- diagnostics.md (only when failures, harness issues, text-sanity issues, or
-  preflight warnings are detected)
-- check_models.log
-- environment.log
+Tracked in git (skimmable decision artifacts):
+
+- `index.md` — run dashboard (counts, usability, top observations) + links
+- `reports/diagnostics.md` — maintainer triage tables and per-model evidence
+- `issues/run_summary.md` — paste-ready whole-run issue summary (when findings exist)
+- `issues/issue_*.md` — per-crash issue drafts (hard actionable crashes only)
+- `results.jsonl` — canonical machine-readable per-model records
+- `run.json` — run-level metadata, provenance, artifact manifest
+- `environment.log` — complete dependency and toolchain inventory
+
+Local only (gitignored, regenerated each run):
+
+- `reports/results.html` — self-contained interactive report
+- `reports/model_gallery.md` — complete per-model evidence gallery
+- `results.history.jsonl` — append-only run history
+- `check_models.log` — full run log
 
 ## Why use it (short)
 
