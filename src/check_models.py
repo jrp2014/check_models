@@ -7717,6 +7717,40 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     return parts
 
 
+def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
+    """Render every model's actual output preview as one skimmable table.
+
+    The chooser carries mechanical judgements; this table answers the other
+    first question — what did each model actually say — without expanding the
+    per-model evidence blocks.
+    """
+    ordered = _gallery_chooser_data(rows).ordered
+    if not ordered:
+        return []
+    return [
+        "## Output at a Glance",
+        "",
+        (
+            f"The first {MAX_OUTPUT_PREVIEW_CHARS} characters of each model's actual "
+            "output (or failure evidence for crashes), in chooser order. Complete "
+            "exact evidence for every model follows below."
+        ),
+        "",
+        *_render_gallery_table(
+            headers=("Model", "Usability", "Output preview"),
+            rows=[
+                (
+                    _gallery_summary_model_link(row.model),
+                    _markdown_inline_code(row.usability),
+                    MARKDOWN_ESCAPER.escape(row.output_preview),
+                )
+                for row in ordered
+            ],
+        ),
+        "",
+    ]
+
+
 # =============================================================================
 # SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS
 # =============================================================================
@@ -9716,6 +9750,7 @@ def generate_markdown_gallery_report(
                 )
             )
     md.extend(_render_gallery_chooser(gallery_rows))
+    md.extend(_render_gallery_output_glance(gallery_rows))
     md.extend(
         _build_gallery_stamps_section(
             versions=versions,

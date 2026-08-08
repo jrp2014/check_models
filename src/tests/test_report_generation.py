@@ -4317,7 +4317,7 @@ class TestMarkdownGalleryReport:
         avoid = _extract_markdown_subsection(
             content,
             "## Avoid for This Run",
-            end_headings=("## Complete Per-model Evidence",),
+            end_headings=("## Output at a Glance",),
         )
         assert "Output preview" not in avoid
         assert "boom" not in avoid
@@ -4755,6 +4755,47 @@ class TestMarkdownGalleryReport:
         assert data.lowest_memory is not None
         assert data.lowest_memory.model == "org/a-usable"
 
+    def test_gallery_output_glance_tables_actual_output_in_chooser_order(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """A skimmable table must show what each model actually said."""
+        good = replace(
+            _make_success("org/good"),
+            generation=_MockGeneration(
+                text="Title: Two cats on a sofa\nKeywords: cats, sofa", generation_tokens=20
+            ),
+        )
+        bad = replace(_make_failure("org/bad"), error_message="load exploded")
+        context = _build_report_render_context(results=[good, bad], prompt="Describe.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[good, bad],
+            filename=out,
+            prompt="Describe.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        glance = _extract_markdown_subsection(
+            content,
+            "## Output at a Glance",
+            end_headings=("## Complete Per-model Evidence",),
+        )
+        # Actual output text, newline-collapsed, with links in chooser order.
+        assert "Title: Two cats on a sofa<br>Keywords: cats, sofa" in glance
+        assert "load exploded" in glance
+        assert glance.index("org/good") < glance.index("org/bad")
+        # The judgement-focused chooser stays free of output previews.
+        chooser = _extract_markdown_subsection(
+            content,
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
+        )
+        assert "Output preview" not in chooser
+        assert content.index("## Avoid for This Run") < content.index("## Output at a Glance")
+
     def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
         """Avoid, memory, and speed policies should have explicit stable ordering."""
 
@@ -4826,7 +4867,7 @@ class TestMarkdownGalleryReport:
         avoid = _extract_markdown_subsection(
             content,
             "## Avoid for This Run",
-            end_headings=("## Complete Per-model Evidence",),
+            end_headings=("## Output at a Glance",),
         )
         highlights = _extract_markdown_subsection(
             content,

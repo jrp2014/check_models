@@ -7,6 +7,12 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add an "Output at a Glance" table to the Markdown gallery (after "Avoid for
+  This Run"): every model's actual output preview (first 280 characters, or
+  failure evidence for crashes) in chooser order, so a reader can get a feel
+  for what each model said without expanding per-model evidence blocks. The
+  judgement-focused chooser table stays preview-free; the HTML report already
+  carried this as its sortable "Output preview" column.
 - Add a `benchmarking-mlx-vlm` agent skill (conda+pip adaptation of the
   upstream mlx-vlm benchmarking methodology: warmup + median-of-N,
   `mx.eval`/`mx.synchronize` before timers, peak-memory protocol, single-env
