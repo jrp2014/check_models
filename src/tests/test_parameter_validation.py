@@ -570,6 +570,10 @@ class TestUpstreamCliParity:
         "--thinking-start-token": "None defers to the upstream default at call time",
         "--trust-remote-code": "harness defaults on, with a security warning and opt-out",
     }
+    # Display/console flags are outside the generation contract; their
+    # upstream defaults also differ between released and git-HEAD mlx-vlm,
+    # and this test must pass against both.
+    DISPLAY_ONLY_FLAGS: ClassVar[frozenset[str]] = frozenset({"--verbose"})
 
     @staticmethod
     def _capture_parser_defaults(build: Callable[[], object]) -> dict[str, object]:
@@ -607,7 +611,7 @@ class TestUpstreamCliParity:
 
         unexpected: dict[str, tuple[object, object]] = {}
         for option in shared:
-            if option in self.DELIBERATE_DEFAULT_DIVERGENCES:
+            if option in self.DELIBERATE_DEFAULT_DIVERGENCES or option in self.DISPLAY_ONLY_FLAGS:
                 continue
             # None on our side means "defer to upstream default at call time".
             if ours[option] is None and upstream[option] is not None:
@@ -615,14 +619,8 @@ class TestUpstreamCliParity:
             if ours[option] != upstream[option]:
                 unexpected[option] = (ours[option], upstream[option])
         assert not unexpected, f"undocumented CLI default drift vs upstream: {unexpected}"
-
-        # Stale allowlist entries must be pruned once upstream converges.
-        for option, reason in self.DELIBERATE_DEFAULT_DIVERGENCES.items():
-            if option not in shared:
-                continue
-            assert ours[option] != upstream[option], (
-                f"{option} no longer diverges from upstream; drop it from the allowlist ({reason})"
-            )
+        # No reverse "allowlist must diverge" assertion: upstream defaults move
+        # between releases and git HEAD, and this test must pass against both.
 
 
 def test_dry_run_setup_writes_no_log_or_environment_files(
