@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import TYPE_CHECKING
 
 # HF cache environment is configured by conftest.py (early env setup + autouse fixture).
@@ -13,6 +15,7 @@ from huggingface_hub.errors import CacheNotFound
 import check_models
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
 
@@ -300,3 +303,157 @@ def test_is_numeric_value_rejects_non_numbers() -> None:
     # Note: "42" is numeric (can be parsed as number)
     assert not check_models.is_numeric_value(None)
     assert not check_models.is_numeric_value([1, 2, 3])
+
+
+# ---------------------------------------------------------------------------
+# Architecture pre-check (upstream --check-arch tier)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class _FakeSnapshotRef:
+    snapshot_path: str
+
+
+@dataclass(frozen=True)
+class _FakeSnapshotRepo:
+    repo_id: str
+    repo_type: str
+    refs: dict[str, _FakeSnapshotRef]
+
+
+@pytest.fixture(name="_clear_arch_caches")
+def _clear_arch_caches_fixture() -> Iterator[None]:
+    """Isolate the memoized installed-package probes between tests."""
+    check_models._installed_mlx_vlm_model_types.cache_clear()
+    check_models._mlx_vlm_model_remapping.cache_clear()
+    yield
+    check_models._installed_mlx_vlm_model_types.cache_clear()
+    check_models._mlx_vlm_model_remapping.cache_clear()
+
+
+def _fake_mlx_vlm_package(tmp_path: Path, model_types: tuple[str, ...], remapping: str) -> Path:
+    package_dir = tmp_path / "mlx_vlm"
+    for model_type in model_types:
+        (package_dir / "models" / model_type).mkdir(parents=True)
+    (package_dir / "models" / "__pycache__").mkdir(exist_ok=True)
+    (package_dir / "utils.py").write_text(remapping, encoding="utf-8")
+    return package_dir
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_installed_mlx_vlm_model_types_scans_package_dirs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Model-type discovery must scan package folders without importing mlx."""
+    package_dir = _fake_mlx_vlm_package(
+        tmp_path,
+        ("qwen2_vl", "fastvlm"),
+        "MODEL_REMAPPING = {'llava_qwen2': 'fastvlm'}\n",
+    )
+    fake_spec = SimpleNamespace(submodule_search_locations=[str(package_dir)])
+    monkeypatch.setattr(check_models, "find_spec", lambda _name: fake_spec)
+
+    assert check_models._installed_mlx_vlm_model_types() == frozenset({"qwen2_vl", "fastvlm"})
+    assert check_models._mlx_vlm_model_remapping() == {"llava_qwen2": "fastvlm"}
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_installed_mlx_vlm_model_types_handles_missing_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A missing mlx_vlm installation must yield indeterminate, not a crash."""
+    monkeypatch.setattr(check_models, "find_spec", lambda _name: None)
+
+    assert check_models._installed_mlx_vlm_model_types() is None
+    assert check_models._mlx_vlm_model_remapping() == {}
+
+
+@pytest.mark.parametrize(
+    ("model_type", "expected_resolved", "expected_supported"),
+    [
+        ("qwen2_vl", "qwen2_vl", True),
+        ("llava_qwen2", "fastvlm", True),  # alias resolves via MODEL_REMAPPING
+        ("totally_new_arch", "totally_new_arch", False),
+    ],
+)
+def test_model_arch_precheck_resolves_aliases_against_installed_packages(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    model_type: str,
+    expected_resolved: str,
+    expected_supported: bool,
+) -> None:
+    """The pre-check must mirror upstream --check-arch semantics."""
+    snapshot = tmp_path / "snapshots" / "abc"
+    snapshot.mkdir(parents=True)
+    (snapshot / "config.json").write_text(json.dumps({"model_type": model_type}), encoding="utf-8")
+    repo = _FakeSnapshotRepo(
+        repo_id="org/model",
+        repo_type="model",
+        refs={"main": _FakeSnapshotRef(snapshot_path=str(snapshot))},
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_installed_mlx_vlm_model_types",
+        lambda: frozenset({"qwen2_vl", "fastvlm"}),
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_mlx_vlm_model_remapping",
+        lambda: {"llava_qwen2": "fastvlm"},
+    )
+
+    result = check_models._model_arch_precheck(repo)
+
+    assert result == (model_type, expected_resolved, expected_supported)
+
+
+def test_model_arch_precheck_is_indeterminate_without_config_or_install(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Missing config or missing installed mlx-vlm must never claim a verdict."""
+    no_snapshot_repo = _FakeSnapshotRepo(repo_id="org/none", repo_type="model", refs={})
+    assert check_models._model_arch_precheck(no_snapshot_repo) == (None, None, None)
+
+    snapshot = tmp_path / "snap"
+    snapshot.mkdir()
+    (snapshot / "config.json").write_text(json.dumps({"model_type": "qwen2_vl"}), "utf-8")
+    repo = _FakeSnapshotRepo(
+        repo_id="org/model",
+        repo_type="model",
+        refs={"main": _FakeSnapshotRef(snapshot_path=str(snapshot))},
+    )
+    monkeypatch.setattr(check_models, "_installed_mlx_vlm_model_types", lambda: None)
+    monkeypatch.setattr(check_models, "_mlx_vlm_model_remapping", dict)
+
+    assert check_models._model_arch_precheck(repo) == ("qwen2_vl", "qwen2_vl", None)
+
+
+def test_arch_precheck_summary_renders_verdict(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The per-model fact renders yes/no with alias resolution, or omits itself."""
+    monkeypatch.setattr(
+        check_models,
+        "_arch_precheck_for_model",
+        lambda _model: ("llava_qwen2", "fastvlm", True),
+    )
+    assert (
+        check_models._arch_precheck_summary("org/model")
+        == "yes (model_type llava_qwen2 via fastvlm)"
+    )
+
+    monkeypatch.setattr(
+        check_models,
+        "_arch_precheck_for_model",
+        lambda _model: ("new_arch", "new_arch", False),
+    )
+    assert check_models._arch_precheck_summary("org/model") == "no (model_type new_arch)"
+
+    monkeypatch.setattr(
+        check_models,
+        "_arch_precheck_for_model",
+        lambda _model: (None, None, None),
+    )
+    assert check_models._arch_precheck_summary("org/model") is None

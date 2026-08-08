@@ -107,6 +107,48 @@ def test_jsonl_records_post_cleanup_memory_for_crashed_attempt(tmp_path: Path) -
     assert rows[0]["metrics"]["post_cleanup_cache_memory_gb"] == 0.25
 
 
+def test_jsonl_records_architecture_precheck_when_determinate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Determinate arch pre-checks must land in the per-model record."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(model_name="org/aliased", generation=None, success=False)
+    monkeypatch.setattr(
+        check_models,
+        "_arch_precheck_for_model",
+        lambda _model: ("llava_qwen2", "fastvlm", True),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    assert rows[0]["architecture"] == {
+        "model_type": "llava_qwen2",
+        "resolved_model_type": "fastvlm",
+        "supported_by_installed_mlx_vlm": True,
+    }
+
+
+def test_jsonl_omits_architecture_record_when_indeterminate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Indeterminate pre-checks must not fabricate an architecture verdict."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(model_name="org/unknown", generation=None, success=False)
+    monkeypatch.setattr(
+        check_models,
+        "_arch_precheck_for_model",
+        lambda _model: (None, None, None),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    assert "architecture" not in rows[0]
+
+
 def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path) -> None:
     """Metadata header should preserve the shared library-version snapshot."""
     output_file = tmp_path / "results.jsonl"

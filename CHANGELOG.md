@@ -7,6 +7,22 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Port upstream mlx-vlm's `--check-arch` compatibility tier into discovery
+  diagnostics: cached `config.json` `model_type` (with `MODEL_REMAPPING`
+  aliases parsed from the installed mlx-vlm source via `ast`, never importing
+  mlx) is compared against installed `mlx_vlm/models` packages. Surfaced as
+  `--dry-run` annotations with an unsupported-architecture count, a per-model
+  "Arch supported by installed mlx-vlm" gallery fact, and an optional
+  `architecture` record in `results.jsonl`. Models with unsupported
+  architectures are still attempted so real crash evidence is captured, and
+  upstream's "Model type {x} not supported." crash now classifies as a
+  dedicated `Unsupported Arch`/`UNSUPPORTED_ARCH` category instead of a
+  generic Model Error.
+- Recognise mlx-vlm's server-side thinking marker pairs
+  (`<|channel>thought`/`<channel|>` and `<|START_THINKING|>`/`<|END_THINKING|>`)
+  as first-class thinking-trace delimiters, with the trace's own delimiters
+  excluded from control-token leakage flags (including prefix captures of the
+  generic `<|...|>` pattern).
 - Add a conditional, paste-ready whole-run GitHub issue summary with expanded
   crashes, a compact table of other surfaced results, clean-completion counts,
   and links to full retained evidence. Generate it during normal finalization,

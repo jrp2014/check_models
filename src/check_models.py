@@ -7,8 +7,10 @@ from __future__ import annotations
 # SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS
 # =============================================================================
 import argparse
+import ast
 import base64
 import codecs
+import functools
 import gc
 import hashlib
 import html
@@ -229,6 +231,10 @@ DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = (
     ("<think>", "</think>"),
     ("◁think▷", "◁/think▷"),
+    # Marker pairs recognised by mlx-vlm's server-side thinking splitter
+    # (mlx_vlm/server/responses_state.py ThinkingStreamState defaults).
+    ("<|channel>thought", "<channel|>"),
+    ("<|START_THINKING|>", "<|END_THINKING|>"),
 )
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
@@ -1103,6 +1109,14 @@ class JsonlFailureRecord(TypedDict, total=False):
     exception_chain: list[dict[str, str]]
 
 
+class JsonlArchitectureRecord(TypedDict):
+    """Cached-config architecture pre-check versus the installed mlx-vlm."""
+
+    model_type: str
+    resolved_model_type: str
+    supported_by_installed_mlx_vlm: bool
+
+
 class JsonlResultRecord(TypedDict):
     """Narrow per-model row shape for ``results.jsonl`` output."""
 
@@ -1117,6 +1131,7 @@ class JsonlResultRecord(TypedDict):
     timing: JsonlTimingRecord
     model_provenance: ModelProvenanceRecord
     prompt_diagnostics: dict[str, JsonLike] | None
+    architecture: NotRequired[JsonlArchitectureRecord]
 
 
 @dataclass(frozen=True)
@@ -2577,6 +2592,7 @@ def _gallery_model_facts(
         ("Root exception type", result.root_error_type),
         ("Root exception module", result.root_error_module),
         ("Root exception message", result.root_error_message),
+        ("Arch supported by installed mlx-vlm", _arch_precheck_summary(result.model_name)),
         *_gallery_runtime_facts(result, row),
         *_gallery_prompt_facts(result, model_provenance),
     )
@@ -4259,8 +4275,14 @@ def analyze_generation_text(
         _strip_empty_thinking_wrappers(leakage_text),
     )
     if prompt_signals.has_thinking_trace:
+        # A legitimate detected trace neutralises its own delimiters, including
+        # <|...|>-style pairs where the generic control-token regex captures
+        # only a prefix of the marker (e.g. "<|channel>" of "<|channel>thought").
+        thinking_markers = {"</think>", *prompt_signals.thinking_trace_markers}
         unexpected_special_tokens = [
-            wrapper for wrapper in unexpected_special_tokens if wrapper != "</think>"
+            wrapper
+            for wrapper in unexpected_special_tokens
+            if not any(wrapper in marker for marker in thinking_markers)
         ]
     present_configured_wrappers = [
         wrapper
@@ -10712,6 +10734,12 @@ class CachedModelEligibility:
     repo_id: str
     supported: bool
     reasons: tuple[str, ...] = ()
+    # Architecture pre-check (upstream --check-arch tier): config.json
+    # model_type versus installed mlx_vlm/models packages. ``None`` means
+    # indeterminate — never a claim that generation works.
+    model_type: str | None = None
+    resolved_model_type: str | None = None
+    arch_supported: bool | None = None
 
 
 _HF_CACHE_SCAN_STATE = HFCacheScanState()
@@ -10828,6 +10856,7 @@ _STAGE_CODE_MAP: Final[dict[str, str]] = {
     "API Mismatch": "API_MISMATCH",
     "Config Missing": "CONFIG_MISSING",
     "No Chat Template": "NO_CHAT_TEMPLATE",
+    "Unsupported Arch": "UNSUPPORTED_ARCH",
     "Weight Mismatch": "WEIGHT_MISMATCH",
     "Type Cast Error": "TYPE_CAST",
     "Processor Error": "PROCESSOR",
@@ -11053,6 +11082,7 @@ def _classify_error(error_msg: str) -> str:
         - API Mismatch: Unexpected keyword arguments (transformers/mlx-vlm API changes)
         - Config Missing: Model repository missing required config files
         - No Chat Template: Tokenizer/processor lacks chat template
+        - Unsupported Arch: model_type not supported by installed mlx-vlm
         - Weight Mismatch: Model weights don't match expected parameters
         - Type Cast Error: MLX core type/cast errors (std::bad_cast)
         - Processor Error: Image processor instantiation failures
@@ -11094,6 +11124,9 @@ def _classify_error(error_msg: str) -> str:
             ["does not appear to have a file named", "missing required file", "config is missing"],
         ),
         ("No Chat Template", ["chat_template is not set", "no template argument was passed"]),
+        # Architecture support (upstream raises "Model type {x} not supported.")
+        # Must precede Weight Mismatch / Model Error to avoid misclassification.
+        ("Unsupported Arch", ["model type", "not supported"]),
         # Weight/parameter errors
         ("Weight Mismatch", ["missing", "parameters"]),
         # MLX core errors
@@ -11106,8 +11139,9 @@ def _classify_error(error_msg: str) -> str:
     ]
 
     for error_type, patterns in error_definitions:
-        # Special case for multi-keyword AND logic (Missing Dep, Model Error)
-        if error_type == "Missing Dep":
+        # Special case for multi-keyword AND logic (Missing Dep, Unsupported
+        # Arch, Model Error)
+        if error_type in {"Missing Dep", "Unsupported Arch"}:
             if all(p in msg_lower for p in patterns):
                 return error_type
             continue
@@ -13685,6 +13719,94 @@ def _hf_cache_main_revision_files(repo: object) -> frozenset[str] | None:
     return None
 
 
+def _hf_cache_main_snapshot_path(repo: object) -> Path | None:
+    """Return the snapshot directory for the repo's main revision, if present."""
+    refs = getattr(repo, "refs", None)
+    if isinstance(refs, Mapping) and "main" in refs:
+        snapshot = getattr(refs["main"], "snapshot_path", None)
+        return Path(str(snapshot)) if snapshot else None
+    for revision in getattr(repo, "revisions", ()):
+        if "main" in getattr(revision, "refs", ()):
+            snapshot = getattr(revision, "snapshot_path", None)
+            return Path(str(snapshot)) if snapshot else None
+    return None
+
+
+@functools.cache
+def _installed_mlx_vlm_model_types() -> frozenset[str] | None:
+    """Return model-type package dirs of the installed mlx-vlm without importing it."""
+    try:
+        spec = find_spec("mlx_vlm")
+    except (ImportError, ValueError):
+        return None
+    if spec is None or not spec.submodule_search_locations:
+        return None
+    models_dir = Path(next(iter(spec.submodule_search_locations))) / "models"
+    if not models_dir.is_dir():
+        return None
+    return frozenset(
+        entry.name
+        for entry in models_dir.iterdir()
+        if entry.is_dir() and not entry.name.startswith(("_", "."))
+    )
+
+
+@functools.cache
+def _mlx_vlm_model_remapping() -> Mapping[str, str]:
+    """Parse mlx-vlm's MODEL_REMAPPING alias table from source without importing mlx."""
+    try:
+        spec = find_spec("mlx_vlm")
+    except (ImportError, ValueError):
+        return {}
+    if spec is None or not spec.submodule_search_locations:
+        return {}
+    utils_path = Path(next(iter(spec.submodule_search_locations))) / "utils.py"
+    try:
+        tree = ast.parse(utils_path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, ValueError):
+        return {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name) and target.id == "MODEL_REMAPPING":
+                try:
+                    value = ast.literal_eval(node.value)
+                except ValueError:
+                    return {}
+                if isinstance(value, dict):
+                    return {str(key): str(item) for key, item in value.items()}
+    return {}
+
+
+def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | None]:
+    """Check the cached config's model_type against installed mlx-vlm model packages.
+
+    Mirrors upstream's ``--check-arch`` tier: a file-presence and folder-name
+    check only, never a proof that generation works. Returns
+    ``(model_type, resolved_model_type, supported)`` where ``supported`` is
+    ``None`` when indeterminate (no config, unreadable config, or no installed
+    mlx-vlm package to compare against).
+    """
+    snapshot = _hf_cache_main_snapshot_path(repo)
+    if snapshot is None:
+        return None, None, None
+    config_path = snapshot / "config.json"
+    try:
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, None, None
+    raw_model_type = config.get("model_type") or config.get("speculators_model_type")
+    if not isinstance(raw_model_type, str) or not raw_model_type:
+        return None, None, None
+    model_type = raw_model_type.lower()
+    resolved = _mlx_vlm_model_remapping().get(model_type, model_type)
+    installed = _installed_mlx_vlm_model_types()
+    if installed is None:
+        return model_type, resolved, None
+    return model_type, resolved, resolved in installed
+
+
 def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
     """Classify whether a cached repo should be auto-run like mlx-vlm's server list."""
     repo_id = str(getattr(repo, "repo_id", ""))
@@ -13708,10 +13830,14 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         if not has_safetensors:
             reasons.append("missing safetensors weights")
 
+    model_type, resolved_model_type, arch_supported = _model_arch_precheck(repo)
     return CachedModelEligibility(
         repo_id=repo_id,
         supported=not reasons,
         reasons=tuple(reasons),
+        model_type=model_type,
+        resolved_model_type=resolved_model_type,
+        arch_supported=arch_supported,
     )
 
 
@@ -13734,6 +13860,28 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
             key=lambda entry: entry.repo_id,
         )
     )
+
+
+def _arch_precheck_for_model(model_id: str) -> tuple[str | None, str | None, bool | None]:
+    """Return the cached-config architecture pre-check for one model id.
+
+    Returns ``(model_type, resolved_model_type, supported)`` with all ``None``
+    when the model is not in the local cache scan or the check is indeterminate.
+    """
+    for entry in get_cached_model_eligibility():
+        if entry.repo_id == model_id:
+            return entry.model_type, entry.resolved_model_type, entry.arch_supported
+    return None, None, None
+
+
+def _arch_precheck_summary(model_id: str) -> str | None:
+    """Render the architecture pre-check as one human-readable fact value."""
+    model_type, resolved, supported = _arch_precheck_for_model(model_id)
+    if supported is None or model_type is None:
+        return None
+    resolved_note = f" via {resolved}" if resolved is not None and resolved != model_type else ""
+    verdict = "yes" if supported else "no"
+    return f"{verdict} (model_type {model_type}{resolved_note})"
 
 
 def _all_cached_repo_ids() -> list[str]:
@@ -15030,6 +15178,13 @@ def _build_jsonl_result_record(
         ),
         "prompt_diagnostics": prompt_diagnostics or None,
     }
+    model_type, resolved_model_type, arch_supported = _arch_precheck_for_model(result.model_name)
+    if model_type is not None and resolved_model_type is not None and arch_supported is not None:
+        record["architecture"] = {
+            "model_type": model_type,
+            "resolved_model_type": resolved_model_type,
+            "supported_by_installed_mlx_vlm": arch_supported,
+        }
     return record
 
 
@@ -17668,8 +17823,30 @@ def _handle_dry_run(
     if not model_identifiers:
         logger.warning("   ⚠️  No models to process!")
     else:
+        unsupported_arch_count = 0
         for idx, model_id in enumerate(model_identifiers, start=1):
-            logger.info("   %2d. %s", idx, model_id)
+            model_type, resolved, arch_supported = _arch_precheck_for_model(model_id)
+            if arch_supported is False:
+                unsupported_arch_count += 1
+                resolved_note = (
+                    f" (resolves to {resolved})" if resolved and resolved != model_type else ""
+                )
+                logger.info(
+                    "   %2d. %s  ⚠️ model_type %s%s not in installed mlx_vlm/models",
+                    idx,
+                    model_id,
+                    model_type,
+                    resolved_note,
+                )
+            else:
+                logger.info("   %2d. %s", idx, model_id)
+        if unsupported_arch_count:
+            logger.warning(
+                "   %d model(s) use architectures not supported by the installed mlx-vlm "
+                "(folder-name pre-check only; they will still be attempted to capture "
+                "real crash evidence)",
+                unsupported_arch_count,
+            )
 
     log_blank()
     logger.info("📊 Would process %d model(s)", len(model_identifiers))

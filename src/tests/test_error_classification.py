@@ -30,6 +30,10 @@ from check_models import (
         # Config/Validation errors
         ("does not appear to have a file named config.json", "Config Missing"),
         ("ValueError: chat_template is not set", "No Chat Template"),
+        # Upstream mlx-vlm raises "Model type {x} not supported." — must beat
+        # the generic Weight Mismatch / Model Error buckets.
+        ("Model type llava_qwen2 not supported. Error: no module", "Unsupported Arch"),
+        ("ValueError: Model type foo not supported.", "Unsupported Arch"),
         ("ValueError: Missing 5 parameters:", "Weight Mismatch"),
         # MLX/Core errors
         ("std::bad_cast", "Type Cast Error"),

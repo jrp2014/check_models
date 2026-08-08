@@ -382,6 +382,36 @@ def test_closed_thinking_trace_is_neutral_and_model_name_invariant() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    ("start_marker", "end_marker"),
+    [
+        ("<|channel>thought", "<channel|>"),
+        ("<|START_THINKING|>", "<|END_THINKING|>"),
+    ],
+)
+def test_upstream_server_thinking_marker_pairs_are_recognised(
+    start_marker: str,
+    end_marker: str,
+) -> None:
+    """mlx-vlm server marker pairs must behave exactly like <think></think>."""
+    closed = _result(
+        f"{start_marker}Inspect the scene.{end_marker} A blue boat rests on calm water."
+    )
+    assert check_models._assess_result(closed) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+    # The trace's own delimiters must not be double-flagged as leaked control
+    # tokens by the generic <|...|> pattern.
+    details = check_models._observation_details(closed)
+    assert "unexpected_special_tokens" not in details
+    assert details["thinking_trace_markers"] == [start_marker, end_marker]
+
+    unclosed = _result(f"{start_marker}Inspect the scene forever...")
+    analysis = unclosed.quality_analysis
+    assert analysis is not None
+    assert analysis.thinking_trace_incomplete
+
+
 def test_closed_thinking_trace_without_final_answer_is_unusable() -> None:
     result = _result("<think>Inspect the scene.</think>")
 
