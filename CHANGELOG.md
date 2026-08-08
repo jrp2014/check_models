@@ -25,6 +25,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate duplicate and dead code in `check_models.py` (net −132 lines,
+  behavior-preserving): delete the unused `_native_mlx_vlm_*_kwargs` repro trio
+  superseded by the CLI-token builder; drop vestigial `artifact_name`/`prompt`
+  parameters; collapse the byte-identical timed/untimed branches of
+  `_prepare_generation_prompt` with `nullcontext`; share one memory-delta
+  fallback helper between history and JSONL records; share one failure-outcome
+  helper across run-issue-summary skip paths; route the styled log wrappers
+  through one `_log_styled` helper; extract the repeated relative-target
+  builder inside `_markdown_artifact_target`; reuse `_make_rich_console` for
+  the reports dashboard console; and hoist an O(n²) per-result provenance
+  rebuild out of `save_run_json_report`. Reviewed-and-rejected merges (accessor
+  chain, escaper classes, lib-name tuple derivation, 4-site metric-record
+  unification) are documented inline where relevant.
 - Stop tracking the bulky regenerated run artifacts in git
   (`results.history.jsonl`, `results.html`, `model_gallery.md`,
   `check_models.log` — they remain on disk and gitignored) while keeping the

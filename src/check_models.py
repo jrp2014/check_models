@@ -35,6 +35,7 @@ from contextlib import (
     ContextDecorator,
     ExitStack,
     contextmanager,
+    nullcontext,
     redirect_stderr,
     redirect_stdout,
     suppress,
@@ -2928,7 +2929,12 @@ class LogStyles:
     MODEL_NAME: ClassVar[str] = "model_name"
 
 
-def _make_rich_console(*, width: int | None = None) -> Console:
+def _make_rich_console(
+    *,
+    width: int | None = None,
+    markup: bool = False,
+    highlight: bool = False,
+) -> Console:
     """Create the shared console object used by Rich logging."""
     colors_enabled = _rich_color_enabled()
     force_terminal = True if colors_enabled and os.getenv("FORCE_COLOR") is not None else None
@@ -2937,8 +2943,8 @@ def _make_rich_console(*, width: int | None = None) -> Console:
         width=width,
         force_terminal=force_terminal,
         no_color=not colors_enabled,
-        markup=False,
-        highlight=False,
+        markup=markup,
+        highlight=highlight,
         emoji=True,
     )
 
@@ -6893,26 +6899,13 @@ def _github_output_artifact_url(
     return _github_repo_artifact_url(repo_relative, anchor=anchor)
 
 
-def _markdown_artifact_target(
+def _relative_markdown_artifact_target(
     *,
     report_filename: Path,
     artifact_filename: Path,
-    anchor: str | None = None,
+    anchor: str | None,
 ) -> str:
-    """Return the best Markdown target for a companion artifact link."""
-    if _LinkStyleState.value == "relative":
-        target = _relative_markdown_artifact_path(
-            report_filename=report_filename,
-            artifact_filename=artifact_filename,
-        ).replace(" ", "%20")
-        if anchor is not None:
-            return f"{target}#{anchor}"
-        return target
-
-    github_url = _github_output_artifact_url(artifact_filename, anchor=anchor)
-    if github_url is not None:
-        return github_url
-
+    """Return an escaped relative Markdown target with an optional anchor."""
     target = _relative_markdown_artifact_path(
         report_filename=report_filename,
         artifact_filename=artifact_filename,
@@ -6920,6 +6913,25 @@ def _markdown_artifact_target(
     if anchor is not None:
         return f"{target}#{anchor}"
     return target
+
+
+def _markdown_artifact_target(
+    *,
+    report_filename: Path,
+    artifact_filename: Path,
+    anchor: str | None = None,
+) -> str:
+    """Return the best Markdown target for a companion artifact link."""
+    if _LinkStyleState.value != "relative":
+        github_url = _github_output_artifact_url(artifact_filename, anchor=anchor)
+        if github_url is not None:
+            return github_url
+
+    return _relative_markdown_artifact_target(
+        report_filename=report_filename,
+        artifact_filename=artifact_filename,
+        anchor=anchor,
+    )
 
 
 def _issue_markdown_artifact_target(
@@ -7639,6 +7651,9 @@ _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
 )
 
 # Library names to include in the environment table (order matters)
+# NOTE: deliberately similar to _ISSUE_RELEVANT_LIB_NAMES below but not derivable
+# from it: diagnostics adds mlx-audio (runtime probe surface) while issue drafts
+# add Pillow (image decode provenance). Keep both lists explicit.
 _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
@@ -8114,12 +8129,9 @@ def _append_markdown_image_metadata_section(
 def _write_markdown_artifact(
     filename: Path,
     markdown_lines: Sequence[str],
-    *,
-    artifact_name: str,
 ) -> None:
     """Normalize and write Markdown artifact content."""
     markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
-    del artifact_name
     _write_text_file(filename, markdown_content)
 
 
@@ -9709,7 +9721,7 @@ def generate_markdown_gallery_report(
     _append_markdown_wrapped_blockquote(md, prompt)
     md.extend(_generate_model_gallery_section(report_context))
 
-    _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
+    _write_markdown_artifact(filename, md)
 
 
 def _assessments_by_model(
@@ -11733,43 +11745,25 @@ def _prepare_generation_prompt(
     """Run preflight checks and build the prompt payload for generation."""
     try:
         chat_template_kwargs = _build_chat_template_kwargs(params)
-        if phase_timer is not None:
-            with phase_timer.track("prompt_prep"):
-                _run_model_preflight_validators(
-                    model_identifier=params.model_identifier,
-                    processor=processor,
-                    config=config,
-                    phase_callback=phase_callback,
-                )
-                _set_failure_phase(phase_callback, "prefill")
-                return cast(
-                    "str | list[object]",
-                    apply_chat_template(
-                        processor=processor,
-                        config=config,
-                        prompt=params.prompt,
-                        num_images=1,
-                        **chat_template_kwargs,
-                    ),
-                )
-
-        _run_model_preflight_validators(
-            model_identifier=params.model_identifier,
-            processor=processor,
-            config=config,
-            phase_callback=phase_callback,
-        )
-        _set_failure_phase(phase_callback, "prefill")
-        return cast(
-            "str | list[object]",
-            apply_chat_template(
+        timer_scope = phase_timer.track("prompt_prep") if phase_timer is not None else nullcontext()
+        with timer_scope:
+            _run_model_preflight_validators(
+                model_identifier=params.model_identifier,
                 processor=processor,
                 config=config,
-                prompt=params.prompt,
-                num_images=1,
-                **chat_template_kwargs,
-            ),
-        )
+                phase_callback=phase_callback,
+            )
+            _set_failure_phase(phase_callback, "prefill")
+            return cast(
+                "str | list[object]",
+                apply_chat_template(
+                    processor=processor,
+                    config=config,
+                    prompt=params.prompt,
+                    num_images=1,
+                    **chat_template_kwargs,
+                ),
+            )
     except ValueError as preflight_err:
         message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
         logger.exception("Model preflight validation failed for %s", params.model_identifier)
@@ -12517,22 +12511,25 @@ def exit_with_cli_error(
     raise SystemExit(exit_code)
 
 
+def _log_styled(level: int, msg: str, *, prefix: str, separator: str, style_hint: str) -> None:
+    """Log one styled status message with an optional emoji prefix."""
+    formatted_msg = f"{prefix}{separator}{msg}" if prefix else msg
+    logger.log(level, formatted_msg, extra={"style_hint": style_hint})
+
+
 def log_success(msg: str, *, prefix: str = "✓") -> None:
     """Log a success message with green styling and optional prefix."""
-    formatted_msg = f"{prefix} {msg}" if prefix else msg
-    logger.info(formatted_msg, extra={"style_hint": LogStyles.SUCCESS})
+    _log_styled(logging.INFO, msg, prefix=prefix, separator=" ", style_hint=LogStyles.SUCCESS)
 
 
 def log_warning_note(msg: str, *, prefix: str = "⚠️") -> None:
     """Log a warning note (non-error condition worth noting)."""
-    formatted_msg = f"{prefix}  {msg}" if prefix else msg
-    logger.warning(formatted_msg, extra={"style_hint": LogStyles.WARNING})
+    _log_styled(logging.WARNING, msg, prefix=prefix, separator="  ", style_hint=LogStyles.WARNING)
 
 
 def log_failure(msg: str, *, prefix: str = "✗") -> None:
     """Log a failure message with red styling and optional prefix."""
-    formatted_msg = f"{prefix} {msg}" if prefix else msg
-    logger.error(formatted_msg, extra={"style_hint": LogStyles.ERROR})
+    _log_styled(logging.ERROR, msg, prefix=prefix, separator=" ", style_hint=LogStyles.ERROR)
 
 
 def log_metric_label(label: str, *, emoji: str = "", indent: str = "") -> None:
@@ -12879,7 +12876,7 @@ def _log_verbose_success_details_mode(
         log_blank()
         _log_perf_block(res)
         log_blank()
-        _log_additional_diagnostics(res, gen_text, prompt=prompt)
+        _log_additional_diagnostics(res, gen_text)
     else:
         _log_compact_metrics(res)
 
@@ -13018,11 +13015,8 @@ def _log_perf_block(res: PerformanceResult) -> None:
 def _log_additional_diagnostics(
     res: PerformanceResult,
     gen_text: str,
-    *,
-    prompt: str | None = None,
 ) -> None:
     """Log retained mechanical output observations in detailed mode."""
-    del prompt
     if not gen_text:
         return
     analysis = _quality_analysis_for_result(res)
@@ -14817,6 +14811,18 @@ def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
     return prompt if len(prompt) <= max_chars else f"{prompt[:max_chars]}..."
 
 
+def _resolved_memory_deltas_gb(
+    result: PerformanceResult,
+    performance: GenerationPerformanceData,
+) -> tuple[float, float]:
+    """Prefer explicitly captured memory deltas, falling back to generation data."""
+    active = (
+        result.active_memory if result.active_memory is not None else performance.active_memory_gb
+    )
+    cache = result.cache_memory if result.cache_memory is not None else performance.cache_memory_gb
+    return active, cache
+
+
 def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
     """Return raw execution, timing, token, and resource facts for one model."""
     record: HistoryModelResultRecord = {
@@ -14833,6 +14839,7 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
     }
     if result.generation is not None:
         performance = _extract_generation_performance_data(result.generation)
+        active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance)
         record.update(
             {
                 "prompt_tokens": performance.prompt_tokens,
@@ -14840,16 +14847,8 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
                 "total_tokens": performance.total_tokens,
                 "generation_tps": performance.generation_tps,
                 "peak_memory_gb": performance.peak_memory_gb,
-                "active_memory_gb": (
-                    result.active_memory
-                    if result.active_memory is not None
-                    else performance.active_memory_gb
-                ),
-                "cache_memory_gb": (
-                    result.cache_memory
-                    if result.cache_memory is not None
-                    else performance.cache_memory_gb
-                ),
+                "active_memory_gb": active_memory_gb,
+                "cache_memory_gb": cache_memory_gb,
             }
         )
     if result.runtime_diagnostics is not None:
@@ -14971,6 +14970,7 @@ def _build_jsonl_metrics_record(
         return metrics
 
     performance_data = _extract_generation_performance_data(generation)
+    active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance_data)
     metrics.update(
         {
             "prompt_tokens": performance_data.prompt_tokens,
@@ -14979,16 +14979,8 @@ def _build_jsonl_metrics_record(
             "prompt_tps": performance_data.prompt_tps,
             "generation_tps": performance_data.generation_tps,
             "peak_memory_gb": performance_data.peak_memory_gb,
-            "active_memory_gb": (
-                result.active_memory
-                if result.active_memory is not None
-                else performance_data.active_memory_gb
-            ),
-            "cache_memory_gb": (
-                result.cache_memory
-                if result.cache_memory is not None
-                else performance_data.cache_memory_gb
-            ),
+            "active_memory_gb": active_memory_gb,
+            "cache_memory_gb": cache_memory_gb,
         }
     )
     model_load_active_memory_gb = (
@@ -15278,6 +15270,7 @@ def save_run_json_report(
         for _model_name, assessment in report_context.assessments
     ):
         artifacts["run_issue_summary"] = "issues/run_summary.md"
+    provenance_by_model = _model_provenance_by_model(report_context)
     payload: RunJsonReportRecord = {
         "schema_version": "2.0",
         "generated_at": local_now_str(),
@@ -15300,7 +15293,7 @@ def save_run_json_report(
         "trust_remote_code": trust_remote_code,
         "model_provenance": {
             result.model_name: _public_model_provenance(
-                _model_provenance_by_model(report_context).get(result.model_name)
+                provenance_by_model.get(result.model_name)
                 or _collect_model_provenance(
                     result.model_name,
                     requested_revision=requested_revision,
@@ -16298,7 +16291,6 @@ def generate_run_issue_summary_report(
     _write_markdown_artifact(
         summary_path,
         (title, "", *render_report_markdown(tuple(blocks))),
-        artifact_name="run issue summary",
     )
     return summary_path
 
@@ -16401,117 +16393,6 @@ def _issue_public_image_source_url(run_args: argparse.Namespace | None) -> str |
         return _parse_public_image_source_url(source_url)
     except argparse.ArgumentTypeError:
         return None
-
-
-def _native_mlx_vlm_load_kwargs(
-    run_args: argparse.Namespace | None,
-    *,
-    resolved_revision: str | None = None,
-) -> dict[str, object]:
-    """Return ``mlx_vlm.utils.load`` kwargs represented in native repro scripts."""
-    kwargs: dict[str, object] = {
-        "trust_remote_code": bool(getattr(run_args, "trust_remote_code", True))
-    }
-    if run_args is None:
-        if resolved_revision is not None:
-            kwargs["revision"] = resolved_revision
-        return kwargs
-
-    adapter_path = getattr(run_args, "adapter_path", None)
-    if adapter_path is not None:
-        kwargs["adapter_path"] = str(adapter_path)
-    revision = resolved_revision or getattr(run_args, "revision", None)
-    if revision is not None:
-        kwargs["revision"] = str(revision)
-    if bool(getattr(run_args, "lazy_load", False)):
-        kwargs["lazy"] = True
-    if bool(getattr(run_args, "force_download", False)):
-        kwargs["force_download"] = True
-    if bool(getattr(run_args, "quantize_activations", False)):
-        kwargs["quantize_activations"] = True
-    return kwargs
-
-
-def _native_mlx_vlm_template_kwargs(
-    run_args: argparse.Namespace | None,
-) -> dict[str, object]:
-    """Return chat-template kwargs matching the benchmark's thinking setup."""
-    if run_args is None or not bool(getattr(run_args, "enable_thinking", False)):
-        return {}
-
-    kwargs: dict[str, object] = {
-        "enable_thinking": True,
-        "thinking_end_token": getattr(
-            run_args,
-            "thinking_end_token",
-            DEFAULT_THINKING_END_MARKER,
-        ),
-    }
-    thinking_budget = getattr(run_args, "thinking_budget", None)
-    if thinking_budget is not None:
-        kwargs["thinking_budget"] = thinking_budget
-    thinking_start_token = getattr(run_args, "thinking_start_token", None)
-    if thinking_start_token is not None:
-        kwargs["thinking_start_token"] = thinking_start_token
-    return kwargs
-
-
-def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
-    """Return ``mlx_vlm.generate.generate`` kwargs for native repro scripts."""
-    kwargs: dict[str, object] = {
-        "max_tokens": getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
-        if run_args is not None
-        else DEFAULT_MAX_TOKENS,
-        "temperature": getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
-        if run_args is not None
-        else DEFAULT_TEMPERATURE,
-    }
-    if run_args is None:
-        return kwargs
-
-    scalar_optional_fields = (
-        ("top_p", 1.0),
-        ("min_p", 0.0),
-        ("top_k", 0),
-        ("seed", None),
-        ("repetition_penalty", None),
-        ("repetition_context_size", 20),
-        ("presence_penalty", None),
-        ("presence_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
-        ("frequency_penalty", None),
-        ("frequency_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
-        ("max_kv_size", None),
-        ("kv_bits", None),
-        ("kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
-        ("kv_group_size", DEFAULT_KV_GROUP_SIZE),
-        ("quantized_kv_start", DEFAULT_QUANTIZED_KV_START),
-        ("prefill_step_size", None),
-        ("thinking_budget", None),
-        ("thinking_start_token", None),
-        ("thinking_end_token", DEFAULT_THINKING_END_MARKER),
-    )
-    for attr_name, default_value in scalar_optional_fields:
-        value = getattr(run_args, attr_name, default_value)
-        if value != default_value and value is not None:
-            kwargs[attr_name] = value
-
-    resize_shape = getattr(run_args, "resize_shape", None)
-    if resize_shape is not None:
-        kwargs["resize_shape"] = tuple(resize_shape)
-    eos_tokens = getattr(run_args, "eos_tokens", None)
-    if eos_tokens:
-        kwargs["eos_tokens"] = list(eos_tokens)
-    if bool(getattr(run_args, "skip_special_tokens", False)):
-        kwargs["skip_special_tokens"] = True
-    if bool(getattr(run_args, "enable_thinking", False)):
-        kwargs["enable_thinking"] = True
-    logit_bias = getattr(run_args, "logit_bias", None)
-    if logit_bias:
-        kwargs["logit_bias"] = dict(logit_bias)
-    processor_kwargs = getattr(run_args, "processor_kwargs", None)
-    if processor_kwargs:
-        kwargs.update(processor_kwargs)
-    return kwargs
 
 
 def _append_native_cli_optional_pair(
@@ -17090,6 +16971,19 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
     )
 
 
+def _run_issue_summary_failure(
+    summary_path: Path,
+    error_message: str,
+) -> tuple[Path | None, ReportArtifactOutcome]:
+    """Describe one failed or skipped run-issue-summary artifact outcome."""
+    return None, ReportArtifactOutcome(
+        key="run_issue_summary",
+        path=summary_path,
+        succeeded=False,
+        error_message=error_message,
+    )
+
+
 def _generate_run_issue_summary_output(
     inputs: ReportGenerationInputs,
     *,
@@ -17106,12 +17000,7 @@ def _generate_run_issue_summary_output(
         error_message = "Skipped because current JSONL generation failed."
         if cleanup_error is not None:
             error_message += f" Stale summary cleanup failed: {cleanup_error}"
-        return None, ReportArtifactOutcome(
-            key="run_issue_summary",
-            path=summary_path,
-            succeeded=False,
-            error_message=error_message,
-        )
+        return _run_issue_summary_failure(summary_path, error_message)
     summary_required = any(
         assessment.maintainer_status != "none" or assessment.execution == "indeterminate"
         for _, assessment in inputs.report_context.assessments
@@ -17120,23 +17009,16 @@ def _generate_run_issue_summary_output(
         cleanup_error = _remove_run_issue_summary(inputs.output_paths)
         if cleanup_error is None:
             return None, None
-        return None, ReportArtifactOutcome(
-            key="run_issue_summary",
-            path=summary_path,
-            succeeded=False,
-            error_message=f"Stale summary cleanup failed: {cleanup_error}",
+        return _run_issue_summary_failure(
+            summary_path,
+            f"Stale summary cleanup failed: {cleanup_error}",
         )
     if not diagnostics_succeeded:
         cleanup_error = _remove_run_issue_summary(inputs.output_paths)
         error_message = "Skipped because current diagnostics generation failed."
         if cleanup_error is not None:
             error_message += f" Stale summary cleanup failed: {cleanup_error}"
-        return None, ReportArtifactOutcome(
-            key="run_issue_summary",
-            path=summary_path,
-            succeeded=False,
-            error_message=error_message,
-        )
+        return _run_issue_summary_failure(summary_path, error_message)
     try:
         generated = generate_run_issue_summary_report(
             inputs.output_paths,
@@ -17150,12 +17032,7 @@ def _generate_run_issue_summary_output(
         error_message = str(error)
         if cleanup_error is not None:
             error_message += f"; stale summary cleanup failed: {cleanup_error}"
-        return None, ReportArtifactOutcome(
-            key="run_issue_summary",
-            path=summary_path,
-            succeeded=False,
-            error_message=error_message,
-        )
+        return _run_issue_summary_failure(summary_path, error_message)
     outcome = (
         ReportArtifactOutcome(
             key="run_issue_summary",
@@ -17462,16 +17339,7 @@ def _print_reports_dashboard(
     run_issue_summary: Path | None = None,
 ) -> None:
     """Print a highly polished, unified console dashboard of all generated artifacts."""
-    colors_enabled = _rich_color_enabled()
-    force_terminal = True if colors_enabled and os.getenv("FORCE_COLOR") is not None else None
-    console = Console(
-        stderr=True,
-        force_terminal=force_terminal,
-        no_color=not colors_enabled,
-        markup=True,
-        highlight=True,
-        emoji=True,
-    )
+    console = _make_rich_console(markup=True, highlight=True)
 
     table = Table(
         box=None,
