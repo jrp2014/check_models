@@ -66,7 +66,7 @@ CATALOG_PROMPT = (
             check_models.ResultAssessment(
                 "completed",
                 "usable_with_caveats",
-                "observation_needs_reproduction",
+                "none",
                 ("minimal_output",),
             ),
             id="minimal-output",
@@ -83,7 +83,7 @@ CATALOG_PROMPT = (
             check_models.ResultAssessment(
                 "completed",
                 "unusable",
-                "observation_needs_reproduction",
+                "none",
                 ("missing_requested_sections",),
             ),
             id="missing-requested-sections",
@@ -106,7 +106,7 @@ CATALOG_PROMPT = (
             check_models.ResultAssessment(
                 "completed",
                 "unusable",
-                "observation_needs_reproduction",
+                "none",
                 ("prompt_instruction_echo",),
             ),
             id="instruction-echo",
@@ -151,7 +151,7 @@ CATALOG_PROMPT = (
             check_models.ResultAssessment(
                 "completed",
                 "usable_with_caveats",
-                "observation_needs_reproduction",
+                "none",
                 ("no_keyword_overlap",),
             ),
             id="no-keyword-overlap",
@@ -228,7 +228,7 @@ def test_catalog_constraint_violations_are_repairable_caveats(
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed",
         "usable_with_caveats",
-        "observation_needs_reproduction",
+        "none",
         ("catalog_constraint_violation",),
     )
 
@@ -655,7 +655,7 @@ def test_assisted_output_returning_every_supplied_draft_field_is_observed_exactl
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed",
         "usable_with_caveats",
-        "observation_needs_reproduction",
+        "none",
         ("catalog_constraint_violation", "draft_returned_unchanged"),
     )
 

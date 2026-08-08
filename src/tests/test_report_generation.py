@@ -422,7 +422,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert "1 clean completion; see the [full model gallery]" in content
+    assert "1 clean completion. See the [full model gallery]" in content
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -549,8 +549,19 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
         "## Completed Runs with Observations",
         end_headings=("## Indeterminate Attempts",),
     )
-    assert triage.index("org/z-repeated") < triage.index("org/a-minimal")
-    assert observations.index("org/z-repeated") < observations.index("org/a-minimal")
+    # Repetition is an integration signal; a minimal response is a
+    # compliance-only note and stays out of the maintainer lane entirely.
+    assert "org/z-repeated" in triage
+    assert "org/a-minimal" not in triage
+    assert "org/z-repeated" in observations
+    assert "org/a-minimal" not in observations
+    compliance = _extract_markdown_subsection(
+        content,
+        "## Model Compliance Notes (not maintainer issues)",
+        end_headings=("## Clean Completion Context",),
+    )
+    assert "org/a-minimal" in compliance
+    assert "org/z-repeated" not in compliance
 
 
 def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
@@ -2119,7 +2130,9 @@ def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
 
 def test_tabs_round_trip_across_every_public_model_evidence_artifact(tmp_path: Path) -> None:
     """Hard tabs in captured model output must survive JSON, Markdown, and HTML."""
-    output = "left\tright"
+    # The leaked control token keeps this an integration signal so diagnostics
+    # carries the evidence block (compliance-only results no longer do).
+    output = "left\tright<|end|>"
     result = replace(
         _make_success("org/tabbed"),
         generation=_MockGeneration(text=output, generation_tokens=2),
@@ -4678,8 +4691,8 @@ class TestMarkdownGalleryReport:
         assert "usable" in short_row
         assert "insufficient sample" in short_row
         assert "999" not in short_row
-        assert "Fastest valid generation: `org/valid` at 40.0 tok/s" in content
-        assert "Average valid generation throughput: 40.0 tok/s" in content
+        assert "Fastest clean completion: `org/valid` at 40.0 tok/s" in content
+        assert "Average clean-completion throughput: 40.0 tok/s" in content
         evidence = _extract_markdown_subsection(
             content,
             "### org/short",
@@ -4707,6 +4720,7 @@ class TestMarkdownGalleryReport:
                 generation_tps=tps,
                 first_token_latency_s=None,
                 peak_memory_gb=memory,
+                prompt_tokens=200,
                 generation_tokens=100,
                 output_preview="",
             )
@@ -4730,7 +4744,8 @@ class TestMarkdownGalleryReport:
         # Throughput tie at 30.0 resolves alphabetically.
         assert data.fastest is not None
         assert data.fastest.model == "org/a-usable"
-        assert data.average_tps == pytest.approx((30.0 + 30.0 + 10.0) / 3)
+        # org/caveats is excluded: highlights consider clean completions only.
+        assert data.average_tps == pytest.approx((30.0 + 30.0) / 2)
         assert data.lowest_memory is not None
         assert data.lowest_memory.model == "org/a-usable"
 
@@ -4855,11 +4870,12 @@ class TestMarkdownGalleryReport:
         )
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
         assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
-        # Ties on throughput resolve alphabetically; alpha wins over beta at 30.
-        assert "Fastest valid generation: `org/alpha` at " in highlights
-        assert "Average valid generation throughput: " in highlights
-        # gamma has the lowest captured peak memory (1.0 GB).
-        assert "Lowest captured peak memory: `org/gamma` at " in highlights
+        # Highlights consider only clean completions (usable, no observations);
+        # ties on throughput resolve alphabetically.
+        assert "Fastest clean completion: `org/alpha` at " in highlights
+        assert "Average clean-completion throughput: " in highlights
+        # gamma has the lowest captured peak memory (1.0 GB) among clean rows.
+        assert "Lowest peak memory among clean completions: `org/gamma` at " in highlights
 
     def test_gallery_crash_evidence_keeps_traceback_before_captured_output(
         self,

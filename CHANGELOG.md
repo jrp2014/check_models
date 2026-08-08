@@ -7,6 +7,35 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Separate model prompt compliance from maintainer-worthy observations: each
+  observation in the display registry now declares whether it is an
+  integration signal (repetition, empty output, control-token/role leakage,
+  incomplete or unanswered thinking) or a compliance note (missing fields,
+  constraint counts, hint copying, instruction echo, minimal output, cap
+  hits). Only integration signals place a completed model in the maintainer
+  lane; compliance-only results keep their usability impact and move to a new
+  "Model Compliance Notes (not maintainer issues)" diagnostics section, and
+  the run summary reports them beside the strictly observation-free clean
+  count.
+- Rank observation summaries by integration importance (registry order)
+  instead of frequency in the index dashboard, diagnostics counts, and
+  run-summary clusters, so e.g. repetition outranks a frequent constraint
+  miss.
+- Wrapper-aware structural parsing: generic control-token wrappers and empty
+  thinking wrappers are stripped from the semantic analysis copy before
+  section/preamble/cutoff detection, so a model that produced the requested
+  fields inside a leaked wrapper (e.g. "<|begin_of_box|>Title: ...") is
+  assessed on those fields while the leak itself is still reported.
+- Resource highlights now consider only clean completions ("Fastest clean
+  completion", "Lowest peak memory among clean completions") and the average
+  throughput line carries an explicit cross-model comparability caveat.
+- The choosers gain a "Prompt tok" column (full rendered prompt including
+  image tokens) so prefill cost is attributable at a glance.
+- Load failures reporting parameters the architecture does not expect
+  ("Received N parameters not in model") now attribute to mlx-vlm
+  (architecture/conversion mismatch) instead of mlx; genuinely missing
+  weights stay with the model-config owner.
+
 - Diagnostics per-model facts now include the "Arch supported by installed
   mlx-vlm" pre-check verdict (previously gallery-only), so the maintainer
   surface carries the architecture context directly.

@@ -4278,7 +4278,14 @@ def analyze_generation_text(
         text,
         known_special_tokens=known_special_tokens,
     )
-    analysis_text = normalized.text
+    # Wrapper-aware semantic copy: drop empty thinking wrappers and generic
+    # control-token wrappers before structural analysis, so a model that
+    # produced the requested fields inside a leaked wrapper (e.g.
+    # "<|begin_of_box|>Title: ...") is assessed on those fields. The leak
+    # itself is still detected and reported from the raw text below.
+    analysis_text = CONTROL_TOKEN_WRAPPER_RE.sub(
+        " ", _strip_empty_thinking_wrappers(normalized.text)
+    )
     is_repetitive, repeated_token = _detect_repetitive_output(analysis_text)
     prompt_signals = _collect_prompt_quality_signals(
         analysis_text,
@@ -6389,7 +6396,11 @@ def _validate_report_render_context(context: ReportRenderContext) -> None:
     legal_axes: frozenset[tuple[ExecutionStatus, ModelUsability, MaintainerStatus]] = frozenset(
         {
             ("completed", "usable", "none"),
+            # Compliance-only observations degrade usability without entering
+            # the maintainer lane; integration signals add the maintainer axis.
+            ("completed", "usable_with_caveats", "none"),
             ("completed", "usable_with_caveats", "observation_needs_reproduction"),
+            ("completed", "unusable", "none"),
             ("completed", "unusable", "observation_needs_reproduction"),
             ("crashed", "not_evaluated", "actionable_failure"),
             ("indeterminate", "not_evaluated", "none"),
@@ -7216,6 +7227,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
             else None
         ),
         peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
+        prompt_tokens=_generation_int_metric(generation, "prompt_tokens"),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
         output_preview=output_preview,
     )
@@ -7229,6 +7241,12 @@ class ObservationDisplaySpec:
     maintainer_label: str
     selector_gloss: str
     unusable: bool = False
+    # True when the observation plausibly indicates an mlx-vlm/library
+    # integration issue (template handling, detokenization, control-token
+    # leakage, degenerate decoding) rather than model prompt compliance.
+    # Compliance-only observations stay chooser-relevant but do not put a
+    # model into the maintainer lane.
+    integration_signal: bool = False
 
 
 # Display priority is list order: gross unusable signals first, then caveats.
@@ -7238,23 +7256,27 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "No response text was returned",
         "empty response",
         unusable=True,
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "repeated_output",
         "Response repeats the same text",
         "repeated text",
         unusable=True,
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "missing_final_answer",
         "Internal reasoning is present but no final answer was returned",
         "thinking only, no answer",
         unusable=True,
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "unexpected_special_token",
         "Unrecognised model control tokens remain visible",
         "control tokens visible",
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "missing_requested_sections",
@@ -7285,21 +7307,25 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "Internal reasoning block appears incomplete",
         "incomplete thinking block",
         unusable=True,
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "role_boundary_token_present",
         "Conversation-role control tokens remain visible",
         "role tokens visible",
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "thinking_trace_present",
         "Internal reasoning text remains visible",
         "thinking text visible",
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "configured_wrapper_present",
         "Expected model wrapper tokens remain visible",
         "wrapper tokens visible",
+        integration_signal=True,
     ),
     ObservationDisplaySpec(
         "catalog_constraint_violation",
@@ -7339,6 +7365,9 @@ _OBSERVATION_SELECTOR_GLOSSES: Final[dict[ObservationCode, str]] = {
 }
 _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
     spec.code for spec in _OBSERVATION_DISPLAY_SPECS if spec.unusable
+)
+_INTEGRATION_SIGNAL_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
+    spec.code for spec in _OBSERVATION_DISPLAY_SPECS if spec.integration_signal
 )
 _RANGE_ENDPOINT_COUNT: Final[int] = 2
 _USABILITY_DISPLAY_PRIORITY: Final[dict[ModelUsability, int]] = {
@@ -7509,12 +7538,17 @@ class GalleryChooserData:
 
 
 def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
-    """Compute the single chooser ordering and resource highlights once."""
+    """Compute the single chooser ordering and resource highlights once.
+
+    Highlights consider only clean completions (usable, no observations): a
+    fast model that merely reformulates supplied hints is not a useful
+    "fastest" recommendation.
+    """
     ordered = tuple(
         sorted(rows, key=lambda row: (_gallery_usability_sort_key(row.usability), row.model))
     )
     avoided = tuple(row for row in ordered if row.usability in {"unusable", "not_evaluated"})
-    usable = [row for row in ordered if row.usability in {"usable", "usable_with_caveats"}]
+    usable = [row for row in ordered if row.usability == "usable" and not row.observations]
     valid_rows = [row for row in usable if row.generation_tps is not None]
     fastest = (
         min(valid_rows, key=lambda row: (-cast("float", row.generation_tps), row.model))
@@ -7553,6 +7587,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
             _gallery_metric("peak_memory", row.peak_memory_gb),
+            _gallery_metric("prompt_tokens", row.prompt_tokens),
             _gallery_metric("generation_tokens", row.generation_tokens),
             MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
         )
@@ -7565,7 +7600,8 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             "Current-run usability and captured resource facts only. Total time is end-to-end; "
             "throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
-            "Prefill/first is first-token latency when captured."
+            "Prefill/first is first-token latency when captured; Prompt tok is the full "
+            "rendered prompt including image tokens, which drives prefill cost."
         ),
         "",
         *_render_gallery_table(
@@ -7576,6 +7612,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 "Gen TPS",
                 "Prefill/first s",
                 "Peak GB",
+                "Prompt tok",
                 "Gen tok",
                 "Observations",
             ),
@@ -7592,24 +7629,25 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         parts.extend(
             [
                 (
-                    f"Fastest valid generation: `{data.fastest.model}` at "
+                    f"Fastest clean completion: `{data.fastest.model}` at "
                     f"{_gallery_metric('generation_tps', data.fastest.generation_tps)} tok/s"
                 ),
                 "",
                 (
-                    "Average valid generation throughput: "
-                    f"{_gallery_metric('generation_tps', data.average_tps)} tok/s"
+                    "Average clean-completion throughput: "
+                    f"{_gallery_metric('generation_tps', data.average_tps)} tok/s "
+                    "(indicative only: tokenizers and architectures differ across models)"
                 ),
                 "",
             ]
         )
     else:
-        parts.extend(["No valid throughput samples in this run.", ""])
+        parts.extend(["No clean completions with valid throughput samples in this run.", ""])
     if data.lowest_memory is not None:
         parts.extend(
             [
                 (
-                    f"Lowest captured peak memory: `{data.lowest_memory.model}` at "
+                    f"Lowest peak memory among clean completions: `{data.lowest_memory.model}` at "
                     f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB"
                 ),
                 "",
@@ -7761,6 +7799,7 @@ class GalleryRow:
     generation_tps: float | None
     first_token_latency_s: float | None
     peak_memory_gb: float | None
+    prompt_tokens: int | None
     generation_tokens: int | None
     output_preview: str
 
@@ -7860,9 +7899,12 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
 
     if execution == "crashed":
         maintainer_status: MaintainerStatus = "actionable_failure"
-    elif observations:
+    elif set(observations) & _INTEGRATION_SIGNAL_OBSERVATIONS:
         maintainer_status = "observation_needs_reproduction"
     else:
+        # Compliance-only observations (constraint counts, missing fields,
+        # hint copying, instruction echo, cap hits) inform model choosers but
+        # are not evidence of an mlx-vlm defect.
         maintainer_status = "none"
 
     return ResultAssessment(execution, usability, maintainer_status, observations)
@@ -8512,6 +8554,9 @@ class DiagnosticsPartitions:
     actionable: tuple[PerformanceResult, ...]
     observations: tuple[PerformanceResult, ...]
     indeterminate: tuple[PerformanceResult, ...]
+    # Completed with compliance-only observations: chooser-relevant context,
+    # deliberately outside the maintainer lane.
+    compliance: tuple[PerformanceResult, ...]
     clean: tuple[PerformanceResult, ...]
 
 
@@ -8558,18 +8603,30 @@ def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
             key=sort_key,
         )
     )
-    clean = tuple(
+    compliance = tuple(
         sorted(
             (
                 result
                 for result in context.result_set.results
                 if assessments[result.model_name].execution == "completed"
                 and assessments[result.model_name].maintainer_status == "none"
+                and assessments[result.model_name].observations
             ),
             key=sort_key,
         )
     )
-    return DiagnosticsPartitions(actionable, observations, indeterminate, clean)
+    clean = tuple(
+        sorted(
+            (
+                result
+                for result in context.result_set.results
+                if assessments[result.model_name].execution == "completed"
+                and not assessments[result.model_name].observations
+            ),
+            key=sort_key,
+        )
+    )
+    return DiagnosticsPartitions(actionable, observations, indeterminate, compliance, clean)
 
 
 def _diagnostics_fact(value: object | None) -> str:
@@ -8783,9 +8840,12 @@ def _diagnostics_counts_blocks(
     observation_counts: Counter[ObservationCode] = Counter(
         observation for assessment in assessments for observation in assessment.observations
     )
+    # Severity-ranked (registry order): integration signals surface first.
     observation_label_counts = {
-        _human_observation_labels((observation,)): count
-        for observation, count in observation_counts.items()
+        _human_observation_labels((observation,)): observation_counts[observation]
+        for observation in sorted(
+            observation_counts, key=lambda code: _OBSERVATION_DISPLAY_RANK[code]
+        )
     }
     outcome_rows = (
         ("Attempted", str(outcomes["models_attempted"])),
@@ -8796,9 +8856,14 @@ def _diagnostics_counts_blocks(
     )
 
     def count_blocks[T: str](
-        label: str, heading: str, counts: Mapping[T, int]
+        label: str,
+        heading: str,
+        counts: Mapping[T, int],
+        *,
+        preserve_order: bool = False,
     ) -> tuple[ReportBlock, ReportBlock]:
-        rows = tuple((key.replace("_", " "), str(value)) for key, value in sorted(counts.items()))
+        ordered = counts.items() if preserve_order else sorted(counts.items())
+        rows = tuple((key.replace("_", " "), str(value)) for key, value in ordered)
         return ReportParagraph(label), ReportTable(
             (heading, "Count"), rows or (("none recorded", "0"),)
         )
@@ -8808,7 +8873,9 @@ def _diagnostics_counts_blocks(
         ReportTable(("Outcome", "Count"), outcome_rows),
         *count_blocks("Maintainer status counts", "Maintainer status", maintainer_counts),
         *count_blocks("Usability counts", "Usability", usability_counts),
-        *count_blocks("Observation counts", "Observation", observation_label_counts),
+        *count_blocks(
+            "Observation counts", "Observation", observation_label_counts, preserve_order=True
+        ),
     )
 
 
@@ -8965,6 +9032,30 @@ def _diagnostics_evidence_blocks(
             ),
         ),
     ]
+    compliance_rows = tuple(
+        (
+            ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
+            assessments[result.model_name].usability,
+            _gallery_observation_labels(assessments[result.model_name].observations),
+        )
+        for result in partitions.compliance
+    )
+    compliance: ReportBlock = (
+        ReportTable(("Model", "Usability", "Observations"), compliance_rows)
+        if compliance_rows
+        else ReportParagraph("No compliance-only observations.")
+    )
+    blocks.append(
+        _report_section(
+            "Model Compliance Notes (not maintainer issues)",
+            ReportParagraph(
+                "Prompt-compliance observations (missing fields, constraint counts, hint "
+                "copying, instruction echo, cap hits) inform model selection; complete "
+                "evidence is in the model gallery."
+            ),
+            compliance,
+        )
+    )
     clean_rows = tuple(
         _diagnostics_clean_row(result, provenance.get(result.model_name))
         for result in partitions.clean
@@ -9222,6 +9313,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
             _gallery_metric("peak_memory", row.peak_memory_gb),
+            _gallery_metric("prompt_tokens", row.prompt_tokens),
             _gallery_metric("generation_tokens", row.generation_tokens),
             _gallery_observation_labels(row.observations),
             row.output_preview,
@@ -9241,6 +9333,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             row.generation_tps,
             row.first_token_latency_s,
             row.peak_memory_gb,
+            row.prompt_tokens,
             row.generation_tokens,
             _gallery_observation_labels(row.observations),
             row.output_preview,
@@ -9268,6 +9361,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                 "Gen TPS",
                 "Prefill/first s",
                 "Peak GB",
+                "Prompt tok",
                 "Gen tok",
                 "Observations",
                 "Output preview",
@@ -9287,21 +9381,23 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         parts.extend(
             (
                 (
-                    f"<p>Fastest valid generation: {_html_model_link(data.fastest.model)} at "
+                    f"<p>Fastest clean completion: {_html_model_link(data.fastest.model)} at "
                     f"{html.escape(_gallery_metric('generation_tps', data.fastest.generation_tps))} "
                     "tok/s.</p>"
                 ),
                 (
-                    "<p>Average valid generation throughput: "
-                    f"{html.escape(_gallery_metric('generation_tps', data.average_tps))} tok/s.</p>"
+                    "<p>Average clean-completion throughput: "
+                    f"{html.escape(_gallery_metric('generation_tps', data.average_tps))} tok/s "
+                    "(indicative only: tokenizers and architectures differ across models).</p>"
                 ),
             )
         )
     else:
-        parts.append("<p>No valid throughput samples in this run.</p>")
+        parts.append("<p>No clean completions with valid throughput samples in this run.</p>")
     if data.lowest_memory is not None:
         parts.append(
-            f"<p>Lowest captured peak memory: {_html_model_link(data.lowest_memory.model)} at "
+            "<p>Lowest peak memory among clean completions: "
+            f"{_html_model_link(data.lowest_memory.model)} at "
             f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
             "GB.</p>"
         )
@@ -11195,6 +11291,17 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     # (Package Name, List of unique identification patterns)
     # Order matters: matches earlier in list take precedence
     package_definitions = [
+        # Unexpected parameters surface inside mlx.nn.load_weights, but weights
+        # the architecture does not expect indicate an mlx-vlm architecture/
+        # conversion mismatch, so route there first (the traceback keeps the
+        # mlx frames as evidence). Genuinely *missing* weights stay with the
+        # model-config owner below.
+        (
+            "mlx-vlm",
+            [
+                "parameters not in model",
+            ],
+        ),
         (
             "mlx",
             [
@@ -15981,15 +16088,14 @@ def _run_issue_summary_observation_cluster_section(
             _human_observation_labels(cast("Sequence[ObservationCode]", signature)),
             str(count),
         )
+        # Integration importance first (best display rank in the signature),
+        # then frequency: a rare repetition cluster outranks a common
+        # constraint-miss cluster.
         for signature, count in sorted(
             counts.items(),
             key=lambda item: (
+                min(_OBSERVATION_DISPLAY_RANK[cast("ObservationCode", code)] for code in item[0]),
                 -item[1],
-                _assessment_actionability_key(
-                    "",
-                    "unusable",
-                    cast("Sequence[ObservationCode]", item[0]),
-                ),
             ),
         )
     )
@@ -16224,7 +16330,13 @@ def generate_run_issue_summary_report(
     counts = Counter(result["assessment"]["execution"] for result in source.results)
     clean_count = sum(
         result["assessment"]["execution"] == "completed"
+        and not result["assessment"]["observations"]
+        for result in source.results
+    )
+    compliance_only_count = sum(
+        result["assessment"]["execution"] == "completed"
         and result["assessment"]["maintainer_status"] == "none"
+        and bool(result["assessment"]["observations"])
         for result in source.results
     )
     title = (
@@ -16282,16 +16394,19 @@ def generate_run_issue_summary_report(
         )
 
     clean_sentence = f"{_pluralized_count(clean_count, 'clean completion')}."
+    if compliance_only_count:
+        clean_sentence = (
+            f"{_pluralized_count(clean_count, 'clean completion')}; "
+            f"{compliance_only_count} more completed with prompt-compliance "
+            "observations only (not maintainer issues)."
+        )
     if include_gallery_markdown:
         gallery_link = _run_issue_summary_artifact_link(
             summary_path=summary_path,
             artifact_path=output_paths.gallery_markdown,
             label="full model gallery",
         )
-        clean_sentence = (
-            f"{_pluralized_count(clean_count, 'clean completion')}; see the "
-            f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
-        )
+        clean_sentence += f" See the {_render_report_cell_markdown(gallery_link, escaped=False)}."
     blocks.append(
         ReportSection(
             "Clean completions",
@@ -16384,9 +16499,14 @@ def _output_index_dashboard_lines(
         ),
     ]
     if observation_counter:
+        # Rank by integration importance (registry order), not frequency, so
+        # e.g. repetition outranks a frequent-but-benign constraint miss.
+        ranked = sorted(
+            observation_counter.items(),
+            key=lambda item: _OBSERVATION_DISPLAY_RANK[item[0]],
+        )
         top_observations = ", ".join(
-            f"{_OBSERVATION_DISPLAY_LABELS[code]} ({count})"
-            for code, count in observation_counter.most_common(5)
+            f"{_OBSERVATION_DISPLAY_LABELS[code]} ({count})" for code, count in ranked[:5]
         )
         lines.append(f"- Top observations: {top_observations}")
     lines.append("")
