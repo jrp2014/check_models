@@ -92,7 +92,6 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
-from tabulate import tabulate
 
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
@@ -2137,7 +2136,30 @@ def _render_report_table_markdown(block: ReportTable) -> list[str]:
         divider_line = f"| {' | '.join('---' for _header in escaped_headers)} |"
         row_lines = [f"| {' | '.join(row)} |" for row in escaped_rows]
         return [header_line, divider_line, *row_lines, ""]
-    return [*tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines(), ""]
+    return [*_render_padded_pipe_table(escaped_headers, escaped_rows), ""]
+
+
+def _render_padded_pipe_table(
+    headers: Sequence[str],
+    rows: Sequence[tuple[str, ...]],
+) -> list[str]:
+    """Render a GitHub-style pipe table with columns padded to equal width."""
+    widths = [len(header) for header in headers]
+    for row in rows:
+        for index, cell in enumerate(row[: len(widths)]):
+            widths[index] = max(widths[index], len(cell))
+    header_line = "| " + " | ".join(h.ljust(w) for h, w in zip(headers, widths, strict=True)) + " |"
+    divider_line = "|" + "|".join("-" * (width + 2) for width in widths) + "|"
+    row_lines = [
+        "| "
+        + " | ".join(
+            (row[index] if index < len(row) else "").ljust(width)
+            for index, width in enumerate(widths)
+        )
+        + " |"
+        for row in rows
+    ]
+    return [header_line, divider_line, *row_lines]
 
 
 def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
@@ -2564,6 +2586,50 @@ def _gallery_model_facts(
     )
 
 
+def _gallery_model_evidence_blocks(result: PerformanceResult) -> tuple[ReportBlock, ...]:
+    """Build one model's evidence body (output/traceback branches) shared by renderers.
+
+    The captured-facts block stays renderer-specific so each side keeps its
+    established escaping (Markdown pipe-escaper vs escaped HTML table).
+    """
+    blocks: list[ReportBlock] = []
+    if result.success:
+        output = _generation_text_value(result.generation)
+        if not output:
+            blocks.append(
+                _report_section(
+                    "Complete generated output", ReportParagraph("empty output"), level=4
+                )
+            )
+        else:
+            blocks.append(ReportModelOutput(output))
+    else:
+        traceback_block: ReportBlock = (
+            ReportCodeBlock(_home_relative_report_text(result.error_traceback), language="python")
+            if result.error_traceback
+            else ReportParagraph("traceback not captured")
+        )
+        blocks.append(_report_section("Complete traceback", traceback_block, level=4))
+        partial_output = _generation_text_value(result.generation)
+        if partial_output:
+            blocks.append(
+                _report_section(
+                    "Partial generated output", ReportCodeBlock(partial_output), level=4
+                )
+            )
+        if result.captured_output_on_fail:
+            blocks.append(
+                _report_section(
+                    "Captured upstream output",
+                    ReportCodeBlock(_home_relative_report_text(result.captured_output_on_fail)),
+                    level=4,
+                )
+            )
+        if not partial_output and not result.captured_output_on_fail:
+            blocks.append(ReportParagraph("No partial or captured output."))
+    return tuple(blocks)
+
+
 def _render_gallery_model(
     result: PerformanceResult,
     row: GalleryRow,
@@ -2571,18 +2637,11 @@ def _render_gallery_model(
     model_provenance: ModelProvenanceRecord | None,
 ) -> list[str]:
     """Render complete captured evidence for one model without reclassification."""
-    generation = result.generation
-    escaped_facts = [
+    escaped_facts = tuple(
         (MARKDOWN_ESCAPER.escape(label), MARKDOWN_ESCAPER.escape(value))
-        for label, value in _gallery_model_facts(
-            result,
-            row,
-            assessment,
-            model_provenance,
-        )
+        for label, value in _gallery_model_facts(result, row, assessment, model_provenance)
         if value is not None
-    ]
-
+    )
     out = [
         f'<a id="{_gallery_model_anchor(result.model_name)}"></a>',
         "",
@@ -2593,42 +2652,13 @@ def _render_gallery_model(
         "",
     ]
     out.extend(
-        render_report_markdown((ReportKeyValues(tuple(escaped_facts), markdown_escaped=True),))
+        render_report_markdown(
+            (
+                ReportKeyValues(escaped_facts, markdown_escaped=True),
+                *_gallery_model_evidence_blocks(result),
+            )
+        )
     )
-    out.append("")
-
-    if result.success:
-        output = _generation_text_value(generation)
-        if not output:
-            out.extend([_markdown_emphasis("Complete generated output:"), "", "empty output", ""])
-        else:
-            out.extend(render_report_markdown((ReportModelOutput(output),)))
-    else:
-        out.extend([_markdown_emphasis("Complete traceback:"), ""])
-        if result.error_traceback:
-            _append_markdown_code_block(
-                out,
-                _home_relative_report_text(result.error_traceback),
-                language="python",
-            )
-        else:
-            out.extend(["traceback not captured", ""])
-
-        partial_output = _generation_text_value(generation)
-        if partial_output:
-            out.extend([_markdown_emphasis("Partial generated output:"), ""])
-            _append_markdown_code_block(out, partial_output)
-        if result.captured_output_on_fail:
-            out.extend([_markdown_emphasis("Captured upstream output:"), ""])
-            _append_markdown_code_block(
-                out,
-                _home_relative_report_text(result.captured_output_on_fail),
-            )
-        if not partial_output and not result.captured_output_on_fail:
-            out.extend(["No partial or captured output.", ""])
-
-    while out and out[-1] == "":
-        out.pop()
     out.extend(["", "</details>", ""])
     return out
 
@@ -6748,10 +6778,10 @@ def _build_runtime_analysis_summary(
     return runtime_summary
 
 
-def _format_runtime_generation_total_line(
+def _runtime_generation_total_fact(
     runtime_analysis: RuntimeAnalysisSummary,
-) -> str | None:
-    """Build the total upstream generation timing line for runtime summaries."""
+) -> tuple[str, str] | None:
+    """Build the total upstream generation timing fact for runtime summaries."""
     generation_total: float = runtime_analysis["generation_total"]
     generation_models: int = runtime_analysis["generation_models"]
     if generation_models <= 0 or generation_total <= 0.0:
@@ -6766,18 +6796,18 @@ def _format_runtime_generation_total_line(
     else:
         split_note = "; upstream model prefill / first-token split unavailable"
     return (
-        "- **Generation total:** "
-        f"{format_overall_runtime(generation_total)} across {generation_models} model(s)"
-        f"{split_note}."
+        "Generation total",
+        (
+            f"{format_overall_runtime(generation_total)} across {generation_models} model(s)"
+            f"{split_note}."
+        ),
     )
 
 
-def _format_runtime_phase_totals_line(
+def _runtime_phase_totals_fact(
     runtime_analysis: RuntimeAnalysisSummary,
-    *,
-    trailing_period: bool = True,
-) -> str | None:
-    """Build the aggregate phase totals line shared by report renderers."""
+) -> tuple[str, str] | None:
+    """Build the aggregate phase totals fact shared by report renderers."""
     phase_totals: dict[RuntimePhaseName, float] = runtime_analysis["phase_totals"]
     phase_summary = ", ".join(
         f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={format_overall_runtime(duration)}"
@@ -6786,23 +6816,28 @@ def _format_runtime_phase_totals_line(
     )
     if not phase_summary:
         return None
-    suffix = "." if trailing_period else ""
-    return f"- **Phase totals:** {phase_summary}{suffix}"
+    return ("Phase totals", f"{phase_summary}.")
 
 
-def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
-    """Build concise aggregate timing bullets for optional runtime signals."""
-    lines: list[str] = []
+def _runtime_timing_snapshot_facts(
+    runtime_analysis: RuntimeAnalysisSummary,
+) -> list[tuple[str, str]]:
+    """Build concise aggregate timing facts for optional runtime signals."""
+    facts: list[tuple[str, str]] = []
 
     validation_models: int = runtime_analysis["validation_models"]
     validation_total: float = runtime_analysis["validation_total"]
     if validation_models > 0 and validation_total > 0.0:
         validation_avg: float = validation_total / validation_models
-        lines.append(
-            "- **Validation overhead:** "
-            f"{format_overall_runtime(validation_total)} total "
-            f"(avg {format_overall_runtime(validation_avg)} across "
-            f"{validation_models} model(s)).",
+        facts.append(
+            (
+                "Validation overhead",
+                (
+                    f"{format_overall_runtime(validation_total)} total "
+                    f"(avg {format_overall_runtime(validation_avg)} across "
+                    f"{validation_models} model(s))."
+                ),
+            )
         )
 
     first_token_models: int = runtime_analysis["first_token_latency_models"]
@@ -6815,15 +6850,19 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
         and first_token_min is not None
         and first_token_max is not None
     ):
-        lines.append(
-            "- **Upstream model prefill / first-token time:** "
-            f"Avg {format_overall_runtime(first_token_avg)} | "
-            f"Min {format_overall_runtime(first_token_min)} | "
-            f"Max {format_overall_runtime(first_token_max)} "
-            f"across {first_token_models} model(s).",
+        facts.append(
+            (
+                "Upstream model prefill / first-token time",
+                (
+                    f"Avg {format_overall_runtime(first_token_avg)} | "
+                    f"Min {format_overall_runtime(first_token_min)} | "
+                    f"Max {format_overall_runtime(first_token_max)} "
+                    f"across {first_token_models} model(s)."
+                ),
+            )
         )
 
-    return lines
+    return facts
 
 
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
@@ -7474,12 +7513,54 @@ def _render_gallery_table(
     )
 
 
-def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
-    """Render the skim-first chooser, avoid list, and explicit resource policies."""
-    ordered = sorted(
-        rows,
-        key=lambda row: (_gallery_usability_sort_key(row.usability), row.model),
+@dataclass(frozen=True)
+class GalleryChooserData:
+    """Shared, pre-sorted chooser facts consumed by both report renderers."""
+
+    ordered: tuple[GalleryRow, ...]
+    avoided: tuple[GalleryRow, ...]
+    fastest: GalleryRow | None
+    average_tps: float | None
+    lowest_memory: GalleryRow | None
+
+
+def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
+    """Compute the single chooser ordering and resource highlights once."""
+    ordered = tuple(
+        sorted(rows, key=lambda row: (_gallery_usability_sort_key(row.usability), row.model))
     )
+    avoided = tuple(row for row in ordered if row.usability in {"unusable", "not_evaluated"})
+    usable = [row for row in ordered if row.usability in {"usable", "usable_with_caveats"}]
+    valid_rows = [row for row in usable if row.generation_tps is not None]
+    fastest = (
+        min(valid_rows, key=lambda row: (-cast("float", row.generation_tps), row.model))
+        if valid_rows
+        else None
+    )
+    average_tps = (
+        sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
+        if valid_rows
+        else None
+    )
+    with_memory = [row for row in usable if row.peak_memory_gb is not None]
+    lowest_memory = (
+        min(with_memory, key=lambda row: (cast("float", row.peak_memory_gb), row.model))
+        if with_memory
+        else None
+    )
+    return GalleryChooserData(
+        ordered=ordered,
+        avoided=avoided,
+        fastest=fastest,
+        average_tps=average_tps,
+        lowest_memory=lowest_memory,
+    )
+
+
+def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
+    """Render the skim-first chooser, resource highlights, and avoid list."""
+    data = _gallery_chooser_data(rows)
+    ordered = data.ordered
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
@@ -7517,12 +7598,42 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             rows=chooser_rows,
         ),
         "",
-        "## Avoid for This Run",
+        "## Resource Highlights",
         "",
     ]
 
-    avoided = [row for row in ordered if row.usability in {"unusable", "not_evaluated"}]
-    if avoided:
+    # One sortable row set replaces the former lowest-memory/fastest re-listing
+    # tables; the highlights carry the same decisions in three lines.
+    if data.fastest is not None and data.average_tps is not None:
+        parts.extend(
+            [
+                (
+                    f"Fastest valid generation: `{data.fastest.model}` at "
+                    f"{_gallery_metric('generation_tps', data.fastest.generation_tps)} tok/s"
+                ),
+                "",
+                (
+                    "Average valid generation throughput: "
+                    f"{_gallery_metric('generation_tps', data.average_tps)} tok/s"
+                ),
+                "",
+            ]
+        )
+    else:
+        parts.extend(["No valid throughput samples in this run.", ""])
+    if data.lowest_memory is not None:
+        parts.extend(
+            [
+                (
+                    f"Lowest captured peak memory: `{data.lowest_memory.model}` at "
+                    f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB"
+                ),
+                "",
+            ]
+        )
+    parts.extend(["## Avoid for This Run", ""])
+
+    if data.avoided:
         parts.extend(
             _render_gallery_table(
                 headers=("Model", "Usability", "Observations"),
@@ -7532,87 +7643,12 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                         _markdown_inline_code(row.usability),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
                     )
-                    for row in avoided
+                    for row in data.avoided
                 ],
             )
         )
     else:
         parts.append("No unusable or not-evaluated models in this run.")
-    parts.extend(["", "## Lowest-memory Usable Models (Including Caveats)", ""])
-
-    usable = [row for row in rows if row.usability in {"usable", "usable_with_caveats"}]
-    by_memory = sorted(
-        usable,
-        key=lambda row: (
-            row.peak_memory_gb is None,
-            row.peak_memory_gb if row.peak_memory_gb is not None else 0.0,
-            row.model,
-        ),
-    )
-    if by_memory:
-        parts.extend(
-            _render_gallery_table(
-                headers=("Model", "Usability", "Peak GB", "Gen tok"),
-                rows=[
-                    (
-                        _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability),
-                        _gallery_metric("peak_memory", row.peak_memory_gb),
-                        _gallery_metric("generation_tokens", row.generation_tokens),
-                    )
-                    for row in by_memory
-                ],
-            )
-        )
-    else:
-        parts.append("No usable models in this run.")
-    parts.extend(["", "## Fastest Usable Models (Including Caveats)", ""])
-
-    by_speed = sorted(
-        usable,
-        key=lambda row: (
-            row.generation_tps is None,
-            -(row.generation_tps if row.generation_tps is not None else 0.0),
-            row.model,
-        ),
-    )
-    valid_rows = [row for row in by_speed if row.generation_tps is not None]
-    if valid_rows:
-        fastest = valid_rows[0]
-        average = sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
-        parts.extend(
-            [
-                (
-                    f"Fastest valid generation: `{fastest.model}` at "
-                    f"{_gallery_metric('generation_tps', fastest.generation_tps)} tok/s"
-                ),
-                "",
-                (
-                    "Average valid generation throughput: "
-                    f"{_gallery_metric('generation_tps', average)} tok/s"
-                ),
-                "",
-            ]
-        )
-    else:
-        parts.extend(["No valid throughput samples in this run.", ""])
-    if by_speed:
-        parts.extend(
-            _render_gallery_table(
-                headers=("Model", "Usability", "Gen TPS", "Gen tok"),
-                rows=[
-                    (
-                        _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability),
-                        _gallery_throughput_cell(row),
-                        _gallery_metric("generation_tokens", row.generation_tokens),
-                    )
-                    for row in by_speed
-                ],
-            )
-        )
-    else:
-        parts.append("No usable models in this run.")
     parts.append("")
     return parts
 
@@ -9146,17 +9182,15 @@ def _html_embedded_image(image_path: Path | None) -> str:
 
 
 def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
-    """Render the same facts-only chooser and resource policies as Markdown."""
+    """Render the same facts-only chooser and resource highlights as Markdown."""
     assessments = _assessments_by_model(report_context)
     rows = [
         _gallery_row(result, assessments[result.model_name])
         for result in report_context.result_set.results
     ]
     result_by_model = {result.model_name: result for result in report_context.result_set.results}
-    ordered = sorted(
-        rows,
-        key=lambda row: (_gallery_usability_sort_key(row.usability), row.model),
-    )
+    data = _gallery_chooser_data(rows)
+    ordered = data.ordered
     chooser_rows = [
         (
             _html_model_link(row.model),
@@ -9224,10 +9258,35 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             sortable=True,
         ),
         "</div>",
-        "<h3>Avoid for This Run</h3>",
+        "<h3>Resource Highlights</h3>",
     ]
-    avoided = [row for row in ordered if row.usability in {"unusable", "not_evaluated"}]
-    if avoided:
+    # The chooser table is sortable by every column, so the former
+    # lowest-memory/fastest re-listing tables collapse into highlight lines.
+    if data.fastest is not None and data.average_tps is not None:
+        parts.extend(
+            (
+                (
+                    f"<p>Fastest valid generation: {_html_model_link(data.fastest.model)} at "
+                    f"{html.escape(_gallery_metric('generation_tps', data.fastest.generation_tps))} "
+                    "tok/s.</p>"
+                ),
+                (
+                    "<p>Average valid generation throughput: "
+                    f"{html.escape(_gallery_metric('generation_tps', data.average_tps))} tok/s.</p>"
+                ),
+            )
+        )
+    else:
+        parts.append("<p>No valid throughput samples in this run.</p>")
+    if data.lowest_memory is not None:
+        parts.append(
+            f"<p>Lowest captured peak memory: {_html_model_link(data.lowest_memory.model)} at "
+            f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
+            "GB.</p>"
+        )
+
+    parts.append("<h3>Avoid for This Run</h3>")
+    if data.avoided:
         parts.append(
             _html_table(
                 caption="Unusable and not-evaluated models",
@@ -9239,91 +9298,13 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                         _gallery_observation_labels(row.observations),
                         row.output_preview,
                     )
-                    for row in avoided
+                    for row in data.avoided
                 ],
                 raw_columns=frozenset({0}),
             )
         )
     else:
         parts.append("<p>No unusable or not-evaluated models in this run.</p>")
-
-    usable = [row for row in rows if row.usability in {"usable", "usable_with_caveats"}]
-    by_memory = sorted(
-        usable,
-        key=lambda row: (
-            row.peak_memory_gb is None,
-            row.peak_memory_gb if row.peak_memory_gb is not None else 0.0,
-            row.model,
-        ),
-    )
-    parts.append("<h3>Lowest-memory Usable Models (Including Caveats)</h3>")
-    if by_memory:
-        parts.append(
-            _html_table(
-                caption="Usable models ordered by lowest captured peak memory",
-                headers=("Model", "Usability", "Peak GB", "Gen tok"),
-                rows=[
-                    (
-                        _html_model_link(row.model),
-                        row.usability,
-                        _gallery_metric("peak_memory", row.peak_memory_gb),
-                        _gallery_metric("generation_tokens", row.generation_tokens),
-                    )
-                    for row in by_memory
-                ],
-                raw_columns=frozenset({0}),
-            )
-        )
-    else:
-        parts.append("<p>No usable models in this run.</p>")
-
-    by_speed = sorted(
-        usable,
-        key=lambda row: (
-            row.generation_tps is None,
-            -(row.generation_tps if row.generation_tps is not None else 0.0),
-            row.model,
-        ),
-    )
-    valid_rows = [row for row in by_speed if row.generation_tps is not None]
-    parts.append("<h3>Fastest Usable Models (Including Caveats)</h3>")
-    if valid_rows:
-        fastest = valid_rows[0]
-        average = sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
-        parts.extend(
-            (
-                (
-                    f"<p>Fastest valid generation: {_html_model_link(fastest.model)} at "
-                    f"{html.escape(_gallery_metric('generation_tps', fastest.generation_tps))} "
-                    "tok/s.</p>"
-                ),
-                (
-                    "<p>Average valid generation throughput: "
-                    f"{html.escape(_gallery_metric('generation_tps', average))} tok/s.</p>"
-                ),
-            )
-        )
-    else:
-        parts.append("<p>No valid throughput samples in this run.</p>")
-    if by_speed:
-        parts.append(
-            _html_table(
-                caption="Usable models ordered by valid generation throughput",
-                headers=("Model", "Usability", "Gen TPS", "Gen tok"),
-                rows=[
-                    (
-                        _html_model_link(row.model),
-                        row.usability,
-                        _gallery_throughput_cell(row),
-                        _gallery_metric("generation_tokens", row.generation_tokens),
-                    )
-                    for row in by_speed
-                ],
-                raw_columns=frozenset({0}),
-            )
-        )
-    else:
-        parts.append("<p>No usable models in this run.</p>")
     parts.append("</section>")
     return "\n".join(parts)
 
@@ -9337,12 +9318,7 @@ def _html_gallery_model(
     """Render one complete, escaped model-evidence entry from shared gallery facts."""
     facts = tuple(
         (label, value)
-        for label, value in _gallery_model_facts(
-            result,
-            row,
-            assessment,
-            model_provenance,
-        )
+        for label, value in _gallery_model_facts(result, row, assessment, model_provenance)
         if value is not None
     )
     parts = [
@@ -9354,36 +9330,10 @@ def _html_gallery_model(
             headers=("Fact", "Value"),
             rows=facts,
         ),
+        *render_report_html(_gallery_model_evidence_blocks(result)),
+        "</details>",
+        "</article>",
     ]
-    if assessment.execution == "completed":
-        output = _generation_text_value(result.generation)
-        parts.append("<h4>Complete generated output</h4>")
-        if not output:
-            parts.append("<p>empty output</p>")
-        else:
-            parts.extend(render_report_html((ReportModelOutput(output),)))
-    else:
-        parts.extend(
-            (
-                "<h4>Complete traceback</h4>",
-                _html_code_block(
-                    _home_relative_report_text(result.error_traceback or "unavailable")
-                ),
-            )
-        )
-        partial_output = _generation_text_value(result.generation)
-        if partial_output:
-            parts.extend(("<h4>Partial generated output</h4>", _html_code_block(partial_output)))
-        if result.captured_output_on_fail:
-            parts.extend(
-                (
-                    "<h4>Captured upstream output</h4>",
-                    _html_code_block(_home_relative_report_text(result.captured_output_on_fail)),
-                )
-            )
-        if not partial_output and not result.captured_output_on_fail:
-            parts.append("<p>No partial or captured output.</p>")
-    parts.extend(("</details>", "</article>"))
     return "\n".join(parts)
 
 
@@ -9443,16 +9393,12 @@ def _html_runtime_facts(
     rows = [("Overall runtime", format_overall_runtime(total_runtime_seconds))]
     runtime_analysis = _build_runtime_analysis_summary(results)
     if runtime_analysis is not None:
-        lines = [
-            _format_runtime_generation_total_line(runtime_analysis),
-            _format_runtime_phase_totals_line(runtime_analysis),
-            *_format_runtime_timing_snapshot_lines(runtime_analysis),
+        facts = [
+            _runtime_generation_total_fact(runtime_analysis),
+            _runtime_phase_totals_fact(runtime_analysis),
+            *_runtime_timing_snapshot_facts(runtime_analysis),
         ]
-        for line in lines:
-            if line is None:
-                continue
-            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
-            rows.append((label, value))
+        rows.extend(fact for fact in facts if fact is not None)
     return "\n".join(
         (
             '<section id="runtime">',

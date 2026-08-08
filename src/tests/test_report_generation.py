@@ -11,7 +11,7 @@ import re
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, get_args
+from typing import TYPE_CHECKING, Literal, cast, get_args
 from unittest.mock import patch
 
 import pytest
@@ -2144,7 +2144,7 @@ def test_tabs_round_trip_across_every_public_model_evidence_artifact(tmp_path: P
     assert output in diagnostics_path.read_text(encoding="utf-8")
     html_report = html_path.read_text(encoding="utf-8")
     match = re.search(
-        r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
+        r'<pre class="model-output-readable">(.*?)</pre>',
         html_report,
         re.DOTALL,
     )
@@ -2675,7 +2675,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "<summary>org/observed" in diagnostics
     assert "<summary>org/network" in diagnostics
     assert re.search(
-        r"\| Response repeats the same text\s+\|\s+1 \|\n\n## Triage",
+        r"\| Response repeats the same text\s+\|\s+1\s+\|\n\n## Triage",
         diagnostics,
     )
     assert re.search(
@@ -4081,8 +4081,9 @@ class TestMarkdownGalleryReport:
         assert "## Prompt" in content
         assert "## Current-run Chooser" in content
         assert "## Avoid for This Run" in content
-        assert "## Lowest-memory Usable Models (Including Caveats)" in content
-        assert "## Fastest Usable Models (Including Caveats)" in content
+        assert "## Resource Highlights" in content
+        assert "## Lowest-memory Usable Models (Including Caveats)" not in content
+        assert "## Fastest Usable Models (Including Caveats)" not in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text\nDescribe this image fully." not in content
@@ -4279,7 +4280,7 @@ class TestMarkdownGalleryReport:
         avoid = _extract_markdown_subsection(
             content,
             "## Avoid for This Run",
-            end_headings=("## Lowest-memory Usable Models (Including Caveats)",),
+            end_headings=("## Complete Per-model Evidence",),
         )
         assert "Output preview" not in avoid
         assert "boom" not in avoid
@@ -4470,9 +4471,8 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         headings = [
             "## Current-run Chooser",
+            "## Resource Highlights",
             "## Avoid for This Run",
-            "## Lowest-memory Usable Models (Including Caveats)",
-            "## Fastest Usable Models (Including Caveats)",
             "## Complete Per-model Evidence",
         ]
         assert [content.index(heading) for heading in headings] == sorted(
@@ -4481,7 +4481,7 @@ class TestMarkdownGalleryReport:
         chooser = _extract_markdown_subsection(
             content,
             "## Current-run Chooser",
-            end_headings=("## Avoid for This Run",),
+            end_headings=("## Resource Highlights",),
         )
         expected_model_order = (
             "org/usable",
@@ -4673,6 +4673,51 @@ class TestMarkdownGalleryReport:
         assert "*Generation throughput (raw):* 999 tok/s" in evidence
         assert "*Generation tokens:* 8" in evidence
 
+    def test_gallery_chooser_data_is_the_single_shared_dataset(self) -> None:
+        """Markdown and HTML choosers must derive ordering and highlights here."""
+
+        def gallery_row(
+            model: str,
+            usability: str,
+            *,
+            tps: float | None = None,
+            memory: float | None = None,
+        ) -> check_models.GalleryRow:
+            return check_models.GalleryRow(
+                model=model,
+                usability=cast("check_models.ModelUsability", usability),
+                observations=(),
+                total_time_s=1.0,
+                generation_tps=tps,
+                first_token_latency_s=None,
+                peak_memory_gb=memory,
+                generation_tokens=100,
+                output_preview="",
+            )
+
+        rows = [
+            gallery_row("org/b-usable", "usable", tps=30.0, memory=2.0),
+            gallery_row("org/a-usable", "usable", tps=30.0, memory=1.5),
+            gallery_row("org/caveats", "usable_with_caveats", tps=10.0, memory=None),
+            gallery_row("org/bad", "unusable"),
+        ]
+
+        data = check_models._gallery_chooser_data(rows)
+
+        assert [row.model for row in data.ordered] == [
+            "org/a-usable",
+            "org/b-usable",
+            "org/caveats",
+            "org/bad",
+        ]
+        assert [row.model for row in data.avoided] == ["org/bad"]
+        # Throughput tie at 30.0 resolves alphabetically.
+        assert data.fastest is not None
+        assert data.fastest.model == "org/a-usable"
+        assert data.average_tps == pytest.approx((30.0 + 30.0 + 10.0) / 3)
+        assert data.lowest_memory is not None
+        assert data.lowest_memory.model == "org/a-usable"
+
     def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
         """Avoid, memory, and speed policies should have explicit stable ordering."""
 
@@ -4744,26 +4789,20 @@ class TestMarkdownGalleryReport:
         avoid = _extract_markdown_subsection(
             content,
             "## Avoid for This Run",
-            end_headings=("## Lowest-memory Usable Models (Including Caveats)",),
-        )
-        memory = _extract_markdown_subsection(
-            content,
-            "## Lowest-memory Usable Models (Including Caveats)",
-            end_headings=("## Fastest Usable Models (Including Caveats)",),
-        )
-        speed = _extract_markdown_subsection(
-            content,
-            "## Fastest Usable Models (Including Caveats)",
             end_headings=("## Complete Per-model Evidence",),
+        )
+        highlights = _extract_markdown_subsection(
+            content,
+            "## Resource Highlights",
+            end_headings=("## Avoid for This Run",),
         )
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
         assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
-        assert memory.index("org/gamma") < memory.index("org/alpha")
-        assert memory.index("org/alpha") < memory.index("org/beta")
-        assert memory.index("org/beta") < memory.index("org/zeta")
-        assert speed.index("org/alpha") < speed.index("org/beta")
-        assert speed.index("org/beta") < speed.index("org/gamma")
-        assert speed.index("org/gamma") < speed.index("org/zeta")
+        # Ties on throughput resolve alphabetically; alpha wins over beta at 30.
+        assert "Fastest valid generation: `org/alpha` at " in highlights
+        assert "Average valid generation throughput: " in highlights
+        # gamma has the lowest captured peak memory (1.0 GB).
+        assert "Lowest captured peak memory: `org/gamma` at " in highlights
 
     def test_gallery_crash_evidence_keeps_traceback_before_captured_output(
         self,

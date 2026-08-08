@@ -25,6 +25,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Merge the gallery's three redundant chooser tables into one: the sortable
+  Current-run Chooser remains the single row set, and the former
+  "Lowest-memory"/"Fastest Usable Models" re-listing tables collapse into a
+  "Resource Highlights" section (fastest model, average valid throughput,
+  lowest captured peak memory). Both renderers now derive ordering and
+  highlights from one shared `_gallery_chooser_data` dataset, and per-model
+  gallery evidence bodies (output/traceback/captured-output branches) render
+  through one shared report-block builder instead of parallel Markdown and
+  HTML implementations. Failure evidence labels are now `####` headings in
+  Markdown (previously emphasis lines) to match the HTML structure.
+- Drop the `tabulate` dependency: report tables render through a small
+  built-in padded pipe-table emitter (numeric columns are now left-aligned
+  like text). Runtime-fact producers return `(label, value)` pairs directly,
+  removing the HTML renderer's markdown-bullet re-parsing.
 - Improve report skimmability for 60+ model runs: the output index now leads
   with a "Run at a glance" dashboard (outcome counts, usability breakdown, top
   observations) before the artifact links; the collapsed "Exact raw output"

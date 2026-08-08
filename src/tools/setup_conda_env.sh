@@ -270,7 +270,6 @@ from json import loads
 from pathlib import Path
 from platform import system
 import huggingface_hub
-import tabulate
 try:
     import torch, torchvision, torchaudio
     print(f'✓ PyTorch version: {torch.__version__}')
