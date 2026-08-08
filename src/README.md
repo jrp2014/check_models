@@ -248,13 +248,18 @@ The tool generates a deliberately small artifact set in `output/` by default:
   prefill/first-token timing, captured performance facts,
   expandable complete output, maintainer diagnostics, and full run context.
 - **Gallery Markdown** (`reports/model_gallery.md`): Model-comparison artifact with
-  a bounded, orientation-corrected reference-image preview, image metadata, the full prompt, a usable-first,
-  facts-only chooser whose previews preserve line breaks, and readable plus exact raw complete
-  output for every attempted model. End-to-end time precedes decode-only throughput.
+  a bounded, orientation-corrected reference-image preview, image metadata, the
+  full prompt, a usable-first facts-only chooser, a Resource Highlights section
+  (fastest model, average throughput, lowest peak memory), an Output-at-a-Glance
+  table previewing every model's actual output, and complete readable output per
+  model (an exact-raw copy appears only when it differs from the readable view).
+  End-to-end time precedes decode-only throughput.
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
   schema `2.0` assessments, complete captured evidence, local component installation
-  identity, per-model completion time, exact observation evidence, and each model's
-  requested versus resolved cache revision.
+  identity, per-model completion time, exact observation evidence, each model's
+  requested versus resolved cache revision, the complete rendered chat-template
+  prompt, captured upstream console output for successful runs, and the
+  architecture pre-check verdict against the installed mlx-vlm.
 - **Run JSON** (`run.json`): Stable schema `2.0` run-level machine contract with mode,
   attempted/evaluated/indeterminate counts, component source/install provenance,
   check_models producer version/revision and dirty-worktree state, source-image
@@ -279,8 +284,9 @@ The tool generates a deliberately small artifact set in `output/` by default:
   evidence without copying full prompts, outputs, tracebacks, or scripts. Its
   cross-file links always use canonical GitHub repository URLs so they still work
   when the report is pasted into an issue.
-- **Index** (`index.md`): Tiny navigation page linking the current-run files and,
-  when generated, the run issue summary before individual crash drafts.
+- **Index** (`index.md`): Run dashboard — outcome counts, usability breakdown,
+  and top observations at a glance — followed by links to the current-run files
+  and, when generated, the run issue summary before individual crash drafts.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
   generated or captured failure output.
 - **Environment** (`environment.log`): Full package and Conda environment capture.
