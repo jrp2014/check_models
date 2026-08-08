@@ -3484,8 +3484,13 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     return False, None
 
 
+# One alternation per recognised delimiter pair so every empty wrapper —
+# not just <think></think> — stays neutral evidence per the documented policy.
 _EMPTY_THINKING_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
-    r"<think>\s*</think>",
+    "|".join(
+        rf"{re.escape(start_marker)}\s*{re.escape(end_marker)}"
+        for start_marker, end_marker in THINKING_TRACE_DELIMITER_PAIRS
+    ),
     re.IGNORECASE,
 )
 

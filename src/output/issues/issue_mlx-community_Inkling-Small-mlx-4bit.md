@@ -40,10 +40,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11990, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11313, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11344, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -53,7 +53,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 712, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 748, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -439,7 +439,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12230, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12414, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -450,7 +450,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12005, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -827,12 +827,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3343.46it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5490.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[18:42:53] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[12:31:13] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -862,7 +862,7 @@ original image before filing.
 | Component       | Value                                                           |
 |-----------------|-----------------------------------------------------------------|
 | mlx-vlm         | 0.6.11                                                          |
-| mlx             | 0.32.1.dev20260807+8056817bd                                    |
+| mlx             | 0.32.1.dev20260808+6539d1807                                    |
 | mlx-lm          | 0.31.3                                                          |
 | transformers    | 5.14.1                                                          |
 | tokenizers      | 0.22.2                                                          |
@@ -871,10 +871,10 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6                                                            |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.8.9; revision 71573977481c715cf44fc467831b75239d3860ed; clean |
+| check_models    | 0.8.9; revision 00ce6a08c5df718aeb04738406e08a81f28a7304; clean |
 
 ### Full environment evidence
 
 | Evidence | Link |
 | --- | --- |
-| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/71573977481c715cf44fc467831b75239d3860ed/src/output/environment.log) |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/00ce6a08c5df718aeb04738406e08a81f28a7304/src/output/environment.log) |

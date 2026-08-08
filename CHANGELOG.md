@@ -28,7 +28,10 @@ Notable changes to this project will be documented in this file.
   (`<|channel>thought`/`<channel|>` and `<|START_THINKING|>`/`<|END_THINKING|>`)
   as first-class thinking-trace delimiters, with the trace's own delimiters
   excluded from control-token leakage flags (including prefix captures of the
-  generic `<|...|>` pattern).
+  generic `<|...|>` pattern). Empty-wrapper neutrality now also derives from
+  the full delimiter-pair table instead of matching only `<think></think>`,
+  so e.g. an empty `<|channel>thought<channel|>` wrapper before a substantive
+  answer no longer downgrades the result to "control tokens visible".
 - Add a conditional, paste-ready whole-run GitHub issue summary with expanded
   crashes, a compact table of other surfaced results, clean-completion counts,
   and links to full retained evidence. Generate it during normal finalization,

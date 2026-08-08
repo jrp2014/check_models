@@ -367,6 +367,23 @@ def test_empty_thinking_wrapper_is_neutral() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        "<|channel>thought\n<channel|>A complete response.",
+        "<|START_THINKING|><|END_THINKING|> A complete response.",
+        "◁think▷◁/think▷ A complete response.",
+    ],
+)
+def test_empty_wrappers_of_every_recognised_pair_are_neutral(text: str) -> None:
+    """Empty wrappers must be neutral for all delimiter pairs, not just <think>."""
+    result = _result(text)
+
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
 def test_closed_thinking_trace_is_neutral_and_model_name_invariant() -> None:
     text = "<think>Inspect the scene.</think> A blue boat rests on calm water."
     plain = _result(text, model_name="example/plain-model")

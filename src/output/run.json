@@ -23,7 +23,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "71573977481c715cf44fc467831b75239d3860ed",
+      "source_revision": "00ce6a08c5df718aeb04738406e08a81f28a7304",
       "vcs_revision": null,
       "version": "0.8.9"
     },
@@ -39,9 +39,9 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "8056817bd1202477b6bed2b1f871da5960d64b28",
+      "source_revision": "6539d180781112bc4e4f07c7b03c434bc0b46db8",
       "vcs_revision": null,
-      "version": "0.32.1.dev20260807+8056817bd"
+      "version": "0.32.1.dev20260808+6539d1807"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -108,7 +108,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "blind",
-  "generated_at": "2026-08-07 18:50:49 BST",
+  "generated_at": "2026-08-08 12:40:36 BST",
   "generation_settings": {
     "max_tokens": 500,
     "prefill_step_size": 4096,
@@ -126,7 +126,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.27.0",
-    "mlx": "0.32.1.dev20260807+8056817bd",
+    "mlx": "0.32.1.dev20260808+6539d1807",
     "mlx-audio": "0.4.7",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -524,7 +524,7 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "71573977481c715cf44fc467831b75239d3860ed",
+    "git_revision": "00ce6a08c5df718aeb04738406e08a81f28a7304",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.8.9"
@@ -1046,6 +1046,6 @@
   },
   "prompt_sha256": "1d38bb7cb66d092afaf6eb724e8ca0886502cd26f30f57d6e1ed2d5c99193059",
   "schema_version": "2.0",
-  "total_runtime_seconds": 629.724,
+  "total_runtime_seconds": 804.389,
   "trust_remote_code": true
 }

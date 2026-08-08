@@ -4,57 +4,57 @@
 
 Outcome counts
 
-| Outcome             |   Count |
-|---------------------|---------|
-| Attempted           |      64 |
-| Conclusive outcomes |      64 |
-| Completed           |      63 |
-| Crashed             |       1 |
-| Indeterminate       |       0 |
+| Outcome             | Count |
+|---------------------|-------|
+| Attempted           | 64    |
+| Conclusive outcomes | 64    |
+| Completed           | 63    |
+| Crashed             | 1     |
+| Indeterminate       | 0     |
 
 Maintainer status counts
 
-| Maintainer status              |   Count |
-|--------------------------------|---------|
-| actionable failure             |       1 |
-| none                           |      53 |
-| observation needs reproduction |      10 |
+| Maintainer status              | Count |
+|--------------------------------|-------|
+| actionable failure             | 1     |
+| none                           | 53    |
+| observation needs reproduction | 10    |
 
 Usability counts
 
-| Usability           |   Count |
-|---------------------|---------|
-| not evaluated       |       1 |
-| unusable            |       4 |
-| usable              |      53 |
-| usable with caveats |       6 |
+| Usability           | Count |
+|---------------------|-------|
+| not evaluated       | 1     |
+| unusable            | 4     |
+| usable              | 53    |
+| usable with caveats | 6     |
 
 Observation counts
 
-| Observation                                      |   Count |
-|--------------------------------------------------|---------|
-| Conversation-role control tokens remain visible  |       3 |
-| Internal reasoning block appears incomplete      |       1 |
-| Response appears cut off at the token limit      |       4 |
-| Response is unusually short                      |       1 |
-| Response repeats the same text                   |       1 |
-| Unrecognised model control tokens remain visible |       2 |
+| Observation                                      | Count |
+|--------------------------------------------------|-------|
+| Conversation-role control tokens remain visible  | 3     |
+| Internal reasoning block appears incomplete      | 1     |
+| Response appears cut off at the token limit      | 4     |
+| Response is unusually short                      | 1     |
+| Response repeats the same text                   | 1     |
+| Unrecognised model control tokens remain visible | 2     |
 
 ## Triage
 
-| Model                                                                                                           | Execution   | Usability           | Maintainer status              | Observations                                      |
-|-----------------------------------------------------------------------------------------------------------------|-------------|---------------------|--------------------------------|---------------------------------------------------|
-| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                        | crashed     | not_evaluated       | actionable_failure             | none                                              |
-| [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                  | completed   | unusable            | observation_needs_reproduction | repeated text; cut off at token limit             |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed   | usable_with_caveats | observation_needs_reproduction | control tokens visible                            |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed   | usable_with_caveats | observation_needs_reproduction | control tokens visible                            |
-| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | completed   | unusable            | observation_needs_reproduction | cut off at token limit                            |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed   | unusable            | observation_needs_reproduction | cut off at token limit                            |
-| [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                  | completed   | unusable            | observation_needs_reproduction | cut off at token limit; incomplete thinking block |
-| [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                      | completed   | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed   | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed   | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed   | usable_with_caveats | observation_needs_reproduction | very short response                               |
+| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                      |
+|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|---------------------------------------------------|
+| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                        | crashed   | not_evaluated       | actionable_failure             | none                                              |
+| [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                  | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit             |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                            |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                            |
+| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | completed | unusable            | observation_needs_reproduction | cut off at token limit                            |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | cut off at token limit                            |
+| [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                  | completed | unusable            | observation_needs_reproduction | cut off at token limit; incomplete thinking block |
+| [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                      | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                               |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | usable_with_caveats | observation_needs_reproduction | very short response                               |
 
 ## Crashes requiring action
 
@@ -93,14 +93,15 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 - *Post-cleanup active memory (GB):* 0.00442481
 - *Post-cleanup cache memory (GB):* 0.0
 
-#### Complete traceback
+<details>
+<summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11990, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11313, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11344, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -110,7 +111,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 712, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 748, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -496,7 +497,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12230, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12414, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -507,7 +508,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12005, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -875,6 +876,8 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 
 ```
 
+</details>
+
 #### Captured stdout/stderr
 
 ```text
@@ -882,12 +885,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3343.46it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5490.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[18:42:53] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[12:31:13] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
@@ -947,7 +950,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Post-cleanup active memory (GB):* 0.015566016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 280
-- *Generation tokens:* 88
+- *Generation tokens:* 81
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -955,7 +958,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 ```text
 <|channel>thought
-<channel|>A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is a dark brown tabby, lying on its side with its head tucked in. The cat on the right is a lighter brown and tan tabby, lying on its side with its head turned down. There are two remote controls between the cats. The lighting is bright and even.
+<channel|>A high-angle, medium-shot shows two tabby cats sleeping on a pink blanket. The cat on the left is lying on its side, with its head turned and its paws curled up. The cat on the right is lying on its stomach, with its head turned down and its legs stretched out. Two remote controls are between the cats. The background is a red couch.
 ```
 
 </details>
@@ -981,7 +984,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Post-cleanup active memory (GB):* 0.015566016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 280
-- *Generation tokens:* 85
+- *Generation tokens:* 84
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -989,7 +992,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 ```text
 <|channel>thought
-<channel|>A high-angle medium-shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is lying on its side with its head curled up and its paws tucked in. The cat on the right is lying on its side with its head down and its legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
+<channel|>A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned toward the other cat. The cat on the right is larger and lying on its stomach with its head turned down. There are two remote controls on the couch between the cats. The lighting is bright and even.
 ```
 
 </details>
@@ -1277,59 +1280,59 @@ None.
 
 | Model                                                 | Runtime identity                                        | Performance                                                                                    |
 |-------------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| HuggingFaceTB/SmolVLM-Instruct                        | rev 81cd9a775a4d; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 128 tok/s; 5.5 GB peak; cleanup 0.000116/0.0 GB active/cache       |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 78 prompt / 169 generated; 523 tok/s; 1.0 GB peak; cleanup 0.000247/0.0 GB active/cache        |
-| meta-llama/Llama-3.2-11B-Vision-Instruct              | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 15 prompt / 130 generated; 4.96 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache         |
-| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 51.9 tok/s; 9.3 GB peak; cleanup 0.0018/0.0 GB active/cache         |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 439 prompt / 107 generated; 25.1 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache        |
-| mlx-community/FastVLM-0.5B-bf16                       | rev 81ffe9290466; FastVLMProcessor; stop completed      | 24 prompt / 428 generated; 351 tok/s; 2.0 GB peak; cleanup 0.00287/0.0 GB active/cache         |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 273 prompt / 303 generated; 30.5 tok/s; 18 GB peak; cleanup 0.0161/0.0 GB active/cache         |
-| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 273 prompt / 288 generated; 17.0 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache         |
-| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 272 prompt / 106 generated; 48.2 tok/s; 17 GB peak; cleanup 0.0177/0.0 GB active/cache         |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 284 prompt / 148 generated; 131 tok/s; 16 GB peak; cleanup 0.0183/0.0 GB active/cache          |
+| HuggingFaceTB/SmolVLM-Instruct                        | rev 81cd9a775a4d; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 125 tok/s; 5.5 GB peak; cleanup 0.000116/0.0 GB active/cache       |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 78 prompt / 169 generated; 516 tok/s; 1.00 GB peak; cleanup 0.000247/0.0 GB active/cache       |
+| meta-llama/Llama-3.2-11B-Vision-Instruct              | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 15 prompt / 130 generated; 5.04 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache         |
+| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 60.8 tok/s; 9.3 GB peak; cleanup 0.0018/0.0 GB active/cache         |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 439 prompt / 107 generated; 30.6 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache        |
+| mlx-community/FastVLM-0.5B-bf16                       | rev 81ffe9290466; FastVLMProcessor; stop completed      | 24 prompt / 428 generated; 346 tok/s; 2.1 GB peak; cleanup 0.00287/0.0 GB active/cache         |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 273 prompt / 303 generated; 31.5 tok/s; 18 GB peak; cleanup 0.0161/0.0 GB active/cache         |
+| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 273 prompt / 288 generated; 16.6 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache         |
+| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 272 prompt / 106 generated; 47.1 tok/s; 17 GB peak; cleanup 0.0177/0.0 GB active/cache         |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 284 prompt / 148 generated; 120 tok/s; 16 GB peak; cleanup 0.0183/0.0 GB active/cache          |
 | mlx-community/gemma-4-31b-bf16                        | rev 19f0f1af698c; Gemma4Processor; stop completed       | 272 prompt / 15 generated; insufficient sample; 63 GB peak; cleanup 0.0188/0.0 GB active/cache |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 284 prompt / 98 generated; 26.9 tok/s; 19 GB peak; cleanup 0.0193/0.0 GB active/cache          |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit               | rev 9677807f1065; Glm46VProcessor; stop completed       | 402 prompt / 301 generated; 48.1 tok/s; 13 GB peak; cleanup 0.00318/0.0 GB active/cache        |
-| mlx-community/GLM-4.6V-Flash-6bit                     | rev df9464782d34; Glm46VProcessor; stop completed       | 406 prompt / 197 generated; 63.6 tok/s; 10 GB peak; cleanup 0.00351/0.0 GB active/cache        |
-| mlx-community/GLM-4.6V-Flash-mxfp4                    | rev 773591fa7388; Glm46VProcessor; stop completed       | 406 prompt / 205 generated; 91.7 tok/s; 7.7 GB peak; cleanup 0.00383/0.0 GB active/cache       |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed    | 406 prompt / 172 generated; 51.3 tok/s; 63 GB peak; cleanup 0.00416/0.0 GB active/cache        |
-| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3340 prompt / 77 generated; 28.2 tok/s; 19 GB peak; cleanup 0.00474/0.0 GB active/cache        |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3340 prompt / 99 generated; 32.3 tok/s; 18 GB peak; cleanup 0.00505/0.0 GB active/cache        |
-| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 267 prompt / 103 generated; 315 tok/s; 3.0 GB peak; cleanup 0.00649/0.0 GB active/cache        |
-| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 267 prompt / 108 generated; 185 tok/s; 4.1 GB peak; cleanup 0.00662/0.0 GB active/cache        |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      | rev 8451adc50203; MllamaProcessor; stop completed       | 14 prompt / 155 generated; 16.5 tok/s; 15 GB peak; cleanup 0.00714/0.0 GB active/cache         |
-| mlx-community/llava-v1.6-mistral-7b-8bit              | rev b8df5f329d95; LlavaNextProcessor; stop completed    | 2354 prompt / 82 generated; 62.0 tok/s; 9.7 GB peak; cleanup 0.0194/0.0 GB active/cache        |
-| mlx-community/MiniCPM-V-4.6-8bit                      | rev 03721395f6b8; MiniCPMVProcessor; stop completed     | 226 prompt / 112 generated; 252 tok/s; 3.0 GB peak; cleanup 0.00767/0.0 GB active/cache        |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 972 prompt / 155 generated; 65.1 tok/s; 9.8 GB peak; cleanup 0.00793/0.0 GB active/cache       |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 972 prompt / 156 generated; 60.0 tok/s; 10 GB peak; cleanup 0.00819/0.0 GB active/cache        |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 971 prompt / 178 generated; 188 tok/s; 4.5 GB peak; cleanup 0.00846/0.0 GB active/cache        |
-| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 747 prompt / 174 generated; 50.2 tok/s; 11 GB peak; cleanup 0.00877/0.0 GB active/cache        |
-| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 747 prompt / 199 generated; 29.5 tok/s; 18 GB peak; cleanup 0.00908/0.0 GB active/cache        |
-| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 764 prompt / 158 generated; 5.95 tok/s; 23 GB peak; cleanup 0.0097/0.0 GB active/cache         |
-| mlx-community/nanoLLaVA-1.5-4bit                      | rev 524020474496; Qwen2Tokenizer; stop completed        | 20 prompt / 123 generated; 365 tok/s; 1.8 GB peak; cleanup 0.02/0.0 GB active/cache            |
-| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 59.7 tok/s; 71 GB peak; cleanup 0.0102/0.0 GB active/cache         |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 284 prompt / 98 generated; 28.1 tok/s; 19 GB peak; cleanup 0.0193/0.0 GB active/cache          |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit               | rev 9677807f1065; Glm46VProcessor; stop completed       | 402 prompt / 301 generated; 47.0 tok/s; 13 GB peak; cleanup 0.00318/0.0 GB active/cache        |
+| mlx-community/GLM-4.6V-Flash-6bit                     | rev df9464782d34; Glm46VProcessor; stop completed       | 406 prompt / 197 generated; 60.2 tok/s; 10 GB peak; cleanup 0.00351/0.0 GB active/cache        |
+| mlx-community/GLM-4.6V-Flash-mxfp4                    | rev 773591fa7388; Glm46VProcessor; stop completed       | 406 prompt / 205 generated; 88.0 tok/s; 7.7 GB peak; cleanup 0.00383/0.0 GB active/cache       |
+| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed    | 406 prompt / 172 generated; 51.0 tok/s; 63 GB peak; cleanup 0.00416/0.0 GB active/cache        |
+| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3340 prompt / 77 generated; 32.0 tok/s; 19 GB peak; cleanup 0.00474/0.0 GB active/cache        |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3340 prompt / 99 generated; 35.4 tok/s; 18 GB peak; cleanup 0.00505/0.0 GB active/cache        |
+| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 267 prompt / 103 generated; 334 tok/s; 3.0 GB peak; cleanup 0.00649/0.0 GB active/cache        |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 267 prompt / 108 generated; 195 tok/s; 4.1 GB peak; cleanup 0.00662/0.0 GB active/cache        |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      | rev 8451adc50203; MllamaProcessor; stop completed       | 14 prompt / 155 generated; 15.1 tok/s; 15 GB peak; cleanup 0.00714/0.0 GB active/cache         |
+| mlx-community/llava-v1.6-mistral-7b-8bit              | rev b8df5f329d95; LlavaNextProcessor; stop completed    | 2354 prompt / 82 generated; 62.5 tok/s; 9.7 GB peak; cleanup 0.0194/0.0 GB active/cache        |
+| mlx-community/MiniCPM-V-4.6-8bit                      | rev 03721395f6b8; MiniCPMVProcessor; stop completed     | 226 prompt / 112 generated; 278 tok/s; 3.0 GB peak; cleanup 0.00767/0.0 GB active/cache        |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 972 prompt / 155 generated; 63.7 tok/s; 9.8 GB peak; cleanup 0.00793/0.0 GB active/cache       |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 972 prompt / 156 generated; 63.2 tok/s; 10 GB peak; cleanup 0.00819/0.0 GB active/cache        |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 971 prompt / 178 generated; 187 tok/s; 4.5 GB peak; cleanup 0.00846/0.0 GB active/cache        |
+| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 747 prompt / 174 generated; 51.9 tok/s; 11 GB peak; cleanup 0.00877/0.0 GB active/cache        |
+| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 747 prompt / 199 generated; 30.6 tok/s; 18 GB peak; cleanup 0.00908/0.0 GB active/cache        |
+| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 764 prompt / 158 generated; 5.96 tok/s; 23 GB peak; cleanup 0.0097/0.0 GB active/cache         |
+| mlx-community/nanoLLaVA-1.5-4bit                      | rev 524020474496; Qwen2Tokenizer; stop completed        | 20 prompt / 123 generated; 368 tok/s; 1.8 GB peak; cleanup 0.02/0.0 GB active/cache            |
+| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 68.8 tok/s; 71 GB peak; cleanup 0.0102/0.0 GB active/cache         |
 | mlx-community/paligemma2-10b-ft-docci-448-6bit        | rev 1485fa9b3c7a; PaliGemmaProcessor; stop completed    | 1029 prompt / 180 generated; 33.3 tok/s; 11 GB peak; cleanup 0.021/0.0 GB active/cache         |
-| mlx-community/paligemma2-10b-ft-docci-448-bf16        | rev 7c412694b919; PaliGemmaProcessor; stop completed    | 1029 prompt / 159 generated; 5.34 tok/s; 26 GB peak; cleanup 0.0221/0.0 GB active/cache        |
-| mlx-community/paligemma2-3b-ft-docci-448-bf16         | rev f66333527ce7; PaliGemmaProcessor; stop completed    | 1029 prompt / 126 generated; 18.8 tok/s; 10 GB peak; cleanup 0.0231/0.0 GB active/cache        |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 59.0 tok/s; 9.3 GB peak; cleanup 0.0103/0.0 GB active/cache         |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed      | 1237 prompt / 199 generated; 34.2 tok/s; 15 GB peak; cleanup 0.0244/0.0 GB active/cache        |
-| mlx-community/pixtral-12b-bf16                        | rev 378cf65efd79; PixtralProcessor; stop completed      | 1237 prompt / 204 generated; 18.3 tok/s; 27 GB peak; cleanup 0.0247/0.0 GB active/cache        |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 415 prompt / 69 generated; 317 tok/s; 2.5 GB peak; cleanup 0.0106/0.0 GB active/cache          |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16               | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 121 tok/s; 5.2 GB peak; cleanup 0.0109/0.0 GB active/cache         |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 315 prompt / 401 generated; 123 tok/s; 5.3 GB peak; cleanup 0.0112/0.0 GB active/cache         |
-| mlx-community/Qwen3.5-27B-4bit                        | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 317 prompt / 315 generated; 29.6 tok/s; 19 GB peak; cleanup 0.0117/0.0 GB active/cache         |
-| mlx-community/Qwen3.5-27B-mxfp8                       | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 17.2 tok/s; 30 GB peak; cleanup 0.0122/0.0 GB active/cache         |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 317 prompt / 326 generated; 103 tok/s; 21 GB peak; cleanup 0.0127/0.0 GB active/cache          |
-| mlx-community/Qwen3.5-35B-A3B-6bit                    | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 90.0 tok/s; 30 GB peak; cleanup 0.0132/0.0 GB active/cache         |
-| mlx-community/Qwen3.5-35B-A3B-bf16                    | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 70.0 tok/s; 71 GB peak; cleanup 0.0137/0.0 GB active/cache         |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 317 prompt / 265 generated; 98.9 tok/s; 7.0 GB peak; cleanup 0.0143/0.0 GB active/cache        |
+| mlx-community/paligemma2-10b-ft-docci-448-bf16        | rev 7c412694b919; PaliGemmaProcessor; stop completed    | 1029 prompt / 159 generated; 5.39 tok/s; 26 GB peak; cleanup 0.0221/0.0 GB active/cache        |
+| mlx-community/paligemma2-3b-ft-docci-448-bf16         | rev f66333527ce7; PaliGemmaProcessor; stop completed    | 1029 prompt / 126 generated; 19.6 tok/s; 10 GB peak; cleanup 0.0231/0.0 GB active/cache        |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 60.1 tok/s; 9.3 GB peak; cleanup 0.0103/0.0 GB active/cache         |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed      | 1237 prompt / 199 generated; 40.2 tok/s; 15 GB peak; cleanup 0.0244/0.0 GB active/cache        |
+| mlx-community/pixtral-12b-bf16                        | rev 378cf65efd79; PixtralProcessor; stop completed      | 1237 prompt / 204 generated; 20.0 tok/s; 27 GB peak; cleanup 0.0247/0.0 GB active/cache        |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 415 prompt / 69 generated; 331 tok/s; 2.5 GB peak; cleanup 0.0106/0.0 GB active/cache          |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16               | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 133 tok/s; 5.3 GB peak; cleanup 0.0109/0.0 GB active/cache         |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 315 prompt / 401 generated; 133 tok/s; 5.3 GB peak; cleanup 0.0112/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-27B-4bit                        | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 317 prompt / 315 generated; 33.4 tok/s; 19 GB peak; cleanup 0.0117/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-27B-mxfp8                       | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 19.2 tok/s; 30 GB peak; cleanup 0.0122/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 317 prompt / 326 generated; 120 tok/s; 21 GB peak; cleanup 0.0127/0.0 GB active/cache          |
+| mlx-community/Qwen3.5-35B-A3B-6bit                    | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 101 tok/s; 30 GB peak; cleanup 0.0132/0.0 GB active/cache          |
+| mlx-community/Qwen3.5-35B-A3B-bf16                    | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 69.6 tok/s; 71 GB peak; cleanup 0.0137/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 317 prompt / 265 generated; 99.6 tok/s; 7.0 GB peak; cleanup 0.0143/0.0 GB active/cache        |
 | mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 317 prompt / 283 generated; 19.3 tok/s; 30 GB peak; cleanup 0.0148/0.0 GB active/cache         |
-| mlx-community/SmolVLM-Instruct-bf16                   | rev cae61cdedd06; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 125 tok/s; 5.5 GB peak; cleanup 0.0149/0.0 GB active/cache         |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 95 prompt / 143 generated; 132 tok/s; 5.5 GB peak; cleanup 0.015/0.0 GB active/cache           |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 188 prompt / 113 generated; 47.2 tok/s; 65 GB peak; cleanup 0.0153/0.0 GB active/cache         |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 415 prompt / 104 generated; 66.1 tok/s; 10 GB peak; cleanup 0.0156/0.0 GB active/cache         |
-| qnguyen3/nanoLLaVA                                    | rev 13d60cec183a; Qwen2Tokenizer; stop completed        | 20 prompt / 44 generated; 91.0 tok/s; 4.0 GB peak; cleanup 0.0253/0.0 GB active/cache          |
-| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 136 tok/s; 5.2 GB peak; cleanup 0.000558/0.0 GB active/cache       |
+| mlx-community/SmolVLM-Instruct-bf16                   | rev cae61cdedd06; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 124 tok/s; 5.5 GB peak; cleanup 0.0149/0.0 GB active/cache         |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 95 prompt / 143 generated; 129 tok/s; 5.5 GB peak; cleanup 0.015/0.0 GB active/cache           |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 188 prompt / 113 generated; 48.0 tok/s; 65 GB peak; cleanup 0.0153/0.0 GB active/cache         |
+| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 415 prompt / 104 generated; 66.3 tok/s; 10 GB peak; cleanup 0.0156/0.0 GB active/cache         |
+| qnguyen3/nanoLLaVA                                    | rev 13d60cec183a; Qwen2Tokenizer; stop completed        | 20 prompt / 44 generated; 116 tok/s; 4.1 GB peak; cleanup 0.0253/0.0 GB active/cache           |
+| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 135 tok/s; 5.1 GB peak; cleanup 0.000558/0.0 GB active/cache       |
 
 </details>
 
@@ -1376,7 +1379,7 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.11                                                                                                                                          |
-| mlx                        | 0.32.1.dev20260807+8056817bd                                                                                                                    |
+| mlx                        | 0.32.1.dev20260808+6539d1807                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.7                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -1405,6 +1408,6 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (164,591,992 bytes, sha256=521bd22d775f929912876487aa2def0a121b9b574141b0a47583b5f3c80e01ed) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,678,352 bytes, sha256=8981b1ac0f9a8fe29383470e279aa887ca562237e73a3fe9e8835f623d791776)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (165,577,880 bytes, sha256=0d3bca561dcf0924959abae6246546e2ad15baedff1ff9e418c7fd25d07b187e) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,720,768 bytes, sha256=e050432ff21c83cbced2ec7ef4484713a23824f41a53900772885e8453ba7830)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
