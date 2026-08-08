@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-08 20:44:52 BST
+Generated on: 2026-08-08 22:59:20 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -18,55 +18,55 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Gen tok | Observations                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|---------|-----------------------------------------------------------------------------------------------------|
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 8.47s   | 23.6 tok/s | 1.41            | 17      | 103     | none                                                                                                |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 10.78s  | 13.7 tok/s | 1.67            | 15      | 89      | none                                                                                                |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.79s   | 59.2 tok/s | 2.44            | 12      | 121     | none                                                                                                |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 10.31s  | 40.3 tok/s | 3.41            | 12      | 171     | none                                                                                                |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.86s   | 144 tok/s  | 1.09            | 6.4     | 117     | none                                                                                                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.19s   | 55.8 tok/s | 0.29            | 9.4     | 100     | none                                                                                                |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 78.03s  | 94.0 tok/s | 72.94           | 24      | 79      | none                                                                                                |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 83.08s  | 90.7 tok/s | 78.90           | 10      | 106     | none                                                                                                |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 30.48s  | 40.4 tok/s | 19.81           | 70      | 118     | none                                                                                                |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.95s   | 114 tok/s  | 0.44            | 16      | 96      | none                                                                                                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 9.49s   | 18.5 tok/s | 1.31            | 20      | 83      | none                                                                                                |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 6.67s   | 39.7 tok/s | 1.88            | 15      | 82      | none                                                                                                |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 1.62s   | 514 tok/s  | 0.04            | 1.2     | 107     | title/keyword constraints failed                                                                    |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 17.95s  | 90.4 tok/s | 14.88           | 8.4     | 90      | title/keyword constraints failed                                                                    |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 10.80s  | 27.1 tok/s | 3.19            | 22      | 110     | title/keyword constraints failed                                                                    |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 15.67s  | 62.5 tok/s | 11.24           | 8.4     | 104     | title/keyword constraints failed                                                                    |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 10.67s  | 22.9 tok/s | 1.73            | 18      | 130     | role tokens visible                                                                                 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.99s   | 42.9 tok/s | 0.97            | 11      | 105     | title/keyword constraints failed                                                                    |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 83.91s  | 63.3 tok/s | 71.55           | 74      | 107     | title/keyword constraints failed                                                                    |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 78.43s  | 213 tok/s  | 76.30           | 5.1     | 102     | title/keyword constraints failed; draft hints copied unchanged                                      |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 22.42s  | 89.8 tok/s | 19.37           | 8.4     | 90      | title/keyword constraints failed                                                                    |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 110.89s | 14.9 tok/s | 100.61          | 35      | 87      | title/keyword constraints failed                                                                    |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 3.25s   | 126 tok/s  | 0.34            | 5.5     | 125     | title/keyword constraints failed                                                                    |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 12.70s  | 20.5 tok/s | 1.44            | 18      | 155     | title/keyword constraints failed                                                                    |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 6.77s   | 45.8 tok/s | 0.40            | 17      | 130     | title/keyword constraints failed                                                                    |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 16.88s  | 40.7 tok/s | 1.87            | 14      | 500     | missing required fields; echoes instructions; cut off at token limit                                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 23.72s  | 48.5 tok/s | 4.38            | 60      | 500     | repeated text; missing required fields; cut off at token limit                                      |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 3.07s   | 328 tok/s  | 0.10            | 2.1     | 130     | missing required fields; extra text before Title                                                    |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 28.40s  | 35.3 tok/s | 9.94            | 13      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `unusable`            | 43.10s  | 23.2 tok/s | 29.54           | 78      | 92      | control tokens visible; missing required fields; extra text before Title                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 127.13s | 4.15 tok/s | 1.63            | 40      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 2.36s   | 184 tok/s  | 0.10            | 4.1     | 93      | missing required fields                                                                             |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 4.39s   | 245 tok/s  | 0.25            | 3.8     | 500     | missing required fields; cut off at token limit; incomplete thinking block                          |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 32.71s  | 6.06 tok/s | 3.48            | 24      | 156     | missing required fields                                                                             |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 28.06s  | 81.2 tok/s | 19.86           | 8.4     | 500     | missing required fields; echoes instructions; cut off at token limit                                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 40.63s  | 42.2 tok/s | 26.34           | 14      | 500     | repeated text; cut off at token limit; title/keyword constraints failed                             |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | 6.43s   | 68.4 tok/s | 0.35            | 29      | 83      | missing required fields; extra text before Title                                                    |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | 6.73s   | 56.8 tok/s | 0.36            | 28      | 85      | missing required fields; extra text before Title                                                    |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 6.96s   | 58.8 tok/s | 3.76            | 9.7     | 52      | missing required fields                                                                             |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.80s   | 292 tok/s  | 0.08            | 2.2     | 71      | missing required fields                                                                             |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 15.91s  | 40.4 tok/s | 1.17            | 4.4     | 500     | repeated text; missing required fields; cut off at token limit                                      |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.89s   | -          | -               | -       | -       | none                                                                                                |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 7.20s   | 30.4 tok/s | 1.15            | 17      | 103     | none                                                                                                |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 11.39s  | 13.7 tok/s | 2.23            | 15      | 89      | none                                                                                                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 7.61s   | 53.9 tok/s | 2.86            | 12      | 121     | none                                                                                                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 10.38s  | 43.8 tok/s | 3.20            | 12      | 171     | none                                                                                                |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 4.58s   | 156 tok/s  | 1.05            | 6.4     | 117     | none                                                                                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.37s   | 52.6 tok/s | 0.31            | 9.4     | 100     | none                                                                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 83.67s  | 59.0 tok/s | 78.57           | 24      | 79      | none                                                                                                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 87.08s  | 67.6 tok/s | 82.32           | 10      | 106     | none                                                                                                |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 58.16s  | 19.2 tok/s | 39.19           | 70      | 118     | none                                                                                                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 5.16s   | 104 tok/s  | 0.47            | 16      | 96      | none                                                                                                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 12.50s  | 12.2 tok/s | 2.24            | 20      | 83      | none                                                                                                |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 10.04s  | 18.8 tok/s | 2.85            | 15      | 82      | none                                                                                                |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 1.29s   | 520 tok/s  | 0.04            | 1.2     | 107     | title/keyword constraints failed                                                                    |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 16.82s  | 93.0 tok/s | 14.09           | 8.4     | 90      | title/keyword constraints failed                                                                    |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 10.20s  | 26.8 tok/s | 2.85            | 22      | 110     | title/keyword constraints failed                                                                    |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 11.63s  | 71.1 tok/s | 7.96            | 8.5     | 104     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 9.22s   | 30.3 tok/s | 1.24            | 18      | 130     | role tokens visible                                                                                 |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 6.66s   | 43.2 tok/s | 0.93            | 11      | 105     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 114.54s | 35.0 tok/s | 94.10           | 74      | 107     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 107.13s | 198 tok/s  | 104.83          | 5.1     | 102     | title/keyword constraints failed; draft hints copied unchanged                                      |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 28.00s  | 80.0 tok/s | 24.59           | 8.4     | 90      | title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 137.36s | 7.31 tok/s | 120.62          | 35      | 87      | title/keyword constraints failed                                                                    |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 4.36s   | 122 tok/s  | 0.40            | 5.5     | 125     | title/keyword constraints failed                                                                    |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 19.51s  | 11.5 tok/s | 1.81            | 18      | 155     | title/keyword constraints failed                                                                    |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 7.02s   | 43.9 tok/s | 0.40            | 17      | 130     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 17.05s  | 38.7 tok/s | 1.77            | 14      | 500     | missing required fields; echoes instructions; cut off at token limit                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 29.93s  | 49.0 tok/s | 7.02            | 60      | 500     | repeated text; missing required fields; cut off at token limit                                      |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.73s   | 323 tok/s  | 0.10            | 2.1     | 130     | missing required fields; extra text before Title                                                    |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 22.88s  | 39.4 tok/s | 7.52            | 13      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `unusable`            | 39.93s  | 26.2 tok/s | 24.12           | 78      | 92      | control tokens visible; missing required fields; extra text before Title                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 127.49s | 4.45 tok/s | 2.92            | 40      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 2.63s   | 171 tok/s  | 0.12            | 3.8     | 93      | missing required fields                                                                             |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 5.33s   | 182 tok/s  | 0.26            | 3.8     | 500     | missing required fields; cut off at token limit; incomplete thinking block                          |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 35.65s  | 5.76 tok/s | 4.31            | 24      | 156     | missing required fields                                                                             |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 33.56s  | 81.8 tok/s | 24.42           | 8.4     | 500     | missing required fields; echoes instructions; cut off at token limit                                |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 69.07s  | 25.3 tok/s | 45.69           | 14      | 500     | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | 10.52s  | 17.7 tok/s | 0.37            | 29      | 81      | missing required fields; extra text before Title                                                    |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | 10.12s  | 19.4 tok/s | 0.38            | 28      | 82      | missing required fields; extra text before Title                                                    |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 8.12s   | 45.3 tok/s | 5.06            | 9.7     | 52      | missing required fields                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.60s   | 317 tok/s  | 0.08            | 2.2     | 71      | missing required fields                                                                             |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 22.96s  | 27.1 tok/s | 2.06            | 4.4     | 500     | repeated text; missing required fields; cut off at token limit                                      |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.59s   | -          | -               | -       | -       | none                                                                                                |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Resource Highlights
 
-Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 514 tok/s
+Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 520 tok/s
 
-Average valid generation throughput: 82.7 tok/s
+Average valid generation throughput: 76.5 tok/s
 
 Lowest captured peak memory: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.2 GB
 
@@ -139,8 +139,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Inflatable Boats Speeding Across Open Sea Near Seaford<br><br>Two inflatable motorboats with outboard engines race across a vast, dark blue ocean, leaving white wakes behind them. The boats carry multiple passengers and feature distinctive blue and white designs, with one displaying...                           |
 | [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows two inflatable boats (motorboats) on the ocean, so maybe "Two motorboats speeding across the sea" but need to be concise. Let's see: "Two inflatable motorboats racing on the ocean"...                                 |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>Inflatable Boats Speeding Across the Ocean<br><br>Description:<br>Two inflatable motorboats, one labeled "Rapid," cruise across the open sea, leaving white wakes as they move, under a clear blue sky with a distinct horizon line, capturing a vibrant holiday scene.<br><br>Keywords: Seaf...               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | <\|channel>thought<br><channel\|>Title: Two Inflatable Boats Speeding Across the Seaford Coast<br>Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky.<br>Keywords: Seaford, England, UK, inflatable boat, mot...                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | <\|channel>thought<br><channel\|>Title: Two Motorboats Speeding Across the Sea at Seaford<br>Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky.<br>Keywords: Seaford, England, UK, inflatable boat, mo...                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | <\|channel>thought<br><channel\|>Title: Two Inflatable Boats Speeding Across Seaford Sea<br>Description: Two inflatable motorboats with outboard engines speed across the deep blue sea, leaving white wakes under a clear sky.<br>Keywords: Seaford, England, UK, ocean, inflatable boat, motor...                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | <\|channel>thought<br><channel\|>Title: Two Inflatable Boats Speeding Across the Seaford Sea<br>Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky.<br>Keywords: Seaford, England, UK, ocean, inflatabl...                      |
 | [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Seafront, Seaford, England, UK, GBR, Europe, Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.                                                                                                             |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: "Seaford in Action"<br>Description: A serene scene of two inflatable boats, one driving away from the other, captured in motion on a clear blue sky. The boats are driving on a calm sea, with a distinct horizon line in the background. The image is a testament to the beauty...                               |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>-... |
@@ -236,23 +236,23 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.71s
-- *Generation time:* 6.33s
-- *Total time:* 8.47s
-- *Input validation time:* 0.416
-- *Prompt preparation time:* 0.00207
-- *First-token latency:* 1.41
-- *Cleanup time:* 0.211
+- *Model load time:* 1.64s
+- *Generation time:* 5.20s
+- *Total time:* 7.20s
+- *Input validation time:* 0.361
+- *Prompt preparation time:* 0.00195
+- *First-token latency:* 1.15
+- *Cleanup time:* 0.144
 - *Prompt tokens:* 2,610
 - *Generation tokens:* 103
 - *Total tokens:* 2,713
-- *Prompt throughput (raw):* 1,857 tok/s
-- *Generation throughput (raw):* 23.6 tok/s
+- *Prompt throughput (raw):* 2,270 tok/s
+- *Generation throughput (raw):* 30.4 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.21
 - *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.003
+- *Post-cleanup active memory:* 0.00302
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -295,23 +295,23 @@ Keywords: Inflatable boat, Motorboat, People, Riding, Ocean, Horizon, Blue sky, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.80s
-- *Generation time:* 8.66s
-- *Total time:* 10.78s
-- *Input validation time:* 0.315
-- *Prompt preparation time:* 0.00151
-- *First-token latency:* 1.67
-- *Cleanup time:* 0.121
+- *Model load time:* 1.69s
+- *Generation time:* 9.28s
+- *Total time:* 11.39s
+- *Input validation time:* 0.415
+- *Prompt preparation time:* 0.00174
+- *First-token latency:* 2.23
+- *Cleanup time:* 0.155
 - *Prompt tokens:* 297
 - *Generation tokens:* 89
 - *Total tokens:* 386
-- *Prompt throughput (raw):* 178 tok/s
+- *Prompt throughput (raw):* 133 tok/s
 - *Generation throughput (raw):* 13.7 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.59
 - *Model-load active memory:* 11.4
-- *Post-cleanup active memory:* 0.00431
+- *Post-cleanup active memory:* 0.00433
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -354,23 +354,23 @@ Keywords: Ocean, Inflatable Boats, Outboard Motors, Speed, White Wakes, Sunny Da
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.48s
-- *Generation time:* 4.99s
-- *Total time:* 6.79s
-- *Input validation time:* 0.315
-- *Prompt preparation time:* 0.00806
-- *First-token latency:* 2.44
-- *Cleanup time:* 0.129
+- *Model load time:* 1.51s
+- *Generation time:* 5.68s
+- *Total time:* 7.61s
+- *Input validation time:* 0.406
+- *Prompt preparation time:* 0.00924
+- *First-token latency:* 2.86
+- *Cleanup time:* 0.187
 - *Prompt tokens:* 2,578
 - *Generation tokens:* 121
 - *Total tokens:* 2,699
-- *Prompt throughput (raw):* 1,057 tok/s
-- *Generation throughput (raw):* 59.2 tok/s
+- *Prompt throughput (raw):* 900 tok/s
+- *Generation throughput (raw):* 53.9 tok/s
 - *Peak memory:* 12
 - *Active memory:* 8.0
 - *Cache memory:* 0.51
 - *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.0051
+- *Post-cleanup active memory:* 0.00511
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -416,23 +416,23 @@ Seaford, UK, inflatable boats, outboard motors, racing, ocean, blue sky, horizon
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.74s
-- *Generation time:* 8.16s
-- *Total time:* 10.31s
-- *Input validation time:* 0.402
-- *Prompt preparation time:* 0.000269
-- *First-token latency:* 3.41
-- *Cleanup time:* 0.113
+- *Model load time:* 2.03s
+- *Generation time:* 7.66s
+- *Total time:* 10.38s
+- *Input validation time:* 0.665
+- *Prompt preparation time:* 0.000279
+- *First-token latency:* 3.2
+- *Cleanup time:* 0.234
 - *Prompt tokens:* 2,578
 - *Generation tokens:* 171
 - *Total tokens:* 2,749
-- *Prompt throughput (raw):* 755 tok/s
-- *Generation throughput (raw):* 40.3 tok/s
+- *Prompt throughput (raw):* 807 tok/s
+- *Generation throughput (raw):* 43.8 tok/s
 - *Peak memory:* 12
 - *Active memory:* 8.4
 - *Cache memory:* 0.51
 - *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00536
+- *Post-cleanup active memory:* 0.00538
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -478,23 +478,23 @@ inflatable motorboats, Seaford, England, UK, Europe, 2026-08-07, racing, ocean, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.17s
-- *Generation time:* 2.37s
-- *Total time:* 3.86s
-- *Input validation time:* 0.31
-- *Prompt preparation time:* 0.00762
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.0871
+- *Model load time:* 1.56s
+- *Generation time:* 2.34s
+- *Total time:* 4.58s
+- *Input validation time:* 0.663
+- *Prompt preparation time:* 0.0103
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 2,577
 - *Generation tokens:* 117
 - *Total tokens:* 2,694
-- *Prompt throughput (raw):* 2,363 tok/s
-- *Generation throughput (raw):* 144 tok/s
+- *Prompt throughput (raw):* 2,449 tok/s
+- *Generation throughput (raw):* 156 tok/s
 - *Peak memory:* 6.4
 - *Active memory:* 2.8
 - *Cache memory:* 0.35
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.00562
+- *Post-cleanup active memory:* 0.00564
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -540,23 +540,23 @@ Adobe Stock, action, blue sky, England, Europe, holiday, inflatable boat, motorb
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.38s
-- *Generation time:* 2.50s
-- *Total time:* 4.19s
-- *Input validation time:* 0.31
-- *Prompt preparation time:* 0.000869
-- *First-token latency:* 0.285
-- *Cleanup time:* 0.0766
+- *Model load time:* 0.99s
+- *Generation time:* 2.71s
+- *Total time:* 4.37s
+- *Input validation time:* 0.661
+- *Prompt preparation time:* 0.00124
+- *First-token latency:* 0.312
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 1,112
 - *Generation tokens:* 100
 - *Total tokens:* 1,212
-- *Prompt throughput (raw):* 3,899 tok/s
-- *Generation throughput (raw):* 55.8 tok/s
+- *Prompt throughput (raw):* 3,560 tok/s
+- *Generation throughput (raw):* 52.6 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
 - *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00713
+- *Post-cleanup active memory:* 0.00714
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -599,23 +599,23 @@ Keywords: inflatable boats, outboard motors, ocean, Seaford, England, UK, Europe
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.84s
-- *Generation time:* 74.62s
-- *Total time:* 78.03s
-- *Input validation time:* 0.541
-- *Prompt preparation time:* 0.015
-- *First-token latency:* 72.9
-- *Cleanup time:* 0.14
+- *Model load time:* 2.48s
+- *Generation time:* 80.72s
+- *Total time:* 83.67s
+- *Input validation time:* 0.443
+- *Prompt preparation time:* 0.0142
+- *First-token latency:* 78.6
+- *Cleanup time:* 0.179
 - *Prompt tokens:* 16,643
 - *Generation tokens:* 79
 - *Total tokens:* 16,722
-- *Prompt throughput (raw):* 228 tok/s
-- *Generation throughput (raw):* 94.0 tok/s
+- *Prompt throughput (raw):* 212 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
 - *Cache memory:* 0.88
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00857
+- *Post-cleanup active memory:* 0.00859
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -658,23 +658,23 @@ Keywords: inflatable boat, motorboat, sea, ocean, water, people, passengers, spe
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.73s
-- *Generation time:* 80.91s
-- *Total time:* 83.08s
-- *Input validation time:* 0.42
-- *Prompt preparation time:* 0.000351
-- *First-token latency:* 78.9
-- *Cleanup time:* 0.0895
+- *Model load time:* 1.66s
+- *Generation time:* 84.89s
+- *Total time:* 87.08s
+- *Input validation time:* 0.517
+- *Prompt preparation time:* 0.000371
+- *First-token latency:* 82.3
+- *Cleanup time:* 0.155
 - *Prompt tokens:* 16,643
 - *Generation tokens:* 106
 - *Total tokens:* 16,749
-- *Prompt throughput (raw):* 211 tok/s
-- *Generation throughput (raw):* 90.7 tok/s
+- *Prompt throughput (raw):* 202 tok/s
+- *Generation throughput (raw):* 67.6 tok/s
 - *Peak memory:* 10
 - *Active memory:* 6.6
 - *Cache memory:* 1.2
 - *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00909
+- *Post-cleanup active memory:* 0.00911
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -736,23 +736,23 @@ Inflatable boat, motorboat, outboard motor, wake, blue sky, horizon, people, rid
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 6.60s
-- *Generation time:* 23.56s
-- *Total time:* 30.48s
-- *Input validation time:* 0.307
-- *Prompt preparation time:* 0.0162
-- *First-token latency:* 19.8
-- *Cleanup time:* 0.195
+- *Model load time:* 11.51s
+- *Generation time:* 46.14s
+- *Total time:* 58.16s
+- *Input validation time:* 0.477
+- *Prompt preparation time:* 0.0141
+- *First-token latency:* 39.2
+- *Cleanup time:* 0.735
 - *Prompt tokens:* 3,478
 - *Generation tokens:* 118
 - *Total tokens:* 3,596
-- *Prompt throughput (raw):* 176 tok/s
-- *Generation throughput (raw):* 40.4 tok/s
+- *Prompt throughput (raw):* 88.7 tok/s
+- *Generation throughput (raw):* 19.2 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.41
 - *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.00998
+- *Post-cleanup active memory:* 0.01
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -798,18 +798,18 @@ Inflatable boat, Motorboat, Seaford, England, UK, Europe, Blue sky, Horizon, Oce
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.74s
-- *Generation time:* 1.84s
-- *Total time:* 4.95s
-- *Input validation time:* 0.345
-- *Prompt preparation time:* 0.0215
-- *First-token latency:* 0.442
-- *Cleanup time:* 0.126
+- *Model load time:* 2.70s
+- *Generation time:* 1.89s
+- *Total time:* 5.16s
+- *Input validation time:* 0.533
+- *Prompt preparation time:* 0.0218
+- *First-token latency:* 0.466
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 588
 - *Generation tokens:* 96
 - *Total tokens:* 684
-- *Prompt throughput (raw):* 1,330 tok/s
-- *Generation throughput (raw):* 114 tok/s
+- *Prompt throughput (raw):* 1,263 tok/s
+- *Generation throughput (raw):* 104 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.20
@@ -855,18 +855,18 @@ Keywords: blue sky, England, Europe, holiday, horizon, inflatable boat, motorboa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.82s
-- *Generation time:* 6.34s
-- *Total time:* 9.49s
-- *Input validation time:* 0.319
-- *Prompt preparation time:* 0.000293
-- *First-token latency:* 1.31
-- *Cleanup time:* 0.21
+- *Model load time:* 2.59s
+- *Generation time:* 9.58s
+- *Total time:* 12.50s
+- *Input validation time:* 0.322
+- *Prompt preparation time:* 0.000288
+- *First-token latency:* 2.24
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 588
 - *Generation tokens:* 83
 - *Total tokens:* 671
-- *Prompt throughput (raw):* 448 tok/s
-- *Generation throughput (raw):* 18.5 tok/s
+- *Prompt throughput (raw):* 262 tok/s
+- *Generation throughput (raw):* 12.2 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.77
@@ -912,18 +912,18 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, ocean, water, wake, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.91s
-- *Generation time:* 4.41s
-- *Total time:* 6.67s
-- *Input validation time:* 0.334
-- *Prompt preparation time:* 0.00392
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.127
+- *Model load time:* 1.73s
+- *Generation time:* 7.68s
+- *Total time:* 10.04s
+- *Input validation time:* 0.611
+- *Prompt preparation time:* 0.00423
+- *First-token latency:* 2.85
+- *Cleanup time:* 0.166
 - *Prompt tokens:* 2,649
 - *Generation tokens:* 82
 - *Total tokens:* 2,731
-- *Prompt throughput (raw):* 1,412 tok/s
-- *Generation throughput (raw):* 39.7 tok/s
+- *Prompt throughput (raw):* 930 tok/s
+- *Generation throughput (raw):* 18.8 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.50
@@ -974,23 +974,23 @@ Inflatable boat, Motorboat, Sea, Blue sky, Horizon, Water, Speeding, Outboard mo
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Duplicate keywords: seaford, uk
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.61s
-- *Generation time:* 0.66s
-- *Total time:* 1.62s
-- *Input validation time:* 0.339
-- *Prompt preparation time:* 0.00839
-- *First-token latency:* 0.0392
-- *Cleanup time:* 0.0739
+- *Model load time:* 0.38s
+- *Generation time:* 0.60s
+- *Total time:* 1.29s
+- *Input validation time:* 0.302
+- *Prompt preparation time:* 0.00648
+- *First-token latency:* 0.0389
+- *Cleanup time:* 0.0615
 - *Prompt tokens:* 385
 - *Generation tokens:* 107
 - *Total tokens:* 492
-- *Prompt throughput (raw):* 9,829 tok/s
-- *Generation throughput (raw):* 514 tok/s
+- *Prompt throughput (raw):* 9,903 tok/s
+- *Generation throughput (raw):* 520 tok/s
 - *Peak memory:* 1.2
 - *Active memory:* 0.90
 - *Cache memory:* 0.02
 - *Model-load active memory:* 0.897
-- *Post-cleanup active memory:* 0.000132
+- *Post-cleanup active memory:* 0.000149
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1037,23 +1037,23 @@ Seafront, Seaford, England, UK, GBR, Europe, Inflatable boat, Motorboat, People,
 - *Observations:* Keyword list has 20 terms (requested 10-18); Duplicate
   keywords: water
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 16.83s
-- *Total time:* 17.95s
-- *Input validation time:* 0.336
-- *Prompt preparation time:* 0.0102
-- *First-token latency:* 14.9
-- *Cleanup time:* 0.1
+- *Model load time:* 0.66s
+- *Generation time:* 15.86s
+- *Total time:* 16.82s
+- *Input validation time:* 0.292
+- *Prompt preparation time:* 0.00949
+- *First-token latency:* 14.1
+- *Cleanup time:* 0.0862
 - *Prompt tokens:* 16,628
 - *Generation tokens:* 90
 - *Total tokens:* 16,718
-- *Prompt throughput (raw):* 1,118 tok/s
-- *Generation throughput (raw):* 90.4 tok/s
+- *Prompt throughput (raw):* 1,180 tok/s
+- *Generation throughput (raw):* 93.0 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.000443
+- *Post-cleanup active memory:* 0.00046
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1096,23 +1096,23 @@ Keywords: motorboat, inflatable boat, sea, people, sky, horizon, water, action, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 24 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.47s
-- *Generation time:* 7.89s
-- *Total time:* 10.80s
-- *Input validation time:* 0.422
-- *Prompt preparation time:* 0.00872
-- *First-token latency:* 3.19
-- *Cleanup time:* 0.16
+- *Model load time:* 2.19s
+- *Generation time:* 7.56s
+- *Total time:* 10.20s
+- *Input validation time:* 0.431
+- *Prompt preparation time:* 0.00869
+- *First-token latency:* 2.85
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,045
 - *Generation tokens:* 110
 - *Total tokens:* 2,155
-- *Prompt throughput (raw):* 642 tok/s
-- *Generation throughput (raw):* 27.1 tok/s
+- *Prompt throughput (raw):* 718 tok/s
+- *Generation throughput (raw):* 26.8 tok/s
 - *Peak memory:* 22
 - *Active memory:* 18
 - *Cache memory:* 0.42
 - *Model-load active memory:* 18
-- *Post-cleanup active memory:* 0.000968
+- *Post-cleanup active memory:* 0.000984
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1159,23 +1159,23 @@ Adobe Stock, inflatable boats, outboard motors, ocean, blue sky, horizon, speedi
 - *Observations:* Title has 3 words (requested 5-10); Keyword list has 21
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.62s
-- *Generation time:* 13.39s
-- *Total time:* 15.67s
-- *Input validation time:* 0.634
-- *Prompt preparation time:* 0.00818
-- *First-token latency:* 11.2
+- *Model load time:* 1.41s
+- *Generation time:* 9.90s
+- *Total time:* 11.63s
+- *Input validation time:* 0.304
+- *Prompt preparation time:* 0.00831
+- *First-token latency:* 7.96
 - *Cleanup time:* 0.145
 - *Prompt tokens:* 6,330
 - *Generation tokens:* 104
 - *Total tokens:* 6,434
-- *Prompt throughput (raw):* 563 tok/s
-- *Generation throughput (raw):* 62.5 tok/s
-- *Peak memory:* 8.4
+- *Prompt throughput (raw):* 796 tok/s
+- *Generation throughput (raw):* 71.1 tok/s
+- *Peak memory:* 8.5
 - *Active memory:* 6.8
 - *Cache memory:* 0.46
 - *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00211
+- *Post-cleanup active memory:* 0.00213
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1216,23 +1216,23 @@ Keywords: Two Inflatable Boats, outboard motors, speeding across ocean, white wa
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.24s
-- *Generation time:* 8.04s
-- *Total time:* 10.67s
-- *Input validation time:* 0.377
-- *Prompt preparation time:* 0.0013
-- *First-token latency:* 1.73
-- *Cleanup time:* 0.191
+- *Model load time:* 2.26s
+- *Generation time:* 6.24s
+- *Total time:* 9.22s
+- *Input validation time:* 0.706
+- *Prompt preparation time:* 0.00209
+- *First-token latency:* 1.24
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 2,608
 - *Generation tokens:* 130
 - *Total tokens:* 2,738
-- *Prompt throughput (raw):* 1,507 tok/s
-- *Generation throughput (raw):* 22.9 tok/s
+- *Prompt throughput (raw):* 2,104 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
 - *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00269
+- *Post-cleanup active memory:* 0.0027
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1288,23 +1288,23 @@ Keywords: inflatable boats, ocean, outboard motors, white wakes, clear blue sky,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.34s
-- *Generation time:* 4.33s
-- *Total time:* 5.99s
-- *Input validation time:* 0.312
-- *Prompt preparation time:* 0.00142
-- *First-token latency:* 0.972
-- *Cleanup time:* 0.0944
+- *Model load time:* 1.61s
+- *Generation time:* 4.51s
+- *Total time:* 6.66s
+- *Input validation time:* 0.524
+- *Prompt preparation time:* 0.0021
+- *First-token latency:* 0.935
+- *Cleanup time:* 0.293
 - *Prompt tokens:* 1,498
 - *Generation tokens:* 105
 - *Total tokens:* 1,603
-- *Prompt throughput (raw):* 1,541 tok/s
-- *Generation throughput (raw):* 42.9 tok/s
+- *Prompt throughput (raw):* 1,603 tok/s
+- *Generation throughput (raw):* 43.2 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
 - *Model-load active memory:* 9.04
-- *Post-cleanup active memory:* 0.00593
+- *Post-cleanup active memory:* 0.00595
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1347,23 +1347,23 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 9.02s
-- *Generation time:* 74.56s
-- *Total time:* 83.91s
-- *Input validation time:* 0.309
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 71.5
-- *Cleanup time:* 0.27
+- *Model load time:* 14.59s
+- *Generation time:* 99.24s
+- *Total time:* 114.54s
+- *Input validation time:* 0.677
+- *Prompt preparation time:* 0.0162
+- *First-token latency:* 94.1
+- *Cleanup time:* 0.79
 - *Prompt tokens:* 16,643
 - *Generation tokens:* 107
 - *Total tokens:* 16,750
-- *Prompt throughput (raw):* 233 tok/s
-- *Generation throughput (raw):* 63.3 tok/s
+- *Prompt throughput (raw):* 177 tok/s
+- *Generation throughput (raw):* 35.0 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00706
+- *Post-cleanup active memory:* 0.00708
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1407,23 +1407,23 @@ Keywords: inflatable boat, motorboat, sea, ocean, people, passengers, wake, spee
 - *Observations:* Keyword list has 20 terms (requested 10-18); Title,
   Description and Keywords copy all supplied hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.58s
-- *Generation time:* 77.53s
-- *Total time:* 78.43s
-- *Input validation time:* 0.305
-- *Prompt preparation time:* 0.00397
-- *First-token latency:* 76.3
-- *Cleanup time:* 0.0974
+- *Model load time:* 0.57s
+- *Generation time:* 106.21s
+- *Total time:* 107.13s
+- *Input validation time:* 0.335
+- *Prompt preparation time:* 0.00422
+- *First-token latency:* 105
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 102
 - *Total tokens:* 16,741
-- *Prompt throughput (raw):* 218 tok/s
-- *Generation throughput (raw):* 213 tok/s
+- *Prompt throughput (raw):* 159 tok/s
+- *Generation throughput (raw):* 198 tok/s
 - *Peak memory:* 5.1
 - *Active memory:* 1.3
 - *Cache memory:* 0.87
 - *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00744
+- *Post-cleanup active memory:* 0.00746
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1470,23 +1470,23 @@ Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, In
 - *Observations:* Keyword list has 20 terms (requested 10-18); Duplicate
   keywords: water
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.92s
-- *Generation time:* 21.18s
-- *Total time:* 22.42s
-- *Input validation time:* 0.308
-- *Prompt preparation time:* 0.000216
-- *First-token latency:* 19.4
-- *Cleanup time:* 0.0833
+- *Model load time:* 0.84s
+- *Generation time:* 26.72s
+- *Total time:* 28.00s
+- *Input validation time:* 0.427
+- *Prompt preparation time:* 0.000291
+- *First-token latency:* 24.6
+- *Cleanup time:* 0.158
 - *Prompt tokens:* 16,628
 - *Generation tokens:* 90
 - *Total tokens:* 16,718
-- *Prompt throughput (raw):* 859 tok/s
-- *Generation throughput (raw):* 89.8 tok/s
+- *Prompt throughput (raw):* 676 tok/s
+- *Generation throughput (raw):* 80.0 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00775
+- *Post-cleanup active memory:* 0.00777
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1529,23 +1529,23 @@ Keywords: motorboat, inflatable boat, sea, people, sky, horizon, water, action, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.29s
-- *Generation time:* 107.26s
-- *Total time:* 110.89s
-- *Input validation time:* 0.315
-- *Prompt preparation time:* 0.0147
-- *First-token latency:* 101
-- *Cleanup time:* 0.157
+- *Model load time:* 3.34s
+- *Generation time:* 133.46s
+- *Total time:* 137.36s
+- *Input validation time:* 0.506
+- *Prompt preparation time:* 0.0146
+- *First-token latency:* 121
+- *Cleanup time:* 0.316
 - *Prompt tokens:* 16,643
 - *Generation tokens:* 87
 - *Total tokens:* 16,730
-- *Prompt throughput (raw):* 165 tok/s
-- *Generation throughput (raw):* 14.9 tok/s
+- *Prompt throughput (raw):* 138 tok/s
+- *Generation throughput (raw):* 7.31 tok/s
 - *Peak memory:* 35
 - *Active memory:* 29
 - *Cache memory:* 1.9
 - *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.0096
+- *Post-cleanup active memory:* 0.00962
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1589,23 +1589,23 @@ Keywords: Sea, Ocean, Boats, Motorboats, Inflatable boats, People, Passengers, S
 - *Observations:* Title has 2 words (requested 5-10); Keyword list has 20
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.95s
-- *Generation time:* 1.96s
-- *Total time:* 3.25s
-- *Input validation time:* 0.342
-- *Prompt preparation time:* 0.00194
-- *First-token latency:* 0.335
-- *Cleanup time:* 0.0774
+- *Model load time:* 0.87s
+- *Generation time:* 2.73s
+- *Total time:* 4.36s
+- *Input validation time:* 0.75
+- *Prompt preparation time:* 0.00462
+- *First-token latency:* 0.4
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 411
 - *Generation tokens:* 125
 - *Total tokens:* 536
-- *Prompt throughput (raw):* 1,226 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 1,028 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.19
 - *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00972
+- *Post-cleanup active memory:* 0.00973
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1646,18 +1646,18 @@ Keywords: "Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 24 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.69s
-- *Generation time:* 9.56s
-- *Total time:* 12.70s
-- *Input validation time:* 0.432
-- *Prompt preparation time:* 0.00517
-- *First-token latency:* 1.44
-- *Cleanup time:* 0.22
+- *Model load time:* 3.06s
+- *Generation time:* 15.76s
+- *Total time:* 19.51s
+- *Input validation time:* 0.662
+- *Prompt preparation time:* 0.00415
+- *First-token latency:* 1.81
+- *Cleanup time:* 0.319
 - *Prompt tokens:* 579
 - *Generation tokens:* 155
 - *Total tokens:* 734
-- *Prompt throughput (raw):* 403 tok/s
-- *Generation throughput (raw):* 20.5 tok/s
+- *Prompt throughput (raw):* 320 tok/s
+- *Generation throughput (raw):* 11.5 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.44
@@ -1705,18 +1705,18 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.51s
-- *Generation time:* 3.70s
-- *Total time:* 6.77s
-- *Input validation time:* 0.544
-- *Prompt preparation time:* 0.0035
-- *First-token latency:* 0.399
-- *Cleanup time:* 0.158
+- *Model load time:* 2.48s
+- *Generation time:* 3.83s
+- *Total time:* 7.02s
+- *Input validation time:* 0.69
+- *Prompt preparation time:* 0.00339
+- *First-token latency:* 0.404
+- *Cleanup time:* 0.223
 - *Prompt tokens:* 578
 - *Generation tokens:* 130
 - *Total tokens:* 708
-- *Prompt throughput (raw):* 1,449 tok/s
-- *Generation throughput (raw):* 45.8 tok/s
+- *Prompt throughput (raw):* 1,431 tok/s
+- *Generation throughput (raw):* 43.9 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -1766,23 +1766,23 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.82s
-- *Generation time:* 14.66s
-- *Total time:* 16.88s
-- *Input validation time:* 0.388
-- *Prompt preparation time:* 0.00778
-- *First-token latency:* 1.87
-- *Cleanup time:* 0.114
+- *Model load time:* 1.58s
+- *Generation time:* 15.14s
+- *Total time:* 17.05s
+- *Input validation time:* 0.317
+- *Prompt preparation time:* 0.00682
+- *First-token latency:* 1.77
+- *Cleanup time:* 0.148
 - *Prompt tokens:* 2,740
 - *Generation tokens:* 500
 - *Total tokens:* 3,240
-- *Prompt throughput (raw):* 1,462 tok/s
-- *Generation throughput (raw):* 40.7 tok/s
+- *Prompt throughput (raw):* 1,549 tok/s
+- *Generation throughput (raw):* 38.7 tok/s
 - *Peak memory:* 14
 - *Active memory:* 13
 - *Cache memory:* 0.67
 - *Model-load active memory:* 12.6
-- *Post-cleanup active memory:* 0.000706
+- *Post-cleanup active memory:* 0.000722
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -1831,23 +1831,23 @@ We need to produce:
 - *Observations:* Response repeats the same text; Missing or empty fields:
   Title, Description, Keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 7.83s
-- *Generation time:* 15.40s
-- *Total time:* 23.72s
-- *Input validation time:* 0.466
-- *Prompt preparation time:* 0.0109
-- *First-token latency:* 4.38
-- *Cleanup time:* 0.243
+- *Model load time:* 11.50s
+- *Generation time:* 18.07s
+- *Total time:* 29.93s
+- *Input validation time:* 0.335
+- *Prompt preparation time:* 0.0119
+- *First-token latency:* 7.02
+- *Cleanup time:* 0.297
 - *Prompt tokens:* 1,590
 - *Generation tokens:* 500
 - *Total tokens:* 2,090
-- *Prompt throughput (raw):* 363 tok/s
-- *Generation throughput (raw):* 48.5 tok/s
+- *Prompt throughput (raw):* 226 tok/s
+- *Generation throughput (raw):* 49.0 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.14
 - *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00118
+- *Post-cleanup active memory:* 0.0012
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -1892,23 +1892,23 @@ Finally, the keywords. I need to cover everything. I'll start with the obvious: 
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.90s
-- *Generation time:* 1.76s
-- *Total time:* 3.07s
-- *Input validation time:* 0.404
-- *Prompt preparation time:* 0.00181
-- *First-token latency:* 0.101
-- *Cleanup time:* 0.0983
+- *Model load time:* 0.61s
+- *Generation time:* 1.70s
+- *Total time:* 2.73s
+- *Input validation time:* 0.417
+- *Prompt preparation time:* 0.00167
+- *First-token latency:* 0.0984
+- *Cleanup time:* 0.0985
 - *Prompt tokens:* 319
 - *Generation tokens:* 130
 - *Total tokens:* 449
-- *Prompt throughput (raw):* 3,156 tok/s
-- *Generation throughput (raw):* 328 tok/s
+- *Prompt throughput (raw):* 3,241 tok/s
+- *Generation throughput (raw):* 323 tok/s
 - *Peak memory:* 2.1
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
-- *Post-cleanup active memory:* 0.00149
+- *Post-cleanup active memory:* 0.00151
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -1951,23 +1951,23 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
   appears before the Title field; Response appears cut off at the token limit;
   Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 3.44s
-- *Generation time:* 24.61s
-- *Total time:* 28.40s
-- *Input validation time:* 0.329
-- *Prompt preparation time:* 0.00183
-- *First-token latency:* 9.94
-- *Cleanup time:* 0.208
+- *Model load time:* 1.78s
+- *Generation time:* 20.73s
+- *Total time:* 22.88s
+- *Input validation time:* 0.35
+- *Prompt preparation time:* 0.00171
+- *First-token latency:* 7.52
+- *Cleanup time:* 0.144
 - *Prompt tokens:* 6,326
 - *Generation tokens:* 500
 - *Total tokens:* 6,826
-- *Prompt throughput (raw):* 637 tok/s
-- *Generation throughput (raw):* 35.3 tok/s
+- *Prompt throughput (raw):* 841 tok/s
+- *Generation throughput (raw):* 39.4 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.41
 - *Model-load active memory:* 11.8
-- *Post-cleanup active memory:* 0.0018
+- *Post-cleanup active memory:* 0.00182
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -2032,23 +2032,23 @@ Title: "Inflatable Boats Speeding
 - *Observations:* Unrecognised model control tokens remain visible; Missing or
   empty fields: Title; Extra text appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 8.53s
-- *Generation time:* 34.01s
-- *Total time:* 43.10s
-- *Input validation time:* 0.549
-- *Prompt preparation time:* 0.00788
-- *First-token latency:* 29.5
-- *Cleanup time:* 0.26
+- *Model load time:* 11.24s
+- *Generation time:* 28.17s
+- *Total time:* 39.93s
+- *Input validation time:* 0.499
+- *Prompt preparation time:* 0.00708
+- *First-token latency:* 24.1
+- *Cleanup time:* 0.484
 - *Prompt tokens:* 6,330
 - *Generation tokens:* 92
 - *Total tokens:* 6,422
-- *Prompt throughput (raw):* 214 tok/s
-- *Generation throughput (raw):* 23.2 tok/s
+- *Prompt throughput (raw):* 262 tok/s
+- *Generation throughput (raw):* 26.2 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
 - *Model-load active memory:* 61.9
-- *Post-cleanup active memory:* 0.00243
+- *Post-cleanup active memory:* 0.00244
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -2102,23 +2102,23 @@ Keywords: inflatable boat, motorboat, ocean, speeding, white wakes, clear blue s
   appears before the Title field; Response appears cut off at the token limit;
   Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.82s
-- *Generation time:* 122.76s
-- *Total time:* 127.13s
-- *Input validation time:* 0.537
-- *Prompt preparation time:* 0.00221
-- *First-token latency:* 1.63
-- *Cleanup time:* 0.266
+- *Model load time:* 7.49s
+- *Generation time:* 119.50s
+- *Total time:* 127.49s
+- *Input validation time:* 0.475
+- *Prompt preparation time:* 0.00186
+- *First-token latency:* 2.92
+- *Cleanup time:* 0.442
 - *Prompt tokens:* 1,313
 - *Generation tokens:* 500
 - *Total tokens:* 1,813
-- *Prompt throughput (raw):* 807 tok/s
-- *Generation throughput (raw):* 4.15 tok/s
+- *Prompt throughput (raw):* 449 tok/s
+- *Generation throughput (raw):* 4.45 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.6
 - *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.00365
+- *Post-cleanup active memory:* 0.00367
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -2167,23 +2167,23 @@ Wait, check the hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europ
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.79s
-- *Generation time:* 1.03s
-- *Total time:* 2.36s
-- *Input validation time:* 0.543
-- *Prompt preparation time:* 0.00449
-- *First-token latency:* 0.105
-- *Cleanup time:* 0.0922
+- *Model load time:* 0.72s
+- *Generation time:* 1.27s
+- *Total time:* 2.63s
+- *Input validation time:* 0.631
+- *Prompt preparation time:* 0.00621
+- *First-token latency:* 0.116
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 571
 - *Generation tokens:* 93
 - *Total tokens:* 664
-- *Prompt throughput (raw):* 5,447 tok/s
-- *Generation throughput (raw):* 184 tok/s
-- *Peak memory:* 4.1
+- *Prompt throughput (raw):* 4,906 tok/s
+- *Generation throughput (raw):* 171 tok/s
+- *Peak memory:* 3.8
 - *Active memory:* 3.2
 - *Cache memory:* 0.02
 - *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.00379
+- *Post-cleanup active memory:* 0.0038
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -2224,23 +2224,23 @@ Seafoam Adventure, Two Inflatable Boats, Clear Sky, Horizon, People, Motorboat, 
   Response appears cut off at the token limit; Internal reasoning block
   appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.14s
-- *Generation time:* 2.89s
-- *Total time:* 4.39s
-- *Input validation time:* 0.334
-- *Prompt preparation time:* 0.00905
-- *First-token latency:* 0.248
-- *Cleanup time:* 0.101
+- *Model load time:* 1.10s
+- *Generation time:* 3.72s
+- *Total time:* 5.33s
+- *Input validation time:* 0.482
+- *Prompt preparation time:* 0.0114
+- *First-token latency:* 0.26
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 920
 - *Generation tokens:* 500
 - *Total tokens:* 1,420
-- *Prompt throughput (raw):* 3,704 tok/s
-- *Generation throughput (raw):* 245 tok/s
+- *Prompt throughput (raw):* 3,544 tok/s
+- *Generation throughput (raw):* 182 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.06
 - *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00483
+- *Post-cleanup active memory:* 0.00485
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -2344,23 +2344,23 @@ Now keywords: need 10-18 unique, covering relevant context and visible details. 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.39s
-- *Generation time:* 29.99s
-- *Total time:* 32.71s
-- *Input validation time:* 0.316
-- *Prompt preparation time:* 0.00531
-- *First-token latency:* 3.48
-- *Cleanup time:* 0.113
+- *Model load time:* 2.58s
+- *Generation time:* 32.32s
+- *Total time:* 35.65s
+- *Input validation time:* 0.732
+- *Prompt preparation time:* 0.00579
+- *First-token latency:* 4.31
+- *Cleanup time:* 0.35
 - *Prompt tokens:* 3,111
 - *Generation tokens:* 156
 - *Total tokens:* 3,267
-- *Prompt throughput (raw):* 894 tok/s
-- *Generation throughput (raw):* 6.06 tok/s
+- *Prompt throughput (raw):* 722 tok/s
+- *Generation throughput (raw):* 5.76 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
 - *Model-load active memory:* 17.4
-- *Post-cleanup active memory:* 0.00655
+- *Post-cleanup active memory:* 0.00657
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
@@ -2405,23 +2405,23 @@ Inflatable boat, motorboat, Seaford, England, UK, Europe, open sea, horizon, blu
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.90s
-- *Generation time:* 26.83s
-- *Total time:* 28.06s
-- *Input validation time:* 0.309
-- *Prompt preparation time:* 0.011
-- *First-token latency:* 19.9
-- *Cleanup time:* 0.157
+- *Model load time:* 1.03s
+- *Generation time:* 31.90s
+- *Total time:* 33.56s
+- *Input validation time:* 0.597
+- *Prompt preparation time:* 0.0222
+- *First-token latency:* 24.4
+- *Cleanup time:* 0.171
 - *Prompt tokens:* 16,630
 - *Generation tokens:* 500
 - *Total tokens:* 17,130
-- *Prompt throughput (raw):* 837 tok/s
-- *Generation throughput (raw):* 81.2 tok/s
+- *Prompt throughput (raw):* 681 tok/s
+- *Generation throughput (raw):* 81.8 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00806
+- *Post-cleanup active memory:* 0.00808
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -2472,18 +2472,18 @@ Now keywords. Need 10-18 unique, comma-separated. From context: UK, Europe, Engl
   summer, adventure, travel, tourism, seaside, gbr, blue, horizon line,
   inflatable, outboard motor, speed boat
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.33s
-- *Generation time:* 38.98s
-- *Total time:* 40.63s
-- *Input validation time:* 0.306
-- *Prompt preparation time:* 0.000283
-- *First-token latency:* 26.3
-- *Cleanup time:* 0.159
+- *Model load time:* 1.45s
+- *Generation time:* 66.91s
+- *Total time:* 69.07s
+- *Input validation time:* 0.69
+- *Prompt preparation time:* 0.000579
+- *First-token latency:* 45.7
+- *Cleanup time:* 0.318
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 500
 - *Total tokens:* 17,139
-- *Prompt throughput (raw):* 632 tok/s
-- *Generation throughput (raw):* 42.2 tok/s
+- *Prompt throughput (raw):* 364 tok/s
+- *Generation throughput (raw):* 25.3 tok/s
 - *Peak memory:* 14
 - *Active memory:* 9.5
 - *Cache memory:* 1.3
@@ -2534,18 +2534,18 @@ Keywords: Seaford, England, UK, Europe, Inflatable boat, Motorboat, People, Hori
 - *Observations:* Missing or empty fields: Title; Extra text appears before
   the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.57s
-- *Generation time:* 2.31s
-- *Total time:* 6.43s
-- *Input validation time:* 0.519
-- *Prompt preparation time:* 0.0224
-- *First-token latency:* 0.349
-- *Cleanup time:* 0.148
+- *Model load time:* 3.97s
+- *Generation time:* 5.64s
+- *Total time:* 10.52s
+- *Input validation time:* 0.867
+- *Prompt preparation time:* 0.0257
+- *First-token latency:* 0.37
+- *Cleanup time:* 0.192
 - *Prompt tokens:* 584
-- *Generation tokens:* 83
-- *Total tokens:* 667
-- *Prompt throughput (raw):* 1,673 tok/s
-- *Generation throughput (raw):* 68.4 tok/s
+- *Generation tokens:* 81
+- *Total tokens:* 665
+- *Prompt throughput (raw):* 1,577 tok/s
+- *Generation throughput (raw):* 17.7 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -2571,9 +2571,9 @@ Keywords: Seaford, England, UK, Europe, Inflatable boat, Motorboat, People, Hori
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two Inflatable Boats Speeding Across the Seaford Coast
-Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky.
-Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action, sky, horizon, people, vehicles, travel, holiday, transport, transport
+&lt;channel|&gt;Title: Two Inflatable Boats Speeding Across Seaford Sea
+Description: Two inflatable motorboats with outboard engines speed across the deep blue sea, leaving white wakes under a clear sky.
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, water, water, action, people, horizon, sky, blue, vehicles, holiday, travel
 </pre>
 
 <details>
@@ -2581,9 +2581,9 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action
 
 ```text
 <|channel>thought
-<channel|>Title: Two Inflatable Boats Speeding Across the Seaford Coast
-Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky. 
-Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action, sky, horizon, people, vehicles, travel, holiday, transport, transport
+<channel|>Title: Two Inflatable Boats Speeding Across Seaford Sea
+Description: Two inflatable motorboats with outboard engines speed across the deep blue sea, leaving white wakes under a clear sky.
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, water, water, action, people, horizon, sky, blue, vehicles, holiday, travel
 ```
 
 </details>
@@ -2605,18 +2605,18 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action
 - *Observations:* Missing or empty fields: Title; Extra text appears before
   the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.74s
-- *Generation time:* 2.67s
-- *Total time:* 6.73s
-- *Input validation time:* 0.32
-- *Prompt preparation time:* 0.000362
-- *First-token latency:* 0.356
-- *Cleanup time:* 0.175
+- *Model load time:* 3.97s
+- *Generation time:* 5.61s
+- *Total time:* 10.12s
+- *Input validation time:* 0.52
+- *Prompt preparation time:* 0.00047
+- *First-token latency:* 0.379
+- *Cleanup time:* 0.448
 - *Prompt tokens:* 584
-- *Generation tokens:* 85
-- *Total tokens:* 669
-- *Prompt throughput (raw):* 1,641 tok/s
-- *Generation throughput (raw):* 56.8 tok/s
+- *Generation tokens:* 82
+- *Total tokens:* 666
+- *Prompt throughput (raw):* 1,541 tok/s
+- *Generation throughput (raw):* 19.4 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -2642,9 +2642,9 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two Motorboats Speeding Across the Sea at Seaford
+&lt;channel|&gt;Title: Two Inflatable Boats Speeding Across the Seaford Sea
 Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky.
-Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, water, ocean, blue sky, horizon, holiday, vehicles, riding, sailing, Europe
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, people, action, water, blue sky, horizon, holiday, vehicles, riding, speed
 </pre>
 
 <details>
@@ -2652,9 +2652,9 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, wate
 
 ```text
 <|channel>thought
-<channel|>Title: Two Motorboats Speeding Across the Sea at Seaford
-Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky. 
-Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, water, ocean, blue sky, horizon, holiday, vehicles, riding, sailing, Europe
+<channel|>Title: Two Inflatable Boats Speeding Across the Seaford Sea
+Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky.
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, people, action, water, blue sky, horizon, holiday, vehicles, riding, speed
 ```
 
 </details>
@@ -2675,18 +2675,18 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, wate
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 1.12s
-- *Generation time:* 5.32s
-- *Total time:* 6.96s
-- *Input validation time:* 0.513
-- *Prompt preparation time:* 0.00176
-- *First-token latency:* 3.76
-- *Cleanup time:* 0.1
+- *Model load time:* 0.92s
+- *Generation time:* 6.86s
+- *Total time:* 8.12s
+- *Input validation time:* 0.335
+- *Prompt preparation time:* 0.00162
+- *First-token latency:* 5.06
+- *Cleanup time:* 0.0893
 - *Prompt tokens:* 2,305
 - *Generation tokens:* 52
 - *Total tokens:* 2,357
-- *Prompt throughput (raw):* 613 tok/s
-- *Generation throughput (raw):* 58.8 tok/s
+- *Prompt throughput (raw):* 456 tok/s
+- *Generation throughput (raw):* 45.3 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.90
@@ -2740,18 +2740,18 @@ Seafront, Seaford, England, UK, GBR, Europe, Two inflatable boats with outboard 
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.64s
-- *Generation time:* 0.83s
-- *Total time:* 1.80s
-- *Input validation time:* 0.321
-- *Prompt preparation time:* 0.00138
-- *First-token latency:* 0.0791
-- *Cleanup time:* 0.0915
+- *Model load time:* 0.48s
+- *Generation time:* 0.80s
+- *Total time:* 1.60s
+- *Input validation time:* 0.309
+- *Prompt preparation time:* 0.00135
+- *First-token latency:* 0.0824
+- *Cleanup time:* 0.0805
 - *Prompt tokens:* 315
 - *Generation tokens:* 71
 - *Total tokens:* 386
-- *Prompt throughput (raw):* 3,981 tok/s
-- *Generation throughput (raw):* 292 tok/s
+- *Prompt throughput (raw):* 3,821 tok/s
+- *Generation throughput (raw):* 317 tok/s
 - *Peak memory:* 2.2
 - *Active memory:* 0.61
 - *Cache memory:* 0.30
@@ -2797,23 +2797,23 @@ Description: A serene scene of two inflatable boats, one driving away from the o
 - *Observations:* Response repeats the same text; Missing or empty fields:
   Title, Description, Keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.27s
-- *Generation time:* 14.31s
-- *Total time:* 15.91s
-- *Input validation time:* 0.312
-- *Prompt preparation time:* 0.000166
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.197
+- *Model load time:* 1.13s
+- *Generation time:* 21.49s
+- *Total time:* 22.96s
+- *Input validation time:* 0.306
+- *Prompt preparation time:* 0.000172
+- *First-token latency:* 2.06
+- *Cleanup time:* 0.355
 - *Prompt tokens:* 4,404
 - *Generation tokens:* 500
 - *Total tokens:* 4,904
-- *Prompt throughput (raw):* 3,773 tok/s
-- *Generation throughput (raw):* 40.4 tok/s
+- *Prompt throughput (raw):* 2,139 tok/s
+- *Generation throughput (raw):* 27.1 tok/s
 - *Peak memory:* 4.4
 - *Active memory:* 1.7
 - *Cache memory:* 1.9
 - *Model-load active memory:* 1.73
-- *Post-cleanup active memory:* 0.0141
+- *Post-cleanup active memory:* 0.0142
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
@@ -2947,13 +2947,13 @@ Description: A serene scene of two inflatable boats, one driving away from the o
   <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
 - *Arch supported by installed mlx-vlm:* yes (model_type inkling_mm_model via
   inkling)
-- *Model load time:* 0.35s
+- *Model load time:* 0.20s
 - *Generation time:* -
-- *Total time:* 0.89s
-- *Input validation time:* 0.539
+- *Total time:* 0.59s
+- *Input validation time:* 0.388
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.1
+- *Cleanup time:* 0.0826
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -2963,7 +2963,7 @@ Description: A serene scene of two inflatable boats, one driving away from the o
 - *Active memory:* -
 - *Cache memory:* -
 - *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.00269
+- *Post-cleanup active memory:* 0.0027
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 500
@@ -3768,12 +3768,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3965.34it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3640.54it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[20:30:31] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:41:36] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 </details>

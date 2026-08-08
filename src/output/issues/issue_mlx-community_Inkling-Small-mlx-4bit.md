@@ -32,7 +32,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup active memory (GB):* 0.002704444
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -827,12 +827,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3965.34it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3640.54it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[20:30:31] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:41:36] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -891,10 +891,10 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6                                                            |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision a5278f16d20d4ab8f0788b666ad3b30c1931e98a; dirty |
+| check_models    | 0.9.0; revision 2c4a2c90ed4626fcd270637cf302e554a5ec54af; clean |
 
 ### Full environment evidence
 
 | Evidence | Link |
 | --- | --- |
-| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/2c4a2c90ed4626fcd270637cf302e554a5ec54af/src/output/environment.log) |

@@ -113,7 +113,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup active memory (GB):* 0.002704444
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -908,12 +908,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3965.34it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3640.54it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[20:30:31] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:41:36] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
@@ -940,7 +940,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001180718
+- *Post-cleanup active memory (GB):* 0.001197102
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1590
 - *Generation tokens:* 500
@@ -981,7 +981,7 @@ Finally, the keywords. I need to cover everything. I'll start with the obvious: 
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.014140684
+- *Post-cleanup active memory (GB):* 0.014157068
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4404
 - *Generation tokens:* 500
@@ -1109,7 +1109,7 @@ Finally, the keywords. I need to cover everything. I'll start with the obvious: 
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.01029035
+- *Post-cleanup active memory (GB):* 0.010306734
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16639
 - *Generation tokens:* 500
@@ -1153,7 +1153,7 @@ Keywords: Seaford, England, UK, Europe, Inflatable boat, Motorboat, People, Hori
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002425916
+- *Post-cleanup active memory (GB):* 0.0024423
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6330
 - *Generation tokens:* 92
@@ -1192,7 +1192,7 @@ Keywords: inflatable boat, motorboat, ocean, speeding, white wakes, clear blue s
 - *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.000705582
+- *Post-cleanup active memory (GB):* 0.000721966
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2740
 - *Generation tokens:* 500
@@ -1231,15 +1231,15 @@ We need to produce:
 - *Observations:* missing_requested_sections, unexpected_catalog_preamble
 - *Missing sections:* ["title"]
 - *Unexpected text before Title:* Title: Two Inflatable Boats Speeding Across
-  the Seaford Coast
+  Seaford Sea
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010290372
+- *Post-cleanup active memory (GB):* 0.010306756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 584
-- *Generation tokens:* 83
+- *Generation tokens:* 81
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1247,9 +1247,9 @@ We need to produce:
 
 ```text
 <|channel>thought
-<channel|>Title: Two Inflatable Boats Speeding Across the Seaford Coast
-Description: Two inflatable motorboats with outboard engines speed across the blue ocean water, leaving white wakes under a clear sky. 
-Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action, sky, horizon, people, vehicles, travel, holiday, transport, transport
+<channel|>Title: Two Inflatable Boats Speeding Across Seaford Sea
+Description: Two inflatable motorboats with outboard engines speed across the deep blue sea, leaving white wakes under a clear sky.
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, water, water, action, people, horizon, sky, blue, vehicles, holiday, travel
 ```
 
 </details>
@@ -1268,16 +1268,16 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, unexpected_catalog_preamble
 - *Missing sections:* ["title"]
-- *Unexpected text before Title:* Title: Two Motorboats Speeding Across the
-  Sea at Seaford
+- *Unexpected text before Title:* Title: Two Inflatable Boats Speeding Across
+  the Seaford Sea
 - *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010290372
+- *Post-cleanup active memory (GB):* 0.010306756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 584
-- *Generation tokens:* 85
+- *Generation tokens:* 82
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1285,9 +1285,9 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, water, ocean, action
 
 ```text
 <|channel>thought
-<channel|>Title: Two Motorboats Speeding Across the Sea at Seaford
-Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky. 
-Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, water, ocean, blue sky, horizon, holiday, vehicles, riding, sailing, Europe
+<channel|>Title: Two Inflatable Boats Speeding Across the Seaford Sea
+Description: Two inflatable boats with outboard motors speed across the blue ocean water, leaving white wakes behind them under a clear sky.
+Keywords: Seaford, England, UK, ocean, inflatable boat, motorboat, people, action, water, blue sky, horizon, holiday, vehicles, riding, speed
 ```
 
 </details>
@@ -1316,7 +1316,7 @@ Keywords: Seaford, England, UK, inflatable boat, motorboat, people, action, wate
 - *Processor class:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.001492016
+- *Post-cleanup active memory (GB):* 0.0015084
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 319
 - *Generation tokens:* 130
@@ -1383,7 +1383,7 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001803312
+- *Post-cleanup active memory (GB):* 0.001819696
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6326
 - *Generation tokens:* 500
@@ -1447,7 +1447,7 @@ Title: "Inflatable Boats Speeding
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.003654752
+- *Post-cleanup active memory (GB):* 0.003671136
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1313
 - *Generation tokens:* 500
@@ -1490,7 +1490,7 @@ Wait, check the hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europ
 - *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003785824
+- *Post-cleanup active memory (GB):* 0.003802208
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 571
 - *Generation tokens:* 93
@@ -1523,7 +1523,7 @@ Seafoam Adventure, Two Inflatable Boats, Clear Sky, Horizon, People, Motorboat, 
 - *Processor class:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01248588
+- *Post-cleanup active memory (GB):* 0.012502264
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2305
 - *Generation tokens:* 52
@@ -1560,7 +1560,7 @@ Seafront, Seaford, England, UK, GBR, Europe, Two inflatable boats with outboard 
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.004834414
+- *Post-cleanup active memory (GB):* 0.004850798
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 920
 - *Generation tokens:* 500
@@ -1621,7 +1621,7 @@ Now keywords: need 10-18 unique, covering relevant context and visible details. 
 - *Processor class:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.006554746
+- *Post-cleanup active memory (GB):* 0.00657113
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 3111
 - *Generation tokens:* 156
@@ -1658,7 +1658,7 @@ Inflatable boat, motorboat, Seaford, England, UK, Europe, open sea, horizon, blu
 - *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.013108472
+- *Post-cleanup active memory (GB):* 0.013124856
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 315
 - *Generation tokens:* 71
@@ -1695,7 +1695,7 @@ Description: A serene scene of two inflatable boats, one driving away from the o
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.008062088
+- *Post-cleanup active memory (GB):* 0.008078472
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16630
 - *Generation tokens:* 500
@@ -1734,7 +1734,7 @@ Now keywords. Need 10-18 unique, comma-separated. From context: UK, Europe, Engl
 - *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup active memory (GB):* 0.002704444
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2608
 - *Generation tokens:* 130
@@ -1775,7 +1775,7 @@ Keywords: inflatable boats, ocean, outboard motors, white wakes, clear blue sky,
 - *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00013212
+- *Post-cleanup active memory (GB):* 0.000148504
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 385
 - *Generation tokens:* 107
@@ -1818,7 +1818,7 @@ Seafront, Seaford, England, UK, GBR, Europe, Inflatable boat, Motorboat, People,
 - *Processor class:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.000967726
+- *Post-cleanup active memory (GB):* 0.00098411
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2045
 - *Generation tokens:* 110
@@ -1861,7 +1861,7 @@ Adobe Stock, inflatable boats, outboard motors, ocean, blue sky, horizon, speedi
 - *Processor class:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010831044
+- *Post-cleanup active memory (GB):* 0.010847428
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 579
 - *Generation tokens:* 155
@@ -1901,7 +1901,7 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 - *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.011371742
+- *Post-cleanup active memory (GB):* 0.011388126
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 578
 - *Generation tokens:* 130
@@ -1941,7 +1941,7 @@ Keywords: Seaford, England, UK, Channel, Rib, Inflatable boat, Motorboat, Speedb
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002114608
+- *Post-cleanup active memory (GB):* 0.002130992
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6330
 - *Generation tokens:* 104
@@ -1979,7 +1979,7 @@ Keywords: Two Inflatable Boats, outboard motors, speeding across ocean, white wa
 - *Processor class:* mlx_vlm.models.molmo.processing_molmo.MolmoProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.005932144
+- *Post-cleanup active memory (GB):* 0.005948528
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1498
 - *Generation tokens:* 105
@@ -2019,7 +2019,7 @@ Keywords: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, H
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.007062654
+- *Post-cleanup active memory (GB):* 0.007079038
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16643
 - *Generation tokens:* 107
@@ -2060,7 +2060,7 @@ Keywords: inflatable boat, motorboat, sea, ocean, people, passengers, wake, spee
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.007439496
+- *Post-cleanup active memory (GB):* 0.00745588
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16639
 - *Generation tokens:* 102
@@ -2104,7 +2104,7 @@ Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, In
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.007750792
+- *Post-cleanup active memory (GB):* 0.007767176
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16628
 - *Generation tokens:* 90
@@ -2144,7 +2144,7 @@ Keywords: motorboat, inflatable boat, sea, people, sky, horizon, water, action, 
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.009602186
+- *Post-cleanup active memory (GB):* 0.00961857
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16643
 - *Generation tokens:* 87
@@ -2184,7 +2184,7 @@ Keywords: Sea, Ocean, Boats, Motorboats, Inflatable boats, People, Passengers, S
 - *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.009716874
+- *Post-cleanup active memory (GB):* 0.009733258
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 411
 - *Generation tokens:* 125
@@ -2223,7 +2223,7 @@ Keywords: "Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, 
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.000443432
+- *Post-cleanup active memory (GB):* 0.000459816
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16628
 - *Generation tokens:* 90
@@ -2253,18 +2253,18 @@ None.
 
 | Model                                             | Runtime identity                                        | Performance                                                                               |
 |---------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 588 prompt / 96 generated; 114 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 588 prompt / 83 generated; 18.5 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache     |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2610 prompt / 103 generated; 23.6 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed       | 297 prompt / 89 generated; 13.7 tok/s; 15 GB peak; cleanup 0.00431/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 2578 prompt / 121 generated; 59.2 tok/s; 12 GB peak; cleanup 0.0051/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 2578 prompt / 171 generated; 40.3 tok/s; 12 GB peak; cleanup 0.00536/0.0 GB active/cache  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 2577 prompt / 117 generated; 144 tok/s; 6.4 GB peak; cleanup 0.00562/0.0 GB active/cache  |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 1112 prompt / 100 generated; 55.8 tok/s; 9.4 GB peak; cleanup 0.00713/0.0 GB active/cache |
-| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 2649 prompt / 82 generated; 39.7 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16643 prompt / 79 generated; 94.0 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16643 prompt / 106 generated; 90.7 tok/s; 10 GB peak; cleanup 0.00909/0.0 GB active/cache |
-| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3478 prompt / 118 generated; 40.4 tok/s; 70 GB peak; cleanup 0.00998/0.0 GB active/cache  |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 588 prompt / 96 generated; 104 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 588 prompt / 83 generated; 12.2 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache     |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2610 prompt / 103 generated; 30.4 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache  |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed       | 297 prompt / 89 generated; 13.7 tok/s; 15 GB peak; cleanup 0.00433/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 2578 prompt / 121 generated; 53.9 tok/s; 12 GB peak; cleanup 0.00511/0.0 GB active/cache  |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 2578 prompt / 171 generated; 43.8 tok/s; 12 GB peak; cleanup 0.00538/0.0 GB active/cache  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 2577 prompt / 117 generated; 156 tok/s; 6.4 GB peak; cleanup 0.00564/0.0 GB active/cache  |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 1112 prompt / 100 generated; 52.6 tok/s; 9.4 GB peak; cleanup 0.00714/0.0 GB active/cache |
+| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 2649 prompt / 82 generated; 18.8 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache    |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16643 prompt / 79 generated; 59.0 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16643 prompt / 106 generated; 67.6 tok/s; 10 GB peak; cleanup 0.00911/0.0 GB active/cache |
+| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3478 prompt / 118 generated; 19.2 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache     |
 
 </details>
 
