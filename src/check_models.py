@@ -13825,7 +13825,14 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
         return None, None, None
     config_path = snapshot / "config.json"
     try:
-        config = json.loads(config_path.read_text(encoding="utf-8"))
+        # HF cache snapshots link config.json into blobs/ by design, so resolve
+        # the link but require containment inside this repo's cache directory
+        # and a regular, size-capped file before reading.
+        cache_repo_root = snapshot.parent.parent.resolve(strict=True)
+        resolved_config = config_path.resolve(strict=True)
+        if not resolved_config.is_relative_to(cache_repo_root):
+            return None, None, None
+        config = json.loads(_read_text_file(resolved_config))
     except (OSError, ValueError):
         return None, None, None
     raw_model_type = config.get("model_type") or config.get("speculators_model_type")

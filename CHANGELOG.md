@@ -47,6 +47,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Harden the new file reads/writes flagged by the advisory Skylos danger
+  scan: the architecture pre-check resolves the HF-cache `config.json`
+  symlink but requires containment inside the repo's cache directory and a
+  regular, size-capped file (via `_read_text_file`); test helpers use
+  `safe_io.write_text_no_follow`/`read_text_no_follow` instead of raw
+  `Path.read_text`/`write_text`.
 - Docs/Makefile/packaging hygiene: root `README.md` output list now matches
   the real artifact set (removed nonexistent `results.md`/`results.tsv`,
   annotated tracked vs local-only); root `make help` is auto-generated from

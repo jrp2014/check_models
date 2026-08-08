@@ -13,6 +13,7 @@ import pytest
 from huggingface_hub.errors import CacheNotFound
 
 import check_models
+from tools import safe_io
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -337,7 +338,7 @@ def _fake_mlx_vlm_package(tmp_path: Path, model_types: tuple[str, ...], remappin
     for model_type in model_types:
         (package_dir / "models" / model_type).mkdir(parents=True)
     (package_dir / "models" / "__pycache__").mkdir(exist_ok=True)
-    (package_dir / "utils.py").write_text(remapping, encoding="utf-8")
+    safe_io.write_text_no_follow(package_dir / "utils.py", remapping)
     return package_dir
 
 
