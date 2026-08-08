@@ -69,10 +69,10 @@ src/output/test_*
 src/output/reports/test_*
 src/output/issues/test_*
 
-# Bulky regenerated run artifacts stay local-only; the skimmable decision
-# artifacts (index.md, diagnostics.md, run_summary.md, issue_*.md, run.json,
-# results.jsonl, environment.log, reports/assets/) remain tracked.
+# Bulky regenerated run artifacts stay local-only. The human reports
+# (results.html, model_gallery.md) and the decision artifacts (index.md,
+# diagnostics.md, run_summary.md, issue_*.md, run.json, results.jsonl,
+# environment.log, reports/assets/) are tracked so they are browsable on
+# GitHub; only the append-only history and the raw log stay local.
 src/output/results.history.jsonl
 src/output/check_models.log
-src/output/reports/results.html
-src/output/reports/model_gallery.md

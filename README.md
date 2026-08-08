@@ -28,9 +28,12 @@ python -m check_models --image ~/Pictures/sample.jpg
 
 Expected outputs (default location: `src/output/`):
 
-Tracked in git (skimmable decision artifacts):
+Tracked in git (browsable on GitHub):
 
 - `index.md` — run dashboard (counts, usability, top observations) + links
+- `reports/results.html` — self-contained interactive report
+- `reports/model_gallery.md` — complete per-model evidence gallery, with an
+  Output-at-a-Glance table of every model's actual output
 - `reports/diagnostics.md` — maintainer triage tables and per-model evidence
 - `issues/run_summary.md` — paste-ready whole-run issue summary (when findings exist)
 - `issues/issue_*.md` — per-crash issue drafts (hard actionable crashes only)
@@ -40,8 +43,6 @@ Tracked in git (skimmable decision artifacts):
 
 Local only (gitignored, regenerated each run):
 
-- `reports/results.html` — self-contained interactive report
-- `reports/model_gallery.md` — complete per-model evidence gallery
 - `results.history.jsonl` — append-only run history
 - `check_models.log` — full run log
 

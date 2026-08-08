@@ -1570,6 +1570,8 @@ _GITHUB_REF_OVERRIDE: str | None = None
 _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
 _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
+        DEFAULT_HTML_OUTPUT.name,
+        DEFAULT_GALLERY_MD_OUTPUT.name,
         DEFAULT_DIAGNOSTICS_OUTPUT.name,
     }
 )
@@ -1581,12 +1583,10 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_ENV_OUTPUT.name,
     }
 )
-# Bulky regenerated artifacts stay on disk but are no longer tracked in git, so
-# report links to them must always be relative (a GitHub URL would 404).
+# The append-only history and raw log stay on disk but are not tracked in git,
+# so report links to them must always be relative (a GitHub URL would 404).
 _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
-        DEFAULT_HTML_OUTPUT.name,
-        DEFAULT_GALLERY_MD_OUTPUT.name,
         DEFAULT_LOG_OUTPUT.name,
         "results.history.jsonl",
     }

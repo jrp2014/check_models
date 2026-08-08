@@ -422,10 +422,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert (
-        "1 clean completion; see the full model gallery (model_gallery.md, producer-local)."
-        in content
-    )
+    assert "1 clean completion; see the [full model gallery]" in content
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -1302,8 +1299,8 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     assert output_paths.index.read_text(encoding="utf-8") == (
         "# Check Models Output Index\n"
         "\n"
-        "- [results.html](reports/results.html) (local only, not tracked)\n"
-        "- [model_gallery.md](reports/model_gallery.md) (local only, not tracked)\n"
+        "- [results.html](reports/results.html)\n"
+        "- [model_gallery.md](reports/model_gallery.md)\n"
         "- [diagnostics.md](reports/diagnostics.md)\n"
         "- [results.jsonl](results.jsonl)\n"
         "- [run.json](run.json)\n"
@@ -1313,10 +1310,8 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
 
 
 def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None:
-    """Untracked bulky artifacts must resolve to relative links, never GitHub URLs."""
+    """Untracked artifacts must resolve to relative links, never GitHub URLs."""
     for name in (
-        "reports/results.html",
-        "reports/model_gallery.md",
         "check_models.log",
         "results.history.jsonl",
     ):
@@ -1325,10 +1320,15 @@ def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None
         repo_local = check_models._REPO_ROOT / "src" / "output" / name
         assert check_models._published_output_repo_path(repo_local) is None
 
-    tracked = check_models._REPO_ROOT / "src" / "output" / "reports" / "diagnostics.md"
-    tracked_path = check_models._published_output_repo_path(tracked)
-    assert tracked_path is not None
-    assert tracked_path.as_posix() == "src/output/reports/diagnostics.md"
+    for name in (
+        "reports/diagnostics.md",
+        "reports/model_gallery.md",
+        "reports/results.html",
+    ):
+        tracked = check_models._REPO_ROOT / "src" / "output" / name
+        tracked_path = check_models._published_output_repo_path(tracked)
+        assert tracked_path is not None
+        assert tracked_path.as_posix() == f"src/output/{name}"
 
 
 def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Path) -> None:
@@ -1980,23 +1980,15 @@ def test_chained_failure_retains_exact_exception_chain() -> None:
 
 
 def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
-    """Retained human reports should not disclose publication-private home paths.
-
-    ``model_gallery.md`` and ``results.html`` are local-only (gitignored), so
-    they exist only on machines that have produced a run; check them when
-    present but never require them on a fresh checkout (CI).
-    """
+    """Tracked human reports should not disclose publication-private home paths."""
     output_dir = Path(__file__).parents[1] / "output"
-    tracked = (output_dir / "reports/diagnostics.md",)
-    local_only = (
+    tracked = (
+        output_dir / "reports/diagnostics.md",
         output_dir / "reports/model_gallery.md",
         output_dir / "reports/results.html",
     )
     for artifact in tracked:
         assert str(Path.home()) not in artifact.read_text(encoding="utf-8"), artifact
-    for artifact in local_only:
-        if artifact.is_file():
-            assert str(Path.home()) not in artifact.read_text(encoding="utf-8"), artifact
 
 
 def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(

@@ -56,6 +56,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Track `results.html` and `model_gallery.md` in git again so the rich human
+  reports are browsable on GitHub; report links to them are GitHub blob URLs
+  once more. Only the append-only `results.history.jsonl` and raw
+  `check_models.log` remain gitignored/local-only.
 - Exclude agent-managed `.worktrees/` checkouts from the repo-root Skylos
   danger gate: they hold third-party repositories (e.g. an upstream mlx-vlm
   checkout) whose GitHub workflows are not this repository's to gate, and
