@@ -50,6 +50,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Exclude agent-managed `.worktrees/` checkouts from the repo-root Skylos
+  danger gate: they hold third-party repositories (e.g. an upstream mlx-vlm
+  checkout) whose GitHub workflows are not this repository's to gate, and
+  their findings were failing `make quality` as false alarms.
 - Catalog-constraint observation labels now name only the constraints that
   were actually breached: an in-range title or keyword count no longer reads
   as a second failure beside a real violation such as duplicate keywords
