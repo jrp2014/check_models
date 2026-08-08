@@ -1952,14 +1952,23 @@ def test_chained_failure_retains_exact_exception_chain() -> None:
 
 
 def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
-    """Checked-in human reports should not retain publication-private home paths."""
+    """Retained human reports should not disclose publication-private home paths.
+
+    ``model_gallery.md`` and ``results.html`` are local-only (gitignored), so
+    they exist only on machines that have produced a run; check them when
+    present but never require them on a fresh checkout (CI).
+    """
     output_dir = Path(__file__).parents[1] / "output"
-    diagnostics = (output_dir / "reports/diagnostics.md").read_text(encoding="utf-8")
-    gallery = (output_dir / "reports/model_gallery.md").read_text(encoding="utf-8")
-    html_report = (output_dir / "reports/results.html").read_text(encoding="utf-8")
-    assert str(Path.home()) not in diagnostics
-    assert str(Path.home()) not in gallery
-    assert str(Path.home()) not in html_report
+    tracked = (output_dir / "reports/diagnostics.md",)
+    local_only = (
+        output_dir / "reports/model_gallery.md",
+        output_dir / "reports/results.html",
+    )
+    for artifact in tracked:
+        assert str(Path.home()) not in artifact.read_text(encoding="utf-8"), artifact
+    for artifact in local_only:
+        if artifact.is_file():
+            assert str(Path.home()) not in artifact.read_text(encoding="utf-8"), artifact
 
 
 def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
