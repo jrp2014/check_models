@@ -25,6 +25,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Improve report skimmability for 60+ model runs: the output index now leads
+  with a "Run at a glance" dashboard (outcome counts, usability breakdown, top
+  observations) before the artifact links; the collapsed "Exact raw output"
+  copy is emitted only when it would differ from the readable view (markdown:
+  trailing whitespace or escaped markup; HTML: never, since escaping is
+  lossless); diagnostics folds every complete traceback in a `<details>` block
+  so one crash's multi-hundred-line dump cannot bury the triage tables; and the
+  run-issue-summary link caveat is now dynamic — pinned-commit wording when
+  artifact links carry a clean-worktree SHA, mutable-branch wording otherwise.
 - Consolidate duplicate and dead code in `check_models.py` (net −132 lines,
   behavior-preserving): delete the unused `_native_mlx_vlm_*_kwargs` repro trio
   superseded by the CLI-token builder; drop vestigial `artifact_name`/`prompt`

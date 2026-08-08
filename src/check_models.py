@@ -2164,7 +2164,7 @@ def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
 
 
 def _render_report_model_output_markdown(block: ReportModelOutput) -> list[str]:
-    """Render readable model Markdown and a byte-preserving collapsed raw view."""
+    """Render readable model Markdown, plus a collapsed raw view only when it differs."""
     readable = "\n".join(line.rstrip() for line in block.content.split("\n"))
     presentation = html.escape(readable, quote=False).replace("`", "&#96;").replace("@", "&#64;")
     rendered = [
@@ -2175,11 +2175,15 @@ def _render_report_model_output_markdown(block: ReportModelOutput) -> list[str]:
         "</pre>",
         "",
     ]
-    _append_markdown_details_block(
-        rendered,
-        summary=block.raw_summary,
-        body_lines=render_report_markdown((ReportCodeBlock(block.content),)),
-    )
+    # The readable view strips trailing whitespace and entity-escapes markup
+    # characters; when both are no-ops the raw fence would be byte-identical,
+    # so it earns no second copy.
+    if readable != block.content or presentation != readable:
+        _append_markdown_details_block(
+            rendered,
+            summary=block.raw_summary,
+            body_lines=render_report_markdown((ReportCodeBlock(block.content),)),
+        )
     return rendered
 
 
@@ -2288,15 +2292,15 @@ def _render_report_details_html(block: ReportDetails) -> list[str]:
 
 
 def _render_report_model_output_html(block: ReportModelOutput) -> list[str]:
-    """Render readable and exact escaped model output in HTML."""
+    """Render exact escaped model output in HTML.
+
+    HTML escaping is lossless, so the readable pre block already carries the
+    exact bytes; a second collapsed raw copy would always be identical.
+    """
     escaped_content = html.escape(block.content)
     return [
         "<p><b>Readable output:</b></p>",
         f'<pre class="model-output-readable">{escaped_content}</pre>',
-        "<details>",
-        f"<summary>{html.escape(block.raw_summary)}</summary>",
-        f'<pre><code class="language-text">{escaped_content}</code></pre>',
-        "</details>",
     ]
 
 
@@ -8661,7 +8665,6 @@ def _diagnostics_model_blocks(
     *,
     run_args: argparse.Namespace | None,
     model_provenance: ModelProvenanceRecord | None,
-    collapse_traceback: bool = False,
 ) -> tuple[ReportBlock, ...]:
     """Build one model's complete maintainer evidence in priority order."""
     blocks: list[ReportBlock] = []
@@ -8688,17 +8691,10 @@ def _diagnostics_model_blocks(
         )
     )
     if assessment.execution == "crashed" and result.error_traceback:
+        # Always fold the complete traceback: the exact evidence is preserved
+        # inside the details block without burying surrounding triage content.
         traceback_block = ReportCodeBlock(_home_relative_report_text(result.error_traceback))
-        if collapse_traceback:
-            blocks.append(ReportDetails("Complete traceback", (traceback_block,)))
-        else:
-            blocks.append(
-                _report_section(
-                    "Complete traceback",
-                    traceback_block,
-                    level=4,
-                )
-            )
+        blocks.append(ReportDetails("Complete traceback", (traceback_block,)))
     if result.generation is not None:
         generated_output = _generation_text_value(result.generation) or "(empty)"
         if assessment.execution == "completed":
@@ -16063,14 +16059,22 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
         for label in ("macOS Version", "GPU/Chip", "Python Version")
         if system.get(label)
     )
+    blob_ref = _github_blob_ref()
+    if re.fullmatch(r"[0-9a-f]{40}", blob_ref):
+        link_caveat = (
+            f"GitHub links are pinned to producer commit `{blob_ref[:12]}`, so the "
+            "linked evidence is durable."
+        )
+    else:
+        link_caveat = (
+            "GitHub links target the repository's mutable main branch; use the committed "
+            "output snapshot when durable issue evidence is required."
+        )
     return ReportSection(
         "Run context",
         (
             ReportKeyValues(tuple(rows)),
-            ReportParagraph(
-                "GitHub links target the repository's mutable main branch; use the committed "
-                "output snapshot when durable issue evidence is required."
-            ),
+            ReportParagraph(link_caveat),
         ),
     )
 
@@ -16328,14 +16332,51 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     )
 
 
+def _output_index_dashboard_lines(
+    assessments: Sequence[tuple[str, ResultAssessment]],
+) -> list[str]:
+    """Render run-outcome counts and top observations for the output index."""
+    counts = _run_outcome_counts(assessments)
+    usability_counter = Counter(assessment.usability for _model, assessment in assessments)
+    observation_counter = Counter(
+        code for _model, assessment in assessments for code in assessment.observations
+    )
+    lines = [
+        "## Run at a glance",
+        "",
+        (
+            f"- Models attempted: {counts['models_attempted']} "
+            f"(completed {counts['models_completed']}, "
+            f"crashed {counts['models_crashed']}, "
+            f"indeterminate {counts['models_indeterminate']})"
+        ),
+        (
+            "- Usability: "
+            + ", ".join(
+                f"{label.replace('_', ' ')} {usability_counter.get(label, 0)}"
+                for label in ("usable", "usable_with_caveats", "unusable", "not_evaluated")
+            )
+        ),
+    ]
+    if observation_counter:
+        top_observations = ", ".join(
+            f"{_OBSERVATION_DISPLAY_LABELS[code]} ({count})"
+            for code, count in observation_counter.most_common(5)
+        )
+        lines.append(f"- Top observations: {top_observations}")
+    lines.append("")
+    return lines
+
+
 def generate_output_index_report(
     filename: Path,
     *,
     output_paths: ReportOutputPaths,
     run_issue_summary: Path | None = None,
     issue_reports: Mapping[str, Path] | None = None,
+    assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
 ) -> None:
-    """Write a minimal navigation list for the retained artifacts."""
+    """Write a run dashboard plus navigation list for the retained artifacts."""
     links = (
         (output_paths.html, "results.html"),
         (output_paths.gallery_markdown, "model_gallery.md"),
@@ -16346,6 +16387,10 @@ def generate_output_index_report(
         (output_paths.environment, output_paths.environment.name),
     )
     md = ["# Check Models Output Index", ""]
+    if assessments is not None:
+        md.extend(_output_index_dashboard_lines(assessments))
+        md.append("## Artifacts")
+        md.append("")
     md.extend(
         f"- {_output_index_link(filename, path, label)}"
         + (" (local only, not tracked)" if path.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES else "")
@@ -16702,7 +16747,6 @@ def _generate_github_issue_reports(
                         assessments[result.model_name],
                         run_args=run_args,
                         model_provenance=provenance,
-                        collapse_traceback=True,
                     ),
                     level=3,
                 ),
@@ -16907,6 +16951,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
         "output_index": lambda: generate_output_index_report(
             output_paths.index,
             output_paths=output_paths,
+            assessments=inputs.report_context.assessments,
         ),
         "html": lambda: generate_html_report(
             results=inputs.results,
@@ -17152,6 +17197,7 @@ def _generate_reports_and_log_outputs(
             output_paths=inputs.output_paths,
             run_issue_summary=run_issue_summary,
             issue_reports=diagnostics_artifacts.issue_reports,
+            assessments=inputs.report_context.assessments,
         ),
     )
     run_artifact(index_artifact)

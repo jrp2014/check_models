@@ -403,7 +403,12 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "0.8.9" in content
     assert "abc123" in content
     assert "GitHub links" in content
-    assert "mutable" in content
+    # The link caveat is dynamic: pinned wording for a clean-worktree SHA ref,
+    # mutable-branch wording otherwise.
+    if re.fullmatch(r"[0-9a-f]{40}", check_models._github_blob_ref()):
+        assert "pinned to producer commit" in content
+    else:
+        assert "mutable" in content
     assert "org/clean" not in content
     assert "Traceback (most recent call last)" not in content
     assert "generated output that must not be copied" not in content
@@ -1328,6 +1333,85 @@ def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Pa
     assert "[org/a](issues/issue_org_a.md)" in content
     assert "[org/z](issues/issue_org_z.md)" in content
     assert content.index("[org/a]") < content.index("[org/z]")
+
+
+def test_output_index_renders_run_dashboard(tmp_path: Path) -> None:
+    """The index should lead with run counts, usability, and top observations."""
+    output_dir = tmp_path / "output"
+    output_paths = check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=output_dir / "reports" / "results.html",
+        gallery_markdown=output_dir / "reports" / "model_gallery.md",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=output_dir / "reports" / "diagnostics.md",
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+    assessments = (
+        ("org/good", check_models.ResultAssessment("completed", "usable", "none", ())),
+        (
+            "org/warn",
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("minimal_output",),
+            ),
+        ),
+        (
+            "org/crash",
+            check_models.ResultAssessment("crashed", "not_evaluated", "actionable_failure", ()),
+        ),
+    )
+
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        check_models.generate_output_index_report(
+            output_paths.index,
+            output_paths=output_paths,
+            assessments=assessments,
+        )
+
+    content = output_paths.index.read_text(encoding="utf-8")
+    assert "## Run at a glance" in content
+    assert "- Models attempted: 3 (completed 2, crashed 1, indeterminate 0)" in content
+    assert "- Usability: usable 1, usable with caveats 1, unusable 0, not evaluated 1" in content
+    minimal_label = check_models._OBSERVATION_DISPLAY_LABELS["minimal_output"]
+    assert f"- Top observations: {minimal_label} (1)" in content
+    assert "## Artifacts" in content
+    assert content.index("## Run at a glance") < content.index("## Artifacts")
+
+
+def test_run_issue_summary_link_caveat_reflects_blob_ref(tmp_path: Path) -> None:
+    """The link caveat must say pinned for SHA refs and mutable for branch refs."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/observed",
+                usability="usable_with_caveats",
+                maintainer_status="observation_needs_reproduction",
+                observations=["minimal_output"],
+            ),
+        ),
+        total_runtime_seconds=120.0,
+    )
+
+    pinned_sha = "a" * 40
+    with patch.object(check_models, "_GITHUB_REF_OVERRIDE", pinned_sha):
+        summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    pinned_content = summary.read_text(encoding="utf-8")
+    assert f"pinned to producer commit `{pinned_sha[:12]}`" in pinned_content
+    assert "mutable" not in pinned_content
+
+    with patch.object(check_models, "_GITHUB_REF_OVERRIDE", "main"):
+        summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    branch_content = summary.read_text(encoding="utf-8")
+    assert "mutable main branch" in branch_content
+    assert "pinned to producer commit" not in branch_content
 
 
 def _report_outcome(
@@ -2774,7 +2858,9 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         )
         assert content.index("#### Execution and provenance") < content.index("Complete traceback")
     assert "<summary>Complete traceback</summary>" in issue_content
-    assert "<summary>Complete traceback</summary>" not in diagnostics_content
+    # Diagnostics folds the complete traceback too, so one crash's dump cannot
+    # bury the triage tables; the exact evidence stays inside the details block.
+    assert "<summary>Complete traceback</summary>" in diagnostics_content
     assert "The original local input is not published" in issue_content
     assert "python -m mlx_vlm.generate" not in issue_content
     assert issue_content.index("## Reproduction inputs") < issue_content.index(
@@ -3446,10 +3532,12 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         escaped = html.escape(output, quote=True)
-        assert content.count(escaped) == 2
+        # HTML escaping is lossless, so the readable pre block is the single
+        # exact copy; a second collapsed raw copy would always be identical.
+        assert content.count(escaped) == 1
         match = re.search(
             r"<details><summary>Complete evidence: org/evidence</summary>.*?"
-            r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
+            r'<pre class="model-output-readable">(.*?)</pre>',
             content,
             flags=re.DOTALL,
         )
@@ -3487,8 +3575,10 @@ class TestHtmlReportEdgeCases:
         )
         assert model_entry is not None
         assert f'<pre class="model-output-readable">{escaped}</pre>' in model_entry.group(0)
-        assert "<summary>Exact raw output</summary>" in model_entry.group(0)
-        assert model_entry.group(0).count(escaped) == 2
+        # The readable pre already carries the exact escaped bytes; no second
+        # collapsed raw copy is emitted.
+        assert "<summary>Exact raw output</summary>" not in model_entry.group(0)
+        assert model_entry.group(0).count(escaped) == 1
 
     def test_html_contains_gallery_and_diagnostics_without_semantic_scores(
         self,
@@ -3997,7 +4087,7 @@ class TestMarkdownGalleryReport:
         assert "Describe this image fully." in content
         assert "```text\nDescribe this image fully." not in content
         assert "<summary>Complete evidence: org/good</summary>" in content
-        assert "```text" in content
+        assert '<pre class="model-output-readable">' in content
         assert '<a id="model-org-good"></a>' in content
         assert "*Usability:*" in content
         assert "*Observations:*" in content
@@ -4246,9 +4336,11 @@ class TestMarkdownGalleryReport:
         assert "Peak GB" in chooser
         assert "Observations" in chooser
         assert "<summary>Complete evidence: org/complete-output</summary>" in content
-        assert "```text" in content
-        assert content.count(f"```text\n{complete_text}\n```") == 1
-        assert content.count("END-SENTINEL") == 2
+        # Plain text renders once as the readable view; the raw fence would be
+        # byte-identical, so exactly one exact copy is retained.
+        assert f"```text\n{complete_text}\n```" not in content
+        assert complete_text in content
+        assert content.count("END-SENTINEL") == 1
 
     def test_gallery_includes_all_model_output_and_cost_summary(
         self,

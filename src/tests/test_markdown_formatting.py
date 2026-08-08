@@ -181,7 +181,7 @@ def test_gallery_evidence_block_marks_missing_metrics() -> None:
 
 
 def test_gallery_output_uses_expandable_fenced_evidence() -> None:
-    """Gallery output should retain complete model text in an expandable code block."""
+    """Plain output renders once as readable text without a redundant raw fence."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(text="alpha\n\nbeta"),
@@ -194,9 +194,27 @@ def test_gallery_output_uses_expandable_fenced_evidence() -> None:
     md = _gallery_lines_for(result)
 
     assert "<summary>Complete evidence: test/model</summary>" in md
-    assert "```text\nalpha\n\nbeta\n```" in md
     assert '<pre class="model-output-readable">\nalpha\n\nbeta\n</pre>' in md
-    assert md.count("```text\nalpha\n\nbeta\n```") == 1
+    # The readable view is byte-identical to the raw text here, so no
+    # collapsed raw fence should be emitted.
+    assert "```text\nalpha\n\nbeta\n```" not in md
+
+
+def test_gallery_output_keeps_raw_fence_when_readable_view_differs() -> None:
+    """Trailing whitespace or escaped markup must retain the exact raw fence."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(text="alpha  \n@user `tick`"),
+        success=True,
+        model_load_time=1.0,
+        generation_time=2.0,
+        total_time=3.0,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert '<pre class="model-output-readable">' in md
+    assert "```text\nalpha  \n@user `tick`\n```" in md
 
 
 def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:
