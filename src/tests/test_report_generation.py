@@ -394,7 +394,10 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert "1 clean completion; see the [full model gallery]" in content
+    assert (
+        "1 clean completion; see the full model gallery (model_gallery.md, producer-local)."
+        in content
+    )
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -621,7 +624,7 @@ def test_run_issue_summary_keeps_current_log_and_environment_links(tmp_path: Pat
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
     assert "Stale retained artifacts omitted" not in content
-    assert "src/output/check_models.log" in content
+    assert "check_models.log (producer-local, not published)" in content
     assert "src/output/environment.log" in content
     assert "| Environment |" in content
     assert "| Log |" in content
@@ -1266,14 +1269,33 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     assert output_paths.index.read_text(encoding="utf-8") == (
         "# Check Models Output Index\n"
         "\n"
-        "- [results.html](reports/results.html)\n"
-        "- [model_gallery.md](reports/model_gallery.md)\n"
+        "- [results.html](reports/results.html) (local only, not tracked)\n"
+        "- [model_gallery.md](reports/model_gallery.md) (local only, not tracked)\n"
         "- [diagnostics.md](reports/diagnostics.md)\n"
         "- [results.jsonl](results.jsonl)\n"
         "- [run.json](run.json)\n"
-        "- [check_models.log](check_models.log)\n"
+        "- [check_models.log](check_models.log) (local only, not tracked)\n"
         "- [environment.log](environment.log)\n"
     )
+
+
+def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None:
+    """Untracked bulky artifacts must resolve to relative links, never GitHub URLs."""
+    for name in (
+        "reports/results.html",
+        "reports/model_gallery.md",
+        "check_models.log",
+        "results.history.jsonl",
+    ):
+        assert check_models._published_output_repo_path(tmp_path / name) is None
+        # Location-based inference must not resurrect a GitHub path either.
+        repo_local = check_models._REPO_ROOT / "src" / "output" / name
+        assert check_models._published_output_repo_path(repo_local) is None
+
+    tracked = check_models._REPO_ROOT / "src" / "output" / "reports" / "diagnostics.md"
+    tracked_path = check_models._published_output_repo_path(tracked)
+    assert tracked_path is not None
+    assert tracked_path.as_posix() == "src/output/reports/diagnostics.md"
 
 
 def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Path) -> None:
@@ -3874,7 +3896,14 @@ class TestRetainedMarkdownArtifactEdges:
 
             if link_style == "github":
                 assert github_output_targets
-                assert relative_targets == []
+                # Local-only artifacts are never published, so they are the only
+                # links allowed to stay relative in GitHub link style.
+                assert relative_targets
+                assert all(
+                    target.split("#", 1)[0].rsplit("/", 1)[-1]
+                    in check_models._LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES
+                    for target in relative_targets
+                )
             else:
                 assert relative_targets
                 environment_url = (

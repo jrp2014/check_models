@@ -74,6 +74,12 @@ The file is organized in this order — search for these exact landmark headers 
   `results.jsonl`, `run.json`, `check_models.log`, `environment.log`, and
   append-only `results.history.jsonl`). Hard actionable crashes additionally
   create factual issue drafts under `src/output/issues/`.
+- **Tracked vs local-only outputs**: the skimmable decision artifacts
+  (`index.md`, `diagnostics.md`, `run.json`, `results.jsonl`,
+  `environment.log`, `issues/`, `reports/assets/`) are committed each run;
+  the bulky regenerated ones (`results.html`, `model_gallery.md`,
+  `check_models.log`, `results.history.jsonl`) are gitignored and local-only
+  (`_LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES` keeps report links to them relative).
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)

@@ -25,6 +25,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Stop tracking the bulky regenerated run artifacts in git
+  (`results.history.jsonl`, `results.html`, `model_gallery.md`,
+  `check_models.log` — they remain on disk and gitignored) while keeping the
+  skimmable decision artifacts tracked (`index.md`, `diagnostics.md`,
+  `run.json`, `results.jsonl`, `environment.log`, `issues/`,
+  `reports/assets/`). Report links to local-only artifacts now always render
+  relative (never GitHub blob URLs that would 404), the output index labels
+  them "(local only, not tracked)", and paste-ready issue summaries name them
+  as producer-local text instead of linking. `environment.log` deliberately
+  stays tracked so issue drafts keep a resolvable environment-evidence link.
+  Existing git history is unchanged by design.
 - Persist tee'd live mlx-vlm console output (prompt, generated text, and upstream
   timing/memory lines) into `check_models.log` for every model attempt, success
   or failure, as a file-only log record so the durable log keeps the model text

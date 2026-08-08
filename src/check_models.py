@@ -1525,18 +1525,24 @@ _GITHUB_REF_OVERRIDE: str | None = None
 _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
 _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
-        DEFAULT_HTML_OUTPUT.name,
-        DEFAULT_GALLERY_MD_OUTPUT.name,
         DEFAULT_DIAGNOSTICS_OUTPUT.name,
     }
 )
 _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
         DEFAULT_OUTPUT_INDEX.name,
-        DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
         DEFAULT_RUN_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
+    }
+)
+# Bulky regenerated artifacts stay on disk but are no longer tracked in git, so
+# report links to them must always be relative (a GitHub URL would 404).
+_LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
+    {
+        DEFAULT_HTML_OUTPUT.name,
+        DEFAULT_GALLERY_MD_OUTPUT.name,
+        DEFAULT_LOG_OUTPUT.name,
         "results.history.jsonl",
     }
 )
@@ -6855,6 +6861,8 @@ def _github_repo_artifact_url(
 
 def _published_output_repo_path(artifact_filename: Path) -> PurePosixPath | None:
     """Infer the tracked repo path for a published output artifact when possible."""
+    if artifact_filename.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES:
+        return None
     try:
         repo_relative = artifact_filename.resolve().relative_to(_REPO_ROOT)
     except ValueError:
@@ -16124,13 +16132,19 @@ def _run_issue_summary_artifacts_section(
     artifact_rows.extend(
         (label, path) for label, path in retained_logs if path.name not in stale_names
     )
+    # Local-only artifacts are not published to the repository, so a link from a
+    # pasted GitHub issue could never resolve; name them as producer-local text.
     rows = tuple(
         (
             label,
-            _run_issue_summary_artifact_link(
-                summary_path=summary_path,
-                artifact_path=path,
-                label=path.name,
+            (
+                f"{path.name} (producer-local, not published)"
+                if path.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES
+                else _run_issue_summary_artifact_link(
+                    summary_path=summary_path,
+                    artifact_path=path,
+                    label=path.name,
+                )
             ),
         )
         for label, path in artifact_rows
@@ -16241,15 +16255,21 @@ def generate_run_issue_summary_report(
 
     clean_sentence = f"{_pluralized_count(clean_count, 'clean completion')}."
     if include_gallery_markdown:
-        gallery_link = _run_issue_summary_artifact_link(
-            summary_path=summary_path,
-            artifact_path=output_paths.gallery_markdown,
-            label="full model gallery",
-        )
-        clean_sentence = (
-            f"{_pluralized_count(clean_count, 'clean completion')}; see the "
-            f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
-        )
+        if output_paths.gallery_markdown.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES:
+            clean_sentence = (
+                f"{_pluralized_count(clean_count, 'clean completion')}; see the full "
+                f"model gallery ({output_paths.gallery_markdown.name}, producer-local)."
+            )
+        else:
+            gallery_link = _run_issue_summary_artifact_link(
+                summary_path=summary_path,
+                artifact_path=output_paths.gallery_markdown,
+                label="full model gallery",
+            )
+            clean_sentence = (
+                f"{_pluralized_count(clean_count, 'clean completion')}; see the "
+                f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
+            )
     blocks.append(
         ReportSection(
             "Clean completions",
@@ -16334,7 +16354,11 @@ def generate_output_index_report(
         (output_paths.environment, output_paths.environment.name),
     )
     md = ["# Check Models Output Index", ""]
-    md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
+    md.extend(
+        f"- {_output_index_link(filename, path, label)}"
+        + (" (local only, not tracked)" if path.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES else "")
+        for path, label in links
+    )
     if run_issue_summary is not None:
         md.extend(("", "## Paste-ready run issue", ""))
         md.append(f"- {_output_index_link(filename, run_issue_summary, 'Run issue summary')}")

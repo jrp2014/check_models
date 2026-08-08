@@ -68,3 +68,11 @@ typings/
 src/output/test_*
 src/output/reports/test_*
 src/output/issues/test_*
+
+# Bulky regenerated run artifacts stay local-only; the skimmable decision
+# artifacts (index.md, diagnostics.md, run_summary.md, issue_*.md, run.json,
+# results.jsonl, environment.log, reports/assets/) remain tracked.
+src/output/results.history.jsonl
+src/output/check_models.log
+src/output/reports/results.html
+src/output/reports/model_gallery.md

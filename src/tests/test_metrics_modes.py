@@ -1378,12 +1378,12 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
     assert paths.index.read_text(encoding="utf-8").splitlines() == [
         "# Check Models Output Index",
         "",
-        "- [results.html](reports/results.html)",
-        "- [model_gallery.md](reports/model_gallery.md)",
+        "- [results.html](reports/results.html) (local only, not tracked)",
+        "- [model_gallery.md](reports/model_gallery.md) (local only, not tracked)",
         "- [diagnostics.md](reports/diagnostics.md)",
         "- [results.jsonl](results.jsonl)",
         "- [run.json](run.json)",
-        "- [check_models.log](check_models.log)",
+        "- [check_models.log](check_models.log) (local only, not tracked)",
         "- [environment.log](environment.log)",
     ]
 
