@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-08 12:54:07 BST
+FULL ENVIRONMENT DUMP - 2026-08-08 22:38:51 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 213
+Total packages: 212
 
 absl-py==2.5.0
 accelerate==1.14.0
@@ -26,14 +26,13 @@ certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.4.9
-check_models==0.8.9
+check_models==0.9.0
 check_models==0.8.9
 click==8.4.2
 cmake==4.4.2
 coverage==7.15.4
 cryptography==50.0.0
 cyclonedx-python-lib==11.11.0
-datasets==5.0.0
 defusedxml==0.7.1
 dill==0.4.1
 distlib==0.4.3
@@ -88,8 +87,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.1.dev20260808+6539d1807
-mlx==0.32.1.dev20260808+6539d1807
+mlx==0.32.1.dev20260808+8d6662986
+mlx==0.32.1.dev20260808+8d6662986
 mlx-audio==0.4.7
 mlx-lm==0.31.3
 mlx-vlm==0.6.11
@@ -169,7 +168,7 @@ sortedcontainers==2.4.0
 sounddevice==0.5.5
 soundfile==0.14.0
 sse-starlette==3.4.8
-starlette==1.5.0
+starlette==1.5.1
 sympy==1.14.0
 tabulate==0.10.0
 tensorflow==2.21.0
@@ -210,7 +209,7 @@ tzlocal==5.4.4
 uc-micro-py==2.0.0
 urllib3==2.7.0
 uvicorn==0.52.1
-virtualenv==21.7.2
+virtualenv==21.7.3
 vulture==2.16
 wcwidth==0.8.2
 wheel==0.47.0
@@ -221,5 +220,5 @@ yarl==1.24.5
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-08 12:54:07 BST
+Environment dump completed at 2026-08-08 22:38:51 BST
 ================================================================================
