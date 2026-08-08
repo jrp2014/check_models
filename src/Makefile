@@ -196,10 +196,14 @@ deps-sync: ## Sync README dependency blocks
 	$(RUN_PY) tools/update_readme_deps.py
 
 .PHONY: update
-update: ## Update conda environment and reinstall project with all dependencies
-	@echo "[update] Updating pip in environment: $(ENV_NAME) ($(ENV_TYPE))"
+update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs, smoke)
+	bash tools/update.sh
+
+.PHONY: update-quick
+update-quick: ## Quick in-env refresh: upgrade pip and reinstall project (dev+extras+torch)
+	@echo "[update-quick] Updating pip in environment: $(ENV_NAME) ($(ENV_TYPE))"
 	@$(RUN_PY) -m pip install --upgrade pip
-	@echo "[update] Reinstalling project with all dependencies (dev+extras+torch)..."
+	@echo "[update-quick] Reinstalling project with all dependencies (dev+extras+torch)..."
 	@$(RUN_PY) -m pip install -e .[dev,extras,torch] --upgrade
 	@echo "✓ Environment updated and project reinstalled"
 	@echo "  To change dependency bounds, edit pyproject.toml and run: make deps-sync"
@@ -208,8 +212,7 @@ update: ## Update conda environment and reinstall project with all dependencies
 update-env: update ## Alias for 'update' target
 
 .PHONY: update-full
-update-full: ## Full updater: conda/brew, local MLX repo builds, stubs, smoke (tools/update.sh)
-	bash tools/update.sh
+update-full: update ## Alias for 'update' (kept for compatibility)
 
 # Aggregates
 .PHONY: check

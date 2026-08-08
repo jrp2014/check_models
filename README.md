@@ -61,18 +61,20 @@ Local only (gitignored, regenerated each run):
 ## Common Make Commands
 
 ```bash
-make install   # install runtime dependencies
-make dev       # install dev dependencies (dev + extras + torch)
-make test      # run pytest only
-make quality   # run full gate (ruff + typing + vulture + Skylos quality/audit + pytest + shellcheck + markdownlint)
-make skylos-danger      # advisory Skylos workflow/security scan
+make install       # install runtime dependencies
+make dev           # install dev dependencies (dev + extras + torch)
+make update        # full update: conda/brew, local MLX builds, stubs, smoke (tools/update.sh)
+make update-quick  # quick in-env refresh (pip upgrade + editable reinstall)
+make test          # run pytest only
+make quality       # run full gate (ruff + typing + vulture + Skylos quality/audit/danger + pytest + shellcheck + markdownlint)
+make skylos-danger      # advisory Skylos workflow/security scan (diff-aware on PRs)
 make skylos-danger-llm  # same advisory scan with LLM-oriented output
 make skylos-verify      # narrow Skylos file/range verifier (pass ARGS='--file ... --range ...')
 ```
 
-`make skylos-danger` remains advisory for now, but the repo-root `--danger`
-scan is currently clean, so it is a credible candidate for promotion into the
-blocking gate later.
+The Skylos `--danger` scan is part of the blocking `make quality` gate (full
+mode); `make skylos-danger` runs the same scan in advisory, diff-aware form
+for triage.
 
 > [!TIP]
 > **Platform**: macOS with Apple Silicon is required.

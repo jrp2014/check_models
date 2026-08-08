@@ -86,8 +86,8 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit, full pytest, shellcheck, markdownlint |
-| `make skylos-danger` | Advisory Skylos `--danger` scan for workflow and security findings; not merge-blocking yet, but the current repo-root scan is clean and could be promoted later |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit and the blocking `--danger` gate, full pytest, shellcheck, markdownlint |
+| `make skylos-danger` | Advisory Skylos `--danger` scan (diff-aware on PRs) for triage; the same scan runs blocking inside `make quality` full mode |
 | `make skylos-danger-llm` | Advisory Skylos `--danger` scan with LLM-optimized output for agent triage |
 | `make skylos-verify` | Run `skylos verify` with repo project context for narrow post-edit agent checks |
 | `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
@@ -100,6 +100,8 @@ The file is organized in this order — search for these exact landmark headers 
 | `make ci` | Full strict CI pipeline |
 | `make stubs` | Auto-generate `typings/` stubs for `mlx-lm`, `mlx-vlm`, `transformers`, `tokenizers` |
 | `make deps-sync` | Sync README dependency blocks with pyproject.toml |
+| `make update` | Full updater via `src/tools/update.sh`: conda/brew refresh, local MLX repo builds, stubs, runtime smoke |
+| `make update-quick` | Quick in-env refresh: pip upgrade + editable reinstall with `[dev,extras,torch]` |
 | `make clean` | Remove caches and generated outputs |
 
 ### 6. Testing guidance

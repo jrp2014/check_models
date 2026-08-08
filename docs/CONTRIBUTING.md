@@ -200,16 +200,12 @@ The project uses several automated quality checks:
    Validation tests must not rewrite tracked `src/output/` assets; use a temp
    directory or gitignored `test_*` path for generated reports and logs.
    The blocking Skylos steps gate quality, secrets, dependency-vulnerability,
-   and `-a` audit findings. Run `make skylos-danger` separately for advisory
-   `--danger` findings, including GitHub Actions workflow hardening checks. Run
-   `make skylos-danger-llm` when you want the same advisory findings rendered in
-   the LLM-oriented format for agent triage. For a narrow agent/edit-loop check,
-   run `make skylos-verify ARGS='--file path/to/file --range L1:L2'`.
-
-   The advisory `make skylos-danger` path is intentionally non-blocking for now,
-   but note the current repo-root `--danger` scan is clean. If you want stricter
-   enforcement later, this path can be promoted into the blocking gate without
-   inheriting known findings.
+   `-a` audit findings, and (in full mode) `--danger` security findings via the
+   Skylos Danger Gate. Run `make skylos-danger` for the same `--danger` scan in
+   advisory/diff-aware form (useful for triage on PR diffs), or
+   `make skylos-danger-llm` for the LLM-oriented rendering for agent triage.
+   For a narrow agent/edit-loop check, run
+   `make skylos-verify ARGS='--file path/to/file --range L1:L2'`.
 
 7. **Markdown linting**:
 
@@ -424,8 +420,11 @@ make -C src install-all
 Dependencies are defined in `src/pyproject.toml` as the single source of truth.
 
 ```bash
-# Update environment and reinstall project (recommended after pulling changes):
+# Full update: conda/brew, local MLX repo builds, stubs, smoke (tools/update.sh):
 make update
+
+# Quick in-env refresh only (pip upgrade + editable reinstall):
+make update-quick
 
 # Check for outdated packages:
 make check-outdated
@@ -440,26 +439,26 @@ make deps-sync
 python -m tools.update_readme_deps --check
 ```
 
-#### Advanced: Using update.sh for MLX Development
+#### Advanced: update.sh options (what `make update` runs)
 
-If you're actively developing MLX libraries locally, use `src/tools/update.sh` for more granular control:
+`make update` runs `src/tools/update.sh`; invoke the script directly when you
+need its environment-variable switches:
 
 ```bash
 cd src
 bash tools/update.sh
 ```
 
-**When to use `update.sh`**:
+**When to use `make update` / `update.sh`**:
 
 - You have local development builds of MLX, MLX-LM, or MLX-VLM
-- You need to update specific dependency groups independently
-- You want to skip certain groups (e.g., skip torch on Apple Silicon)
-- You need environment diagnostics and validation
+- You want system package managers (conda/Homebrew) refreshed too
+- You need environment diagnostics, stub regeneration, and the runtime smoke
 
-**When to use `make update`**:
+**When to use `make update-quick`**:
 
 - Standard workflow (using released packages from PyPI)
-- Quick updates after pulling repository changes
+- Quick in-env refresh after pulling repository changes
 - You don't need special handling for local MLX builds
 
 **Features of update.sh**:
@@ -503,10 +502,10 @@ bash tools/update.sh
 - `MLX_LOCAL_BUILD_SMOKE_EXPECTED`: Override the expected deterministic output
   substring (`Hello! How can I help you today?`).
 
-`tools/update.sh` is intended for local MLX ecosystem development when sibling
-`mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It follows upstream
-MLX editable dev install guidance for `mlx`; use `make update` for ordinary
-PyPI dependency updates.
+`tools/update.sh` (what `make update` runs) auto-detects sibling `mlx`,
+`mlx-lm`, and `mlx-vlm` repositories and follows upstream MLX editable dev
+install guidance for `mlx`; without local repos it falls back to PyPI updates.
+Use `make update-quick` for a lightweight in-env refresh only.
 
 **MLX_METAL_JIT Trade-offs**:
 
@@ -543,10 +542,10 @@ SKIP_TORCH=1 bash tools/update.sh
 
 ### Keeping Your Environment Up-to-Date
 
-After pulling changes from the repository, update your environment with:
+After pulling changes from the repository, refresh your environment with:
 
 ```bash
-make update
+make update-quick
 ```
 
 This command will:
@@ -554,6 +553,10 @@ This command will:
 - Update pip in your conda/venv environment
 - Reinstall the project with all dependencies (dev, extras, torch)
 - Apply the current dependency bounds from `src/pyproject.toml`
+
+For the full update — conda/Homebrew refresh, local MLX repo pulls and source
+builds, stub regeneration, and the runtime smoke — run `make update`
+(which runs `src/tools/update.sh`).
 
 ### Cleaning Build Artifacts
 

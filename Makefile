@@ -117,15 +117,18 @@ check_models: ## Run VLM checker (pass args: make check_models ARGS='--model X -
 	$(MAKE) -C $(SRC) check_models ARGS='$(ARGS)'
 
 .PHONY: update
-update: ## Update conda environment and reinstall project dependencies
+update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs, smoke)
 	$(MAKE) -C $(SRC) update
+
+.PHONY: update-quick
+update-quick: ## Quick in-env refresh: upgrade pip and reinstall project dependencies
+	$(MAKE) -C $(SRC) update-quick
 
 .PHONY: update-env
 update-env: update ## Alias for 'update' target
 
 .PHONY: update-full
-update-full: ## Full updater: conda/brew, local MLX repo builds, stubs, smoke (tools/update.sh)
-	$(MAKE) -C $(SRC) update-full
+update-full: update ## Alias for 'update' (kept for compatibility)
 
 
 .PHONY: deps-sync

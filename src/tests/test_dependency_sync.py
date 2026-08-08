@@ -786,7 +786,7 @@ def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
     assert "make skylos-danger" in copilot_text
     assert "make skylos-danger-llm" in copilot_text
     assert "make skylos-verify" in copilot_text
-    assert "could be promoted later" in copilot_text
+    assert "runs blocking inside `make quality`" in copilot_text
     assert "`make quality` already runs the full pytest suite" in quality_workflow
     assert "make skylos-danger-llm" in quality_workflow
     assert "make skylos-verify" in quality_workflow

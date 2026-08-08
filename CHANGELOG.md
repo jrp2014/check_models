@@ -47,6 +47,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `make update` now runs the full `tools/update.sh` orchestration
+  (conda/Homebrew refresh, local MLX repo pulls and source builds, stub
+  regeneration, runtime smoke); the previous lightweight pip refresh moved to
+  `make update-quick`, and `make update-full` remains as a compatibility
+  alias. Contributor docs updated to match.
+- Promote the Skylos `--danger` scan into the blocking quality gate: the
+  repo-root scan is clean, so `make quality` (full mode) now fails on any
+  danger finding via a new "Skylos Danger Gate" step
+  (`run_skylos_danger_advisory.sh --full --gate`). `make skylos-danger`
+  keeps the advisory, diff-aware form for PR triage; the fast gate
+  (pre-push) is unchanged.
 - Harden the new file reads/writes flagged by the advisory Skylos danger
   scan: the architecture pre-check resolves the HF-cache `config.json`
   symlink but requires containment inside the repo's cache directory and a
@@ -59,8 +70,9 @@ Notable changes to this project will be documented in this file.
   `##` comments (11 previously invisible targets now listed); `stubs-clear`
   aliases `clean-stubs`; `check_models-demo` actually differs from
   `check_models`; `validate-env` delegates to `tools.validate_env` instead of
-  duplicating its probes; new `make update-full` wires the previously
-  make-unreachable `tools/update.sh`; the `subprocess` pytest marker is
+  duplicating its probes; the previously make-unreachable `tools/update.sh`
+  is now wired into make (see the `make update` entry below); the
+  `subprocess` pytest marker is
   declared in `pyproject.toml`; `pip-audit` ships in the dev extras so
   `make audit` stops installing at runtime; `AGENTS.md`/`CLAUDE.md` parity is
   guarded by a test; duplicated dependency/make-target doc sections in

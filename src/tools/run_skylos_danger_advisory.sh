@@ -5,12 +5,13 @@ set -euo pipefail
 MODE="auto"
 DIFF_BASE=""
 WRITE_LLM_REPORT=0
+GATE_MODE=0
 
 usage() {
     cat >&2 <<'EOF'
-Usage: bash tools/run_skylos_danger_advisory.sh [--full] [--diff-base REF] [--llm]
+Usage: bash tools/run_skylos_danger_advisory.sh [--full] [--diff-base REF] [--llm] [--gate]
 
-Runs Skylos --danger separately from the blocking quality gate.
+Runs Skylos --danger. Advisory by default; --gate makes findings blocking.
 Default behavior:
   - local runs: full-repo advisory scan
   - GitHub Actions PR runs: diff-aware advisory scan using origin/$GITHUB_BASE_REF
@@ -19,6 +20,7 @@ Options:
   --full           Run a full-repo advisory scan.
   --diff-base REF  Limit findings to changed lines since REF.
   --llm            Also write an LLM-optimized report for agent triage.
+  --gate           Exit non-zero when any danger finding is reported (blocking).
 EOF
 }
 
@@ -39,6 +41,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --llm)
             WRITE_LLM_REPORT=1
+            shift
+            ;;
+        --gate)
+            GATE_MODE=1
             shift
             ;;
         -h|--help)
@@ -111,7 +117,10 @@ fi
 
 quality_run_python_tool skylos cicd annotate --input "$report_path" --severity medium
 
-gate_args=(cicd gate --input "$report_path" --advisory)
+gate_args=(cicd gate --input "$report_path")
+if [ "$GATE_MODE" -eq 0 ]; then
+    gate_args+=(--advisory)
+fi
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     gate_args+=(--summary)
 fi
@@ -158,7 +167,10 @@ if [ "$WRITE_LLM_REPORT" -eq 1 ]; then
 fi
 
 if [ "$danger_count" -eq 0 ]; then
-    echo "✅ Skylos danger advisory found no issues. JSON report: $report_path"
+    echo "✅ Skylos danger scan found no issues. JSON report: $report_path"
+elif [ "$GATE_MODE" -eq 1 ]; then
+    echo "❌ Skylos danger gate: $danger_count blocking finding(s). JSON report: $report_path" >&2
+    exit 1
 else
     echo "⚠️  Skylos danger advisory reported $danger_count findings. JSON report: $report_path"
 fi
