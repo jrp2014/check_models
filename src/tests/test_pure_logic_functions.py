@@ -1134,7 +1134,7 @@ class TestPreflightDependencyDiagnostics:
         """Transformers releases above 5.12 should be accepted after the MLX fix."""
         issues = mod._detect_upstream_version_issues(
             {
-                "mlx-vlm": "0.6.3",
+                "mlx-vlm": "0.6.9",
                 "mlx-lm": "0.31.3",
                 "mlx": "0.31.2",
                 "mlx-audio": "0.4.3",
@@ -1273,70 +1273,6 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         assert "total_tokens" in fields
         assert "prompt_tps" in fields
 
-    def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
-        """Source matcher should flag unguarded startswith URL branch."""
-        risky_source = 'elif image_source.startswith(("http://", "https://")):\n    pass\n'
-        safe_source = (
-            "elif isinstance(image_source, str) and "
-            'image_source.startswith(("http://", "https://")):\n    pass\n'
-        )
-        assert mod._has_mlx_vlm_load_image_path_bug(risky_source)
-        assert not mod._has_mlx_vlm_load_image_path_bug(safe_source)
-
-    def test_resolve_distribution_source_file_finds_relative_path(
-        self,
-        mod: types.ModuleType,
-        monkeypatch: pytest.MonkeyPatch,
-        tmp_path: Path,
-    ) -> None:
-        """Distribution file resolver should locate files without importing package modules."""
-
-        class _FakeDistribution:
-            def __init__(self, base_dir: Path) -> None:
-                self.base_dir = base_dir
-                self.files: list[object] = []
-
-            def locate_file(self, file_ref: object) -> Path:
-                return self.base_dir / str(file_ref)
-
-        source_file = tmp_path / "mlx_vlm" / "utils.py"
-        source_file.parent.mkdir(parents=True)
-        source_file.write_text("# test file\n", encoding="utf-8")
-
-        fake_distribution = _FakeDistribution(tmp_path)
-        monkeypatch.setattr(mod, "distribution", lambda _name: fake_distribution)
-
-        resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
-        assert resolved == source_file
-
-    def test_detect_mlx_vlm_load_image_issue_uses_distribution_source_fallback(
-        self,
-        mod: types.ModuleType,
-        monkeypatch: pytest.MonkeyPatch,
-        tmp_path: Path,
-    ) -> None:
-        """mlx-vlm source inspection should work even when load_image import is unavailable."""
-        source_file = tmp_path / "mlx_vlm" / "utils.py"
-        source_file.parent.mkdir(parents=True)
-        source_file.write_text(
-            'elif image_source.startswith(("http://", "https://")):\n    pass\n',
-            encoding="utf-8",
-        )
-
-        def _stub_load_image(*_args: object, **_kwargs: object) -> None:
-            return None
-
-        monkeypatch.setattr(mod, "load_image", _stub_load_image)
-        monkeypatch.setattr(
-            mod,
-            "_resolve_distribution_source_file",
-            lambda _name, _relative_path: source_file,
-        )
-
-        issue = mod._detect_mlx_vlm_load_image_issue()
-        assert issue is not None
-        assert "unguarded URL startswith() branch" in issue
-
     def test_validate_model_artifact_layout_demotes_legacy_snapshot_notes(
         self,
         mod: types.ModuleType,
@@ -1364,32 +1300,3 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         assert "snapshot missing config.json" not in caplog.text
         assert "loaded processor has no image_processor" not in caplog.text
         assert not any(record.levelno >= logging.WARNING for record in caplog.records)
-
-    def test_resolve_distribution_source_file_uses_module_spec_fallback(
-        self,
-        mod: types.ModuleType,
-        monkeypatch: pytest.MonkeyPatch,
-        tmp_path: Path,
-    ) -> None:
-        """Resolver should fall back to module search paths for editable installs."""
-
-        class _FakeDistribution:
-            files: tuple[object, ...] = ()
-
-            def locate_file(self, _file_ref: object) -> Path:
-                return tmp_path / "missing.py"
-
-        class _FakeSpec:
-            def __init__(self, location: Path) -> None:
-                self.submodule_search_locations = [str(location)]
-
-        pkg_dir = tmp_path / "mlx_vlm"
-        pkg_dir.mkdir()
-        source_file = pkg_dir / "utils.py"
-        source_file.write_text("# editable source\n", encoding="utf-8")
-
-        monkeypatch.setattr(mod, "distribution", lambda _name: _FakeDistribution())
-        monkeypatch.setattr(mod, "find_spec", lambda _name: _FakeSpec(pkg_dir))
-
-        resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
-        assert resolved == source_file

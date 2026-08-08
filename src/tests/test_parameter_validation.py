@@ -1,7 +1,9 @@
 """Tests for parameter validation functions."""
 
 import argparse
+from collections.abc import Callable
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -555,3 +557,69 @@ class TestCliArgumentNormalization:
         check_models._apply_eval_mode_defaults(args, {"date": "2026-07-10"})
 
         assert args.eval_mode == "blind"
+
+
+class TestUpstreamCliParity:
+    """Shared CLI flags must track mlx-vlm's generate CLI unless deliberately divergent."""
+
+    # Flag -> reason the default deliberately differs from upstream generate.
+    DELIBERATE_DEFAULT_DIVERGENCES: ClassVar[dict[str, str]] = {
+        "--max-tokens": "bounded diagnostic runs (500) vs upstream free-form 2048",
+        "--prompt": "harness builds a metadata-cataloguing prompt when unset",
+        "--revision": "None distinguishes requested vs resolved revisions in reports",
+        "--thinking-start-token": "None defers to the upstream default at call time",
+        "--trust-remote-code": "harness defaults on, with a security warning and opt-out",
+    }
+
+    @staticmethod
+    def _capture_parser_defaults(build: Callable[[], object]) -> dict[str, object]:
+        captured: dict[str, object] = {}
+        real_parse_args = argparse.ArgumentParser.parse_args
+
+        def _grab(self: argparse.ArgumentParser, *_args: object, **_kw: object) -> object:
+            for action in self._actions:
+                for option in action.option_strings:
+                    if option.startswith("--"):
+                        captured[option] = action.default
+            return argparse.Namespace()
+
+        argparse.ArgumentParser.parse_args = _grab  # type: ignore[method-assign, assignment]
+        try:
+            build()
+        finally:
+            argparse.ArgumentParser.parse_args = real_parse_args  # type: ignore[method-assign]
+        return captured
+
+    def test_shared_flag_defaults_match_mlx_vlm_generate(self) -> None:
+        """Overlapping flags keep upstream defaults except documented divergences."""
+        dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
+
+        upstream = self._capture_parser_defaults(dispatch.parse_arguments)
+        parser = check_models._build_cli_parser()
+        ours: dict[str, object] = {}
+        for action in parser._actions:
+            for option in action.option_strings:
+                if option.startswith("--"):
+                    ours[option] = action.default
+
+        shared = sorted((set(ours) & set(upstream)) - {"--help"})
+        assert len(shared) >= 25, "shared CLI surface unexpectedly shrank"
+
+        unexpected: dict[str, tuple[object, object]] = {}
+        for option in shared:
+            if option in self.DELIBERATE_DEFAULT_DIVERGENCES:
+                continue
+            # None on our side means "defer to upstream default at call time".
+            if ours[option] is None and upstream[option] is not None:
+                continue
+            if ours[option] != upstream[option]:
+                unexpected[option] = (ours[option], upstream[option])
+        assert not unexpected, f"undocumented CLI default drift vs upstream: {unexpected}"
+
+        # Stale allowlist entries must be pruned once upstream converges.
+        for option, reason in self.DELIBERATE_DEFAULT_DIVERGENCES.items():
+            if option not in shared:
+                continue
+            assert ours[option] != upstream[option], (
+                f"{option} no longer diverges from upstream; drop it from the allowlist ({reason})"
+            )

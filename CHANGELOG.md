@@ -56,6 +56,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Retire three now-inert compatibility fiddles (~350 lines): the local-only
+  artifact link machinery (every linked artifact is tracked, so the
+  relative-link special cases were unreachable); the `load_image` source-grep
+  preflight shim (upstream guarded the URL branch in mlx-vlm 0.4.0, below the
+  project floor); and the lossy-BPE detokenizer monkeypatch + retry wrapper
+  (upstream fixed the UTF-8 flush in 0.6.9 — the `mlx-vlm` floor is raised to
+  `>=0.6.9` accordingly and generation now fails fast with decode-phase
+  tagging instead of monkeypatching upstream internals).
+- Align the CLI with mlx-vlm's `generate` CLI where they overlap:
+  `--prefill-step-size` default drops from 4096 to upstream's 2048, and a new
+  `--thinking-mode` flag passes through to chat templates that support it
+  (independent of `--enable-thinking`, matching upstream). A new
+  `TestUpstreamCliParity` guard asserts shared-flag defaults match upstream,
+  with an explicit allowlist documenting the deliberate divergences
+  (`--max-tokens` 500, harness-built `--prompt`, `--revision` None,
+  `--thinking-start-token` None, `--trust-remote-code` on-with-warning).
 - Promote two log-only facts into `results.jsonl`: the complete rendered
   chat-template prompt (`prompt_diagnostics.rendered_prompt`, beside the
   bounded preview) and the tee'd upstream console output for **successful**

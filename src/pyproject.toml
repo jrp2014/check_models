@@ -33,7 +33,7 @@ dependencies = [
     # Core MLX runtime stack required by benchmark execution
     "mlx>=0.31.2",
     "mlx-lm>=0.31.3",
-    "mlx-vlm>=0.6.2",
+    "mlx-vlm>=0.6.9", # >=0.6.9: BPE detokenizer UTF-8 flush fix (retired local workaround)
     # Project-level compatibility floor for the MLX ecosystem; current
     # mlx-lm GitHub main supports Transformers 5.13.0 and later.
     "transformers>=5.7.0",

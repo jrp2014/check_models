@@ -1309,14 +1309,8 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     )
 
 
-def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None:
-    """Untracked artifacts must resolve to relative links, never GitHub URLs."""
-    for name in ("results.history.jsonl",):
-        assert check_models._published_output_repo_path(tmp_path / name) is None
-        # Location-based inference must not resurrect a GitHub path either.
-        repo_local = check_models._REPO_ROOT / "src" / "output" / name
-        assert check_models._published_output_repo_path(repo_local) is None
-
+def test_tracked_artifacts_publish_canonical_repo_paths(tmp_path: Path) -> None:
+    """Every linked artifact resolves to its canonical tracked repo path."""
     for name in (
         "check_models.log",
         "reports/diagnostics.md",
@@ -1327,6 +1321,8 @@ def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None
         tracked_path = check_models._published_output_repo_path(tracked)
         assert tracked_path is not None
         assert tracked_path.as_posix() == f"src/output/{name}"
+    # Unknown names outside the repo tree stay unpublished (relative links).
+    assert check_models._published_output_repo_path(tmp_path / "scratch.txt") is None
 
 
 def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Path) -> None:
@@ -4013,14 +4009,7 @@ class TestRetainedMarkdownArtifactEdges:
 
             if link_style == "github":
                 assert github_output_targets
-                # Only genuinely untracked artifacts (currently just the
-                # append-only history, which reports do not link) may stay
-                # relative in GitHub link style.
-                assert all(
-                    target.split("#", 1)[0].rsplit("/", 1)[-1]
-                    in check_models._LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES
-                    for target in relative_targets
-                )
+                assert relative_targets == []
             else:
                 assert relative_targets
                 environment_url = (

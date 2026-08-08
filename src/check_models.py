@@ -1296,6 +1296,7 @@ class ChatTemplateKwargs(TypedDict, total=False):
     enable_thinking: bool
     thinking_budget: int
     thinking_end_token: str
+    thinking_mode: str
     thinking_start_token: str
 
 
@@ -1583,13 +1584,6 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_JSONL_OUTPUT.name,
         DEFAULT_RUN_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
-    }
-)
-# The append-only history stays on disk but is not tracked in git, so report
-# links to it must always be relative (a GitHub URL would 404).
-_LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
-    {
-        "results.history.jsonl",
     }
 )
 _MODEL_LOAD_ACTIVE_MEMORY_ATTR: Final[str] = "model_load_active_memory"
@@ -2827,6 +2821,7 @@ class ProcessImageParams:
     processor_kwargs: dict[str, JsonLike] | None = None
     enable_thinking: bool = False
     thinking_budget: int | None = None
+    thinking_mode: str | None = None
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
     context_marker: str = "Context:"
@@ -5004,82 +4999,6 @@ def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
     return issues
 
 
-def _has_mlx_vlm_load_image_path_bug(source_text: str) -> bool:
-    """Detect the known unguarded ``startswith`` branch in mlx-vlm load_image()."""
-    has_risky_branch = 'elif image_source.startswith(("http://", "https://"))' in source_text
-    has_safe_guard = (
-        'elif isinstance(image_source, str) and image_source.startswith(("http://", "https://"))'
-        in source_text
-    )
-    return has_risky_branch and not has_safe_guard
-
-
-def _resolve_distribution_source_file(distribution_name: str, relative_path: str) -> Path | None:
-    """Locate an installed distribution file path without importing the package."""
-    try:
-        package_distribution = distribution(distribution_name)
-    except PackageNotFoundError:
-        return None
-
-    direct_candidate = Path(str(package_distribution.locate_file(relative_path)))
-    if direct_candidate.is_file():
-        return direct_candidate
-
-    normalized_target = relative_path.replace("\\", "/")
-    for file_ref in package_distribution.files or []:
-        file_path = str(file_ref).replace("\\", "/")
-        if not file_path.endswith(normalized_target):
-            continue
-
-        candidate = Path(str(package_distribution.locate_file(file_ref)))
-        if candidate.is_file():
-            return candidate
-
-    module_name = normalized_target.split("/", 1)[0]
-    module_spec = find_spec(module_name)
-    module_locations = (
-        list(module_spec.submodule_search_locations)
-        if module_spec and module_spec.submodule_search_locations
-        else []
-    )
-    if module_locations:
-        module_root = Path(module_locations[0])
-        _, _, module_relative = normalized_target.partition("/")
-        if module_relative:
-            candidate = module_root / module_relative
-            if candidate.is_file():
-                return candidate
-
-    return None
-
-
-def _detect_mlx_vlm_load_image_issue() -> str | None:
-    """Detect known mlx-vlm load_image Path/BytesIO branch bug from source."""
-    source_path: Path | None = None
-    if getattr(load_image, "__module__", "") == "mlx_vlm.utils":
-        code_obj = getattr(load_image, "__code__", None)
-        if code_obj is not None:
-            source_path = Path(code_obj.co_filename)
-
-    if source_path is None:
-        source_path = _resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
-    if source_path is None:
-        return None
-
-    try:
-        source_text = source_path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-
-    if _has_mlx_vlm_load_image_path_bug(source_text):
-        return (
-            "mlx-vlm load_image() has an unguarded URL startswith() branch; "
-            "Path/BytesIO inputs can raise AttributeError in upstream code."
-        )
-
-    return None
-
-
 _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
     "load": (
         "mlx_vlm.utils.load",
@@ -5289,10 +5208,6 @@ def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
 def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]:
     """Collect actionable dependency/runtime issues before model execution."""
     issues = _detect_upstream_version_issues(versions)
-
-    load_image_issue = _detect_mlx_vlm_load_image_issue()
-    if load_image_issue:
-        issues.append(load_image_issue)
 
     issues.extend(_detect_runtime_api_drift_issues())
 
@@ -6976,8 +6891,6 @@ def _github_repo_artifact_url(
 
 def _published_output_repo_path(artifact_filename: Path) -> PurePosixPath | None:
     """Infer the tracked repo path for a published output artifact when possible."""
-    if artifact_filename.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES:
-        return None
     try:
         repo_relative = artifact_filename.resolve().relative_to(_REPO_ROOT)
     except ValueError:
@@ -10582,14 +10495,19 @@ def _is_generation_processor(
 
 
 def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
-    """Collect optional chat-template kwargs for benchmark runs."""
-    if not params.enable_thinking:
-        return {}
+    """Collect optional chat-template kwargs for benchmark runs.
 
-    template_kwargs: ChatTemplateKwargs = {
-        "enable_thinking": True,
-        "thinking_end_token": params.thinking_end_token,
-    }
+    Mirrors upstream ``mlx_vlm.generate`` semantics: ``thinking_mode`` applies
+    whenever set (templates that support it), independent of enable_thinking.
+    """
+    template_kwargs: ChatTemplateKwargs = {}
+    if params.thinking_mode is not None:
+        template_kwargs["thinking_mode"] = params.thinking_mode
+    if not params.enable_thinking:
+        return template_kwargs
+
+    template_kwargs["enable_thinking"] = True
+    template_kwargs["thinking_end_token"] = params.thinking_end_token
     if params.thinking_budget is not None:
         template_kwargs["thinking_budget"] = params.thinking_budget
     if params.thinking_start_token is not None:
@@ -11630,144 +11548,21 @@ def _ensure_generation_runtime_symbols() -> None:
     raise _tag_exception_failure_phase(RuntimeError(msg), "import")
 
 
-def _is_mlx_vlm_bpe_detokenizer_decode_failure(error: BaseException) -> bool:
-    """Return whether an error matches the upstream mlx-vlm UTF-8 detokenizer bug."""
-    if not isinstance(error, UnicodeDecodeError):
-        return False
-    if error.encoding.strip().lower() != "utf-8":
-        return False
-
-    for frame in traceback.extract_tb(error.__traceback__):
-        normalized_filename = frame.filename.replace("\\", "/")
-        if (
-            normalized_filename.endswith("/mlx_vlm/tokenizer_utils.py")
-            and frame.name == "add_token"
-        ):
-            return True
-    return False
-
-
-@contextmanager
-def _temporary_mlx_vlm_lossy_bpe_detokenizer_patch() -> Generator[None]:
-    """Temporarily ignore undecodable bytes in mlx-vlm BPE streaming detokenization."""
-    space_byte: Final[int] = 32
-    try:
-        tokenizer_utils = __import__(
-            "mlx_vlm.tokenizer_utils",
-            fromlist=["BPEStreamingDetokenizer"],
-        )
-    except ImportError:
-        yield
-        return
-
-    detokenizer_cls = getattr(tokenizer_utils, "BPEStreamingDetokenizer", None)
-    remove_space = getattr(tokenizer_utils, "_remove_space", None)
-    original_add_token = getattr(detokenizer_cls, "add_token", None)
-    if not isinstance(detokenizer_cls, type) or not callable(original_add_token):
-        yield
-        return
-    detokenizer_type = cast("Any", detokenizer_cls)
-
-    def _lossy_add_token(
-        self: object,
-        token: int,
-        skip_special_token_ids: Sequence[int] = (),
-    ) -> None:
-        detokenizer = cast("Any", self)
-        if token in skip_special_token_ids:
-            return
-
-        tokenmap = getattr(detokenizer, "tokenmap", None)
-        byte_decoder = getattr(detokenizer, "_byte_decoder", None)
-        pending = getattr(detokenizer, "_unflushed", None)
-        accumulated_text = getattr(detokenizer, "text", None)
-        trim_space = getattr(detokenizer, "trim_space", False)
-        if (
-            not isinstance(tokenmap, list)
-            or not isinstance(byte_decoder, Mapping)
-            or not isinstance(pending, str)
-            or not isinstance(accumulated_text, str)
-        ):
-            original_add_token(self, token, skip_special_token_ids)
-            return
-
-        try:
-            value = tokenmap[token]
-        except (IndexError, TypeError):
-            original_add_token(self, token, skip_special_token_ids)
-            return
-        if not isinstance(value, str) or not value:
-            original_add_token(self, token, skip_special_token_ids)
-            return
-
-        try:
-            leading_byte = byte_decoder[value[0]]
-        except KeyError:
-            original_add_token(self, token, skip_special_token_ids)
-            return
-
-        if leading_byte != space_byte:
-            object.__setattr__(detokenizer, "_unflushed", pending + value)
-            return
-
-        current_text = bytearray(byte_decoder[ch] for ch in pending if ch in byte_decoder).decode(
-            "utf-8", errors="ignore"
-        )
-        if accumulated_text or not trim_space:
-            next_text = accumulated_text + current_text
-        elif callable(remove_space):
-            next_text = accumulated_text + cast("str", remove_space(current_text))
-        else:
-            next_text = accumulated_text + current_text.lstrip()
-
-        detokenizer.text = next_text
-        object.__setattr__(detokenizer, "_unflushed", value)
-
-    detokenizer_type.add_token = _lossy_add_token
-    try:
-        yield
-    finally:
-        detokenizer_type.add_token = original_add_token
-
-
-def _run_generation_with_retry_workaround(
+def _run_generation_guarded(
     *,
     params: ProcessImageParams,
     generate_once: Callable[[], GenerationResult | SupportsGenerationResult],
 ) -> GenerationResult | SupportsGenerationResult:
-    """Run generation once, retrying only for the known upstream detokenizer bug."""
+    """Run generation once, tagging failures with the decode phase."""
     try:
         return generate_once()
     except TimeoutError as gen_to_err:
         msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
         raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err
     except (OSError, ValueError) as gen_known_err:
-        if not _is_mlx_vlm_bpe_detokenizer_decode_failure(gen_known_err):
-            msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
-            logger.exception("Generation error for %s", params.model_identifier)
-            raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-
-        logger.warning(
-            "Generation hit upstream mlx-vlm UTF-8 detokenizer failure for %s; "
-            "retrying once with lossy BPE decode fallback.",
-            params.model_identifier,
-        )
-        try:
-            with _temporary_mlx_vlm_lossy_bpe_detokenizer_patch():
-                return generate_once()
-        except TimeoutError as retry_timeout_err:
-            msg = f"Generation timed out for model {params.model_identifier}: {retry_timeout_err}"
-            raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from retry_timeout_err
-        except (OSError, ValueError) as retry_known_err:
-            msg = f"Model generation failed for {params.model_identifier}: {retry_known_err}"
-            logger.exception("Generation error for %s", params.model_identifier)
-            raise _tag_exception_failure_phase(ValueError(msg), "decode") from retry_known_err
-        except (RuntimeError, TypeError, AttributeError, KeyError) as retry_err:
-            msg = (
-                f"Model runtime error during generation for {params.model_identifier}: {retry_err}"
-            )
-            logger.exception("Runtime error for %s", params.model_identifier)
-            raise _tag_exception_failure_phase(ValueError(msg), "decode") from retry_err
+        msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
+        logger.exception("Generation error for %s", params.model_identifier)
+        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
     except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
         msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
         logger.exception("Runtime error for %s", params.model_identifier)
@@ -12125,7 +11920,7 @@ def _run_model_generation(
         phase_timer.start("decode")
     _set_failure_phase(phase_callback, "decode")
     try:
-        output = _run_generation_with_retry_workaround(
+        output = _run_generation_guarded(
             params=params,
             generate_once=_generate_once,
         )
@@ -14241,6 +14036,7 @@ def process_models(
             processor_kwargs=args.processor_kwargs,
             enable_thinking=args.enable_thinking,
             thinking_budget=args.thinking_budget,
+            thinking_mode=args.thinking_mode,
             thinking_start_token=args.thinking_start_token,
             thinking_end_token=args.thinking_end_token,
             context_marker=args.context_marker,
@@ -16337,19 +16133,13 @@ def _run_issue_summary_artifacts_section(
     artifact_rows.extend(
         (label, path) for label, path in retained_logs if path.name not in stale_names
     )
-    # Local-only artifacts are not published to the repository, so a link from a
-    # pasted GitHub issue could never resolve; name them as producer-local text.
     rows = tuple(
         (
             label,
-            (
-                f"{path.name} (producer-local, not published)"
-                if path.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES
-                else _run_issue_summary_artifact_link(
-                    summary_path=summary_path,
-                    artifact_path=path,
-                    label=path.name,
-                )
+            _run_issue_summary_artifact_link(
+                summary_path=summary_path,
+                artifact_path=path,
+                label=path.name,
             ),
         )
         for label, path in artifact_rows
@@ -16460,21 +16250,15 @@ def generate_run_issue_summary_report(
 
     clean_sentence = f"{_pluralized_count(clean_count, 'clean completion')}."
     if include_gallery_markdown:
-        if output_paths.gallery_markdown.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES:
-            clean_sentence = (
-                f"{_pluralized_count(clean_count, 'clean completion')}; see the full "
-                f"model gallery ({output_paths.gallery_markdown.name}, producer-local)."
-            )
-        else:
-            gallery_link = _run_issue_summary_artifact_link(
-                summary_path=summary_path,
-                artifact_path=output_paths.gallery_markdown,
-                label="full model gallery",
-            )
-            clean_sentence = (
-                f"{_pluralized_count(clean_count, 'clean completion')}; see the "
-                f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
-            )
+        gallery_link = _run_issue_summary_artifact_link(
+            summary_path=summary_path,
+            artifact_path=output_paths.gallery_markdown,
+            label="full model gallery",
+        )
+        clean_sentence = (
+            f"{_pluralized_count(clean_count, 'clean completion')}; see the "
+            f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
+        )
     blocks.append(
         ReportSection(
             "Clean completions",
@@ -16599,11 +16383,7 @@ def generate_output_index_report(
         md.extend(_output_index_dashboard_lines(assessments))
         md.append("## Artifacts")
         md.append("")
-    md.extend(
-        f"- {_output_index_link(filename, path, label)}"
-        + (" (local only, not tracked)" if path.name in _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES else "")
-        for path, label in links
-    )
+    md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
     if run_issue_summary is not None:
         md.extend(("", "## Paste-ready run issue", ""))
         md.append(f"- {_output_index_link(filename, run_issue_summary, 'Run issue summary')}")
@@ -16807,6 +16587,11 @@ def _build_native_mlx_vlm_cli_tokens(
         tokens,
         "--thinking-budget",
         getattr(run_args, "thinking_budget", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--thinking-mode",
+        getattr(run_args, "thinking_mode", None),
     )
     _append_native_cli_optional_pair(
         tokens,
@@ -18212,6 +17997,14 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         help="Enable thinking mode in the upstream chat template and generation flow.",
     )
     prompt_group.add_argument(
+        "--thinking-mode",
+        type=str,
+        default=None,
+        help=(
+            "Value passed to chat templates that support thinking_mode (matches mlx-vlm upstream)."
+        ),
+    )
+    prompt_group.add_argument(
         "--thinking-budget",
         type=int,
         default=None,
@@ -18405,8 +18198,8 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
     runtime_group.add_argument(
         "--prefill-step-size",
         type=int,
-        default=4096,
-        help="Step size for prompt prefill. Default: 4096 (faster than mlx-lm default).",
+        default=2048,
+        help="Step size for prompt prefill. Default: 2048 (matches mlx-vlm upstream).",
     )
     runtime_group.add_argument(
         "-T",
