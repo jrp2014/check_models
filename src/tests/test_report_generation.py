@@ -4285,8 +4285,8 @@ class TestMarkdownGalleryReport:
         assert "## Current-run Chooser" in content
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
-        assert "<!-- markdownlint-disable MD034 MD049 -->" in content
-        assert "<!-- markdownlint-enable MD034 MD049 -->" in content
+        assert "<!-- markdownlint-disable MD034 MD037 MD049 -->" in content
+        assert "<!-- markdownlint-enable MD034 MD037 MD049 -->" in content
         assert "<!-- markdownlint-disable MD013 MD034 -->" not in content
         assert "<!-- markdownlint-enable MD013" not in content
 
@@ -4360,7 +4360,7 @@ class TestMarkdownGalleryReport:
         assert "Output preview" not in chooser
         assert "BEGIN" not in chooser
         assert "END-SENTINEL" not in chooser
-        assert "<!-- markdownlint-disable MD034 MD049 -->" in chooser
+        assert "<!-- markdownlint-disable MD034 MD037 MD049 -->" in chooser
         assert chooser.index("Total s") < chooser.index("Gen TPS")
         assert "Gen tok" in chooser
         assert "Peak GB" in chooser

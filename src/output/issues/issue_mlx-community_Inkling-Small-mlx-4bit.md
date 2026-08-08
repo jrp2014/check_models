@@ -17,9 +17,11 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 - *Usability:* not_evaluated
 - *Maintainer status:* actionable_failure
 - *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type inkling_mm_model via
+  inkling)
 - *Phase:* model_load
 - *Stage:* Model Error
-- *Package:* mlx
+- *Package:* mlx-vlm
 - *Error type:* ValueError
 - *Error message:* Model loading failed: Received 362 parameters not in model;
   families: audio_tower, language_model; representative parameters:
@@ -32,7 +34,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002704444
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -40,10 +42,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11841, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11951, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11318, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11428, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -439,7 +441,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12271, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12381, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -450,7 +452,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11856, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11966, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -827,20 +829,20 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3640.54it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4404.15it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:41:36] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[23:57:20] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,964 x 5,605 pixels
-- *Image size:* 39,212,214 bytes
-- *Image SHA-256:* f5cc97b21d6d751921d8c5b18cbc80b9b8bca1839b8ff95e1a75d7427992e488
+- *Image dimensions:* 9,984 x 6,656 pixels
+- *Image size:* 60,712,161 bytes
+- *Image SHA-256:* 2d3e8ab39253f25bfa3f4a37188a72d369bb79657c8f7011611e1f58fb3afc23
 
 <details>
 <summary>Exact prompt</summary>
@@ -851,12 +853,13 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-07 17:17:16 UTC+01:00
+- Capture date/time: 2026-08-08 15:43:55 UTC+01:00
+- GPS: 51.815915°N, 0.638706°W
 
 Descriptive hints:
-- Title hint: Seafront, Seaford, England, UK, GBR, Europe
-- Description hint: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.
-- Keyword hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK, Vehicles, Water, action, beautiful
+- Title hint: Town centre, Tring, England, UK, GBR, Europe
+- Description hint: Akeman Street Baptist Church, Tring, Herts
+- Keyword hints: Adobe Stock, Akeman Street Baptist Church, Any Vision, Buckinghamshire, Bushes, Chapel, Chimney, Christian, Church, Clouds, England, Entrance, Europe, Hertfordshire, Locations, Objects, Red brick, Roof, Sign, Sky
 
 Write:
 - a concrete 5-10-word title;
@@ -891,10 +894,10 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6                                                            |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision 2c4a2c90ed4626fcd270637cf302e554a5ec54af; clean |
+| check_models    | 0.9.0; revision 96883994f5f5a716ec67b0b8d73d6f3a12e7748d; clean |
 
 ### Full environment evidence
 
 | Evidence | Link |
 | --- | --- |
-| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/2c4a2c90ed4626fcd270637cf302e554a5ec54af/src/output/environment.log) |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/environment.log) |

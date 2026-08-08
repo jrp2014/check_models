@@ -226,7 +226,9 @@ __all__ = [
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
-MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD049"
+# MD037 included: verbatim model-output previews may contain emphasis-like
+# sequences (e.g. "*   bullet" reasoning text) that must not be edited.
+MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD037 MD049"
 MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
@@ -9032,9 +9034,12 @@ def _diagnostics_evidence_blocks(
             ),
         ),
     ]
+    # Plain names: compliance models carry no diagnostics evidence blocks, so
+    # there is no in-document anchor to link; complete evidence is in the
+    # gallery, as the section preamble states.
     compliance_rows = tuple(
         (
-            ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
+            result.model_name,
             assessments[result.model_name].usability,
             _gallery_observation_labels(assessments[result.model_name].observations),
         )
@@ -9153,7 +9158,14 @@ def generate_diagnostics_report(
             run_args=run_args,
         ),
     )
-    parts = ["# Diagnostics", "", *render_report_markdown(blocks)]
+    # MD004/MD037: verbatim model-output evidence (repeated fragments,
+    # preambles, reasoning text) may contain asterisk bullets and
+    # emphasis-like sequences; the evidence contract forbids editing them.
+    parts = [
+        "# Diagnostics",
+        "",
+        *_guard_markdownlint_block(render_report_markdown(blocks), rules="MD004 MD037"),
+    ]
     while parts and parts[-1] == "":
         parts.pop()
     _write_text_file(filename, "\n".join(parts) + "\n")

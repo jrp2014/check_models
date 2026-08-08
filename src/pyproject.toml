@@ -157,6 +157,9 @@ strict = false
 line-length = 100
 required-version = ">=0.16.0"
 exclude = [
+    # Run artifacts quote upstream/model code verbatim as evidence; never
+    # reformat or lint them as project code.
+    "output",
     ".eggs",
     ".git",
     ".git-rewrite",

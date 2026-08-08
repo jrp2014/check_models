@@ -769,7 +769,7 @@ def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
 
     # Behavioural checks on the live constants; exact source spelling is not
     # asserted so harmless refactors (annotation style, quoting) stay legal.
-    assert check_models.MARKDOWNLINT_GALLERY_SUMMARY_RULES == "MD034 MD049"
+    assert check_models.MARKDOWNLINT_GALLERY_SUMMARY_RULES == "MD034 MD037 MD049"
     assert check_models.MARKDOWNLINT_TABLE_PIPE_RULES == "MD060"
     assert "MARKDOWNLINT_MAIN_TABLE_RULES" not in source
     assert "MARKDOWNLINT_DETAILS_RULES" not in source

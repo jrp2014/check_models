@@ -23,7 +23,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "2c4a2c90ed4626fcd270637cf302e554a5ec54af",
+      "source_revision": "96883994f5f5a716ec67b0b8d73d6f3a12e7748d",
       "vcs_revision": null,
       "version": "0.9.0"
     },
@@ -108,20 +108,23 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-08 22:59:19 BST",
+  "generated_at": "2026-08-09 00:14:54 BST",
   "generation_settings": {
-    "max_tokens": 500,
+    "enable_thinking": true,
+    "max_tokens": 1000,
     "prefill_step_size": 2048,
     "temperature": 0.0,
+    "thinking_budget": 300,
+    "thinking_end_token": "</think>",
     "top_p": 1.0
   },
   "image": {
-    "height": 5605,
-    "megapixels": 55.84822,
-    "name": "20260807-171716_DSC01411.jpg",
-    "sha256": "f5cc97b21d6d751921d8c5b18cbc80b9b8bca1839b8ff95e1a75d7427992e488",
-    "size_bytes": 39212214,
-    "width": 9964
+    "height": 6656,
+    "megapixels": 66.453504,
+    "name": "20260808-154355_DSC01451.jpg",
+    "sha256": "2d3e8ab39253f25bfa3f4a37188a72d369bb79657c8f7011611e1f58fb3afc23",
+    "size_bytes": 60712161,
+    "width": 9984
   },
   "library_versions": {
     "Pillow": "12.3.0",
@@ -392,92 +395,92 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "2c4a2c90ed4626fcd270637cf302e554a5ec54af",
+    "git_revision": "96883994f5f5a716ec67b0b8d73d6f3a12e7748d",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.9.0"
   },
-  "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-07 17:17:16 UTC+01:00\n\nDescriptive hints:\n- Title hint: Seafront, Seaford, England, UK, GBR, Europe\n- Description hint: Two inflatable boats with outboard motors are speeding across the ocean, leaving white wakes behind them, against a clear blue sky and a distinct horizon line.\n- Keyword hints: Adobe Stock, Any Vision, Blue sky, Driver, England, Europe, Holiday, Horizon, Inflatable boat, Motorboat, People, Riding, Sailing, Seaford, Sky, UK, Vehicles, Water, action, beautiful\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
+  "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-08 15:43:55 UTC+01:00\n- GPS: 51.815915\u00b0N, 0.638706\u00b0W\n\nDescriptive hints:\n- Title hint: Town centre, Tring, England, UK, GBR, Europe\n- Description hint: Akeman Street Baptist Church, Tring, Herts\n- Keyword hints: Adobe Stock, Akeman Street Baptist Church, Any Vision, Buckinghamshire, Bushes, Chapel, Chimney, Christian, Church, Clouds, England, Entrance, Europe, Hertfordshire, Locations, Objects, Red brick, Roof, Sign, Sky\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
   "prompt_burden": {
     "LiquidAI/LFM2.5-VL-450M-MLX-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 151,
+      "nontext_tokens_est": 171,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 385
+      "text_tokens_est": 218,
+      "total_tokens": 389
     },
     "Qwen/Qwen3-VL-2B-Instruct": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16394,
+      "nontext_tokens_est": 16327,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16628
+      "text_tokens_est": 218,
+      "total_tokens": 16545
     },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2506,
+      "nontext_tokens_est": 2985,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2740
+      "text_tokens_est": 218,
+      "total_tokens": 3203
     },
     "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 1811,
+      "nontext_tokens_est": 2171,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2045
+      "text_tokens_est": 218,
+      "total_tokens": 2389
     },
     "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 1356,
+      "nontext_tokens_est": 1411,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1590
+      "text_tokens_est": 218,
+      "total_tokens": 1629
     },
     "mlx-community/FastVLM-0.5B-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 85,
+      "nontext_tokens_est": 114,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 319
+      "text_tokens_est": 218,
+      "total_tokens": 332
     },
     "mlx-community/GLM-4.1V-9B-Thinking-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 6092,
+      "nontext_tokens_est": 6228,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 6326
+      "text_tokens_est": 218,
+      "total_tokens": 6446
     },
     "mlx-community/GLM-4.6V-Flash-mxfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": 6096,
+      "nontext_tokens_est": 6228,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 6330
+      "text_tokens_est": 218,
+      "total_tokens": 6446
     },
     "mlx-community/GLM-4.6V-nvfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": 6096,
+      "nontext_tokens_est": 6228,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 6330
+      "text_tokens_est": 218,
+      "total_tokens": 6446
     },
     "mlx-community/Idefics3-8B-Llama3-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2374,
+      "nontext_tokens_est": 2393,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2608
+      "text_tokens_est": 218,
+      "total_tokens": 2611
     },
     "mlx-community/Inkling-Small-mlx-4bit": {
       "image_patch_count": null,
@@ -489,255 +492,255 @@
     },
     "mlx-community/InternVL3-8B-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2376,
+      "nontext_tokens_est": 1893,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2610
+      "text_tokens_est": 218,
+      "total_tokens": 2111
     },
     "mlx-community/Kimi-VL-A3B-Thinking-2506-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 1079,
+      "nontext_tokens_est": 1103,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1313
+      "text_tokens_est": 218,
+      "total_tokens": 1321
     },
     "mlx-community/LFM2.5-VL-1.6B-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 337,
+      "nontext_tokens_est": 361,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 571
+      "text_tokens_est": 218,
+      "total_tokens": 579
     },
     "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 63,
+      "nontext_tokens_est": 82,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 297
+      "text_tokens_est": 218,
+      "total_tokens": 300
     },
     "mlx-community/MiniCPM-V-4.6-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 686,
+      "nontext_tokens_est": 712,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 920
+      "text_tokens_est": 218,
+      "total_tokens": 930
     },
     "mlx-community/Ministral-3-14B-Instruct-2512-mxfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2344,
+      "nontext_tokens_est": 2704,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2578
+      "text_tokens_est": 218,
+      "total_tokens": 2922
     },
     "mlx-community/Ministral-3-14B-Instruct-2512-nvfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2344,
+      "nontext_tokens_est": 2704,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2578
+      "text_tokens_est": 218,
+      "total_tokens": 2922
     },
     "mlx-community/Ministral-3-3B-Instruct-2512-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2343,
+      "nontext_tokens_est": 2703,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2577
+      "text_tokens_est": 218,
+      "total_tokens": 2921
     },
     "mlx-community/Molmo-7B-D-0924-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 1264,
+      "nontext_tokens_est": 1293,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1498
+      "text_tokens_est": 218,
+      "total_tokens": 1511
     },
     "mlx-community/MolmoPoint-8B-fp16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2877,
+      "nontext_tokens_est": 2906,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 3111
+      "text_tokens_est": 218,
+      "total_tokens": 3124
     },
     "mlx-community/Ornith-1.0-35B-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16409,
+      "nontext_tokens_est": 16339,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
+      "text_tokens_est": 218,
+      "total_tokens": 16557
     },
     "mlx-community/Phi-3.5-vision-instruct-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 878,
+      "nontext_tokens_est": 907,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 1112
+      "text_tokens_est": 218,
+      "total_tokens": 1125
     },
     "mlx-community/Qwen2-VL-2B-Instruct-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16405,
+      "nontext_tokens_est": 16338,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16639
+      "text_tokens_est": 218,
+      "total_tokens": 16556
     },
     "mlx-community/Qwen3-VL-2B-Instruct-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16394,
+      "nontext_tokens_est": 16327,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16628
+      "text_tokens_est": 218,
+      "total_tokens": 16545
     },
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16396,
+      "nontext_tokens_est": 16329,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16630
+      "text_tokens_est": 218,
+      "total_tokens": 16547
     },
     "mlx-community/Qwen3.5-35B-A3B-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16409,
+      "nontext_tokens_est": 16339,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
+      "text_tokens_est": 218,
+      "total_tokens": 16557
     },
     "mlx-community/Qwen3.5-9B-MLX-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16409,
+      "nontext_tokens_est": 16339,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
+      "text_tokens_est": 218,
+      "total_tokens": 16557
     },
     "mlx-community/Qwen3.6-27B-mxfp8": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16409,
+      "nontext_tokens_est": 16339,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16643
+      "text_tokens_est": 218,
+      "total_tokens": 16557
     },
     "mlx-community/SmolVLM2-2.2B-Instruct-mlx": {
       "image_patch_count": null,
-      "nontext_tokens_est": 177,
+      "nontext_tokens_est": 206,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 411
+      "text_tokens_est": 218,
+      "total_tokens": 424
     },
     "mlx-community/Step-3.7-Flash-oQ2e": {
       "image_patch_count": null,
-      "nontext_tokens_est": 3244,
+      "nontext_tokens_est": 3267,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 3478
+      "text_tokens_est": 218,
+      "total_tokens": 3485
     },
     "mlx-community/X-Reasoner-7B-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 16405,
+      "nontext_tokens_est": 16338,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 16639
+      "text_tokens_est": 218,
+      "total_tokens": 16556
     },
     "mlx-community/diffusiongemma-26B-A4B-it-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 350,
+      "nontext_tokens_est": 380,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 584
+      "text_tokens_est": 218,
+      "total_tokens": 598
     },
     "mlx-community/diffusiongemma-26B-A4B-it-mxfp8": {
       "image_patch_count": null,
-      "nontext_tokens_est": 350,
+      "nontext_tokens_est": 380,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 584
+      "text_tokens_est": 218,
+      "total_tokens": 598
     },
     "mlx-community/gemma-3-27b-it-qat-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 345,
+      "nontext_tokens_est": 372,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 579
+      "text_tokens_est": 218,
+      "total_tokens": 590
     },
     "mlx-community/gemma-3n-E4B-it-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 344,
+      "nontext_tokens_est": 371,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 578
+      "text_tokens_est": 218,
+      "total_tokens": 589
     },
     "mlx-community/gemma-4-26b-a4b-it-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 354,
+      "nontext_tokens_est": 380,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 588
+      "text_tokens_est": 218,
+      "total_tokens": 598
     },
     "mlx-community/gemma-4-31b-it-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 354,
+      "nontext_tokens_est": 380,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 588
+      "text_tokens_est": 218,
+      "total_tokens": 598
     },
     "mlx-community/llava-v1.6-mistral-7b-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2071,
+      "nontext_tokens_est": 2296,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2305
+      "text_tokens_est": 218,
+      "total_tokens": 2514
     },
     "mlx-community/nanoLLaVA-1.5-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 81,
+      "nontext_tokens_est": 110,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 315
+      "text_tokens_est": 218,
+      "total_tokens": 328
     },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 4170,
+      "nontext_tokens_est": 4198,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 4404
+      "text_tokens_est": 218,
+      "total_tokens": 4416
     },
     "mlx-community/pixtral-12b-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": 2415,
+      "nontext_tokens_est": 2894,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 234,
-      "total_tokens": 2649
+      "text_tokens_est": 218,
+      "total_tokens": 3112
     }
   },
-  "prompt_sha256": "0267501520fd4ef0f4364bbdf44e72da686a3ec6b7e7653b9102e673ce7c4363",
+  "prompt_sha256": "5492ac4a786103f0be148393b30e12def862d69411fe86219bbd81ffbed65fea",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1226.07,
+  "total_runtime_seconds": 1336.894,
   "trust_remote_code": true
 }
