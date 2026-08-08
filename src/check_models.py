@@ -8634,6 +8634,9 @@ def _diagnostics_result_facts(
         ("Maintainer status", assessment.maintainer_status),
         ("Observations", ", ".join(assessment.observations) or "none"),
     ]
+    arch_summary = _arch_precheck_summary(result.model_name)
+    if arch_summary is not None:
+        rows.append(("Arch supported by installed mlx-vlm", arch_summary))
     detail_labels = {
         "missing_sections": "Missing sections",
         "repeated_fragment": "Repeated fragment",

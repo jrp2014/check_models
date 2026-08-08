@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Diagnostics per-model facts now include the "Arch supported by installed
+  mlx-vlm" pre-check verdict (previously gallery-only), so the maintainer
+  surface carries the architecture context directly.
+
 - `--dry-run` no longer writes `check_models.log` or `environment.log`: no
   models are invoked, and overwriting the retained artifacts of a real run
   would desynchronize them from the run's other tracked outputs.
