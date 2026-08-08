@@ -654,7 +654,7 @@ def test_run_issue_summary_keeps_current_log_and_environment_links(tmp_path: Pat
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
     assert "Stale retained artifacts omitted" not in content
-    assert "check_models.log (producer-local, not published)" in content
+    assert "src/output/check_models.log" in content
     assert "src/output/environment.log" in content
     assert "| Environment |" in content
     assert "| Log |" in content
@@ -1304,23 +1304,21 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
         "- [diagnostics.md](reports/diagnostics.md)\n"
         "- [results.jsonl](results.jsonl)\n"
         "- [run.json](run.json)\n"
-        "- [check_models.log](check_models.log) (local only, not tracked)\n"
+        "- [check_models.log](check_models.log)\n"
         "- [environment.log](environment.log)\n"
     )
 
 
 def test_local_only_artifacts_never_publish_github_paths(tmp_path: Path) -> None:
     """Untracked artifacts must resolve to relative links, never GitHub URLs."""
-    for name in (
-        "check_models.log",
-        "results.history.jsonl",
-    ):
+    for name in ("results.history.jsonl",):
         assert check_models._published_output_repo_path(tmp_path / name) is None
         # Location-based inference must not resurrect a GitHub path either.
         repo_local = check_models._REPO_ROOT / "src" / "output" / name
         assert check_models._published_output_repo_path(repo_local) is None
 
     for name in (
+        "check_models.log",
         "reports/diagnostics.md",
         "reports/model_gallery.md",
         "reports/results.html",
@@ -4015,9 +4013,9 @@ class TestRetainedMarkdownArtifactEdges:
 
             if link_style == "github":
                 assert github_output_targets
-                # Local-only artifacts are never published, so they are the only
-                # links allowed to stay relative in GitHub link style.
-                assert relative_targets
+                # Only genuinely untracked artifacts (currently just the
+                # append-only history, which reports do not link) may stay
+                # relative in GitHub link style.
                 assert all(
                     target.split("#", 1)[0].rsplit("/", 1)[-1]
                     in check_models._LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES

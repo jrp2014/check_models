@@ -1156,6 +1156,7 @@ class JsonlResultRecord(TypedDict):
     assessment: JsonlAssessmentRecord
     generated_text: str
     captured_output_on_fail: str
+    captured_upstream_output: NotRequired[str]
     failure: JsonlFailureRecord | None
     metrics: JsonlMetricsRecord
     timing: JsonlTimingRecord
@@ -1578,16 +1579,16 @@ _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
 _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
         DEFAULT_OUTPUT_INDEX.name,
+        DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
         DEFAULT_RUN_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
     }
 )
-# The append-only history and raw log stay on disk but are not tracked in git,
-# so report links to them must always be relative (a GitHub URL would 404).
+# The append-only history stays on disk but is not tracked in git, so report
+# links to it must always be relative (a GitHub URL would 404).
 _LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
-        DEFAULT_LOG_OUTPUT.name,
         "results.history.jsonl",
     }
 )
@@ -1659,6 +1660,9 @@ class PromptDiagnostics:
     tokenizer_class: str | None = None
     rendered_prompt_hash_sha256: str | None = None
     rendered_prompt_preview: str | None = None
+    # Complete rendered chat-template prompt as sent upstream (the preview is
+    # for bounded human surfaces; machine reports keep the full bytes).
+    rendered_prompt: str | None = None
     rendered_prompt_chars: int | None = None
     image_placeholder_count: int | None = None
     processed_image_width: int | None = None
@@ -1719,6 +1723,9 @@ class PerformanceResult:
     error_signature: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
+    # Tee'd upstream console output for successful runs (failures use
+    # captured_output_on_fail); bounded and deduplicated at capture time.
+    captured_upstream_output: str | None = None
     generation_time: float | None = None
     model_load_time: float | None = None
     total_time: float | None = None
@@ -10705,6 +10712,7 @@ def _build_prompt_diagnostics(
             formatted_prompt,
             max_chars=_RENDERED_PROMPT_PREVIEW_CHARS,
         ),
+        rendered_prompt=formatted_prompt,
         rendered_prompt_chars=len(formatted_prompt),
         image_placeholder_count=_count_image_placeholders(formatted_prompt),
         processed_image_width=processed_width,
@@ -10731,6 +10739,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "tokenizer_class",
         "rendered_prompt_hash_sha256",
         "rendered_prompt_preview",
+        "rendered_prompt",
         "rendered_prompt_chars",
         "image_placeholder_count",
         "processed_image_width",
@@ -10741,6 +10750,8 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
     ):
         value = getattr(diagnostics, key)
         if value is not None:
+            if key == "rendered_prompt" and isinstance(value, str):
+                value = _home_relative_report_text(value)
             payload[key] = _prompt_diag_json_value(value)
     if diagnostics.special_token_ids:
         payload["special_token_ids"] = list(diagnostics.special_token_ids)
@@ -12319,6 +12330,8 @@ def _build_success_process_result(
     phase_timer: PhaseTimer,
     total_start_time: float,
     upstream_boundary: UpstreamBoundary,
+    stdout_text: str = "",
+    stderr_text: str = "",
 ) -> tuple[PerformanceResult, str | None]:
     """Build the successful PerformanceResult and resolved stop reason."""
     performance_data = _extract_generation_performance_data(output)
@@ -12337,6 +12350,10 @@ def _build_success_process_result(
         generation=output,
         success=True,
         upstream_boundary=upstream_boundary,
+        captured_upstream_output=_compose_stream_capture_for_file_log(
+            stdout_text=stdout_text,
+            stderr_text=stderr_text,
+        ),
         generation_time=generation_time,
         model_load_time=model_load_time,
         total_time=total_time,
@@ -12473,6 +12490,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             phase_timer=phase_timer,
             total_start_time=total_start_time,
             upstream_boundary=upstream_boundary,
+            stdout_text=stdout_capture.getvalue(),
+            stderr_text=stderr_capture.getvalue(),
         )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
         result_payload, stop_reason = _build_exception_process_result(
@@ -15269,6 +15288,10 @@ def _build_jsonl_result_record(
             "resolved_model_type": resolved_model_type,
             "supported_by_installed_mlx_vlm": arch_supported,
         }
+    if result.captured_upstream_output:
+        record["captured_upstream_output"] = _home_relative_report_text(
+            result.captured_upstream_output
+        )
     return record
 
 

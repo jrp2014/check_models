@@ -30,7 +30,7 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~18,000 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~18,500 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
@@ -74,13 +74,13 @@ The file is organized in this order — search for these exact landmark headers 
   `results.jsonl`, `run.json`, `check_models.log`, `environment.log`, and
   append-only `results.history.jsonl`). Hard actionable crashes additionally
   create factual issue drafts under `src/output/issues/`.
-- **Tracked vs local-only outputs**: the human reports (`results.html`,
-  `model_gallery.md`) and decision artifacts (`index.md`, `diagnostics.md`,
-  `run.json`, `results.jsonl`, `environment.log`, `issues/`,
-  `reports/assets/`) are committed each run so they are browsable on GitHub;
-  only the append-only `results.history.jsonl` and raw `check_models.log`
-  are gitignored and local-only (`_LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES` keeps
-  report links to those two relative).
+- **Tracked vs local-only outputs**: every run artifact — the human reports
+  (`results.html`, `model_gallery.md`), decision artifacts (`index.md`,
+  `diagnostics.md`, `run.json`, `results.jsonl`, `environment.log`,
+  `issues/`, `reports/assets/`), and the run log (`check_models.log`) — is
+  committed each run so it is browsable on GitHub; only the append-only
+  `results.history.jsonl` is gitignored and local-only
+  (`_LOCAL_ONLY_OUTPUT_ARTIFACT_NAMES` keeps report links to it relative).
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)

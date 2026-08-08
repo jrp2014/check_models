@@ -56,6 +56,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Promote two log-only facts into `results.jsonl`: the complete rendered
+  chat-template prompt (`prompt_diagnostics.rendered_prompt`, beside the
+  bounded preview) and the tee'd upstream console output for **successful**
+  runs (`captured_upstream_output`, bounded/deduplicated like the file-log
+  copy; failures already kept `captured_output_on_fail`). Both are
+  home-path-sanitized before serialization.
+- Track `check_models.log` in git as well, so the run timeline and verbatim
+  upstream console blocks are browsable on GitHub; only the append-only
+  `results.history.jsonl` remains gitignored/local-only.
 - Track `results.html` and `model_gallery.md` in git again so the rich human
   reports are browsable on GitHub; report links to them are GitHub blob URLs
   once more. Only the append-only `results.history.jsonl` and raw

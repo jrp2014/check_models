@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
@@ -24,8 +25,6 @@ from check_models import (
 from tools import safe_io
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     import pytest
 
 
@@ -147,6 +146,64 @@ def test_jsonl_omits_architecture_record_when_indeterminate(
 
     _header, rows = _read_jsonl(output_file)
     assert "architecture" not in rows[0]
+
+
+def test_jsonl_keeps_captured_upstream_output_for_successful_runs(
+    tmp_path: Path,
+) -> None:
+    """Tee'd upstream console output must survive into records, home-sanitized."""
+    output_file = tmp_path / "results.jsonl"
+    home = str(Path.home())
+    result = PerformanceResult(
+        model_name="org/success",
+        generation=MockGeneration(text="A caption."),
+        success=True,
+        captured_upstream_output=(
+            f"Prompt: 100 tokens\n=== STDERR ===\nFetching {home}/cache/file"
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    captured = rows[0]["captured_upstream_output"]
+    assert "Prompt: 100 tokens" in captured
+    assert home not in captured
+
+    quiet = PerformanceResult(
+        model_name="org/quiet",
+        generation=MockGeneration(text="A caption."),
+        success=True,
+    )
+    save_jsonl_report([quiet], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+    assert "captured_upstream_output" not in rows[0]
+
+
+def test_jsonl_prompt_diagnostics_keep_full_rendered_prompt(tmp_path: Path) -> None:
+    """The complete rendered prompt must be recorded beside its bounded preview."""
+    output_file = tmp_path / "results.jsonl"
+    rendered = "<|im_start|>User:<image>" + ("describe " * 200) + "<|im_end|>"
+    result = PerformanceResult(
+        model_name="org/prompted",
+        generation=MockGeneration(text="A caption."),
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview=rendered[:100],
+            rendered_prompt=rendered,
+            rendered_prompt_chars=len(rendered),
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    diagnostics = rows[0]["prompt_diagnostics"]
+    assert diagnostics is not None
+    assert diagnostics["rendered_prompt"] == rendered
+    preview = diagnostics["rendered_prompt_preview"]
+    assert isinstance(preview, str)
+    assert len(preview) == 100
 
 
 def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path) -> None:
