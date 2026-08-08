@@ -420,7 +420,11 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
     assert "title/keyword constraints failed" in md
     assert "Prefill/first s" in md
     assert "*Observations:* Response appears cut off at the token limit" in md
-    assert "Keyword list has" in md
+    # Wrapped bullet lines may break inside the label; compare space-normalized.
+    normalized = " ".join(md.split())
+    assert "Keyword list has 1 terms (requested 10-18)" in normalized
+    # The in-range title count must not be presented as a violation.
+    assert "Title has 5 words" not in normalized
     assert "Keyword count violation" not in md
 
 

@@ -7486,6 +7486,9 @@ def _human_observation_labels(
                 fields = ", ".join(field.title() for field in missing_sections)
                 label = f"Missing or empty fields: {fields}"
         elif code == "catalog_constraint_violation" and details is not None:
+            # Name only the constraints that were actually breached; an
+            # in-range count alongside e.g. a duplicate-keyword violation must
+            # not read as a second failure.
             constraint_labels: list[str] = []
             title_count = details.get("title_word_count")
             title_range = details.get("title_word_range")
@@ -7493,6 +7496,7 @@ def _human_observation_labels(
                 title_count is not None
                 and title_range is not None
                 and len(title_range) == _RANGE_ENDPOINT_COUNT
+                and not title_range[0] <= title_count <= title_range[1]
             ):
                 constraint_labels.append(
                     f"Title has {title_count} words (requested {title_range[0]}-{title_range[1]})"
@@ -7503,6 +7507,7 @@ def _human_observation_labels(
                 keyword_count is not None
                 and keyword_range is not None
                 and len(keyword_range) == _RANGE_ENDPOINT_COUNT
+                and not keyword_range[0] <= keyword_count <= keyword_range[1]
             ):
                 constraint_labels.append(
                     "Keyword list has "

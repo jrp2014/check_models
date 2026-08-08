@@ -50,6 +50,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Catalog-constraint observation labels now name only the constraints that
+  were actually breached: an in-range title or keyword count no longer reads
+  as a second failure beside a real violation such as duplicate keywords
+  (seen live when a model produced valid counts but repeated two keywords).
 - `make update` now runs the full `tools/update.sh` orchestration
   (conda/Homebrew refresh, local MLX repo pulls and source builds, stub
   regeneration, runtime smoke); the previous lightweight pip refresh moved to

@@ -289,6 +289,34 @@ def test_human_observation_labels_are_readable_and_severity_ordered() -> None:
     )
 
 
+def test_catalog_constraint_label_names_only_breached_constraints() -> None:
+    """In-range counts must not read as violations beside a real breach."""
+    duplicates_only = check_models._human_observation_labels(
+        ("catalog_constraint_violation",),
+        details={
+            "title_word_count": 5,
+            "title_word_range": [5, 10],
+            "keyword_count": 18,
+            "keyword_count_range": [10, 18],
+            "duplicate_keywords": ["action", "vehicles"],
+        },
+    )
+    assert duplicates_only == "Duplicate keywords: action, vehicles"
+
+    out_of_range = check_models._human_observation_labels(
+        ("catalog_constraint_violation",),
+        details={
+            "title_word_count": 4,
+            "title_word_range": [5, 10],
+            "keyword_count": 3,
+            "keyword_count_range": [10, 18],
+        },
+    )
+    assert out_of_range == (
+        "Title has 4 words (requested 5-10); Keyword list has 3 terms (requested 10-18)"
+    )
+
+
 def test_human_observation_labels_cover_every_stable_code() -> None:
     all_codes = get_args(check_models.ObservationCode.__value__)
 
