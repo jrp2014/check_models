@@ -30,6 +30,29 @@ A cached repo is treated as server-supported when **all** of the following hold:
 This is a **cache/file-presence** check. It does not load the model or prove
 generation works.
 
+## Architecture pre-check (upstream `--check-arch` tier)
+
+`check_models` also mirrors the upstream `hf-cache-models --check-arch` tier:
+each cached repo's `config.json` `model_type` (falling back to
+`speculators_model_type`, lowercased, with `MODEL_REMAPPING` aliases parsed
+from the installed mlx-vlm source — never importing mlx) is compared against
+the package directories under the installed `mlx_vlm/models/`.
+
+- `--dry-run` annotates models whose architecture is not supported and prints
+  an unsupported-architecture count.
+- The per-model gallery/diagnostics fact "Arch supported by installed
+  mlx-vlm" and the optional `architecture` record in `results.jsonl` carry the
+  same verdict (`model_type`, `resolved_model_type`,
+  `supported_by_installed_mlx_vlm`).
+- This is a **folder-name check only**: "unsupported" means "probably not
+  loadable", never proof. Unsupported models are still attempted so real
+  crash evidence is captured; a resulting `Model type {x} not supported.`
+  crash classifies as `UNSUPPORTED_ARCH`.
+
+Live sites: `_installed_mlx_vlm_model_types`, `_mlx_vlm_model_remapping`,
+`_model_arch_precheck`, `_arch_precheck_for_model` in `src/check_models.py`;
+locked by `src/tests/test_model_discovery.py`.
+
 ## Prefer in-repo tools (do not fork cache logic)
 
 ```bash

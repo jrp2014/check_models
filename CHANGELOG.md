@@ -7,6 +7,12 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add a `benchmarking-mlx-vlm` agent skill (conda+pip adaptation of the
+  upstream mlx-vlm benchmarking methodology: warmup + median-of-N,
+  `mx.eval`/`mx.synchronize` before timers, peak-memory protocol, single-env
+  A/B discipline), document the architecture pre-check in the
+  `hf-cache-mlx-vlm-models` skill, and note which upstream skills are
+  deliberately not adapted.
 - Port upstream mlx-vlm's `--check-arch` compatibility tier into discovery
   diagnostics: cached `config.json` `model_type` (with `MODEL_REMAPPING`
   aliases parsed from the installed mlx-vlm source via `ast`, never importing

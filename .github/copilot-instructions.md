@@ -204,12 +204,16 @@ relevant `SKILL.md` **before** starting work of that kind.
 | `add-or-fix-type-checking` | Typing errors from mypy, ty, pyrefly, or `make quality` | `.agents/skills/add-or-fix-type-checking/SKILL.md` |
 | `native-mlx-vlm-repro` | Isolate failures with native `python -m mlx_vlm.generate` / Python load→template→generate outside the harness | `.agents/skills/native-mlx-vlm-repro/SKILL.md` |
 | `upstream-mlx-vlm-issues` | Draft or improve maintainer-ready mlx-vlm GitHub issue Markdown from diagnostics or crash drafts (do not file unless asked) | `.agents/skills/upstream-mlx-vlm-issues/SKILL.md` |
-| `hf-cache-mlx-vlm-models` | List or reason about HF cache models under the mlx-vlm server-supported discovery filter | `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md` |
+| `hf-cache-mlx-vlm-models` | List or reason about HF cache models under the mlx-vlm server-supported discovery filter, including the architecture pre-check | `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md` |
+| `benchmarking-mlx-vlm` | Credible perf measurement: median-of-N with warmup, `mx.eval` before timers, peak-memory protocol, A/B across MLX versions | `.agents/skills/benchmarking-mlx-vlm/SKILL.md` |
 
 Upstream mlx-vlm support skills (see Blaizzy/mlx-vlm#1343) are adapted here for
 **conda + pip** only. Never document or run `uv run` in this repository. Prefer
 existing `src/output/issues/`, `reports/diagnostics.md`, and
-`get_cached_model_ids()` / `--dry-run` over inventing parallel tools.
+`get_cached_model_ids()` / `--dry-run` over inventing parallel tools. Upstream
+also ships `server-inference`, `convert-quantize`, and `add-new-model` skills;
+they target work inside an mlx-vlm checkout and are deliberately not adapted
+here.
 
 ### 11. Common edit recipes
 
