@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-08
+
 ### Added
 
 - Add an "Output at a Glance" table to the Markdown gallery (after "Avoid for
