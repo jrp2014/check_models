@@ -1178,10 +1178,6 @@ class RunIssueSummarySource:
     run_window: tuple[datetime, datetime] | None = None
 
 
-class RunIssueSummaryValidationError(ValueError):
-    """Raised when retained inputs cannot satisfy the summary contract."""
-
-
 type RuntimePhaseName = Literal[
     "model_load",
     "prompt_prep",
@@ -4576,20 +4572,20 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
     - Honors --no-color / --force-color to toggle Rich console styling
     - Applies --width via MLX_VLM_WIDTH env var for child processes too
     """
-    if getattr(args, "no_color", False):
+    if args.no_color:
         _set_rich_color_enabled(enabled=False)
-    elif getattr(args, "force_color", False):
+    elif args.force_color:
         _set_rich_color_enabled(enabled=True)
 
     # Width override: prefer CLI value; store in env so subprocesses inherit it
-    if getattr(args, "width", None) is not None:
+    if args.width is not None:
         try:
             os.environ["MLX_VLM_WIDTH"] = str(int(args.width))
         except (TypeError, ValueError):
             # Invalid width -> remove override and fall back to detection
             os.environ.pop("MLX_VLM_WIDTH", None)
         else:
-            if getattr(args, "verbose", False):
+            if args.verbose:
                 logger.debug(
                     "Width override set to %s columns",
                     os.environ.get("MLX_VLM_WIDTH"),
@@ -4999,6 +4995,44 @@ def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
     return issues
 
 
+# The drift detector checks only the surface check_models actually calls.
+# _GENERATE_CALL_ARGS are the call-site positional/required arguments;
+# _SENT_GENERATE_KEYWORDS mirrors _build_generate_kwargs /
+# _build_generate_extra_kwargs exactly (locked by a builder-parity test), so
+# upstream parameters this harness never passes cannot raise false drift.
+_GENERATE_CALL_ARGS: Final[tuple[str, ...]] = ("model", "processor", "prompt", "image")
+_SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
+    # Always sent by _build_generate_kwargs
+    "verbose",
+    "temperature",
+    "top_p",
+    "repetition_penalty",
+    "repetition_context_size",
+    "seed",
+    "presence_penalty",
+    "presence_context_size",
+    "frequency_penalty",
+    "frequency_context_size",
+    "logit_bias",
+    "max_kv_size",
+    "kv_bits",
+    "kv_quant_scheme",
+    "kv_group_size",
+    "quantized_kv_start",
+    "max_tokens",
+    # Conditionally sent by _build_generate_extra_kwargs
+    "min_p",
+    "top_k",
+    "prefill_step_size",
+    "resize_shape",
+    "eos_tokens",
+    "skip_special_tokens",
+    "enable_thinking",
+    "thinking_budget",
+    "thinking_end_token",
+    "thinking_start_token",
+)
+
 _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
     "load": (
         "mlx_vlm.utils.load",
@@ -5018,41 +5052,7 @@ _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
     ),
     "generate": (
         "mlx_vlm.generate.generate",
-        (
-            "model",
-            "processor",
-            "prompt",
-            "image",
-            "audio",
-            "video",
-            "verbose",
-            "temperature",
-            "top_p",
-            "repetition_penalty",
-            "repetition_context_size",
-            "seed",
-            "presence_penalty",
-            "presence_context_size",
-            "frequency_penalty",
-            "frequency_context_size",
-            "logit_bias",
-            "max_kv_size",
-            "kv_bits",
-            "kv_quant_scheme",
-            "kv_group_size",
-            "quantized_kv_start",
-            "max_tokens",
-            "min_p",
-            "top_k",
-            "prefill_step_size",
-            "resize_shape",
-            "eos_tokens",
-            "skip_special_tokens",
-            "enable_thinking",
-            "thinking_budget",
-            "thinking_end_token",
-            "thinking_start_token",
-        ),
+        (*_GENERATE_CALL_ARGS, *_SENT_GENERATE_KEYWORDS),
     ),
     "load_image": (
         "mlx_vlm.utils.load_image",
@@ -12772,14 +12772,14 @@ def _log_token_summary(res: PerformanceResult) -> None:
 
 def _log_detailed_timings(res: PerformanceResult) -> None:
     """Log detailed runtime timings and termination metadata with tree structure."""
-    total_time_val = getattr(res, "total_time", None)
-    generation_time_val = getattr(res, "generation_time", None)
-    model_load_time_val = getattr(res, "model_load_time", None)
+    total_time_val = res.total_time
+    generation_time_val = res.generation_time
+    model_load_time_val = res.model_load_time
     runtime = res.runtime_diagnostics
 
     if not total_time_val or total_time_val <= 0:
         return
-    total_time_seconds = float(total_time_val)
+    total_time_seconds = total_time_val
 
     tt_val = format_field_value("total_time", total_time_val)
     tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
@@ -12938,9 +12938,9 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     gen = res.generation
 
     # Extract values
-    total_time = getattr(res, "total_time", None)
-    gen_time = getattr(res, "generation_time", None)
-    load_time = getattr(res, "model_load_time", None)
+    total_time = res.total_time
+    gen_time = res.generation_time
+    load_time = res.model_load_time
     runtime = res.runtime_diagnostics
     peak_mem = _generation_float_metric(gen, "peak_memory") or 0.0
     prompt_tokens = _generation_int_metric(gen, "prompt_tokens") or 0
@@ -15372,31 +15372,56 @@ def _validate_run_issue_metadata(
     return cast("JsonlMetadataRecord", metadata_value)
 
 
+class RunIssueSummaryValidationError(ValueError):
+    """Type-shape violation in retained inputs.
+
+    Subclassing ValueError keeps regeneration catch paths intact while
+    satisfying the raise-TypeError-for-types lint (TRY004) with a class whose
+    name states the contract.
+    """
+
+
+def _require_optional_str_fields(
+    record: Mapping[str, JsonLike],
+    keys: Sequence[str],
+    *,
+    context: str,
+) -> None:
+    """Raise when any named field is present with a non-string value."""
+    for key in keys:
+        value = record.get(key)
+        if value is not None and not isinstance(value, str):
+            message = f"{context} has invalid field {key}"
+            raise ValueError(message)
+
+
+def _json_int_or_none(value: JsonLike) -> int | None:
+    """Narrow a JSON value to int, rejecting bools."""
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
 def _validate_run_issue_failure(value: JsonLike, line_number: int) -> None:
     """Validate the bounded failure fields consumed by the summary renderer."""
     if value is None:
         return
+    context = f"JSONL result row {line_number} failure"
     if not isinstance(value, dict):
-        message = f"JSONL result row {line_number} has invalid failure evidence"
+        message = f"{context} is not a record"
         raise RunIssueSummaryValidationError(message)
-    for key in ("phase", "stage", "exception_type", "message"):
-        field_value = value.get(key)
-        if field_value is not None and not isinstance(field_value, str):
-            message = f"JSONL result row {line_number} has invalid failure field {key}"
-            raise ValueError(message)
+    _require_optional_str_fields(
+        value, ("phase", "stage", "exception_type", "message"), context=context
+    )
     chain = value.get("exception_chain")
     if chain is None:
         return
     if not isinstance(chain, list):
-        message = f"JSONL result row {line_number} has invalid exception chain"
+        message = f"{context} has an invalid exception chain"
         raise RunIssueSummaryValidationError(message)
     for entry in chain:
-        if not isinstance(entry, dict) or any(
-            entry.get(key) is not None and not isinstance(entry.get(key), str)
-            for key in ("type", "message")
-        ):
-            message = f"JSONL result row {line_number} has invalid exception chain entry"
-            raise ValueError(message)
+        if not isinstance(entry, dict):
+            message = f"{context} has an invalid exception chain entry"
+            raise RunIssueSummaryValidationError(message)
+        _require_optional_str_fields(entry, ("type", "message"), context=context)
 
 
 def _validate_run_issue_model_provenance(
@@ -15405,17 +15430,23 @@ def _validate_run_issue_model_provenance(
     expected_model: str,
 ) -> None:
     """Validate the model and revision fields consumed by the summary renderer."""
+    context = f"JSONL result row {line_number} model provenance"
     if not isinstance(value, dict) or not isinstance(value.get("model"), str):
-        message = f"JSONL result row {line_number} has invalid model provenance"
+        message = f"{context} is invalid"
         raise RunIssueSummaryValidationError(message)
     if value["model"] != expected_model:
-        message = f"JSONL result row {line_number} model provenance does not match {expected_model}"
+        message = f"{context} does not match {expected_model}"
         raise ValueError(message)
-    for key in ("requested_revision", "resolved_revision"):
-        revision = value.get(key)
-        if revision is not None and not isinstance(revision, str):
-            message = f"JSONL result row {line_number} has invalid {key.replace('_', ' ')}"
-            raise ValueError(message)
+    _require_optional_str_fields(
+        value, ("requested_revision", "resolved_revision"), context=context
+    )
+
+
+_RUN_ISSUE_ASSESSMENT_VOCABULARIES: Final[tuple[tuple[str, frozenset[str]], ...]] = (
+    ("execution", _RUN_ISSUE_EXECUTION_VALUES),
+    ("usability", _RUN_ISSUE_USABILITY_VALUES),
+    ("maintainer_status", _RUN_ISSUE_MAINTAINER_VALUES),
+)
 
 
 def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResultRecord:
@@ -15431,17 +15462,13 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
     if not isinstance(model, str) or not isinstance(assessment, dict):
         message = f"JSONL result row {line_number} has invalid field types"
         raise RunIssueSummaryValidationError(message)
-    execution = assessment.get("execution")
-    usability = assessment.get("usability")
-    maintainer_status = assessment.get("maintainer_status")
+    vocabulary_violation = any(
+        not isinstance(assessment.get(field), str) or assessment.get(field) not in vocabulary
+        for field, vocabulary in _RUN_ISSUE_ASSESSMENT_VOCABULARIES
+    )
     observations = assessment.get("observations")
     if (
-        not isinstance(execution, str)
-        or execution not in _RUN_ISSUE_EXECUTION_VALUES
-        or not isinstance(usability, str)
-        or usability not in _RUN_ISSUE_USABILITY_VALUES
-        or not isinstance(maintainer_status, str)
-        or maintainer_status not in _RUN_ISSUE_MAINTAINER_VALUES
+        vocabulary_violation
         or not isinstance(observations, list)
         or any(
             not isinstance(item, str) or item not in _RUN_ISSUE_OBSERVATION_VALUES
@@ -15467,23 +15494,17 @@ def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
     if not isinstance(name, str):
         return None
     sha256 = value.get("sha256")
-    size_bytes = value.get("size_bytes")
-    width = value.get("width")
-    height = value.get("height")
     megapixels = value.get("megapixels")
-    valid_sha256 = (
-        sha256.lower()
-        if isinstance(sha256, str) and re.fullmatch(r"[0-9a-fA-F]{64}", sha256)
-        else None
-    )
     record: RunImageRecord = {
         "name": name,
-        "sha256": valid_sha256,
-        "size_bytes": (
-            size_bytes if isinstance(size_bytes, int) and not isinstance(size_bytes, bool) else None
+        "sha256": (
+            sha256.lower()
+            if isinstance(sha256, str) and re.fullmatch(r"[0-9a-fA-F]{64}", sha256)
+            else None
         ),
-        "width": width if isinstance(width, int) and not isinstance(width, bool) else None,
-        "height": height if isinstance(height, int) and not isinstance(height, bool) else None,
+        "size_bytes": _json_int_or_none(value.get("size_bytes")),
+        "width": _json_int_or_none(value.get("width")),
+        "height": _json_int_or_none(value.get("height")),
         "megapixels": (
             float(megapixels)
             if isinstance(megapixels, int | float) and not isinstance(megapixels, bool)
@@ -16330,7 +16351,7 @@ def _output_index_dashboard_lines(
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
     usability_counter = Counter(assessment.usability for _model, assessment in assessments)
-    observation_counter = Counter(
+    observation_counter: Counter[ObservationCode] = Counter(
         code for _model, assessment in assessments for code in assessment.observations
     )
     lines = [

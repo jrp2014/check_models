@@ -1208,3 +1208,27 @@ class TestProcessImageWithModelMock:
 
         assert finalized.runtime_diagnostics is not None
         assert finalized.runtime_diagnostics.first_token_latency_s == 0.25
+
+
+def test_sent_generate_keywords_mirror_the_kwargs_builders(test_image: Path) -> None:
+    """The drift-detector contract must equal what the builders actually send."""
+    params = replace(
+        _build_params(test_image),
+        min_p=0.05,
+        top_k=40,
+        prefill_step_size=2048,
+        resize_shape=(448, 448),
+        eos_tokens=("<eos>",),
+        skip_special_tokens=True,
+        enable_thinking=True,
+        thinking_budget=128,
+        thinking_start_token="<think>",  # noqa: S106 - thinking delimiter, not a credential
+        thinking_end_token="</think>",  # noqa: S106 - thinking delimiter, not a credential
+    )
+
+    sent = check_models._build_generate_kwargs(
+        params,
+        check_models._build_generate_extra_kwargs(params),
+    )
+
+    assert set(sent) == set(check_models._SENT_GENERATE_KEYWORDS)

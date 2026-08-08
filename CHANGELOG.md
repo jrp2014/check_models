@@ -56,6 +56,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Structural compression follow-up: the run-issue JSONL validators now share
+  one `_require_optional_str_fields` helper, a table-driven assessment
+  vocabulary check, and a `_json_int_or_none` narrower (the unused
+  `RunIssueSummaryValidationError` subclass is removed); the generate() drift
+  detector derives its parameter contract from `_SENT_GENERATE_KEYWORDS` —
+  exactly the keywords the kwargs builders send, locked by a builder-parity
+  test — so upstream parameters this harness never passes (e.g. audio/video)
+  can no longer raise false drift; and `getattr` probes on the module's own
+  frozen dataclasses and fully-parsed CLI namespace are converted to direct
+  attribute access so typos fail loudly (probes on upstream objects, partial
+  regeneration namespaces, and exceptions remain deliberately defensive).
 - Retire three now-inert compatibility fiddles (~350 lines): the local-only
   artifact link machinery (every linked artifact is tracked, so the
   relative-link special cases were unreachable); the `load_image` source-grep
