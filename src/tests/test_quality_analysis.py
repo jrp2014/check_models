@@ -472,6 +472,40 @@ def test_prompt_seeded_thinking_open_is_closed_by_generated_marker() -> None:
     ]
 
 
+def test_prompt_seeded_thinking_uses_full_prompt_when_preview_is_truncated() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/long-seeded-thinking",
+        success=True,
+        generation=_Generation(
+            "Inspect the scene.</done> Two cats sleep on a pink couch.",
+            generation_tokens=18,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview="<image>Long catalogue prompt truncated before the assistant suffix...",
+            rendered_prompt="<image>Long catalogue prompt.<reason>",
+            generate_kwargs={
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            },
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+        system_info={},
+    )
+    enriched = context.result_set.results[0]
+
+    assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+    assert check_models._observation_details(enriched)["thinking_trace_markers"] == [
+        "<reason>",
+        "</done>",
+    ]
+
+
 def test_complete_prompt_seeded_empty_thinking_wrapper_is_neutral() -> None:
     result = check_models.PerformanceResult(
         model_name="example/seeded-no-thinking",
@@ -567,6 +601,38 @@ def test_configured_thinking_delimiters_are_observed_without_model_name_policy()
 
     assessment = dict(context.assessments)[result.model_name]
     assert assessment == check_models.ResultAssessment("completed", "usable", "none", ())
+
+
+def test_configured_empty_thinking_wrapper_is_neutral_evidence() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/plain-model",
+        success=True,
+        generation=_Generation(
+            "<reason></done> Two cats sleep on a pink couch.",
+            generation_tokens=14,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            }
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+        system_info={},
+    )
+    enriched = context.result_set.results[0]
+
+    assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+    assert check_models._observation_details(enriched)["thinking_trace_markers"] == [
+        "<reason>",
+        "</done>",
+    ]
 
 
 def test_configured_special_token_is_not_unexpected() -> None:

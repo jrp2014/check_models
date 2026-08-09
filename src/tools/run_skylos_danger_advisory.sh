@@ -90,8 +90,8 @@ mkdir -p .skylos
 
 report_path=".skylos/skylos-danger-advisory.json"
 llm_report_path=".skylos/skylos-danger-advisory.llm.txt"
-scan_args=(. --danger --json -o "$report_path" --no-upload)
-llm_args=(. --danger --llm -o "$llm_report_path" --no-upload)
+scan_args=(. --danger --json -o "$report_path" --no-upload --exclude .worktrees)
+llm_args=(. --danger --llm -o "$llm_report_path" --no-upload --exclude .worktrees)
 
 if [ "$MODE" = "diff" ]; then
     scan_args+=(--diff "$DIFF_BASE")

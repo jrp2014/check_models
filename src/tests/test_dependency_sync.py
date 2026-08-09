@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import json
 import logging
+import os
 import re
 import subprocess
 import sys
@@ -1705,6 +1706,61 @@ def test_skylos_danger_advisory_script_is_separate_and_agent_friendly() -> None:
     assert "--advisory" in script
     assert "--llm" in script
     assert ".skylos/skylos-danger-advisory.llm.txt" in script
+
+
+@pytest.mark.subprocess
+def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> None:
+    """The real wrapper must pass its worktree exclusion to the scanner process."""
+    repo_root = tmp_path / "repo"
+    tools_dir = repo_root / "src" / "tools"
+    tools_dir.mkdir(parents=True)
+    script = tools_dir / SKYLOS_DANGER_ADVISORY_SCRIPT.name
+    script.write_bytes(SKYLOS_DANGER_ADVISORY_SCRIPT.read_bytes())
+    call_log = tmp_path / "skylos-calls.log"
+    (tools_dir / "common_quality.sh").write_text(
+        dedent(
+            """\
+            quality_repo_root() { printf '%s\\n' "$TEST_REPO_ROOT"; }
+            quality_setup_python() {
+                QUALITY_PYTHON="$TEST_PYTHON"
+                export QUALITY_PYTHON
+            }
+            quality_require_python_tool() { return 0; }
+            quality_run_python_tool() {
+                printf '%s\\n' "$*" >> "$TEST_CALL_LOG"
+                shift
+                while [ "$#" -gt 0 ]; do
+                    if [ "$1" = "-o" ]; then
+                        printf '{"danger":[]}\\n' > "$2"
+                        break
+                    fi
+                    shift
+                done
+            }
+            """
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-copied script
+        ["/bin/bash", str(script), "--full", "--gate"],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=repo_root,
+        env={
+            **os.environ,
+            "TEST_REPO_ROOT": str(repo_root),
+            "TEST_PYTHON": sys.executable,
+            "TEST_CALL_LOG": str(call_log),
+        },
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    scan_call = next(
+        line for line in call_log.read_text().splitlines() if "--danger --json" in line
+    )
+    assert "--exclude .worktrees" in scan_call
 
 
 def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
