@@ -73,8 +73,8 @@ original image before filing.
 
 | Evidence | Link |
 | --- | --- |
-| Full diagnostics | [model evidence](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-inkling-small-mlx-4bit) |
-| Detailed issue draft | [crash draft](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/issues/issue_mlx-community_Inkling-Small-mlx-4bit.md) |
+| Full diagnostics | [model evidence](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-inkling-small-mlx-4bit) |
+| Detailed issue draft | [crash draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Inkling-Small-mlx-4bit.md) |
 
 ## Observation clusters
 
@@ -98,26 +98,26 @@ Repeated mechanical observation signatures among results requiring review.
 
 | Model | Usability | Observed result | Evidence |
 | --- | --- | --- | --- |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | unusable | Response repeats the same text; Response appears cut off at the token limit; Keyword list has 469 terms (requested 10-18); Duplicate keywords: church | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-liquidai-lfm25-vl-450m-mlx-bf16) |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit | unusable | Response repeats the same text; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | unusable | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Expected model wrapper tokens remain visible; Keyword list has 223 terms (requested 10-18); Duplicate keywords: tring, hertfordshire, england, uk, europe, red brick, steeple, stone wall, gate, entrance, sign, sky, clouds, bushes, herts, baptist church, church | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) |
-| mlx-community/paligemma2-3b-pt-896-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response repeats the task instructions instead of only returning the requested fields; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit) |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | Missing or empty fields: Title; Extra text appears before the Title field; Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
-| mlx-community/gemma-4-26b-a4b-it-4bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 36 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-gemma-4-26b-a4b-it-4bit) |
-| mlx-community/MiniCPM-V-4.6-8bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-minicpm-v-46-8bit) |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 39 terms (requested 10-18); Duplicate keywords: hertfordshire, red brick, chapel, entrance, clouds, church, england, sign, bushes | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
-| mlx-community/GLM-4.6V-nvfp4 | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title has 15 words (requested 5-10); Keyword list has 66 terms (requested 10-18); Duplicate keywords: hertfordshire, england, europe, red brick, sign, bushes, chapel, church, clouds, entrance, maroon door, arched windows, greenery | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
-| mlx-community/Ornith-1.0-35B-bf16 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-ornith-10-35b-bf16) |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible; Keyword list has 19 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16) |
-| mlx-community/Qwen3.5-35B-A3B-4bit | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen35-35b-a3b-4bit) |
-| mlx-community/Qwen3.5-9B-MLX-4bit | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen35-9b-mlx-4bit) |
-| mlx-community/Qwen3.6-27B-mxfp8 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible; Keyword list has 20 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen36-27b-mxfp8) |
-| mlx-community/Step-3.7-Flash-oQ2e | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-step-37-flash-oq2e) |
-| mlx-community/Idefics3-8B-Llama3-bf16 | usable with caveats | Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md#diagnostic-mlx-community-idefics3-8b-llama3-bf16) |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | unusable | Response repeats the same text; Response appears cut off at the token limit; Keyword list has 469 terms (requested 10-18); Duplicate keywords: church | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-liquidai-lfm25-vl-450m-mlx-bf16) |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | unusable | Response repeats the same text; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | unusable | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Expected model wrapper tokens remain visible; Keyword list has 223 terms (requested 10-18); Duplicate keywords: tring, hertfordshire, england, uk, europe, red brick, steeple, stone wall, gate, entrance, sign, sky, clouds, bushes, herts, baptist church, church | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) |
+| mlx-community/paligemma2-3b-pt-896-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response repeats the task instructions instead of only returning the requested fields; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit) |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | Missing or empty fields: Title; Extra text appears before the Title field; Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
+| mlx-community/gemma-4-26b-a4b-it-4bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 36 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-gemma-4-26b-a4b-it-4bit) |
+| mlx-community/MiniCPM-V-4.6-8bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-minicpm-v-46-8bit) |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 39 terms (requested 10-18); Duplicate keywords: hertfordshire, red brick, chapel, entrance, clouds, church, england, sign, bushes | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
+| mlx-community/GLM-4.6V-nvfp4 | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title has 15 words (requested 5-10); Keyword list has 66 terms (requested 10-18); Duplicate keywords: hertfordshire, england, europe, red brick, sign, bushes, chapel, church, clouds, entrance, maroon door, arched windows, greenery | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
+| mlx-community/Ornith-1.0-35B-bf16 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-ornith-10-35b-bf16) |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible; Keyword list has 19 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16) |
+| mlx-community/Qwen3.5-35B-A3B-4bit | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen35-35b-a3b-4bit) |
+| mlx-community/Qwen3.5-9B-MLX-4bit | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen35-9b-mlx-4bit) |
+| mlx-community/Qwen3.6-27B-mxfp8 | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible; Keyword list has 20 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen36-27b-mxfp8) |
+| mlx-community/Step-3.7-Flash-oQ2e | unusable | Extra text appears before the Title field; Expected model wrapper tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-step-37-flash-oq2e) |
+| mlx-community/Idefics3-8B-Llama3-bf16 | usable with caveats | Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-idefics3-8b-llama3-bf16) |
 
 ## Clean completions
 
-7 clean completions; 18 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/model_gallery.md).
+7 clean completions; 18 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
 
 ## Run context
 
@@ -140,16 +140,18 @@ Repeated mechanical observation signatures among results requiring review.
 - *GPU/Chip:* Apple M5 Max
 - *Python Version:* 3.13.13
 
-GitHub links are pinned to producer commit `96883994f5f5`, so the linked
-evidence is durable.
+GitHub links target the repository's mutable main branch; they resolve to this
+run's evidence only once these artifacts are committed, and a later run's
+commit supersedes them. Pin links to that artifact commit when durable issue
+evidence is required.
 
 ## Full artifacts
 
 | Artifact | Link |
 | --- | --- |
-| Diagnostics | [diagnostics.md](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/diagnostics.md) |
-| Model gallery | [model_gallery.md](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/reports/model_gallery.md) |
-| Results JSONL | [results.jsonl](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/results.jsonl) |
-| Run JSON | [run.json](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/run.json) |
-| Environment | [environment.log](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/environment.log) |
-| Log | [check_models.log](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/check_models.log) |
+| Diagnostics | [diagnostics.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md) |
+| Model gallery | [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md) |
+| Results JSONL | [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl) |
+| Run JSON | [run.json](https://github.com/jrp2014/check_models/blob/main/src/output/run.json) |
+| Environment | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
+| Log | [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log) |

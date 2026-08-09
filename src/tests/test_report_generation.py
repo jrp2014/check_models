@@ -783,11 +783,15 @@ def test_diagnostics_and_issue_draft_compact_large_unexpected_parameter_errors(
     assert parameters[-1] in issue_content
 
 
-def test_github_blob_ref_uses_clean_producer_revision(
+def test_github_blob_ref_never_pins_to_producer_head(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Clean producer revisions should pin GitHub artifact links to that commit."""
-    monkeypatch.setattr(check_models, "_GITHUB_REF_OVERRIDE", None)
+    """Artifact links must not pin to producer HEAD, even for clean worktrees.
+
+    The artifacts being generated cannot exist in any commit at generation
+    time, so a HEAD pin would show the previous run while claiming the
+    evidence is durable. Only an explicit override may pin.
+    """
     monkeypatch.setattr(
         check_models,
         "_collect_check_models_provenance",
@@ -799,19 +803,10 @@ def test_github_blob_ref_uses_clean_producer_revision(
             "dirty": False,
         },
     )
-    assert check_models._github_blob_ref() == "deadbeefcafebabe"
-    monkeypatch.setattr(
-        check_models,
-        "_collect_check_models_provenance",
-        lambda: {
-            "name": "check_models",
-            "version": "0.8.9",
-            "git_revision": "deadbeefcafebabe",
-            "install_type": "source-tree",
-            "dirty": True,
-        },
-    )
+    monkeypatch.setattr(check_models, "_GITHUB_REF_OVERRIDE", None)
     assert check_models._github_blob_ref() == check_models._GITHUB_DEFAULT_BRANCH
+    monkeypatch.setattr(check_models, "_GITHUB_REF_OVERRIDE", "a" * 40)
+    assert check_models._github_blob_ref() == "a" * 40
 
 
 def test_observation_display_registry_covers_literal_codes() -> None:

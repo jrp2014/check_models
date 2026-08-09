@@ -3865,15 +3865,17 @@ def _detect_reasoning_output(
         return ReasoningOutputSignals()
 
     semantic_text = text
+    thinking_trace_markers: list[str] = []
     for start_marker, end_marker in delimiter_pairs:
         empty_wrapper = re.compile(
             rf"{re.escape(start_marker)}\s*{re.escape(end_marker)}",
             re.IGNORECASE,
         )
+        if empty_wrapper.search(semantic_text):
+            thinking_trace_markers.extend((start_marker, end_marker))
         semantic_text = empty_wrapper.sub(" ", semantic_text)
     text_lower: str = semantic_text.casefold()
     seeded_lower = seeded_text.casefold()
-    thinking_trace_markers: list[str] = []
     thinking_trace_incomplete = False
     thinking_only_output = False
     for start_marker, end_marker in delimiter_pairs:
@@ -6868,23 +6870,16 @@ def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename
 
 
 def _github_blob_ref() -> str:
-    """Return the preferred GitHub blob/tree ref for tracked artifact links.
+    """Return the GitHub blob/tree ref for tracked artifact links.
 
-    Prefer an explicit override, then a clean producer git revision, else the
-    default branch. Dirty worktrees stay on the branch tip so links do not point
-    at a commit that never contained the published bytes.
+    Artifact links always target the default branch (or an explicit override).
+    The producer's HEAD commit is never used: the artifacts being generated
+    cannot be contained in any commit that exists at generation time, so a
+    HEAD-pinned link would show the *previous* run while claiming durability.
+    Branch links become correct once this run's artifacts are committed. A SHA
+    override remains available for deliberate post-commit regeneration.
     """
-    if _GITHUB_REF_OVERRIDE:
-        return _GITHUB_REF_OVERRIDE
-    try:
-        provenance = _collect_check_models_provenance()
-    except (OSError, RuntimeError, ValueError, TypeError):
-        return _GITHUB_DEFAULT_BRANCH
-    revision = provenance.get("git_revision")
-    dirty = provenance.get("dirty")
-    if isinstance(revision, str) and revision and dirty is False:
-        return revision
-    return _GITHUB_DEFAULT_BRANCH
+    return _GITHUB_REF_OVERRIDE or _GITHUB_DEFAULT_BRANCH
 
 
 def _github_repo_artifact_url(
@@ -14359,9 +14354,10 @@ def _populate_result_quality_analysis(
     resolved_requested_max_tokens = (
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
+    diagnostics = result.prompt_diagnostics
     thinking_trace_delimiters: list[tuple[str, str]] = list(THINKING_TRACE_DELIMITER_PAIRS)
-    if result.prompt_diagnostics is not None:
-        generation_kwargs = result.prompt_diagnostics.generate_kwargs
+    if diagnostics is not None:
+        generation_kwargs = diagnostics.generate_kwargs
         start_marker = generation_kwargs.get("thinking_start_token")
         end_marker = generation_kwargs.get("thinking_end_token")
         if isinstance(start_marker, str) and isinstance(end_marker, str):
@@ -14375,13 +14371,12 @@ def _populate_result_quality_analysis(
         prompt=prompt,
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
-        known_special_tokens=_configured_output_wrappers(result.prompt_diagnostics),
-        configured_generation_wrappers=_configured_generation_wrappers(result.prompt_diagnostics),
+        known_special_tokens=_configured_output_wrappers(diagnostics),
+        configured_generation_wrappers=_configured_generation_wrappers(diagnostics),
         thinking_trace_delimiters=thinking_trace_delimiters,
         seeded_thinking_text=(
-            result.prompt_diagnostics.rendered_prompt_preview
-            if result.prompt_diagnostics is not None
-            and result.prompt_diagnostics.rendered_prompt_preview is not None
+            diagnostics.rendered_prompt or diagnostics.rendered_prompt_preview or ""
+            if diagnostics is not None
             else ""
         ),
     )
@@ -16216,14 +16211,19 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
     )
     blob_ref = _github_blob_ref()
     if re.fullmatch(r"[0-9a-f]{40}", blob_ref):
+        # Only reachable via an explicit ref override supplied after the run's
+        # artifacts were committed; a producer-HEAD pin is never used because
+        # that commit predates the artifacts it would claim to contain.
         link_caveat = (
             f"GitHub links are pinned to producer commit `{blob_ref[:12]}`, so the "
             "linked evidence is durable."
         )
     else:
         link_caveat = (
-            "GitHub links target the repository's mutable main branch; use the committed "
-            "output snapshot when durable issue evidence is required."
+            "GitHub links target the repository's mutable main branch; they resolve "
+            "to this run's evidence only once these artifacts are committed, and a "
+            "later run's commit supersedes them. Pin links to that artifact commit "
+            "when durable issue evidence is required."
         )
     return ReportSection(
         "Run context",

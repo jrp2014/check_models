@@ -7,6 +7,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Fix a false durability claim in generated reports: GitHub artifact links
+  were pinned to the producer's HEAD commit when the worktree was clean, but
+  that commit predates the run and can only contain the *previous* run's
+  artifacts. Artifact links now always target the default branch (valid once
+  the run is committed; superseded by later runs), the run-summary caveat
+  states that honestly, and SHA pinning is reserved for an explicit ref
+  override during post-commit regeneration.
+- Thinking-output analysis now uses the complete rendered prompt when deciding
+  whether generation closes a prompt-seeded block, and records configured empty
+  delimiter pairs as neutral evidence instead of wrapper leakage.
+- The blocking Skylos danger scan now passes its `.worktrees` exclusion directly
+  to the scanner, preventing third-party checkouts from failing this repository's
+  quality gate.
 - Uncap `markdownlint-cli2`: the npm spec is now a caret range (currently
   `^0.23.2`) with the untracked repo-local lockfile recording the resolved
   version, and
