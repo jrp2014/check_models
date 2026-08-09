@@ -34,7 +34,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup active memory (GB):* 0.002704444
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -42,10 +42,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11951, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11958, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11428, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11435, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -55,7 +55,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 748, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 750, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -441,7 +441,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12381, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12388, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -452,7 +452,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11966, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -829,20 +829,20 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4404.15it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3352.02it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[23:57:20] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
 - *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 60,712,161 bytes
-- *Image SHA-256:* 2d3e8ab39253f25bfa3f4a37188a72d369bb79657c8f7011611e1f58fb3afc23
+- *Image size:* 45,221,684 bytes
+- *Image SHA-256:* c285c098dd74e95801ffa1682a82ee2233a8cbb0baed91714ede8a361b9c6438
 
 <details>
 <summary>Exact prompt</summary>
@@ -853,13 +853,13 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-08 15:43:55 UTC+01:00
-- GPS: 51.815915°N, 0.638706°W
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
 
 Descriptive hints:
-- Title hint: Town centre, Tring, England, UK, GBR, Europe
-- Description hint: Akeman Street Baptist Church, Tring, Herts
-- Keyword hints: Adobe Stock, Akeman Street Baptist Church, Any Vision, Buckinghamshire, Bushes, Chapel, Chimney, Christian, Church, Clouds, England, Entrance, Europe, Hertfordshire, Locations, Objects, Red brick, Roof, Sign, Sky
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
 
 Write:
 - a concrete 5-10-word title;
@@ -885,19 +885,19 @@ original image before filing.
 | Component       | Value                                                           |
 |-----------------|-----------------------------------------------------------------|
 | mlx-vlm         | 0.6.11                                                          |
-| mlx             | 0.32.1.dev20260808+8d6662986                                    |
+| mlx             | 0.32.1.dev20260809+8c28c385f                                    |
 | mlx-lm          | 0.31.3                                                          |
 | transformers    | 5.14.1                                                          |
 | tokenizers      | 0.22.2                                                          |
 | huggingface-hub | 1.27.0                                                          |
 | Pillow          | 12.3.0                                                          |
 | Python Version  | 3.13.13                                                         |
-| macOS Version   | 26.6                                                            |
+| macOS Version   | 26.6.1                                                          |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision 96883994f5f5a716ec67b0b8d73d6f3a12e7748d; clean |
+| check_models    | 0.9.0; revision 28d5fea993655832b615df0b959be62a1226335d; clean |
 
 ### Full environment evidence
 
 | Evidence | Link |
 | --- | --- |
-| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/96883994f5f5a716ec67b0b8d73d6f3a12e7748d/src/output/environment.log) |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
