@@ -7,6 +7,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Validate the input image once per run instead of once per model:
+  successful validations are cached against the file's size and mtime (URLs
+  cache for the process lifetime), failures are never cached. Saves the
+  repeated full decode of large inputs (~15 s across 42 models on a 45 MB
+  image) without weakening direct-caller validation.
 - Crash issue drafts for model-load failures now render a durable native
   one-command repro (`python -m mlx_vlm.generate … --image any-local-image.jpg`)
   even when the run's image is unpublished, since load crashes occur before

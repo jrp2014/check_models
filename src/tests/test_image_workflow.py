@@ -158,3 +158,38 @@ def test_validate_image_accessible_missing_file() -> None:
     """Should raise OSError for missing file."""
     with pytest.raises(OSError, match="Error accessing image"):
         check_models.validate_image_accessible(image_path="/nonexistent/image.jpg")
+
+
+def test_validate_image_accessible_validates_unchanged_input_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A multi-model run must not re-decode the same unchanged image per model."""
+    img_path = tmp_path / "test.jpg"
+    Image.new("RGB", (100, 100)).save(img_path)
+    monkeypatch.setattr(check_models, "_IMAGE_VALIDATION_CACHE", {})
+    calls: list[str] = []
+    original_load_image = check_models.load_image
+
+    def _counting_load_image(path: str) -> object:
+        calls.append(path)
+        return original_load_image(path)
+
+    monkeypatch.setattr(check_models, "load_image", _counting_load_image)
+
+    check_models.validate_image_accessible(image_path=img_path)
+    check_models.validate_image_accessible(image_path=img_path)
+    assert len(calls) == 1
+
+    # A changed file (new size/mtime) must be revalidated.
+    Image.new("RGB", (200, 200)).save(img_path)
+    check_models.validate_image_accessible(image_path=img_path)
+    assert len(calls) == 2
+
+
+def test_validate_image_accessible_never_caches_failures(tmp_path: Path) -> None:
+    """A failed validation must fail again on retry, not be cached as valid."""
+    img_path = tmp_path / "missing.jpg"
+    for _ in range(2):
+        with pytest.raises(OSError, match="Error accessing image"):
+            check_models.validate_image_accessible(image_path=img_path)

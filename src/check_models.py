@@ -10807,12 +10807,31 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
     return payload
 
 
+_IMAGE_VALIDATION_CACHE: dict[str, tuple[int, int] | None] = {}
+
+
+def _image_validation_cache_key(image_path: str | Path) -> tuple[str, tuple[int, int] | None]:
+    """Return the cache identity and change-detection stamp for an image input."""
+    try:
+        stat_result = Path(image_path).stat()
+    except OSError:
+        # URLs and unreadable paths carry no stamp; a same-run repeat is enough.
+        return str(image_path), None
+    return str(image_path), (stat_result.st_size, stat_result.st_mtime_ns)
+
+
 def validate_image_accessible(*, image_path: str | Path) -> None:
     """Validate image file is accessible and supported.
 
     Uses mlx_vlm's load_image() which supports both local file paths and URLs.
     This enables --image https://... usage following mlx-vlm best practices.
+    A multi-model run validates the same input once: successful validations are
+    cached for the process lifetime and revalidated if the file's size or
+    mtime changes. Failures are never cached.
     """
+    cache_name, cache_stamp = _image_validation_cache_key(image_path)
+    if cache_name in _IMAGE_VALIDATION_CACHE and _IMAGE_VALIDATION_CACHE[cache_name] == cache_stamp:
+        return
     try:
         with TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT):
             # load_image() from mlx_vlm.utils handles both file paths and URLs
@@ -10847,6 +10866,7 @@ def validate_image_accessible(*, image_path: str | Path) -> None:
     except (OSError, ValueError) as err:
         msg = f"Error accessing image {image_path}: {err}"
         raise OSError(msg) from err
+    _IMAGE_VALIDATION_CACHE[cache_name] = cache_stamp
 
 
 @dataclass
