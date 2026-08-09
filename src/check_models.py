@@ -7612,7 +7612,9 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             "throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
             "Prefill/first is first-token latency when captured; Prompt tok is the full "
-            "rendered prompt including image tokens, which drives prefill cost."
+            "rendered prompt including image tokens, which drives prefill cost. "
+            "For cross-attention architectures the token count reflects the tokenised "
+            "text burden only, not total vision prefill compute."
         ),
         "",
         *_render_gallery_table(
@@ -9367,7 +9369,10 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         (
             "<p>Current-run usability and captured resource facts only. Total time is "
             "end-to-end; throughput covers generation only and requires "
-            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens.</p>"
+            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
+            "Prompt tok is the full rendered prompt including image tokens; for "
+            "cross-attention architectures it reflects the tokenised text burden "
+            "only, not total vision prefill compute.</p>"
         ),
         _html_filter_controls(),
         '<div id="chooser-table">',
@@ -15842,14 +15847,41 @@ def _reproduction_input_blocks(
     image: RunImageRecord | None,
     run_args: argparse.Namespace | None,
     resolved_revision: str | None,
+    crash_phase: str | None = None,
 ) -> tuple[ReportBlock, ...]:
-    """Describe exact inputs and render a command only for a published image."""
+    """Describe exact inputs and render a command only when it is exact evidence.
+
+    A full command is rendered for a verifiable public image, or for model-load
+    crashes, which occur before image decoding and so reproduce with any image.
+    """
     blocks: list[ReportBlock] = [
         ReportKeyValues(_reproduction_image_facts(image)),
         ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
     ]
     source_url = image.get("source_url") if image is not None else None
     if image is None or source_url is None:
+        if crash_phase == "model_load":
+            blocks.extend(
+                (
+                    ReportParagraph(
+                        "The crash occurred during model load, before image decoding, so "
+                        "the exact input image is not required: substitute any local "
+                        "image for the placeholder path and run one native mlx-vlm "
+                        "process."
+                    ),
+                    ReportCodeBlock(
+                        build_native_mlx_vlm_repro_command_spec(
+                            model_name=model_name,
+                            prompt=prompt,
+                            image_ref="any-local-image.jpg",
+                            run_args=run_args,
+                            resolved_revision=resolved_revision,
+                        ).shell_command(),
+                        language="bash",
+                    ),
+                )
+            )
+            return tuple(blocks)
         blocks.append(
             ReportParagraph(
                 "The original local input is not published, so this report does not claim "
@@ -16044,6 +16076,7 @@ def _run_issue_summary_crash_section(
                     image=source.image,
                     run_args=_retained_generation_args(source),
                     resolved_revision=resolved_revision or requested_revision,
+                    crash_phase=failure.get("phase") if failure is not None else None,
                 ),
                 level=4,
             ),
@@ -16933,6 +16966,7 @@ def _generate_github_issue_reports(
                     resolved_revision=(
                         provenance["resolved_revision"] if provenance is not None else None
                     ),
+                    crash_phase=result.failure_phase,
                 ),
             ),
         )

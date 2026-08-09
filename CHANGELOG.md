@@ -7,6 +7,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Crash issue drafts for model-load failures now render a durable native
+  one-command repro (`python -m mlx_vlm.generate … --image any-local-image.jpg`)
+  even when the run's image is unpublished, since load crashes occur before
+  image decoding; post-load crashes still withhold the command rather than
+  claim an unverifiable reproduction.
+- Chooser preambles (Markdown and HTML) now caveat the Prompt tok column: for
+  cross-attention architectures the token count reflects tokenised text burden
+  only, not total vision prefill compute.
 - Classify an empty `<|channel>thought` / `<channel|>` pair emitted by the
   model as visible control-token leakage while still ignoring it for catalogue
   field parsing; semantic thinking delimiters remain neutral when complete.

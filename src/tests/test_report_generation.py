@@ -599,6 +599,55 @@ def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: P
     assert "prompt.txt" not in content
 
 
+def test_run_issue_summary_load_crash_gets_native_repro_without_public_image(
+    tmp_path: Path,
+) -> None:
+    """Model-load crashes reproduce with any image, so a command is always durable."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/load-crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    failure = result["failure"]
+    assert isinstance(failure, dict)
+    failure["phase"] = "model_load"
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    prose = " ".join(content.split())
+    assert "crash occurred during model load, before image decoding" in prose
+    assert "python -m mlx_vlm.generate" in content
+    assert "--model org/load-crash" in content
+    assert "--image any-local-image.jpg" in content
+    assert "does not claim a complete reproduction command" not in prose
+
+
+def test_run_issue_summary_withholds_command_for_post_load_crash(tmp_path: Path) -> None:
+    """Crashes after model load still need the exact image, so no command is claimed."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/decode-crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "does not claim a complete reproduction command" in " ".join(content.split())
+    assert "any-local-image.jpg" not in content
+
+
 def test_run_issue_summary_withholds_stale_log_and_environment_links(tmp_path: Path) -> None:
     """Issue-ready evidence must not attribute prior-run logs to the current run."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
