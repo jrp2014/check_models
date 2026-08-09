@@ -7,6 +7,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Uncap `markdownlint-cli2`: the npm spec is now a caret range (currently
+  `^0.23.2`) with the untracked repo-local lockfile recording the resolved
+  version, and
+  `UPDATE_NODE_TOOLING=1` updates without `--save-exact`; the sync test
+  asserts the uncapped policy instead of exact versions.
+- End the git-hook installer tug-of-war: `tools/install_precommit_hook.py`
+  now leaves pre-commit-framework-managed hooks in place (they run the same
+  repo scripts via `.pre-commit-config.yaml`) instead of overwriting them —
+  overwriting is why `validate_env` kept reporting the framework as not
+  installed, and the framework then re-ran the overwritten script as a
+  migrated `.legacy` hook, executing every check twice.
+
 - Stub generation no longer imports pure-Python target packages: stubgen runs
   in source-tree (filesystem) discovery mode for mlx_lm/mlx_vlm, falling back
   to import mode only for C-extension packages (tokenizers) and lazy-module

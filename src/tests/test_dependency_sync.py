@@ -740,24 +740,32 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
         assert "check_models_data/quality_config.yaml" in archive.namelist()
 
 
-def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
-    """Keep markdownlint-cli2 aligned between npm metadata and update tooling."""
+def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
+    """Keep markdownlint-cli2 aligned between npm metadata and update tooling.
+
+    Policy: the spec is a caret range (not an exact pin), the lockfile provides
+    reproducible installs, and update.sh can move to the latest release.
+    """
     package_json = json.loads((PKG_ROOT / "package.json").read_text(encoding="utf-8"))
     package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
-    assert markdownlint_spec == "0.23.1"
+    assert markdownlint_spec.startswith("^"), "markdownlint-cli2 must stay uncapped (caret range)"
     assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
-    assert package_lock["packages"]["node_modules/markdownlint-cli2"]["version"] == "0.23.1"
-    assert package_json["overrides"]["smol-toml"] == "1.6.1"
-    assert package_lock["packages"]["node_modules/smol-toml"]["version"] == "1.6.1"
+    locked_version = package_lock["packages"]["node_modules/markdownlint-cli2"]["version"]
+    assert locked_version, "lockfile must resolve markdownlint-cli2"
+    # The security override for the transitive smol-toml stays pinned and synced.
+    assert (
+        package_lock["packages"]["node_modules/smol-toml"]["version"]
+        == package_json["overrides"]["smol-toml"]
+    )
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert 'npm install --ignore-scripts --prefix "$PROJECT_ROOT"' in update_script
     assert (
-        'npm install --prefix "$PROJECT_ROOT" --save-dev --save-exact '
-        "markdownlint-cli2@latest" in update_script
+        'npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest' in update_script
     )
+    assert "--save-exact" not in update_script
     assert update_script.index("markdownlint-cli2@latest") > update_script.index(
         "UPDATE_NODE_TOOLING"
     )
