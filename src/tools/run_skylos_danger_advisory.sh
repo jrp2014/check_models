@@ -106,7 +106,7 @@ else
 fi
 
 set +e
-quality_run_python_tool skylos "${scan_args[@]}"
+quality_run_python_tool skylos "${scan_args[@]}" </dev/null
 scan_exit_code=$?
 set -e
 
@@ -115,7 +115,45 @@ if [ ! -f "$report_path" ]; then
     exit "$scan_exit_code"
 fi
 
-quality_run_python_tool skylos cicd annotate --input "$report_path" --severity medium
+# Skylos 4.33.x ignores both `--exclude .worktrees` and the config.yaml exclude
+# for the danger/workflow scanner, so third-party checkouts under .worktrees/
+# (e.g. upstream mlx-vlm repro worktrees) leak their workflow files into this
+# repo's gate. Filter those findings out of the report before annotate/gate,
+# and say how many were dropped so the exclusion is never silent.
+dropped_worktree_count="$($QUALITY_PYTHON - "$report_path" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+report_path = Path(sys.argv[1])
+report = json.loads(report_path.read_text(encoding="utf-8"))
+findings = report.get("danger", [])
+if not isinstance(findings, list):
+    print(0)
+    raise SystemExit(0)
+
+kept = [
+    finding
+    for finding in findings
+    if not (
+        isinstance(finding, dict)
+        and "/.worktrees/" in str(finding.get("file", ""))
+    )
+]
+dropped = len(findings) - len(kept)
+if dropped:
+    report["danger"] = kept
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+print(dropped)
+PY
+)"
+if [ "$dropped_worktree_count" -gt 0 ]; then
+    echo "ℹ️  Dropped $dropped_worktree_count finding(s) from third-party .worktrees/ checkouts (not this repository's files to gate)."
+fi
+
+quality_run_python_tool skylos cicd annotate --input "$report_path" --severity medium </dev/null
 
 gate_args=(cicd gate --input "$report_path")
 if [ "$GATE_MODE" -eq 0 ]; then
@@ -127,7 +165,9 @@ fi
 if [ "$MODE" = "diff" ]; then
     gate_args+=(--diff-base "$DIFF_BASE")
 fi
-quality_run_python_tool skylos "${gate_args[@]}"
+# </dev/null keeps skylos non-interactive: on a TTY, a failing gate launches a
+# "Continue anyway?" prompt and a deployment wizard that offers to push commits.
+quality_run_python_tool skylos "${gate_args[@]}" </dev/null
 
 danger_count="$($QUALITY_PYTHON - "$report_path" <<'PY'
 from __future__ import annotations
@@ -154,7 +194,7 @@ fi
 
 if [ "$WRITE_LLM_REPORT" -eq 1 ]; then
     set +e
-    quality_run_python_tool skylos "${llm_args[@]}"
+    quality_run_python_tool skylos "${llm_args[@]}" </dev/null
     llm_exit_code=$?
     set -e
 

@@ -7,6 +7,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make the Skylos danger gate immune to two Skylos 4.33.x behaviors: findings
+  from third-party checkouts under `.worktrees/` are now filtered out of the
+  danger report (with a visible drop notice) before annotate/gate, because the
+  scanner intermittently ignores both `--exclude .worktrees` and the config
+  exclude for workflow files; and every skylos invocation in the quality
+  scripts runs with stdin from `/dev/null`, since a failing gate on a TTY now
+  launches an interactive "continue anyway?" prompt and a deployment wizard
+  that offers to push commits.
 - Fix a false durability claim in generated reports: GitHub artifact links
   were pinned to the producer's HEAD commit when the worktree was clean, but
   that commit predates the run and can only contain the *previous* run's

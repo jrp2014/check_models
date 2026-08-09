@@ -95,13 +95,15 @@ quality_run_pyrefly_check "$@"
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
 
+# </dev/null keeps skylos non-interactive: on a TTY, a failing gate can launch
+# a "Continue anyway?" prompt and a deployment wizard that offers to push.
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_python_tool skylos . --quality --secrets --sca --gate --no-upload --format concise
+    quality_run_python_tool skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
 
 echo "=== Skylos Audit Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_python_tool skylos . -a
+    quality_run_python_tool skylos . -a </dev/null
 
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="
