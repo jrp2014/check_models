@@ -7,6 +7,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Stub generation no longer imports pure-Python target packages: stubgen runs
+  in source-tree (filesystem) discovery mode for mlx_lm/mlx_vlm, falling back
+  to import mode only for C-extension packages (tokenizers) and lazy-module
+  packages whose API exists only at runtime (transformers). This fixes the
+  `RuntimeError: Timeout waiting for subprocess` failures from update.sh —
+  mlx-vlm's package tree had outgrown mypy's fixed 30s inspection budget, and
+  `mlx_vlm.chat_ui` raises SystemExit at import without gradio (upstream
+  63c41804) — and cuts generation time from ~7 minutes to under a minute.
+  Packages now run individually with one retry, and the dispatch.pyi
+  re-export contract check is AST-based instead of exact-text. Two targeted
+  Skylos suppressions document new-in-4.33.2 false positives (a snake_case
+  phase key flagged as a high-entropy secret; a find_spec-derived path
+  flagged as tainted).
+
 - Separate model prompt compliance from maintainer-worthy observations: each
   observation in the display registry now declares whether it is an
   integration signal (repetition, empty output, control-token/role leakage,

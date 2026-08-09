@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import ast
 import importlib.metadata
+import importlib.util
 import json
 import logging
 import re
@@ -40,7 +41,7 @@ except ModuleNotFoundError:  # pragma: no cover - direct script execution
     from tools.safe_io import read_text_no_follow, write_text_no_follow
 
 if TYPE_CHECKING:  # TC003: typing-only import
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Iterable, Mapping, Sequence
 
 
 def _first_existing_path(paths: Iterable[Path]) -> Path | None:
@@ -135,7 +136,6 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
         generate_dir / "__init__.pyi": (),
         generate_dir / "dispatch.pyi": (
             "GenerateKwargs as GenerateKwargs",
-            "from .common import GenerationResult as GenerationResult",
             "ProcessorLike as ProcessorLike",
             "Unpack as Unpack",
             "processor: ProcessorLike | PreTrainedTokenizer",
@@ -182,8 +182,18 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
             public_name="GenerateKwargs",
         ):
             missing_tokens.append("from .types import GenerateKwargs as GenerateKwargs")
-        if path.name == "dispatch.pyi" and _stub_defines_top_level_class(text, "GenerationResult"):
-            missing_tokens.append("imported common.GenerationResult without a duplicate class")
+        if path.name == "dispatch.pyi":
+            # AST-based: stubgen may merge the re-export into a combined
+            # import line, so exact-text matching is too brittle here.
+            if not _stub_imports_relative_symbol_as(
+                text,
+                module_name="common",
+                symbol_name="GenerationResult",
+                public_name="GenerationResult",
+            ):
+                missing_tokens.append("from .common import GenerationResult as GenerationResult")
+            if _stub_defines_top_level_class(text, "GenerationResult"):
+                missing_tokens.append("imported common.GenerationResult without a duplicate class")
         if missing_tokens:
             issues.append(
                 f"{path.relative_to(typings_dir)} is missing upstream generate contract markers: "
@@ -1095,17 +1105,63 @@ def _log_stubgen_output(
         log_fn("[stubgen] %s", line)
 
 
-def run_stubgen(packages: Iterable[str]) -> int:
-    """Invoke stubgen for the provided packages and return its exit code."""
-    TYPINGS_DIR.mkdir(parents=True, exist_ok=True)
-    pkg_list = _validate_packages(packages)
+def _read_package_init_text(init_file: Path) -> str | None:
+    """Read a package ``__init__.py`` located via importlib metadata.
 
-    stubgen_command = _ensure_mypy_stubgen_command(_default_stubgen_command())
+    The path derives from ``find_spec()`` on a regex-validated package name
+    (interpreter metadata, not user input), so reading it is safe.
+    """
+    if not init_file.is_file():
+        return None
+    try:
+        return init_file.read_text(encoding="utf-8")  # skylos: ignore[SKY-D215] spec path
+    except OSError:
+        return None
 
-    args = [*stubgen_command]
-    for pkg in pkg_list:
-        args.extend(["-p", pkg])
-    args.extend(["-o", str(TYPINGS_DIR)])
+
+def _package_source_dir(package: str) -> Path | None:
+    """Return the package's source directory when it is a pure-Python tree.
+
+    Pure-Python packages are stubbed from their source tree (stubgen's
+    positional directory mode): discovery is a filesystem walk, so no package
+    code is imported. This avoids two failure classes seen with ``-p`` import
+    discovery: modules that raise SystemExit at import time (for example
+    ``mlx_vlm.chat_ui`` without gradio, upstream 63c41804) and package trees
+    whose cumulative import time exceeds mypy's fixed 30s inspection budget
+    (``mlx_vlm`` and ``mlx_lm`` today). C-extension packages return ``None``
+    and keep import-based discovery, which they genuinely require.
+    """
+    if "." in package:
+        return None
+    try:
+        spec = importlib.util.find_spec(package)
+    except (ImportError, ValueError):
+        return None
+    if spec is None or not spec.submodule_search_locations:
+        return None
+    package_dir = Path(next(iter(spec.submodule_search_locations)))
+    init_file = package_dir / "__init__.py"
+    init_text = _read_package_init_text(init_file)
+    has_compiled_modules = any(package_dir.rglob("*.so")) or any(package_dir.rglob("*.pyd"))
+    # Lazy-module packages (e.g. transformers' _LazyModule) publish their API
+    # through runtime __getattr__, which only import-based discovery can see.
+    is_lazy_package = init_text is not None and (
+        "_LazyModule" in init_text or "def __getattr__" in init_text
+    )
+    if init_text is None or has_compiled_modules or is_lazy_package:
+        return None
+    return package_dir
+
+
+def _run_stubgen_once(stubgen_command: Sequence[str], package: str) -> int:
+    """Run stubgen for one package and log its output; return the exit code."""
+    source_dir = _package_source_dir(package)
+    if source_dir is not None:
+        logger.info("[stubs] %s: source-tree mode (%s)", package, source_dir)
+        args = [*stubgen_command, str(source_dir), "-o", str(TYPINGS_DIR)]
+    else:
+        logger.info("[stubs] %s: import mode (-p)", package)
+        args = [*stubgen_command, "-p", package, "-o", str(TYPINGS_DIR)]
     try:
         completed = subprocess.run(
             args,
@@ -1121,13 +1177,34 @@ def run_stubgen(packages: Iterable[str]) -> int:
 
     output_lines = _split_stubgen_output(completed.stdout, completed.stderr)
     return_code = completed.returncode or 0
-    transformers_requested = any(pkg.split(".")[0] == "transformers" for pkg in pkg_list)
     _log_stubgen_output(
         output_lines=output_lines,
         return_code=return_code,
-        transformers_requested=transformers_requested,
+        transformers_requested=package.split(".", maxsplit=1)[0] == "transformers",
     )
     return return_code
+
+
+def run_stubgen(packages: Iterable[str]) -> int:
+    """Invoke stubgen per package (isolated, with one retry) and return worst exit code."""
+    TYPINGS_DIR.mkdir(parents=True, exist_ok=True)
+    pkg_list = _validate_packages(packages)
+
+    stubgen_command = _ensure_mypy_stubgen_command(_default_stubgen_command())
+
+    overall_return_code = 0
+    for package in pkg_list:
+        return_code = _run_stubgen_once(stubgen_command, package)
+        if return_code:
+            logger.warning(
+                "[stubs] stubgen failed for %s (exit %d); retrying once",
+                package,
+                return_code,
+            )
+            return_code = _run_stubgen_once(stubgen_command, package)
+        if return_code:
+            overall_return_code = return_code
+    return overall_return_code
 
 
 def main() -> int:
