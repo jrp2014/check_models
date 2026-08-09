@@ -370,18 +370,32 @@ def test_empty_thinking_wrapper_is_neutral() -> None:
 @pytest.mark.parametrize(
     "text",
     [
-        "<|channel>thought\n<channel|>A complete response.",
         "<|START_THINKING|><|END_THINKING|> A complete response.",
         "◁think▷◁/think▷ A complete response.",
     ],
 )
 def test_empty_wrappers_of_every_recognised_pair_are_neutral(text: str) -> None:
-    """Empty wrappers must be neutral for all delimiter pairs, not just <think>."""
+    """Empty thinking wrappers stay neutral for every non-channel delimiter pair."""
     result = _result(text)
 
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed", "usable", "none", ()
     )
+
+
+def test_generated_empty_channel_wrapper_is_control_token_leakage() -> None:
+    result = _result("<|channel>thought\n<channel|>Title: A complete response.")
+
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed",
+        "usable_with_caveats",
+        "observation_needs_reproduction",
+        ("unexpected_special_token",),
+    )
+    assert check_models._observation_details(result)["unexpected_special_tokens"] == [
+        "<|channel>thought",
+        "<channel|>",
+    ]
 
 
 def test_closed_thinking_trace_is_neutral_and_model_name_invariant() -> None:

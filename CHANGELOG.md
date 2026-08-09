@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Classify an empty `<|channel>thought` / `<channel|>` pair emitted by the
+  model as visible control-token leakage while still ignoring it for catalogue
+  field parsing; semantic thinking delimiters remain neutral when complete.
 - Make the Skylos danger gate immune to two Skylos 4.33.x behaviors: findings
   from third-party checkouts under `.worktrees/` are now filtered out of the
   danger report (with a visible drop notice) before annotate/gate, because the

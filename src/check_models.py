@@ -260,12 +260,18 @@ DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
+CHANNEL_THINKING_DELIMITER_PAIR: Final[tuple[str, str]] = ("<|channel>thought", "<channel|>")
+EMPTY_CHANNEL_THINKING_RE: Final[re.Pattern[str]] = re.compile(
+    rf"{re.escape(CHANNEL_THINKING_DELIMITER_PAIR[0])}\s*"
+    rf"{re.escape(CHANNEL_THINKING_DELIMITER_PAIR[1])}",
+    re.IGNORECASE,
+)
 THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = (
     ("<think>", "</think>"),
     ("◁think▷", "◁/think▷"),
     # Marker pairs recognised by mlx-vlm's server-side thinking splitter
     # (mlx_vlm/server/responses_state.py ThinkingStreamState defaults).
-    ("<|channel>thought", "<channel|>"),
+    CHANNEL_THINKING_DELIMITER_PAIR,
     ("<|START_THINKING|>", "<|END_THINKING|>"),
 )
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
@@ -4319,6 +4325,12 @@ def analyze_generation_text(
     _has_special_tokens, unexpected_special_tokens = _detect_special_token_leakage(
         _strip_empty_thinking_wrappers(leakage_text),
     )
+    # An empty generated channel is still unconsumed transport syntax. Keep it
+    # out of structural parsing, but retain both markers as integration evidence.
+    empty_channel_markers = (
+        CHANNEL_THINKING_DELIMITER_PAIR if EMPTY_CHANNEL_THINKING_RE.search(text) else ()
+    )
+    unexpected_special_tokens.extend(empty_channel_markers)
     if prompt_signals.has_thinking_trace:
         # A legitimate detected trace neutralises its own delimiters, including
         # <|...|>-style pairs where the generic control-token regex captures
@@ -4327,8 +4339,10 @@ def analyze_generation_text(
         unexpected_special_tokens = [
             wrapper
             for wrapper in unexpected_special_tokens
-            if not any(wrapper in marker for marker in thinking_markers)
+            if wrapper in empty_channel_markers
+            or not any(wrapper in marker for marker in thinking_markers)
         ]
+    unexpected_special_tokens = _dedupe_preserve_order(unexpected_special_tokens)
     present_configured_wrappers = [
         wrapper
         for wrapper in _dedupe_preserve_order(configured_generation_wrappers)
