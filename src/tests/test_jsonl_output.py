@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import dataclasses
 import json
 from dataclasses import dataclass
@@ -1863,3 +1864,90 @@ class TestRerunEvidence:
         candidates = check_models._select_rerun_candidates([observed, clean])
 
         assert [candidate.model_name for candidate in candidates] == ["observed-model"]
+
+    def test_differential_rerun_preserves_inference_configuration(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Triage overrides must not silently discard model/template configuration."""
+        captured: list[check_models.ProcessImageParams] = []
+        rerun_result = PerformanceResult(
+            model_name="org/model",
+            generation=MockGeneration(text="rerun output"),
+            success=True,
+        )
+        args = argparse.Namespace(
+            trust_remote_code=False,
+            top_p=0.8,
+            min_p=0.1,
+            top_k=12,
+            repetition_penalty=1.1,
+            repetition_context_size=48,
+            seed=7,
+            presence_penalty=0.2,
+            presence_context_size=64,
+            frequency_penalty=0.3,
+            frequency_context_size=96,
+            logit_bias={42: -1.0},
+            lazy_load=True,
+            max_kv_size=2048,
+            kv_bits=4,
+            kv_quant_scheme="turboquant",
+            kv_group_size=32,
+            quantized_kv_start=128,
+            force_download=True,
+            quantize_activations=True,
+            revision="model-revision",
+            adapter_path="adapter/path",
+            prefill_step_size=512,
+            resize_shape=(64, 32),
+            eos_tokens=("<eos>",),
+            skip_special_tokens=True,
+            processor_kwargs={"crop": False},
+            enable_thinking=True,
+            thinking_budget=24,
+            thinking_mode="budget",
+            thinking_start_token="<think>",  # noqa: S106 - protocol delimiter, not a credential
+            thinking_end_token="</think>",  # noqa: S106 - protocol delimiter, not a credential
+            context_marker="Metadata:",
+        )
+
+        def capture(params: check_models.ProcessImageParams) -> PerformanceResult:
+            captured.append(params)
+            return rerun_result
+
+        with patch.object(check_models, "process_image_with_model", side_effect=capture):
+            check_models._run_differential_reruns(
+                [PerformanceResult(model_name="org/model", generation=None, success=False)],
+                args,
+                tmp_path / "image.jpg",
+            )
+
+        assert len(captured) == 1
+        params = captured[0]
+        assert (
+            params.prompt,
+            params.max_tokens,
+            params.temperature,
+            params.timeout,
+            params.verbose,
+        ) == (
+            check_models.RERUN_TRIAGE_PROMPT,
+            check_models.RERUN_TRIAGE_MAX_TOKENS,
+            0.0,
+            check_models.RERUN_TRIAGE_TIMEOUT,
+            False,
+        )
+        assert params.revision == "model-revision"
+        assert params.adapter_path == "adapter/path"
+        assert params.prefill_step_size == 512
+        assert params.resize_shape == (64, 32)
+        assert params.eos_tokens == ("<eos>",)
+        assert params.skip_special_tokens is True
+        assert params.processor_kwargs == {"crop": False}
+        assert params.enable_thinking is True
+        assert params.thinking_budget == 24
+        assert params.thinking_mode == "budget"
+        assert params.thinking_start_token == "<think>"
+        assert params.thinking_end_token == "</think>"
+        assert params.context_marker == "Metadata:"

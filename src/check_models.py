@@ -193,8 +193,6 @@ __all__ = [
     "get_system_characteristics",
     "get_system_info",
     "get_terminal_width",
-    "is_numeric_field",
-    "is_numeric_value",
     "log_blank",
     "log_failure",
     "log_file_path",
@@ -226,7 +224,12 @@ __all__ = [
 # =============================================================================
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
+logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 NOT_AVAILABLE: Final[str] = "N/A"
+RERUN_TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
+HTML_UNESCAPED_AMPERSAND_RE: Final[re.Pattern[str]] = re.compile(
+    r"&(?!lt;|gt;|amp;|#)",
+)
 # MD037 included: verbatim model-output previews may contain emphasis-like
 # sequences (e.g. "*   bullet" reasoning text) that must not be edited.
 MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD037 MD049"
@@ -574,9 +577,6 @@ def load_quality_config(config_path: Path | None = None) -> None:
             logger.warning("Failed to load quality config from %s: %s", config_path, e)
 
 
-_temp_logger = logging.getLogger(LOGGER_NAME)
-
-
 def _format_import_probe_output_excerpt(
     output: str,
     *,
@@ -730,7 +730,7 @@ try:
 except (ImportError, AttributeError, ValueError):
     _defusedxml_available = False
 if not _defusedxml_available:
-    _temp_logger.warning(
+    logger.warning(
         "defusedxml not installed — XMP metadata extraction will be disabled. "
         "Install with: pip install defusedxml",
     )
@@ -1874,16 +1874,12 @@ def _prompt_burden_for_result(
     diagnostics = result.prompt_diagnostics
     placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
     substantial = total is not None and total >= QUALITY.long_prompt_tokens_threshold
-    processed_width = getattr(diagnostics, "processed_image_width", None) or getattr(
-        image_profile,
-        "processed_width",
-        None,
+    processed_width = (diagnostics.processed_image_width if diagnostics is not None else None) or (
+        image_profile.processed_width if image_profile is not None else None
     )
-    processed_height = getattr(diagnostics, "processed_image_height", None) or getattr(
-        image_profile,
-        "processed_height",
-        None,
-    )
+    processed_height = (
+        diagnostics.processed_image_height if diagnostics is not None else None
+    ) or (image_profile.processed_height if image_profile is not None else None)
 
     reason: str | None = None
     kind: PromptBurdenKind = "normal"
@@ -2038,7 +2034,7 @@ def _escape_report_markdown_text(text: str) -> str:
     """Escape HTML-like text for non-code Markdown report blocks."""
     escaped = html.escape(_wrap_bare_urls(text), quote=False)
     escaped = _escape_markdown_underscore_runs(escaped)
-    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
+    return HTML_UNESCAPED_AMPERSAND_RE.sub("&amp;", escaped)
 
 
 def _escape_report_markdown_heading(text: str) -> str:
@@ -2880,18 +2876,6 @@ class ProcessImageParams:
 # =============================================================================
 
 
-class TimingStrategy(Protocol):
-    """Protocol for timing operations."""
-
-    def start(self) -> None:
-        """Start the timer."""
-        ...
-
-    def stop(self) -> float:
-        """Stop the timer and return the elapsed time in seconds."""
-        ...
-
-
 class PerfCounterTimer:
     """Default timing strategy using time.perf_counter()."""
 
@@ -2972,14 +2956,12 @@ class TimeoutManager(ContextDecorator):
             signal.signal(signal.SIGALRM, self.timer)
 
 
-# Configure logging - Single logger instance
+# Logging uses the module-level logger initialized with the other constants.
 # Contributor rule of thumb:
 # - Send user-visible messages through logger so console and file logs stay aligned.
 # - Use Rich to build structured renderables (for example tables or panels),
 #   then route them through _log_rich_renderable() / _log_rich_table()
 #   instead of calling Console.print() directly from feature code.
-logger: logging.Logger = logging.getLogger(LOGGER_NAME)
-
 # Disable Hugging Face tokenizers parallelism to avoid fork-related warnings/deadlocks.
 # This must be set before tokenizers are created/used.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -3241,8 +3223,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "error_package": ("Error", "Package"),
 }
 
-# Threshold for splitting long header text into multiple lines
-HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
@@ -3257,12 +3237,6 @@ SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
-
-# Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
-# Exclude non-numeric fields explicitly
-NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
-    k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues", "error_package"}
-)
 
 # Performance timing fields: those from PerformanceResult (not GenerationResult)
 # Automatically derived from FIELD_ABBREVIATIONS for consistency
@@ -3356,7 +3330,7 @@ def _escape_markdown_table_text(
     result = result.replace("|", "\\|")
     result = HTML_ESCAPER.escape(result)
     result = _escape_markdown_underscore_runs(result)
-    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+    return HTML_UNESCAPED_AMPERSAND_RE.sub("&amp;", result)
 
 
 class MarkdownPipeEscaper:
@@ -4553,32 +4527,6 @@ def _format_peak_memory_context(
     return (
         f"{peak} GB ({fmt_num(percentage)}% of {fmt_num(working_set_gb)} GB "
         "recommended working set)"
-    )
-
-
-def is_numeric_value(val: object) -> bool:
-    """Return True if val can be interpreted as a number."""
-    return _coerce_numeric_value(val) is not None
-
-
-@lru_cache(maxsize=128)
-def is_numeric_field(field_name: str) -> bool:
-    """Check if a field should be treated as numeric (right-aligned).
-
-    Uses caching to avoid repeated string operations for frequently
-    accessed field names during formatting operations.
-
-    Args:
-        field_name: Name of the metric field to check
-
-    Returns:
-        True if field contains numeric data
-    """
-    field_lower = field_name.lower()
-    return (
-        field_name in NUMERIC_FIELD_PATTERNS
-        or any(keyword in field_lower for keyword in ("token", "tps", "memory", "time"))
-        or field_lower.endswith("_tokens")
     )
 
 
@@ -7104,15 +7052,7 @@ def _public_model_provenance(
 
 def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
     """Return cached quality analysis for a result when present."""
-    if res.quality_analysis is not None:
-        return res.quality_analysis
-    generation = res.generation
-    if generation is None:
-        return None
-    generation_analysis = getattr(generation, "quality_analysis", None)
-    return (
-        generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
-    )
+    return res.quality_analysis
 
 
 _EXTERNAL_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
@@ -7638,6 +7578,19 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     )
 
 
+def _gallery_chooser_explanation() -> str:
+    """Return the metric caveat shared verbatim by both chooser formats."""
+    return (
+        "Current-run usability and captured resource facts only. Total time is end-to-end; "
+        "throughput covers generation only and requires "
+        f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
+        "Prefill/first is first-token latency when captured; Prompt tok is the full "
+        "rendered prompt including image tokens, which drives prefill cost. "
+        "For cross-attention architectures the token count reflects the tokenised "
+        "text burden only, not total vision prefill compute."
+    )
+
+
 def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     """Render the skim-first chooser, resource highlights, and avoid list."""
     data = _gallery_chooser_data(rows)
@@ -7659,15 +7612,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     parts = [
         "## Current-run Chooser",
         "",
-        (
-            "Current-run usability and captured resource facts only. Total time is end-to-end; "
-            "throughput covers generation only and requires "
-            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
-            "Prefill/first is first-token latency when captured; Prompt tok is the full "
-            "rendered prompt including image tokens, which drives prefill cost. "
-            "For cross-attention architectures the token count reflects the tokenised "
-            "text burden only, not total vision prefill compute."
-        ),
+        _gallery_chooser_explanation(),
         "",
         *_render_gallery_table(
             headers=(
@@ -8192,7 +8137,7 @@ def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped: str = _escape_markdown_underscore_runs(HTML_ESCAPER.escape(_wrap_bare_urls(text)))
     escaped = escaped.replace("*", "&#42;")
-    escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
+    escaped = HTML_UNESCAPED_AMPERSAND_RE.sub("&amp;", escaped)
     return _neutralize_markdown_blockquote_prefix(escaped)
 
 
@@ -9418,14 +9363,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     parts = [
         '<section id="current-run-chooser">',
         "<h2>Current-run Chooser</h2>",
-        (
-            "<p>Current-run usability and captured resource facts only. Total time is "
-            "end-to-end; throughput covers generation only and requires "
-            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
-            "Prompt tok is the full rendered prompt including image tokens; for "
-            "cross-attention architectures it reflects the tokenised text burden "
-            "only, not total vision prefill compute.</p>"
-        ),
+        f"<p>{html.escape(_gallery_chooser_explanation(), quote=True)}</p>",
         _html_filter_controls(),
         '<div id="chooser-table">',
         _html_table(
@@ -12043,7 +11981,6 @@ def _finalize_process_result(
 
 def _run_model_generation(
     params: ProcessImageParams,
-    timer: TimingStrategy | None = None,
     phase_callback: Callable[[str], None] | None = None,
     phase_timer: PhaseTimer | None = None,
 ) -> GenerationResult | SupportsGenerationResult:
@@ -12056,7 +11993,6 @@ def _run_model_generation(
 
     Args:
         params: The parameters for the image processing.
-        timer: Optional timing strategy. If None, uses PerfCounterTimer.
         phase_callback: Optional callback invoked when execution enters a new phase.
         phase_timer: Optional per-phase timer that records load, prep, and decode durations.
     """
@@ -12102,10 +12038,8 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-    # Time the generation process manually since MLX VLM doesn't include timing
-    # Use injected timer or default to PerfCounterTimer
-    if timer is None:
-        timer = PerfCounterTimer()
+    # Time the generation process manually since MLX VLM doesn't include timing.
+    timer = PerfCounterTimer()
 
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
@@ -12158,7 +12092,7 @@ def _run_model_generation(
             params=params,
             generate_once=_generate_once,
         )
-    except (TimeoutError, OSError, ValueError, RuntimeError) as generation_err:
+    except (TimeoutError, ValueError) as generation_err:
         _tag_exception_prompt_diagnostics(generation_err, prompt_diagnostics)
         raise
     finally:
@@ -12871,6 +12805,41 @@ def _summary_parts(
     return parts
 
 
+def _quality_warning_messages(
+    analysis: GenerationQualityAnalysis,
+    generated_tokens: int | None,
+) -> tuple[str, ...]:
+    """Return the actionable mechanical warnings shared by console modes."""
+    messages: list[str] = []
+    if analysis.is_repetitive and analysis.repeated_token:
+        messages.append(f"Repetitive: '{analysis.repeated_token}'")
+    if analysis.missing_sections:
+        messages.append(f"Missing sections: {', '.join(analysis.missing_sections)}")
+    if analysis.thinking_trace_incomplete:
+        messages.append("Expected thinking trace did not reach a final answer")
+    if analysis.instruction_echo:
+        messages.append("Instruction text appears in output")
+    if analysis.unexpected_catalog_preamble:
+        messages.append("Unexpected text appears before the Title section")
+    if analysis.likely_capped and analysis.token_cap_reasons:
+        messages.append(f"Output reached requested token limit ({generated_tokens} tokens)")
+    if analysis.unexpected_special_tokens:
+        messages.append(
+            "Unexpected special token wrappers: "
+            + ", ".join(analysis.unexpected_special_tokens[:2])
+        )
+    return tuple(messages)
+
+
+def _log_quality_warnings(
+    analysis: GenerationQualityAnalysis,
+    generated_tokens: int | None,
+) -> None:
+    """Log the shared actionable warning set in stable severity order."""
+    for message in _quality_warning_messages(analysis, generated_tokens):
+        log_warning_note(message)
+
+
 def _preview_generation(
     gen: StoredGenerationResult | None,
     *,
@@ -12900,27 +12869,11 @@ def _preview_generation(
         )
         return
 
-    # Show brief inline warnings for directly observed mechanical conditions.
-    if analysis.is_repetitive and analysis.repeated_token:
-        log_warning_note(f"Repetitive: '{analysis.repeated_token}'")
-    if analysis.missing_sections:
-        missing = ", ".join(analysis.missing_sections)
-        log_warning_note(f"Missing sections: {missing}")
-    if analysis.thinking_trace_incomplete:
-        log_warning_note("Expected thinking trace did not reach a final answer")
-    if analysis.instruction_echo:
-        log_warning_note("Instruction text appears in output")
-    if analysis.unexpected_catalog_preamble:
-        log_warning_note("Unexpected text appears before the Title section")
-    if analysis.likely_capped and analysis.token_cap_reasons:
-        log_warning_note(f"Output reached requested token limit ({gen_tokens} tokens)")
-    elif analysis.likely_capped:
+    _log_quality_warnings(analysis, gen_tokens)
+    if analysis.likely_capped and not analysis.token_cap_reasons:
         # Same gate as the token_cap_truncation observation: a cap hit without
         # degradation evidence is neutral information, not a warning.
         logger.info("Output used the full requested token budget (%s tokens)", gen_tokens)
-    if analysis.unexpected_special_tokens:
-        tokens = ", ".join(analysis.unexpected_special_tokens[:2])
-        log_warning_note(f"Unexpected special token wrappers: {tokens}")
 
     # Show full output in trace (truncated in summary table)
     log_metric_label("Generated Text:", emoji="📝")
@@ -12955,19 +12908,7 @@ def _log_verbose_success_details_mode(
 
     log_blank()
 
-    # Log only directly observed mechanical conditions.
-    if analysis.is_repetitive and analysis.repeated_token:
-        log_warning_note(
-            f"Contiguous repetition detected: {analysis.repeated_token}",
-        )
-    if analysis.missing_sections:
-        log_warning_note(f"Missing requested sections: {', '.join(analysis.missing_sections)}")
-    if analysis.unexpected_special_tokens:
-        log_warning_note(
-            f"Unexpected special token(s): {', '.join(analysis.unexpected_special_tokens)}"
-        )
-    if analysis.unexpected_catalog_preamble:
-        log_warning_note("Unexpected text appears before the Title section")
+    _log_quality_warnings(analysis, gen_tokens)
 
     if not gen_text:
         log_metric_label("Generated Text:", emoji="📝")
@@ -13539,51 +13480,34 @@ def _raise_for_missing_runtime_dependencies() -> None:
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     if getattr(args, "image", None) is not None:
-        img_path: Path = args.image.resolve()
-        log_file_path(str(img_path), label="Image File:     ")
-        try:
-            with Image.open(img_path) as img:
-                img.verify()
-            print_image_dimensions(img_path)
-        except (
-            FileNotFoundError,
-            UnidentifiedImageError,
-            OSError,
-        ) as img_err:
-            exit_with_cli_error(
-                f"Cannot open or verify image {img_path}: {img_err}. Exiting.",
-                suppress_cause=True,
-            )
-        else:
-            return img_path
-    else:
-        folder_path: Path = args.folder.resolve()
-        log_file_path(str(folder_path), label="Scanning folder:")
-        if not folder_path.is_dir():
-            exit_with_cli_error(f"Folder '{folder_path}' does not exist. Exiting.")
-        most_recent_path: Path | None = find_most_recent_file(folder_path)
-        if most_recent_path is None:
-            exit_with_cli_error(
-                f"Could not find the most recent image file in {folder_path}. Exiting.",
-            )
-            raise SystemExit  # pragma: no cover
-        resolved_image_path: Path = most_recent_path.resolve()
-        log_file_path(str(resolved_image_path), label="Image File:     ")
-        try:
-            with Image.open(resolved_image_path) as img:
-                img.verify()
-            print_image_dimensions(resolved_image_path)
-        except (
-            FileNotFoundError,
-            UnidentifiedImageError,
-            OSError,
-        ) as img_err:
-            exit_with_cli_error(
-                f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
-                suppress_cause=True,
-            )
-        else:
-            return resolved_image_path
+        return _validate_selected_image(args.image.resolve())
+
+    folder_path: Path = args.folder.resolve()
+    log_file_path(str(folder_path), label="Scanning folder:")
+    if not folder_path.is_dir():
+        exit_with_cli_error(f"Folder '{folder_path}' does not exist. Exiting.")
+    most_recent_path: Path | None = find_most_recent_file(folder_path)
+    if most_recent_path is None:
+        exit_with_cli_error(
+            f"Could not find the most recent image file in {folder_path}. Exiting.",
+        )
+        raise SystemExit  # pragma: no cover
+    return _validate_selected_image(most_recent_path.resolve())
+
+
+def _validate_selected_image(image_path: Path) -> Path:
+    """Verify one selected image and return its resolved path."""
+    log_file_path(str(image_path), label="Image File:     ")
+    try:
+        with Image.open(image_path) as image:
+            image.verify()
+        print_image_dimensions(image_path)
+    except (FileNotFoundError, UnidentifiedImageError, OSError) as image_error:
+        exit_with_cli_error(
+            f"Cannot open or verify image {image_path}: {image_error}. Exiting.",
+            suppress_cause=True,
+        )
+    return image_path
 
 
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
@@ -13800,7 +13724,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             _build_prompt_preview(prompt, max_chars=max_display_len),
         )
     elif eval_mode == "triage":
-        prompt = "Describe this image briefly."
+        prompt = RERUN_TRIAGE_PROMPT
         logger.info("Using triage-mode prompt (minimal context).")
     else:
         include_metadata_hints = eval_mode == "assisted"
@@ -14159,6 +14083,62 @@ def apply_exclusions(
     return filtered
 
 
+def _process_image_params_from_args(
+    args: argparse.Namespace,
+    *,
+    model_identifier: str,
+    image_path: Path,
+    prompt: str,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    timeout: float | None = None,
+    verbose: bool | None = None,
+) -> ProcessImageParams:
+    """Build inference parameters once, with explicit per-run overrides."""
+    return ProcessImageParams(
+        model_identifier=model_identifier,
+        image_path=image_path,
+        prompt=prompt,
+        max_tokens=args.max_tokens if max_tokens is None else max_tokens,
+        temperature=args.temperature if temperature is None else temperature,
+        timeout=args.timeout if timeout is None else timeout,
+        verbose=args.verbose if verbose is None else verbose,
+        trust_remote_code=args.trust_remote_code,
+        top_p=args.top_p,
+        min_p=args.min_p,
+        top_k=args.top_k,
+        repetition_penalty=args.repetition_penalty,
+        repetition_context_size=args.repetition_context_size,
+        seed=args.seed,
+        presence_penalty=args.presence_penalty,
+        presence_context_size=args.presence_context_size,
+        frequency_penalty=args.frequency_penalty,
+        frequency_context_size=args.frequency_context_size,
+        logit_bias=args.logit_bias,
+        lazy=args.lazy_load,
+        max_kv_size=args.max_kv_size,
+        kv_bits=args.kv_bits,
+        kv_quant_scheme=args.kv_quant_scheme,
+        kv_group_size=args.kv_group_size,
+        quantized_kv_start=args.quantized_kv_start,
+        force_download=args.force_download,
+        quantize_activations=args.quantize_activations,
+        revision=args.revision,
+        adapter_path=args.adapter_path,
+        prefill_step_size=args.prefill_step_size,
+        resize_shape=args.resize_shape,
+        eos_tokens=args.eos_tokens,
+        skip_special_tokens=args.skip_special_tokens,
+        processor_kwargs=args.processor_kwargs,
+        enable_thinking=args.enable_thinking,
+        thinking_budget=args.thinking_budget,
+        thinking_mode=args.thinking_mode,
+        thinking_start_token=args.thinking_start_token,
+        thinking_end_token=args.thinking_end_token,
+        context_marker=args.context_marker,
+    )
+
+
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
@@ -14241,48 +14221,11 @@ def process_models(
         # Compact logging for model header
         log_model_name(model_label, label=f"Processing Model {run_label}:")
 
-        is_vlm_verbose: bool = args.verbose
-        params = ProcessImageParams(
+        params = _process_image_params_from_args(
+            args,
             model_identifier=model_id,
             image_path=image_path,
             prompt=prompt,
-            max_tokens=args.max_tokens,
-            temperature=args.temperature,
-            timeout=args.timeout,
-            verbose=is_vlm_verbose,
-            trust_remote_code=args.trust_remote_code,
-            top_p=args.top_p,
-            min_p=args.min_p,
-            top_k=args.top_k,
-            repetition_penalty=args.repetition_penalty,
-            repetition_context_size=args.repetition_context_size,
-            seed=args.seed,
-            presence_penalty=args.presence_penalty,
-            presence_context_size=args.presence_context_size,
-            frequency_penalty=args.frequency_penalty,
-            frequency_context_size=args.frequency_context_size,
-            logit_bias=args.logit_bias,
-            lazy=args.lazy_load,
-            max_kv_size=args.max_kv_size,
-            kv_bits=args.kv_bits,
-            kv_quant_scheme=args.kv_quant_scheme,
-            kv_group_size=args.kv_group_size,
-            quantized_kv_start=args.quantized_kv_start,
-            force_download=args.force_download,
-            quantize_activations=args.quantize_activations,
-            revision=args.revision,
-            adapter_path=args.adapter_path,
-            prefill_step_size=args.prefill_step_size,
-            resize_shape=args.resize_shape,
-            eos_tokens=args.eos_tokens,
-            skip_special_tokens=args.skip_special_tokens,
-            processor_kwargs=args.processor_kwargs,
-            enable_thinking=args.enable_thinking,
-            thinking_budget=args.thinking_budget,
-            thinking_mode=args.thinking_mode,
-            thinking_start_token=args.thinking_start_token,
-            thinking_end_token=args.thinking_end_token,
-            context_marker=args.context_marker,
         )
         result: PerformanceResult = process_image_with_model(params)
 
@@ -15974,6 +15917,7 @@ def _reproduction_input_blocks(
                             image_ref="any-local-image.jpg",
                             run_args=run_args,
                             resolved_revision=resolved_revision,
+                            minimal_load=True,
                         ).shell_command(),
                         language="bash",
                     ),
@@ -16762,6 +16706,71 @@ def _append_native_cli_sequence(
             tokens.extend([flag, *values])
 
 
+_NATIVE_CLI_SEQUENCE_ARGS: Final[tuple[tuple[str, str], ...]] = (
+    ("--resize-shape", "resize_shape"),
+    ("--eos-tokens", "eos_tokens"),
+)
+_NATIVE_CLI_OPTIONAL_ARGS: Final[tuple[tuple[str, str], ...]] = (
+    ("--seed", "seed"),
+    ("--repetition-penalty", "repetition_penalty"),
+    ("--max-kv-size", "max_kv_size"),
+    ("--kv-bits", "kv_bits"),
+    ("--presence-penalty", "presence_penalty"),
+    ("--frequency-penalty", "frequency_penalty"),
+    ("--prefill-step-size", "prefill_step_size"),
+    ("--thinking-budget", "thinking_budget"),
+    ("--thinking-mode", "thinking_mode"),
+    ("--thinking-start-token", "thinking_start_token"),
+)
+_NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
+    ("--repetition-context-size", "repetition_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+    ("--presence-context-size", "presence_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+    ("--frequency-context-size", "frequency_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+    ("--kv-quant-scheme", "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
+    ("--kv-group-size", "kv_group_size", DEFAULT_KV_GROUP_SIZE),
+    ("--quantized-kv-start", "quantized_kv_start", DEFAULT_QUANTIZED_KV_START),
+    ("--thinking-end-token", "thinking_end_token", DEFAULT_THINKING_END_MARKER),
+)
+_NATIVE_CLI_BOOLEAN_FLAGS: Final[tuple[tuple[str, str], ...]] = (
+    ("--skip-special-tokens", "skip_special_tokens"),
+    ("--enable-thinking", "enable_thinking"),
+)
+_NATIVE_CLI_LOAD_BOOLEAN_FLAGS: Final[tuple[tuple[str, str, bool], ...]] = (
+    ("--force-download", "force_download", False),
+    ("--trust-remote-code", "trust_remote_code", True),
+    ("--quantize-activations", "quantize_activations", False),
+)
+_NATIVE_GENERATION_KWARG_DEFAULTS: Final[tuple[tuple[str, object], ...]] = (
+    ("top_p", 1.0),
+    ("min_p", 0.0),
+    ("top_k", 0),
+    ("logit_bias", None),
+)
+
+
+def _append_native_cli_load_args(
+    tokens: list[str],
+    run_args: argparse.Namespace,
+    resolved_revision: str | None,
+) -> None:
+    """Append model-loading arguments shared by full and load-only repros."""
+    if (adapter_path := getattr(run_args, "adapter_path", None)) is not None:
+        tokens.extend(
+            [
+                "--adapter-path",
+                _issue_repro_portable_path_ref(str(adapter_path), fallback="path/to/adapter"),
+            ]
+        )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--revision",
+        resolved_revision or getattr(run_args, "revision", None),
+    )
+    for flag, attribute, default in _NATIVE_CLI_LOAD_BOOLEAN_FLAGS:
+        if bool(getattr(run_args, attribute, default)):
+            tokens.append(flag)
+
+
 def _build_native_mlx_vlm_cli_tokens(
     *,
     model_name: str,
@@ -16769,6 +16778,7 @@ def _build_native_mlx_vlm_cli_tokens(
     image_ref: str,
     run_args: argparse.Namespace | None,
     resolved_revision: str | None = None,
+    minimal_load: bool = False,
 ) -> list[str]:
     """Build a native ``python -m mlx_vlm.generate`` command for issue drafts."""
     tokens = [
@@ -16780,135 +16790,57 @@ def _build_native_mlx_vlm_cli_tokens(
         "--image",
         image_ref,
         "--prompt",
-        prompt,
+        "x" if minimal_load else prompt,
         "--max-tokens",
         str(
-            getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
-            if run_args is not None
-            else DEFAULT_MAX_TOKENS
+            8
+            if minimal_load
+            else (
+                getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
+                if run_args is not None
+                else DEFAULT_MAX_TOKENS
+            )
         ),
         "--temperature",
         str(
-            getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
-            if run_args is not None
-            else DEFAULT_TEMPERATURE
+            DEFAULT_TEMPERATURE
+            if minimal_load
+            else (
+                getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
+                if run_args is not None
+                else DEFAULT_TEMPERATURE
+            )
         ),
     ]
     if run_args is None:
         _append_native_cli_optional_pair(tokens, "--revision", resolved_revision)
         return tokens
 
-    adapter_path = getattr(run_args, "adapter_path", None)
-    if adapter_path is not None:
-        tokens.extend(
-            [
-                "--adapter-path",
-                _issue_repro_portable_path_ref(
-                    str(adapter_path),
-                    fallback="path/to/adapter",
-                ),
-            ]
-        )
-    _append_native_cli_sequence(tokens, "--resize-shape", getattr(run_args, "resize_shape", None))
-    _append_native_cli_sequence(tokens, "--eos-tokens", getattr(run_args, "eos_tokens", None))
-    _append_native_cli_optional_pair(tokens, "--seed", getattr(run_args, "seed", None))
-    _append_native_cli_optional_pair(
-        tokens,
-        "--repetition-penalty",
-        getattr(run_args, "repetition_penalty", None),
-    )
-    repetition_context_size = getattr(
-        run_args,
-        "repetition_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    if repetition_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
-        tokens.extend(["--repetition-context-size", str(repetition_context_size)])
-    _append_native_cli_optional_pair(
-        tokens, "--max-kv-size", getattr(run_args, "max_kv_size", None)
-    )
-    _append_native_cli_optional_pair(tokens, "--kv-bits", getattr(run_args, "kv_bits", None))
-    _append_native_cli_optional_pair(
-        tokens,
-        "--presence-penalty",
-        getattr(run_args, "presence_penalty", None),
-    )
-    _append_native_cli_optional_pair(
-        tokens,
-        "--frequency-penalty",
-        getattr(run_args, "frequency_penalty", None),
-    )
+    _append_native_cli_load_args(tokens, run_args, resolved_revision)
+    if minimal_load:
+        return tokens
 
-    presence_context_size = getattr(
-        run_args,
-        "presence_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    if presence_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
-        tokens.extend(["--presence-context-size", str(presence_context_size)])
-
-    frequency_context_size = getattr(
-        run_args,
-        "frequency_context_size",
-        DEFAULT_PENALTY_CONTEXT_SIZE,
-    )
-    if frequency_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
-        tokens.extend(["--frequency-context-size", str(frequency_context_size)])
-
-    kv_quant_scheme = getattr(run_args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME)
-    if kv_quant_scheme != DEFAULT_KV_QUANT_SCHEME:
-        tokens.extend(["--kv-quant-scheme", str(kv_quant_scheme)])
-
-    kv_group_size = getattr(run_args, "kv_group_size", DEFAULT_KV_GROUP_SIZE)
-    if kv_group_size != DEFAULT_KV_GROUP_SIZE:
-        tokens.extend(["--kv-group-size", str(kv_group_size)])
-
-    quantized_kv_start = getattr(run_args, "quantized_kv_start", DEFAULT_QUANTIZED_KV_START)
-    if quantized_kv_start != DEFAULT_QUANTIZED_KV_START:
-        tokens.extend(["--quantized-kv-start", str(quantized_kv_start)])
-
-    if bool(getattr(run_args, "skip_special_tokens", False)):
-        tokens.append("--skip-special-tokens")
-    if bool(getattr(run_args, "force_download", False)):
-        tokens.append("--force-download")
-    _append_native_cli_optional_pair(
-        tokens,
-        "--revision",
-        resolved_revision or getattr(run_args, "revision", None),
-    )
-    if bool(getattr(run_args, "trust_remote_code", True)):
-        tokens.append("--trust-remote-code")
-    if bool(getattr(run_args, "quantize_activations", False)):
-        tokens.append("--quantize-activations")
-
+    for flag, attribute in _NATIVE_CLI_SEQUENCE_ARGS:
+        _append_native_cli_sequence(tokens, flag, getattr(run_args, attribute, None))
+    for flag, attribute in _NATIVE_CLI_OPTIONAL_ARGS:
+        _append_native_cli_optional_pair(tokens, flag, getattr(run_args, attribute, None))
+    for flag, attribute, default in _NATIVE_CLI_NONDEFAULT_ARGS:
+        value = getattr(run_args, attribute, default)
+        if value != default:
+            tokens.extend([flag, str(value)])
+    for flag, attribute in _NATIVE_CLI_BOOLEAN_FLAGS:
+        if bool(getattr(run_args, attribute, False)):
+            tokens.append(flag)
     processor_kwargs = getattr(run_args, "processor_kwargs", None)
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
-    _append_native_cli_optional_pair(
-        tokens,
-        "--prefill-step-size",
-        getattr(run_args, "prefill_step_size", None),
-    )
-    if bool(getattr(run_args, "enable_thinking", False)):
-        tokens.append("--enable-thinking")
-    _append_native_cli_optional_pair(
-        tokens,
-        "--thinking-budget",
-        getattr(run_args, "thinking_budget", None),
-    )
-    _append_native_cli_optional_pair(
-        tokens,
-        "--thinking-mode",
-        getattr(run_args, "thinking_mode", None),
-    )
-    _append_native_cli_optional_pair(
-        tokens,
-        "--thinking-start-token",
-        getattr(run_args, "thinking_start_token", None),
-    )
-    thinking_end_token = getattr(run_args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
-    if thinking_end_token != DEFAULT_THINKING_END_MARKER:
-        tokens.extend(["--thinking-end-token", str(thinking_end_token)])
+    generation_kwargs = {
+        attribute: value
+        for attribute, default in _NATIVE_GENERATION_KWARG_DEFAULTS
+        if (value := getattr(run_args, attribute, default)) != default
+    }
+    if generation_kwargs:
+        tokens.extend(["--gen-kwargs", json.dumps(generation_kwargs, sort_keys=True)])
     return tokens
 
 
@@ -16919,6 +16851,7 @@ def build_native_mlx_vlm_repro_command_spec(
     image_ref: str,
     run_args: argparse.Namespace | None,
     resolved_revision: str | None = None,
+    minimal_load: bool = False,
 ) -> ReproCommandSpec:
     """Build a native ``mlx_vlm.generate`` CLI repro command spec."""
     tokens = _build_native_mlx_vlm_cli_tokens(
@@ -16927,6 +16860,7 @@ def build_native_mlx_vlm_repro_command_spec(
         image_ref=image_ref,
         run_args=run_args,
         resolved_revision=resolved_revision,
+        minimal_load=minimal_load,
     )
     return ReproCommandSpec(
         base_tokens=tuple(tokens[:3]),
@@ -17561,7 +17495,6 @@ def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
 
 # ---------- Phase 5: Automatic Differential Reruns ----------
 
-RERUN_TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
 RERUN_TRIAGE_MAX_TOKENS: Final[int] = 100
 RERUN_TRIAGE_TIMEOUT: Final[float] = 60.0
 
@@ -17623,7 +17556,8 @@ def _run_differential_reruns(
             len(candidates),
             result.model_name,
         )
-        params = ProcessImageParams(
+        params = _process_image_params_from_args(
+            args,
             model_identifier=result.model_name,
             image_path=image_path,
             prompt=RERUN_TRIAGE_PROMPT,
@@ -17631,41 +17565,6 @@ def _run_differential_reruns(
             temperature=0.0,
             timeout=RERUN_TRIAGE_TIMEOUT,
             verbose=False,
-            trust_remote_code=getattr(args, "trust_remote_code", True),
-            top_p=getattr(args, "top_p", 1.0),
-            min_p=getattr(args, "min_p", 0.0),
-            top_k=getattr(args, "top_k", 0),
-            repetition_penalty=getattr(args, "repetition_penalty", None),
-            repetition_context_size=getattr(args, "repetition_context_size", 20),
-            seed=getattr(args, "seed", None),
-            presence_penalty=getattr(args, "presence_penalty", None),
-            presence_context_size=getattr(
-                args,
-                "presence_context_size",
-                DEFAULT_PENALTY_CONTEXT_SIZE,
-            ),
-            frequency_penalty=getattr(args, "frequency_penalty", None),
-            frequency_context_size=getattr(
-                args,
-                "frequency_context_size",
-                DEFAULT_PENALTY_CONTEXT_SIZE,
-            ),
-            logit_bias=getattr(args, "logit_bias", None),
-            lazy=getattr(args, "lazy_load", False),
-            max_kv_size=getattr(args, "max_kv_size", None),
-            kv_bits=getattr(args, "kv_bits", None),
-            kv_quant_scheme=cast(
-                'Literal["uniform", "turboquant"]',
-                getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
-            ),
-            kv_group_size=getattr(args, "kv_group_size", DEFAULT_KV_GROUP_SIZE),
-            quantized_kv_start=getattr(
-                args,
-                "quantized_kv_start",
-                DEFAULT_QUANTIZED_KV_START,
-            ),
-            force_download=getattr(args, "force_download", False),
-            quantize_activations=getattr(args, "quantize_activations", False),
         )
         rerun_result = process_image_with_model(params)
         evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
@@ -18004,22 +17903,25 @@ def _handle_dry_run(
         logger.info("   ... (%d more lines)", len(wrapped) - max_lines)
     log_blank()
 
+    validate_and_warn_model_selection(args)
+
     # Discover models
     if args.models:
         model_identifiers = args.models
         logger.info("📦 Models specified explicitly:")
+        selection_context = "explicit list"
     else:
         model_identifiers = _supported_cached_model_ids_with_skipped_logging(
             get_cached_model_eligibility()
         )
         logger.info("📦 Server-supported models discovered in cache:")
+        selection_context = "cached models"
 
-    # Apply exclusions
-    excluded = set(args.exclude or [])
-    if excluded:
-        before_count = len(model_identifiers)
-        model_identifiers = [m for m in model_identifiers if m not in excluded]
-        logger.info("   (Excluded %d models via --exclude)", before_count - len(model_identifiers))
+    model_identifiers = apply_exclusions(
+        model_identifiers,
+        args.exclude or [],
+        selection_context,
+    )
 
     if not model_identifiers:
         logger.warning("   ⚠️  No models to process!")

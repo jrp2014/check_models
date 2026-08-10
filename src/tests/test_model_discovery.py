@@ -275,37 +275,6 @@ def test_validate_kv_params_rejects_zero_size() -> None:
         check_models.validate_kv_params(kv_bits=4, max_kv_size=0)
 
 
-def test_is_numeric_field_identifies_numeric_fields() -> None:
-    """Should correctly identify numeric field names."""
-    assert check_models.is_numeric_field("prompt_tps")
-    assert check_models.is_numeric_field("generation_tps")
-    assert check_models.is_numeric_field("total_time")
-    assert check_models.is_numeric_field("peak_memory_gb")
-
-
-def test_is_numeric_field_rejects_text_fields() -> None:
-    """Should correctly identify non-numeric fields."""
-    assert not check_models.is_numeric_field("model_identifier")
-    assert not check_models.is_numeric_field("response")
-    assert not check_models.is_numeric_field("error_message")
-
-
-def test_is_numeric_value_identifies_numbers() -> None:
-    """Should correctly identify numeric values."""
-    assert check_models.is_numeric_value(42)
-    assert check_models.is_numeric_value(3.14)
-    assert check_models.is_numeric_value(0)
-    assert check_models.is_numeric_value(-1.5)
-
-
-def test_is_numeric_value_rejects_non_numbers() -> None:
-    """Should reject non-numeric values."""
-    assert not check_models.is_numeric_value("text")
-    # Note: "42" is numeric (can be parsed as number)
-    assert not check_models.is_numeric_value(None)
-    assert not check_models.is_numeric_value([1, 2, 3])
-
-
 # ---------------------------------------------------------------------------
 # Architecture pre-check (upstream --check-arch tier)
 # ---------------------------------------------------------------------------

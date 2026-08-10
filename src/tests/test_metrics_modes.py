@@ -1455,3 +1455,52 @@ def test_console_cap_note_is_neutral_without_degradation_evidence(
             analysis=degraded,
         )
     assert "reached requested token limit" in caplog.text
+
+
+def test_preview_and_verbose_modes_log_the_same_quality_warnings(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Changing verbosity must not hide actionable mechanical observations."""
+    analysis = GenerationQualityAnalysis(
+        is_repetitive=True,
+        repeated_token="loop",  # noqa: S106 - generated-text fixture, not a credential
+        missing_sections=["keywords"],
+        thinking_trace_incomplete=True,
+        instruction_echo=True,
+        unexpected_catalog_preamble="preface",
+        likely_capped=True,
+        token_cap_reasons=["repetition"],
+        unexpected_special_tokens=["<bad>"],
+    )
+    generation = _StubGeneration(text="loop", generation_tokens=500)
+    result = PerformanceResult(
+        model_name="dummy/model",
+        generation=generation,
+        success=True,
+    )
+    expected = (
+        "Repetitive: 'loop'",
+        "Missing sections: keywords",
+        "Expected thinking trace did not reach a final answer",
+        "Instruction text appears in output",
+        "Unexpected text appears before the Title section",
+        "Output reached requested token limit (500 tokens)",
+        "Unexpected special token wrappers: <bad>",
+    )
+
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        check_models._preview_generation(generation, analysis=analysis)
+    preview_messages = "\n".join(record.message for record in caplog.records)
+    caplog.clear()
+
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        check_models._log_verbose_success_details_mode(
+            result,
+            detailed=False,
+            analysis=analysis,
+        )
+    verbose_messages = "\n".join(record.message for record in caplog.records)
+
+    for message in expected:
+        assert message in preview_messages
+        assert message in verbose_messages

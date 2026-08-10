@@ -7,6 +7,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Preserve every applicable inference setting in automatic differential reruns
+  while overriding only the deliberately minimal triage prompt, token limit,
+  temperature, timeout, and verbosity. Console preview and verbose modes now
+  also render quality warnings from one shared decision path.
+- Generate native mlx-vlm reproductions from declarative CLI mappings, including
+  retained sampling, processor, adapter, revision, thinking, and KV settings;
+  model-load crashes use a compact `--prompt x --max-tokens 8` reproduction.
+- Keep Markdown and HTML chooser explanations in sync, including first-token and
+  cross-attention caveats, and make dry runs apply the same exclusion validation
+  as real model selection.
+- Compact the monolith by removing unused numeric-format and injected-timer APIs,
+  and single-source image verification, logging, triage prompt text, and Markdown
+  ampersand escaping without changing retained output schemas.
 - The suppression audit now requires every `noqa`/`type: ignore`/shellcheck
   suppression to carry a human justification (`- <why>` after the codes, or a
   second `# <why>` comment for `type: ignore`), and all fourteen previously

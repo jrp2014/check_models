@@ -625,6 +625,12 @@ def test_run_issue_summary_load_crash_gets_native_repro_without_public_image(
     assert "python -m mlx_vlm.generate" in content
     assert "--model org/load-crash" in content
     assert "--image any-local-image.jpg" in content
+    command_line = next(
+        line for line in content.splitlines() if "python -m mlx_vlm.generate" in line
+    )
+    assert "--prompt x" in command_line
+    assert "--max-tokens 8" in command_line
+    assert "full prompt that must not be copied" not in command_line
     assert "does not claim a complete reproduction command" not in prose
 
 
@@ -646,6 +652,97 @@ def test_run_issue_summary_withholds_command_for_post_load_crash(tmp_path: Path)
     content = summary.read_text(encoding="utf-8")
     assert "does not claim a complete reproduction command" in " ".join(content.split())
     assert "any-local-image.jpg" not in content
+
+
+def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
+    """The native command must retain every harness setting exposed by its CLI."""
+    run_args = Namespace(
+        max_tokens=321,
+        temperature=0.25,
+        top_p=0.81,
+        min_p=0.12,
+        top_k=7,
+        logit_bias={42: -1.5},
+        adapter_path="adapters/test",
+        resize_shape=(64, 32),
+        eos_tokens=(EOS_OVERRIDE_TOKEN,),
+        seed=73,
+        repetition_penalty=1.15,
+        repetition_context_size=48,
+        presence_penalty=0.3,
+        presence_context_size=96,
+        frequency_penalty=0.2,
+        frequency_context_size=80,
+        max_kv_size=4096,
+        kv_bits=4,
+        kv_quant_scheme="turboquant",
+        kv_group_size=32,
+        quantized_kv_start=128,
+        skip_special_tokens=True,
+        force_download=True,
+        revision="requested-revision",
+        trust_remote_code=True,
+        quantize_activations=True,
+        processor_kwargs={"cropping": False},
+        prefill_step_size=512,
+        enable_thinking=True,
+        thinking_budget=24,
+        thinking_mode="enabled",
+        thinking_start_token=THINKING_START_TOKEN,
+        thinking_end_token=CUSTOM_THINKING_END_TOKEN,
+    )
+
+    tokens = check_models._build_native_mlx_vlm_cli_tokens(
+        model_name="org/model",
+        prompt="Describe this image.",
+        image_ref="image.jpg",
+        run_args=run_args,
+        resolved_revision="resolved-revision",
+    )
+
+    expected_pairs = {
+        "--adapter-path": "adapters/test",
+        "--seed": "73",
+        "--repetition-penalty": "1.15",
+        "--repetition-context-size": "48",
+        "--presence-penalty": "0.3",
+        "--presence-context-size": "96",
+        "--frequency-penalty": "0.2",
+        "--frequency-context-size": "80",
+        "--max-kv-size": "4096",
+        "--kv-bits": "4",
+        "--kv-quant-scheme": "turboquant",
+        "--kv-group-size": "32",
+        "--quantized-kv-start": "128",
+        "--revision": "resolved-revision",
+        "--prefill-step-size": "512",
+        "--thinking-budget": "24",
+        "--thinking-mode": "enabled",
+        "--thinking-start-token": THINKING_START_TOKEN,
+        "--thinking-end-token": CUSTOM_THINKING_END_TOKEN,
+    }
+    for flag, value in expected_pairs.items():
+        assert tokens[tokens.index(flag) + 1] == value
+    assert tokens[tokens.index("--resize-shape") + 1 : tokens.index("--resize-shape") + 3] == [
+        "64",
+        "32",
+    ]
+    assert tokens[tokens.index("--eos-tokens") + 1] == EOS_OVERRIDE_TOKEN
+    for flag in (
+        "--skip-special-tokens",
+        "--force-download",
+        "--trust-remote-code",
+        "--quantize-activations",
+        "--enable-thinking",
+    ):
+        assert flag in tokens
+    assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
+    assert json.loads(tokens[tokens.index("--gen-kwargs") + 1]) == {
+        "logit_bias": {"42": -1.5},
+        "min_p": 0.12,
+        "top_k": 7,
+        "top_p": 0.81,
+    }
 
 
 def test_run_issue_summary_withholds_stale_log_and_environment_links(tmp_path: Path) -> None:
@@ -2824,6 +2921,40 @@ def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
     assert 'data-sort-column="6"' in chooser
     assert 'data-sort-value="0.375"' in chooser
     assert "sortChooserColumn" in chooser
+
+
+def test_markdown_and_html_choosers_share_metric_explanations(tmp_path: Path) -> None:
+    """Both chooser formats must explain timing and cross-attention token burden."""
+    result = _make_success("org/chooser-copy")
+    markdown_path = tmp_path / "gallery.md"
+    html_path = tmp_path / "results.html"
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+    )
+
+    generate_markdown_gallery_report(
+        [result],
+        markdown_path,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+    generate_html_report(
+        [result],
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        report_context=context,
+    )
+
+    explanations = (
+        "Prefill/first is first-token latency when captured",
+        "For cross-attention architectures the token count reflects the tokenised text burden",
+    )
+    for report in (markdown_path.read_text(), html.unescape(html_path.read_text())):
+        for explanation in explanations:
+            assert explanation in report
 
 
 def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(

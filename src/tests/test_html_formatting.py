@@ -64,8 +64,3 @@ def test_escape_html_tags_selective_entity_chain() -> None:
     assert "&gt;" in result
     assert "&amp;" in result
     assert "&quot;" in result
-
-
-def test_error_package_is_a_text_field() -> None:
-    """Package-owner labels should never be right-aligned or numerically sorted."""
-    assert not check_models.is_numeric_field("error_package")

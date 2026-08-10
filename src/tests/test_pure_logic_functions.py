@@ -344,6 +344,29 @@ class TestValidateAndWarnModelSelection:
 
         assert not caplog.messages
 
+    def test_dry_run_uses_real_selection_warnings(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+        tmp_path: Path,
+    ) -> None:
+        """Dry-run selection should warn exactly as an executable selection would."""
+        args = self._make_args(exclude=["missing-model"], models=["selected-model"])
+        image_path = tmp_path / "image.jpg"
+
+        with (
+            patch.object(mod, "_all_cached_repo_ids", return_value=["selected-model"]),
+            patch.object(mod, "_arch_precheck_for_model", return_value=(None, None, None)),
+            caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME),
+        ):
+            mod._handle_dry_run(args, image_path, "Describe this image.", {})
+
+        assert any(
+            "missing-model" in message and "will have no effect" in message
+            for message in caplog.messages
+        )
+        assert any("Would process 1 model(s)" in message for message in caplog.messages)
+
 
 # ── prepare_prompt ─────────────────────────────────────────────────────────
 
