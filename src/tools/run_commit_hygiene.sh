@@ -34,7 +34,7 @@ while IFS= read -r -d '' file; do
             case "$file" in
                 src/node_modules/*|*/node_modules/*)
                     ;;
-                .worktrees/*|*/.worktrees/*)
+                .worktrees/*|*/.worktrees/*|.claude/*|*/.claude/*)
                     # Third-party checkouts: never --fix and re-stage their files.
                     ;;
                 *)

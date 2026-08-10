@@ -43,10 +43,10 @@ if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
     os.environ["HF_HOME"] = str(_temp_hf_cache)
 
 # Now import huggingface_hub after environment is configured
-import pytest  # noqa: E402
-from huggingface_hub import scan_cache_dir  # noqa: E402
-from huggingface_hub.errors import CacheNotFound  # noqa: E402
-from PIL import Image  # noqa: E402
+import pytest  # noqa: E402 - after HF cache env setup
+from huggingface_hub import scan_cache_dir  # noqa: E402 - after HF cache env setup
+from huggingface_hub.errors import CacheNotFound  # noqa: E402 - after HF cache env setup
+from PIL import Image  # noqa: E402 - after HF cache env setup
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -91,7 +91,7 @@ def reset_logger_handlers() -> Generator[None]:
     propagate is enabled for caplog to work correctly.
     """
     # Import lazily to avoid circular imports at module load time
-    from check_models import logger  # noqa: PLC0415
+    from check_models import logger  # noqa: PLC0415 - avoid circular import at load
 
     # Save original state
     original_propagate = logger.propagate

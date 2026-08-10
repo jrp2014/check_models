@@ -133,7 +133,8 @@ if [ "$QUALITY_MODE" = "fast" ]; then
         "**/*.md" \
         "!src/node_modules/**" \
         "!**/node_modules/**" \
-        "!**/.worktrees/**"
+        "!**/.worktrees/**" \
+        "!**/.claude/**"
 
     echo ""
     echo "✅ Fast quality checks passed!"
@@ -162,7 +163,8 @@ quality_run_markdownlint \
     "**/*.md" \
     "!src/node_modules/**" \
     "!**/node_modules/**" \
-    "!**/.worktrees/**"
+    "!**/.worktrees/**" \
+    "!**/.claude/**"
 
 echo ""
 echo "✅ All quality checks passed!"

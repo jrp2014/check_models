@@ -567,7 +567,7 @@ def load_quality_config(config_path: Path | None = None) -> None:
                     "quality_config.yaml top-level document must be a mapping",
                 )
                 new_quality = QualityThresholds.from_config(config_mapping)
-                global QUALITY  # noqa: PLW0603
+                global QUALITY  # noqa: PLW0603 - single rebinding point for the config-loaded thresholds
                 QUALITY = new_quality
                 logger.debug("Loaded quality configuration from %s", config_path)
         except (OSError, TypeError, ValueError, yaml.YAMLError) as e:

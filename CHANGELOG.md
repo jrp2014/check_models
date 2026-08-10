@@ -7,6 +7,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The suppression audit now requires every `noqa`/`type: ignore`/shellcheck
+  suppression to carry a human justification (`- <why>` after the codes, or a
+  second `# <why>` comment for `type: ignore`), and all fourteen previously
+  bare suppressions gained one. Agent worktrees under `.claude/` are excluded
+  from the audit, the Skylos configs, the danger post-filter, markdownlint,
+  and commit hygiene, matching the existing `.worktrees/` policy (stale repo
+  copies in agent worktrees were inflating the audit and could re-leak into
+  gates).
 - Single-source the two structurally drift-prone vocabularies: thinking
   delimiter pairs become a `ThinkingDelimiterPair` table carrying an explicit
   `reports_when_empty` policy flag (regexes, the legacy pair tuple,

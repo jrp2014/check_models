@@ -587,11 +587,11 @@ class TestUpstreamCliParity:
                         captured[option] = action.default
             return argparse.Namespace()
 
-        argparse.ArgumentParser.parse_args = _grab  # type: ignore[method-assign, assignment]
+        argparse.ArgumentParser.parse_args = _grab  # type: ignore[method-assign, assignment]  # deliberate monkeypatch to capture parser defaults
         try:
             build()
         finally:
-            argparse.ArgumentParser.parse_args = real_parse_args  # type: ignore[method-assign]
+            argparse.ArgumentParser.parse_args = real_parse_args  # type: ignore[method-assign]  # restore the real parser
         return captured
 
     def test_shared_flag_defaults_match_mlx_vlm_generate(self) -> None:

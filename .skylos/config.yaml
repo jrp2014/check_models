@@ -11,8 +11,9 @@ exclude:
   - "*.egg-info"
   - src/check_models.suppression-audit*.py
   # Agent-managed worktrees hold third-party checkouts (e.g. upstream mlx-vlm)
-  # whose workflows are not this repository's to gate.
+  # and stale repo copies whose files are not this repository's to gate.
   - .worktrees
+  - .claude
 
 # Mirror the package-local quality policy so repo-root scans and `src` scans
 # treat this intentional single-file CLI and its behavior-grouped tests the same.

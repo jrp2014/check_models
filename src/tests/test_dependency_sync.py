@@ -486,8 +486,9 @@ def test_root_skylos_config_mirrors_package_quality_policy() -> None:
         "dist",
         "*.egg-info",
         "src/check_models.suppression-audit*.py",
-        # Third-party checkouts must never gate this repository.
+        # Third-party checkouts and agent worktrees must never gate this repo.
         ".worktrees",
+        ".claude",
     } <= set(root_config["exclude"])
     assert set(root_config["ignore"]) == set(package_config["ignore"])
     for key in SKYLOS_MONOLITH_QUALITY_LIMITS:
@@ -2202,7 +2203,7 @@ def test_check_if_needed_requires_evidence_for_every_suppressed_code(
     src_root.mkdir(parents=True)
     file_path = src_root / "sample.py"
     file_path.write_text(
-        "def sample():  # noqa: PLR0912, PLR0915\n    pass\n",
+        "def sample():  # noqa: PLR0912, PLR0915 - fixture rationale\n    pass\n",
         encoding="utf-8",
     )
     finding = check_suppressions.SuppressionFinding(
@@ -2210,7 +2211,7 @@ def test_check_if_needed_requires_evidence_for_every_suppressed_code(
         line_num=1,
         kind="noqa",
         codes=("PLR0912", "PLR0915"),
-        line_text="def sample():  # noqa: PLR0912, PLR0915",
+        line_text="def sample():  # noqa: PLR0912, PLR0915 - fixture rationale",
     )
     result = subprocess.CompletedProcess(
         args=["ruff"],
@@ -2429,6 +2430,7 @@ def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> No
     report: dict[str, object] = {
         "danger": [
             {"file": "/repo/.worktrees/mlx-vlm-x/.github/workflows/tests.yml", "rule": "D292"},
+            {"file": "/repo/.claude/worktrees/agent-x/src/check_models.py", "rule": "D215"},
             {"file": "/repo/src/tools/update.sh", "rule": "D301"},
             "not-a-dict-entry",
         ],
@@ -2436,7 +2438,7 @@ def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> No
     }
     dropped = filter_danger_report.drop_worktree_findings(report)
 
-    assert dropped == 1
+    assert dropped == 2
     assert report["danger"] == [
         {"file": "/repo/src/tools/update.sh", "rule": "D301"},
         "not-a-dict-entry",
@@ -2462,3 +2464,45 @@ def test_artifact_schema_version_constants_match_typed_dict_literals() -> None:
     assert jsonl_literal == (check_models.JSONL_FORMAT_VERSION,)
     assert run_json_literal == (check_models.RUN_JSON_SCHEMA_VERSION,)
     assert history_literal == (check_models.HISTORY_FORMAT_VERSION,)
+
+
+def test_check_if_needed_rejects_suppressions_without_justification(tmp_path: Path) -> None:
+    """A suppression must say why it is safe, not only what it silences."""
+    repo_root = tmp_path / "repo"
+    src_root = repo_root / "src"
+    src_root.mkdir(parents=True)
+    file_path = src_root / "sample.py"
+    file_path.write_text("unused = 1  # noqa: F841\n", encoding="utf-8")
+    finding = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="noqa",
+        codes=("F841",),
+        line_text="unused = 1  # noqa: F841",
+    )
+
+    needed, reason = check_suppressions.check_if_needed(
+        finding,
+        repo_root=repo_root,
+        src_root=src_root,
+    )
+
+    assert needed is False
+    assert "no justification" in reason
+    # The rationale extractor recognises both comment styles.
+    justified_noqa = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="noqa",
+        codes=("F841",),
+        line_text="unused = 1  # noqa: F841 - fixture keeps the name visible",
+    )
+    justified_ignore = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="type-ignore",
+        codes=("assignment",),
+        line_text="x = y  # type: ignore[assignment]  # narrowing is deliberate",
+    )
+    assert check_suppressions._suppression_rationale(justified_noqa)
+    assert check_suppressions._suppression_rationale(justified_ignore)

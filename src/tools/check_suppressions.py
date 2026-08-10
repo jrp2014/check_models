@@ -31,6 +31,7 @@ PYTHON_SUFFIXES: Final[frozenset[str]] = frozenset({".py"})
 SHELL_SUFFIXES: Final[frozenset[str]] = frozenset({".sh"})
 EXCLUDED_PATH_PARTS: Final[frozenset[str]] = frozenset(
     {
+        ".claude",
         ".conda",
         ".worktrees",
         "__pycache__",
@@ -274,6 +275,21 @@ def _run_for_finding(
         temp_path.unlink(missing_ok=True)
 
 
+def _suppression_rationale(finding: SuppressionFinding) -> str:
+    """Return the human justification text that follows the suppression codes."""
+    if finding.kind == "noqa":
+        match = NOQA_SPECIFIC_RE.search(finding.line_text)
+    elif finding.kind == "type-ignore":
+        match = TYPE_IGNORE_SPECIFIC_RE.search(finding.line_text)
+    elif finding.kind == "shellcheck":
+        match = SHELLCHECK_RE.search(finding.line_text)
+    else:
+        return ""
+    if match is None:
+        return ""
+    return finding.line_text[match.end() :].strip().lstrip("#- ").strip()
+
+
 def check_if_needed(
     finding: SuppressionFinding,
     *,
@@ -288,6 +304,12 @@ def check_if_needed(
         invalid_reason = "Bare # type: ignore is not allowed; use explicit error codes"
     elif not finding.codes:
         invalid_reason = "Suppression has no explicit codes"
+    elif not _suppression_rationale(finding):
+        # A suppression must say why it is safe, not just what it silences.
+        invalid_reason = (
+            "Suppression has no justification; append ' - <why>' after the codes "
+            "(for type: ignore, use a second '# <why>' comment)"
+        )
     if invalid_reason is not None:
         return False, invalid_reason
 

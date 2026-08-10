@@ -43,13 +43,13 @@ if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
     os.environ["HF_HOME"] = str(_temp_hf_cache)
 
 # Now import huggingface_hub after environment is configured
-import pytest  # noqa: E402
-from huggingface_hub import scan_cache_dir  # noqa: E402
-from huggingface_hub.errors import CacheNotFound  # noqa: E402
-from PIL import Image  # noqa: E402
+import pytest  # noqa: E402 - after HF cache env setup
+from huggingface_hub import scan_cache_dir  # noqa: E402 - after HF cache env setup
+from huggingface_hub.errors import CacheNotFound  # noqa: E402 - after HF cache env setup
+from PIL import Image  # noqa: E402 - after HF cache env setup
 
-import check_models  # noqa: E402
-from tools import safe_io  # noqa: E402
+import check_models  # noqa: E402 - after HF cache env setup
+from tools import safe_io  # noqa: E402 - after HF cache env setup
 
 # Fixture model - small, fast, reliable MLX conversion
 FIXTURE_MODEL = "mlx-community/nanoLLaVA-1.5-4bit"

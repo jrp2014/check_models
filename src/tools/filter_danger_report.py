@@ -21,7 +21,7 @@ from pathlib import Path
 
 from tools.safe_io import read_text_no_follow, write_text_no_follow
 
-WORKTREES_MARKER = "/.worktrees/"
+WORKTREE_MARKERS = ("/.worktrees/", "/.claude/worktrees/")
 # Danger reports for this repo run ~10 MB; cap well above that.
 MAX_REPORT_BYTES = 64 * 1024 * 1024
 
@@ -34,7 +34,10 @@ def drop_worktree_findings(report: dict[str, object]) -> int:
     kept = [
         finding
         for finding in findings
-        if not (isinstance(finding, dict) and WORKTREES_MARKER in str(finding.get("file", "")))
+        if not (
+            isinstance(finding, dict)
+            and any(marker in str(finding.get("file", "")) for marker in WORKTREE_MARKERS)
+        )
     ]
     dropped = len(findings) - len(kept)
     if dropped:
