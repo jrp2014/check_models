@@ -7,6 +7,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Fix `validate_env`'s pre-commit framework check: it ran
+  `pre-commit run --all-files --dry-run` (no such flag), which always failed
+  and reported "hooks not installed" even when the framework hooks were in
+  place. It now checks `.git/hooks` for the framework's generated pre-commit
+  and pre-push scripts via the installer's own detection helper, and never
+  executes the hook suite just to probe installation.
 - Validate the input image once per run instead of once per model:
   successful validations are cached against the file's size and mtime (URLs
   cache for the process lifetime), failures are never cached. Saves the

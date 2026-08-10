@@ -31,6 +31,7 @@ from check_models_data.dependency_policy import (
     VALIDATE_ENV_CORE_FALLBACK_SPECS,
     VALIDATE_ENV_EXTRAS_FALLBACK_SPECS,
 )
+from tools.install_precommit_hook import _is_pre_commit_framework_hook
 
 logger = logging.getLogger("validate-env")
 
@@ -338,7 +339,7 @@ def check_git_hooks() -> bool:
 
 
 def check_precommit_framework() -> bool:
-    """Check if pre-commit framework is available."""
+    """Check if the pre-commit framework's generated hooks are installed."""
     precommit_path = shutil.which("pre-commit")
     if not precommit_path:
         logger.warning("⚠ pre-commit framework not installed (optional)")
@@ -346,18 +347,21 @@ def check_precommit_framework() -> bool:
         logger.warning("  Then run: pre-commit install")
         return False
 
-    # Check if hooks are installed
-    result = subprocess.run(
-        [precommit_path, "run", "--all-files", "--dry-run"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode == 0 or "would be modified" in result.stdout:
+    # Installed means the framework's generated scripts occupy .git/hooks for
+    # the hook types configured in .pre-commit-config.yaml. Never run the
+    # hooks to find out: `pre-commit run` executes the full check suite and
+    # says nothing about installation.
+    hooks_dir = Path(__file__).resolve().parents[2] / ".git" / "hooks"
+    missing_hooks = [
+        name
+        for name in ("pre-commit", "pre-push")
+        if not _is_pre_commit_framework_hook(hooks_dir / name)
+    ]
+    if not missing_hooks:
         logger.info("✓ pre-commit framework configured")
         return True
 
-    logger.warning("⚠ pre-commit framework hooks not installed")
+    logger.warning("⚠ pre-commit framework hooks not installed: %s", ", ".join(missing_hooks))
     logger.warning("  Run: pre-commit install")
     return False
 
