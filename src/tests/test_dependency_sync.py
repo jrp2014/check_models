@@ -554,11 +554,14 @@ def test_conda_setup_verifies_mlx_backend_pair() -> None:
 
 
 def test_conda_setup_uses_current_huggingface_cli_installation() -> None:
-    """Avoid installing removed huggingface-hub extras during fresh setup."""
+    """Avoid installing removed huggingface-hub extras on any bootstrap path."""
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
 
     assert '"huggingface_hub[cli]"' not in setup_script
     assert "command -v hf" in setup_script
+
+    makefile = (PKG_ROOT / "Makefile").read_text(encoding="utf-8")
+    assert "huggingface_hub[cli]" not in makefile
 
 
 @pytest.mark.subprocess
@@ -744,22 +747,32 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
 def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     """Keep markdownlint-cli2 aligned between npm metadata and update tooling.
 
-    Policy: the spec is a caret range (not an exact pin), the lockfile provides
-    reproducible installs, and update.sh can move to the latest release.
+    Policy: the spec is a caret range (not an exact pin) and update.sh can move
+    to the latest release. The lockfile is deliberately untracked, so it is
+    only cross-checked when a local `npm install` has produced one.
     """
     package_json = json.loads((PKG_ROOT / "package.json").read_text(encoding="utf-8"))
-    package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
     assert markdownlint_spec.startswith("^"), "markdownlint-cli2 must stay uncapped (caret range)"
-    assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
-    locked_version = package_lock["packages"]["node_modules/markdownlint-cli2"]["version"]
-    assert locked_version, "lockfile must resolve markdownlint-cli2"
-    # The security override for the transitive smol-toml stays pinned and synced.
-    assert (
-        package_lock["packages"]["node_modules/smol-toml"]["version"]
-        == package_json["overrides"]["smol-toml"]
-    )
+    # No repo-scoped npm scripts: the canonical markdownlint invocation lives in
+    # tools/run_quality_checks.sh; a second spelling here would drift.
+    assert "scripts" not in package_json
+
+    lock_path = PKG_ROOT / "package-lock.json"
+    if lock_path.exists():
+        package_lock = json.loads(lock_path.read_text(encoding="utf-8"))
+        assert (
+            markdownlint_spec
+            == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
+        )
+        locked_version = package_lock["packages"]["node_modules/markdownlint-cli2"]["version"]
+        assert locked_version, "lockfile must resolve markdownlint-cli2"
+        # The security override for the transitive smol-toml stays pinned and synced.
+        assert (
+            package_lock["packages"]["node_modules/smol-toml"]["version"]
+            == package_json["overrides"]["smol-toml"]
+        )
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert 'npm install --ignore-scripts --prefix "$PROJECT_ROOT"' in update_script
@@ -1680,7 +1693,11 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     assert 'echo "=== Skylos Quality Gate ==="' in quality_script
     assert 'echo "=== Skylos Audit Gate ==="' in quality_script
     assert "SKYLOS_JOBS" not in quality_script
-    assert "--danger" not in quality_script
+    # The danger scan is deliberately blocking in full mode, and only via the
+    # wrapper script (never a bare `skylos --danger` that would bypass the
+    # worktree post-filter and non-interactive guards).
+    assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate' in quality_script
+    assert "skylos . --danger" not in quality_script
     assert quality_script.count('"!**/.worktrees/**"') == 2
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"

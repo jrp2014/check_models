@@ -34,6 +34,9 @@ while IFS= read -r -d '' file; do
             case "$file" in
                 src/node_modules/*|*/node_modules/*)
                     ;;
+                .worktrees/*|*/.worktrees/*)
+                    # Third-party checkouts: never --fix and re-stage their files.
+                    ;;
                 *)
                     markdown_files+=("$file")
                     ;;

@@ -50,7 +50,7 @@
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
-    "reportMissingImports": "none",
+    "reportMissingImports": "warning",
     "reportMissingModuleSource": "none"
   },
   // Enable Pylance pytest support (fixture completions, parameter inference)
@@ -100,7 +100,7 @@
   "python.interpreterPath": "/Users/jrp/miniconda3/envs/mlx-vlm/bin/python",
   "cursorpyright.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
-    "reportMissingImports": "none",
+    "reportMissingImports": "warning",
     "reportMissingModuleSource": "none"
   },
   "cursorpyright.analysis.exclude": [

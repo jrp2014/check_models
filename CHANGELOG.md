@@ -7,6 +7,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Fix eight live cross-file drifts found by a coupling audit: danger-gate
+  docs now state the gate is blocking (and the test guard asserts the real
+  wrapper invocation instead of a vacuously absent flag); `update.sh` honours
+  the `CONDA_ENV` override; `bootstrap-dev` stops installing the removed
+  `huggingface_hub[cli]` extra; ruff/mypy `tools/.archived` excludes are
+  spelled relative to their actual project root (they were silent no-ops);
+  index.md artifact labels derive from real paths so custom `--output-*`
+  names stay honest; `run_summary.md` and `reports/assets/source-image.jpg`
+  resolve canonical GitHub URLs from out-of-repo output dirs; the commit
+  hygiene hook never `--fix`es staged Markdown under third-party
+  `.worktrees/`; the orphan `lint:md` npm script (a third, drifted
+  markdownlint spelling) is removed; the markdownlint sync test no longer
+  fails on fresh clones without the untracked lockfile; `.vscode` pyright
+  severity and `.editorconfig` shell indentation match the enforced configs.
 - Use the cached `mlx-community/nanoLLaVA-1.5-4bit` conversion for end-to-end
   smoke inference instead of the removed `qnguyen3/nanoLLaVA` fixture, so the
   full local quality gate exercises rather than skips both inference tests.

@@ -178,7 +178,8 @@ exclude = [
     "_build",
     "build",
     "dist",
-    "src/tools/.archived",
+    # Relative to the project root (src/), so no "src/" prefix.
+    "tools/.archived",
     "venv",
 ]
 indent-width = 4
@@ -309,8 +310,8 @@ python_version = "3.13"
 follow_imports = "skip"
 # Do not globally suppress missing imports; use targeted overrides below.
 ignore_missing_imports = false
-# Exclude archived tools
-exclude = ["^src/tools/\\.archived/"]
+# Exclude archived tools (paths are seen relative to src/, so no "src/" prefix)
+exclude = ["^tools/\\.archived/"]
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
 mypy_path = "../typings"
 

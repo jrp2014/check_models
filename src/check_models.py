@@ -6926,7 +6926,11 @@ def _published_output_repo_path(artifact_filename: Path) -> PurePosixPath | None
         return _PUBLISHED_OUTPUT_ROOT / "reports" / artifact_name
     if artifact_name in _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES:
         return _PUBLISHED_OUTPUT_ROOT / artifact_name
-    if artifact_name.startswith("issue_") and artifact_name.endswith(".md"):
+    if artifact_name == "source-image.jpg":
+        return _PUBLISHED_OUTPUT_ROOT / "reports" / "assets" / artifact_name
+    if artifact_name == "run_summary.md" or (
+        artifact_name.startswith("issue_") and artifact_name.endswith(".md")
+    ):
         return _PUBLISHED_OUTPUT_ROOT / "issues" / artifact_name
     return None
 
@@ -16601,14 +16605,18 @@ def generate_output_index_report(
     assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
 ) -> None:
     """Write a run dashboard plus navigation list for the retained artifacts."""
-    links = (
-        (output_paths.html, "results.html"),
-        (output_paths.gallery_markdown, "model_gallery.md"),
-        (output_paths.diagnostics, "diagnostics.md"),
-        (output_paths.jsonl, "results.jsonl"),
-        (output_paths.run_json, "run.json"),
-        (output_paths.log, output_paths.log.name),
-        (output_paths.environment, output_paths.environment.name),
+    # Labels derive from the actual paths so custom --output-* names stay honest.
+    links = tuple(
+        (path, path.name)
+        for path in (
+            output_paths.html,
+            output_paths.gallery_markdown,
+            output_paths.diagnostics,
+            output_paths.jsonl,
+            output_paths.run_json,
+            output_paths.log,
+            output_paths.environment,
+        )
     )
     md = ["# Check Models Output Index", ""]
     if assessments is not None:

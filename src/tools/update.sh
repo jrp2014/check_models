@@ -201,6 +201,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Same override convention as common_quality.sh and the Makefiles.
+CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
+
 # Repo-local markdownlint tools (if npm is available)
 if command -v npm >/dev/null 2>&1; then
 	if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then
@@ -533,8 +536,8 @@ run_generate_stubs_command() {
 	shift
 	local src_dir
 	src_dir="$(cd "$script_dir/.." && pwd)"
-	if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
-		(cd "$src_dir" && conda run -n mlx-vlm python -m tools.generate_stubs "$@")
+	if command -v conda &> /dev/null && conda env list | grep -q "^${CONDA_ENV} "; then
+		(cd "$src_dir" && conda run -n "$CONDA_ENV" python -m tools.generate_stubs "$@")
 	else
 		(cd "$src_dir" && python -m tools.generate_stubs "$@")
 	fi
@@ -565,7 +568,7 @@ reconcile_project_environment_from_pyproject() {
 	python -m pip check
 	(
 		cd "$PROJECT_ROOT"
-		python -m tools.validate_env --expected-conda-env "${CONDA_DEFAULT_ENV:-mlx-vlm}"
+		python -m tools.validate_env --expected-conda-env "${CONDA_DEFAULT_ENV:-$CONDA_ENV}"
 	)
 }
 

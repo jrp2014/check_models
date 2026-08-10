@@ -8,8 +8,5 @@
   },
   "overrides": {
     "smol-toml": "1.6.1"
-  },
-  "scripts": {
-    "lint:md": "markdownlint-cli2 --config ../.markdownlint.jsonc '**/*.md' '#node_modules'"
   }
 }
