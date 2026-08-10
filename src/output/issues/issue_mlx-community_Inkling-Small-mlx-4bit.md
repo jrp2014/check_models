@@ -42,10 +42,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11997, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11454, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11474, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -441,7 +441,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12407, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12427, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -452,7 +452,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12012, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -829,12 +829,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3382.40it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5373.61it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[20:08:29] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -910,16 +910,16 @@ Keywords:' --max-tokens 500 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03
 | Component       | Value                                                           |
 |-----------------|-----------------------------------------------------------------|
 | mlx-vlm         | 0.6.11                                                          |
-| mlx             | 0.32.1.dev20260809+8c28c385f                                    |
+| mlx             | 0.32.1.dev20260810+e78d894c8                                    |
 | mlx-lm          | 0.31.3                                                          |
-| transformers    | 5.14.1                                                          |
+| transformers    | 5.15.0                                                          |
 | tokenizers      | 0.22.2                                                          |
 | huggingface-hub | 1.27.0                                                          |
 | Pillow          | 12.3.0                                                          |
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6.1                                                          |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision 212c2c4654d25a32027546b54a218889e451d9d2; clean |
+| check_models    | 0.9.0; revision c37ff98d4113eaaaed386335728148ac4dfb9758; dirty |
 
 ### Full environment evidence
 

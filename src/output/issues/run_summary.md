@@ -2,7 +2,7 @@
 
 ## Run summary
 
-- *Run timestamp:* 2026-08-09 22:23:20 BST
+- *Run timestamp:* 2026-08-10 20:22:07 BST
 - *Evaluation mode:* assisted
 - *Models attempted:* 42
 - *Completed:* 41
@@ -126,7 +126,7 @@ Repeated mechanical observation signatures among results requiring review.
 | mlx-community/llava-v1.6-mistral-7b-8bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description; Extra text appears before the Title field; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-llava-v16-mistral-7b-8bit) |
 | mlx-community/paligemma2-3b-pt-896-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response repeats the task instructions instead of only returning the requested fields; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit) |
 | mlx-community/X-Reasoner-7B-8bit | unusable | Response repeats the same text; Response appears cut off at the token limit; Keyword list has 184 terms (requested 10-18); Duplicate keywords: stone wall, dusk, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, serene, calm, quiet | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-x-reasoner-7b-8bit) |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | Unrecognised model control tokens remain visible; Duplicate keywords: historic | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | Unrecognised model control tokens remain visible; Duplicate keywords: historic, urban | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) |
 | mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | unusable | Missing or empty fields: Title, Description, Keywords; Response appears cut off at the token limit; Internal reasoning block appears incomplete | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) |
@@ -148,11 +148,11 @@ Repeated mechanical observation signatures among results requiring review.
 - *Generation: top_p:* 1.0
 - *Trust remote code:* true
 - *check_models version:* 0.9.0
-- *check_models revision:* 212c2c4654d25a32027546b54a218889e451d9d2
-- *check_models source dirty:* false
+- *check_models revision:* c37ff98d4113eaaaed386335728148ac4dfb9758
+- *check_models source dirty:* true
 - *mlx-vlm:* 0.6.11
-- *mlx:* 0.32.1.dev20260809+8c28c385f
-- *transformers:* 5.14.1
+- *mlx:* 0.32.1.dev20260810+e78d894c8
+- *transformers:* 5.15.0
 - *macOS Version:* 26.6.1
 - *GPU/Chip:* Apple M5 Max
 - *Python Version:* 3.13.13
@@ -164,12 +164,11 @@ evidence is required.
 
 ## Full artifacts
 
-Stale retained artifacts omitted because their timestamps fall outside this
-run: `check_models.log`, `environment.log`.
-
 | Artifact | Link |
 | --- | --- |
 | Diagnostics | [diagnostics.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md) |
 | Model gallery | [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md) |
 | Results JSONL | [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl) |
 | Run JSON | [run.json](https://github.com/jrp2014/check_models/blob/main/src/output/run.json) |
+| Environment | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
+| Log | [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log) |

@@ -108,10 +108,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11997, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11454, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11474, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -507,7 +507,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12407, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12427, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -518,7 +518,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12012, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -895,12 +895,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3382.40it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5373.61it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[20:08:29] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
@@ -1201,7 +1201,7 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 - *Requested title word range:* [5, 10]
 - *Keyword count:* 16
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["historic"]
+- *Duplicate keywords:* ["historic", "urban"]
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1209,7 +1209,7 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 - *Post-cleanup active memory (GB):* 0.010306756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 619
-- *Generation tokens:* 82
+- *Generation tokens:* 84
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1217,9 +1217,9 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 
 ```text
 <|channel>thought
-<channel|>Title: Arundel Cathedral over Residential Houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady & St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
-Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban
+<channel|>Title: Arundel Cathedral over residential houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady & St. Philip Howard rising above local stone cottages and a red car under a clear sky.
+Keywords: Arundel, Cathedral, England, Gothic, architecture, church, stone, house, red car, roof, sky, neighborhood, historic, historic, urban, urban
 ```
 
 </details>
@@ -1247,7 +1247,7 @@ Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, sto
 - *Post-cleanup active memory (GB):* 0.010306756
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 619
-- *Generation tokens:* 84
+- *Generation tokens:* 81
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1256,8 +1256,8 @@ Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, sto
 ```text
 <|channel>thought
 <channel|>Title: Arundel Cathedral of Our Lady & St. Philip Howard
-Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
-Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers
+Description: A view of the French-Gothic Arundel Cathedral rising over neighborhood stone walls and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Gothic, Architecture, Stone, Cottage, Red Car, Roof, Sky, Neighborhood, Parking, Flower, Historic, Europe
 ```
 
 </details>
@@ -1601,20 +1601,20 @@ is in the model gallery.
 
 | Model                                                 | Runtime identity                                        | Performance                                                                                |
 |-------------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 2426 prompt / 104 generated; 27.1 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache  |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 618 prompt / 126 generated; 30.3 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache     |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 623 prompt / 101 generated; 115 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 623 prompt / 85 generated; 26.0 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2147 prompt / 101 generated; 33.4 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 2959 prompt / 198 generated; 64.4 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 2959 prompt / 188 generated; 62.6 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 2958 prompt / 161 generated; 181 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache   |
-| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 59.6 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache  |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 1164 prompt / 119 generated; 54.6 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 83.0 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16596 prompt / 88 generated; 85.9 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache |
-| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 16596 prompt / 103 generated; 18.1 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache  |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3524 prompt / 111 generated; 43.7 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache      |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 2426 prompt / 104 generated; 30.3 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache  |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 618 prompt / 126 generated; 31.0 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache     |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 623 prompt / 101 generated; 110 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 623 prompt / 85 generated; 23.4 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2147 prompt / 101 generated; 31.4 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 2959 prompt / 198 generated; 64.1 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 2959 prompt / 188 generated; 60.9 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 2958 prompt / 161 generated; 178 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache   |
+| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 55.9 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache  |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 1164 prompt / 119 generated; 54.8 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 106 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16596 prompt / 88 generated; 92.0 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache |
+| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 16596 prompt / 103 generated; 17.0 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache  |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3524 prompt / 111 generated; 44.8 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache      |
 
 </details>
 
@@ -1685,10 +1685,10 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.11                                                                                                                                          |
-| mlx                        | 0.32.1.dev20260809+8c28c385f                                                                                                                    |
+| mlx                        | 0.32.1.dev20260810+e78d894c8                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
-| mlx-audio                  | 0.4.7                                                                                                                                           |
-| transformers               | 5.14.1                                                                                                                                          |
+| mlx-audio                  | 0.4.8                                                                                                                                           |
+| transformers               | 5.15.0                                                                                                                                          |
 | tokenizers                 | 0.22.2                                                                                                                                          |
 | huggingface-hub            | 1.27.0                                                                                                                                          |
 | Python Version             | 3.13.13                                                                                                                                         |
@@ -1714,7 +1714,7 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (165,677,336 bytes, sha256=26e8fdf2551230764eb86a576256ee63d77ea1d7bde4fc72faa3ecc6eafdd95f) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,740,096 bytes, sha256=511ad05d90fe6e27ae31250a8ca8906f0416b0da931c490cff61b02b519b4303)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (167,850,184 bytes, sha256=dd75ab57d5bbf694c3eab98fd42e8aaff9882bf262fcaf8dd331ec534a2c4d7d) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,887,216 bytes, sha256=c8426dc61b1a90e1859b1da64ae5d5d3bcf822cb82bfd02e443c87c6d38d78d1)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
