@@ -275,6 +275,11 @@ THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = (
     ("<|START_THINKING|>", "<|END_THINKING|>"),
 )
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
+# Artifact schema versions. Three distinct schemas; writers and readers must
+# reference these constants, never bare "2.0"/"1.0" literals.
+JSONL_FORMAT_VERSION: Final = "2.0"
+RUN_JSON_SCHEMA_VERSION: Final = "2.0"
+HISTORY_FORMAT_VERSION: Final = "1.0"
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
 ROOT_PATH: Final[Path] = Path(os.sep)
@@ -897,7 +902,7 @@ class HistoryRunRecord(TypedDict, total=False):
     """Append-only run record shape for ``*.history.jsonl``."""
 
     _type: Literal["run"]
-    format_version: str
+    format_version: Literal["1.0"]
     timestamp: str
     prompt_hash: str
     prompt_preview: str
@@ -1028,7 +1033,7 @@ class JsonlMetadataRecord(TypedDict, total=False):
     """Shared header row for ``results.jsonl`` format."""
 
     _type: Required[Literal["metadata"]]
-    format_version: Required[str]
+    format_version: Required[Literal["2.0"]]
     prompt: Required[str]
     system: Required[dict[str, str]]
     timestamp: Required[str]
@@ -15033,7 +15038,7 @@ def _build_history_run_record(
     """Build one append-only run record without current-report semantics."""
     record: HistoryRunRecord = {
         "_type": "run",
-        "format_version": "1.0",
+        "format_version": HISTORY_FORMAT_VERSION,
         "timestamp": local_now_str(),
         "prompt_hash": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "prompt_preview": _build_prompt_preview(prompt),
@@ -15093,7 +15098,7 @@ def _build_jsonl_metadata_record(
     resolved_eval_mode = _resolve_eval_mode(eval_mode, None)
     record: JsonlMetadataRecord = {
         "_type": "metadata",
-        "format_version": "2.0",
+        "format_version": JSONL_FORMAT_VERSION,
         "prompt": prompt,
         "system": {key: _home_relative_report_text(value) for key, value in system_info.items()},
         "timestamp": local_now_str(),
@@ -15441,7 +15446,7 @@ def save_run_json_report(
         artifacts["run_issue_summary"] = "issues/run_summary.md"
     provenance_by_model = _model_provenance_by_model(report_context)
     payload: RunJsonReportRecord = {
-        "schema_version": "2.0",
+        "schema_version": RUN_JSON_SCHEMA_VERSION,
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
@@ -15516,8 +15521,8 @@ def _validate_run_issue_metadata(
     if not isinstance(metadata_value, dict) or metadata_value.get("_type") != "metadata":
         message = f"First JSONL row in {jsonl_path} must be metadata"
         raise ValueError(message)
-    if metadata_value.get("format_version") != "2.0":
-        message = "Run issue summary requires results.jsonl format_version 2.0"
+    if metadata_value.get("format_version") != JSONL_FORMAT_VERSION:
+        message = f"Run issue summary requires results.jsonl format_version {JSONL_FORMAT_VERSION}"
         raise ValueError(message)
     system = metadata_value.get("system")
     versions = metadata_value.get("library_versions")

@@ -7,6 +7,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add a sync-guard test pack so single facts can no longer drift silently
+  across files: hook types single-sourced from `install_precommit_hook.py`
+  and asserted against `.pre-commit-config.yaml`; the stub package list
+  derived from `generate_stubs.DEFAULT_PACKAGES`; the Python floor asserted
+  across pyproject, type-checker configs, `validate_env`, the conda setup
+  script, and every workflow; workflow files enumerated by glob in both the
+  YAML-validation step and the actions-pinning test; `SECTION:` banners
+  asserted against copilot-instructions §3; smoke-test model/expected-output
+  docs asserted against `update.sh` defaults; `.worktrees` added to the
+  skylos mirror assertion; artifact schema versions extracted to constants
+  matched against their TypedDict Literals; `make format` coverage asserted
+  against the gate's formatter scope (and `check_models_data` added to
+  `FMT_PATHS`); the Skylos danger worktree post-filter extracted to
+  `tools/filter_danger_report.py` (safe-io hardened) with a unit test.
 - Fix eight live cross-file drifts found by a coupling audit: danger-gate
   docs now state the gate is blocking (and the test guard asserts the real
   wrapper invocation instead of a vacuously absent flag); `update.sh` honours

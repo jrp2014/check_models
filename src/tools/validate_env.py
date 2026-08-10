@@ -31,7 +31,10 @@ from check_models_data.dependency_policy import (
     VALIDATE_ENV_CORE_FALLBACK_SPECS,
     VALIDATE_ENV_EXTRAS_FALLBACK_SPECS,
 )
-from tools.install_precommit_hook import _is_pre_commit_framework_hook
+from tools.install_precommit_hook import (
+    REQUIRED_HOOK_TYPES,
+    _is_pre_commit_framework_hook,
+)
 
 logger = logging.getLogger("validate-env")
 
@@ -324,8 +327,7 @@ def check_git_hooks() -> bool:
     """Check if commit/push git hooks are installed."""
     repo_root = Path(__file__).resolve().parents[2]
     hooks_dir = repo_root / ".git" / "hooks"
-    required_hooks = ("pre-commit", "pre-push")
-    missing_hooks = [name for name in required_hooks if not (hooks_dir / name).exists()]
+    missing_hooks = [name for name in REQUIRED_HOOK_TYPES if not (hooks_dir / name).exists()]
 
     if not missing_hooks:
         logger.info("✓ Git commit/push hooks installed")
@@ -353,9 +355,7 @@ def check_precommit_framework() -> bool:
     # says nothing about installation.
     hooks_dir = Path(__file__).resolve().parents[2] / ".git" / "hooks"
     missing_hooks = [
-        name
-        for name in ("pre-commit", "pre-push")
-        if not _is_pre_commit_framework_hook(hooks_dir / name)
+        name for name in REQUIRED_HOOK_TYPES if not _is_pre_commit_framework_hook(hooks_dir / name)
     ]
     if not missing_hooks:
         logger.info("✓ pre-commit framework configured")

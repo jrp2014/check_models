@@ -27,6 +27,11 @@ from tools.safe_io import read_text_no_follow, write_text_no_follow
 
 logger = logging.getLogger("precommit")
 
+# The hook types this project installs. Must match `default_install_hook_types`
+# in .pre-commit-config.yaml (guarded by test_dependency_sync); validate_env
+# imports this so both installers and the checker share one definition.
+REQUIRED_HOOK_TYPES: tuple[str, ...] = ("pre-commit", "pre-push")
+
 PRECOMMIT_HOOK_CONTENT = r"""#!/usr/bin/env bash
 set -euo pipefail
 

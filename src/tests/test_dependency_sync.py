@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import tomllib
+import typing
 import zipfile
 from pathlib import Path
 from textwrap import dedent
@@ -27,10 +28,12 @@ from check_models_data import dependency_policy
 from tools import (
     bugtest,
     check_suppressions,
+    filter_danger_report,
     generate_stubs,
     install_precommit_hook,
     safe_io,
     update_readme_deps,
+    validate_env,
 )
 
 _TEST_FILE = Path(__file__).resolve()
@@ -483,6 +486,8 @@ def test_root_skylos_config_mirrors_package_quality_policy() -> None:
         "dist",
         "*.egg-info",
         "src/check_models.suppression-audit*.py",
+        # Third-party checkouts must never gate this repository.
+        ".worktrees",
     } <= set(root_config["exclude"])
     assert set(root_config["ignore"]) == set(package_config["ignore"])
     for key in SKYLOS_MONOLITH_QUALITY_LIMITS:
@@ -850,6 +855,8 @@ def test_output_artifact_policy_is_documented_and_gitignored() -> None:
         "src/output/test_*",
         "src/output/reports/test_*",
         "src/output/issues/test_*",
+        # The append-only history is deliberately untracked.
+        "src/output/results.history.jsonl",
     }.issubset(gitignore_lines)
 
 
@@ -1636,15 +1643,19 @@ def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> No
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
 
+    # Derive the expected list from generate_stubs so adding a package there
+    # forces the shell paths (and this test) to follow.
+    stub_packages = " ".join(generate_stubs.DEFAULT_PACKAGES)
     assert (
-        'run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers'
-        in update_script
+        f'run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check '
+        f"{stub_packages}" in update_script
     )
+    assert update_script.count(stub_packages) >= 2
     assert (
         '"$QUALITY_PYTHON" -m tools.generate_stubs --check --refresh-manifest-on-check'
         in quality_script
     )
-    assert "mlx_lm mlx_vlm transformers tokenizers" in quality_script
+    assert quality_script.count(stub_packages) == 2
     assert "Local package provenance:" in update_script
 
 
@@ -1733,6 +1744,10 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
     tools_dir.mkdir(parents=True)
     script = tools_dir / SKYLOS_DANGER_ADVISORY_SCRIPT.name
     script.write_bytes(SKYLOS_DANGER_ADVISORY_SCRIPT.read_bytes())
+    (tools_dir / "__init__.py").write_text("", encoding="utf-8")
+    for helper_name in ("filter_danger_report.py", "safe_io.py"):
+        helper = PKG_ROOT / "tools" / helper_name
+        (tools_dir / helper_name).write_bytes(helper.read_bytes())
     call_log = tmp_path / "skylos-calls.log"
     (tools_dir / "common_quality.sh").write_text(
         dedent(
@@ -2032,10 +2047,14 @@ def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> 
     """Workflow security hardening and advisory Skylos danger wiring should stay in place."""
     action_ref_pattern = re.compile(r"^[^@]+@[0-9a-f]{40}$")
 
-    for workflow_path in (
-        REPO_ROOT / ".github" / "workflows" / "dependency-sync.yml",
-        REPO_ROOT / ".github" / "workflows" / "quality.yml",
-    ):
+    # Glob so a new workflow file cannot silently escape these requirements.
+    workflow_paths = sorted(
+        path
+        for pattern in ("*.yml", "*.yaml")
+        for path in (REPO_ROOT / ".github" / "workflows").glob(pattern)
+    )
+    assert workflow_paths, "no workflow files found"
+    for workflow_path in workflow_paths:
         workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
 
         assert workflow["permissions"] == {}
@@ -2274,3 +2293,172 @@ def test_agents_and_claude_docs_stay_in_sync() -> None:
     assert body_below_title(agents) == body_below_title(claude), (
         "AGENTS.md and CLAUDE.md have drifted; apply edits to both files"
     )
+
+
+def test_precommit_hook_types_match_framework_config() -> None:
+    """Both installers and validate_env must agree with .pre-commit-config.yaml."""
+    config = yaml.safe_load((REPO_ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8"))
+
+    assert tuple(config["default_install_hook_types"]) == (
+        install_precommit_hook.REQUIRED_HOOK_TYPES
+    )
+    # Each configured hook's entry script must exist and be the same script the
+    # custom installer's generated hooks execute.
+    entries = [hook["entry"] for repo in config["repos"] for hook in repo["hooks"]]
+    for entry in entries:
+        script = entry.removeprefix("bash ").split()[0]
+        assert (REPO_ROOT / script).is_file(), entry
+    hook_bodies = (
+        install_precommit_hook.PRECOMMIT_HOOK_CONTENT + install_precommit_hook.PREPUSH_HOOK_CONTENT
+    )
+    for entry in entries:
+        script_name = Path(entry.removeprefix("bash ").split()[0]).name
+        if script_name == "run_commit_hygiene.sh":
+            assert script_name in hook_bodies
+    # The custom pre-push hook delegates to check_quality_simple.sh, which the
+    # framework runs via its own fast-push hook; both must reference it.
+    assert "check_quality_simple.sh" in hook_bodies
+    assert any("check_quality_simple.sh" in entry for entry in entries)
+
+
+def test_python_floor_is_single_sourced() -> None:
+    """Every encoding of the minimum Python version must agree with pyproject."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    requires_python = pyproject["project"]["requires-python"]
+    assert requires_python.startswith(">=")
+    floor = requires_python.removeprefix(">=").strip()
+
+    assert pyproject["tool"]["mypy"]["python_version"] == floor
+    assert pyproject["tool"]["pyright"]["pythonVersion"] == floor
+    assert pyproject["tool"]["pyrefly"]["python-version"] == floor
+
+    assert ".".join(str(part) for part in validate_env.REQUIRED_PYTHON_VERSION) == floor
+
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    assert f"python={floor}" in setup_script
+
+    for workflow_path in sorted((REPO_ROOT / ".github" / "workflows").glob("*.yml")):
+        workflow_text = workflow_path.read_text(encoding="utf-8")
+        for match in re.finditer(r'python-version:\s*"([^"]+)"', workflow_text):
+            assert match.group(1) == floor, workflow_path.name
+
+
+def test_update_smoke_defaults_are_documented() -> None:
+    """The smoke model and expected output are mirrored into docs by hand."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    model_match = re.search(r"MLX_LOCAL_BUILD_SMOKE_MODEL:-([^}]+)\}", update_script)
+    expected_match = re.search(r"MLX_LOCAL_BUILD_SMOKE_EXPECTED:-([^}]+)\}", update_script)
+    assert model_match is not None
+    assert expected_match is not None
+    model = model_match.group(1)
+    expected = expected_match.group(1)
+
+    package_readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
+    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    for text, name in ((package_readme, "src/README.md"), (contributing, "CONTRIBUTING.md")):
+        assert model in text, f"smoke model not documented in {name}"
+        assert expected in text, f"smoke expected output not documented in {name}"
+
+
+def test_section_banners_match_copilot_instructions() -> None:
+    """The monolith's SECTION landmarks and the documented map must stay identical."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+    banners = re.findall(r"^# SECTION: (.+)$", source, re.MULTILINE)
+    # Only the §3 table rows define the map; prose mentions elsewhere are free.
+    documented = re.findall(
+        r"^\|.*?`SECTION: ([^`]+)`",
+        COPILOT_INSTRUCTIONS.read_text(encoding="utf-8"),
+        re.MULTILINE,
+    )
+
+    assert banners, "no SECTION banners found in check_models.py"
+    assert banners == documented, (
+        "SECTION banners and copilot-instructions §3 have drifted (order matters)"
+    )
+
+
+def test_ci_only_mlx_core_stub_step_is_declared() -> None:
+    """CI generates mlx.core stubs locally absent from the stub tooling; keep that visible."""
+    quality_workflow = (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(
+        encoding="utf-8"
+    )
+    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    assert "nanobind" in quality_workflow
+    assert "nanobind" in copilot_text, (
+        "CI-only mlx.core stub generation must stay documented until it is unified "
+        "with tools/generate_stubs.py"
+    )
+
+
+def test_make_format_covers_every_gate_formatted_directory() -> None:
+    """`make format` must reach every directory the full gate's `ruff format .` reaches."""
+    makefile = (PKG_ROOT / "Makefile").read_text(encoding="utf-8")
+    fmt_match = re.search(r"^FMT_PATHS := (.+)$", makefile, re.MULTILINE)
+    assert fmt_match is not None
+    fmt_paths = set(fmt_match.group(1).split())
+
+    expected_dirs = {
+        path.name
+        for path in PKG_ROOT.iterdir()
+        if path.is_dir()
+        and not path.name.startswith(".")
+        and path.name
+        not in {"node_modules", "output", "build", "dist", "check_models.egg-info", "typings"}
+        and any(path.glob("*.py"))
+    }
+    assert expected_dirs | {"check_models.py"} <= fmt_paths | expected_dirs & fmt_paths | {
+        "check_models.py"
+    }
+    assert expected_dirs <= fmt_paths, (
+        f"make format misses {expected_dirs - fmt_paths}; the gate's `ruff format .` "
+        "would still reformat them"
+    )
+
+
+def test_quality_script_globs_workflow_yaml_files() -> None:
+    """Workflow YAML validation must enumerate by glob, not by hardcoded list."""
+    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
+
+    assert 'find "$(quality_repo_root)/.github/workflows"' in quality_script
+    assert ".github/workflows/quality.yml" not in quality_script
+
+
+def test_danger_report_filter_drops_only_worktree_findings(tmp_path: Path) -> None:
+    """The Skylos danger post-filter must drop .worktrees findings and keep the rest."""
+    report: dict[str, object] = {
+        "danger": [
+            {"file": "/repo/.worktrees/mlx-vlm-x/.github/workflows/tests.yml", "rule": "D292"},
+            {"file": "/repo/src/tools/update.sh", "rule": "D301"},
+            "not-a-dict-entry",
+        ],
+        "grade": {"overall": {"score": 54}},
+    }
+    dropped = filter_danger_report.drop_worktree_findings(report)
+
+    assert dropped == 1
+    assert report["danger"] == [
+        {"file": "/repo/src/tools/update.sh", "rule": "D301"},
+        "not-a-dict-entry",
+    ]
+
+    report_path = tmp_path / "report.json"
+    report_path.write_text(json.dumps({"danger": []}), encoding="utf-8")
+    assert filter_danger_report.main(["prog", str(report_path)]) == 0
+
+
+def test_artifact_schema_version_constants_match_typed_dict_literals() -> None:
+    """Writers/readers share version constants that must match the TypedDict Literals."""
+    jsonl_literal = typing.get_args(
+        typing.get_type_hints(check_models.JsonlMetadataRecord)["format_version"]
+    )
+    run_json_literal = typing.get_args(
+        typing.get_type_hints(check_models.RunJsonReportRecord)["schema_version"]
+    )
+    history_literal = typing.get_args(
+        typing.get_type_hints(check_models.HistoryRunRecord)["format_version"]
+    )
+
+    assert jsonl_literal == (check_models.JSONL_FORMAT_VERSION,)
+    assert run_json_literal == (check_models.RUN_JSON_SCHEMA_VERSION,)
+    assert history_literal == (check_models.HISTORY_FORMAT_VERSION,)

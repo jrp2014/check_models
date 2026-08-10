@@ -41,9 +41,19 @@ if [ "$QUALITY_MODE" = "full" ]; then
 fi
 
 echo "=== Workflow YAML Validation ==="
+# Glob rather than enumerate so a new workflow file cannot silently skip
+# validation.
+workflow_yaml_files=()
+while IFS= read -r -d '' workflow_file; do
+    workflow_yaml_files+=("$workflow_file")
+done < <(find "$(quality_repo_root)/.github/workflows" \
+    \( -name "*.yml" -o -name "*.yaml" \) -type f -print0 | sort -z)
+if [ "${#workflow_yaml_files[@]}" -eq 0 ]; then
+    echo "❌ No workflow files found under .github/workflows" >&2
+    exit 1
+fi
 quality_validate_yaml_files \
-    "$(quality_repo_root)/.github/workflows/quality.yml" \
-    "$(quality_repo_root)/.github/workflows/dependency-sync.yml" \
+    "${workflow_yaml_files[@]}" \
     "$(quality_repo_root)/.pre-commit-config.yaml"
 
 echo "=== Dependency Sync (Check) ==="

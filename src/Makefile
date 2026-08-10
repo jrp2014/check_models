@@ -52,7 +52,7 @@ else
 endif
 
 MYPY_CONFIG := pyproject.toml
-FMT_PATHS := check_models.py tests tools
+FMT_PATHS := check_models.py tests tools check_models_data
 
 .DEFAULT_GOAL := help
 

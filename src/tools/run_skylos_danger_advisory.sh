@@ -120,34 +120,9 @@ fi
 # (e.g. upstream mlx-vlm repro worktrees) leak their workflow files into this
 # repo's gate. Filter those findings out of the report before annotate/gate,
 # and say how many were dropped so the exclusion is never silent.
-dropped_worktree_count="$($QUALITY_PYTHON - "$report_path" <<'PY'
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-
-report_path = Path(sys.argv[1])
-report = json.loads(report_path.read_text(encoding="utf-8"))
-findings = report.get("danger", [])
-if not isinstance(findings, list):
-    print(0)
-    raise SystemExit(0)
-
-kept = [
-    finding
-    for finding in findings
-    if not (
-        isinstance(finding, dict)
-        and "/.worktrees/" in str(finding.get("file", ""))
-    )
-]
-dropped = len(findings) - len(kept)
-if dropped:
-    report["danger"] = kept
-    report_path.write_text(json.dumps(report), encoding="utf-8")
-print(dropped)
-PY
+dropped_worktree_count="$(
+    report_abs_path="$PWD/$report_path"
+    cd "$SCRIPT_DIR/.." && "$QUALITY_PYTHON" -m tools.filter_danger_report "$report_abs_path"
 )"
 if [ "$dropped_worktree_count" -gt 0 ]; then
     echo "ℹ️  Dropped $dropped_worktree_count finding(s) from third-party .worktrees/ checkouts (not this repository's files to gate)."
