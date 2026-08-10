@@ -19,8 +19,8 @@ Maintainer status counts
 | Maintainer status              | Count |
 |--------------------------------|-------|
 | actionable failure             | 1     |
-| none                           | 30    |
-| observation needs reproduction | 11    |
+| none                           | 28    |
+| observation needs reproduction | 13    |
 
 Usability counts
 
@@ -28,15 +28,15 @@ Usability counts
 |---------------------|-------|
 | not evaluated       | 1     |
 | unusable            | 15    |
-| usable              | 15    |
-| usable with caveats | 11    |
+| usable              | 14    |
+| usable with caveats | 12    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
 | Response repeats the same text                                                        | 5     |
-| Unrecognised model control tokens remain visible                                      | 1     |
+| Unrecognised model control tokens remain visible                                      | 3     |
 | Required fields are missing or empty                                                  | 11    |
 | Response repeats the task instructions instead of only returning the requested fields | 3     |
 | Extra text appears before the Title field                                             | 6     |
@@ -55,6 +55,8 @@ Observation counts
 | [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; extra text before Title; cut off at token limit                                  |
 | [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
 | [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                                 |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                   |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                   |
 | [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                               |
 | [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | unusable            | observation_needs_reproduction | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
@@ -106,10 +108,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11958, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11435, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11454, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -119,7 +121,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 750, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 756, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -505,7 +507,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12388, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12407, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -516,7 +518,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -893,12 +895,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3352.02it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3382.40it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
@@ -1175,6 +1177,87 @@ Title: Arundel Cathedral and Cottage at Dusk
 Description: A serene view of Arundel Cathedral of Our Lady & St. Philip Howard, framed by a quaint cottage and vibrant red car, under a clear blue sky at dusk.
 
 Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, French-Gothic, blue sky, cottage, red car, parking, roof, flower, bush, neighborhood, streetlamp, stone wall, window, cross, steeple, garage, 20 mph sign, brick building, white house, stone pathway, lamp post, 2026-08-06, 18:26:35 UTC+01:00, 50.806659°N, 0.551382°W, flower box, potted flowers, stone fence, white garage door, satellite dish, chimney, streetlight, lamp, window box, flower pot, stone wall, brick, white, red, blue, green, yellow, dusk, sunlight, shadow, clear sky, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, serene, calm, quiet, evening, sunset, dusk, twilight, peaceful, calm, quiet, serene, tranquil, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet,
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+
+<details>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
+
+### mlx-community/diffusiongemma-26B-A4B-it-8bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* unexpected_special_token, catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Title word count:* 7
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 16
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["historic"]
+- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.010306756
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 619
+- *Generation tokens:* 82
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+<|channel>thought
+<channel|>Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady & St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+<details>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible</summary>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* unexpected_special_token
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.010306756
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 619
+- *Generation tokens:* 84
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+<|channel>thought
+<channel|>Title: Arundel Cathedral of Our Lady & St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers
 ```
 
 </details>
@@ -1503,7 +1586,6 @@ is in the model gallery.
 | mlx-community/MolmoPoint-8B-fp16              | unusable            | missing required fields                                                                       |
 | mlx-community/nanoLLaVA-1.5-4bit              | unusable            | missing required fields                                                                       |
 | LiquidAI/LFM2.5-VL-450M-MLX-bf16              | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit  | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/GLM-4.6V-Flash-mxfp4            | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/Molmo-7B-D-0924-8bit            | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/pixtral-12b-8bit                | usable_with_caveats | title/keyword constraints failed                                                              |
@@ -1517,23 +1599,22 @@ is in the model gallery.
 <details>
 <summary>Clean completions</summary>
 
-| Model                                                 | Runtime identity                                           | Performance                                                                                |
-|-------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2426 prompt / 104 generated; 29.5 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache  |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 619 prompt / 83 generated; 54.0 tok/s; 28 GB peak; cleanup 0.0103/0.0 GB active/cache      |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 618 prompt / 126 generated; 31.5 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache     |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 623 prompt / 101 generated; 129 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 623 prompt / 85 generated; 26.3 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2147 prompt / 101 generated; 35.1 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2959 prompt / 198 generated; 66.4 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed        | 2959 prompt / 188 generated; 63.5 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2958 prompt / 161 generated; 187 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache   |
-| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed         | 16596 prompt / 102 generated; 63.3 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache  |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1164 prompt / 119 generated; 55.6 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16596 prompt / 102 generated; 109 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16596 prompt / 88 generated; 90.7 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache |
-| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed         | 16596 prompt / 103 generated; 17.9 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache  |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed         | 3524 prompt / 111 generated; 45.9 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache      |
+| Model                                                 | Runtime identity                                        | Performance                                                                                |
+|-------------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 2426 prompt / 104 generated; 27.1 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache  |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 618 prompt / 126 generated; 30.3 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache     |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 623 prompt / 101 generated; 115 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 623 prompt / 85 generated; 26.0 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 2147 prompt / 101 generated; 33.4 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 2959 prompt / 198 generated; 64.4 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 2959 prompt / 188 generated; 62.6 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 2958 prompt / 161 generated; 181 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache   |
+| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 59.6 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache  |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 1164 prompt / 119 generated; 54.6 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16596 prompt / 102 generated; 83.0 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16596 prompt / 88 generated; 85.9 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache |
+| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 16596 prompt / 103 generated; 18.1 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache  |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 3524 prompt / 111 generated; 43.7 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache      |
 
 </details>
 
@@ -1590,6 +1671,8 @@ original image before filing.
 | mlx-community/llava-v1.6-mistral-7b-8bit         | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
 | mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
 | mlx-community/X-Reasoner-7B-8bit                 | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
 | mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |

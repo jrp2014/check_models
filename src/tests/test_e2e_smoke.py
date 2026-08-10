@@ -51,9 +51,8 @@ from PIL import Image  # noqa: E402
 import check_models  # noqa: E402
 from tools import safe_io  # noqa: E402
 
-# Fixture model - small, fast, reliable
-# nanoLLaVA is ~600MB, fastest load, lowest memory (4.5GB peak)
-FIXTURE_MODEL = "qnguyen3/nanoLLaVA"
+# Fixture model - small, fast, reliable MLX conversion
+FIXTURE_MODEL = "mlx-community/nanoLLaVA-1.5-4bit"
 
 
 class CLIResult(NamedTuple):

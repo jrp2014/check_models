@@ -35,11 +35,11 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 <section id="runtime">
 <h2>Runtime</h2>
 <p><b>Runtime</b></p>
-<ul><li><b>Overall runtime:</b> 940.33s</li><li><b>Generation total:</b> 821.88s across 41 model(s); upstream model prefill / first-token split available for 41/41 model(s).</li><li><b>Phase totals:</b> model load=97.35s, local prompt prep=0.23s, upstream model prefill / first-token=496.73s, input preparation + decode=325.15s, cleanup=4.90s.</li><li><b>Validation overhead:</b> 15.16s total (avg 0.36s across 42 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 12.12s | Min 0.28s | Max 76.38s across 41 model(s).</li></ul>
+<ul><li><b>Overall runtime:</b> 962.42s</li><li><b>Generation total:</b> 845.41s across 41 model(s); upstream model prefill / first-token split available for 41/41 model(s).</li><li><b>Phase totals:</b> model load=95.24s, local prompt prep=0.24s, upstream model prefill / first-token=512.59s, input preparation + decode=332.82s, cleanup=4.99s.</li><li><b>Validation overhead:</b> 15.75s total (avg 0.38s across 42 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 12.50s | Min 0.04s | Max 80.58s across 41 model(s).</li></ul>
 </section>
 <section id="current-run-chooser">
 <h2>Current-run Chooser</h2>
-<p>Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens.</p>
+<p>Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens. Prompt tok is the full rendered prompt including image tokens; for cross-attention architectures it reflects the tokenised text burden only, not total vision prefill compute.</p>
 
 <div class="filter-controls">
 <strong>Filter current-run chooser:</strong>
@@ -135,9 +135,9 @@ applyAssessmentFilters();
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="10.45075779200124">10.45s</td>
-<td data-sort-value="29.54525939566543">29.5 tok/s</td>
-<td data-sort-value="3.850718083000174">3.85</td>
+<td data-sort-value="10.664709832999506">10.66s</td>
+<td data-sort-value="27.099589855067066">27.1 tok/s</td>
+<td data-sort-value="3.600927249997767">3.60</td>
 <td data-sort-value="23.014821042">23</td>
 <td data-sort-value="2426">2,426</td>
 <td data-sort-value="104">104</td>
@@ -161,9 +161,9 @@ Keywor...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="6.557263041000624">6.56s</td>
-<td data-sort-value="35.0917616229171">35.1 tok/s</td>
-<td data-sort-value="1.0163623330008704">1.02</td>
+<td data-sort-value="6.512937167000928">6.51s</td>
+<td data-sort-value="33.38402958246254">33.4 tok/s</td>
+<td data-sort-value="0.8630602909979643">0.86</td>
 <td data-sort-value="17.104731172">17</td>
 <td data-sort-value="2147">2,147</td>
 <td data-sort-value="101">101</td>
@@ -183,9 +183,9 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard,...</td
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.3676631250000355">7.37s</td>
-<td data-sort-value="66.38203413831305">66.4 tok/s</td>
-<td data-sort-value="2.0594401670005027">2.06</td>
+<td data-sort-value="7.446863167002448">7.45s</td>
+<td data-sort-value="64.38918992995131">64.4 tok/s</td>
+<td data-sort-value="2.105895958000474">2.11</td>
 <td data-sort-value="13.054938887">13</td>
 <td data-sort-value="2959">2,959</td>
 <td data-sort-value="198">198</td>
@@ -205,9 +205,9 @@ A photograph taken on **6 August 2026** near **Arundel, West Sussex (50.806659°
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.396492375000889">7.40s</td>
-<td data-sort-value="63.52749690283299">63.5 tok/s</td>
-<td data-sort-value="2.07525595900006">2.08</td>
+<td data-sort-value="7.730517500000133">7.73s</td>
+<td data-sort-value="62.64871346658572">62.6 tok/s</td>
+<td data-sort-value="2.117371792002814">2.12</td>
 <td data-sort-value="13.478366983">13</td>
 <td data-sort-value="2959">2,959</td>
 <td data-sort-value="188">188</td>
@@ -227,9 +227,9 @@ A photograph captured on **August 6, 2026, at 18:26 UTC+1, near 50.806659°N, 0.
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.8071286670001427">3.81s</td>
-<td data-sort-value="186.95369944502775">187 tok/s</td>
-<td data-sort-value="1.0795908750005765">1.08</td>
+<td data-sort-value="3.7836005829994974">3.78s</td>
+<td data-sort-value="181.47936384201037">181 tok/s</td>
+<td data-sort-value="1.0225899170000048">1.02</td>
 <td data-sort-value="7.79929923">7.8</td>
 <td data-sort-value="2958">2,958</td>
 <td data-sort-value="161">161</td>
@@ -249,9 +249,9 @@ A bright, clear evening in August 2026 captures the grandeur of Arundel Cathedra
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="75.93405391599845">75.93s</td>
-<td data-sort-value="63.30555052358623">63.3 tok/s</td>
-<td data-sort-value="63.13529962499888">63.14</td>
+<td data-sort-value="77.19617470900266">77.20s</td>
+<td data-sort-value="59.57739622083442">59.6 tok/s</td>
+<td data-sort-value="63.5878764170011">63.59</td>
 <td data-sort-value="74.111445646">74</td>
 <td data-sort-value="16596">16,596</td>
 <td data-sort-value="102">102</td>
@@ -267,9 +267,9 @@ Keywords: Arundel, Ca...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.423932416999378">4.42s</td>
-<td data-sort-value="55.55509303738512">55.6 tok/s</td>
-<td data-sort-value="0.4914427920011804">0.49</td>
+<td data-sort-value="4.305144292000477">4.31s</td>
+<td data-sort-value="54.554080475005925">54.6 tok/s</td>
+<td data-sort-value="0.2999802910017024">0.30</td>
 <td data-sort-value="9.2786486">9.3</td>
 <td data-sort-value="1164">1,164</td>
 <td data-sort-value="119">119</td>
@@ -285,9 +285,9 @@ Description: Arundel Cathedral of Our Lady &amp; St. Philip Howard stands majest
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="60.729725125000186">60.73s</td>
-<td data-sort-value="108.73463847799474">109 tok/s</td>
-<td data-sort-value="56.09047050000117">56.09</td>
+<td data-sort-value="63.317621917001816">63.32s</td>
+<td data-sort-value="82.99598692252455">83.0 tok/s</td>
+<td data-sort-value="58.33161112499875">58.33</td>
 <td data-sort-value="24.289994266">24</td>
 <td data-sort-value="16596">16,596</td>
 <td data-sort-value="102">102</td>
@@ -307,9 +307,9 @@ Keywords: Arundel Cathedral, Got...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="63.91660816699914">63.92s</td>
-<td data-sort-value="90.74060837819545">90.7 tok/s</td>
-<td data-sort-value="60.300546208000014">60.30</td>
+<td data-sort-value="79.0686551660001">79.07s</td>
+<td data-sort-value="85.90179144730197">85.9 tok/s</td>
+<td data-sort-value="74.90569179099839">74.91</td>
 <td data-sort-value="9.982065802">10.0</td>
 <td data-sort-value="16596">16,596</td>
 <td data-sort-value="88">88</td>
@@ -329,9 +329,9 @@ Keywords: Arundel Cathedral, Residential Street, Red Car, Blue Sky, Go...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="86.51391191599942">86.51s</td>
-<td data-sort-value="17.941617713626673">17.9 tok/s</td>
-<td data-sort-value="76.38216604099944">76.38</td>
+<td data-sort-value="91.21399983399897">91.21s</td>
+<td data-sort-value="18.067921703095656">18.1 tok/s</td>
+<td data-sort-value="80.57971916599854">80.58</td>
 <td data-sort-value="34.667646642">35</td>
 <td data-sort-value="16596">16,596</td>
 <td data-sort-value="103">103</td>
@@ -355,9 +355,9 @@ Keywords:...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="28.585110332998738">28.59s</td>
-<td data-sort-value="45.8510907344596">45.9 tok/s</td>
-<td data-sort-value="17.298944374999337">17.30</td>
+<td data-sort-value="26.305682334001176">26.31s</td>
+<td data-sort-value="43.747829235695555">43.7 tok/s</td>
+<td data-sort-value="15.927867083999445">15.93</td>
 <td data-sort-value="69.931602058">70</td>
 <td data-sort-value="3524">3,524</td>
 <td data-sort-value="111">111</td>
@@ -372,34 +372,14 @@ Arundel Cathedral and Residential Street View
 Description:
 A view of Arundel Cathedral of Our Lady and St Philip Howard rising above a residential street in Arundel, England, featuring a red car parked in a driveway, a brick cottage, and a clear blue sky on a bright da...</td>
 </tr>
-<tr data-model="mlx-community/diffusiongemma-26b-a4b-it-mxfp8" data-execution="completed" data-usability="usable" data-maintainer-status="none" class="completed usable">
-<td data-sort-value="mlx-community/diffusiongemma-26B-A4B-it-mxfp8"><a href="#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"><code>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</code></a></td>
-<td data-sort-value="completed">completed</td>
-<td data-sort-value="usable">usable</td>
-<td data-sort-value="none">none</td>
-<td data-sort-value="6.283455374999903">6.28s</td>
-<td data-sort-value="53.96606999477517">54.0 tok/s</td>
-<td data-sort-value="0.47300287500002014">0.47</td>
-<td data-sort-value="28.321953567">28</td>
-<td data-sort-value="619">619</td>
-<td data-sort-value="83">83</td>
-<td data-sort-value="none">none</td>
-<td data-sort-value="&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
-Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.
-Keywords: Arundel, Cathedral, Church...">&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
-Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.
-Keywords: Arundel, Cathedral, Church...</td>
-</tr>
 <tr data-model="mlx-community/gemma-3-27b-it-qat-4bit" data-execution="completed" data-usability="usable" data-maintainer-status="none" class="completed usable">
 <td data-sort-value="mlx-community/gemma-3-27b-it-qat-4bit"><a href="#model-mlx-community-gemma-3-27b-it-qat-4bit"><code>mlx-community/gemma-3-27b-it-qat-4bit</code></a></td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="8.377449416000672">8.38s</td>
-<td data-sort-value="31.473400711746947">31.5 tok/s</td>
-<td data-sort-value="1.2090142499982903">1.21</td>
+<td data-sort-value="8.54674674999842">8.55s</td>
+<td data-sort-value="30.303203391309605">30.3 tok/s</td>
+<td data-sort-value="1.0534831250006391">1.05</td>
 <td data-sort-value="18.126832034">18</td>
 <td data-sort-value="618">618</td>
 <td data-sort-value="126">126</td>
@@ -413,10 +393,10 @@ Description: Captured on 6th August 2026, Arundel Cathedral of Our Lady &amp; St
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="4.5529903339993325">4.55s</td>
-<td data-sort-value="129.01962114680575">129 tok/s</td>
-<td data-sort-value="0.4744526249996852">0.47</td>
-<td data-sort-value="16.246527182">16</td>
+<td data-sort-value="4.881182332999742">4.88s</td>
+<td data-sort-value="115.36677874047291">115 tok/s</td>
+<td data-sort-value="0.4304064579991973">0.43</td>
+<td data-sort-value="16.242054282">16</td>
 <td data-sort-value="623">623</td>
 <td data-sort-value="101">101</td>
 <td data-sort-value="none">none</td>
@@ -435,9 +415,9 @@ A view of the French-Gothic Arundel Cathedral rising above traditional brick and
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable">usable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.878054875000089">7.88s</td>
-<td data-sort-value="26.28130779573143">26.3 tok/s</td>
-<td data-sort-value="1.1481467079993308">1.15</td>
+<td data-sort-value="8.097628084000462">8.10s</td>
+<td data-sort-value="26.03859266081456">26.0 tok/s</td>
+<td data-sort-value="1.2532269170005748">1.25</td>
 <td data-sort-value="19.596396598">20</td>
 <td data-sort-value="623">623</td>
 <td data-sort-value="85">85</td>
@@ -453,10 +433,10 @@ Keywords: Arundel, Arundel Cathedral, England, West Sussex, cathed...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="2.5023776250000083">2.50s</td>
-<td data-sort-value="509.1645163088888">509 tok/s</td>
-<td data-sort-value="1.1247390829994401">1.12</td>
-<td data-sort-value="1.201362232">1.2</td>
+<td data-sort-value="1.4460253750003176">1.45s</td>
+<td data-sort-value="513.7014028079416">514 tok/s</td>
+<td data-sort-value="0.03816112500135205">0.04</td>
+<td data-sort-value="1.23928245">1.2</td>
 <td data-sort-value="425">425</td>
 <td data-sort-value="119">119</td>
 <td data-sort-value="title/keyword constraints failed">title/keyword constraints failed</td>
@@ -481,9 +461,9 @@ Arundel Cathed...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="17.176767375000054">17.18s</td>
-<td data-sort-value="89.87114172679104">89.9 tok/s</td>
-<td data-sort-value="13.93377362499996">13.93</td>
+<td data-sort-value="16.813847333000012">16.81s</td>
+<td data-sort-value="94.35660256002649">94.4 tok/s</td>
+<td data-sort-value="13.655767582997214">13.66</td>
 <td data-sort-value="8.383962288">8.4</td>
 <td data-sort-value="16581">16,581</td>
 <td data-sort-value="123">123</td>
@@ -499,9 +479,9 @@ Description: A red car is parked in a narrow street in Arundel, England, with th
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="10.673016624999946">10.67s</td>
-<td data-sort-value="80.06031521859714">80.1 tok/s</td>
-<td data-sort-value="7.2121989999996">7.21</td>
+<td data-sort-value="14.071728208000422">14.07s</td>
+<td data-sort-value="68.31310859721901">68.3 tok/s</td>
+<td data-sort-value="10.307446958002402">10.31</td>
 <td data-sort-value="8.439369686">8.4</td>
 <td data-sort-value="6483">6,483</td>
 <td data-sort-value="85">85</td>
@@ -517,9 +497,9 @@ Keywords: Arundel Cathedral, red car, white garage, blue sky, England, UK, Goth.
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="39.10358795799948">39.10s</td>
-<td data-sort-value="31.890640188062857">31.9 tok/s</td>
-<td data-sort-value="25.28730320799877">25.29</td>
+<td data-sort-value="34.60214575000282">34.60s</td>
+<td data-sort-value="37.44024888221293">37.4 tok/s</td>
+<td data-sort-value="22.281791958001126">22.28</td>
 <td data-sort-value="78.163607736">78</td>
 <td data-sort-value="6483">6,483</td>
 <td data-sort-value="100">100</td>
@@ -535,9 +515,9 @@ Keywords: Arunde...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="10.415822582999681">10.42s</td>
-<td data-sort-value="29.066930156153692">29.1 tok/s</td>
-<td data-sort-value="2.4542517909994785">2.45</td>
+<td data-sort-value="8.823150624997652">8.82s</td>
+<td data-sort-value="31.40303148943442">31.4 tok/s</td>
+<td data-sort-value="1.2248872499985737">1.22</td>
 <td data-sort-value="18.065643056">18</td>
 <td data-sort-value="2644">2,644</td>
 <td data-sort-value="141">141</td>
@@ -551,10 +531,10 @@ Description: The Arundel Cathedral of Our Lady and St. Philip Howard is a French
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="6.220921583000745">6.22s</td>
-<td data-sort-value="52.504604983441645">52.5 tok/s</td>
-<td data-sort-value="0.9544875840001624">0.95</td>
-<td data-sort-value="10.767372162">11</td>
+<td data-sort-value="5.909318292000535">5.91s</td>
+<td data-sort-value="51.20350034708943">51.2 tok/s</td>
+<td data-sort-value="0.6837202079987037">0.68</td>
+<td data-sort-value="11.203122894">11</td>
 <td data-sort-value="1547">1,547</td>
 <td data-sort-value="135">135</td>
 <td data-sort-value="title/keyword constraints failed">title/keyword constraints failed</td>
@@ -569,9 +549,9 @@ Description: A red car is parked in front of a white cottage with a stone wall, 
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="73.5577100419996">73.56s</td>
-<td data-sort-value="219.1590471010797">219 tok/s</td>
-<td data-sort-value="71.07584750000024">71.08</td>
+<td data-sort-value="75.26605583299897">75.27s</td>
+<td data-sort-value="207.78550935641886">208 tok/s</td>
+<td data-sort-value="72.80130862499936">72.80</td>
 <td data-sort-value="5.06396306">5.1</td>
 <td data-sort-value="16592">16,592</td>
 <td data-sort-value="141">141</td>
@@ -595,9 +575,9 @@ Keywords:...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="19.565150082999025">19.57s</td>
-<td data-sort-value="90.27388495611163">90.3 tok/s</td>
-<td data-sort-value="16.19174699999894">16.19</td>
+<td data-sort-value="23.039631332998397">23.04s</td>
+<td data-sort-value="92.92279301023665">92.9 tok/s</td>
+<td data-sort-value="19.44689025000116">19.45</td>
 <td data-sort-value="8.391286032">8.4</td>
 <td data-sort-value="16581">16,581</td>
 <td data-sort-value="123">123</td>
@@ -613,9 +593,9 @@ Description: A red car is parked in a narrow street in Arundel, England, with th
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.1415813749990775">3.14s</td>
-<td data-sort-value="129.62433498582132">130 tok/s</td>
-<td data-sort-value="0.5485172909993707">0.55</td>
+<td data-sort-value="2.9143524169994635">2.91s</td>
+<td data-sort-value="128.75765921539593">129 tok/s</td>
+<td data-sort-value="0.3297563750020345">0.33</td>
 <td data-sort-value="5.47516535">5.5</td>
 <td data-sort-value="462">462</td>
 <td data-sort-value="112">112</td>
@@ -626,34 +606,54 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; 
 Description: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
 Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue sky, Bush, Car,...</td>
 </tr>
-<tr data-model="mlx-community/diffusiongemma-26b-a4b-it-8bit" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="none" class="completed usable_with_caveats">
+<tr data-model="mlx-community/diffusiongemma-26b-a4b-it-8bit" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="observation_needs_reproduction" class="completed usable_with_caveats">
 <td data-sort-value="mlx-community/diffusiongemma-26B-A4B-it-8bit"><a href="#model-mlx-community-diffusiongemma-26b-a4b-it-8bit"><code>mlx-community/diffusiongemma-26B-A4B-it-8bit</code></a></td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
-<td data-sort-value="none">none</td>
-<td data-sort-value="7.031226582999807">7.03s</td>
-<td data-sort-value="45.504352988229876">45.5 tok/s</td>
-<td data-sort-value="0.7315932080000493">0.73</td>
+<td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
+<td data-sort-value="6.563958208000258">6.56s</td>
+<td data-sort-value="48.7810766310952">48.8 tok/s</td>
+<td data-sort-value="0.3607317919995694">0.36</td>
 <td data-sort-value="29.094147871">29</td>
 <td data-sort-value="619">619</td>
-<td data-sort-value="87">87</td>
-<td data-sort-value="title/keyword constraints failed">title/keyword constraints failed</td>
+<td data-sort-value="82">82</td>
+<td data-sort-value="control tokens visible; title/keyword constraints failed">control tokens visible; title/keyword constraints failed</td>
 <td data-sort-value="&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral over residential houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.
-Keywords: Arundel, Ca...">&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral over residential houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.
-Keywords: Arundel, Ca...</td>
+&lt;channel|&gt;Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathed...">&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathed...</td>
+</tr>
+<tr data-model="mlx-community/diffusiongemma-26b-a4b-it-mxfp8" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="observation_needs_reproduction" class="completed usable_with_caveats">
+<td data-sort-value="mlx-community/diffusiongemma-26B-A4B-it-mxfp8"><a href="#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"><code>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</code></a></td>
+<td data-sort-value="completed">completed</td>
+<td data-sort-value="usable_with_caveats">usable_with_caveats</td>
+<td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
+<td data-sort-value="6.518606166999234">6.52s</td>
+<td data-sort-value="46.33233807502467">46.3 tok/s</td>
+<td data-sort-value="0.353497583000717">0.35</td>
+<td data-sort-value="28.321953567">28</td>
+<td data-sort-value="619">619</td>
+<td data-sort-value="84">84</td>
+<td data-sort-value="control tokens visible">control tokens visible</td>
+<td data-sort-value="&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, E...">&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, E...</td>
 </tr>
 <tr data-model="mlx-community/pixtral-12b-8bit" data-execution="completed" data-usability="usable_with_caveats" data-maintainer-status="none" class="completed usable_with_caveats">
 <td data-sort-value="mlx-community/pixtral-12b-8bit"><a href="#model-mlx-community-pixtral-12b-8bit"><code>mlx-community/pixtral-12b-8bit</code></a></td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="usable_with_caveats">usable_with_caveats</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="7.737812499999563">7.74s</td>
-<td data-sort-value="39.53746020495098">39.5 tok/s</td>
-<td data-sort-value="2.141596875000687">2.14</td>
+<td data-sort-value="7.698931124999945">7.70s</td>
+<td data-sort-value="38.11958828544297">38.1 tok/s</td>
+<td data-sort-value="2.2254585000009683">2.23</td>
 <td data-sort-value="15.620066553">16</td>
 <td data-sort-value="3149">3,149</td>
 <td data-sort-value="106">106</td>
@@ -679,9 +679,9 @@ Arundel Cathedral, Our Lady &amp; St. Philip Howard, Blue...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="16.987471833999734">16.99s</td>
-<td data-sort-value="41.233966442748354">41.2 tok/s</td>
-<td data-sort-value="2.2388184159990487">2.24</td>
+<td data-sort-value="17.187237416001153">17.19s</td>
+<td data-sort-value="40.062718987829975">40.1 tok/s</td>
+<td data-sort-value="2.1754544169998553">2.18</td>
 <td data-sort-value="14.686391472">15</td>
 <td data-sort-value="3240">3,240</td>
 <td data-sort-value="500">500</td>
@@ -695,10 +695,10 @@ We need to produce British-English catalogue metadata from the image and supplie
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="28.44099287499921">28.44s</td>
-<td data-sort-value="58.71601405561375">58.7 tok/s</td>
-<td data-sort-value="7.721447542000533">7.72</td>
-<td data-sort-value="60.029070549">60</td>
+<td data-sort-value="24.520549333999952">24.52s</td>
+<td data-sort-value="53.56711020144252">53.6 tok/s</td>
+<td data-sort-value="5.2561879999993835">5.26</td>
+<td data-sort-value="60.029070647">60</td>
 <td data-sort-value="1665">1,665</td>
 <td data-sort-value="500">500</td>
 <td data-sort-value="missing required fields; cut off at token limit; incomplete thinking block">missing required fields; cut off at token limit; incomplete thinking block</td>
@@ -709,10 +709,10 @@ We need to produce British-English catalogue metadata from the image and supplie
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.4285809579996567">3.43s</td>
-<td data-sort-value="351.6123288013218">352 tok/s</td>
-<td data-sort-value="0.8893287920000148">0.89</td>
-<td data-sort-value="1.96086744">2.0</td>
+<td data-sort-value="3.2072750410006847">3.21s</td>
+<td data-sort-value="324.72079588825864">325 tok/s</td>
+<td data-sort-value="0.10083287499946891">0.10</td>
+<td data-sort-value="2.117054372">2.1</td>
 <td data-sort-value="368">368</td>
 <td data-sort-value="131">131</td>
 <td data-sort-value="missing required fields; extra text before Title">missing required fields; extra text before Title</td>
@@ -725,9 +725,9 @@ Description: A photograph of the Arundel Cathedral of Our Lady and St. Philip Ho
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="20.48961595900073">20.49s</td>
-<td data-sort-value="44.245838315179945">44.2 tok/s</td>
-<td data-sort-value="6.595804624999801">6.60</td>
+<td data-sort-value="24.90761216700048">24.91s</td>
+<td data-sort-value="39.77255244026288">39.8 tok/s</td>
+<td data-sort-value="9.270604999997886">9.27</td>
 <td data-sort-value="13.432508366">13</td>
 <td data-sort-value="6479">6,479</td>
 <td data-sort-value="500">500</td>
@@ -743,10 +743,10 @@ Then the description: need to combine context (date/time, location) with visible
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="117.50964183399992">117.51s</td>
-<td data-sort-value="4.568698252983543">4.57 tok/s</td>
-<td data-sort-value="3.591581374999805">3.59</td>
-<td data-sort-value="39.939833436">40</td>
+<td data-sort-value="118.25940829200044">118.26s</td>
+<td data-sort-value="4.45475938372691">4.45 tok/s</td>
+<td data-sort-value="1.5482861249984126">1.55</td>
+<td data-sort-value="39.939833432">40</td>
 <td data-sort-value="1355">1,355</td>
 <td data-sort-value="500">500</td>
 <td data-sort-value="missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block">missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block</td>
@@ -761,9 +761,9 @@ Starting with the title: The main subject is Arundel Cathedral, so th...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="4.548521041999265">4.55s</td>
-<td data-sort-value="181.25405874741026">181 tok/s</td>
-<td data-sort-value="0.3914509160003945">0.39</td>
+<td data-sort-value="4.2321048750018235">4.23s</td>
+<td data-sort-value="181.89808190669513">182 tok/s</td>
+<td data-sort-value="0.10302137499820674">0.10</td>
 <td data-sort-value="4.107993936">4.1</td>
 <td data-sort-value="615">615</td>
 <td data-sort-value="500">500</td>
@@ -779,10 +779,10 @@ Description: A stunning view of Arundel Cathedral of Our Lady and St Philip Howa
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="30.706121166998855">30.71s</td>
-<td data-sort-value="19.18604891800576">19.2 tok/s</td>
-<td data-sort-value="2.0370160000002215">2.04</td>
-<td data-sort-value="14.729226079">15</td>
+<td data-sort-value="31.29080220799733">31.29s</td>
+<td data-sort-value="18.52760339160131">18.5 tok/s</td>
+<td data-sort-value="1.8018438750004862">1.80</td>
+<td data-sort-value="14.995020789">15</td>
 <td data-sort-value="333">333</td>
 <td data-sort-value="500">500</td>
 <td data-sort-value="repeated text; cut off at token limit; title/keyword constraints failed">repeated text; cut off at token limit; title/keyword constraints failed</td>
@@ -797,10 +797,10 @@ Description: The Arundel Cathedral of Our Lady and St. Philip Howard is captured
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="3.408707749998939">3.41s</td>
-<td data-sort-value="254.31952494056284">254 tok/s</td>
-<td data-sort-value="1.2851086659993598">1.29</td>
-<td data-sort-value="3.79786298">3.8</td>
+<td data-sort-value="2.3824103750012">2.38s</td>
+<td data-sort-value="256.4136128021573">256 tok/s</td>
+<td data-sort-value="0.25714179199712817">0.26</td>
+<td data-sort-value="3.797928516">3.8</td>
 <td data-sort-value="965">965</td>
 <td data-sort-value="40">40</td>
 <td data-sort-value="missing required fields; extra text before Title">missing required fields; extra text before Title</td>
@@ -815,9 +815,9 @@ Keywords: Arundel, cathedral, church, England, Europe, blue sky, red car, cottag
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="30.879178291001153">30.88s</td>
-<td data-sort-value="5.924296913390634">5.92 tok/s</td>
-<td data-sort-value="4.738475083000594">4.74</td>
+<td data-sort-value="28.690627583000605">28.69s</td>
+<td data-sort-value="6.04130782547397">6.04 tok/s</td>
+<td data-sort-value="2.992192458001228">2.99</td>
 <td data-sort-value="24.141060853">24</td>
 <td data-sort-value="3160">3,160</td>
 <td data-sort-value="134">134</td>
@@ -833,9 +833,9 @@ Captured on August 6, 2026, this image showcases Arundel Cathedral of Our Lady &
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="24.125983207999525">24.13s</td>
-<td data-sort-value="90.14261915029913">90.1 tok/s</td>
-<td data-sort-value="16.558986666999772">16.56</td>
+<td data-sort-value="24.020276166000258">24.02s</td>
+<td data-sort-value="92.08323516630547">92.1 tok/s</td>
+<td data-sort-value="16.60117670800173">16.60</td>
 <td data-sort-value="8.391597328">8.4</td>
 <td data-sort-value="16583">16,583</td>
 <td data-sort-value="500">500</td>
@@ -847,9 +847,9 @@ Captured on August 6, 2026, this image showcases Arundel Cathedral of Our Lady &
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="28.486698166001588">28.49s</td>
-<td data-sort-value="55.90978571951764">55.9 tok/s</td>
-<td data-sort-value="17.187257915998998">17.19</td>
+<td data-sort-value="30.39602379200005">30.40s</td>
+<td data-sort-value="54.479354004328755">54.5 tok/s</td>
+<td data-sort-value="18.69023174999893">18.69</td>
 <td data-sort-value="13.488025726">13</td>
 <td data-sort-value="16592">16,592</td>
 <td data-sort-value="500">500</td>
@@ -869,10 +869,10 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic arc...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="14.303024832999654">14.30s</td>
-<td data-sort-value="48.84091255252082">48.8 tok/s</td>
-<td data-sort-value="0.9280928749994928">0.93</td>
-<td data-sort-value="16.969672555">17</td>
+<td data-sort-value="14.438039291002497">14.44s</td>
+<td data-sort-value="46.423673576148865">46.4 tok/s</td>
+<td data-sort-value="0.393418332998408">0.39</td>
+<td data-sort-value="17.034263447">17</td>
 <td data-sort-value="617">617</td>
 <td data-sort-value="500">500</td>
 <td data-sort-value="missing required fields">missing required fields</td>
@@ -883,9 +883,9 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic arc...</td>
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="12.583493125001041">12.58s</td>
-<td data-sort-value="60.80896106302064">60.8 tok/s</td>
-<td data-sort-value="2.316416916999515">2.32</td>
+<td data-sort-value="12.975072375000309">12.98s</td>
+<td data-sort-value="58.78174049733918">58.8 tok/s</td>
+<td data-sort-value="2.3869811250006023">2.39</td>
 <td data-sort-value="9.698099212">9.7</td>
 <td data-sort-value="2552">2,552</td>
 <td data-sort-value="500">500</td>
@@ -905,10 +905,10 @@ Keywords: [/] Arundel Cathedral of Our Lady &amp; St. Philip Howard, Arundel, UK
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="none">none</td>
-<td data-sort-value="2.1393904169999587">2.14s</td>
-<td data-sort-value="336.7107667977915">337 tok/s</td>
-<td data-sort-value="0.2776240000002872">0.28</td>
-<td data-sort-value="2.381140236">2.4</td>
+<td data-sort-value="1.8615085419987736">1.86s</td>
+<td data-sort-value="285.9787316799174">286 tok/s</td>
+<td data-sort-value="0.07982895799796097">0.08</td>
+<td data-sort-value="2.479083308">2.5</td>
 <td data-sort-value="364">364</td>
 <td data-sort-value="77">77</td>
 <td data-sort-value="missing required fields">missing required fields</td>
@@ -921,9 +921,9 @@ Description: A 10-minute description of the cathedral, including its location, t
 <td data-sort-value="completed">completed</td>
 <td data-sort-value="unusable">unusable</td>
 <td data-sort-value="observation_needs_reproduction">observation_needs_reproduction</td>
-<td data-sort-value="16.152679707998686">16.15s</td>
-<td data-sort-value="39.964816308951725">40.0 tok/s</td>
-<td data-sort-value="1.233196000001044">1.23</td>
+<td data-sort-value="15.189403250002215">15.19s</td>
+<td data-sort-value="43.43828552570676">43.4 tok/s</td>
+<td data-sort-value="1.1411379580022185">1.14</td>
 <td data-sort-value="4.363416088">4.4</td>
 <td data-sort-value="4444">4,444</td>
 <td data-sort-value="500">500</td>
@@ -943,7 +943,7 @@ Description: A 10-minute description of the cathedral, including its location, t
 <td data-sort-value="crashed">crashed</td>
 <td data-sort-value="not_evaluated">not_evaluated</td>
 <td data-sort-value="actionable_failure">actionable_failure</td>
-<td data-sort-value="0.78935066700069">0.79s</td>
+<td data-sort-value="0.5979029169975547">0.60s</td>
 <td data-sort-value="">-</td>
 <td data-sort-value="">-</td>
 <td data-sort-value="">-</td>
@@ -966,8 +966,8 @@ language_model.model.layers.10.mlp.expe...</td>
 </table>
 </div>
 <h3>Resource Highlights</h3>
-<p>Fastest clean completion: <a href="#model-mlx-community-ministral-3-3b-instruct-2512-4bit"><code>mlx-community/Ministral-3-3B-Instruct-2512-4bit</code></a> at 187 tok/s.</p>
-<p>Average clean-completion throughput: 67.0 tok/s (indicative only: tokenizers and architectures differ across models).</p>
+<p>Fastest clean completion: <a href="#model-mlx-community-ministral-3-3b-instruct-2512-4bit"><code>mlx-community/Ministral-3-3B-Instruct-2512-4bit</code></a> at 181 tok/s.</p>
+<p>Average clean-completion throughput: 63.3 tok/s (indicative only: tokenizers and architectures differ across models).</p>
 <p>Lowest peak memory among clean completions: <a href="#model-mlx-community-ministral-3-3b-instruct-2512-4bit"><code>mlx-community/Ministral-3-3B-Instruct-2512-4bit</code></a> at 7.8 GB.</p>
 <h3>Avoid for This Run</h3>
 <table>
@@ -1145,31 +1145,31 @@ language_model.model.layers.10.mlp.expe...</td>
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.14s</td>
+<td>2.20s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>7.92s</td>
+<td>8.04s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>10.45s</td>
+<td>10.66s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.38</td>
+<td>0.408</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00702</td>
+<td>0.00782</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>3.85</td>
+<td>3.6</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.11</td>
+<td>0.128</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1185,11 +1185,11 @@ language_model.model.layers.10.mlp.expe...</td>
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>630 tok/s</td>
+<td>674 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>29.5 tok/s</td>
+<td>27.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -1312,31 +1312,31 @@ Arundel Cathedral, Residential Street, Red Car, Cottage, Stone Wall, Garden, Chu
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.66s</td>
+<td>1.61s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>4.54s</td>
+<td>4.53s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>6.56s</td>
+<td>6.51s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.358</td>
+<td>0.361</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00179</td>
+<td>0.00184</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.02</td>
+<td>0.863</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.112</td>
+<td>0.108</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1352,11 +1352,11 @@ Arundel Cathedral, Residential Street, Red Car, Cottage, Stone Wall, Garden, Chu
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,112 tok/s</td>
+<td>2,488 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>35.1 tok/s</td>
+<td>33.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -1476,31 +1476,31 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.42s</td>
+<td>1.34s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.58s</td>
+<td>5.73s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.37s</td>
+<td>7.45s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.355</td>
+<td>0.363</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00732</td>
+<td>0.00721</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.06</td>
+<td>2.11</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0841</td>
+<td>0.0891</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1516,11 +1516,11 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,437 tok/s</td>
+<td>1,405 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>66.4 tok/s</td>
+<td>64.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -1643,31 +1643,31 @@ Arundel Cathedral, Our Lady &amp; St. Philip Howard, Gothic architecture, stone 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.47s</td>
+<td>1.70s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.57s</td>
+<td>5.66s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.40s</td>
+<td>7.73s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.357</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000243</td>
+<td>0.000263</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.08</td>
+<td>2.12</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0833</td>
+<td>0.0912</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1683,11 +1683,11 @@ Arundel Cathedral, Our Lady &amp; St. Philip Howard, Gothic architecture, stone 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,426 tok/s</td>
+<td>1,397 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>63.5 tok/s</td>
+<td>62.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -1810,31 +1810,31 @@ Arundel, Arundel Cathedral, Cathedral, Cottage, England, UK, Europe, French-Goth
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.97s</td>
+<td>0.96s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.48s</td>
+<td>2.45s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.81s</td>
+<td>3.78s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.356</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00674</td>
+<td>0.00701</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.08</td>
+<td>1.02</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.074</td>
+<td>0.0837</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -1850,11 +1850,11 @@ Arundel, Arundel Cathedral, Cathedral, Cottage, England, UK, Europe, French-Goth
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,740 tok/s</td>
+<td>2,893 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>187 tok/s</td>
+<td>181 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -1977,15 +1977,15 @@ Arundel Cathedral, Gothic architecture, stone cottages, red car, blue sky, Augus
 </tr>
 <tr>
 <td>Model load time</td>
-<td>9.78s</td>
+<td>10.53s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>65.77s</td>
+<td>66.29s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>75.93s</td>
+<td>77.20s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
@@ -1993,15 +1993,15 @@ Arundel Cathedral, Gothic architecture, stone cottages, red car, blue sky, Augus
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0144</td>
+<td>0.0143</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>63.1</td>
+<td>63.6</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.238</td>
+<td>0.228</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2017,11 +2017,11 @@ Arundel Cathedral, Gothic architecture, stone cottages, red car, blue sky, Augus
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>263 tok/s</td>
+<td>261 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>63.3 tok/s</td>
+<td>59.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2139,31 +2139,31 @@ Keywords: Arundel, Cathedral, England, UK, Red Car, Cottage, Roof, Spire, Blue S
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.93s</td>
+<td>0.94s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.13s</td>
+<td>2.99s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.42s</td>
+<td>4.31s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.36</td>
+<td>0.377</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000911</td>
+<td>0.000942</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.491</td>
+<td>0.3</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0828</td>
+<td>0.0942</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2179,11 +2179,11 @@ Keywords: Arundel, Cathedral, England, UK, Red Car, Cottage, Roof, Spire, Blue S
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>2,369 tok/s</td>
+<td>3,880 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>55.6 tok/s</td>
+<td>54.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2303,31 +2303,31 @@ Keywords: Arundel Cathedral, Our Lady &amp; St. Philip Howard, Arundel, England,
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.46s</td>
+<td>2.51s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>57.90s</td>
+<td>60.44s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>60.73s</td>
+<td>63.32s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.35</td>
+<td>0.348</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0146</td>
+<td>0.0139</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>56.1</td>
+<td>58.3</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.117</td>
+<td>0.172</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2343,11 +2343,11 @@ Keywords: Arundel Cathedral, Our Lady &amp; St. Philip Howard, Arundel, England,
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>296 tok/s</td>
+<td>285 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>109 tok/s</td>
+<td>83.0 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2359,7 +2359,7 @@ Keywords: Arundel Cathedral, Our Lady &amp; St. Philip Howard, Arundel, England,
 </tr>
 <tr>
 <td>Cache memory</td>
-<td>0.89</td>
+<td>0.88</td>
 </tr>
 <tr>
 <td>Model-load active memory</td>
@@ -2467,31 +2467,31 @@ Keywords: Arundel Cathedral, Gothic architecture, red car, stone wall, brick bui
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.40s</td>
+<td>1.68s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>62.15s</td>
+<td>76.93s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>63.92s</td>
+<td>79.07s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.45</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000319</td>
+<td>0.000313</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>60.3</td>
+<td>74.9</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0878</td>
+<td>0.114</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2507,11 +2507,11 @@ Keywords: Arundel Cathedral, Gothic architecture, red car, stone wall, brick bui
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>275 tok/s</td>
+<td>222 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>90.7 tok/s</td>
+<td>85.9 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2631,31 +2631,31 @@ Keywords: Arundel Cathedral, Residential Street, Red Car, Blue Sky, Gothic Archi
 </tr>
 <tr>
 <td>Model load time</td>
-<td>3.12s</td>
+<td>3.42s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>83.01s</td>
+<td>87.40s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>86.51s</td>
+<td>91.21s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.368</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0149</td>
+<td>0.0161</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>76.4</td>
+<td>80.6</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.138</td>
+<td>0.13</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2671,11 +2671,11 @@ Keywords: Arundel Cathedral, Residential Street, Red Car, Blue Sky, Gothic Archi
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>217 tok/s</td>
+<td>206 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>17.9 tok/s</td>
+<td>18.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2798,31 +2798,31 @@ Arundel, Cathedral, Church, Gothic, England, UK, Red Car, Cottage, Residential, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>7.66s</td>
+<td>6.61s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>20.55s</td>
+<td>19.31s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>28.59s</td>
+<td>26.31s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.362</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0163</td>
+<td>0.0158</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>17.3</td>
+<td>15.9</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.226</td>
+<td>0.207</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -2838,11 +2838,11 @@ Arundel, Cathedral, Church, Gothic, England, UK, Red Car, Cottage, Residential, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>204 tok/s</td>
+<td>221 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>45.9 tok/s</td>
+<td>43.7 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -2933,169 +2933,6 @@ Keywords:
 Arundel, Arundel Cathedral, Cathedral, Church, Gothic architecture, Red car, Parking, Residential street, Brick building, Blue sky, England, UK, Europe, Roof, Window, Flower, Bush, Stone wall</pre>
 </details>
 </article>
-<article id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8">
-<h3>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</h3>
-<details><summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-<table>
-<caption>Captured facts for mlx-community/diffusiongemma-26B-A4B-it-mxfp8</caption>
-<thead><tr>
-<th scope="col">Fact</th>
-<th scope="col">Value</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>Execution</td>
-<td>completed</td>
-</tr>
-<tr>
-<td>Usability</td>
-<td>usable</td>
-</tr>
-<tr>
-<td>Maintainer status</td>
-<td>none</td>
-</tr>
-<tr>
-<td>Observations</td>
-<td>none</td>
-</tr>
-<tr>
-<td>Arch supported by installed mlx-vlm</td>
-<td>yes (model_type diffusion_gemma)</td>
-</tr>
-<tr>
-<td>Model load time</td>
-<td>3.19s</td>
-</tr>
-<tr>
-<td>Generation time</td>
-<td>2.74s</td>
-</tr>
-<tr>
-<td>Total time</td>
-<td>6.28s</td>
-</tr>
-<tr>
-<td>Input validation time</td>
-<td>0.348</td>
-</tr>
-<tr>
-<td>Prompt preparation time</td>
-<td>0.000316</td>
-</tr>
-<tr>
-<td>First-token latency</td>
-<td>0.473</td>
-</tr>
-<tr>
-<td>Cleanup time</td>
-<td>0.128</td>
-</tr>
-<tr>
-<td>Prompt tokens</td>
-<td>619</td>
-</tr>
-<tr>
-<td>Generation tokens</td>
-<td>83</td>
-</tr>
-<tr>
-<td>Total tokens</td>
-<td>702</td>
-</tr>
-<tr>
-<td>Prompt throughput (raw)</td>
-<td>1,309 tok/s</td>
-</tr>
-<tr>
-<td>Generation throughput (raw)</td>
-<td>54.0 tok/s</td>
-</tr>
-<tr>
-<td>Peak memory</td>
-<td>28</td>
-</tr>
-<tr>
-<td>Active memory</td>
-<td>27</td>
-</tr>
-<tr>
-<td>Cache memory</td>
-<td>0.01</td>
-</tr>
-<tr>
-<td>Model-load active memory</td>
-<td>27.2</td>
-</tr>
-<tr>
-<td>Post-cleanup active memory</td>
-<td>0.0103</td>
-</tr>
-<tr>
-<td>Post-cleanup cache memory</td>
-<td>0.0</td>
-</tr>
-<tr>
-<td>Stop reason</td>
-<td>completed</td>
-</tr>
-<tr>
-<td>Requested maximum tokens</td>
-<td>500</td>
-</tr>
-<tr>
-<td>Rendered prompt characters</td>
-<td>1378</td>
-</tr>
-<tr>
-<td>Image placeholders</td>
-<td>1</td>
-</tr>
-<tr>
-<td>Processed image</td>
-<td>not captured</td>
-</tr>
-<tr>
-<td>Image patch count</td>
-<td>not captured</td>
-</tr>
-<tr>
-<td>Processor</td>
-<td>mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor</td>
-</tr>
-<tr>
-<td>Tokenizer</td>
-<td>transformers.models.gemma.tokenization_gemma.GemmaTokenizer</td>
-</tr>
-<tr>
-<td>Requested model revision</td>
-<td>not requested</td>
-</tr>
-<tr>
-<td>Resolved model revision</td>
-<td>ded389e478f86d498ad9e7f47666e83b166a28f1</td>
-</tr>
-<tr>
-<td>Resolved snapshot path</td>
-<td>~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1</td>
-</tr>
-<tr>
-<td>Generation settings</td>
-<td>{&quot;max_tokens&quot;: 500, &quot;prefill_step_size&quot;: 2048, &quot;temperature&quot;: 0.0, &quot;top_p&quot;: 1.0}</td>
-</tr>
-<tr>
-<td>EOS token</td>
-<td>&lt;eos&gt;</td>
-</tr>
-</tbody>
-</table>
-<p><b>Readable output:</b></p>
-<pre class="model-output-readable">&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
-Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.
-Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car, Cottage, Roof, Sky, Neighborhood, Stone, Brick, Flowers, Europe</pre>
-</details>
-</article>
 <article id="model-mlx-community-gemma-3-27b-it-qat-4bit">
 <h3>mlx-community/gemma-3-27b-it-qat-4bit</h3>
 <details><summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
@@ -3128,31 +2965,31 @@ Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.28s</td>
+<td>2.42s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.74s</td>
+<td>5.76s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>8.38s</td>
+<td>8.55s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.35</td>
+<td>0.356</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00257</td>
+<td>0.00271</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.21</td>
+<td>1.05</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.122</td>
+<td>0.138</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3168,11 +3005,11 @@ Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>511 tok/s</td>
+<td>587 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>31.5 tok/s</td>
+<td>30.3 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -3290,27 +3127,27 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St Philip Howard, Church,
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.35s</td>
+<td>2.52s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.82s</td>
+<td>1.97s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.55s</td>
+<td>4.88s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.347</td>
+<td>0.355</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0216</td>
+<td>0.0222</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.474</td>
+<td>0.43</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
@@ -3330,11 +3167,11 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St Philip Howard, Church,
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,313 tok/s</td>
+<td>1,447 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>129 tok/s</td>
+<td>115 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -3457,19 +3294,19 @@ Arundel, Cathedral, England, Europe, architecture, blue sky, red car, house, roo
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.57s</td>
+<td>2.62s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>4.95s</td>
+<td>5.11s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.88s</td>
+<td>8.10s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.348</td>
+<td>0.355</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
@@ -3477,11 +3314,11 @@ Arundel, Cathedral, England, Europe, architecture, blue sky, red car, house, roo
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.15</td>
+<td>1.25</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.132</td>
+<td>0.149</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3497,11 +3334,11 @@ Arundel, Cathedral, England, Europe, architecture, blue sky, red car, house, roo
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>543 tok/s</td>
+<td>497 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>26.3 tok/s</td>
+<td>26.0 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -3619,31 +3456,31 @@ Keywords: Arundel, Arundel Cathedral, England, West Sussex, cathedral, church, F
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.40s</td>
+<td>0.42s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.77s</td>
+<td>0.69s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.50s</td>
+<td>1.45s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.325</td>
+<td>0.334</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0061</td>
+<td>0.00641</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.12</td>
+<td>0.0382</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0582</td>
+<td>0.059</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3659,11 +3496,11 @@ Keywords: Arundel, Arundel Cathedral, England, West Sussex, cathedral, church, F
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>378 tok/s</td>
+<td>11,137 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>509 tok/s</td>
+<td>514 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -3786,31 +3623,31 @@ Arundel Cathedral, Arundel, England, GBR, Europe, red car, street corner, Arunde
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.65s</td>
+<td>0.67s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>16.19s</td>
+<td>15.80s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>17.18s</td>
+<td>16.81s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.319</td>
+<td>0.325</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00887</td>
+<td>0.00927</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>13.9</td>
+<td>13.7</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0957</td>
+<td>0.0822</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3826,11 +3663,11 @@ Arundel Cathedral, Arundel, England, GBR, Europe, red car, street corner, Arunde
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,190 tok/s</td>
+<td>1,214 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>89.9 tok/s</td>
+<td>94.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -3950,31 +3787,31 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.41s</td>
+<td>1.53s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>8.83s</td>
+<td>12.09s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>10.67s</td>
+<td>14.07s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.412</td>
+<td>0.434</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0089</td>
+<td>0.00775</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>7.21</td>
+<td>10.3</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0851</td>
+<td>0.105</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -3990,11 +3827,11 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>899 tok/s</td>
+<td>629 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>80.1 tok/s</td>
+<td>68.3 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4112,31 +3949,31 @@ Keywords: Arundel Cathedral, red car, white garage, blue sky, England, UK, Gothi
 </tr>
 <tr>
 <td>Model load time</td>
-<td>9.64s</td>
+<td>8.58s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>29.07s</td>
+<td>25.52s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>39.10s</td>
+<td>34.60s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.377</td>
+<td>0.484</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00836</td>
+<td>0.00723</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>25.3</td>
+<td>22.3</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.262</td>
+<td>0.23</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4152,11 +3989,11 @@ Keywords: Arundel Cathedral, red car, white garage, blue sky, England, UK, Gothi
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>256 tok/s</td>
+<td>291 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>31.9 tok/s</td>
+<td>37.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4278,27 +4115,27 @@ Keywords: Arundel Cathedral, Arundel, England, UK, Cathedral, Church, Red Car, C
 </tr>
 <tr>
 <td>Generation time</td>
-<td>8.03s</td>
+<td>6.45s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>10.42s</td>
+<td>8.82s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.39</td>
+<td>0.376</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00126</td>
+<td>0.00131</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.45</td>
+<td>1.22</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.19</td>
+<td>0.107</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4314,11 +4151,11 @@ Keywords: Arundel Cathedral, Arundel, England, UK, Cathedral, Church, Red Car, C
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,077 tok/s</td>
+<td>2,159 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>29.1 tok/s</td>
+<td>31.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4436,31 +4273,31 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.33s</td>
+<td>1.20s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>4.53s</td>
+<td>4.35s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>6.22s</td>
+<td>5.91s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.355</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00135</td>
+<td>0.00138</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.954</td>
+<td>0.684</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0758</td>
+<td>0.084</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4476,11 +4313,11 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,621 tok/s</td>
+<td>2,263 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>52.5 tok/s</td>
+<td>51.2 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4600,31 +4437,31 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.64s</td>
+<td>0.55s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>72.56s</td>
+<td>74.34s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>73.56s</td>
+<td>75.27s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.363</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00337</td>
+<td>0.00408</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>71.1</td>
+<td>72.8</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0796</td>
+<td>0.0948</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4640,11 +4477,11 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>233 tok/s</td>
+<td>228 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>219 tok/s</td>
+<td>208 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4767,31 +4604,31 @@ Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; St. Philip
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.76s</td>
+<td>0.87s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>18.44s</td>
+<td>21.77s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>19.57s</td>
+<td>23.04s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.353</td>
+<td>0.395</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000194</td>
+<td>0.000263</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>16.2</td>
+<td>19.4</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0875</td>
+<td>0.085</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4807,11 +4644,11 @@ Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; St. Philip
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,024 tok/s</td>
+<td>853 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>90.3 tok/s</td>
+<td>92.9 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -4935,15 +4772,15 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.11s</td>
+<td>1.89s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.14s</td>
+<td>2.91s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.348</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
@@ -4951,11 +4788,11 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.549</td>
+<td>0.33</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0732</td>
+<td>0.0773</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -4971,11 +4808,11 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>842 tok/s</td>
+<td>1,401 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>130 tok/s</td>
+<td>129 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -5081,11 +4918,11 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; 
 </tr>
 <tr>
 <td>Maintainer status</td>
-<td>none</td>
+<td>observation_needs_reproduction</td>
 </tr>
 <tr>
 <td>Observations</td>
-<td>Duplicate keywords: england</td>
+<td>Unrecognised model control tokens remain visible; Duplicate keywords: historic</td>
 </tr>
 <tr>
 <td>Arch supported by installed mlx-vlm</td>
@@ -5093,31 +4930,31 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>3.29s</td>
+<td>3.41s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.37s</td>
+<td>2.76s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.03s</td>
+<td>6.56s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.364</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0204</td>
+<td>0.0225</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.732</td>
+<td>0.361</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.128</td>
+<td>0.134</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5125,19 +4962,19 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; 
 </tr>
 <tr>
 <td>Generation tokens</td>
-<td>87</td>
+<td>82</td>
 </tr>
 <tr>
 <td>Total tokens</td>
-<td>706</td>
+<td>701</td>
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>846 tok/s</td>
+<td>1,716 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>45.5 tok/s</td>
+<td>48.8 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -5219,9 +5056,172 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; 
 </table>
 <p><b>Readable output:</b></p>
 <pre class="model-output-readable">&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral over residential houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.
-Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, house, car, roof, brick, stone, sky, neighborhood, historic, religious, spire, urban</pre>
+&lt;channel|&gt;Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban</pre>
+</details>
+</article>
+<article id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8">
+<h3>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</h3>
+<details><summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+<table>
+<caption>Captured facts for mlx-community/diffusiongemma-26B-A4B-it-mxfp8</caption>
+<thead><tr>
+<th scope="col">Fact</th>
+<th scope="col">Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Execution</td>
+<td>completed</td>
+</tr>
+<tr>
+<td>Usability</td>
+<td>usable_with_caveats</td>
+</tr>
+<tr>
+<td>Maintainer status</td>
+<td>observation_needs_reproduction</td>
+</tr>
+<tr>
+<td>Observations</td>
+<td>Unrecognised model control tokens remain visible</td>
+</tr>
+<tr>
+<td>Arch supported by installed mlx-vlm</td>
+<td>yes (model_type diffusion_gemma)</td>
+</tr>
+<tr>
+<td>Model load time</td>
+<td>3.26s</td>
+</tr>
+<tr>
+<td>Generation time</td>
+<td>2.89s</td>
+</tr>
+<tr>
+<td>Total time</td>
+<td>6.52s</td>
+</tr>
+<tr>
+<td>Input validation time</td>
+<td>0.352</td>
+</tr>
+<tr>
+<td>Prompt preparation time</td>
+<td>0.000306</td>
+</tr>
+<tr>
+<td>First-token latency</td>
+<td>0.353</td>
+</tr>
+<tr>
+<td>Cleanup time</td>
+<td>0.136</td>
+</tr>
+<tr>
+<td>Prompt tokens</td>
+<td>619</td>
+</tr>
+<tr>
+<td>Generation tokens</td>
+<td>84</td>
+</tr>
+<tr>
+<td>Total tokens</td>
+<td>703</td>
+</tr>
+<tr>
+<td>Prompt throughput (raw)</td>
+<td>1,751 tok/s</td>
+</tr>
+<tr>
+<td>Generation throughput (raw)</td>
+<td>46.3 tok/s</td>
+</tr>
+<tr>
+<td>Peak memory</td>
+<td>28</td>
+</tr>
+<tr>
+<td>Active memory</td>
+<td>27</td>
+</tr>
+<tr>
+<td>Cache memory</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td>Model-load active memory</td>
+<td>27.2</td>
+</tr>
+<tr>
+<td>Post-cleanup active memory</td>
+<td>0.0103</td>
+</tr>
+<tr>
+<td>Post-cleanup cache memory</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>Stop reason</td>
+<td>completed</td>
+</tr>
+<tr>
+<td>Requested maximum tokens</td>
+<td>500</td>
+</tr>
+<tr>
+<td>Rendered prompt characters</td>
+<td>1378</td>
+</tr>
+<tr>
+<td>Image placeholders</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Processed image</td>
+<td>not captured</td>
+</tr>
+<tr>
+<td>Image patch count</td>
+<td>not captured</td>
+</tr>
+<tr>
+<td>Processor</td>
+<td>mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor</td>
+</tr>
+<tr>
+<td>Tokenizer</td>
+<td>transformers.models.gemma.tokenization_gemma.GemmaTokenizer</td>
+</tr>
+<tr>
+<td>Requested model revision</td>
+<td>not requested</td>
+</tr>
+<tr>
+<td>Resolved model revision</td>
+<td>ded389e478f86d498ad9e7f47666e83b166a28f1</td>
+</tr>
+<tr>
+<td>Resolved snapshot path</td>
+<td>~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1</td>
+</tr>
+<tr>
+<td>Generation settings</td>
+<td>{&quot;max_tokens&quot;: 500, &quot;prefill_step_size&quot;: 2048, &quot;temperature&quot;: 0.0, &quot;top_p&quot;: 1.0}</td>
+</tr>
+<tr>
+<td>EOS token</td>
+<td>&lt;eos&gt;</td>
+</tr>
+</tbody>
+</table>
+<p><b>Readable output:</b></p>
+<pre class="model-output-readable">&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers</pre>
 </details>
 </article>
 <article id="model-mlx-community-pixtral-12b-8bit">
@@ -5256,31 +5256,31 @@ Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, ho
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.02s</td>
+<td>1.78s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>5.34s</td>
+<td>5.53s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>7.74s</td>
+<td>7.70s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.366</td>
+<td>0.37</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00445</td>
+<td>0.00901</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.14</td>
+<td>2.23</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.094</td>
+<td>0.1</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5296,11 +5296,11 @@ Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, ho
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,470 tok/s</td>
+<td>1,415 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>39.5 tok/s</td>
+<td>38.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -5423,31 +5423,31 @@ Arundel Cathedral, Our Lady &amp; St. Philip Howard, Blue Sky, Red Car, Church, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.72s</td>
+<td>1.62s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>14.88s</td>
+<td>15.19s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>16.99s</td>
+<td>17.19s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.379</td>
+<td>0.363</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00675</td>
+<td>0.00676</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.24</td>
+<td>2.18</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0891</td>
+<td>0.104</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5463,11 +5463,11 @@ Arundel Cathedral, Our Lady &amp; St. Philip Howard, Blue Sky, Red Car, Church, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,447 tok/s</td>
+<td>1,489 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>41.2 tok/s</td>
+<td>40.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -5590,31 +5590,31 @@ Description: 1-2 sentences factual, combine relevant context with main visible s
 </tr>
 <tr>
 <td>Model load time</td>
-<td>10.99s</td>
+<td>8.62s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>17.07s</td>
+<td>15.38s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>28.44s</td>
+<td>24.52s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.374</td>
+<td>0.508</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00833</td>
+<td>0.00989</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>7.72</td>
+<td>5.26</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.233</td>
+<td>0.227</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5630,11 +5630,11 @@ Description: 1-2 sentences factual, combine relevant context with main visible s
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>216 tok/s</td>
+<td>317 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>58.7 tok/s</td>
+<td>53.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -5756,31 +5756,31 @@ Here&#x27;s the final list: Arundel, Arundel Cathedral, England, UK, Gothic arch
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.60s</td>
+<td>0.77s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.47s</td>
+<td>2.00s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.43s</td>
+<td>3.21s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.356</td>
+<td>0.433</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00161</td>
+<td>0.00169</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.889</td>
+<td>0.101</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0739</td>
+<td>0.0975</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5796,15 +5796,15 @@ Here&#x27;s the final list: Arundel, Arundel Cathedral, England, UK, Gothic arch
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>414 tok/s</td>
+<td>3,650 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>352 tok/s</td>
+<td>325 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
-<td>2.0</td>
+<td>2.1</td>
 </tr>
 <tr>
 <td>Active memory</td>
@@ -5812,7 +5812,7 @@ Here&#x27;s the final list: Arundel, Arundel Cathedral, England, UK, Gothic arch
 </tr>
 <tr>
 <td>Cache memory</td>
-<td>0.03</td>
+<td>0.02</td>
 </tr>
 <tr>
 <td>Model-load active memory</td>
@@ -5917,31 +5917,31 @@ Description: A photograph of the Arundel Cathedral of Our Lady and St. Philip Ho
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.69s</td>
+<td>2.01s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>18.45s</td>
+<td>22.47s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>20.49s</td>
+<td>24.91s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.41</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00175</td>
+<td>0.00189</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>6.6</td>
+<td>9.27</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.135</td>
+<td>0.134</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -5957,11 +5957,11 @@ Description: A photograph of the Arundel Cathedral of Our Lady and St. Philip Ho
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>982 tok/s</td>
+<td>699 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>44.2 tok/s</td>
+<td>39.8 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6095,31 +6095,31 @@ Wait, let&#x27;s check the hints. The keyword hints include: Adobe Stock, Any Vi
 </tr>
 <tr>
 <td>Model load time</td>
-<td>3.34s</td>
+<td>3.33s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>113.80s</td>
+<td>114.55s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>117.51s</td>
+<td>118.26s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.37</td>
+<td>0.376</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00182</td>
+<td>0.00181</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>3.59</td>
+<td>1.55</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.158</td>
+<td>0.131</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6135,11 +6135,11 @@ Wait, let&#x27;s check the hints. The keyword hints include: Adobe Stock, Any Vi
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>377 tok/s</td>
+<td>875 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>4.57 tok/s</td>
+<td>4.45 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6261,31 +6261,31 @@ Keywords: Need 10-18 unique keywords. From the image: Arundel Cathedral, Our Lad
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.62s</td>
+<td>0.59s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>3.58s</td>
+<td>3.28s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>4.55s</td>
+<td>4.23s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.358</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00334</td>
+<td>0.00397</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.391</td>
+<td>0.103</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0687</td>
+<td>0.0737</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6301,11 +6301,11 @@ Keywords: Need 10-18 unique keywords. From the image: Arundel Cathedral, Our Lad
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,571 tok/s</td>
+<td>5,970 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>181 tok/s</td>
+<td>182 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6425,31 +6425,31 @@ Keywords: Arundel Cathedral, French-Gothic architecture, Arundel, England, UK, G
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.72s</td>
+<td>1.58s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>28.63s</td>
+<td>29.33s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>30.71s</td>
+<td>31.29s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.35</td>
+<td>0.367</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00128</td>
+<td>0.00129</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.04</td>
+<td>1.8</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0939</td>
+<td>0.0968</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6465,11 +6465,11 @@ Keywords: Arundel Cathedral, French-Gothic architecture, Arundel, England, UK, G
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>163 tok/s</td>
+<td>185 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>19.2 tok/s</td>
+<td>18.5 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6589,31 +6589,31 @@ Keywords: Arundel, Cathedral, Church, Church Architecture, Church Building, Chur
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.93s</td>
+<td>0.92s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>2.11s</td>
+<td>1.09s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>3.41s</td>
+<td>2.38s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.355</td>
+<td>0.357</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00884</td>
+<td>0.00863</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.29</td>
+<td>0.257</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0905</td>
+<td>0.0912</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6629,11 +6629,11 @@ Keywords: Arundel, Cathedral, Church, Church Architecture, Church Building, Chur
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>751 tok/s</td>
+<td>3,753 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>254 tok/s</td>
+<td>256 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6755,27 +6755,27 @@ Keywords: Arundel, cathedral, church, England, Europe, blue sky, red car, cottag
 </tr>
 <tr>
 <td>Generation time</td>
-<td>28.27s</td>
+<td>26.08s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>30.88s</td>
+<td>28.69s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.355</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00532</td>
+<td>0.00477</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>4.74</td>
+<td>2.99</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.11</td>
+<td>0.109</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6791,11 +6791,11 @@ Keywords: Arundel, cathedral, church, England, Europe, blue sky, red car, cottag
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>667 tok/s</td>
+<td>1,056 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>5.92 tok/s</td>
+<td>6.04 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -6915,23 +6915,23 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.74s</td>
+<td>0.76s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>23.00s</td>
+<td>22.90s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>24.13s</td>
+<td>24.02s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.363</td>
+<td>0.348</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0117</td>
+<td>0.0114</td>
 </tr>
 <tr>
 <td>First-token latency</td>
@@ -6939,7 +6939,7 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.123</td>
+<td>0.0821</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -6955,11 +6955,11 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,001 tok/s</td>
+<td>999 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>90.1 tok/s</td>
+<td>92.1 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -7075,31 +7075,31 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.18s</td>
+<td>1.29s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>26.95s</td>
+<td>28.72s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>28.49s</td>
+<td>30.40s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.354</td>
+<td>0.384</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000241</td>
+<td>0.000303</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>17.2</td>
+<td>18.7</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0961</td>
+<td>0.114</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7115,11 +7115,11 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>965 tok/s</td>
+<td>888 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>55.9 tok/s</td>
+<td>54.5 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -7239,31 +7239,31 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>2.26s</td>
+<td>2.38s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>11.68s</td>
+<td>11.69s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>14.30s</td>
+<td>14.44s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.351</td>
+<td>0.358</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00277</td>
+<td>0.00338</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.928</td>
+<td>0.393</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.122</td>
+<td>0.127</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7279,11 +7279,11 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>665 tok/s</td>
+<td>1,568 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>48.8 tok/s</td>
+<td>46.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -7399,31 +7399,31 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.95s</td>
+<td>0.97s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>11.27s</td>
+<td>11.63s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>12.58s</td>
+<td>12.98s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.361</td>
+<td>0.374</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00155</td>
+<td>0.0016</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>2.32</td>
+<td>2.39</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0864</td>
+<td>0.1</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7439,11 +7439,11 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,102 tok/s</td>
+<td>1,069 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>60.8 tok/s</td>
+<td>58.8 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -7591,31 +7591,31 @@ Keywords: [/car, church, cathedral, arundel, uk, europe, sky, roof, building, ar
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.71s</td>
+<td>0.56s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>1.08s</td>
+<td>0.94s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>2.14s</td>
+<td>1.86s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.349</td>
+<td>0.36</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.00138</td>
+<td>0.00148</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.278</td>
+<td>0.0798</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0814</td>
+<td>0.097</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7631,15 +7631,15 @@ Keywords: [/car, church, cathedral, arundel, uk, europe, sky, roof, building, ar
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>1,311 tok/s</td>
+<td>4,560 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>337 tok/s</td>
+<td>286 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
-<td>2.4</td>
+<td>2.5</td>
 </tr>
 <tr>
 <td>Active memory</td>
@@ -7752,31 +7752,31 @@ Description: A 10-minute description of the cathedral, including its location, t
 </tr>
 <tr>
 <td>Model load time</td>
-<td>1.23s</td>
+<td>1.35s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>14.55s</td>
+<td>13.46s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>16.15s</td>
+<td>15.19s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.358</td>
+<td>0.356</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.000169</td>
+<td>0.000176</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>1.23</td>
+<td>1.14</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.193</td>
+<td>0.19</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -7792,11 +7792,11 @@ Description: A 10-minute description of the cathedral, including its location, t
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>3,604 tok/s</td>
+<td>3,894 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>40.0 tok/s</td>
+<td>43.4 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
@@ -8705,11 +8705,11 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>0.79s</td>
+<td>0.60s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.555</td>
+<td>0.369</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
@@ -8721,7 +8721,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.069</td>
+<td>0.0725</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -8823,10 +8823,10 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.</td>
 </table>
 <h4>Complete traceback</h4>
 <pre><code class="language-python">Traceback (most recent call last):
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11958, in _run_model_generation
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11435, in _load_model
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11454, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -8836,7 +8836,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.</td>
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 750, in _typed_mlx_vlm_load
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 756, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -9222,7 +9222,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 12388, in process_image_with_model
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 12407, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -9233,7 +9233,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11973, in _run_model_generation
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), &quot;model_load&quot;) from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -9604,12 +9604,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00&lt;?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00&lt;00:00, 3352.02it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00&lt;00:00, 3382.40it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58</code></pre>
+[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58</code></pre>
 </details>
 </article>
 </section>
@@ -9662,11 +9662,11 @@ Reconstruction complete: |          |  0.00B /  0.00B
 </tr>
 <tr>
 <td>none</td>
-<td>30</td>
+<td>28</td>
 </tr>
 <tr>
 <td>observation needs reproduction</td>
-<td>11</td>
+<td>13</td>
 </tr>
 </tbody>
 </table>
@@ -9689,11 +9689,11 @@ Reconstruction complete: |          |  0.00B /  0.00B
 </tr>
 <tr>
 <td>usable</td>
-<td>15</td>
+<td>14</td>
 </tr>
 <tr>
 <td>usable with caveats</td>
-<td>11</td>
+<td>12</td>
 </tr>
 </tbody>
 </table>
@@ -9712,7 +9712,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 </tr>
 <tr>
 <td>Unrecognised model control tokens remain visible</td>
-<td>1</td>
+<td>3</td>
 </tr>
 <tr>
 <td>Required fields are missing or empty</td>
@@ -9799,6 +9799,20 @@ Reconstruction complete: |          |  0.00B /  0.00B
 <td>repeated text; cut off at token limit; title/keyword constraints failed</td>
 </tr>
 <tr>
+<td><a href="#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit">mlx-community/diffusiongemma-26B-A4B-it-8bit</a></td>
+<td>completed</td>
+<td>usable_with_caveats</td>
+<td>observation_needs_reproduction</td>
+<td>control tokens visible; title/keyword constraints failed</td>
+</tr>
+<tr>
+<td><a href="#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8">mlx-community/diffusiongemma-26B-A4B-it-mxfp8</a></td>
+<td>completed</td>
+<td>usable_with_caveats</td>
+<td>observation_needs_reproduction</td>
+<td>control tokens visible</td>
+</tr>
+<tr>
 <td><a href="#diagnostic-mlx-community-glm-46v-nvfp4">mlx-community/GLM-4.6V-nvfp4</a></td>
 <td>completed</td>
 <td>usable_with_caveats</td>
@@ -9870,10 +9884,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 <details>
 <summary>Complete traceback</summary>
 <pre><code class="language-text">Traceback (most recent call last):
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11958, in _run_model_generation
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11435, in _load_model
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11454, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -9883,7 +9897,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 750, in _typed_mlx_vlm_load
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 756, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -10269,7 +10283,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 12388, in process_image_with_model
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 12407, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -10280,7 +10294,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11973, in _run_model_generation
+  File &quot;~/Documents/AI/mlx/check_models/src/check_models.py&quot;, line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), &quot;model_load&quot;) from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -10652,12 +10666,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00&lt;?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00&lt;00:00, 3352.02it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00&lt;00:00, 3382.40it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58</code></pre>
+[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58</code></pre>
 <h2>Completed Runs with Observations</h2>
 <a id="diagnostic-mlx-community-lfm25-vl-16b-bf16"></a>
 <details>
@@ -10881,6 +10895,71 @@ Keywords: [/car, church, cathedral, arundel, uk, europe, sky, roof, building, ar
 Description: A serene view of Arundel Cathedral of Our Lady &amp; St. Philip Howard, framed by a quaint cottage and vibrant red car, under a clear blue sky at dusk.
 
 Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, French-Gothic, blue sky, cottage, red car, parking, roof, flower, bush, neighborhood, streetlamp, stone wall, window, cross, steeple, garage, 20 mph sign, brick building, white house, stone pathway, lamp post, 2026-08-06, 18:26:35 UTC+01:00, 50.806659°N, 0.551382°W, flower box, potted flowers, stone fence, white garage door, satellite dish, chimney, streetlight, lamp, window box, flower pot, stone wall, brick, white, red, blue, green, yellow, dusk, sunlight, shadow, clear sky, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, serene, calm, quiet, evening, sunset, dusk, twilight, peaceful, calm, quiet, serene, tranquil, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet, serene, peaceful, historic, traditional, residential, urban, architectural, landmark, cultural, scenic, picturesque, tranquil, calm, quiet,</code></pre>
+</details>
+<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+<details>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
+<h3>mlx-community/diffusiongemma-26B-A4B-it-8bit</h3>
+<h4>Execution and provenance</h4>
+<ul>
+<li><b>Execution:</b> completed</li>
+<li><b>Usability:</b> usable_with_caveats</li>
+<li><b>Maintainer status:</b> observation_needs_reproduction</li>
+<li><b>Observations:</b> unexpected_special_token, catalog_constraint_violation</li>
+<li><b>Arch supported by installed mlx-vlm:</b> yes (model_type diffusion_gemma)</li>
+<li><b>Unexpected special tokens:</b> [&quot;&lt;|channel&gt;thought&quot;, &quot;&lt;channel|&gt;&quot;]</li>
+<li><b>Thinking trace markers:</b> [&quot;&lt;|channel&gt;thought&quot;, &quot;&lt;channel|&gt;&quot;]</li>
+<li><b>Title word count:</b> 7</li>
+<li><b>Requested title word range:</b> [5, 10]</li>
+<li><b>Keyword count:</b> 16</li>
+<li><b>Requested keyword count range:</b> [10, 18]</li>
+<li><b>Duplicate keywords:</b> [&quot;historic&quot;]</li>
+<li><b>Resolved model revision:</b> 7b95e3887078ba56283c24f2578d6e5a06b9d7e8</li>
+<li><b>Processor class:</b> mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor</li>
+<li><b>Tokenizer class:</b> transformers.models.gemma.tokenization_gemma.GemmaTokenizer</li>
+<li><b>Stop reason:</b> completed</li>
+<li><b>Post-cleanup active memory (GB):</b> 0.010306756</li>
+<li><b>Post-cleanup cache memory (GB):</b> 0.0</li>
+<li><b>Prompt tokens:</b> 619</li>
+<li><b>Generation tokens:</b> 82</li>
+<li><b>Configured EOS token ID:</b> 1</li>
+<li><b>Configured EOS token:</b> &lt;eos&gt;</li>
+</ul>
+<h4>Complete output</h4>
+<pre><code class="language-text">&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban</code></pre>
+</details>
+<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+<details>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible</summary>
+<h3>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</h3>
+<h4>Execution and provenance</h4>
+<ul>
+<li><b>Execution:</b> completed</li>
+<li><b>Usability:</b> usable_with_caveats</li>
+<li><b>Maintainer status:</b> observation_needs_reproduction</li>
+<li><b>Observations:</b> unexpected_special_token</li>
+<li><b>Arch supported by installed mlx-vlm:</b> yes (model_type diffusion_gemma)</li>
+<li><b>Unexpected special tokens:</b> [&quot;&lt;|channel&gt;thought&quot;, &quot;&lt;channel|&gt;&quot;]</li>
+<li><b>Thinking trace markers:</b> [&quot;&lt;|channel&gt;thought&quot;, &quot;&lt;channel|&gt;&quot;]</li>
+<li><b>Resolved model revision:</b> ded389e478f86d498ad9e7f47666e83b166a28f1</li>
+<li><b>Processor class:</b> mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor</li>
+<li><b>Tokenizer class:</b> transformers.models.gemma.tokenization_gemma.GemmaTokenizer</li>
+<li><b>Stop reason:</b> completed</li>
+<li><b>Post-cleanup active memory (GB):</b> 0.010306756</li>
+<li><b>Post-cleanup cache memory (GB):</b> 0.0</li>
+<li><b>Prompt tokens:</b> 619</li>
+<li><b>Generation tokens:</b> 84</li>
+<li><b>Configured EOS token ID:</b> 1</li>
+<li><b>Configured EOS token:</b> &lt;eos&gt;</li>
+</ul>
+<h4>Complete output</h4>
+<pre><code class="language-text">&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers</code></pre>
 </details>
 <a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
 <details>
@@ -11152,11 +11231,6 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 <td>title/keyword constraints failed</td>
 </tr>
 <tr>
-<td>mlx-community/diffusiongemma-26B-A4B-it-8bit</td>
-<td>usable_with_caveats</td>
-<td>title/keyword constraints failed</td>
-</tr>
-<tr>
 <td>mlx-community/GLM-4.6V-Flash-mxfp4</td>
 <td>usable_with_caveats</td>
 <td>title/keyword constraints failed</td>
@@ -11208,77 +11282,72 @@ Keywords: Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue s
 <tr>
 <td>mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</td>
 <td>rev 0a970d20ad7d; Mistral3Processor; stop completed</td>
-<td>2426 prompt / 104 generated; 29.5 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache</td>
-</tr>
-<tr>
-<td>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</td>
-<td>rev ded389e478f8; DiffusionGemma4Processor; stop completed</td>
-<td>619 prompt / 83 generated; 54.0 tok/s; 28 GB peak; cleanup 0.0103/0.0 GB active/cache</td>
+<td>2426 prompt / 104 generated; 27.1 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-3-27b-it-qat-4bit</td>
 <td>rev fc4e000f32af; Gemma3Processor; stop completed</td>
-<td>618 prompt / 126 generated; 31.5 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache</td>
+<td>618 prompt / 126 generated; 30.3 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-4-26b-a4b-it-4bit</td>
 <td>rev 0d77464eeb23; Gemma4Processor; stop completed</td>
-<td>623 prompt / 101 generated; 129 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache</td>
+<td>623 prompt / 101 generated; 115 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/gemma-4-31b-it-4bit</td>
 <td>rev 696d436c4047; Gemma4Processor; stop completed</td>
-<td>623 prompt / 85 generated; 26.3 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache</td>
+<td>623 prompt / 85 generated; 26.0 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/InternVL3-8B-bf16</td>
 <td>rev e0df3dd79263; InternVLChatProcessor; stop completed</td>
-<td>2147 prompt / 101 generated; 35.1 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache</td>
+<td>2147 prompt / 101 generated; 33.4 tok/s; 17 GB peak; cleanup 0.00302/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</td>
 <td>rev 7c992876448f; Mistral3Processor; stop completed</td>
-<td>2959 prompt / 198 generated; 66.4 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache</td>
+<td>2959 prompt / 198 generated; 64.4 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</td>
 <td>rev 28777b889d84; Mistral3Processor; stop completed</td>
-<td>2959 prompt / 188 generated; 63.5 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache</td>
+<td>2959 prompt / 188 generated; 62.6 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Ministral-3-3B-Instruct-2512-4bit</td>
 <td>rev a962dcb09eee; Mistral3Processor; stop completed</td>
-<td>2958 prompt / 161 generated; 187 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache</td>
+<td>2958 prompt / 161 generated; 181 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Ornith-1.0-35B-bf16</td>
 <td>rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed</td>
-<td>16596 prompt / 102 generated; 63.3 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache</td>
+<td>16596 prompt / 102 generated; 59.6 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Phi-3.5-vision-instruct-bf16</td>
 <td>rev d8da684308c2; Phi3VProcessor; stop completed</td>
-<td>1164 prompt / 119 generated; 55.6 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache</td>
+<td>1164 prompt / 119 generated; 54.6 tok/s; 9.3 GB peak; cleanup 0.00714/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3.5-35B-A3B-4bit</td>
 <td>rev 1e20fd8d4205; Qwen3VLProcessor; stop completed</td>
-<td>16596 prompt / 102 generated; 109 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache</td>
+<td>16596 prompt / 102 generated; 83.0 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3.5-9B-MLX-4bit</td>
 <td>rev 938d8919941c; Qwen3VLProcessor; stop completed</td>
-<td>16596 prompt / 88 generated; 90.7 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache</td>
+<td>16596 prompt / 88 generated; 85.9 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Qwen3.6-27B-mxfp8</td>
 <td>rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed</td>
-<td>16596 prompt / 103 generated; 17.9 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache</td>
+<td>16596 prompt / 103 generated; 18.1 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache</td>
 </tr>
 <tr>
 <td>mlx-community/Step-3.7-Flash-oQ2e</td>
 <td>rev 3dacb46f724a; Step3VLProcessor; stop completed</td>
-<td>3524 prompt / 111 generated; 45.9 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache</td>
+<td>3524 prompt / 111 generated; 43.7 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache</td>
 </tr>
 </tbody>
 </table>
@@ -11351,6 +11420,14 @@ Keywords:</code></pre>
 <tr>
 <td>mlx-community/X-Reasoner-7B-8bit</td>
 <td>21732e74613b465bc98e9d5ec210aba5c7adbcc1</td>
+</tr>
+<tr>
+<td>mlx-community/diffusiongemma-26B-A4B-it-8bit</td>
+<td>7b95e3887078ba56283c24f2578d6e5a06b9d7e8</td>
+</tr>
+<tr>
+<td>mlx-community/diffusiongemma-26B-A4B-it-mxfp8</td>
+<td>ded389e478f86d498ad9e7f47666e83b166a28f1</td>
 </tr>
 <tr>
 <td>mlx-community/GLM-4.6V-nvfp4</td>

@@ -1,155 +1,155 @@
-2026-08-09 21:22:07 BST - DEBUG - Verbose/debug mode enabled.
-2026-08-09 21:22:07 BST - INFO - Full environment dump written to:
-2026-08-09 21:22:07 BST - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
-2026-08-09 21:22:07 BST - DEBUG - Environment details saved for reproducibility
-2026-08-09 21:22:07 BST - INFO - --- Library Versions ---
-2026-08-09 21:22:07 BST - INFO -    ╭─────────────────┬──────────────────────────────╮
-2026-08-09 21:22:07 BST - INFO -    │ Library         │ Version                      │
-2026-08-09 21:22:07 BST - INFO -    ├─────────────────┼──────────────────────────────┤
-2026-08-09 21:22:07 BST - INFO -    │ Pillow          │ 12.3.0                       │
-2026-08-09 21:22:07 BST - INFO -    │ huggingface-hub │ 1.27.0                       │
-2026-08-09 21:22:07 BST - INFO -    │ mlx             │ 0.32.1.dev20260809+8c28c385f │
-2026-08-09 21:22:07 BST - INFO -    │ mlx-audio       │ 0.4.7                        │
-2026-08-09 21:22:07 BST - INFO -    │ mlx-lm          │ 0.31.3                       │
-2026-08-09 21:22:07 BST - INFO -    │ mlx-metal       │                              │
-2026-08-09 21:22:07 BST - INFO -    │ mlx-vlm         │ 0.6.11                       │
-2026-08-09 21:22:07 BST - INFO -    │ numpy           │ 2.5.2                        │
-2026-08-09 21:22:07 BST - INFO -    │ tokenizers      │ 0.22.2                       │
-2026-08-09 21:22:07 BST - INFO -    │ transformers    │ 5.14.1                       │
-2026-08-09 21:22:07 BST - INFO -    ╰─────────────────┴──────────────────────────────╯
-2026-08-09 21:22:07 BST - INFO - Generated: 2026-08-09 21:22:07 BST
-2026-08-09 21:22:07 BST - INFO - 
-2026-08-09 21:22:07 BST - INFO - --- System Information ---
-2026-08-09 21:22:07 BST - INFO -    ╭────────────────────────────┬──────────────────────────────────────────────────────────────────╮
-2026-08-09 21:22:07 BST - INFO -    │ Property                   │ Value                                                            │
-2026-08-09 21:22:07 BST - INFO -    ├────────────────────────────┼──────────────────────────────────────────────────────────────────┤
-2026-08-09 21:22:07 BST - INFO -    │ OS                         │ Darwin 25.6.0                                                    │
-2026-08-09 21:22:07 BST - INFO -    │ macOS Version              │ 26.6.1                                                           │
-2026-08-09 21:22:07 BST - INFO -    │ SDK Version                │ 26.5                                                             │
-2026-08-09 21:22:07 BST - INFO -    │ Active Developer Directory │ /Applications/Xcode.app/Contents/Developer                       │
-2026-08-09 21:22:07 BST - INFO -    │ Xcode Version              │ 26.6                                                             │
-2026-08-09 21:22:07 BST - INFO -    │ Xcode Build                │ 17F113                                                           │
-2026-08-09 21:22:07 BST - INFO -    │ SDK Path                   │ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.plat │
-2026-08-09 21:22:07 BST - INFO -    │                            │ form/Developer/SDKs/MacOSX26.5.sdk                               │
-2026-08-09 21:22:07 BST - INFO -    │ Metal SDK                  │ MacOSX26.5.sdk                                                   │
-2026-08-09 21:22:07 BST - INFO -    │ Metal Compiler Version     │ Apple metal version 32023.883 (metalfe-32023.883)                │
-2026-08-09 21:22:07 BST - INFO -    │ Metallib Linker Version    │ AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy    │
-2026-08-09 21:22:07 BST - INFO -    │                            │ metallib linker)                                                 │
-2026-08-09 21:22:07 BST - INFO -    │ Apple Clang Version        │ Apple clang version 21.0.0 (clang-2100.1.1.101)                  │
-2026-08-09 21:22:07 BST - INFO -    │ Python Version             │ 3.13.13                                                          │
-2026-08-09 21:22:07 BST - INFO -    │ Architecture               │ arm64                                                            │
-2026-08-09 21:22:07 BST - INFO -    │ GPU/Chip                   │ Apple M5 Max                                                     │
-2026-08-09 21:22:07 BST - INFO -    │ MLX Device                 │ Apple M5 Max                                                     │
-2026-08-09 21:22:07 BST - INFO -    │ GPU Architecture           │ applegpu_g17s                                                    │
-2026-08-09 21:22:07 BST - INFO -    │ GPU Cores                  │ 40                                                               │
-2026-08-09 21:22:07 BST - INFO -    │ Metal Support              │ Metal 4                                                          │
-2026-08-09 21:22:07 BST - INFO -    │ RAM                        │ 128.0 GB                                                         │
-2026-08-09 21:22:07 BST - INFO -    │ Recommended Working Set    │ 108 GB                                                           │
-2026-08-09 21:22:07 BST - INFO -    │ Fused Attention            │ Available                                                        │
-2026-08-09 21:22:07 BST - INFO -    │ CPU Cores (Physical)       │ 18                                                               │
-2026-08-09 21:22:07 BST - INFO -    │ CPU Cores (Logical)        │ 18                                                               │
-2026-08-09 21:22:07 BST - INFO -    │ MLX Install Type           │ editable local source                                            │
-2026-08-09 21:22:07 BST - INFO -    │ MLX Distribution Root      │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages  │
-2026-08-09 21:22:07 BST - INFO -    │ mlx-metal Distribution     │ not installed; local editable mlx supplies backend               │
-2026-08-09 21:22:07 BST - INFO -    │ MLX Core Extension         │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darw │
-2026-08-09 21:22:07 BST - INFO -    │                            │ in.so                                                            │
-2026-08-09 21:22:07 BST - INFO -    │ MLX Metallib               │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib      │
-2026-08-09 21:22:07 BST - INFO -    │                            │ (165,677,336 bytes,                                              │
-2026-08-09 21:22:07 BST - INFO -    │                            │ sha256=26e8fdf2551230764eb86a576256ee63d77ea1d7bde4fc72faa3ecc6e │
-2026-08-09 21:22:07 BST - INFO -    │                            │ afdd95f)                                                         │
-2026-08-09 21:22:07 BST - INFO -    │ MLX libmlx.dylib           │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib      │
-2026-08-09 21:22:07 BST - INFO -    │                            │ (21,740,096 bytes,                                               │
-2026-08-09 21:22:07 BST - INFO -    │                            │ sha256=511ad05d90fe6e27ae31250a8ca8906f0416b0da931c490cff61b02b5 │
-2026-08-09 21:22:07 BST - INFO -    │                            │ 19b4303)                                                         │
-2026-08-09 21:22:07 BST - INFO -    ╰────────────────────────────┴──────────────────────────────────────────────────────────────────╯
-2026-08-09 21:22:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:07 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
-2026-08-09 21:22:07 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
-2026-08-09 21:22:07 BST - INFO - ====================================================================================================
-2026-08-09 21:22:07 BST - INFO - MLX Vision Language Model Check
-2026-08-09 21:22:07 BST - INFO - ====================================================================================================
-2026-08-09 21:22:07 BST - INFO - Scanning folder: /Users/jrp/Pictures/Processed
-2026-08-09 21:22:07 BST - DEBUG - Most recent image file found: /Users/jrp/Pictures/Processed/20260806-182635_DSC01347.jpg
-2026-08-09 21:22:07 BST - INFO - Image File:      /Users/jrp/Pictures/Processed/20260806-182635_DSC01347.jpg
-2026-08-09 21:22:07 BST - INFO - Image dimensions: 9984x6656 (66.5 MPixels)
-2026-08-09 21:22:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:07 BST - INFO - Image Metadata
-2026-08-09 21:22:07 BST - DEBUG - Extracted GPS fields: lat=(50.0, 48.39954, 0.0), lat_ref='N', lon=(0.0, 33.08292, 0.0), lon_ref='W'
-2026-08-09 21:22:07 BST - DEBUG - Converted GPS: latitude=(50.0, 48.39954, 0.0), longitude=(0.0, 33.08292, 0.0)
-2026-08-09 21:22:07 BST - INFO - Date: 2026-08-06 18:26:35 UTC+01:00
-2026-08-09 21:22:07 BST - INFO - Description: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
-2026-08-09 21:22:07 BST - INFO - GPS Location: 50.806659°N, 0.551382°W
-2026-08-09 21:22:07 BST - INFO - Title: , Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
-2026-08-09 21:22:07 BST - INFO - Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky, Stone, Stone wall, Town, Tree, UK, United Kingdom, Wall, West Sussex, architecture, brick, british, building, charming, christianity, cityscape, day, destination, dormer window, driveway, english, european, flint wall, gothic, heritage, historic, home, house, landmark, old, outdoor, outdoors, picturesque, plant, quaint, religion, residential, scenic, spire, street, summer, sunny, tourism, traditional, travel, urban, village, wheelie bin, window
-2026-08-09 21:22:07 BST - INFO - ====================================================================================================
-2026-08-09 21:22:07 BST - INFO -                                        EXIF Metadata Summary                                        
-2026-08-09 21:22:07 BST - INFO - ====================================================================================================
-2026-08-09 21:22:07 BST - INFO - ╭──────────────────────────┬──────────────────────────────────────────────────────────────╮
-2026-08-09 21:22:07 BST - INFO - │ Tag                      │ Value                                                        │
-2026-08-09 21:22:07 BST - INFO - ├──────────────────────────┼──────────────────────────────────────────────────────────────┤
-2026-08-09 21:22:07 BST - INFO - │ ResolutionUnit           │ 2                                                            │
-2026-08-09 21:22:07 BST - INFO - │ ImageDescription         │ Arundel, UK - October 31, 2021: View of Arundel Cathedral... │
-2026-08-09 21:22:07 BST - INFO - │ Make                     │ SONY                                                         │
-2026-08-09 21:22:07 BST - INFO - │ Model                    │ ILCE-7RM6                                                    │
-2026-08-09 21:22:07 BST - INFO - │ Software                 │ Adobe Photoshop Lightroom Classic 15.5 (Macintosh)           │
-2026-08-09 21:22:07 BST - INFO - │ Orientation              │ 1                                                            │
-2026-08-09 21:22:07 BST - INFO - │ DateTime                 │ 2026:08:09 20:14:55                                          │
-2026-08-09 21:22:07 BST - INFO - │ YResolution              │ 240.0                                                        │
-2026-08-09 21:22:07 BST - INFO - │ Copyright                │ Copyright © 2026 John Pavel                                  │
-2026-08-09 21:22:07 BST - INFO - │ XResolution              │ 240.0                                                        │
-2026-08-09 21:22:07 BST - INFO - │ Artist                   │ John Pavel                                                   │
-2026-08-09 21:22:07 BST - INFO - │ ExifVersion              │ 0232                                                         │
-2026-08-09 21:22:07 BST - INFO - │ ShutterSpeedValue        │ 8.965784                                                     │
-2026-08-09 21:22:07 BST - INFO - │ ApertureValue            │ 4.33985                                                      │
-2026-08-09 21:22:07 BST - INFO - │ DateTimeOriginal         │ 2026:08:06 18:26:35                                          │
-2026-08-09 21:22:07 BST - INFO - │ DateTimeDigitized        │ 2026:08:06 18:26:35                                          │
-2026-08-09 21:22:07 BST - INFO - │ BrightnessValue          │ 8.02890625                                                   │
-2026-08-09 21:22:07 BST - INFO - │ ExposureBiasValue        │ -0.7                                                         │
-2026-08-09 21:22:07 BST - INFO - │ MaxApertureValue         │ 2.96875                                                      │
-2026-08-09 21:22:07 BST - INFO - │ MeteringMode             │ 5                                                            │
-2026-08-09 21:22:07 BST - INFO - │ LightSource              │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ Flash                    │ 16                                                           │
-2026-08-09 21:22:07 BST - INFO - │ FocalLength              │ 59.0                                                         │
-2026-08-09 21:22:07 BST - INFO - │ ColorSpace               │ 1                                                            │
-2026-08-09 21:22:07 BST - INFO - │ DigitalZoomRatio         │ 1.0                                                          │
-2026-08-09 21:22:07 BST - INFO - │ FocalPlaneXResolution    │ 2802.0701904296875                                           │
-2026-08-09 21:22:07 BST - INFO - │ FocalPlaneYResolution    │ 2802.0701904296875                                           │
-2026-08-09 21:22:07 BST - INFO - │ OffsetTime               │ +01:00                                                       │
-2026-08-09 21:22:07 BST - INFO - │ OffsetTimeOriginal       │ +01:00                                                       │
-2026-08-09 21:22:07 BST - INFO - │ OffsetTimeDigitized      │ +01:00                                                       │
-2026-08-09 21:22:07 BST - INFO - │ SubsecTimeOriginal       │ 492                                                          │
-2026-08-09 21:22:07 BST - INFO - │ SubsecTimeDigitized      │ 492                                                          │
-2026-08-09 21:22:07 BST - INFO - │ FocalPlaneResolutionUnit │ 3                                                            │
-2026-08-09 21:22:07 BST - INFO - │ FileSource               │                                                              │
-2026-08-09 21:22:07 BST - INFO - │ ExposureTime             │ 0.002                                                        │
-2026-08-09 21:22:07 BST - INFO - │ FNumber                  │ 4.5                                                          │
-2026-08-09 21:22:07 BST - INFO - │ SceneType                │                                                              │
-2026-08-09 21:22:07 BST - INFO - │ ExposureProgram          │ 3                                                            │
-2026-08-09 21:22:07 BST - INFO - │ CustomRendered           │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ ISOSpeedRatings          │ 100                                                          │
-2026-08-09 21:22:07 BST - INFO - │ ExposureMode             │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ SensitivityType          │ 2                                                            │
-2026-08-09 21:22:07 BST - INFO - │ WhiteBalance             │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ RecommendedExposureIndex │ 100                                                          │
-2026-08-09 21:22:07 BST - INFO - │ BodySerialNumber         │ 02050485                                                     │
-2026-08-09 21:22:07 BST - INFO - │ LensSpecification        │ (24.0, 70.0, 2.8, 2.8)                                       │
-2026-08-09 21:22:07 BST - INFO - │ LensModel                │ FE 24-70mm F2.8 GM II                                        │
-2026-08-09 21:22:07 BST - INFO - │ FocalLengthIn35mmFilm    │ 59                                                           │
-2026-08-09 21:22:07 BST - INFO - │ SceneCaptureType         │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ Contrast                 │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ Saturation               │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - │ Sharpness                │ 0                                                            │
-2026-08-09 21:22:07 BST - INFO - ╰──────────────────────────┴──────────────────────────────────────────────────────────────╯
-2026-08-09 21:22:07 BST - INFO - ====================================================================================================
-2026-08-09 21:22:07 BST - INFO - Auto eval mode selected 'assisted' (descriptive image metadata found).
-2026-08-09 21:22:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:07 BST - INFO - Prompt Configuration
-2026-08-09 21:22:07 BST - INFO - Generating default prompt for the 'assisted' evaluation lane.
-2026-08-09 21:22:07 BST - DEBUG - Using generated assisted-lane prompt.
-2026-08-09 21:22:07 BST - INFO - Final prompt: Create British-English catalogue metadata from the image and supplied context.
+2026-08-10 20:06:27 BST - DEBUG - Verbose/debug mode enabled.
+2026-08-10 20:06:27 BST - INFO - Full environment dump written to:
+2026-08-10 20:06:27 BST - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2026-08-10 20:06:27 BST - DEBUG - Environment details saved for reproducibility
+2026-08-10 20:06:27 BST - INFO - --- Library Versions ---
+2026-08-10 20:06:27 BST - INFO -    ╭─────────────────┬──────────────────────────────╮
+2026-08-10 20:06:27 BST - INFO -    │ Library         │ Version                      │
+2026-08-10 20:06:27 BST - INFO -    ├─────────────────┼──────────────────────────────┤
+2026-08-10 20:06:27 BST - INFO -    │ Pillow          │ 12.3.0                       │
+2026-08-10 20:06:27 BST - INFO -    │ huggingface-hub │ 1.27.0                       │
+2026-08-10 20:06:27 BST - INFO -    │ mlx             │ 0.32.1.dev20260810+e78d894c8 │
+2026-08-10 20:06:27 BST - INFO -    │ mlx-audio       │ 0.4.8                        │
+2026-08-10 20:06:27 BST - INFO -    │ mlx-lm          │ 0.31.3                       │
+2026-08-10 20:06:27 BST - INFO -    │ mlx-metal       │                              │
+2026-08-10 20:06:27 BST - INFO -    │ mlx-vlm         │ 0.6.11                       │
+2026-08-10 20:06:27 BST - INFO -    │ numpy           │ 2.5.2                        │
+2026-08-10 20:06:27 BST - INFO -    │ tokenizers      │ 0.22.2                       │
+2026-08-10 20:06:27 BST - INFO -    │ transformers    │ 5.15.0                       │
+2026-08-10 20:06:27 BST - INFO -    ╰─────────────────┴──────────────────────────────╯
+2026-08-10 20:06:27 BST - INFO - Generated: 2026-08-10 20:06:27 BST
+2026-08-10 20:06:28 BST - INFO - 
+2026-08-10 20:06:28 BST - INFO - --- System Information ---
+2026-08-10 20:06:28 BST - INFO -    ╭────────────────────────────┬──────────────────────────────────────────────────────────────────╮
+2026-08-10 20:06:28 BST - INFO -    │ Property                   │ Value                                                            │
+2026-08-10 20:06:28 BST - INFO -    ├────────────────────────────┼──────────────────────────────────────────────────────────────────┤
+2026-08-10 20:06:28 BST - INFO -    │ OS                         │ Darwin 25.6.0                                                    │
+2026-08-10 20:06:28 BST - INFO -    │ macOS Version              │ 26.6.1                                                           │
+2026-08-10 20:06:28 BST - INFO -    │ SDK Version                │ 26.5                                                             │
+2026-08-10 20:06:28 BST - INFO -    │ Active Developer Directory │ /Applications/Xcode.app/Contents/Developer                       │
+2026-08-10 20:06:28 BST - INFO -    │ Xcode Version              │ 26.6                                                             │
+2026-08-10 20:06:28 BST - INFO -    │ Xcode Build                │ 17F113                                                           │
+2026-08-10 20:06:28 BST - INFO -    │ SDK Path                   │ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.plat │
+2026-08-10 20:06:28 BST - INFO -    │                            │ form/Developer/SDKs/MacOSX26.5.sdk                               │
+2026-08-10 20:06:28 BST - INFO -    │ Metal SDK                  │ MacOSX26.5.sdk                                                   │
+2026-08-10 20:06:28 BST - INFO -    │ Metal Compiler Version     │ Apple metal version 32023.883 (metalfe-32023.883)                │
+2026-08-10 20:06:28 BST - INFO -    │ Metallib Linker Version    │ AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy    │
+2026-08-10 20:06:28 BST - INFO -    │                            │ metallib linker)                                                 │
+2026-08-10 20:06:28 BST - INFO -    │ Apple Clang Version        │ Apple clang version 21.0.0 (clang-2100.1.1.101)                  │
+2026-08-10 20:06:28 BST - INFO -    │ Python Version             │ 3.13.13                                                          │
+2026-08-10 20:06:28 BST - INFO -    │ Architecture               │ arm64                                                            │
+2026-08-10 20:06:28 BST - INFO -    │ GPU/Chip                   │ Apple M5 Max                                                     │
+2026-08-10 20:06:28 BST - INFO -    │ MLX Device                 │ Apple M5 Max                                                     │
+2026-08-10 20:06:28 BST - INFO -    │ GPU Architecture           │ applegpu_g17s                                                    │
+2026-08-10 20:06:28 BST - INFO -    │ GPU Cores                  │ 40                                                               │
+2026-08-10 20:06:28 BST - INFO -    │ Metal Support              │ Metal 4                                                          │
+2026-08-10 20:06:28 BST - INFO -    │ RAM                        │ 128.0 GB                                                         │
+2026-08-10 20:06:28 BST - INFO -    │ Recommended Working Set    │ 108 GB                                                           │
+2026-08-10 20:06:28 BST - INFO -    │ Fused Attention            │ Available                                                        │
+2026-08-10 20:06:28 BST - INFO -    │ CPU Cores (Physical)       │ 18                                                               │
+2026-08-10 20:06:28 BST - INFO -    │ CPU Cores (Logical)        │ 18                                                               │
+2026-08-10 20:06:28 BST - INFO -    │ MLX Install Type           │ editable local source                                            │
+2026-08-10 20:06:28 BST - INFO -    │ MLX Distribution Root      │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages  │
+2026-08-10 20:06:28 BST - INFO -    │ mlx-metal Distribution     │ not installed; local editable mlx supplies backend               │
+2026-08-10 20:06:28 BST - INFO -    │ MLX Core Extension         │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darw │
+2026-08-10 20:06:28 BST - INFO -    │                            │ in.so                                                            │
+2026-08-10 20:06:28 BST - INFO -    │ MLX Metallib               │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib      │
+2026-08-10 20:06:28 BST - INFO -    │                            │ (167,850,184 bytes,                                              │
+2026-08-10 20:06:28 BST - INFO -    │                            │ sha256=dd75ab57d5bbf694c3eab98fd42e8aaff9882bf262fcaf8dd331ec534 │
+2026-08-10 20:06:28 BST - INFO -    │                            │ a2c4d7d)                                                         │
+2026-08-10 20:06:28 BST - INFO -    │ MLX libmlx.dylib           │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib      │
+2026-08-10 20:06:28 BST - INFO -    │                            │ (21,887,216 bytes,                                               │
+2026-08-10 20:06:28 BST - INFO -    │                            │ sha256=c8426dc61b1a90e1859b1da64ae5d5d3bcf822cb82bfd02e443c87c6d │
+2026-08-10 20:06:28 BST - INFO -    │                            │ 38d78d1)                                                         │
+2026-08-10 20:06:28 BST - INFO -    ╰────────────────────────────┴──────────────────────────────────────────────────────────────────╯
+2026-08-10 20:06:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:28 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
+2026-08-10 20:06:28 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
+2026-08-10 20:06:28 BST - INFO - ====================================================================================================
+2026-08-10 20:06:28 BST - INFO - MLX Vision Language Model Check
+2026-08-10 20:06:28 BST - INFO - ====================================================================================================
+2026-08-10 20:06:28 BST - INFO - Scanning folder: /Users/jrp/Pictures/Processed
+2026-08-10 20:06:28 BST - DEBUG - Most recent image file found: /Users/jrp/Pictures/Processed/20260806-182635_DSC01347.jpg
+2026-08-10 20:06:28 BST - INFO - Image File:      /Users/jrp/Pictures/Processed/20260806-182635_DSC01347.jpg
+2026-08-10 20:06:28 BST - INFO - Image dimensions: 9984x6656 (66.5 MPixels)
+2026-08-10 20:06:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:28 BST - INFO - Image Metadata
+2026-08-10 20:06:28 BST - DEBUG - Extracted GPS fields: lat=(50.0, 48.39954, 0.0), lat_ref='N', lon=(0.0, 33.08292, 0.0), lon_ref='W'
+2026-08-10 20:06:28 BST - DEBUG - Converted GPS: latitude=(50.0, 48.39954, 0.0), longitude=(0.0, 33.08292, 0.0)
+2026-08-10 20:06:28 BST - INFO - Date: 2026-08-06 18:26:35 UTC+01:00
+2026-08-10 20:06:28 BST - INFO - Description: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+2026-08-10 20:06:28 BST - INFO - GPS Location: 50.806659°N, 0.551382°W
+2026-08-10 20:06:28 BST - INFO - Title: , Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+2026-08-10 20:06:28 BST - INFO - Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky, Stone, Stone wall, Town, Tree, UK, United Kingdom, Wall, West Sussex, architecture, brick, british, building, charming, christianity, cityscape, day, destination, dormer window, driveway, english, european, flint wall, gothic, heritage, historic, home, house, landmark, old, outdoor, outdoors, picturesque, plant, quaint, religion, residential, scenic, spire, street, summer, sunny, tourism, traditional, travel, urban, village, wheelie bin, window
+2026-08-10 20:06:28 BST - INFO - ====================================================================================================
+2026-08-10 20:06:28 BST - INFO -                                        EXIF Metadata Summary                                        
+2026-08-10 20:06:28 BST - INFO - ====================================================================================================
+2026-08-10 20:06:28 BST - INFO - ╭──────────────────────────┬──────────────────────────────────────────────────────────────╮
+2026-08-10 20:06:28 BST - INFO - │ Tag                      │ Value                                                        │
+2026-08-10 20:06:28 BST - INFO - ├──────────────────────────┼──────────────────────────────────────────────────────────────┤
+2026-08-10 20:06:28 BST - INFO - │ ResolutionUnit           │ 2                                                            │
+2026-08-10 20:06:28 BST - INFO - │ ImageDescription         │ Arundel, UK - October 31, 2021: View of Arundel Cathedral... │
+2026-08-10 20:06:28 BST - INFO - │ Make                     │ SONY                                                         │
+2026-08-10 20:06:28 BST - INFO - │ Model                    │ ILCE-7RM6                                                    │
+2026-08-10 20:06:28 BST - INFO - │ Software                 │ Adobe Photoshop Lightroom Classic 15.5 (Macintosh)           │
+2026-08-10 20:06:28 BST - INFO - │ Orientation              │ 1                                                            │
+2026-08-10 20:06:28 BST - INFO - │ DateTime                 │ 2026:08:09 20:14:55                                          │
+2026-08-10 20:06:28 BST - INFO - │ YResolution              │ 240.0                                                        │
+2026-08-10 20:06:28 BST - INFO - │ Copyright                │ Copyright © 2026 John Pavel                                  │
+2026-08-10 20:06:28 BST - INFO - │ XResolution              │ 240.0                                                        │
+2026-08-10 20:06:28 BST - INFO - │ Artist                   │ John Pavel                                                   │
+2026-08-10 20:06:28 BST - INFO - │ ExifVersion              │ 0232                                                         │
+2026-08-10 20:06:28 BST - INFO - │ ShutterSpeedValue        │ 8.965784                                                     │
+2026-08-10 20:06:28 BST - INFO - │ ApertureValue            │ 4.33985                                                      │
+2026-08-10 20:06:28 BST - INFO - │ DateTimeOriginal         │ 2026:08:06 18:26:35                                          │
+2026-08-10 20:06:28 BST - INFO - │ DateTimeDigitized        │ 2026:08:06 18:26:35                                          │
+2026-08-10 20:06:28 BST - INFO - │ BrightnessValue          │ 8.02890625                                                   │
+2026-08-10 20:06:28 BST - INFO - │ ExposureBiasValue        │ -0.7                                                         │
+2026-08-10 20:06:28 BST - INFO - │ MaxApertureValue         │ 2.96875                                                      │
+2026-08-10 20:06:28 BST - INFO - │ MeteringMode             │ 5                                                            │
+2026-08-10 20:06:28 BST - INFO - │ LightSource              │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ Flash                    │ 16                                                           │
+2026-08-10 20:06:28 BST - INFO - │ FocalLength              │ 59.0                                                         │
+2026-08-10 20:06:28 BST - INFO - │ ColorSpace               │ 1                                                            │
+2026-08-10 20:06:28 BST - INFO - │ DigitalZoomRatio         │ 1.0                                                          │
+2026-08-10 20:06:28 BST - INFO - │ FocalPlaneXResolution    │ 2802.0701904296875                                           │
+2026-08-10 20:06:28 BST - INFO - │ FocalPlaneYResolution    │ 2802.0701904296875                                           │
+2026-08-10 20:06:28 BST - INFO - │ OffsetTime               │ +01:00                                                       │
+2026-08-10 20:06:28 BST - INFO - │ OffsetTimeOriginal       │ +01:00                                                       │
+2026-08-10 20:06:28 BST - INFO - │ OffsetTimeDigitized      │ +01:00                                                       │
+2026-08-10 20:06:28 BST - INFO - │ SubsecTimeOriginal       │ 492                                                          │
+2026-08-10 20:06:28 BST - INFO - │ SubsecTimeDigitized      │ 492                                                          │
+2026-08-10 20:06:28 BST - INFO - │ FocalPlaneResolutionUnit │ 3                                                            │
+2026-08-10 20:06:28 BST - INFO - │ FileSource               │                                                              │
+2026-08-10 20:06:28 BST - INFO - │ ExposureTime             │ 0.002                                                        │
+2026-08-10 20:06:28 BST - INFO - │ FNumber                  │ 4.5                                                          │
+2026-08-10 20:06:28 BST - INFO - │ SceneType                │                                                              │
+2026-08-10 20:06:28 BST - INFO - │ ExposureProgram          │ 3                                                            │
+2026-08-10 20:06:28 BST - INFO - │ CustomRendered           │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ ISOSpeedRatings          │ 100                                                          │
+2026-08-10 20:06:28 BST - INFO - │ ExposureMode             │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ SensitivityType          │ 2                                                            │
+2026-08-10 20:06:28 BST - INFO - │ WhiteBalance             │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ RecommendedExposureIndex │ 100                                                          │
+2026-08-10 20:06:28 BST - INFO - │ BodySerialNumber         │ 02050485                                                     │
+2026-08-10 20:06:28 BST - INFO - │ LensSpecification        │ (24.0, 70.0, 2.8, 2.8)                                       │
+2026-08-10 20:06:28 BST - INFO - │ LensModel                │ FE 24-70mm F2.8 GM II                                        │
+2026-08-10 20:06:28 BST - INFO - │ FocalLengthIn35mmFilm    │ 59                                                           │
+2026-08-10 20:06:28 BST - INFO - │ SceneCaptureType         │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ Contrast                 │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ Saturation               │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - │ Sharpness                │ 0                                                            │
+2026-08-10 20:06:28 BST - INFO - ╰──────────────────────────┴──────────────────────────────────────────────────────────────╯
+2026-08-10 20:06:28 BST - INFO - ====================================================================================================
+2026-08-10 20:06:28 BST - INFO - Auto eval mode selected 'assisted' (descriptive image metadata found).
+2026-08-10 20:06:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:28 BST - INFO - Prompt Configuration
+2026-08-10 20:06:28 BST - INFO - Generating default prompt for the 'assisted' evaluation lane.
+2026-08-10 20:06:28 BST - DEBUG - Using generated assisted-lane prompt.
+2026-08-10 20:06:28 BST - INFO - Final prompt: Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be ...
-2026-08-09 21:22:07 BST - DEBUG - Full prompt:
+2026-08-10 20:06:28 BST - DEBUG - Full prompt:
 Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
@@ -172,22 +172,22 @@ Return exactly these three sections and nothing else:
 Title:
 Description:
 Keywords:
-2026-08-09 21:22:07 BST - INFO - Prompt length: 1331 characters
-2026-08-09 21:22:07 BST - INFO - Scanning cache for models to process...
-2026-08-09 21:22:07 BST - INFO - Processing 42 model(s)...
-2026-08-09 21:22:07 BST - INFO - 
-2026-08-09 21:22:07 BST - INFO - ╭─────────────────────────────────────── 📖 Metrics Legend ────────────────────────────────────────╮
-2026-08-09 21:22:07 BST - INFO - │ Compact mode: tokens(total/prompt/gen) format with aligned keys                                  │
-2026-08-09 21:22:07 BST - INFO - │ Warnings are shown for repetitive output and token-cap truncation.                               │
-2026-08-09 21:22:07 BST - INFO - ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-2026-08-09 21:22:07 BST - INFO - 
-2026-08-09 21:22:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:07 BST - INFO - 
-2026-08-09 21:22:07 BST - INFO - Processing Model [1/42]: LiquidAI/LFM2.5-VL-450M-MLX-bf16
-2026-08-09 21:22:08 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:22:08 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for LiquidAI/LFM2.5-VL-450M-MLX-bf16
-2026-08-09 21:22:10 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for LiquidAI/LFM2.5-VL-450M-MLX-bf16
-2026-08-09 21:22:10 BST - DEBUG - Captured mlx-vlm console output for LiquidAI/LFM2.5-VL-450M-MLX-bf16:
+2026-08-10 20:06:28 BST - INFO - Prompt length: 1331 characters
+2026-08-10 20:06:28 BST - INFO - Scanning cache for models to process...
+2026-08-10 20:06:28 BST - INFO - Processing 42 model(s)...
+2026-08-10 20:06:28 BST - INFO - 
+2026-08-10 20:06:28 BST - INFO - ╭─────────────────────────────────────── 📖 Metrics Legend ────────────────────────────────────────╮
+2026-08-10 20:06:28 BST - INFO - │ Compact mode: tokens(total/prompt/gen) format with aligned keys                                  │
+2026-08-10 20:06:28 BST - INFO - │ Warnings are shown for repetitive output and token-cap truncation.                               │
+2026-08-10 20:06:28 BST - INFO - ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+2026-08-10 20:06:28 BST - INFO - 
+2026-08-10 20:06:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:28 BST - INFO - 
+2026-08-10 20:06:28 BST - INFO - Processing Model [1/42]: LiquidAI/LFM2.5-VL-450M-MLX-bf16
+2026-08-10 20:06:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:06:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for LiquidAI/LFM2.5-VL-450M-MLX-bf16
+2026-08-10 20:06:29 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for LiquidAI/LFM2.5-VL-450M-MLX-bf16
+2026-08-10 20:06:29 BST - DEBUG - Captured mlx-vlm console output for LiquidAI/LFM2.5-VL-450M-MLX-bf16:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -225,27 +225,27 @@ Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Eu
 Keywords:
 Arundel Cathedral, Arundel, England, GBR, Europe, red car, street corner, Arundel, UK, Arundel, England, Europe, cathedral, church, street, parking, sky
 ==========
-Prompt: 425 tokens, 377.865 tokens-per-sec
-Generation: 119 tokens, 509.165 tokens-per-sec
-Peak memory: 1.201 GB
+Prompt: 425 tokens, 11699.166 tokens-per-sec
+Generation: 119 tokens, 509.911 tokens-per-sec
+Peak memory: 1.239 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2818.56it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2734.58it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-2026-08-09 21:22:10 BST - DEBUG - Quality analysis for LiquidAI/LFM2.5-VL-450M-MLX-bf16: keyword_overlap=some_overlap, words=61
-2026-08-09 21:22:10 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:10 BST - INFO - 
-2026-08-09 21:22:10 BST - INFO - Processing Model [2/42]: Qwen/Qwen3-VL-2B-Instruct
-2026-08-09 21:22:10 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:22:10 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for Qwen/Qwen3-VL-2B-Instruct
-2026-08-09 21:22:27 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for Qwen/Qwen3-VL-2B-Instruct
-2026-08-09 21:22:27 BST - DEBUG - Captured mlx-vlm console output for Qwen/Qwen3-VL-2B-Instruct:
+2026-08-10 20:06:29 BST - DEBUG - Quality analysis for LiquidAI/LFM2.5-VL-450M-MLX-bf16: keyword_overlap=some_overlap, words=61
+2026-08-10 20:06:29 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:29 BST - INFO - 
+2026-08-10 20:06:29 BST - INFO - Processing Model [2/42]: Qwen/Qwen3-VL-2B-Instruct
+2026-08-10 20:06:29 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:06:29 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for Qwen/Qwen3-VL-2B-Instruct
+2026-08-10 20:06:46 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for Qwen/Qwen3-VL-2B-Instruct
+2026-08-10 20:06:46 BST - DEBUG - Captured mlx-vlm console output for Qwen/Qwen3-VL-2B-Instruct:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -280,37 +280,37 @@ Description: A red car is parked in a narrow street in Arundel, England, with th
 
 Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, Roof, Sky, Neighborhood, Objects, Parking, Cottage, Flower, French-Gothic, Bush, Street
 ==========
-Prompt: 16581 tokens, 1189.986 tokens-per-sec
-Generation: 123 tokens, 89.871 tokens-per-sec
+Prompt: 16581 tokens, 1205.227 tokens-per-sec
+Generation: 123 tokens, 94.170 tokens-per-sec
 Peak memory: 8.384 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3396.75it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3158.60it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Prefill:   0%|          | 0/16581 [00:00<?, ?tok/s]
-Prefill:  12%|#2        | 2048/16581 [00:03<00:23, 605.63tok/s]
-Prefill:  25%|##4       | 4096/16581 [00:03<00:09, 1377.53tok/s]
-Prefill:  37%|###7      | 6144/16581 [00:03<00:04, 2292.57tok/s]
-Prefill:  49%|####9     | 8192/16581 [00:03<00:02, 3302.21tok/s]
-Prefill:  62%|######1   | 10240/16581 [00:04<00:01, 4314.26tok/s]
-Prefill:  74%|#######4  | 12288/16581 [00:04<00:00, 5197.08tok/s]
-Prefill:  86%|########6 | 14336/16581 [00:04<00:00, 5864.03tok/s]
-Prefill:  99%|#########8| 16384/16581 [00:04<00:00, 6268.69tok/s]
-Prefill: 100%|#########9| 16580/16581 [00:05<00:00, 3242.33tok/s]
-2026-08-09 21:22:27 BST - DEBUG - Quality analysis for Qwen/Qwen3-VL-2B-Instruct: keyword_overlap=some_overlap, words=80
-2026-08-09 21:22:27 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:27 BST - INFO - 
-2026-08-09 21:22:27 BST - INFO - Processing Model [3/42]: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-2026-08-09 21:22:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:22:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-2026-08-09 21:22:44 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-2026-08-09 21:22:44 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX:
+Prefill:  12%|#2        | 2048/16581 [00:03<00:22, 649.10tok/s]
+Prefill:  25%|##4       | 4096/16581 [00:03<00:08, 1455.50tok/s]
+Prefill:  37%|###7      | 6144/16581 [00:03<00:04, 2395.73tok/s]
+Prefill:  49%|####9     | 8192/16581 [00:03<00:02, 3382.13tok/s]
+Prefill:  62%|######1   | 10240/16581 [00:04<00:01, 4320.95tok/s]
+Prefill:  74%|#######4  | 12288/16581 [00:04<00:00, 5083.69tok/s]
+Prefill:  86%|########6 | 14336/16581 [00:04<00:00, 5790.28tok/s]
+Prefill:  99%|#########8| 16384/16581 [00:04<00:00, 6098.57tok/s]
+Prefill: 100%|#########9| 16580/16581 [00:04<00:00, 3385.81tok/s]
+2026-08-10 20:06:46 BST - DEBUG - Quality analysis for Qwen/Qwen3-VL-2B-Instruct: keyword_overlap=some_overlap, words=80
+2026-08-10 20:06:46 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:06:46 BST - INFO - 
+2026-08-10 20:06:46 BST - INFO - Processing Model [3/42]: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+2026-08-10 20:06:46 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:06:46 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+2026-08-10 20:07:02 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+2026-08-10 20:07:02 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -352,32 +352,32 @@ We need to produce Title: 5-10 words. Something like "Arundel Cathedral from a q
 
 Description: 1-2 sentences factual, combine relevant context with main visible subject, setting, action, lighting, distinctive details. Should mention capture date/time? Possibly mention "captured on 6 August 2026 at 18:26 UTC+01". But we need to combine context with visible subject. So something like: "A
 ==========
-Prompt: 3240 tokens, 1447.192 tokens-per-sec
-Generation: 500 tokens, 41.234 tokens-per-sec
+Prompt: 3240 tokens, 1569.703 tokens-per-sec
+Generation: 500 tokens, 42.524 tokens-per-sec
 Peak memory: 14.686 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 5206.83it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2843.60it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Prefill:   0%|          | 0/3240 [00:00<?, ?tok/s]
-Prefill:  63%|######3   | 2048/3240 [00:01<00:00, 1462.71tok/s]
-Prefill: 100%|#########9| 3239/3240 [00:02<00:00, 1556.88tok/s]
-Prefill: 100%|#########9| 3239/3240 [00:02<00:00, 1538.01tok/s]
-2026-08-09 21:22:44 BST - DEBUG - Quality analysis for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX: missing_sections=title+keywords, instruction_echo=True, unexpected_catalog_preamble=True, likely_capped=True, words=325
-2026-08-09 21:22:44 BST - INFO - Mechanical observations for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX: missing-sections(title+keywords), instruction-echo, unexpected-catalog-preamble, token-cap-truncation
-2026-08-09 21:22:44 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:44 BST - INFO - 
-2026-08-09 21:22:44 BST - INFO - Processing Model [4/42]: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-2026-08-09 21:22:45 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:22:45 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-2026-08-09 21:22:55 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-2026-08-09 21:22:55 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit:
+Prefill:  63%|######3   | 2048/3240 [00:01<00:00, 1658.92tok/s]
+Prefill: 100%|#########9| 3239/3240 [00:01<00:00, 1649.19tok/s]
+Prefill: 100%|#########9| 3239/3240 [00:01<00:00, 1650.93tok/s]
+2026-08-10 20:07:02 BST - DEBUG - Quality analysis for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX: missing_sections=title+keywords, instruction_echo=True, unexpected_catalog_preamble=True, likely_capped=True, words=325
+2026-08-10 20:07:02 BST - INFO - Mechanical observations for mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX: missing-sections(title+keywords), instruction-echo, unexpected-catalog-preamble, token-cap-truncation
+2026-08-10 20:07:02 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:02 BST - INFO - 
+2026-08-10 20:07:02 BST - INFO - Processing Model [4/42]: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+2026-08-10 20:07:02 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:02 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+2026-08-10 20:07:12 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+2026-08-10 20:07:12 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -412,31 +412,31 @@ A view of Arundel Cathedral of Our Lady & St. Philip Howard in Arundel, England,
 Keywords:
 Arundel Cathedral, Residential Street, Red Car, Cottage, Stone Wall, Garden, Church, Gothic Architecture, Blue Sky, Parking, England, UK, Europe, Historic Building, Urban Scene
 ==========
-Prompt: 2426 tokens, 630.012 tokens-per-sec
-Generation: 104 tokens, 29.545 tokens-per-sec
+Prompt: 2426 tokens, 743.728 tokens-per-sec
+Generation: 104 tokens, 30.308 tokens-per-sec
 Peak memory: 23.015 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 3002.51it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 2547.56it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Prefill:   0%|          | 0/2426 [00:00<?, ?tok/s]
-Prefill:  84%|########4 | 2048/2426 [00:03<00:00, 635.99tok/s]
-Prefill: 100%|#########9| 2425/2426 [00:03<00:00, 675.89tok/s]
-Prefill: 100%|#########9| 2425/2426 [00:03<00:00, 665.29tok/s]
-2026-08-09 21:22:55 BST - DEBUG - Quality analysis for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit: keyword_overlap=some_overlap, words=69
-2026-08-09 21:22:55 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:22:55 BST - INFO - 
-2026-08-09 21:22:55 BST - INFO - Processing Model [5/42]: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-2026-08-09 21:22:55 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:22:55 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-2026-08-09 21:23:23 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-2026-08-09 21:23:23 BST - DEBUG - Captured mlx-vlm console output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16:
+Prefill:  84%|########4 | 2048/2426 [00:02<00:00, 766.59tok/s]
+Prefill: 100%|#########9| 2425/2426 [00:03<00:00, 787.58tok/s]
+Prefill: 100%|#########9| 2425/2426 [00:03<00:00, 782.12tok/s]
+2026-08-10 20:07:12 BST - DEBUG - Quality analysis for mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit: keyword_overlap=some_overlap, words=69
+2026-08-10 20:07:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:12 BST - INFO - 
+2026-08-10 20:07:12 BST - INFO - Processing Model [5/42]: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+2026-08-10 20:07:12 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:12 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+2026-08-10 20:07:28 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+2026-08-10 20:07:28 BST - DEBUG - Captured mlx-vlm console output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -474,28 +474,28 @@ Finally, the keywords. I'll pull from the hints, but I'll prioritize what's actu
 
 Here's the final list: Arundel, Arundel Cathedral, England, UK, Gothic architecture, red car, stone wall, blue sky, sunset, panoramic view, stone
 ==========
-Prompt: 1665 tokens, 215.633 tokens-per-sec
-Generation: 500 tokens, 58.716 tokens-per-sec
+Prompt: 1665 tokens, 884.867 tokens-per-sec
+Generation: 500 tokens, 59.484 tokens-per-sec
 Peak memory: 60.029 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 3093.14it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4425.49it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-2026-08-09 21:23:24 BST - DEBUG - Quality analysis for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing_sections=title+description+keywords, thinking_trace=True (<think>), thinking_incomplete=True, likely_capped=True, words=337
-2026-08-09 21:23:24 BST - INFO - Mechanical observations for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing-sections(title+description+keywords), thinking-incomplete, token-cap-truncation
-2026-08-09 21:23:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:23:24 BST - INFO - 
-2026-08-09 21:23:24 BST - INFO - Processing Model [6/42]: mlx-community/FastVLM-0.5B-bf16
-2026-08-09 21:23:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:23:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
-2026-08-09 21:23:27 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
-2026-08-09 21:23:27 BST - DEBUG - Captured mlx-vlm console output for mlx-community/FastVLM-0.5B-bf16:
+2026-08-10 20:07:28 BST - DEBUG - Quality analysis for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing_sections=title+description+keywords, thinking_trace=True (<think>), thinking_incomplete=True, likely_capped=True, words=337
+2026-08-10 20:07:28 BST - INFO - Mechanical observations for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing-sections(title+description+keywords), thinking-incomplete, token-cap-truncation
+2026-08-10 20:07:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:28 BST - INFO - 
+2026-08-10 20:07:28 BST - INFO - Processing Model [6/42]: mlx-community/FastVLM-0.5B-bf16
+2026-08-10 20:07:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
+2026-08-10 20:07:30 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
+2026-08-10 20:07:30 BST - DEBUG - Captured mlx-vlm console output for mlx-community/FastVLM-0.5B-bf16:
 ==========
 Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
 
@@ -530,23 +530,1504 @@ Keywords:<|im_end|>
 A concrete 5-10-word title: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
 Description: A photograph of the Arundel Cathedral of Our Lady and St. Philip Howard in Arundel, UK, taken on 2021-08-06 at 18:26:35 UTC+01:00, with a blue sky and a red car parked in front of the cathedral. The image captures the historic architecture of the cathedral, including its spires and Gothic elements, and the surrounding neighborhood.
 ==========
-Prompt: 368 tokens, 413.795 tokens-per-sec
-Generation: 131 tokens, 351.612 tokens-per-sec
-Peak memory: 1.961 GB
+Prompt: 368 tokens, 3818.667 tokens-per-sec
+Generation: 131 tokens, 351.040 tokens-per-sec
+Peak memory: 2.137 GB
 
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 3532.74it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 5532.90it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-2026-08-09 21:23:27 BST - DEBUG - Quality analysis for mlx-community/FastVLM-0.5B-bf16: missing_sections=title+keywords, unexpected_catalog_preamble=True, words=81
-2026-08-09 21:23:27 BST - INFO - Mechanical observations for mlx-community/FastVLM-0.5B-bf16: missing-sections(title+keywords), unexpected-catalog-preamble
-2026-08-09 21:23:27 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-08-09 21:23:27 BST - INFO - 
-2026-08-09 21:23:27 BST - INFO - Processing Model [7/42]: mlx-community/GLM-4.1V-9B-Thinking-8bit
-2026-08-09 21:23:27 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-08-09 21:23:27 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-10 20:07:30 BST - DEBUG - Quality analysis for mlx-community/FastVLM-0.5B-bf16: missing_sections=title+keywords, unexpected_catalog_preamble=True, words=81
+2026-08-10 20:07:30 BST - INFO - Mechanical observations for mlx-community/FastVLM-0.5B-bf16: missing-sections(title+keywords), unexpected-catalog-preamble
+2026-08-10 20:07:30 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:30 BST - INFO - 
+2026-08-10 20:07:30 BST - INFO - Processing Model [7/42]: mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-10 20:07:30 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:30 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-10 20:07:49 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-10 20:07:49 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.1V-9B-Thinking-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|assistant|>
+
+<think>Got it, let's tackle this. First, the title needs to be 5-10 words. The main subject is Arundel Cathedral with surrounding buildings. So maybe "Arundel Cathedral and Neighborhood View".
+
+Then the description: need to combine context (date/time, location) with visible elements. The image shows the cathedral, houses, a red car, blue sky, etc. So something like "Arundel Cathedral of Our Lady & St. Philip Howard in Arundel, England, viewed from a residential neighborhood with a red car parked near the cathedral under a clear blue sky, captured on 2026-08-06."
+
+Wait, but the description hint had October 31, 2021, but the authoritative context says 2026-08-06. So need to use the authoritative date. Also, the description should be factual. Let's make it concise.
+
+Keywords need to be 10-18 unique. Let's list: Arundel Cathedral, England, UK, red car, blue sky, neighborhood, church, cottage, stone wall, flower, Gothic architecture, parking, roof, sky, brick building, residential area.
+
+Now, let's structure each part.
+
+Title: "Arundel Cathedral and Residential View"
+
+Description: "Arundel Cathedral of Our Lady & St. Philip Howard in Arundel, England, viewed from a residential neighborhood with a red car parked near the cathedral under a clear blue sky, captured on 2026-08-06."
+
+Wait, need to make sure it's 1-2 sentences. Let's adjust. "Arundel Cathedral of Our Lady & St. Philip Howard in Arundel, England, viewed from a residential area with a red car near the cathedral, under a clear blue sky, captured on 2026-08-06 UTC+01:00."
+
+Keywords: Arundel Cathedral, England, UK, red car, blue sky, neighborhood, church, cottage, stone wall, flower, Gothic architecture, parking, roof, sky, brick building, residential area, stone wall, car, cathedral, England.
+
+Wait, let's check the hints. The keyword hints include: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car
+==========
+Prompt: 6479 tokens, 1159.986 tokens-per-sec
+Generation: 500 tokens, 47.443 tokens-per-sec
+Peak memory: 13.433 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 3488.71it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6479 [00:00<?, ?tok/s]
+Prefill:  32%|###1      | 2048/6479 [00:03<00:07, 567.81tok/s]
+Prefill:  63%|######3   | 4096/6479 [00:04<00:02, 1047.95tok/s]
+Prefill:  95%|#########4| 6144/6479 [00:05<00:00, 1408.63tok/s]
+Prefill: 100%|#########9| 6478/6479 [00:05<00:00, 1434.65tok/s]
+Prefill: 100%|#########9| 6478/6479 [00:05<00:00, 1187.45tok/s]
+2026-08-10 20:07:49 BST - DEBUG - Quality analysis for mlx-community/GLM-4.1V-9B-Thinking-8bit: thinking_trace=True (<think>), thinking_incomplete=True, unexpected_catalog_preamble=True, likely_capped=True, keyword_overlap=some_overlap, words=327
+2026-08-10 20:07:49 BST - INFO - Mechanical observations for mlx-community/GLM-4.1V-9B-Thinking-8bit: thinking-incomplete, unexpected-catalog-preamble, token-cap-truncation
+2026-08-10 20:07:49 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:49 BST - INFO - 
+2026-08-10 20:07:49 BST - INFO - Processing Model [8/42]: mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-10 20:07:49 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:49 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-10 20:07:58 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-10 20:07:58 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.6V-Flash-mxfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:/nothink<|assistant|>
+<think></think>
+
+Title: Arundel Cathedral View
+Description: The image shows a view of Arundel Cathedral of Our Lady & St. Philip Howard, with a red car parked near a white garage door, set against a clear blue sky.
+Keywords: Arundel Cathedral, red car, white garage, blue sky, England, UK, Gothic architecture, neighborhood street, brick wall, flower pots, cobblestone path.
+==========
+Prompt: 6483 tokens, 1035.060 tokens-per-sec
+Generation: 85 tokens, 80.719 tokens-per-sec
+Peak memory: 8.439 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2729.54it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6483 [00:00<?, ?tok/s]
+Prefill:  32%|###1      | 2048/6483 [00:04<00:09, 483.68tok/s]
+Prefill:  63%|######3   | 4096/6483 [00:05<00:02, 914.42tok/s]
+Prefill:  95%|#########4| 6144/6483 [00:05<00:00, 1255.24tok/s]
+Prefill: 100%|#########9| 6482/6483 [00:06<00:00, 1291.15tok/s]
+Prefill: 100%|#########9| 6482/6483 [00:06<00:00, 1049.20tok/s]
+2026-08-10 20:07:58 BST - DEBUG - Quality analysis for mlx-community/GLM-4.6V-Flash-mxfp4: keyword_overlap=some_overlap, words=56
+2026-08-10 20:07:58 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:07:58 BST - INFO - 
+2026-08-10 20:07:58 BST - INFO - Processing Model [9/42]: mlx-community/GLM-4.6V-nvfp4
+2026-08-10 20:07:58 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:07:58 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.6V-nvfp4
+2026-08-10 20:08:20 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.6V-nvfp4
+2026-08-10 20:08:20 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.6V-nvfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:/nothink<|assistant|>
+<think></think>
+
+<|begin_of_box|>Title: Arundel Cathedral and Red Car in English Village
+Description: A red car is parked in a cobblestone driveway beside a white cottage, with Arundel Cathedral’s Gothic spire and rose window visible under a clear blue sky in Arundel, England.
+Keywords: Arundel Cathedral, Arundel, England, UK, Cathedral, Church, Red Car, Cottage, Blue Sky, Flower, Roof, Neighborhood, Gothic, Parking, Bush, Stone Wall<|end_of_box|>
+==========
+Prompt: 6483 tokens, 501.190 tokens-per-sec
+Generation: 100 tokens, 41.787 tokens-per-sec
+Peak memory: 78.164 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 21 files:   0%|          | 0/21 [00:00<?, ?it/s]
+Fetching 21 files: 100%|##########| 21/21 [00:00<00:00, 4133.87it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6483 [00:00<?, ?tok/s]
+Prefill:  32%|###1      | 2048/6483 [00:06<00:14, 307.59tok/s]
+Prefill:  63%|######3   | 4096/6483 [00:08<00:04, 526.75tok/s]
+Prefill:  95%|#########4| 6144/6483 [00:10<00:00, 667.39tok/s]
+Prefill: 100%|#########9| 6482/6483 [00:11<00:00, 648.24tok/s]
+Prefill: 100%|#########9| 6482/6483 [00:11<00:00, 570.53tok/s]
+2026-08-10 20:08:20 BST - DEBUG - Quality analysis for mlx-community/GLM-4.6V-nvfp4: unexpected_special_token=True (<|begin_of_box|>,<|end_of_box|>), keyword_overlap=some_overlap, words=62
+2026-08-10 20:08:20 BST - INFO - Mechanical observations for mlx-community/GLM-4.6V-nvfp4: unexpected-special-token
+2026-08-10 20:08:20 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:08:20 BST - INFO - 
+2026-08-10 20:08:20 BST - INFO - Processing Model [10/42]: mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-10 20:08:20 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:08:20 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-10 20:08:28 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-10 20:08:28 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Idefics3-8B-Llama3-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|begin_of_text|>User:<image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<end_of_utterance>
+Assistant:
+ Title: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe.
+Description: The Arundel Cathedral of Our Lady and St. Philip Howard is a French-Gothic style cathedral located in Arundel, England, UK. The cathedral is surrounded by a neighborhood of brick cottages and has a red car parked in front of it.
+Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky.<end_of_utterance>
+==========
+Prompt: 2644 tokens, 2371.864 tokens-per-sec
+Generation: 141 tokens, 32.063 tokens-per-sec
+Peak memory: 18.066 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 2478.41it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2644 [00:00<?, ?tok/s]
+Prefill:  77%|#######7  | 2048/2644 [00:00<00:00, 2743.40tok/s]
+Prefill: 100%|#########9| 2643/2644 [00:00<00:00, 2835.63tok/s]
+Prefill: 100%|#########9| 2643/2644 [00:00<00:00, 2813.25tok/s]
+2026-08-10 20:08:28 BST - DEBUG - Quality analysis for mlx-community/Idefics3-8B-Llama3-bf16: keyword_overlap=some_overlap, words=85
+2026-08-10 20:08:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:08:28 BST - INFO - 
+2026-08-10 20:08:28 BST - INFO - Processing Model [11/42]: mlx-community/Inkling-Small-mlx-4bit
+2026-08-10 20:08:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:08:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Inkling-Small-mlx-4bit
+2026-08-10 20:08:29 BST - DEBUG - Model load failure captured for mlx-community/Inkling-Small-mlx-4bit: Received 362 parameters not in model: 
+audio_tower.encoder.biases,
+audio_tower.encoder.scales,
+language_model.model.layers.10.mlp.experts.down_proj.biases,
+language_model.model.layers.10.mlp.experts.down_proj.scales,
+language_model.model.layers.10.mlp.experts.down_proj.weight,
+language_model.model.layers.10.mlp.experts.gate_proj.biases,
+language_model.model.layers.10.mlp.experts.gate_proj.scales,
+language_model.model.layers.10.mlp.experts.gate_proj.weight,
+language_model.model.layers.10.mlp.experts.up_proj.biases,
+language_model.model.layers.10.mlp.experts.up_proj.scales,
+language_model.model.layers.10.mlp.experts.up_proj.weight,
+language_model.model.layers.11.mlp.experts.down_proj.biases,
+language_model.model.layers.11.mlp.experts.down_proj.scales,
+language_model.model.layers.11.mlp.experts.down_proj.weight,
+language_model.model.layers.11.mlp.experts.gate_proj.biases,
+language_model.model.layers.11.mlp.experts.gate_proj.scales,
+language_model.model.layers.11.mlp.experts.gate_proj.weight,
+language_model.model.layers.11.mlp.experts.up_proj.biases,
+language_model.model.layers.11.mlp.experts.up_proj.scales,
+language_model.model.layers.11.mlp.experts.up_proj.weight,
+language_model.model.layers.12.mlp.experts.down_proj.biases,
+language_model.model.layers.12.mlp.experts.down_proj.scales,
+language_model.model.layers.12.mlp.experts.down_proj.weight,
+language_model.model.layers.12.mlp.experts.gate_proj.biases,
+language_model.model.layers.12.mlp.experts.gate_proj.scales,
+language_model.model.layers.12.mlp.experts.gate_proj.weight,
+language_model.model.layers.12.mlp.experts.up_proj.biases,
+language_model.model.layers.12.mlp.experts.up_proj.scales,
+language_model.model.layers.12.mlp.experts.up_proj.weight,
+language_model.model.layers.13.mlp.experts.down_proj.biases,
+language_model.model.layers.13.mlp.experts.down_proj.scales,
+language_model.model.layers.13.mlp.experts.down_proj.weight,
+language_model.model.layers.13.mlp.experts.gate_proj.biases,
+language_model.model.layers.13.mlp.experts.gate_proj.scales,
+language_model.model.layers.13.mlp.experts.gate_proj.weight,
+language_model.model.layers.13.mlp.experts.up_proj.biases,
+language_model.model.layers.13.mlp.experts.up_proj.scales,
+language_model.model.layers.13.mlp.experts.up_proj.weight,
+language_model.model.layers.14.mlp.experts.down_proj.biases,
+language_model.model.layers.14.mlp.experts.down_proj.scales,
+language_model.model.layers.14.mlp.experts.down_proj.weight,
+language_model.model.layers.14.mlp.experts.gate_proj.biases,
+language_model.model.layers.14.mlp.experts.gate_proj.scales,
+language_model.model.layers.14.mlp.experts.gate_proj.weight,
+language_model.model.layers.14.mlp.experts.up_proj.biases,
+language_model.model.layers.14.mlp.experts.up_proj.scales,
+language_model.model.layers.14.mlp.experts.up_proj.weight,
+language_model.model.layers.15.mlp.experts.down_proj.biases,
+language_model.model.layers.15.mlp.experts.down_proj.scales,
+language_model.model.layers.15.mlp.experts.down_proj.weight,
+language_model.model.layers.15.mlp.experts.gate_proj.biases,
+language_model.model.layers.15.mlp.experts.gate_proj.scales,
+language_model.model.layers.15.mlp.experts.gate_proj.weight,
+language_model.model.layers.15.mlp.experts.up_proj.biases,
+language_model.model.layers.15.mlp.experts.up_proj.scales,
+language_model.model.layers.15.mlp.experts.up_proj.weight,
+language_model.model.layers.16.mlp.experts.down_proj.biases,
+language_model.model.layers.16.mlp.experts.down_proj.scales,
+language_model.model.layers.16.mlp.experts.down_proj.weight,
+language_model.model.layers.16.mlp.experts.gate_proj.biases,
+language_model.model.layers.16.mlp.experts.gate_proj.scales,
+language_model.model.layers.16.mlp.experts.gate_proj.weight,
+language_model.model.layers.16.mlp.experts.up_proj.biases,
+language_model.model.layers.16.mlp.experts.up_proj.scales,
+language_model.model.layers.16.mlp.experts.up_proj.weight,
+language_model.model.layers.17.mlp.experts.down_proj.biases,
+language_model.model.layers.17.mlp.experts.down_proj.scales,
+language_model.model.layers.17.mlp.experts.down_proj.weight,
+language_model.model.layers.17.mlp.experts.gate_proj.biases,
+language_model.model.layers.17.mlp.experts.gate_proj.scales,
+language_model.model.layers.17.mlp.experts.gate_proj.weight,
+language_model.model.layers.17.mlp.experts.up_proj.biases,
+language_model.model.layers.17.mlp.experts.up_proj.scales,
+language_model.model.layers.17.mlp.experts.up_proj.weight,
+language_model.model.layers.18.mlp.experts.down_proj.biases,
+language_model.model.layers.18.mlp.experts.down_proj.scales,
+language_model.model.layers.18.mlp.experts.down_proj.weight,
+language_model.model.layers.18.mlp.experts.gate_proj.biases,
+language_model.model.layers.18.mlp.experts.gate_proj.scales,
+language_model.model.layers.18.mlp.experts.gate_proj.weight,
+language_model.model.layers.18.mlp.experts.up_proj.biases,
+language_model.model.layers.18.mlp.experts.up_proj.scales,
+language_model.model.layers.18.mlp.experts.up_proj.weight,
+language_model.model.layers.19.mlp.experts.down_proj.biases,
+language_model.model.layers.19.mlp.experts.down_proj.scales,
+language_model.model.layers.19.mlp.experts.down_proj.weight,
+language_model.model.layers.19.mlp.experts.gate_proj.biases,
+language_model.model.layers.19.mlp.experts.gate_proj.scales,
+language_model.model.layers.19.mlp.experts.gate_proj.weight,
+language_model.model.layers.19.mlp.experts.up_proj.biases,
+language_model.model.layers.19.mlp.experts.up_proj.scales,
+language_model.model.layers.19.mlp.experts.up_proj.weight,
+language_model.model.layers.2.mlp.experts.down_proj.biases,
+language_model.model.layers.2.mlp.experts.down_proj.scales,
+language_model.model.layers.2.mlp.experts.down_proj.weight,
+language_model.model.layers.2.mlp.experts.gate_proj.biases,
+language_model.model.layers.2.mlp.experts.gate_proj.scales,
+language_model.model.layers.2.mlp.experts.gate_proj.weight,
+language_model.model.layers.2.mlp.experts.up_proj.biases,
+language_model.model.layers.2.mlp.experts.up_proj.scales,
+language_model.model.layers.2.mlp.experts.up_proj.weight,
+language_model.model.layers.20.mlp.experts.down_proj.biases,
+language_model.model.layers.20.mlp.experts.down_proj.scales,
+language_model.model.layers.20.mlp.experts.down_proj.weight,
+language_model.model.layers.20.mlp.experts.gate_proj.biases,
+language_model.model.layers.20.mlp.experts.gate_proj.scales,
+language_model.model.layers.20.mlp.experts.gate_proj.weight,
+language_model.model.layers.20.mlp.experts.up_proj.biases,
+language_model.model.layers.20.mlp.experts.up_proj.scales,
+language_model.model.layers.20.mlp.experts.up_proj.weight,
+language_model.model.layers.21.mlp.experts.down_proj.biases,
+language_model.model.layers.21.mlp.experts.down_proj.scales,
+language_model.model.layers.21.mlp.experts.down_proj.weight,
+language_model.model.layers.21.mlp.experts.gate_proj.biases,
+language_model.model.layers.21.mlp.experts.gate_proj.scales,
+language_model.model.layers.21.mlp.experts.gate_proj.weight,
+language_model.model.layers.21.mlp.experts.up_proj.biases,
+language_model.model.layers.21.mlp.experts.up_proj.scales,
+language_model.model.layers.21.mlp.experts.up_proj.weight,
+language_model.model.layers.22.mlp.experts.down_proj.biases,
+language_model.model.layers.22.mlp.experts.down_proj.scales,
+language_model.model.layers.22.mlp.experts.down_proj.weight,
+language_model.model.layers.22.mlp.experts.gate_proj.biases,
+language_model.model.layers.22.mlp.experts.gate_proj.scales,
+language_model.model.layers.22.mlp.experts.gate_proj.weight,
+language_model.model.layers.22.mlp.experts.up_proj.biases,
+language_model.model.layers.22.mlp.experts.up_proj.scales,
+language_model.model.layers.22.mlp.experts.up_proj.weight,
+language_model.model.layers.23.mlp.experts.down_proj.biases,
+language_model.model.layers.23.mlp.experts.down_proj.scales,
+language_model.model.layers.23.mlp.experts.down_proj.weight,
+language_model.model.layers.23.mlp.experts.gate_proj.biases,
+language_model.model.layers.23.mlp.experts.gate_proj.scales,
+language_model.model.layers.23.mlp.experts.gate_proj.weight,
+language_model.model.layers.23.mlp.experts.up_proj.biases,
+language_model.model.layers.23.mlp.experts.up_proj.scales,
+language_model.model.layers.23.mlp.experts.up_proj.weight,
+language_model.model.layers.24.mlp.experts.down_proj.biases,
+language_model.model.layers.24.mlp.experts.down_proj.scales,
+language_model.model.layers.24.mlp.experts.down_proj.weight,
+language_model.model.layers.24.mlp.experts.gate_proj.biases,
+language_model.model.layers.24.mlp.experts.gate_proj.scales,
+language_model.model.layers.24.mlp.experts.gate_proj.weight,
+language_model.model.layers.24.mlp.experts.up_proj.biases,
+language_model.model.layers.24.mlp.experts.up_proj.scales,
+language_model.model.layers.24.mlp.experts.up_proj.weight,
+language_model.model.layers.25.mlp.experts.down_proj.biases,
+language_model.model.layers.25.mlp.experts.down_proj.scales,
+language_model.model.layers.25.mlp.experts.down_proj.weight,
+language_model.model.layers.25.mlp.experts.gate_proj.biases,
+language_model.model.layers.25.mlp.experts.gate_proj.scales,
+language_model.model.layers.25.mlp.experts.gate_proj.weight,
+language_model.model.layers.25.mlp.experts.up_proj.biases,
+language_model.model.layers.25.mlp.experts.up_proj.scales,
+language_model.model.layers.25.mlp.experts.up_proj.weight,
+language_model.model.layers.26.mlp.experts.down_proj.biases,
+language_model.model.layers.26.mlp.experts.down_proj.scales,
+language_model.model.layers.26.mlp.experts.down_proj.weight,
+language_model.model.layers.26.mlp.experts.gate_proj.biases,
+language_model.model.layers.26.mlp.experts.gate_proj.scales,
+language_model.model.layers.26.mlp.experts.gate_proj.weight,
+language_model.model.layers.26.mlp.experts.up_proj.biases,
+language_model.model.layers.26.mlp.experts.up_proj.scales,
+language_model.model.layers.26.mlp.experts.up_proj.weight,
+language_model.model.layers.27.mlp.experts.down_proj.biases,
+language_model.model.layers.27.mlp.experts.down_proj.scales,
+language_model.model.layers.27.mlp.experts.down_proj.weight,
+language_model.model.layers.27.mlp.experts.gate_proj.biases,
+language_model.model.layers.27.mlp.experts.gate_proj.scales,
+language_model.model.layers.27.mlp.experts.gate_proj.weight,
+language_model.model.layers.27.mlp.experts.up_proj.biases,
+language_model.model.layers.27.mlp.experts.up_proj.scales,
+language_model.model.layers.27.mlp.experts.up_proj.weight,
+language_model.model.layers.28.mlp.experts.down_proj.biases,
+language_model.model.layers.28.mlp.experts.down_proj.scales,
+language_model.model.layers.28.mlp.experts.down_proj.weight,
+language_model.model.layers.28.mlp.experts.gate_proj.biases,
+language_model.model.layers.28.mlp.experts.gate_proj.scales,
+language_model.model.layers.28.mlp.experts.gate_proj.weight,
+language_model.model.layers.28.mlp.experts.up_proj.biases,
+language_model.model.layers.28.mlp.experts.up_proj.scales,
+language_model.model.layers.28.mlp.experts.up_proj.weight,
+language_model.model.layers.29.mlp.experts.down_proj.biases,
+language_model.model.layers.29.mlp.experts.down_proj.scales,
+language_model.model.layers.29.mlp.experts.down_proj.weight,
+language_model.model.layers.29.mlp.experts.gate_proj.biases,
+language_model.model.layers.29.mlp.experts.gate_proj.scales,
+language_model.model.layers.29.mlp.experts.gate_proj.weight,
+language_model.model.layers.29.mlp.experts.up_proj.biases,
+language_model.model.layers.29.mlp.experts.up_proj.scales,
+language_model.model.layers.29.mlp.experts.up_proj.weight,
+language_model.model.layers.3.mlp.experts.down_proj.biases,
+language_model.model.layers.3.mlp.experts.down_proj.scales,
+language_model.model.layers.3.mlp.experts.down_proj.weight,
+language_model.model.layers.3.mlp.experts.gate_proj.biases,
+language_model.model.layers.3.mlp.experts.gate_proj.scales,
+language_model.model.layers.3.mlp.experts.gate_proj.weight,
+language_model.model.layers.3.mlp.experts.up_proj.biases,
+language_model.model.layers.3.mlp.experts.up_proj.scales,
+language_model.model.layers.3.mlp.experts.up_proj.weight,
+language_model.model.layers.30.mlp.experts.down_proj.biases,
+language_model.model.layers.30.mlp.experts.down_proj.scales,
+language_model.model.layers.30.mlp.experts.down_proj.weight,
+language_model.model.layers.30.mlp.experts.gate_proj.biases,
+language_model.model.layers.30.mlp.experts.gate_proj.scales,
+language_model.model.layers.30.mlp.experts.gate_proj.weight,
+language_model.model.layers.30.mlp.experts.up_proj.biases,
+language_model.model.layers.30.mlp.experts.up_proj.scales,
+language_model.model.layers.30.mlp.experts.up_proj.weight,
+language_model.model.layers.31.mlp.experts.down_proj.biases,
+language_model.model.layers.31.mlp.experts.down_proj.scales,
+language_model.model.layers.31.mlp.experts.down_proj.weight,
+language_model.model.layers.31.mlp.experts.gate_proj.biases,
+language_model.model.layers.31.mlp.experts.gate_proj.scales,
+language_model.model.layers.31.mlp.experts.gate_proj.weight,
+language_model.model.layers.31.mlp.experts.up_proj.biases,
+language_model.model.layers.31.mlp.experts.up_proj.scales,
+language_model.model.layers.31.mlp.experts.up_proj.weight,
+language_model.model.layers.32.mlp.experts.down_proj.biases,
+language_model.model.layers.32.mlp.experts.down_proj.scales,
+language_model.model.layers.32.mlp.experts.down_proj.weight,
+language_model.model.layers.32.mlp.experts.gate_proj.biases,
+language_model.model.layers.32.mlp.experts.gate_proj.scales,
+language_model.model.layers.32.mlp.experts.gate_proj.weight,
+language_model.model.layers.32.mlp.experts.up_proj.biases,
+language_model.model.layers.32.mlp.experts.up_proj.scales,
+language_model.model.layers.32.mlp.experts.up_proj.weight,
+language_model.model.layers.33.mlp.experts.down_proj.biases,
+language_model.model.layers.33.mlp.experts.down_proj.scales,
+language_model.model.layers.33.mlp.experts.down_proj.weight,
+language_model.model.layers.33.mlp.experts.gate_proj.biases,
+language_model.model.layers.33.mlp.experts.gate_proj.scales,
+language_model.model.layers.33.mlp.experts.gate_proj.weight,
+language_model.model.layers.33.mlp.experts.up_proj.biases,
+language_model.model.layers.33.mlp.experts.up_proj.scales,
+language_model.model.layers.33.mlp.experts.up_proj.weight,
+language_model.model.layers.34.mlp.experts.down_proj.biases,
+language_model.model.layers.34.mlp.experts.down_proj.scales,
+language_model.model.layers.34.mlp.experts.down_proj.weight,
+language_model.model.layers.34.mlp.experts.gate_proj.biases,
+language_model.model.layers.34.mlp.experts.gate_proj.scales,
+language_model.model.layers.34.mlp.experts.gate_proj.weight,
+language_model.model.layers.34.mlp.experts.up_proj.biases,
+language_model.model.layers.34.mlp.experts.up_proj.scales,
+language_model.model.layers.34.mlp.experts.up_proj.weight,
+language_model.model.layers.35.mlp.experts.down_proj.biases,
+language_model.model.layers.35.mlp.experts.down_proj.scales,
+language_model.model.layers.35.mlp.experts.down_proj.weight,
+language_model.model.layers.35.mlp.experts.gate_proj.biases,
+language_model.model.layers.35.mlp.experts.gate_proj.scales,
+language_model.model.layers.35.mlp.experts.gate_proj.weight,
+language_model.model.layers.35.mlp.experts.up_proj.biases,
+language_model.model.layers.35.mlp.experts.up_proj.scales,
+language_model.model.layers.35.mlp.experts.up_proj.weight,
+language_model.model.layers.36.mlp.experts.down_proj.biases,
+language_model.model.layers.36.mlp.experts.down_proj.scales,
+language_model.model.layers.36.mlp.experts.down_proj.weight,
+language_model.model.layers.36.mlp.experts.gate_proj.biases,
+language_model.model.layers.36.mlp.experts.gate_proj.scales,
+language_model.model.layers.36.mlp.experts.gate_proj.weight,
+language_model.model.layers.36.mlp.experts.up_proj.biases,
+language_model.model.layers.36.mlp.experts.up_proj.scales,
+language_model.model.layers.36.mlp.experts.up_proj.weight,
+language_model.model.layers.37.mlp.experts.down_proj.biases,
+language_model.model.layers.37.mlp.experts.down_proj.scales,
+language_model.model.layers.37.mlp.experts.down_proj.weight,
+language_model.model.layers.37.mlp.experts.gate_proj.biases,
+language_model.model.layers.37.mlp.experts.gate_proj.scales,
+language_model.model.layers.37.mlp.experts.gate_proj.weight,
+language_model.model.layers.37.mlp.experts.up_proj.biases,
+language_model.model.layers.37.mlp.experts.up_proj.scales,
+language_model.model.layers.37.mlp.experts.up_proj.weight,
+language_model.model.layers.38.mlp.experts.down_proj.biases,
+language_model.model.layers.38.mlp.experts.down_proj.scales,
+language_model.model.layers.38.mlp.experts.down_proj.weight,
+language_model.model.layers.38.mlp.experts.gate_proj.biases,
+language_model.model.layers.38.mlp.experts.gate_proj.scales,
+language_model.model.layers.38.mlp.experts.gate_proj.weight,
+language_model.model.layers.38.mlp.experts.up_proj.biases,
+language_model.model.layers.38.mlp.experts.up_proj.scales,
+language_model.model.layers.38.mlp.experts.up_proj.weight,
+language_model.model.layers.39.mlp.experts.down_proj.biases,
+language_model.model.layers.39.mlp.experts.down_proj.scales,
+language_model.model.layers.39.mlp.experts.down_proj.weight,
+language_model.model.layers.39.mlp.experts.gate_proj.biases,
+language_model.model.layers.39.mlp.experts.gate_proj.scales,
+language_model.model.layers.39.mlp.experts.gate_proj.weight,
+language_model.model.layers.39.mlp.experts.up_proj.biases,
+language_model.model.layers.39.mlp.experts.up_proj.scales,
+language_model.model.layers.39.mlp.experts.up_proj.weight,
+language_model.model.layers.4.mlp.experts.down_proj.biases,
+language_model.model.layers.4.mlp.experts.down_proj.scales,
+language_model.model.layers.4.mlp.experts.down_proj.weight,
+language_model.model.layers.4.mlp.experts.gate_proj.biases,
+language_model.model.layers.4.mlp.experts.gate_proj.scales,
+language_model.model.layers.4.mlp.experts.gate_proj.weight,
+language_model.model.layers.4.mlp.experts.up_proj.biases,
+language_model.model.layers.4.mlp.experts.up_proj.scales,
+language_model.model.layers.4.mlp.experts.up_proj.weight,
+language_model.model.layers.40.mlp.experts.down_proj.biases,
+language_model.model.layers.40.mlp.experts.down_proj.scales,
+language_model.model.layers.40.mlp.experts.down_proj.weight,
+language_model.model.layers.40.mlp.experts.gate_proj.biases,
+language_model.model.layers.40.mlp.experts.gate_proj.scales,
+language_model.model.layers.40.mlp.experts.gate_proj.weight,
+language_model.model.layers.40.mlp.experts.up_proj.biases,
+language_model.model.layers.40.mlp.experts.up_proj.scales,
+language_model.model.layers.40.mlp.experts.up_proj.weight,
+language_model.model.layers.41.mlp.experts.down_proj.biases,
+language_model.model.layers.41.mlp.experts.down_proj.scales,
+language_model.model.layers.41.mlp.experts.down_proj.weight,
+language_model.model.layers.41.mlp.experts.gate_proj.biases,
+language_model.model.layers.41.mlp.experts.gate_proj.scales,
+language_model.model.layers.41.mlp.experts.gate_proj.weight,
+language_model.model.layers.41.mlp.experts.up_proj.biases,
+language_model.model.layers.41.mlp.experts.up_proj.scales,
+language_model.model.layers.41.mlp.experts.up_proj.weight,
+language_model.model.layers.5.mlp.experts.down_proj.biases,
+language_model.model.layers.5.mlp.experts.down_proj.scales,
+language_model.model.layers.5.mlp.experts.down_proj.weight,
+language_model.model.layers.5.mlp.experts.gate_proj.biases,
+language_model.model.layers.5.mlp.experts.gate_proj.scales,
+language_model.model.layers.5.mlp.experts.gate_proj.weight,
+language_model.model.layers.5.mlp.experts.up_proj.biases,
+language_model.model.layers.5.mlp.experts.up_proj.scales,
+language_model.model.layers.5.mlp.experts.up_proj.weight,
+language_model.model.layers.6.mlp.experts.down_proj.biases,
+language_model.model.layers.6.mlp.experts.down_proj.scales,
+language_model.model.layers.6.mlp.experts.down_proj.weight,
+language_model.model.layers.6.mlp.experts.gate_proj.biases,
+language_model.model.layers.6.mlp.experts.gate_proj.scales,
+language_model.model.layers.6.mlp.experts.gate_proj.weight,
+language_model.model.layers.6.mlp.experts.up_proj.biases,
+language_model.model.layers.6.mlp.experts.up_proj.scales,
+language_model.model.layers.6.mlp.experts.up_proj.weight,
+language_model.model.layers.7.mlp.experts.down_proj.biases,
+language_model.model.layers.7.mlp.experts.down_proj.scales,
+language_model.model.layers.7.mlp.experts.down_proj.weight,
+language_model.model.layers.7.mlp.experts.gate_proj.biases,
+language_model.model.layers.7.mlp.experts.gate_proj.scales,
+language_model.model.layers.7.mlp.experts.gate_proj.weight,
+language_model.model.layers.7.mlp.experts.up_proj.biases,
+language_model.model.layers.7.mlp.experts.up_proj.scales,
+language_model.model.layers.7.mlp.experts.up_proj.weight,
+language_model.model.layers.8.mlp.experts.down_proj.biases,
+language_model.model.layers.8.mlp.experts.down_proj.scales,
+language_model.model.layers.8.mlp.experts.down_proj.weight,
+language_model.model.layers.8.mlp.experts.gate_proj.biases,
+language_model.model.layers.8.mlp.experts.gate_proj.scales,
+language_model.model.layers.8.mlp.experts.gate_proj.weight,
+language_model.model.layers.8.mlp.experts.up_proj.biases,
+language_model.model.layers.8.mlp.experts.up_proj.scales,
+language_model.model.layers.8.mlp.experts.up_proj.weight,
+language_model.model.layers.9.mlp.experts.down_proj.biases,
+language_model.model.layers.9.mlp.experts.down_proj.scales,
+language_model.model.layers.9.mlp.experts.down_proj.weight,
+language_model.model.layers.9.mlp.experts.gate_proj.biases,
+language_model.model.layers.9.mlp.experts.gate_proj.scales,
+language_model.model.layers.9.mlp.experts.gate_proj.weight,
+language_model.model.layers.9.mlp.experts.up_proj.biases,
+language_model.model.layers.9.mlp.experts.up_proj.scales,
+language_model.model.layers.9.mlp.experts.up_proj.weight.
+2026-08-10 20:08:29 BST - DEBUG - HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+2026-08-10 20:08:29 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Inkling-Small-mlx-4bit:
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5373.61it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[20:08:29] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+2026-08-10 20:08:29 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:08:29 BST - INFO - 
+2026-08-10 20:08:29 BST - INFO - Processing Model [12/42]: mlx-community/InternVL3-8B-bf16
+2026-08-10 20:08:29 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:08:29 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/InternVL3-8B-bf16
+2026-08-10 20:08:35 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/InternVL3-8B-bf16
+2026-08-10 20:08:35 BST - DEBUG - Captured mlx-vlm console output for mlx-community/InternVL3-8B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: User: <image>
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+Assistant:
+
+Title: Arundel Cathedral and Neighboring Cottage
+
+Description: The image captures a serene view of Arundel Cathedral with a red car parked in the foreground, set against a clear blue sky on August 6, 2026.
+
+Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Car, Cathedral, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Parking, Red Car, Roof, Sky
+==========
+Prompt: 2147 tokens, 2135.614 tokens-per-sec
+Generation: 101 tokens, 31.398 tokens-per-sec
+Peak memory: 17.105 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 3421.95it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2147 [00:00<?, ?tok/s]
+Prefill:  95%|#########5| 2048/2147 [00:00<00:00, 2769.03tok/s]
+Prefill: 100%|#########9| 2146/2147 [00:00<00:00, 2562.62tok/s]
+2026-08-10 20:08:35 BST - DEBUG - Quality analysis for mlx-community/InternVL3-8B-bf16: keyword_overlap=some_overlap, words=60
+2026-08-10 20:08:35 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:08:35 BST - INFO - 
+2026-08-10 20:08:35 BST - INFO - Processing Model [13/42]: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-10 20:08:35 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:08:35 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-10 20:10:45 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-10 20:10:45 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|im_system|>system<|im_middle|>You are a helpful assistant<|im_end|><|im_user|>user<|im_middle|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|media_start|>image<|media_content|><|media_pad|><|media_end|><|im_end|><|im_assistant|>assistant<|im_middle|>
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a title, a descriptive paragraph, and 10-18 keywords.
+
+Starting with the title: The main subject is Arundel Cathedral, so the title should be concise. Maybe "Arundel Cathedral of Our Lady & St Philip Howard, Arundel, UK" but needs to be 5-10 words. Let's check the hint: "Arundel Cathedral of Our Lady & St Philip Howard, Arundel, England, UK, GBR, Europe" is a bit long. Maybe shorten to "Arundel Cathedral of Our Lady & St Philip Howard, Arundel, UK" (9 words).
+
+Next, the description. The context says October 31, 2021, but the image is from 2026? Wait, the capture date is 2026, but the description hint is from 2021. Hmm, need to use the image's date? Wait, the user says to treat capture date/time as authoritative but not claim it's visible. So maybe use the image's date? Wait, the image's context says capture date is 2026-08-06, but the description hint is October 31, 2021. There's a conflict. The user says to retain details supported by the image, correct conflicts, and add important visible details. The image shows a clear view of the cathedral, houses, a red car, blue sky, etc. So maybe the description should be based on the image, not the hint's date. So the description should mention the cathedral, the red car, the houses, the blue sky, maybe the architectural details. So something like "View of Arundel Cathedral of Our Lady and St Philip Howard in Arundel, UK, with residential buildings, a red car, and a clear blue sky in the background." That's a 1-2 sentence.
+
+Keywords: Need 10-18 unique keywords. From the image: Arundel Cathedral, Our Lady & St Philip Howard, Arundel, UK, England, Europe, Red car, Blue sky, Brick buildings, Stone walls, Dormer windows, Church spires, Residential area, Flowers, Garage door, Street, Streetlamp, House, etc. Let's pick the most distinctive ones: Arundel Cathedral, Our Lady
+==========
+Prompt: 1355 tokens, 818.216 tokens-per-sec
+Generation: 500 tokens, 4.044 tokens-per-sec
+Peak memory: 39.940 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 21 files:   0%|          | 0/21 [00:00<?, ?it/s]
+Fetching 21 files: 100%|##########| 21/21 [00:00<00:00, 4705.65it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:10:45 BST - DEBUG - Quality analysis for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16: missing_sections=title+description, thinking_trace=True (◁think▷), thinking_incomplete=True, instruction_echo=True, unexpected_catalog_preamble=True, likely_capped=True, keyword_overlap=some_overlap, words=347
+2026-08-10 20:10:45 BST - INFO - Mechanical observations for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16: missing-sections(title+description), thinking-incomplete, instruction-echo, unexpected-catalog-preamble, token-cap-truncation
+2026-08-10 20:10:45 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:10:45 BST - INFO - 
+2026-08-10 20:10:45 BST - INFO - Processing Model [14/42]: mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-10 20:10:45 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:10:45 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-10 20:10:49 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-10 20:10:49 BST - DEBUG - Captured mlx-vlm console output for mlx-community/LFM2.5-VL-1.6B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|startoftext|><|im_start|>user
+<image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Title: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+
+Description: A stunning view of Arundel Cathedral of Our Lady and St Philip Howard, showcasing its French-Gothic architecture against a clear blue sky. The cathedral's intricate spires and detailed stonework are highlighted by the warm sunlight, while a red car is parked nearby, adding a touch of modernity to the historic scene.
+
+Keywords: Arundel Cathedral, French-Gothic architecture, Arundel, England, UK, GBR, Europe, Cathedral, Church, Red car, Blue sky, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Warm, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stonework, Spires, Sunlight, Historic, Modern, Parking, Stone
+==========
+Prompt: 615 tokens, 6660.448 tokens-per-sec
+Generation: 500 tokens, 165.798 tokens-per-sec
+Peak memory: 4.108 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
+Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 2456.22it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:10:49 BST - DEBUG - Quality analysis for mlx-community/LFM2.5-VL-1.6B-bf16: repetitive=True (token=keyword: "sunlight"), likely_capped=True, keyword_overlap=some_overlap, words=223
+2026-08-10 20:10:49 BST - INFO - Mechanical observations for mlx-community/LFM2.5-VL-1.6B-bf16: repetitive(keyword: "sunlight"), token-cap-truncation
+2026-08-10 20:10:49 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:10:49 BST - INFO - 
+2026-08-10 20:10:49 BST - INFO - Processing Model [15/42]: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-10 20:10:49 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:10:49 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-10 20:11:22 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-10 20:11:22 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|image|><|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+
+Title: Arundel Cathedral of Our Lady and St. Philip Howard in the Afternoon Sun
+
+Description: The Arundel Cathedral of Our Lady and St. Philip Howard is captured in the late afternoon sun, showcasing its intricate architecture and surrounding neighborhood. The image features a red car parked in a garage, surrounded by a mix of old and new buildings, with the cathedral's spires and towers rising above the rooftops.
+
+Keywords: Arundel, Cathedral, Church, Church Architecture, Church Building, Church Exterior, Church Interior, Church Landscaping, Church Lighting, Church Location, Church Neighborhood, Church Parking, Church Roof, Church Spires, Church Towers, Church Windows, English Architecture, European Architecture, Gothic Architecture, Historic Architecture, Historic Buildings, Historic Landmarks, Historic Landscapes, Historic Neighborhoods, Historic Places, Historic Sites, Historic Towns, Historic Villages, Old Buildings, Old Churches, Old Landmarks, Old Neighborhoods, Old Places, Old Towns, Old Villages, Religious Architecture, Religious Buildings, Religious Landmarks, Religious Landscapes, Religious Neighborhoods, Religious Places, Religious Sites, Religious Towns, Religious Villages, St. Philip Howard, St. Philip's Church, St. Philip's Cathedral, St. Philip's Church of Our Lady, St. Philip's Church of Our Lady and St. Philip, St. Philip's Church of Our Lady and St. Philip's, St. Philip's Church of Our Lady and St. Philip's Cathedral, St. Philip's Church of Our Lady and St. Philip's Church, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's Church, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's Church of Our Lady, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's Church, St. Philip's Church of Our Lady and St. Philip's Church of Our Lady and St. Philip's
+==========
+Prompt: 333 tokens, 154.143 tokens-per-sec
+Generation: 500 tokens, 17.686 tokens-per-sec
+Peak memory: 14.995 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3241.60it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:11:22 BST - DEBUG - Quality analysis for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: repetitive=True (token=phrase: "st. philip's church of..."), likely_capped=True, keyword_overlap=some_overlap, words=369
+2026-08-10 20:11:22 BST - INFO - Mechanical observations for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: repetitive(phrase: "st. philip's church of..."), token-cap-truncation
+2026-08-10 20:11:22 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:22 BST - INFO - 
+2026-08-10 20:11:22 BST - INFO - Processing Model [16/42]: mlx-community/MiniCPM-V-4.6-8bit
+2026-08-10 20:11:22 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:22 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/MiniCPM-V-4.6-8bit
+2026-08-10 20:11:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/MiniCPM-V-4.6-8bit
+2026-08-10 20:11:24 BST - DEBUG - Captured mlx-vlm console output for mlx-community/MiniCPM-V-4.6-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+(<image>./</image>)
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Stunning cathedral view in quaint British neighborhood.
+
+Keywords: Arundel, cathedral, church, England, Europe, blue sky, red car, cottage, flower, brick, roof, neighborhood
+==========
+Prompt: 965 tokens, 3767.698 tokens-per-sec
+Generation: 40 tokens, 255.732 tokens-per-sec
+Peak memory: 3.798 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3663.50it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:11:24 BST - DEBUG - Quality analysis for mlx-community/MiniCPM-V-4.6-8bit: missing_sections=title+description, unexpected_catalog_preamble=True, keyword_overlap=some_overlap, words=22
+2026-08-10 20:11:24 BST - INFO - Mechanical observations for mlx-community/MiniCPM-V-4.6-8bit: missing-sections(title+description), unexpected-catalog-preamble
+2026-08-10 20:11:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:24 BST - INFO - 
+2026-08-10 20:11:24 BST - INFO - Processing Model [17/42]: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-10 20:11:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-10 20:11:31 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-10 20:11:31 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-14B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+Title:
+**Arundel Cathedral & Quaint Cottage, Sunset Light**
+
+Description:
+A photograph taken on **6 August 2026** near **Arundel, West Sussex (50.806659°N, 0.551382°W)**, captures the **Arundel Cathedral of Our Lady & St. Philip Howard** in golden evening light, juxtaposed with a traditional stone cottage and a red car parked in its garage. The scene features clear blue skies, lush greenery, and a blend of Gothic architectural details with rustic residential charm.
+
+Keywords:
+Arundel Cathedral, Our Lady & St. Philip Howard, Gothic architecture, stone cottage, red car, garage entrance, West Sussex, England, UK, European heritage, sunset lighting, clear blue sky, garden plants, traditional British village, historical church, French-Gothic influence, residential neighborhood, 2026-08-06
+==========
+Prompt: 2959 tokens, 1403.910 tokens-per-sec
+Generation: 198 tokens, 64.076 tokens-per-sec
+Peak memory: 13.055 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 3049.60it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2959 [00:00<?, ?tok/s]
+Prefill:  69%|######9   | 2048/2959 [00:01<00:00, 1330.60tok/s]
+Prefill: 100%|#########9| 2958/2959 [00:02<00:00, 1493.47tok/s]
+Prefill: 100%|#########9| 2958/2959 [00:02<00:00, 1456.35tok/s]
+2026-08-10 20:11:31 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4: keyword_overlap=some_overlap, words=114
+2026-08-10 20:11:31 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:31 BST - INFO - 
+2026-08-10 20:11:31 BST - INFO - Processing Model [18/42]: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-10 20:11:31 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:31 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-10 20:11:38 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-10 20:11:38 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-14B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+**Title:**
+Arundel Cathedral & Cottage – Sunset View, UK
+
+**Description:**
+A photograph captured on **August 6, 2026, at 18:26 UTC+1, near 50.806659°N, 0.551382°W** showcases **Arundel Cathedral of Our Lady & St. Philip Howard** towering over a quaint cottage with a red car parked outside. The scene features **French-Gothic architecture, clear blue skies, and well-maintained gardens** against a serene evening backdrop.
+
+**Keywords:**
+Arundel, Arundel Cathedral, Cathedral, Cottage, England, UK, Europe, French-Gothic, Sunset, Red Car, Blue Sky, Church, Neighborhood, Parking, Roof, Gardens, Historical Architecture, 2026-08-06
+==========
+Prompt: 2959 tokens, 1353.457 tokens-per-sec
+Generation: 188 tokens, 60.901 tokens-per-sec
+Peak memory: 13.478 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2655.08it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2959 [00:00<?, ?tok/s]
+Prefill:  69%|######9   | 2048/2959 [00:01<00:00, 1300.09tok/s]
+Prefill: 100%|#########9| 2958/2959 [00:02<00:00, 1434.45tok/s]
+Prefill: 100%|#########9| 2958/2959 [00:02<00:00, 1404.23tok/s]
+2026-08-10 20:11:38 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4: keyword_overlap=some_overlap, words=91
+2026-08-10 20:11:38 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:38 BST - INFO - 
+2026-08-10 20:11:38 BST - INFO - Processing Model [19/42]: mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-10 20:11:38 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:38 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-10 20:11:42 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-10 20:11:42 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-3B-Instruct-2512-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-3B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+Title:
+Arundel’s Gothic Masterpiece with Quaint Residences
+
+Description:
+A bright, clear evening in August 2026 captures the grandeur of Arundel Cathedral of Our Lady & St. Philip Howard against a vivid blue sky, framed by traditional English cottages with stone walls and red parked cars. The cathedral’s intricate Gothic architecture, including pointed spires and a prominent rose window, dominates the skyline, while lush greenery and blooming flowers add charm to the peaceful neighborhood.
+
+Keywords:
+Arundel Cathedral, Gothic architecture, stone cottages, red car, blue sky, August 2026, English countryside, rose window, traditional English buildings, urban park setting, historic stone walls, floral decorations, cathedral spires, vintage neighborhood.
+==========
+Prompt: 2958 tokens, 2807.213 tokens-per-sec
+Generation: 161 tokens, 178.391 tokens-per-sec
+Peak memory: 7.799 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2945.44it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2958 [00:00<?, ?tok/s]
+Prefill:  69%|######9   | 2048/2958 [00:00<00:00, 2431.11tok/s]
+Prefill: 100%|#########9| 2957/2958 [00:01<00:00, 3075.96tok/s]
+Prefill: 100%|#########9| 2957/2958 [00:01<00:00, 2914.66tok/s]
+2026-08-10 20:11:42 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-3B-Instruct-2512-4bit: keyword_overlap=some_overlap, words=106
+2026-08-10 20:11:42 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:42 BST - INFO - 
+2026-08-10 20:11:42 BST - INFO - Processing Model [20/42]: mlx-community/Molmo-7B-D-0924-8bit
+2026-08-10 20:11:42 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:42 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Molmo-7B-D-0924-8bit
+2026-08-10 20:11:48 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Molmo-7B-D-0924-8bit
+2026-08-10 20:11:48 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Molmo-7B-D-0924-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: User: Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords: Assistant:
+ Title: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+
+Description: A red car is parked in front of a white cottage with a stone wall, set against the backdrop of the impressive Arundel Cathedral under a clear blue sky. The scene captures a picturesque view of this historic English landmark and its surrounding neighborhood.
+
+Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+==========
+Prompt: 1547 tokens, 2186.983 tokens-per-sec
+Generation: 135 tokens, 49.690 tokens-per-sec
+Peak memory: 11.203 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 5419.87it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:11:48 BST - DEBUG - Quality analysis for mlx-community/Molmo-7B-D-0924-8bit: keyword_overlap=some_overlap, words=88
+2026-08-10 20:11:48 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:11:48 BST - INFO - 
+2026-08-10 20:11:48 BST - INFO - Processing Model [21/42]: mlx-community/MolmoPoint-8B-fp16
+2026-08-10 20:11:48 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:11:48 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/MolmoPoint-8B-fp16
+2026-08-10 20:12:16 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/MolmoPoint-8B-fp16
+2026-08-10 20:12:16 BST - DEBUG - Captured mlx-vlm console output for mlx-community/MolmoPoint-8B-fp16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|image|><|im_start|>user
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Arundel Cathedral: Gothic Beauty Amidst English Suburb
+
+Captured on August 6, 2026, this image showcases Arundel Cathedral of Our Lady & St. Philip Howard in Arundel, England. The grand Gothic structure stands prominently against a clear blue sky, surrounded by a mix of residential buildings and lush greenery. A red car is visible in the foreground, adding a modern touch to the historic scene.
+
+Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cottage, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+==========
+Prompt: 3160 tokens, 1241.568 tokens-per-sec
+Generation: 134 tokens, 5.981 tokens-per-sec
+Peak memory: 24.141 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]
+Fetching 26 files: 100%|##########| 26/26 [00:00<00:00, 5432.77it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1074: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
+  warnings.warn(
+Prefill:   0%|          | 0/3160 [00:00<?, ?tok/s]
+Prefill:  65%|######4   | 2048/3160 [00:01<00:00, 1358.41tok/s]
+Prefill: 100%|#########9| 3159/3160 [00:02<00:00, 1537.65tok/s]
+Prefill: 100%|#########9| 3159/3160 [00:02<00:00, 1499.10tok/s]
+2026-08-10 20:12:16 BST - DEBUG - Quality analysis for mlx-community/MolmoPoint-8B-fp16: missing_sections=title+description+keywords, words=84
+2026-08-10 20:12:16 BST - INFO - Mechanical observations for mlx-community/MolmoPoint-8B-fp16: missing-sections(title+description+keywords)
+2026-08-10 20:12:16 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:12:16 BST - INFO - 
+2026-08-10 20:12:16 BST - INFO - Processing Model [22/42]: mlx-community/Ornith-1.0-35B-bf16
+2026-08-10 20:12:16 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:12:16 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ornith-1.0-35B-bf16
+2026-08-10 20:13:46 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ornith-1.0-35B-bf16
+2026-08-10 20:13:46 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ornith-1.0-35B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Title: Red car parked outside cottage with cathedral spire
+Description: A red Toyota Yaris is parked in a driveway in front of a cream-coloured cottage with a flint wall, set against the backdrop of Arundel Cathedral's Gothic spire under a clear blue sky.
+Keywords: Arundel, Cathedral, England, UK, Red Car, Cottage, Roof, Spire, Blue Sky, Flints, Garden, Flower, Architecture, Church, Neighborhood, Parking, Toyota, Gothic
+==========
+Prompt: 16596 tokens, 210.197 tokens-per-sec
+Generation: 102 tokens, 55.889 tokens-per-sec
+Peak memory: 74.111 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 6015.50it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16596 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16596 [01:09<08:10, 29.66tok/s]
+Prefill:  25%|##4       | 4096/16596 [01:09<02:56, 71.01tok/s]
+Prefill:  37%|###7      | 6144/16596 [01:10<01:21, 127.91tok/s]
+Prefill:  49%|####9     | 8192/16596 [01:11<00:41, 204.67tok/s]
+Prefill:  62%|######1   | 10240/16596 [01:12<00:20, 303.79tok/s]
+Prefill:  74%|#######4  | 12288/16596 [01:13<00:09, 432.93tok/s]
+Prefill:  86%|########6 | 14336/16596 [01:13<00:03, 591.18tok/s]
+Prefill:  99%|#########8| 16384/16596 [01:14<00:00, 775.87tok/s]
+Prefill: 100%|#########9| 16595/16596 [01:15<00:00, 221.20tok/s]
+2026-08-10 20:13:47 BST - DEBUG - Quality analysis for mlx-community/Ornith-1.0-35B-bf16: keyword_overlap=some_overlap, words=66
+2026-08-10 20:13:47 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:13:47 BST - INFO - 
+2026-08-10 20:13:47 BST - INFO - Processing Model [23/42]: mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-10 20:13:47 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:13:47 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-10 20:13:51 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-10 20:13:51 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Phi-3.5-vision-instruct-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|user|>
+<|image_1|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|end|>
+<|assistant|>
+
+Title: Arundel Cathedral View from the Street
+
+Description: Arundel Cathedral of Our Lady & St. Philip Howard stands majestically over the quaint English town, captured from a street perspective on a clear day. The cathedral's French-Gothic architecture is highlighted by the blue sky and the surrounding greenery.
+
+Keywords: Arundel Cathedral, Our Lady & St. Philip Howard, Arundel, England, French-Gothic, blue sky, greenery, street view, quaint town, architecture
+==========
+Prompt: 1164 tokens, 3775.144 tokens-per-sec
+Generation: 119 tokens, 54.788 tokens-per-sec
+Peak memory: 9.279 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 4049.76it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-10 20:13:51 BST - DEBUG - Quality analysis for mlx-community/Phi-3.5-vision-instruct-bf16: keyword_overlap=some_overlap, words=68
+2026-08-10 20:13:51 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:13:51 BST - INFO - 
+2026-08-10 20:13:51 BST - INFO - Processing Model [24/42]: mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-10 20:13:51 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:13:51 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-10 20:15:11 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-10 20:15:11 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen2-VL-2B-Instruct-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '0', '6', '-', '1', '8', '2', '6', '3', '5', '_', 'D', 'S', 'C', '0', '1', '3', '4', '7', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|vision_start|><|image_pad|><|vision_end|><|im_end|>
+<|im_start|>assistant
+
+Title:
+Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+
+Description:
+Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St. Philip Howard, with a red car parked in front of a house, under a clear blue sky.
+
+Keywords:
+Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+==========
+Prompt: 16592 tokens, 211.048 tokens-per-sec
+Generation: 141 tokens, 219.203 tokens-per-sec
+Peak memory: 5.064 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 3656.76it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16592 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16592 [01:16<09:06, 26.62tok/s]
+Prefill:  25%|##4       | 4096/16592 [01:17<03:13, 64.46tok/s]
+Prefill:  37%|###7      | 6144/16592 [01:17<01:28, 117.98tok/s]
+Prefill:  49%|####9     | 8192/16592 [01:17<00:43, 193.24tok/s]
+Prefill:  62%|######1   | 10240/16592 [01:17<00:21, 298.28tok/s]
+Prefill:  74%|#######4  | 12288/16592 [01:18<00:09, 444.56tok/s]
+Prefill:  86%|########6 | 14336/16592 [01:18<00:03, 644.23tok/s]
+Prefill:  99%|#########8| 16384/16592 [01:18<00:00, 910.28tok/s]
+Prefill: 100%|#########9| 16591/16592 [01:18<00:00, 211.14tok/s]
+2026-08-10 20:15:12 BST - DEBUG - Quality analysis for mlx-community/Qwen2-VL-2B-Instruct-4bit: keyword_overlap=some_overlap, words=79
+2026-08-10 20:15:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-10 20:15:12 BST - INFO - 
+2026-08-10 20:15:12 BST - INFO - Processing Model [25/42]: mlx-community/Qwen3-VL-2B-Instruct-bf16
+2026-08-10 20:15:12 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-10 20:15:12 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3-VL-2B-Instruct-bf16

@@ -212,7 +212,7 @@ def mlx_vlm_available() -> bool:
 @pytest.fixture(scope="session")
 def fixture_model_cached() -> bool:
     """Check if the fixture model (nanoLLaVA) is cached (session-scoped)."""
-    fixture_model = "qnguyen3/nanoLLaVA"
+    fixture_model = "mlx-community/nanoLLaVA-1.5-4bit"
     try:
         repo_ids = [r.repo_id for r in scan_cache_dir().repos]
     except (OSError, ValueError, RuntimeError, CacheNotFound):

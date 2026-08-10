@@ -42,10 +42,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11958, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11435, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11454, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -55,7 +55,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 750, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 756, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -441,7 +441,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12388, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12407, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -452,7 +452,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -829,12 +829,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3352.02it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3382.40it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -874,9 +874,34 @@ Keywords:
 
 </details>
 
-The original local input is not published, so this report does not claim a
-complete reproduction command. Use a shareable equivalent image or add the
-original image before filing.
+The crash occurred during model load, before image decoding, so the exact
+input image is not required: substitute any local image for the placeholder
+path and run one native mlx-vlm process.
+
+```bash
+python -m mlx_vlm.generate --model mlx-community/Inkling-Small-mlx-4bit --image any-local-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
+- GPS: 50.806659°N, 0.551382°W
+
+Descriptive hints:
+- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
+- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
+- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:' --max-tokens 500 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612 --trust-remote-code --prefill-step-size 2048
+```
 
 ## Provenance and Environment
 
@@ -894,7 +919,7 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6.1                                                          |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision 28d5fea993655832b615df0b959be62a1226335d; clean |
+| check_models    | 0.9.0; revision 212c2c4654d25a32027546b54a218889e451d9d2; clean |
 
 ### Full environment evidence
 

@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Use the cached `mlx-community/nanoLLaVA-1.5-4bit` conversion for end-to-end
+  smoke inference instead of the removed `qnguyen3/nanoLLaVA` fixture, so the
+  full local quality gate exercises rather than skips both inference tests.
 - Fix `validate_env`'s pre-commit framework check: it ran
   `pre-commit run --all-files --dry-run` (no such flag), which always failed
   and reported "hooks not installed" even when the framework hooks were in

@@ -729,7 +729,7 @@ The `src/tools/` directory contains scripts useful for development and verificat
 - **E2E Smoke Tests**: The test suite includes end-to-end tests that run actual model inference:
 
   ```bash
-  # Run E2E tests (requires cached model: qnguyen3/nanoLLaVA)
+  # Run E2E tests (requires cached model: mlx-community/nanoLLaVA-1.5-4bit)
   pytest tests/test_e2e_smoke.py -v
 
   # Skip slow tests for quick iteration
@@ -740,8 +740,8 @@ The `src/tools/` directory contains scripts useful for development and verificat
   ```
 
   > [!NOTE]
-  > E2E tests require `qnguyen3/nanoLLaVA` to be cached. Run a quick inference first to download it:
-  > `python -m check_models --models qnguyen3/nanoLLaVA --max-tokens 10`
+  > E2E tests require `mlx-community/nanoLLaVA-1.5-4bit` to be cached. Run a quick inference first to download it:
+  > `python -m check_models --models mlx-community/nanoLLaVA-1.5-4bit --max-tokens 10`
 
 - **`validate_env.py`**: Checks your environment for required dependencies and configuration.
 

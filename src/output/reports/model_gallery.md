@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-09 21:37:49 BST
+Generated on: 2026-08-09 22:23:21 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -12,61 +12,61 @@ model.
 
 ## Current-run Chooser
 
-Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens. Prefill/first is first-token latency when captured; Prompt tok is the full rendered prompt including image tokens, which drives prefill cost.
+Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens. Prefill/first is first-token latency when captured; Prompt tok is the full rendered prompt including image tokens, which drives prefill cost. For cross-attention architectures the token count reflects the tokenised text burden only, not total vision prefill compute.
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.45s  | 29.5 tok/s | 3.85            | 23      | 2,426      | 104     | none                                                                                                                     |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.56s   | 35.1 tok/s | 1.02            | 17      | 2,147      | 101     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 7.37s   | 66.4 tok/s | 2.06            | 13      | 2,959      | 198     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 7.40s   | 63.5 tok/s | 2.08            | 13      | 2,959      | 188     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.81s   | 187 tok/s  | 1.08            | 7.8     | 2,958      | 161     | none                                                                                                                     |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 75.93s  | 63.3 tok/s | 63.14           | 74      | 16,596     | 102     | none                                                                                                                     |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.42s   | 55.6 tok/s | 0.49            | 9.3     | 1,164      | 119     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 60.73s  | 109 tok/s  | 56.09           | 24      | 16,596     | 102     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 63.92s  | 90.7 tok/s | 60.30           | 10.0    | 16,596     | 88      | none                                                                                                                     |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 86.51s  | 17.9 tok/s | 76.38           | 35      | 16,596     | 103     | none                                                                                                                     |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 28.59s  | 45.9 tok/s | 17.30           | 70      | 3,524      | 111     | none                                                                                                                     |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | 6.28s   | 54.0 tok/s | 0.47            | 28      | 619        | 83      | none                                                                                                                     |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 8.38s   | 31.5 tok/s | 1.21            | 18      | 618        | 126     | none                                                                                                                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.55s   | 129 tok/s  | 0.47            | 16      | 623        | 101     | none                                                                                                                     |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.88s   | 26.3 tok/s | 1.15            | 20      | 623        | 85      | none                                                                                                                     |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 2.50s   | 509 tok/s  | 1.12            | 1.2     | 425        | 119     | title/keyword constraints failed                                                                                         |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 17.18s  | 89.9 tok/s | 13.93           | 8.4     | 16,581     | 123     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 10.67s  | 80.1 tok/s | 7.21            | 8.4     | 6,483      | 85      | title/keyword constraints failed                                                                                         |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 39.10s  | 31.9 tok/s | 25.29           | 78      | 6,483      | 100     | control tokens visible                                                                                                   |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 10.42s  | 29.1 tok/s | 2.45            | 18      | 2,644      | 141     | role tokens visible; title/keyword constraints failed                                                                    |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 6.22s   | 52.5 tok/s | 0.95            | 11      | 1,547      | 135     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 73.56s  | 219 tok/s  | 71.08           | 5.1     | 16,592     | 141     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 19.57s  | 90.3 tok/s | 16.19           | 8.4     | 16,581     | 123     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 3.14s   | 130 tok/s  | 0.55            | 5.5     | 462        | 112     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 7.03s   | 45.5 tok/s | 0.73            | 29      | 619        | 87      | title/keyword constraints failed                                                                                         |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 7.74s   | 39.5 tok/s | 2.14            | 16      | 3,149      | 106     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 16.99s  | 41.2 tok/s | 2.24            | 15      | 3,240      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit                            |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 28.44s  | 58.7 tok/s | 7.72            | 60      | 1,665      | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 3.43s   | 352 tok/s  | 0.89            | 2.0     | 368        | 131     | missing required fields; extra text before Title                                                                         |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 20.49s  | 44.2 tok/s | 6.60            | 13      | 6,479      | 500     | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed             |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 117.51s | 4.57 tok/s | 3.59            | 40      | 1,355      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 4.55s   | 181 tok/s  | 0.39            | 4.1     | 615        | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 30.71s  | 19.2 tok/s | 2.04            | 15      | 333        | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 3.41s   | 254 tok/s  | 1.29            | 3.8     | 965        | 40      | missing required fields; extra text before Title                                                                         |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 30.88s  | 5.92 tok/s | 4.74            | 24      | 3,160      | 134     | missing required fields                                                                                                  |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 24.13s  | 90.1 tok/s | 16.56           | 8.4     | 16,583     | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 28.49s  | 55.9 tok/s | 17.19           | 13      | 16,592     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 14.30s  | 48.8 tok/s | 0.93            | 17      | 617        | 500     | missing required fields                                                                                                  |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 12.58s  | 60.8 tok/s | 2.32            | 9.7     | 2,552      | 500     | repeated text; missing required fields; extra text before Title; cut off at token limit                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 2.14s   | 337 tok/s  | 0.28            | 2.4     | 364        | 77      | missing required fields                                                                                                  |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 16.15s  | 40.0 tok/s | 1.23            | 4.4     | 4,444      | 500     | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.79s   | -          | -               | -       | -          | -       | none                                                                                                                     |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.66s  | 27.1 tok/s | 3.60            | 23      | 2,426      | 104     | none                                                                                                                     |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.51s   | 33.4 tok/s | 0.86            | 17      | 2,147      | 101     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 7.45s   | 64.4 tok/s | 2.11            | 13      | 2,959      | 198     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 7.73s   | 62.6 tok/s | 2.12            | 13      | 2,959      | 188     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.78s   | 181 tok/s  | 1.02            | 7.8     | 2,958      | 161     | none                                                                                                                     |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 77.20s  | 59.6 tok/s | 63.59           | 74      | 16,596     | 102     | none                                                                                                                     |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.31s   | 54.6 tok/s | 0.30            | 9.3     | 1,164      | 119     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 63.32s  | 83.0 tok/s | 58.33           | 24      | 16,596     | 102     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 79.07s  | 85.9 tok/s | 74.91           | 10.0    | 16,596     | 88      | none                                                                                                                     |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 91.21s  | 18.1 tok/s | 80.58           | 35      | 16,596     | 103     | none                                                                                                                     |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 26.31s  | 43.7 tok/s | 15.93           | 70      | 3,524      | 111     | none                                                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 8.55s   | 30.3 tok/s | 1.05            | 18      | 618        | 126     | none                                                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.88s   | 115 tok/s  | 0.43            | 16      | 623        | 101     | none                                                                                                                     |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.10s   | 26.0 tok/s | 1.25            | 20      | 623        | 85      | none                                                                                                                     |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 1.45s   | 514 tok/s  | 0.04            | 1.2     | 425        | 119     | title/keyword constraints failed                                                                                         |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 16.81s  | 94.4 tok/s | 13.66           | 8.4     | 16,581     | 123     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 14.07s  | 68.3 tok/s | 10.31           | 8.4     | 6,483      | 85      | title/keyword constraints failed                                                                                         |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 34.60s  | 37.4 tok/s | 22.28           | 78      | 6,483      | 100     | control tokens visible                                                                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 8.82s   | 31.4 tok/s | 1.22            | 18      | 2,644      | 141     | role tokens visible; title/keyword constraints failed                                                                    |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.91s   | 51.2 tok/s | 0.68            | 11      | 1,547      | 135     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 75.27s  | 208 tok/s  | 72.80           | 5.1     | 16,592     | 141     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 23.04s  | 92.9 tok/s | 19.45           | 8.4     | 16,581     | 123     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 2.91s   | 129 tok/s  | 0.33            | 5.5     | 462        | 112     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 6.56s   | 48.8 tok/s | 0.36            | 29      | 619        | 82      | control tokens visible; title/keyword constraints failed                                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 6.52s   | 46.3 tok/s | 0.35            | 28      | 619        | 84      | control tokens visible                                                                                                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 7.70s   | 38.1 tok/s | 2.23            | 16      | 3,149      | 106     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 17.19s  | 40.1 tok/s | 2.18            | 15      | 3,240      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit                            |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.52s  | 53.6 tok/s | 5.26            | 60      | 1,665      | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 3.21s   | 325 tok/s  | 0.10            | 2.1     | 368        | 131     | missing required fields; extra text before Title                                                                         |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 24.91s  | 39.8 tok/s | 9.27            | 13      | 6,479      | 500     | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 118.26s | 4.45 tok/s | 1.55            | 40      | 1,355      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 4.23s   | 182 tok/s  | 0.10            | 4.1     | 615        | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 31.29s  | 18.5 tok/s | 1.80            | 15      | 333        | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.38s   | 256 tok/s  | 0.26            | 3.8     | 965        | 40      | missing required fields; extra text before Title                                                                         |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 28.69s  | 6.04 tok/s | 2.99            | 24      | 3,160      | 134     | missing required fields                                                                                                  |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 24.02s  | 92.1 tok/s | 16.60           | 8.4     | 16,583     | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 30.40s  | 54.5 tok/s | 18.69           | 13      | 16,592     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 14.44s  | 46.4 tok/s | 0.39            | 17      | 617        | 500     | missing required fields                                                                                                  |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 12.98s  | 58.8 tok/s | 2.39            | 9.7     | 2,552      | 500     | repeated text; missing required fields; extra text before Title; cut off at token limit                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.86s   | 286 tok/s  | 0.08            | 2.5     | 364        | 77      | missing required fields                                                                                                  |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 15.19s  | 43.4 tok/s | 1.14            | 4.4     | 4,444      | 500     | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.60s   | -          | -               | -       | -          | -       | none                                                                                                                     |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 187 tok/s
+Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 181 tok/s
 
-Average clean-completion throughput: 67.0 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 63.3 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 7.8 GB
 
@@ -113,7 +113,6 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Arundel Cathedral and Residential Street Scene<br><br>Description: A view of Arundel Cathedral of Our Lady &amp; St. Philip Howard, with a red car parked in a residential street below, under a clear blue sky.<br><br>Keywords: Arundel Cathedral, Residential Street, Red Car, Blue Sky, Go...              |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Arundel Cathedral and Residential Street Scene<br><br>Description:<br>A view of the Gothic Arundel Cathedral rising behind a white cottage with a tiled roof and a parked red car. The scene is captured on a clear, sunny day with bright blue skies and distinct shadows.<br><br>Keywords:...             |
 | [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Arundel Cathedral and Residential Street View<br><br>Description:<br>A view of Arundel Cathedral of Our Lady and St Philip Howard rising above a residential street in Arundel, England, featuring a red car parked in a driveway, a brick cottage, and a clear blue sky on a bright da...                  |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | <\|channel>thought<br><channel\|>Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard<br>Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.<br>Keywords: Arundel, Cathedral, Church...               |
 | [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | Title: Arundel Cathedral &amp; Neighbourhood, West Sussex, August 2026<br>Description: Captured on 6th August 2026, Arundel Cathedral of Our Lady &amp; St Philip Howard dominates the skyline above residential buildings and a stone wall. A red car is parked on the street in the foreground...                   |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title:<br>Arundel Cathedral overlooking residential houses in England<br><br>Description:<br>A view of the French-Gothic Arundel Cathedral rising above traditional brick and stone houses under a clear blue sky. A red car is parked in a driveway next to a white garage door in the foregroun...                  |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Arundel Cathedral of Our Lady and St Philip Howard<br>Description: A view of the French-Gothic Arundel Cathedral towering over residential cottages and a red car parked in a driveway under a clear blue sky.<br>Keywords: Arundel, Arundel Cathedral, England, West Sussex, cathed...                        |
@@ -126,7 +125,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | Title:<br>Arundel Cathedral of Our Lady &amp; St. Philip Howard, Arundel, England, UK, GBR, Europe<br><br>Description:<br>Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St. Philip Howard, with a red car parked in front of a house, under a clear blue sky.<br><br>Keywords:...         |
 | [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title: Arundel Cathedral View<br><br>Description: A red car is parked in a narrow street in Arundel, England, with the Arundel Cathedral of Our Lady &amp; St. Philip Howard visible in the background under a clear blue sky. The scene features traditional stone buildings, a white cottage,...                    |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard<br>Description: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard<br>Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady &amp; St. Philip Howard, Blue sky, Bush, Car,...                 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Arundel Cathedral over residential houses in England<br>Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.<br>Keywords: Arundel, Ca...               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Arundel Cathedral over Residential Houses in England<br>Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.<br>Keywords: Arundel, Cathed...               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard<br>Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.<br>Keywords: Arundel, Cathedral, Church, England, E...               |
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Arundel Cathedral under Clear Blue Sky<br><br>Description:<br>Arundel Cathedral of Our Lady and St. Philip Howard stands prominently against a clear blue sky, with a red car parked nearby in a quaint neighborhood.<br><br>Keywords:<br>Arundel Cathedral, Our Lady &amp; St. Philip Howard, Blue...      |
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are hints, not authoritative. We need to treat capture date/time and GPS as authoritati...                           |
 | [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are a bit of a mess, but the image is clear. It's a view of Arundel Cathedral, a Gothic church, with a red car and a stone wall. I'll go with "Arundel C...                              |
@@ -240,18 +240,18 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.14s
-- *Generation time:* 7.92s
-- *Total time:* 10.45s
-- *Input validation time:* 0.38
-- *Prompt preparation time:* 0.00702
-- *First-token latency:* 3.85
-- *Cleanup time:* 0.11
+- *Model load time:* 2.20s
+- *Generation time:* 8.04s
+- *Total time:* 10.66s
+- *Input validation time:* 0.408
+- *Prompt preparation time:* 0.00782
+- *First-token latency:* 3.6
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 2,426
 - *Generation tokens:* 104
 - *Total tokens:* 2,530
-- *Prompt throughput (raw):* 630 tok/s
-- *Generation throughput (raw):* 29.5 tok/s
+- *Prompt throughput (raw):* 674 tok/s
+- *Generation throughput (raw):* 27.1 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 0.47
@@ -318,18 +318,18 @@ Arundel Cathedral, Residential Street, Red Car, Cottage, Stone Wall, Garden, Chu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.66s
-- *Generation time:* 4.54s
-- *Total time:* 6.56s
-- *Input validation time:* 0.358
-- *Prompt preparation time:* 0.00179
-- *First-token latency:* 1.02
-- *Cleanup time:* 0.112
+- *Model load time:* 1.61s
+- *Generation time:* 4.53s
+- *Total time:* 6.51s
+- *Input validation time:* 0.361
+- *Prompt preparation time:* 0.00184
+- *First-token latency:* 0.863
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 2,147
 - *Generation tokens:* 101
 - *Total tokens:* 2,248
-- *Prompt throughput (raw):* 2,112 tok/s
-- *Generation throughput (raw):* 35.1 tok/s
+- *Prompt throughput (raw):* 2,488 tok/s
+- *Generation throughput (raw):* 33.4 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.17
@@ -390,18 +390,18 @@ Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.42s
-- *Generation time:* 5.58s
-- *Total time:* 7.37s
-- *Input validation time:* 0.355
-- *Prompt preparation time:* 0.00732
-- *First-token latency:* 2.06
-- *Cleanup time:* 0.0841
+- *Model load time:* 1.34s
+- *Generation time:* 5.73s
+- *Total time:* 7.45s
+- *Input validation time:* 0.363
+- *Prompt preparation time:* 0.00721
+- *First-token latency:* 2.11
+- *Cleanup time:* 0.0891
 - *Prompt tokens:* 2,959
 - *Generation tokens:* 198
 - *Total tokens:* 3,157
-- *Prompt throughput (raw):* 1,437 tok/s
-- *Generation throughput (raw):* 66.4 tok/s
+- *Prompt throughput (raw):* 1,405 tok/s
+- *Generation throughput (raw):* 64.4 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.0
 - *Cache memory:* 0.60
@@ -468,18 +468,18 @@ Arundel Cathedral, Our Lady & St. Philip Howard, Gothic architecture, stone cott
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.47s
-- *Generation time:* 5.57s
-- *Total time:* 7.40s
-- *Input validation time:* 0.351
-- *Prompt preparation time:* 0.000243
-- *First-token latency:* 2.08
-- *Cleanup time:* 0.0833
+- *Model load time:* 1.70s
+- *Generation time:* 5.66s
+- *Total time:* 7.73s
+- *Input validation time:* 0.357
+- *Prompt preparation time:* 0.000263
+- *First-token latency:* 2.12
+- *Cleanup time:* 0.0912
 - *Prompt tokens:* 2,959
 - *Generation tokens:* 188
 - *Total tokens:* 3,147
-- *Prompt throughput (raw):* 1,426 tok/s
-- *Generation throughput (raw):* 63.5 tok/s
+- *Prompt throughput (raw):* 1,397 tok/s
+- *Generation throughput (raw):* 62.6 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.4
 - *Cache memory:* 0.60
@@ -546,18 +546,18 @@ Arundel, Arundel Cathedral, Cathedral, Cottage, England, UK, Europe, French-Goth
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.97s
-- *Generation time:* 2.48s
-- *Total time:* 3.81s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00674
-- *First-token latency:* 1.08
-- *Cleanup time:* 0.074
+- *Model load time:* 0.96s
+- *Generation time:* 2.45s
+- *Total time:* 3.78s
+- *Input validation time:* 0.356
+- *Prompt preparation time:* 0.00701
+- *First-token latency:* 1.02
+- *Cleanup time:* 0.0837
 - *Prompt tokens:* 2,958
 - *Generation tokens:* 161
 - *Total tokens:* 3,119
-- *Prompt throughput (raw):* 2,740 tok/s
-- *Generation throughput (raw):* 187 tok/s
+- *Prompt throughput (raw):* 2,893 tok/s
+- *Generation throughput (raw):* 181 tok/s
 - *Peak memory:* 7.8
 - *Active memory:* 2.8
 - *Cache memory:* 0.41
@@ -624,18 +624,18 @@ Arundel Cathedral, Gothic architecture, stone cottages, red car, blue sky, Augus
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 9.78s
-- *Generation time:* 65.77s
-- *Total time:* 75.93s
+- *Model load time:* 10.53s
+- *Generation time:* 66.29s
+- *Total time:* 77.20s
 - *Input validation time:* 0.357
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 63.1
-- *Cleanup time:* 0.238
+- *Prompt preparation time:* 0.0143
+- *First-token latency:* 63.6
+- *Cleanup time:* 0.228
 - *Prompt tokens:* 16,596
 - *Generation tokens:* 102
 - *Total tokens:* 16,698
-- *Prompt throughput (raw):* 263 tok/s
-- *Generation throughput (raw):* 63.3 tok/s
+- *Prompt throughput (raw):* 261 tok/s
+- *Generation throughput (raw):* 59.6 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
 - *Cache memory:* 0.89
@@ -681,18 +681,18 @@ Keywords: Arundel, Cathedral, England, UK, Red Car, Cottage, Roof, Spire, Blue S
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.93s
-- *Generation time:* 3.13s
-- *Total time:* 4.42s
-- *Input validation time:* 0.36
-- *Prompt preparation time:* 0.000911
-- *First-token latency:* 0.491
-- *Cleanup time:* 0.0828
+- *Model load time:* 0.94s
+- *Generation time:* 2.99s
+- *Total time:* 4.31s
+- *Input validation time:* 0.377
+- *Prompt preparation time:* 0.000942
+- *First-token latency:* 0.3
+- *Cleanup time:* 0.0942
 - *Prompt tokens:* 1,164
 - *Generation tokens:* 119
 - *Total tokens:* 1,283
-- *Prompt throughput (raw):* 2,369 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
+- *Prompt throughput (raw):* 3,880 tok/s
+- *Generation throughput (raw):* 54.6 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.62
@@ -753,21 +753,21 @@ Keywords: Arundel Cathedral, Our Lady & St. Philip Howard, Arundel, England, Fre
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.46s
-- *Generation time:* 57.90s
-- *Total time:* 60.73s
-- *Input validation time:* 0.35
-- *Prompt preparation time:* 0.0146
-- *First-token latency:* 56.1
-- *Cleanup time:* 0.117
+- *Model load time:* 2.51s
+- *Generation time:* 60.44s
+- *Total time:* 63.32s
+- *Input validation time:* 0.348
+- *Prompt preparation time:* 0.0139
+- *First-token latency:* 58.3
+- *Cleanup time:* 0.172
 - *Prompt tokens:* 16,596
 - *Generation tokens:* 102
 - *Total tokens:* 16,698
-- *Prompt throughput (raw):* 296 tok/s
-- *Generation throughput (raw):* 109 tok/s
+- *Prompt throughput (raw):* 285 tok/s
+- *Generation throughput (raw):* 83.0 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 20.4
 - *Post-cleanup active memory:* 0.00859
 - *Post-cleanup cache memory:* 0.0
@@ -812,18 +812,18 @@ Keywords: Arundel Cathedral, Gothic architecture, red car, stone wall, brick bui
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.40s
-- *Generation time:* 62.15s
-- *Total time:* 63.92s
-- *Input validation time:* 0.351
-- *Prompt preparation time:* 0.000319
-- *First-token latency:* 60.3
-- *Cleanup time:* 0.0878
+- *Model load time:* 1.68s
+- *Generation time:* 76.93s
+- *Total time:* 79.07s
+- *Input validation time:* 0.45
+- *Prompt preparation time:* 0.000313
+- *First-token latency:* 74.9
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 16,596
 - *Generation tokens:* 88
 - *Total tokens:* 16,684
-- *Prompt throughput (raw):* 275 tok/s
-- *Generation throughput (raw):* 90.7 tok/s
+- *Prompt throughput (raw):* 222 tok/s
+- *Generation throughput (raw):* 85.9 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.6
 - *Cache memory:* 1.2
@@ -884,18 +884,18 @@ Keywords: Arundel Cathedral, Residential Street, Red Car, Blue Sky, Gothic Archi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.12s
-- *Generation time:* 83.01s
-- *Total time:* 86.51s
-- *Input validation time:* 0.351
-- *Prompt preparation time:* 0.0149
-- *First-token latency:* 76.4
-- *Cleanup time:* 0.138
+- *Model load time:* 3.42s
+- *Generation time:* 87.40s
+- *Total time:* 91.21s
+- *Input validation time:* 0.368
+- *Prompt preparation time:* 0.0161
+- *First-token latency:* 80.6
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 16,596
 - *Generation tokens:* 103
 - *Total tokens:* 16,699
-- *Prompt throughput (raw):* 217 tok/s
-- *Generation throughput (raw):* 17.9 tok/s
+- *Prompt throughput (raw):* 206 tok/s
+- *Generation throughput (raw):* 18.1 tok/s
 - *Peak memory:* 35
 - *Active memory:* 29
 - *Cache memory:* 1.9
@@ -946,18 +946,18 @@ Arundel, Cathedral, Church, Gothic, England, UK, Red Car, Cottage, Residential, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 7.66s
-- *Generation time:* 20.55s
-- *Total time:* 28.59s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.0163
-- *First-token latency:* 17.3
-- *Cleanup time:* 0.226
+- *Model load time:* 6.61s
+- *Generation time:* 19.31s
+- *Total time:* 26.31s
+- *Input validation time:* 0.362
+- *Prompt preparation time:* 0.0158
+- *First-token latency:* 15.9
+- *Cleanup time:* 0.207
 - *Prompt tokens:* 3,524
 - *Generation tokens:* 111
 - *Total tokens:* 3,635
-- *Prompt throughput (raw):* 204 tok/s
-- *Generation throughput (raw):* 45.9 tok/s
+- *Prompt throughput (raw):* 221 tok/s
+- *Generation throughput (raw):* 43.7 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.41
@@ -996,76 +996,6 @@ Arundel, Arundel Cathedral, Cathedral, Church, Gothic architecture, Red car, Par
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.19s
-- *Generation time:* 2.74s
-- *Total time:* 6.28s
-- *Input validation time:* 0.348
-- *Prompt preparation time:* 0.000316
-- *First-token latency:* 0.473
-- *Cleanup time:* 0.128
-- *Prompt tokens:* 619
-- *Generation tokens:* 83
-- *Total tokens:* 702
-- *Prompt throughput (raw):* 1,309 tok/s
-- *Generation throughput (raw):* 54.0 tok/s
-- *Peak memory:* 28
-- *Active memory:* 27
-- *Cache memory:* 0.01
-- *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0103
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1378
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
-Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.
-Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car, Cottage, Roof, Sky, Neighborhood, Stone, Brick, Flowers, Europe
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|channel>thought
-<channel|>Title: Arundel Cathedral of Our Lady & St. Philip Howard
-Description: A view of the French-Gothic style Arundel Cathedral rising over neighborhood cottages and a red car parked in a driveway under clear blue sky.
-Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car, Cottage, Roof, Sky, Neighborhood, Stone, Brick, Flowers, Europe
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### mlx-community/gemma-3-27b-it-qat-4bit
@@ -1078,18 +1008,18 @@ Keywords: Arundel, Cathedral, Church, England, UK, Gothic, Architecture, Red Car
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.28s
-- *Generation time:* 5.74s
-- *Total time:* 8.38s
-- *Input validation time:* 0.35
-- *Prompt preparation time:* 0.00257
-- *First-token latency:* 1.21
-- *Cleanup time:* 0.122
+- *Model load time:* 2.42s
+- *Generation time:* 5.76s
+- *Total time:* 8.55s
+- *Input validation time:* 0.356
+- *Prompt preparation time:* 0.00271
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 618
 - *Generation tokens:* 126
 - *Total tokens:* 744
-- *Prompt throughput (raw):* 511 tok/s
-- *Generation throughput (raw):* 31.5 tok/s
+- *Prompt throughput (raw):* 587 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.46
@@ -1146,18 +1076,18 @@ Keywords: Arundel, Arundel Cathedral of Our Lady & St Philip Howard, Church, Cat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.35s
-- *Generation time:* 1.82s
-- *Total time:* 4.55s
-- *Input validation time:* 0.347
-- *Prompt preparation time:* 0.0216
-- *First-token latency:* 0.474
+- *Model load time:* 2.52s
+- *Generation time:* 1.97s
+- *Total time:* 4.88s
+- *Input validation time:* 0.355
+- *Prompt preparation time:* 0.0222
+- *First-token latency:* 0.43
 - *Cleanup time:* 0.115
 - *Prompt tokens:* 623
 - *Generation tokens:* 101
 - *Total tokens:* 724
-- *Prompt throughput (raw):* 1,313 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 1,447 tok/s
+- *Generation throughput (raw):* 115 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.21
@@ -1208,18 +1138,18 @@ Arundel, Cathedral, England, Europe, architecture, blue sky, red car, house, roo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.57s
-- *Generation time:* 4.95s
-- *Total time:* 7.88s
-- *Input validation time:* 0.348
+- *Model load time:* 2.62s
+- *Generation time:* 5.11s
+- *Total time:* 8.10s
+- *Input validation time:* 0.355
 - *Prompt preparation time:* 0.000288
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.132
+- *First-token latency:* 1.25
+- *Cleanup time:* 0.149
 - *Prompt tokens:* 623
 - *Generation tokens:* 85
 - *Total tokens:* 708
-- *Prompt throughput (raw):* 543 tok/s
-- *Generation throughput (raw):* 26.3 tok/s
+- *Prompt throughput (raw):* 497 tok/s
+- *Generation throughput (raw):* 26.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.80
@@ -1266,18 +1196,18 @@ Keywords: Arundel, Arundel Cathedral, England, West Sussex, cathedral, church, F
 - *Observations:* Title has 13 words (requested 5-10); Duplicate keywords:
   arundel, england, europe
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.40s
-- *Generation time:* 1.77s
-- *Total time:* 2.50s
-- *Input validation time:* 0.325
-- *Prompt preparation time:* 0.0061
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.0582
+- *Model load time:* 0.42s
+- *Generation time:* 0.69s
+- *Total time:* 1.45s
+- *Input validation time:* 0.334
+- *Prompt preparation time:* 0.00641
+- *First-token latency:* 0.0382
+- *Cleanup time:* 0.059
 - *Prompt tokens:* 425
 - *Generation tokens:* 119
 - *Total tokens:* 544
-- *Prompt throughput (raw):* 378 tok/s
-- *Generation throughput (raw):* 509 tok/s
+- *Prompt throughput (raw):* 11,137 tok/s
+- *Generation throughput (raw):* 514 tok/s
 - *Peak memory:* 1.2
 - *Active memory:* 0.90
 - *Cache memory:* 0.02
@@ -1344,18 +1274,18 @@ Arundel Cathedral, Arundel, England, GBR, Europe, red car, street corner, Arunde
 - *Maintainer status:* none
 - *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.65s
-- *Generation time:* 16.19s
-- *Total time:* 17.18s
-- *Input validation time:* 0.319
-- *Prompt preparation time:* 0.00887
-- *First-token latency:* 13.9
-- *Cleanup time:* 0.0957
+- *Model load time:* 0.67s
+- *Generation time:* 15.80s
+- *Total time:* 16.81s
+- *Input validation time:* 0.325
+- *Prompt preparation time:* 0.00927
+- *First-token latency:* 13.7
+- *Cleanup time:* 0.0822
 - *Prompt tokens:* 16,581
 - *Generation tokens:* 123
 - *Total tokens:* 16,704
-- *Prompt throughput (raw):* 1,190 tok/s
-- *Generation throughput (raw):* 89.9 tok/s
+- *Prompt throughput (raw):* 1,214 tok/s
+- *Generation throughput (raw):* 94.4 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -1416,18 +1346,18 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 - *Maintainer status:* none
 - *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.41s
-- *Generation time:* 8.83s
-- *Total time:* 10.67s
-- *Input validation time:* 0.412
-- *Prompt preparation time:* 0.0089
-- *First-token latency:* 7.21
-- *Cleanup time:* 0.0851
+- *Model load time:* 1.53s
+- *Generation time:* 12.09s
+- *Total time:* 14.07s
+- *Input validation time:* 0.434
+- *Prompt preparation time:* 0.00775
+- *First-token latency:* 10.3
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 6,483
 - *Generation tokens:* 85
 - *Total tokens:* 6,568
-- *Prompt throughput (raw):* 899 tok/s
-- *Generation throughput (raw):* 80.1 tok/s
+- *Prompt throughput (raw):* 629 tok/s
+- *Generation throughput (raw):* 68.3 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
 - *Cache memory:* 0.46
@@ -1484,18 +1414,18 @@ Keywords: Arundel Cathedral, red car, white garage, blue sky, England, UK, Gothi
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 9.64s
-- *Generation time:* 29.07s
-- *Total time:* 39.10s
-- *Input validation time:* 0.377
-- *Prompt preparation time:* 0.00836
-- *First-token latency:* 25.3
-- *Cleanup time:* 0.262
+- *Model load time:* 8.58s
+- *Generation time:* 25.52s
+- *Total time:* 34.60s
+- *Input validation time:* 0.484
+- *Prompt preparation time:* 0.00723
+- *First-token latency:* 22.3
+- *Cleanup time:* 0.23
 - *Prompt tokens:* 6,483
 - *Generation tokens:* 100
 - *Total tokens:* 6,583
-- *Prompt throughput (raw):* 256 tok/s
-- *Generation throughput (raw):* 31.9 tok/s
+- *Prompt throughput (raw):* 291 tok/s
+- *Generation throughput (raw):* 37.4 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1554,17 +1484,17 @@ Keywords: Arundel Cathedral, Arundel, England, UK, Cathedral, Church, Red Car, C
   13 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
 - *Model load time:* 1.99s
-- *Generation time:* 8.03s
-- *Total time:* 10.42s
-- *Input validation time:* 0.39
-- *Prompt preparation time:* 0.00126
-- *First-token latency:* 2.45
-- *Cleanup time:* 0.19
+- *Generation time:* 6.45s
+- *Total time:* 8.82s
+- *Input validation time:* 0.376
+- *Prompt preparation time:* 0.00131
+- *First-token latency:* 1.22
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 2,644
 - *Generation tokens:* 141
 - *Total tokens:* 2,785
-- *Prompt throughput (raw):* 1,077 tok/s
-- *Generation throughput (raw):* 29.1 tok/s
+- *Prompt throughput (raw):* 2,159 tok/s
+- *Generation throughput (raw):* 31.4 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
@@ -1621,18 +1551,18 @@ Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, 
 - *Maintainer status:* none
 - *Observations:* Title has 13 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.33s
-- *Generation time:* 4.53s
-- *Total time:* 6.22s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00135
-- *First-token latency:* 0.954
-- *Cleanup time:* 0.0758
+- *Model load time:* 1.20s
+- *Generation time:* 4.35s
+- *Total time:* 5.91s
+- *Input validation time:* 0.355
+- *Prompt preparation time:* 0.00138
+- *First-token latency:* 0.684
+- *Cleanup time:* 0.084
 - *Prompt tokens:* 1,547
 - *Generation tokens:* 135
 - *Total tokens:* 1,682
-- *Prompt throughput (raw):* 1,621 tok/s
-- *Generation throughput (raw):* 52.5 tok/s
+- *Prompt throughput (raw):* 2,263 tok/s
+- *Generation throughput (raw):* 51.2 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
@@ -1694,18 +1624,18 @@ Keywords: Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, 
 - *Observations:* Title has 13 words (requested 5-10); Keyword list has 20
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.64s
-- *Generation time:* 72.56s
-- *Total time:* 73.56s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00337
-- *First-token latency:* 71.1
-- *Cleanup time:* 0.0796
+- *Model load time:* 0.55s
+- *Generation time:* 74.34s
+- *Total time:* 75.27s
+- *Input validation time:* 0.363
+- *Prompt preparation time:* 0.00408
+- *First-token latency:* 72.8
+- *Cleanup time:* 0.0948
 - *Prompt tokens:* 16,592
 - *Generation tokens:* 141
 - *Total tokens:* 16,733
-- *Prompt throughput (raw):* 233 tok/s
-- *Generation throughput (raw):* 219 tok/s
+- *Prompt throughput (raw):* 228 tok/s
+- *Generation throughput (raw):* 208 tok/s
 - *Peak memory:* 5.1
 - *Active memory:* 1.3
 - *Cache memory:* 0.86
@@ -1772,18 +1702,18 @@ Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip How
 - *Maintainer status:* none
 - *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.76s
-- *Generation time:* 18.44s
-- *Total time:* 19.57s
-- *Input validation time:* 0.353
-- *Prompt preparation time:* 0.000194
-- *First-token latency:* 16.2
-- *Cleanup time:* 0.0875
+- *Model load time:* 0.87s
+- *Generation time:* 21.77s
+- *Total time:* 23.04s
+- *Input validation time:* 0.395
+- *Prompt preparation time:* 0.000263
+- *First-token latency:* 19.4
+- *Cleanup time:* 0.085
 - *Prompt tokens:* 16,581
 - *Generation tokens:* 123
 - *Total tokens:* 16,704
-- *Prompt throughput (raw):* 1,024 tok/s
-- *Generation throughput (raw):* 90.3 tok/s
+- *Prompt throughput (raw):* 853 tok/s
+- *Generation throughput (raw):* 92.9 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -1845,17 +1775,17 @@ Keywords: Arundel, Cathedral, Church, England, Europe, Blue sky, Car, Red Car, R
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
 - *Model load time:* 0.67s
-- *Generation time:* 2.11s
-- *Total time:* 3.14s
-- *Input validation time:* 0.351
+- *Generation time:* 1.89s
+- *Total time:* 2.91s
+- *Input validation time:* 0.348
 - *Prompt preparation time:* 0.00188
-- *First-token latency:* 0.549
-- *Cleanup time:* 0.0732
+- *First-token latency:* 0.33
+- *Cleanup time:* 0.0773
 - *Prompt tokens:* 462
 - *Generation tokens:* 112
 - *Total tokens:* 574
-- *Prompt throughput (raw):* 842 tok/s
-- *Generation throughput (raw):* 130 tok/s
+- *Prompt throughput (raw):* 1,401 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.19
@@ -1909,21 +1839,22 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. 
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: england
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible; Duplicate
+  keywords: historic
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.29s
-- *Generation time:* 3.37s
-- *Total time:* 7.03s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.0204
-- *First-token latency:* 0.732
-- *Cleanup time:* 0.128
+- *Model load time:* 3.41s
+- *Generation time:* 2.76s
+- *Total time:* 6.56s
+- *Input validation time:* 0.364
+- *Prompt preparation time:* 0.0225
+- *First-token latency:* 0.361
+- *Cleanup time:* 0.134
 - *Prompt tokens:* 619
-- *Generation tokens:* 87
-- *Total tokens:* 706
-- *Prompt throughput (raw):* 846 tok/s
-- *Generation throughput (raw):* 45.5 tok/s
+- *Generation tokens:* 82
+- *Total tokens:* 701
+- *Prompt throughput (raw):* 1,716 tok/s
+- *Generation throughput (raw):* 48.8 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1949,9 +1880,9 @@ Keywords: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. 
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Arundel Cathedral over residential houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.
-Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, house, car, roof, brick, stone, sky, neighborhood, historic, religious, spire, urban
+&lt;channel|&gt;Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady &amp; St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban
 </pre>
 
 <details>
@@ -1959,9 +1890,79 @@ Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, ho
 
 ```text
 <|channel>thought
-<channel|>Title: Arundel Cathedral over residential houses in England
-Description: A view of the French-Gothic Arundel Cathedral of Our Lady & St Philip Howard towering over local neighborhood houses and a red car under a clear blue sky.
-Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, house, car, roof, brick, stone, sky, neighborhood, historic, religious, spire, urban
+<channel|>Title: Arundel Cathedral over Residential Houses in England
+Description: A view of the French-Gothic Arundel Cathedral of Our Lady & St Philip Howard rising over stone walls and residential buildings under a clear blue sky.
+Keywords: Arundel, Cathedral, England, Europe, Gothic, architecture, church, stone, neighborhood, red car, roof, sky, cottage, historic, historic, urban
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.26s
+- *Generation time:* 2.89s
+- *Total time:* 6.52s
+- *Input validation time:* 0.352
+- *Prompt preparation time:* 0.000306
+- *First-token latency:* 0.353
+- *Cleanup time:* 0.136
+- *Prompt tokens:* 619
+- *Generation tokens:* 84
+- *Total tokens:* 703
+- *Prompt throughput (raw):* 1,751 tok/s
+- *Generation throughput (raw):* 46.3 tok/s
+- *Peak memory:* 28
+- *Active memory:* 27
+- *Cache memory:* 0.01
+- *Model-load active memory:* 27.2
+- *Post-cleanup active memory:* 0.0103
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1378
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Arundel Cathedral of Our Lady &amp; St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|channel>thought
+<channel|>Title: Arundel Cathedral of Our Lady & St. Philip Howard
+Description: A view of the French-Gothic Arundel Cathedral rising over stone neighborhood cottages and a red parked car under a clear blue sky.
+Keywords: Arundel, Cathedral, Church, England, Europe, French-Gothic, red car, cottage, roof, blue sky, stone wall, architecture, neighborhood, parking, flowers
 ```
 
 </details>
@@ -1982,18 +1983,18 @@ Keywords: Arundel, Cathedral, England, England, Gothic, architecture, church, ho
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 2.02s
-- *Generation time:* 5.34s
-- *Total time:* 7.74s
-- *Input validation time:* 0.366
-- *Prompt preparation time:* 0.00445
-- *First-token latency:* 2.14
-- *Cleanup time:* 0.094
+- *Model load time:* 1.78s
+- *Generation time:* 5.53s
+- *Total time:* 7.70s
+- *Input validation time:* 0.37
+- *Prompt preparation time:* 0.00901
+- *First-token latency:* 2.23
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 3,149
 - *Generation tokens:* 106
 - *Total tokens:* 3,255
-- *Prompt throughput (raw):* 1,470 tok/s
-- *Generation throughput (raw):* 39.5 tok/s
+- *Prompt throughput (raw):* 1,415 tok/s
+- *Generation throughput (raw):* 38.1 tok/s
 - *Peak memory:* 16
 - *Active memory:* 13
 - *Cache memory:* 0.59
@@ -2063,18 +2064,18 @@ Arundel Cathedral, Our Lady & St. Philip Howard, Blue Sky, Red Car, Church, Cath
   text appears before the Title field; Response appears cut off at the token
   limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.72s
-- *Generation time:* 14.88s
-- *Total time:* 16.99s
-- *Input validation time:* 0.379
-- *Prompt preparation time:* 0.00675
-- *First-token latency:* 2.24
-- *Cleanup time:* 0.0891
+- *Model load time:* 1.62s
+- *Generation time:* 15.19s
+- *Total time:* 17.19s
+- *Input validation time:* 0.363
+- *Prompt preparation time:* 0.00676
+- *First-token latency:* 2.18
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 3,240
 - *Generation tokens:* 500
 - *Total tokens:* 3,740
-- *Prompt throughput (raw):* 1,447 tok/s
-- *Generation throughput (raw):* 41.2 tok/s
+- *Prompt throughput (raw):* 1,489 tok/s
+- *Generation throughput (raw):* 40.1 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.77
@@ -2127,18 +2128,18 @@ Description: 1-2 sentences factual, combine relevant context with main visible s
   Response appears cut off at the token limit; Internal reasoning block
   appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 10.99s
-- *Generation time:* 17.07s
-- *Total time:* 28.44s
-- *Input validation time:* 0.374
-- *Prompt preparation time:* 0.00833
-- *First-token latency:* 7.72
-- *Cleanup time:* 0.233
+- *Model load time:* 8.62s
+- *Generation time:* 15.38s
+- *Total time:* 24.52s
+- *Input validation time:* 0.508
+- *Prompt preparation time:* 0.00989
+- *First-token latency:* 5.26
+- *Cleanup time:* 0.227
 - *Prompt tokens:* 1,665
 - *Generation tokens:* 500
 - *Total tokens:* 2,165
-- *Prompt throughput (raw):* 216 tok/s
-- *Generation throughput (raw):* 58.7 tok/s
+- *Prompt throughput (raw):* 317 tok/s
+- *Generation throughput (raw):* 53.6 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.14
@@ -2190,21 +2191,21 @@ Here's the final list: Arundel, Arundel Cathedral, England, UK, Gothic architect
   before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.60s
-- *Generation time:* 2.47s
-- *Total time:* 3.43s
-- *Input validation time:* 0.356
-- *Prompt preparation time:* 0.00161
-- *First-token latency:* 0.889
-- *Cleanup time:* 0.0739
+- *Model load time:* 0.77s
+- *Generation time:* 2.00s
+- *Total time:* 3.21s
+- *Input validation time:* 0.433
+- *Prompt preparation time:* 0.00169
+- *First-token latency:* 0.101
+- *Cleanup time:* 0.0975
 - *Prompt tokens:* 368
 - *Generation tokens:* 131
 - *Total tokens:* 499
-- *Prompt throughput (raw):* 414 tok/s
-- *Generation throughput (raw):* 352 tok/s
-- *Peak memory:* 2.0
+- *Prompt throughput (raw):* 3,650 tok/s
+- *Generation throughput (raw):* 325 tok/s
+- *Peak memory:* 2.1
 - *Active memory:* 1.2
-- *Cache memory:* 0.03
+- *Cache memory:* 0.02
 - *Model-load active memory:* 1.25
 - *Post-cleanup active memory:* 0.00151
 - *Post-cleanup cache memory:* 0.0
@@ -2260,18 +2261,18 @@ Description: A photograph of the Arundel Cathedral of Our Lady and St. Philip Ho
   red car, blue sky, neighborhood, church, cottage, stone wall, flower,
   parking, car, cathedral
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.69s
-- *Generation time:* 18.45s
-- *Total time:* 20.49s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00175
-- *First-token latency:* 6.6
-- *Cleanup time:* 0.135
+- *Model load time:* 2.01s
+- *Generation time:* 22.47s
+- *Total time:* 24.91s
+- *Input validation time:* 0.41
+- *Prompt preparation time:* 0.00189
+- *First-token latency:* 9.27
+- *Cleanup time:* 0.134
 - *Prompt tokens:* 6,479
 - *Generation tokens:* 500
 - *Total tokens:* 6,979
-- *Prompt throughput (raw):* 982 tok/s
-- *Generation throughput (raw):* 44.2 tok/s
+- *Prompt throughput (raw):* 699 tok/s
+- *Generation throughput (raw):* 39.8 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.42
@@ -2363,18 +2364,18 @@ Wait, let's check the hints. The keyword hints include: Adobe Stock, Any Vision,
   fields; Extra text appears before the Title field; Response appears cut off
   at the token limit; Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.34s
-- *Generation time:* 113.80s
-- *Total time:* 117.51s
-- *Input validation time:* 0.37
-- *Prompt preparation time:* 0.00182
-- *First-token latency:* 3.59
-- *Cleanup time:* 0.158
+- *Model load time:* 3.33s
+- *Generation time:* 114.55s
+- *Total time:* 118.26s
+- *Input validation time:* 0.376
+- *Prompt preparation time:* 0.00181
+- *First-token latency:* 1.55
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 1,355
 - *Generation tokens:* 500
 - *Total tokens:* 1,855
-- *Prompt throughput (raw):* 377 tok/s
-- *Generation throughput (raw):* 4.57 tok/s
+- *Prompt throughput (raw):* 875 tok/s
+- *Generation throughput (raw):* 4.45 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.6
@@ -2442,18 +2443,18 @@ Keywords: Need 10-18 unique keywords. From the image: Arundel Cathedral, Our Lad
   terms (requested 10-18); Duplicate keywords: sunlight, historic, modern,
   parking, stonework, spires
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.62s
-- *Generation time:* 3.58s
-- *Total time:* 4.55s
-- *Input validation time:* 0.351
-- *Prompt preparation time:* 0.00334
-- *First-token latency:* 0.391
-- *Cleanup time:* 0.0687
+- *Model load time:* 0.59s
+- *Generation time:* 3.28s
+- *Total time:* 4.23s
+- *Input validation time:* 0.358
+- *Prompt preparation time:* 0.00397
+- *First-token latency:* 0.103
+- *Cleanup time:* 0.0737
 - *Prompt tokens:* 615
 - *Generation tokens:* 500
 - *Total tokens:* 1,115
-- *Prompt throughput (raw):* 1,571 tok/s
-- *Generation throughput (raw):* 181 tok/s
+- *Prompt throughput (raw):* 5,970 tok/s
+- *Generation throughput (raw):* 182 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.02
@@ -2517,18 +2518,18 @@ Keywords: Arundel Cathedral, French-Gothic architecture, Arundel, England, UK, G
   terms (requested 10-18); Duplicate keywords: st philip s church of our lady
   and st philip s church of our lady and st philip s
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.72s
-- *Generation time:* 28.63s
-- *Total time:* 30.71s
-- *Input validation time:* 0.35
-- *Prompt preparation time:* 0.00128
-- *First-token latency:* 2.04
-- *Cleanup time:* 0.0939
+- *Model load time:* 1.58s
+- *Generation time:* 29.33s
+- *Total time:* 31.29s
+- *Input validation time:* 0.367
+- *Prompt preparation time:* 0.00129
+- *First-token latency:* 1.8
+- *Cleanup time:* 0.0968
 - *Prompt tokens:* 333
 - *Generation tokens:* 500
 - *Total tokens:* 833
-- *Prompt throughput (raw):* 163 tok/s
-- *Generation throughput (raw):* 19.2 tok/s
+- *Prompt throughput (raw):* 185 tok/s
+- *Generation throughput (raw):* 18.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.69
@@ -2577,18 +2578,18 @@ Keywords: Arundel, Cathedral, Church, Church Architecture, Church Building, Chur
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.93s
-- *Generation time:* 2.11s
-- *Total time:* 3.41s
-- *Input validation time:* 0.355
-- *Prompt preparation time:* 0.00884
-- *First-token latency:* 1.29
-- *Cleanup time:* 0.0905
+- *Model load time:* 0.92s
+- *Generation time:* 1.09s
+- *Total time:* 2.38s
+- *Input validation time:* 0.357
+- *Prompt preparation time:* 0.00863
+- *First-token latency:* 0.257
+- *Cleanup time:* 0.0912
 - *Prompt tokens:* 965
 - *Generation tokens:* 40
 - *Total tokens:* 1,005
-- *Prompt throughput (raw):* 751 tok/s
-- *Generation throughput (raw):* 254 tok/s
+- *Prompt throughput (raw):* 3,753 tok/s
+- *Generation throughput (raw):* 256 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
@@ -2635,17 +2636,17 @@ Keywords: Arundel, cathedral, church, England, Europe, blue sky, red car, cottag
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
 - *Model load time:* 2.24s
-- *Generation time:* 28.27s
-- *Total time:* 30.88s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00532
-- *First-token latency:* 4.74
-- *Cleanup time:* 0.11
+- *Generation time:* 26.08s
+- *Total time:* 28.69s
+- *Input validation time:* 0.355
+- *Prompt preparation time:* 0.00477
+- *First-token latency:* 2.99
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 3,160
 - *Generation tokens:* 134
 - *Total tokens:* 3,294
-- *Prompt throughput (raw):* 667 tok/s
-- *Generation throughput (raw):* 5.92 tok/s
+- *Prompt throughput (raw):* 1,056 tok/s
+- *Generation throughput (raw):* 6.04 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
@@ -2708,18 +2709,18 @@ Arundel Cathedral, Arundel, England, Blue sky, Bush, Car, Cathedral, Church, Cot
   Response appears cut off at the token limit; Internal reasoning block
   appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.74s
-- *Generation time:* 23.00s
-- *Total time:* 24.13s
-- *Input validation time:* 0.363
-- *Prompt preparation time:* 0.0117
+- *Model load time:* 0.76s
+- *Generation time:* 22.90s
+- *Total time:* 24.02s
+- *Input validation time:* 0.348
+- *Prompt preparation time:* 0.0114
 - *First-token latency:* 16.6
-- *Cleanup time:* 0.123
+- *Cleanup time:* 0.0821
 - *Prompt tokens:* 16,583
 - *Generation tokens:* 500
 - *Total tokens:* 17,083
-- *Prompt throughput (raw):* 1,001 tok/s
-- *Generation throughput (raw):* 90.1 tok/s
+- *Prompt throughput (raw):* 999 tok/s
+- *Generation throughput (raw):* 92.1 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
@@ -2776,18 +2777,18 @@ Got it, let's tackle this step by step. First, the title. The context says it's 
   urban, architectural, landmark, cultural, scenic, picturesque, tranquil,
   serene, calm, quiet
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.18s
-- *Generation time:* 26.95s
-- *Total time:* 28.49s
-- *Input validation time:* 0.354
-- *Prompt preparation time:* 0.000241
-- *First-token latency:* 17.2
-- *Cleanup time:* 0.0961
+- *Model load time:* 1.29s
+- *Generation time:* 28.72s
+- *Total time:* 30.40s
+- *Input validation time:* 0.384
+- *Prompt preparation time:* 0.000303
+- *First-token latency:* 18.7
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 16,592
 - *Generation tokens:* 500
 - *Total tokens:* 17,092
-- *Prompt throughput (raw):* 965 tok/s
-- *Generation throughput (raw):* 55.9 tok/s
+- *Prompt throughput (raw):* 888 tok/s
+- *Generation throughput (raw):* 54.5 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.3
@@ -2848,18 +2849,18 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.26s
-- *Generation time:* 11.68s
-- *Total time:* 14.30s
-- *Input validation time:* 0.351
-- *Prompt preparation time:* 0.00277
-- *First-token latency:* 0.928
-- *Cleanup time:* 0.122
+- *Model load time:* 2.38s
+- *Generation time:* 11.69s
+- *Total time:* 14.44s
+- *Input validation time:* 0.358
+- *Prompt preparation time:* 0.00338
+- *First-token latency:* 0.393
+- *Cleanup time:* 0.127
 - *Prompt tokens:* 617
 - *Generation tokens:* 500
 - *Total tokens:* 1,117
-- *Prompt throughput (raw):* 665 tok/s
-- *Generation throughput (raw):* 48.8 tok/s
+- *Prompt throughput (raw):* 1,568 tok/s
+- *Generation throughput (raw):* 46.4 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.04
@@ -2914,18 +2915,18 @@ Keywords: Arundel, Arundel Cathedral, England, UK, Europe, Gothic architecture, 
   Title, Description; Extra text appears before the Title field; Response
   appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 0.95s
-- *Generation time:* 11.27s
-- *Total time:* 12.58s
-- *Input validation time:* 0.361
-- *Prompt preparation time:* 0.00155
-- *First-token latency:* 2.32
-- *Cleanup time:* 0.0864
+- *Model load time:* 0.97s
+- *Generation time:* 11.63s
+- *Total time:* 12.98s
+- *Input validation time:* 0.374
+- *Prompt preparation time:* 0.0016
+- *First-token latency:* 2.39
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 2,552
 - *Generation tokens:* 500
 - *Total tokens:* 3,052
-- *Prompt throughput (raw):* 1,102 tok/s
-- *Generation throughput (raw):* 60.8 tok/s
+- *Prompt throughput (raw):* 1,069 tok/s
+- *Generation throughput (raw):* 58.8 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.92
@@ -3043,19 +3044,19 @@ Keywords: [/car, church, cathedral, arundel, uk, europe, sky, roof, building, ar
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.71s
-- *Generation time:* 1.08s
-- *Total time:* 2.14s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00138
-- *First-token latency:* 0.278
-- *Cleanup time:* 0.0814
+- *Model load time:* 0.56s
+- *Generation time:* 0.94s
+- *Total time:* 1.86s
+- *Input validation time:* 0.36
+- *Prompt preparation time:* 0.00148
+- *First-token latency:* 0.0798
+- *Cleanup time:* 0.097
 - *Prompt tokens:* 364
 - *Generation tokens:* 77
 - *Total tokens:* 441
-- *Prompt throughput (raw):* 1,311 tok/s
-- *Generation throughput (raw):* 337 tok/s
-- *Peak memory:* 2.4
+- *Prompt throughput (raw):* 4,560 tok/s
+- *Generation throughput (raw):* 286 tok/s
+- *Peak memory:* 2.5
 - *Active memory:* 0.61
 - *Cache memory:* 0.30
 - *Model-load active memory:* 0.611
@@ -3112,18 +3113,18 @@ Description: A 10-minute description of the cathedral, including its location, t
   of only returning the requested fields; Response appears cut off at the
   token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.23s
-- *Generation time:* 14.55s
-- *Total time:* 16.15s
-- *Input validation time:* 0.358
-- *Prompt preparation time:* 0.000169
-- *First-token latency:* 1.23
-- *Cleanup time:* 0.193
+- *Model load time:* 1.35s
+- *Generation time:* 13.46s
+- *Total time:* 15.19s
+- *Input validation time:* 0.356
+- *Prompt preparation time:* 0.000176
+- *First-token latency:* 1.14
+- *Cleanup time:* 0.19
 - *Prompt tokens:* 4,444
 - *Generation tokens:* 500
 - *Total tokens:* 4,944
-- *Prompt throughput (raw):* 3,604 tok/s
-- *Generation throughput (raw):* 40.0 tok/s
+- *Prompt throughput (raw):* 3,894 tok/s
+- *Generation throughput (raw):* 43.4 tok/s
 - *Peak memory:* 4.4
 - *Active memory:* 1.7
 - *Cache memory:* 1.9
@@ -3206,11 +3207,11 @@ Description: A 10-minute description of the cathedral, including its location, t
   inkling)
 - *Model load time:* 0.23s
 - *Generation time:* -
-- *Total time:* 0.79s
-- *Input validation time:* 0.555
+- *Total time:* 0.60s
+- *Input validation time:* 0.369
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.069
+- *Cleanup time:* 0.0725
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3240,10 +3241,10 @@ Description: A 10-minute description of the cathedral, including its location, t
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11958, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11435, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11454, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3253,7 +3254,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 750, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 756, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -3639,7 +3640,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12388, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12407, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3650,7 +3651,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -4025,12 +4026,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3352.02it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3382.40it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:49] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:09:55] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 </details>
