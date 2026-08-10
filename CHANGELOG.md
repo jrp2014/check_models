@@ -7,6 +7,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Single-source the two structurally drift-prone vocabularies: thinking
+  delimiter pairs become a `ThinkingDelimiterPair` table carrying an explicit
+  `reports_when_empty` policy flag (regexes, the legacy pair tuple,
+  `DEFAULT_THINKING_END_MARKER`, and the empty-wrapper leakage branch all
+  derive from it; the policy is pinned by test), and failure phases gain a
+  `FailurePhaseName` Literal typing `PhaseTimer`, exception phase tags, and
+  preflight raisers, with a complete human-label map asserted against the
+  vocabulary. A misspelled phase or an unclassified new delimiter pair is now
+  a type/test error instead of a silent misclassification.
 - Add a sync-guard test pack so single facts can no longer drift silently
   across files: hook types single-sourced from `install_precommit_hook.py`
   and asserted against `.pre-commit-config.yaml`; the stub package list

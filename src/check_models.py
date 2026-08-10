@@ -94,6 +94,7 @@ from typing import (
     ClassVar,
     Final,
     Literal,
+    NamedTuple,
     NoReturn,
     NotRequired,
     Protocol,
@@ -259,20 +260,42 @@ DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
-DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
-CHANNEL_THINKING_DELIMITER_PAIR: Final[tuple[str, str]] = ("<|channel>thought", "<channel|>")
-EMPTY_CHANNEL_THINKING_RE: Final[re.Pattern[str]] = re.compile(
-    rf"{re.escape(CHANNEL_THINKING_DELIMITER_PAIR[0])}\s*"
-    rf"{re.escape(CHANNEL_THINKING_DELIMITER_PAIR[1])}",
-    re.IGNORECASE,
-)
-THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = (
-    ("<think>", "</think>"),
-    ("◁think▷", "◁/think▷"),
+
+
+class ThinkingDelimiterPair(NamedTuple):
+    """One recognised thinking-trace wrapper and its empty-wrapper policy.
+
+    ``reports_when_empty`` decides what an *empty* generated wrapper means:
+    ``False`` for pairs that chat templates legitimately seed when thinking is
+    disabled (flagging them would false-positive every non-thinking run), and
+    ``True`` for transport syntax that has no business in final text, where an
+    empty wrapper is still unconsumed control-token leakage. Every pair added
+    here must choose explicitly; the policy is asserted in tests.
+    """
+
+    start: str
+    end: str
+    reports_when_empty: bool = False
+
+
+THINKING_TRACE_DELIMITERS: Final[tuple[ThinkingDelimiterPair, ...]] = (
+    ThinkingDelimiterPair("<think>", "</think>"),
+    ThinkingDelimiterPair("◁think▷", "◁/think▷"),
     # Marker pairs recognised by mlx-vlm's server-side thinking splitter
     # (mlx_vlm/server/responses_state.py ThinkingStreamState defaults).
-    CHANNEL_THINKING_DELIMITER_PAIR,
-    ("<|START_THINKING|>", "<|END_THINKING|>"),
+    ThinkingDelimiterPair("<|channel>thought", "<channel|>", reports_when_empty=True),
+    ThinkingDelimiterPair("<|START_THINKING|>", "<|END_THINKING|>"),
+)
+DEFAULT_THINKING_END_MARKER: Final[str] = THINKING_TRACE_DELIMITERS[0].end
+THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = tuple(
+    (pair.start, pair.end) for pair in THINKING_TRACE_DELIMITERS
+)
+_REPORTING_EMPTY_WRAPPER_PATTERNS: Final[
+    tuple[tuple[ThinkingDelimiterPair, re.Pattern[str]], ...]
+] = tuple(
+    (pair, re.compile(rf"{re.escape(pair.start)}\s*{re.escape(pair.end)}", re.IGNORECASE))
+    for pair in THINKING_TRACE_DELIMITERS
+    if pair.reports_when_empty
 )
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 # Artifact schema versions. Three distinct schemas; writers and readers must
@@ -1200,6 +1223,22 @@ type RuntimePhaseName = Literal[
     "cleanup",
 ]
 
+# The failure/timer phase vocabulary. Producers (PhaseTimer, exception phase
+# tags, preflight raisers) are typed against this so a misspelled phase is a
+# type error, not a silently unclassifiable failure.
+type FailurePhaseName = Literal[
+    "input_validation",
+    "import",
+    "model_load",
+    "processor_load",
+    "tokenizer_load",
+    "model_preflight",
+    "prompt_prep",
+    "prefill",
+    "decode",
+    "cleanup",
+]
+
 
 class RuntimeAnalysisSummary(TypedDict):
     """Aggregated runtime interpretation shared across report renderers."""
@@ -1885,12 +1924,12 @@ class PhaseTimer:
         self._durations: dict[str, float] = {}
         self._start_times: dict[str, float] = {}
 
-    def start(self, phase: str) -> None:
+    def start(self, phase: FailurePhaseName) -> None:
         """Start timing a named phase if it is not already active."""
         if phase not in self._start_times:
             self._start_times[phase] = time.perf_counter()
 
-    def stop(self, phase: str) -> float | None:
+    def stop(self, phase: FailurePhaseName) -> float | None:
         """Stop timing a named phase and return the elapsed time."""
         start_time = self._start_times.pop(phase, None)
         if start_time is None:
@@ -1900,7 +1939,7 @@ class PhaseTimer:
         return elapsed
 
     @contextmanager
-    def track(self, phase: str) -> Generator[None]:
+    def track(self, phase: FailurePhaseName) -> Generator[None]:
         """Context manager that records elapsed time for a named phase."""
         self.start(phase)
         try:
@@ -1908,7 +1947,7 @@ class PhaseTimer:
         finally:
             self.stop(phase)
 
-    def duration(self, phase: str) -> float | None:
+    def duration(self, phase: FailurePhaseName) -> float | None:
         """Return the accumulated duration for a phase, if available."""
         duration = self._durations.get(phase)
         if duration is None:
@@ -4036,7 +4075,7 @@ SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     (r"# SOLUTION", "# SOLUTION"),
     (r"\[INST\]", "[INST]"),
     (r"\[/INST\]", "[/INST]"),
-    (r"</think>", "</think>"),
+    (re.escape(DEFAULT_THINKING_END_MARKER), DEFAULT_THINKING_END_MARKER),
     (r"\[PAD\]", "[PAD]"),
     (r"\[CLS\]", "[CLS]"),
     (r"\[SEP\]", "[SEP]"),
@@ -4330,21 +4369,25 @@ def analyze_generation_text(
     _has_special_tokens, unexpected_special_tokens = _detect_special_token_leakage(
         _strip_empty_thinking_wrappers(leakage_text),
     )
-    # An empty generated channel is still unconsumed transport syntax. Keep it
-    # out of structural parsing, but retain both markers as integration evidence.
-    empty_channel_markers = (
-        CHANNEL_THINKING_DELIMITER_PAIR if EMPTY_CHANNEL_THINKING_RE.search(text) else ()
+    # An empty generated wrapper from a reports_when_empty pair is still
+    # unconsumed transport syntax. Keep it out of structural parsing, but
+    # retain both markers as integration evidence.
+    empty_reported_markers = tuple(
+        marker
+        for pair, empty_wrapper_re in _REPORTING_EMPTY_WRAPPER_PATTERNS
+        if empty_wrapper_re.search(text)
+        for marker in (pair.start, pair.end)
     )
-    unexpected_special_tokens.extend(empty_channel_markers)
+    unexpected_special_tokens.extend(empty_reported_markers)
     if prompt_signals.has_thinking_trace:
         # A legitimate detected trace neutralises its own delimiters, including
         # <|...|>-style pairs where the generic control-token regex captures
         # only a prefix of the marker (e.g. "<|channel>" of "<|channel>thought").
-        thinking_markers = {"</think>", *prompt_signals.thinking_trace_markers}
+        thinking_markers = {DEFAULT_THINKING_END_MARKER, *prompt_signals.thinking_trace_markers}
         unexpected_special_tokens = [
             wrapper
             for wrapper in unexpected_special_tokens
-            if wrapper in empty_channel_markers
+            if wrapper in empty_reported_markers
             or not any(wrapper in marker for marker in thinking_markers)
         ]
     unexpected_special_tokens = _dedupe_preserve_order(unexpected_special_tokens)
@@ -11035,14 +11078,40 @@ _PACKAGE_CODE_MAP: Final[dict[str, str]] = {
 }
 
 
-def _normalise_failure_phase(phase: str | None) -> str | None:
-    """Return a normalized failure phase label or ``None`` when unavailable."""
+_FAILURE_PHASE_VALUES: Final[frozenset[str]] = _literal_values(FailurePhaseName)
+# Human labels for every failure phase (completeness asserted in tests).
+_FAILURE_PHASE_HUMAN_LABELS: Final[dict[FailurePhaseName, str]] = {
+    "input_validation": "input validation",
+    "import": "dependency import",
+    "model_load": "model loading",
+    "processor_load": "processor loading",
+    "tokenizer_load": "tokenizer loading",
+    "model_preflight": "model preflight",
+    "prompt_prep": "prompt templating",
+    "prefill": "prompt preparation",
+    "decode": "generation",
+    "cleanup": "cleanup",
+}
+
+
+def _failure_phase_human_label(phase: str | None) -> str:
+    """Return the canonical human label for a phase, tolerating foreign data."""
+    if phase in _FAILURE_PHASE_VALUES:
+        return _FAILURE_PHASE_HUMAN_LABELS[cast("FailurePhaseName", phase)]
+    return (phase or "execution").replace("_", " ")
+
+
+def _normalise_failure_phase(phase: str | None) -> FailurePhaseName | None:
+    """Return the canonical failure phase, or ``None`` for unknown labels."""
     if phase is None:
         return None
-    return phase.strip().lower().replace("-", "_")
+    normalized = phase.strip().lower().replace("-", "_")
+    if normalized in _FAILURE_PHASE_VALUES:
+        return cast("FailurePhaseName", normalized)
+    return None
 
 
-def _tag_exception_failure_phase[E: BaseException](error: E, phase: str) -> E:
+def _tag_exception_failure_phase[E: BaseException](error: E, phase: FailurePhaseName) -> E:
     """Annotate an exception with the current failing phase."""
     normalized = _normalise_failure_phase(phase)
     if normalized is not None:
@@ -11070,7 +11139,7 @@ def _extract_failure_phase(
     error: BaseException,
     *,
     fallback: str | None = None,
-) -> str | None:
+) -> FailurePhaseName | None:
     """Extract the first known failure phase from an exception chain."""
     cur: BaseException | None = error
     while cur is not None:
@@ -11618,7 +11687,7 @@ def _get_config_value(config: object | None, key: str) -> object | None:
     return getattr(config, key, None)
 
 
-def _raise_preflight_error(message: str, *, phase: str) -> NoReturn:
+def _raise_preflight_error(message: str, *, phase: FailurePhaseName) -> NoReturn:
     """Raise a preflight ValueError annotated with the failing phase."""
     raise _tag_exception_failure_phase(ValueError(message), phase)
 
@@ -16127,13 +16196,7 @@ def _run_issue_summary_observed_result(result: JsonlResultRecord) -> str:
     if failure is None:
         return "No assessment evidence was captured"
     phase = failure.get("phase")
-    phase_label = {
-        "model_load": "model loading",
-        "processor_load": "processor loading",
-        "tokenizer_load": "tokenizer loading",
-        "prefill": "prompt preparation",
-        "decode": "generation",
-    }.get(phase or "", (phase or "execution").replace("_", " "))
+    phase_label = _failure_phase_human_label(phase)
     message = failure.get("message") or ""
     if "connection reset" in message.casefold():
         return f"Network connection reset during {phase_label}"

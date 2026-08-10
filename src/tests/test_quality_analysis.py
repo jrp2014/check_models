@@ -1032,3 +1032,39 @@ def test_result_assessment_execution_statuses(
     )
 
     assert check_models._assess_result(result).execution == expected
+
+
+def test_empty_wrapper_reporting_policy_is_explicit_per_pair() -> None:
+    """Every delimiter pair must carry an explicit empty-wrapper policy.
+
+    Template-seeded pairs stay neutral when empty; channel transport syntax
+    reports as control-token leakage. A new pair must opt in deliberately.
+    """
+    reporting = [
+        (pair.start, pair.end)
+        for pair in check_models.THINKING_TRACE_DELIMITERS
+        if pair.reports_when_empty
+    ]
+    assert reporting == [("<|channel>thought", "<channel|>")]
+    # The legacy pair table and default end marker stay derived, not re-spelled.
+    assert (
+        tuple((pair.start, pair.end) for pair in check_models.THINKING_TRACE_DELIMITERS)
+        == check_models.THINKING_TRACE_DELIMITER_PAIRS
+    )
+    assert check_models.THINKING_TRACE_DELIMITERS[0].end == check_models.DEFAULT_THINKING_END_MARKER
+    leak_labels = {label for _, label in check_models.SPECIAL_TOKEN_LEAK_PATTERNS}
+    assert check_models.DEFAULT_THINKING_END_MARKER in leak_labels
+
+
+def test_failure_phase_labels_cover_the_full_vocabulary() -> None:
+    """Every FailurePhaseName renders a deliberate human label."""
+    phase_values = check_models._literal_values(check_models.FailurePhaseName)
+    assert set(check_models._FAILURE_PHASE_HUMAN_LABELS) == phase_values
+    assert phase_values == check_models._FAILURE_PHASE_VALUES
+    # Runtime-attribution phases overlap the failure vocabulary only on the
+    # phases both track; the two extra runtime keys are synthetic splits.
+    runtime_values = check_models._literal_values(check_models.RuntimePhaseName)
+    assert runtime_values - phase_values == {
+        "upstream_prefill_first_token",
+        "input_preparation_and_decode",
+    }
