@@ -2852,6 +2852,10 @@ class ProcessImageParams:
     kv_quant_scheme: Literal["uniform", "turboquant"]
     kv_group_size: int
     quantized_kv_start: int
+    kv_key_bits: float | None = None
+    kv_value_bits: float | None = None
+    kv_key_scheme: Literal["uniform", "turboquant"] | None = None
+    kv_value_scheme: Literal["uniform", "turboquant"] | None = None
     seed: int | None = None
     presence_penalty: float | None = None
     presence_context_size: int = DEFAULT_PENALTY_CONTEXT_SIZE
@@ -5094,6 +5098,10 @@ _SENT_GENERATE_KEYWORDS: Final[tuple[str, ...]] = (
     "quantized_kv_start",
     "max_tokens",
     # Conditionally sent by _build_generate_extra_kwargs
+    "kv_key_bits",
+    "kv_value_bits",
+    "kv_key_scheme",
+    "kv_value_scheme",
     "min_p",
     "top_k",
     "prefill_step_size",
@@ -10367,11 +10375,27 @@ def validate_sampling_params(
         raise ValueError(msg)
 
 
+def _validate_kv_bits_increments(name: str, bits: float) -> None:
+    """Validate a KV bit-width is >= 1 in integer or .5 increments."""
+    if bits < 1:
+        msg = f"{name} must be >= 1 if specified, got {bits:g}"
+        raise ValueError(msg)
+
+    rounded_half = round(bits * 2) / 2
+    if not math.isclose(bits, rounded_half, abs_tol=1e-6):
+        msg = f"{name} must be an integer or .5 increment if specified, got {bits:g}"
+        raise ValueError(msg)
+
+
 def validate_kv_params(
     *,  # Force all parameters to be keyword-only for clarity
     max_kv_size: int | None,
     kv_bits: float | None,
     kv_quant_scheme: Literal["uniform", "turboquant"] = DEFAULT_KV_QUANT_SCHEME,
+    kv_key_bits: float | None = None,
+    kv_value_bits: float | None = None,
+    kv_key_scheme: Literal["uniform", "turboquant"] | None = None,
+    kv_value_scheme: Literal["uniform", "turboquant"] | None = None,
 ) -> None:
     """Validate KV cache parameters are within acceptable ranges."""
     if max_kv_size is not None and max_kv_size <= 0:
@@ -10379,16 +10403,24 @@ def validate_kv_params(
         raise ValueError(msg)
 
     if kv_bits is None:
+        # Upstream from_legacy() silently ignores per-tensor overrides when
+        # kv_bits is unset, so fail fast instead of running a no-op config.
+        set_overrides = [
+            name
+            for name, value in (
+                ("kv_key_bits", kv_key_bits),
+                ("kv_value_bits", kv_value_bits),
+                ("kv_key_scheme", kv_key_scheme),
+                ("kv_value_scheme", kv_value_scheme),
+            )
+            if value is not None
+        ]
+        if set_overrides:
+            msg = f"per-tensor KV overrides require kv_bits: {', '.join(set_overrides)}"
+            raise ValueError(msg)
         return
 
-    rounded_half = round(kv_bits * 2) / 2
-    if kv_bits < 1:
-        msg = f"kv_bits must be >= 1 if specified, got {kv_bits:g}"
-        raise ValueError(msg)
-
-    if not math.isclose(kv_bits, rounded_half, abs_tol=1e-6):
-        msg = f"kv_bits must be an integer or .5 increment if specified, got {kv_bits:g}"
-        raise ValueError(msg)
+    _validate_kv_bits_increments("kv_bits", kv_bits)
 
     is_integer_bits = math.isclose(kv_bits, round(kv_bits), abs_tol=1e-6)
     if kv_quant_scheme == "uniform" and is_integer_bits:
@@ -10397,6 +10429,25 @@ def validate_kv_params(
             msg = (
                 f"uniform kv_bits must be one of 2, 3, 4, 5, 6, or 8 if specified, got {kv_bits:g}"
             )
+            raise ValueError(msg)
+
+    # Fractional kv_bits switches the upstream base scheme to TurboQuant;
+    # per-tensor schemes default to that base when not set explicitly.
+    base_scheme = (
+        "turboquant" if kv_quant_scheme == "turboquant" or not is_integer_bits else "uniform"
+    )
+    for name, bits, scheme in (
+        ("kv_key_bits", kv_key_bits, kv_key_scheme),
+        ("kv_value_bits", kv_value_bits, kv_value_scheme),
+    ):
+        if bits is None:
+            continue
+        _validate_kv_bits_increments(name, bits)
+        effective_scheme = scheme if scheme is not None else base_scheme
+        if effective_scheme == "uniform" and (
+            not math.isclose(bits, round(bits), abs_tol=1e-6) or round(bits) not in UNIFORM_KV_BITS
+        ):
+            msg = f"uniform {name} must be one of 2, 3, 4, 5, 6, or 8 if specified, got {bits:g}"
             raise ValueError(msg)
 
 
@@ -10409,7 +10460,11 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "image",
         "kv_bits",
         "kv_group_size",
+        "kv_key_bits",
+        "kv_key_scheme",
         "kv_quant_scheme",
+        "kv_value_bits",
+        "kv_value_scheme",
         "logit_bias",
         "max_kv_size",
         "max_tokens",
@@ -10594,6 +10649,10 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
         max_kv_size=args.max_kv_size,
         kv_bits=args.kv_bits,
         kv_quant_scheme=args.kv_quant_scheme,
+        kv_key_bits=getattr(args, "kv_key_bits", None),
+        kv_value_bits=getattr(args, "kv_value_bits", None),
+        kv_key_scheme=getattr(args, "kv_key_scheme", None),
+        kv_value_scheme=getattr(args, "kv_value_scheme", None),
     )
 
     args.resize_shape = _normalize_resize_shape(getattr(args, "resize_shape", None))
@@ -10624,6 +10683,19 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
         extra_kwargs["resize_shape"] = params.resize_shape
     if params.eos_tokens is not None:
         extra_kwargs["eos_tokens"] = list(params.eos_tokens)
+    # Per-tensor KV fields are merged through a cast because PyPI mlx-vlm
+    # releases before per-tensor KV quantization lack these GenerateKwargs
+    # keys, and CI type-checks against release stubs.
+    per_tensor_kv_kwargs: dict[str, float | str] = {}
+    if params.kv_key_bits is not None:
+        per_tensor_kv_kwargs["kv_key_bits"] = params.kv_key_bits
+    if params.kv_value_bits is not None:
+        per_tensor_kv_kwargs["kv_value_bits"] = params.kv_value_bits
+    if params.kv_key_scheme is not None:
+        per_tensor_kv_kwargs["kv_key_scheme"] = params.kv_key_scheme
+    if params.kv_value_scheme is not None:
+        per_tensor_kv_kwargs["kv_value_scheme"] = params.kv_value_scheme
+    extra_kwargs.update(cast("GenerateKwargs", per_tensor_kv_kwargs))
     if params.skip_special_tokens:
         extra_kwargs["skip_special_tokens"] = True
     if params.enable_thinking:
@@ -14268,6 +14340,10 @@ def process_models(
             kv_quant_scheme=args.kv_quant_scheme,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
+            kv_key_bits=args.kv_key_bits,
+            kv_value_bits=args.kv_value_bits,
+            kv_key_scheme=args.kv_key_scheme,
+            kv_value_scheme=args.kv_value_scheme,
             force_download=args.force_download,
             quantize_activations=args.quantize_activations,
             revision=args.revision,
@@ -16830,6 +16906,26 @@ def _build_native_mlx_vlm_cli_tokens(
     _append_native_cli_optional_pair(tokens, "--kv-bits", getattr(run_args, "kv_bits", None))
     _append_native_cli_optional_pair(
         tokens,
+        "--kv-key-bits",
+        getattr(run_args, "kv_key_bits", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--kv-value-bits",
+        getattr(run_args, "kv_value_bits", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--kv-key-scheme",
+        getattr(run_args, "kv_key_scheme", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--kv-value-scheme",
+        getattr(run_args, "kv_value_scheme", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
         "--presence-penalty",
         getattr(run_args, "presence_penalty", None),
     )
@@ -17664,6 +17760,16 @@ def _run_differential_reruns(
                 "quantized_kv_start",
                 DEFAULT_QUANTIZED_KV_START,
             ),
+            kv_key_bits=getattr(args, "kv_key_bits", None),
+            kv_value_bits=getattr(args, "kv_value_bits", None),
+            kv_key_scheme=cast(
+                'Literal["uniform", "turboquant"] | None',
+                getattr(args, "kv_key_scheme", None),
+            ),
+            kv_value_scheme=cast(
+                'Literal["uniform", "turboquant"] | None',
+                getattr(args, "kv_value_scheme", None),
+            ),
             force_download=getattr(args, "force_download", False),
             quantize_activations=getattr(args, "quantize_activations", False),
         )
@@ -18487,6 +18593,36 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
             "KV cache quantization backend. Default: uniform. "
             "Use turboquant to match upstream TurboQuant cache handling."
         ),
+    )
+    runtime_group.add_argument(
+        "--kv-key-bits",
+        type=float,
+        default=None,
+        help=(
+            "Override the KV cache key bit-width per tensor (requires --kv-bits; "
+            "TurboQuant defaults to floor(--kv-bits))."
+        ),
+    )
+    runtime_group.add_argument(
+        "--kv-value-bits",
+        type=float,
+        default=None,
+        help=(
+            "Override the KV cache value bit-width per tensor (requires --kv-bits; "
+            "TurboQuant defaults to ceil(--kv-bits))."
+        ),
+    )
+    runtime_group.add_argument(
+        "--kv-key-scheme",
+        choices=["uniform", "turboquant"],
+        default=None,
+        help="Override the KV quantization backend for keys only (requires --kv-bits).",
+    )
+    runtime_group.add_argument(
+        "--kv-value-scheme",
+        choices=["uniform", "turboquant"],
+        default=None,
+        help="Override the KV quantization backend for values only (requires --kv-bits).",
     )
     runtime_group.add_argument(
         "-g",
