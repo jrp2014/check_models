@@ -209,6 +209,10 @@ Notable changes to this project will be documented in this file.
   parent-repo ignore files or future Pyrefly discovery heuristics, and
   gitignore semantics come from git itself rather than hand-mirrored
   excludes. A sync-guard test pins the single-file-mode invocation.
+- The commit hygiene hook no longer crashes on a commit that stages
+  `src/pyproject.toml` without any Markdown files: the README-sync path
+  expanded the empty `markdown_files` array unguarded, which macOS
+  bash 3.2 under `set -u` rejects as an unbound variable.
 
 ## [0.9.0] - 2026-08-08
 

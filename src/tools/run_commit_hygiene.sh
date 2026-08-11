@@ -58,12 +58,14 @@ if [ "$needs_readme_sync" -eq 1 ]; then
         "$QUALITY_PYTHON" -m tools.update_readme_deps
     )
     git add src/README.md
-    for markdown_file in "${markdown_files[@]}"; do
-        if [ "$markdown_file" = "src/README.md" ]; then
-            readme_already_tracked=1
-            break
-        fi
-    done
+    if [ "${#markdown_files[@]}" -gt 0 ]; then
+        for markdown_file in "${markdown_files[@]}"; do
+            if [ "$markdown_file" = "src/README.md" ]; then
+                readme_already_tracked=1
+                break
+            fi
+        done
+    fi
     if [ "$readme_already_tracked" -eq 0 ]; then
         markdown_files+=("src/README.md")
     fi
