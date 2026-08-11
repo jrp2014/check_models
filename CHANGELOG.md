@@ -5,13 +5,16 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.9.1] - 2026-08-11
-
 ### Changed
 
 - Update the development-time nanobind stub generator to 2.14.0 after verifying
   that it emits byte-identical `mlx.core` stubs against the current MLX build;
   MLX's separate build-time nanobind pin remains unchanged.
+
+## [0.9.1] - 2026-08-11
+
+### Changed
+
 - Preserve every applicable inference setting in automatic differential reruns
   while overriding only the deliberately minimal triage prompt, token limit,
   temperature, timeout, and verbosity. Console preview and verbose modes now
