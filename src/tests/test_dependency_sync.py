@@ -1882,6 +1882,66 @@ def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
     assert "Pyrefly emitted warnings; treat warnings as quality failures." in result.stdout
 
 
+@pytest.mark.subprocess
+def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
+    tmp_path: Path,
+) -> None:
+    """The generated Pyrefly config must not inherit parent-repo ignore files.
+
+    Linked worktrees (for example .claude/worktrees/*) sit under a hidden
+    directory that the parent repo's .git/info/exclude ignores, so project
+    discovery finds zero files unless the generated config disables ignore-file
+    collection and Pyrefly's hidden-directory exclude heuristic, restoring the
+    dropped default excludes explicitly.
+    """
+    config_path = tmp_path / "pyrefly-generated.toml"
+    run_script = tmp_path / "write_pyrefly_config.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            cd \"{PKG_ROOT}\"
+            source tools/common_quality.sh
+            QUALITY_PYTHON=\"{sys.executable}\"
+            quality_write_pyrefly_config \"{config_path}\" \"{sys.executable}\"
+            """
+        ),
+        encoding="utf-8",
+    )
+    run_script.chmod(0o755)
+
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
+        ["/bin/bash", str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    generated = tomllib.loads(config_path.read_text(encoding="utf-8"))
+
+    assert generated["use-ignore-files"] is False
+    assert generated["disable-project-excludes-heuristics"] is True
+
+    project_excludes = generated["project-excludes"]
+    assert "**/src/tools/.archived/" in project_excludes, (
+        "pyproject-declared excludes must be preserved"
+    )
+    for restored_default in ("**/node_modules/", "**/__pycache__/", "**/.*/**"):
+        assert restored_default in project_excludes, (
+            f"disabled exclude heuristics must be restored explicitly: {restored_default}"
+        )
+
+    for entry in generated["search-path"]:
+        entry_path = Path(entry)
+        assert entry_path.is_absolute(), (
+            "search-path entries must be absolutized so worktrees resolve the "
+            f"primary checkout's stubs: {entry}"
+        )
+
+
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     """Local MLX builds should follow upstream's editable dev install guidance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

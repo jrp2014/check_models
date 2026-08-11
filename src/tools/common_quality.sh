@@ -248,9 +248,17 @@ quality_require_command() {
         local config_path="$1"
         local python_path="$2"
         local pyproject_path=""
+        local main_checkout_root=""
 
         pyproject_path="$(quality_src_root)/pyproject.toml"
-        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
+        # Linked worktrees (for example .claude/worktrees/*) share the primary
+        # checkout's gitignored assets such as typings/; resolve that root so
+        # relative search-path entries can fall back to it.
+        main_checkout_root="$(git -C "$(quality_src_root)" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || main_checkout_root=""
+        if [ -n "$main_checkout_root" ]; then
+            main_checkout_root="$(dirname "$main_checkout_root")"
+        fi
+        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" "$main_checkout_root" <<'PY'
 from __future__ import annotations
 
 import json
@@ -262,11 +270,60 @@ from typing import Any
 config_path = Path(sys.argv[1])
 python_path = Path(sys.argv[2]).resolve()
 pyproject_path = Path(sys.argv[3])
+main_checkout_root = Path(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[4] else None
 
 tool_config = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))["tool"]["pyrefly"]
 tool_config = dict(tool_config)
 tool_config.pop("conda-environment", None)
 tool_config["python-interpreter-path"] = str(python_path)
+
+# Project discovery must work from linked worktrees under hidden directories
+# (for example .claude/worktrees/*), where parent-repo ignore files such as
+# .git/info/exclude and Pyrefly's hidden-directory heuristic would otherwise
+# match the entire checkout and leave nothing to check.
+tool_config["use-ignore-files"] = False
+tool_config["disable-project-excludes-heuristics"] = True
+
+# Disabling the heuristics/ignore files drops Pyrefly's default excludes and
+# the gitignore-driven ones, so restore them explicitly to keep the gate as
+# strict as the primary checkout without scanning generated junk.
+explicit_excludes = [
+    "**/node_modules/",
+    "**/__pycache__/",
+    "**/venv/**/*",
+    "**/.*/**",
+    "**/build/",
+    "**/dist/",
+    "**/*.egg-info/",
+    "**/output/test*",
+]
+project_excludes = list(tool_config.get("project-excludes", []))
+project_excludes.extend(
+    pattern for pattern in explicit_excludes if pattern not in project_excludes
+)
+tool_config["project-excludes"] = project_excludes
+
+# Absolutize search-path entries; a relative entry missing from this checkout
+# (worktrees do not carry gitignored typings/) resolves against the primary
+# checkout instead so both use the same stub source.
+src_root = pyproject_path.parent.resolve()
+checkout_root = src_root.parent
+search_path_entries: list[str] = []
+for entry in tool_config.get("search-path", []):
+    entry_path = Path(entry)
+    resolved = entry_path if entry_path.is_absolute() else (src_root / entry_path).resolve()
+    if not resolved.exists() and main_checkout_root is not None:
+        try:
+            relative_to_checkout = resolved.relative_to(checkout_root)
+        except ValueError:
+            relative_to_checkout = None
+        if relative_to_checkout is not None:
+            fallback = main_checkout_root / relative_to_checkout
+            if fallback.exists():
+                resolved = fallback
+    search_path_entries.append(str(resolved))
+if search_path_entries:
+    tool_config["search-path"] = search_path_entries
 
 
 def format_toml(value: Any) -> str:

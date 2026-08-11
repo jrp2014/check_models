@@ -187,6 +187,20 @@ Notable changes to this project will be documented in this file.
   rule-set guard asserts the live constant values rather than exact source
   spelling.
 
+### Fixed
+
+- The Pyrefly quality gate now works from linked worktrees under hidden
+  directories (for example `.claude/worktrees/*`): the generated config
+  disables ignore-file collection (the parent repo's `.git/info/exclude`
+  ignores `.claude/worktrees/`, which made project discovery match zero
+  files) and Pyrefly's hidden-directory exclude heuristic, restoring the
+  dropped default excludes explicitly plus gitignore-parity ones
+  (`build/`, `dist/`, egg-info, `output/test*`) so the primary-checkout
+  gate covers the same files as before. Relative `search-path` entries
+  missing from the current checkout (worktrees do not carry the
+  gitignored `typings/`) now resolve against the primary checkout so both
+  consume the same stubs. Guarded by a sync test on the generated config.
+
 ## [0.9.0] - 2026-08-08
 
 ### Added
