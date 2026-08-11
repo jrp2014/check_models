@@ -159,6 +159,55 @@ class TestKVParamsValidation:
         validate_kv_params(max_kv_size=8192, kv_bits=8)
         validate_kv_params(max_kv_size=2048, kv_bits=3.5)
 
+    def test_valid_per_tensor_kv_overrides(self) -> None:
+        """Per-tensor KV overrides pass validation alongside a base kv_bits."""
+        validate_kv_params(max_kv_size=None, kv_bits=4, kv_key_bits=8, kv_value_bits=4)
+        # Fractional kv_bits implies a TurboQuant base, so .5 overrides are fine.
+        validate_kv_params(max_kv_size=None, kv_bits=3.5, kv_key_bits=3.5, kv_value_bits=4.5)
+        # An explicit turboquant per-tensor scheme lifts the uniform bit set.
+        validate_kv_params(
+            max_kv_size=None,
+            kv_bits=8,
+            kv_value_bits=3.5,
+            kv_value_scheme="turboquant",
+        )
+        # Scheme-only overrides are valid without per-tensor bit widths.
+        validate_kv_params(
+            max_kv_size=None,
+            kv_bits=8,
+            kv_key_scheme="turboquant",
+            kv_value_scheme="uniform",
+        )
+
+    def test_per_tensor_kv_overrides_require_kv_bits(self) -> None:
+        """Per-tensor overrides without kv_bits would be silent upstream no-ops."""
+        with pytest.raises(ValueError, match="require kv_bits: kv_key_bits"):
+            validate_kv_params(max_kv_size=None, kv_bits=None, kv_key_bits=8)
+
+        with pytest.raises(ValueError, match="require kv_bits: kv_value_scheme"):
+            validate_kv_params(max_kv_size=None, kv_bits=None, kv_value_scheme="turboquant")
+
+    def test_invalid_per_tensor_kv_bits_raise_error(self) -> None:
+        """Per-tensor bit widths follow the same range and increment rules."""
+        with pytest.raises(ValueError, match="kv_key_bits must be >= 1"):
+            validate_kv_params(max_kv_size=None, kv_bits=4, kv_key_bits=0.5)
+
+        with pytest.raises(ValueError, match=r"kv_value_bits must be an integer or \.5 increment"):
+            validate_kv_params(max_kv_size=None, kv_bits=4, kv_value_bits=3.25)
+
+        # Uniform base scheme restricts per-tensor bit widths to the mx.quantize set.
+        with pytest.raises(ValueError, match="uniform kv_key_bits must be one of"):
+            validate_kv_params(max_kv_size=None, kv_bits=4, kv_key_bits=16)
+
+        # An explicit uniform per-tensor scheme rejects fractional bit widths.
+        with pytest.raises(ValueError, match="uniform kv_value_bits must be one of"):
+            validate_kv_params(
+                max_kv_size=None,
+                kv_bits=3.5,
+                kv_value_bits=4.5,
+                kv_value_scheme="uniform",
+            )
+
 
 class TestCliArgumentNormalization:
     """Test CLI-only normalization and validation helpers."""
@@ -316,6 +365,46 @@ class TestCliArgumentNormalization:
         args = self._build_args(processor_kwargs={"presence_penalty": 0.5})
 
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
+    def test_reserved_per_tensor_kv_processor_kwarg_raises_error(self) -> None:
+        """Processor kwargs should not override the per-tensor KV override flags."""
+        args = self._build_args(processor_kwargs={"kv_key_bits": 8})
+
+        with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
+    def test_per_tensor_kv_flags_parse_and_validate(self) -> None:
+        """The per-tensor KV override flags should parse and pass CLI validation."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(
+            [
+                "--folder",
+                "test-folder",
+                "--kv-bits",
+                "8",
+                "--kv-key-bits",
+                "8",
+                "--kv-value-bits",
+                "3.5",
+                "--kv-value-scheme",
+                "turboquant",
+            ]
+        )
+
+        validate_cli_arguments(args)
+
+        assert args.kv_key_bits == 8.0
+        assert args.kv_value_bits == 3.5
+        assert args.kv_key_scheme is None
+        assert args.kv_value_scheme == "turboquant"
+
+    def test_per_tensor_kv_flags_without_kv_bits_raise(self) -> None:
+        """Per-tensor KV flags without --kv-bits should fail CLI validation."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(["--folder", "test-folder", "--kv-key-bits", "8"])
+
+        with pytest.raises(ValueError, match="require kv_bits"):
             validate_cli_arguments(args)
 
     def test_invalid_min_p_in_cli_args_raises_error(self) -> None:
@@ -661,3 +750,20 @@ def test_dry_run_setup_writes_no_log_or_environment_files(
     check_models.setup_environment(args)
     assert log_path.exists()
     assert env_path.exists()
+
+
+def test_per_tensor_kv_keywords_match_upstream_generate_kwargs() -> None:
+    """Per-tensor KV keywords we send must exist in the installed GenerateKwargs.
+
+    CI installs PyPI mlx-vlm releases, which may predate per-tensor KV cache
+    quantization, so skip (rather than fail) when the installed contract lacks
+    the keys.  Against a git-HEAD install this locks the forwarded names to the
+    upstream TypedDict spelling.
+    """
+    types_module = pytest.importorskip("mlx_vlm.generate.types")
+    annotations: dict[str, object] = getattr(types_module.GenerateKwargs, "__annotations__", {})
+    per_tensor_keys = {"kv_key_bits", "kv_value_bits", "kv_key_scheme", "kv_value_scheme"}
+    if not per_tensor_keys <= set(annotations):
+        pytest.skip("installed mlx-vlm predates per-tensor KV cache quantization")
+
+    assert per_tensor_keys <= set(check_models._SENT_GENERATE_KEYWORDS)

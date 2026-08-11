@@ -1224,6 +1224,10 @@ def test_sent_generate_keywords_mirror_the_kwargs_builders(test_image: Path) -> 
         thinking_budget=128,
         thinking_start_token="<think>",  # noqa: S106 - thinking delimiter, not a credential
         thinking_end_token="</think>",  # noqa: S106 - thinking delimiter, not a credential
+        kv_key_bits=8.0,
+        kv_value_bits=3.0,
+        kv_key_scheme="uniform",
+        kv_value_scheme="turboquant",
     )
 
     sent = check_models._build_generate_kwargs(

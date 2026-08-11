@@ -1895,6 +1895,10 @@ class TestRerunEvidence:
             kv_quant_scheme="turboquant",
             kv_group_size=32,
             quantized_kv_start=128,
+            kv_key_bits=8,
+            kv_value_bits=4,
+            kv_key_scheme="uniform",
+            kv_value_scheme="turboquant",
             force_download=True,
             quantize_activations=True,
             revision="model-revision",
@@ -1940,6 +1944,10 @@ class TestRerunEvidence:
         )
         assert params.revision == "model-revision"
         assert params.adapter_path == "adapter/path"
+        assert params.kv_key_bits == 8
+        assert params.kv_value_bits == 4
+        assert params.kv_key_scheme == "uniform"
+        assert params.kv_value_scheme == "turboquant"
         assert params.prefill_step_size == 512
         assert params.resize_shape == (64, 32)
         assert params.eos_tokens == ("<eos>",)

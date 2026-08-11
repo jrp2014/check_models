@@ -488,6 +488,10 @@ Vision-language models maintain a **key-value (KV) cache** during text generatio
 - `--max-kv-size <int>`: Maximum number of tokens to store in KV cache. Limits memory for very long sequences. Default: `None` (unlimited).
 - `--kv-bits <number>`: Quantize KV cache instead of using full precision (typically 16-bit). Uniform quantization supports `2`, `3`, `4`, `5`, `6`, or `8`; fractional values such as `3.5` use upstream TurboQuant automatically. Default: `None` (no quantization).
 - `--kv-quant-scheme <uniform|turboquant>`: Select the upstream KV quantization backend. Default: `uniform`.
+- `--kv-key-bits <number>`: Override the bit-width for cached keys only (requires `--kv-bits`; under TurboQuant defaults to `floor(--kv-bits)`). Default: `None`.
+- `--kv-value-bits <number>`: Override the bit-width for cached values only (requires `--kv-bits`; under TurboQuant defaults to `ceil(--kv-bits)`). Default: `None`.
+- `--kv-key-scheme <uniform|turboquant>`: Override the quantization backend for keys only (requires `--kv-bits`). Default: `None` (follow `--kv-quant-scheme`).
+- `--kv-value-scheme <uniform|turboquant>`: Override the quantization backend for values only (requires `--kv-bits`). Default: `None` (follow `--kv-quant-scheme`).
 - `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
 - `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `5000`.
 
@@ -503,6 +507,9 @@ python -m check_models --image photo.jpg --kv-bits 8
 
 # Match upstream TurboQuant KV-cache handling
 python -m check_models --image photo.jpg --kv-bits 3.5 --kv-quant-scheme turboquant
+
+# Per-tensor override: 8-bit keys, 3-bit TurboQuant values
+python -m check_models --image photo.jpg --kv-bits 8 --kv-value-bits 3 --kv-value-scheme turboquant
 
 # Aggressive 4-bit quantization with larger groups (4× compression)
 python -m check_models --image photo.jpg --kv-bits 4 --kv-group-size 128

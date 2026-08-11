@@ -5,6 +5,19 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Wire the per-tensor KV cache quantization controls added in upstream
+  mlx-vlm PR #1807 (`kv_key_bits`, `kv_value_bits`, `kv_key_scheme`,
+  `kv_value_scheme`): new `--kv-key-bits`/`--kv-value-bits`/
+  `--kv-key-scheme`/`--kv-value-scheme` CLI flags flow through
+  `ProcessImageParams` into `generate()` only when set (PyPI releases
+  predating the fields never receive them), are validated up front
+  (per-tensor overrides require `--kv-bits`; uniform-scheme bit widths stay
+  in the `mx.quantize` set), mirror into native-CLI issue repros, and are
+  documented in the README KV-cache reference. The upstream-contract test is
+  gated so it skips on PyPI installs that predate the fields.
+
 ### Changed
 
 - Update the development-time nanobind stub generator to 2.14.0 after verifying
