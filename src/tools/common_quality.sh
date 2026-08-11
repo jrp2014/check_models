@@ -353,6 +353,8 @@ PY
 
         if [ "$#" -eq 0 ]; then
             target_display="<project discovery>"
+        elif [ "$#" -gt 8 ]; then
+            target_display="$# explicit files (git ls-files enumeration)"
         else
             target_display="$*"
         fi
@@ -364,12 +366,37 @@ PY
         echo "[pyrefly] check targets: ${target_display}"
     }
 
+    # Explicit targets switch Pyrefly to single-file checking mode, which
+    # skips filesystem discovery entirely — so the gate's file set cannot be
+    # eaten by ignore files or future discovery heuristics, independent of the
+    # generated config neutralizing the known ones. git ls-files is the same
+    # authority the other gates align with and keeps gitignore semantics
+    # without hand-mirrored exclude globs.
+    quality_pyrefly_default_targets() {
+        git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard -- '*.py' '*.pyi' \
+            | LC_ALL=C sort -u \
+            | grep -v '^tools/\.archived/' || true
+    }
+
     quality_run_pyrefly_check() {
         local python_path=""
         local pyrefly_path=""
         local config_path=""
         local output_path=""
         local exit_code=0
+        local -a targets=("$@")
+
+        if [ "${#targets[@]}" -eq 0 ]; then
+            local src_root=""
+            src_root="$(quality_src_root)"
+            while IFS= read -r target; do
+                targets+=("$src_root/$target")
+            done < <(quality_pyrefly_default_targets)
+            if [ "${#targets[@]}" -eq 0 ]; then
+                echo "❌ Pyrefly target enumeration found no Python files (git ls-files returned nothing)." >&2
+                return 1
+            fi
+        fi
 
         python_path="$(quality_resolve_python_path)" || return 1
         pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
@@ -382,12 +409,12 @@ PY
             return 1
         fi
 
-        quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "$@"
+        quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "${targets[@]}"
         if "$pyrefly_path" check \
             -c "$config_path" \
             --min-severity warn \
             --output-format full-text \
-            "$@" 2>&1 | tee "$output_path"; then
+            "${targets[@]}" 2>&1 | tee "$output_path"; then
             exit_code=0
         else
             exit_code=$?

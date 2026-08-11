@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-08-11
+
 ### Changed
 
 - Preserve every applicable inference setting in automatic differential reruns
@@ -200,6 +202,13 @@ Notable changes to this project will be documented in this file.
   missing from the current checkout (worktrees do not carry the
   gitignored `typings/`) now resolve against the primary checkout so both
   consume the same stubs. Guarded by a sync test on the generated config.
+- As a second layer of the same defense, the gate now passes explicit file
+  targets (enumerated via `git ls-files`, minus `tools/.archived/`) instead
+  of relying on project discovery at all: single-file checking mode skips
+  filesystem discovery entirely, so the checked file set cannot be eaten by
+  parent-repo ignore files or future Pyrefly discovery heuristics, and
+  gitignore semantics come from git itself rather than hand-mirrored
+  excludes. A sync-guard test pins the single-file-mode invocation.
 
 ## [0.9.0] - 2026-08-08
 

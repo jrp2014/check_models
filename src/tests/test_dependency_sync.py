@@ -360,6 +360,26 @@ def test_ty_quality_check_resolves_gitignored_generated_stubs() -> None:
     assert 'check --no-respect-ignore-files --python "$python_path"' in common_quality
 
 
+def test_pyrefly_quality_check_passes_explicit_targets() -> None:
+    """Pyrefly must run in single-file mode, not project discovery.
+
+    Explicit targets enumerated via ``git ls-files`` bypass Pyrefly's
+    filesystem discovery entirely, so the gate's file set cannot be eaten by
+    parent-repo ignore files or future discovery heuristics. This is the
+    second layer of the worktree defense; the generated config additionally
+    neutralizes the known discovery pitfalls (see the companion generated-
+    config test).
+    """
+    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
+
+    assert "quality_pyrefly_default_targets" in common_quality
+    assert (
+        'git -C "$(quality_src_root)" ls-files --cached --others --exclude-standard'
+        in common_quality
+    )
+    assert '"${targets[@]}" 2>&1 | tee "$output_path"' in common_quality
+
+
 def test_type_checkers_use_repo_root_generated_typings() -> None:
     """All type checkers should resolve stubs generated at repo-root typings/."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
