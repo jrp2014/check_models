@@ -97,7 +97,7 @@ dev = [
     "pre-commit",
     "pip-audit>=2.7.0", # make audit
 
-    "nanobind==2.13.0",
+    "nanobind==2.14.0",
 ]
 
 [build-system]
