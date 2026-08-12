@@ -1863,6 +1863,43 @@ class PromptBurden:
     patch_count: int | None = None
 
 
+def _classify_prompt_burden(
+    *,
+    total: int | None,
+    text_est: int | None,
+    nontext_est: int | None,
+    ratio: float | None,
+    placeholders: int | None,
+) -> tuple[PromptBurdenKind, str | None]:
+    """Classify prompt burden from token components; returns (kind, reason)."""
+    if total is None:
+        return "unknown", "prompt_token_total_unavailable"
+    if text_est is None or nontext_est is None:
+        return "unavailable", "component_estimates_unavailable"
+    substantial = total >= QUALITY.long_prompt_tokens_threshold
+    if not substantial or ratio is None:
+        return "normal", None
+    if placeholders and ratio >= QUALITY.heavy_nontext_prompt_ratio:
+        return "visual_input", None
+    if text_est >= QUALITY.long_prompt_tokens_threshold:
+        return ("text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"), None
+    return "mixed", None
+
+
+def _merged_processed_dimensions(
+    diagnostics: PromptDiagnostics | None,
+    image_profile: ImageInputProfile | None,
+) -> tuple[int | None, int | None]:
+    """Prefer per-run processed dimensions, falling back to the image profile."""
+    width = (diagnostics.processed_image_width if diagnostics is not None else None) or (
+        image_profile.processed_width if image_profile is not None else None
+    )
+    height = (diagnostics.processed_image_height if diagnostics is not None else None) or (
+        image_profile.processed_height if image_profile is not None else None
+    )
+    return width, height
+
+
 def _prompt_burden_for_result(
     result: PerformanceResult,
     image_profile: ImageInputProfile | None,
@@ -1875,29 +1912,15 @@ def _prompt_burden_for_result(
     ratio = nontext_est / total if total and nontext_est is not None else None
     diagnostics = result.prompt_diagnostics
     placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
-    substantial = total is not None and total >= QUALITY.long_prompt_tokens_threshold
-    processed_width = (diagnostics.processed_image_width if diagnostics is not None else None) or (
-        image_profile.processed_width if image_profile is not None else None
-    )
-    processed_height = (
-        diagnostics.processed_image_height if diagnostics is not None else None
-    ) or (image_profile.processed_height if image_profile is not None else None)
+    processed_width, processed_height = _merged_processed_dimensions(diagnostics, image_profile)
 
-    reason: str | None = None
-    kind: PromptBurdenKind = "normal"
-    if total is None:
-        kind = "unknown"
-        reason = "prompt_token_total_unavailable"
-    elif text_est is None or nontext_est is None:
-        kind = "unavailable"
-        reason = "component_estimates_unavailable"
-    elif substantial and ratio is not None:
-        if placeholders and ratio >= QUALITY.heavy_nontext_prompt_ratio:
-            kind = "visual_input"
-        elif text_est is not None and text_est >= QUALITY.long_prompt_tokens_threshold:
-            kind = "text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"
-        else:
-            kind = "mixed"
+    kind, reason = _classify_prompt_burden(
+        total=total,
+        text_est=text_est,
+        nontext_est=nontext_est,
+        ratio=ratio,
+        placeholders=placeholders,
+    )
 
     return PromptBurden(
         kind=kind,
@@ -13386,13 +13409,21 @@ def _dump_environment_to_log(output_path: Path) -> None:
         # Use importlib.metadata (standard library) instead of subprocess calling pip/conda
         # to avoid S603 security lints and provide faster, more reliable dumping.
         try:
-            # Some environments can have incomplete distribution metadata missing .name
-            def _get_name(d: Distribution) -> str:
-                return getattr(d, "name", "") or ""
+            # Read Name/Version via metadata.get: a dist-info husk without a
+            # METADATA file has neither, and the .name/.version properties'
+            # implicit-None path emits DeprecationWarnings on Python 3.13.
+            def _get_name_version(d: Distribution) -> tuple[str, str]:
+                meta = d.metadata
+                if meta is None:
+                    return "<unknown>", "<unknown>"
+                return (
+                    meta.get("Name") or "<unknown>",
+                    meta.get("Version") or "<unknown>",
+                )
 
             dists = sorted(
-                distributions(),
-                key=lambda d: _get_name(d).lower(),
+                (_get_name_version(d) for d in distributions()),
+                key=lambda name_version: name_version[0].lower(),
             )
             env_lines.extend(
                 [
@@ -13401,7 +13432,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
                     "",
                 ]
             )
-            env_lines.extend(f"{d.name}=={d.version}" for d in dists)
+            env_lines.extend(f"{name}=={dist_version}" for name, dist_version in dists)
             env_lines.append("")
         except (OSError, ValueError, RuntimeError) as dist_err:
             env_lines.append(f"Could not gather package list: {dist_err}")

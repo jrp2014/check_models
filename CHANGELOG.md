@@ -38,6 +38,20 @@ Notable changes to this project will be documented in this file.
   constant is renamed `TRIAGE_PROMPT` (shared by the triage lane and
   differential reruns, which keep their tighter cap).
 
+### Fixed
+
+- Split `_prompt_burden_for_result` into a pure classifier
+  (`_classify_prompt_burden`) plus a processed-dimension merge helper,
+  clearing the Skylos SKY-Q301 cyclomatic-complexity advisory (28 over the
+  threshold of 24) without behavior change; a redundant re-check of
+  `text_est` inside an already-guarded branch was dropped.
+- The environment report's package dump reads distribution Name/Version via
+  `metadata.get` with an unknown-placeholder fallback, so a dist-info husk
+  with no `METADATA` file (for example a leftover from a partial uninstall)
+  no longer triggers Python 3.13 `importlib.metadata` DeprecationWarnings
+  in every test run that exercises the dump; broken distributions now render
+  as `<unknown>==<unknown>` instead of warning.
+
 ## [0.9.1] - 2026-08-11
 
 ### Changed
