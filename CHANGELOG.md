@@ -40,6 +40,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Harden `src/tools/update.sh` against mixed conda/pip metadata damage: before
+  upgrading its five core packaging tools, it now moves only malformed matching
+  `.dist-info` directories to a reported temporary quarantine. This recovers
+  from pip's `uninstall-no-record-file` failure without deleting metadata or
+  touching unrelated distributions.
 - Split `_prompt_burden_for_result` into a pure classifier
   (`_classify_prompt_burden`) plus a processed-dimension merge helper,
   clearing the Skylos SKY-Q301 cyclomatic-complexity advisory (28 over the

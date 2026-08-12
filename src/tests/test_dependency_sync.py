@@ -31,6 +31,7 @@ from tools import (
     filter_danger_report,
     generate_stubs,
     install_precommit_hook,
+    quarantine_broken_pip_metadata,
     safe_io,
     update_readme_deps,
     validate_env,
@@ -40,6 +41,25 @@ _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
 PKG_ROOT = _TEST_FILE.parents[1]
 REPO_ROOT = PKG_ROOT.parent
+
+
+def _write_pip_dist_info(
+    site_dir: Path,
+    distribution: str,
+    version: str,
+    *,
+    complete: bool,
+) -> Path:
+    metadata_dir = site_dir / f"{distribution}-{version}.dist-info"
+    metadata_dir.mkdir()
+    safe_io.write_text_no_follow(metadata_dir / "INSTALLER", "pip\n")
+    if complete:
+        safe_io.write_text_no_follow(
+            metadata_dir / "METADATA",
+            f"Name: {distribution}\nVersion: {version}\n",
+        )
+        safe_io.write_text_no_follow(metadata_dir / "RECORD", "")
+    return metadata_dir
 
 
 def _first_existing(paths: list[Path]) -> Path:
@@ -2029,6 +2049,89 @@ def test_update_script_cleans_stale_pip_invalid_distribution_backups() -> None:
     assert "path.is_symlink()" in update_script
     assert "Removed stale pip invalid-distribution backup" in update_script
     assert "CLEAN_PIP_INVALID_DISTS=0" in update_script
+
+
+def test_update_script_quarantines_broken_packaging_metadata_before_upgrade() -> None:
+    """The packaging-tool upgrade should preflight only its own metadata."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    helper_name = "quarantine_broken_pip_metadata.py"
+    install_command = 'pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly'
+
+    assert helper_name in update_script
+    helper_position = update_script.index(helper_name)
+    install_position = update_script.index(install_command)
+    preflight = update_script[helper_position:install_position]
+    assert "pip wheel setuptools build pyrefly" in " ".join(preflight.split())
+    assert helper_position < install_position
+
+
+def test_quarantine_broken_pip_metadata_moves_only_malformed_targets(
+    tmp_path: Path,
+) -> None:
+    """A stale wheel metadata husk should not mask its healthy replacement."""
+    quarantine = quarantine_broken_pip_metadata.quarantine_broken_metadata
+    site_dir = tmp_path / "site-packages"
+    site_dir.mkdir()
+    quarantine_parent = tmp_path / "quarantine"
+    quarantine_parent.mkdir()
+    stale_wheel = _write_pip_dist_info(site_dir, "wheel", "0.47.0", complete=False)
+    healthy_wheel = _write_pip_dist_info(site_dir, "wheel", "0.48.0", complete=True)
+    unrelated = _write_pip_dist_info(site_dir, "example", "1.0.0", complete=False)
+
+    moved = quarantine(
+        ["wheel"],
+        site_dirs=[site_dir],
+        quarantine_parent=quarantine_parent,
+    )
+
+    assert len(moved) == 1
+    source, destination = moved[0]
+    assert source == stale_wheel
+    assert not stale_wheel.exists()
+    assert healthy_wheel.is_dir()
+    assert unrelated.is_dir()
+    assert destination.is_dir()
+    assert (destination / "INSTALLER").read_text(encoding="utf-8") == "pip\n"
+    assert destination.is_relative_to(quarantine_parent)
+
+
+def test_quarantine_broken_pip_metadata_is_noop_for_healthy_target(
+    tmp_path: Path,
+) -> None:
+    """Healthy metadata should not create an empty quarantine directory."""
+    quarantine = quarantine_broken_pip_metadata.quarantine_broken_metadata
+    site_dir = tmp_path / "site-packages"
+    site_dir.mkdir()
+    quarantine_parent = tmp_path / "quarantine"
+    quarantine_parent.mkdir()
+    healthy_wheel = _write_pip_dist_info(site_dir, "wheel", "0.48.0", complete=True)
+
+    moved = quarantine(
+        ["wheel"],
+        site_dirs=[site_dir],
+        quarantine_parent=quarantine_parent,
+    )
+
+    assert moved == []
+    assert healthy_wheel.is_dir()
+    assert list(quarantine_parent.iterdir()) == []
+
+
+def test_quarantine_broken_pip_metadata_refuses_symlink(tmp_path: Path) -> None:
+    """Metadata quarantine must not follow a matching symlink."""
+    quarantine = quarantine_broken_pip_metadata.quarantine_broken_metadata
+    site_dir = tmp_path / "site-packages"
+    site_dir.mkdir()
+    target = tmp_path / "outside"
+    target.mkdir()
+    metadata_link = site_dir / "wheel-0.47.0.dist-info"
+    metadata_link.symlink_to(target, target_is_directory=True)
+
+    with pytest.raises(RuntimeError, match="refusing symlinked metadata directory"):
+        quarantine(["wheel"], site_dirs=[site_dir], quarantine_parent=tmp_path)
+
+    assert metadata_link.is_symlink()
+    assert target.is_dir()
 
 
 def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
