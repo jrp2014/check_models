@@ -1863,3 +1863,2323 @@ Prefill: 100%|#########9| 3139/3140 [00:04<00:00, 657.19tok/s]
 2026-08-12 22:31:07 BST - INFO - Processing Model [22/42]: mlx-community/Ornith-1.0-35B-bf16
 2026-08-12 22:31:07 BST - DEBUG - System: arm64, GPU: Apple M5 Max
 2026-08-12 22:31:07 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ornith-1.0-35B-bf16
+2026-08-12 22:32:41 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ornith-1.0-35B-bf16
+2026-08-12 22:32:41 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ornith-1.0-35B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Title: Boats and Seagulls at Bristol Harbour Marina
+
+Description: A sunny afternoon view of Bristol Harbour shows numerous leisure boats moored along the waterfront, with a large flock of seagulls floating on the calm water in the foreground. The scene includes the distinctive "Coyote Ugly Saloon" building and the historic Bristol Cathedral visible in the background skyline.
+
+Keywords: Bristol, Harbour, Marina, Boats, Seagulls, Gulls, Coyote Ugly, Cathedral, Cityscape, England, UK, Waterfront, Dock, Architecture, Leisure, Birds, Sunny, Skyline
+==========
+Prompt: 16576 tokens, 215.908 tokens-per-sec
+Generation: 124 tokens, 59.073 tokens-per-sec
+Peak memory: 74.111 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3386.49it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16576 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16576 [01:02<07:24, 32.67tok/s]
+Prefill:  25%|##4       | 4096/16576 [01:03<02:40, 77.93tok/s]
+Prefill:  37%|###7      | 6144/16576 [01:04<01:14, 139.23tok/s]
+Prefill:  49%|####9     | 8192/16576 [01:05<00:37, 220.73tok/s]
+Prefill:  62%|######1   | 10240/16576 [01:06<00:19, 325.27tok/s]
+Prefill:  74%|#######4  | 12288/16576 [01:07<00:09, 456.07tok/s]
+Prefill:  86%|########6 | 14336/16576 [01:08<00:03, 619.16tok/s]
+Prefill:  99%|#########8| 16384/16576 [01:09<00:00, 801.14tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:10<00:00, 236.58tok/s]
+2026-08-12 22:32:42 BST - DEBUG - Quality analysis for mlx-community/Ornith-1.0-35B-bf16: keyword_overlap=some_overlap, words=77
+2026-08-12 22:32:42 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:32:42 BST - INFO - 
+2026-08-12 22:32:42 BST - INFO - Processing Model [23/42]: mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-12 22:32:42 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:32:42 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-12 22:32:45 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Phi-3.5-vision-instruct-bf16
+2026-08-12 22:32:45 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Phi-3.5-vision-instruct-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|user|>
+<|image_1|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|end|>
+<|assistant|>
+
+Title: Bristol City Centre Marina Scene
+
+Description: A serene view of the Bristol City Centre marina with boats docked and a flock of seagulls in the water, set against the backdrop of the historic Bristol Cathedral and the city's skyline.
+
+Keywords: Bristol, City Centre, Marina, Boats, Seagulls, Water, Cathedral, Skyline, Historic, Dock
+==========
+Prompt: 1144 tokens, 3017.114 tokens-per-sec
+Generation: 98 tokens, 53.694 tokens-per-sec
+Peak memory: 9.397 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2996.10it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:32:45 BST - DEBUG - Quality analysis for mlx-community/Phi-3.5-vision-instruct-bf16: keyword_overlap=some_overlap, words=53
+2026-08-12 22:32:45 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:32:45 BST - INFO - 
+2026-08-12 22:32:45 BST - INFO - Processing Model [24/42]: mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-12 22:32:45 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:32:45 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-12 22:34:23 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen2-VL-2B-Instruct-4bit
+2026-08-12 22:34:23 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen2-VL-2B-Instruct-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|vision_start|><|image_pad|><|vision_end|><|im_end|>
+<|im_start|>assistant
+
+Title:
+City Centre, Bristol, England, UK, GBR, Europe
+
+Description:
+This is an image of boats docked at a marina in the City Centre of Bristol, England. The marina is located near Bristol Cathedral, and a flock of seagulls flies and floats in the water in the foreground. The marina is surrounded by buildings, including a building with a sign that says "Coyote Ugly Saloon" and a Ferris wheel in the background. The sky is clear, and the weather is sunny.
+==========
+Prompt: 16572 tokens, 173.313 tokens-per-sec
+Generation: 111 tokens, 177.491 tokens-per-sec
+Peak memory: 5.064 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 4782.06it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16572 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16572 [01:33<11:01, 21.96tok/s]
+Prefill:  25%|##4       | 4096/16572 [01:33<03:54, 53.12tok/s]
+Prefill:  37%|###7      | 6144/16572 [01:33<01:47, 97.18tok/s]
+Prefill:  49%|####9     | 8192/16572 [01:34<00:52, 159.11tok/s]
+Prefill:  62%|######1   | 10240/16572 [01:34<00:25, 245.59tok/s]
+Prefill:  74%|#######4  | 12288/16572 [01:34<00:11, 364.69tok/s]
+Prefill:  87%|########6 | 14336/16572 [01:35<00:04, 525.61tok/s]
+Prefill:  99%|#########8| 16384/16572 [01:35<00:00, 735.50tok/s]
+Prefill: 100%|#########9| 16571/16572 [01:35<00:00, 173.38tok/s]
+2026-08-12 22:34:23 BST - DEBUG - Quality analysis for mlx-community/Qwen2-VL-2B-Instruct-4bit: missing_sections=keywords, words=80
+2026-08-12 22:34:23 BST - INFO - Mechanical observations for mlx-community/Qwen2-VL-2B-Instruct-4bit: missing-sections(keywords)
+2026-08-12 22:34:23 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:34:23 BST - INFO - 
+2026-08-12 22:34:23 BST - INFO - Processing Model [25/42]: mlx-community/Qwen3-VL-2B-Instruct-bf16
+2026-08-12 22:34:23 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:34:23 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3-VL-2B-Instruct-bf16
+2026-08-12 22:34:53 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3-VL-2B-Instruct-bf16
+2026-08-12 22:34:53 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen3-VL-2B-Instruct-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Title: Bristol Marina with Seagulls
+
+Description: A bustling marina in Bristol, England, features docked boats and a flock of seagulls in the water, with the city's architecture, including the Bristol Cathedral, visible in the background under a partly cloudy sky.
+
+Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Architecture, Cathedral, Gull, Dock, Cityscape, Coyote Ugly, Great Britain, Europe, Bristol Cathedral, England, Gull, Harbor, Marina
+==========
+Prompt: 16561 tokens, 622.254 tokens-per-sec
+Generation: 110 tokens, 82.991 tokens-per-sec
+Peak memory: 8.391 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 2324.08it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16561 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16561 [00:06<00:44, 328.33tok/s]
+Prefill:  25%|##4       | 4096/16561 [00:06<00:16, 743.64tok/s]
+Prefill:  37%|###7      | 6144/16561 [00:06<00:08, 1239.25tok/s]
+Prefill:  49%|####9     | 8192/16561 [00:07<00:04, 1778.23tok/s]
+Prefill:  62%|######1   | 10240/16561 [00:07<00:02, 2316.51tok/s]
+Prefill:  74%|#######4  | 12288/16561 [00:08<00:01, 2796.16tok/s]
+Prefill:  87%|########6 | 14336/16561 [00:08<00:00, 3189.87tok/s]
+Prefill:  99%|#########8| 16384/16561 [00:09<00:00, 3452.58tok/s]
+Prefill: 100%|#########9| 16560/16561 [00:09<00:00, 1803.13tok/s]
+2026-08-12 22:34:53 BST - DEBUG - Quality analysis for mlx-community/Qwen3-VL-2B-Instruct-bf16: keyword_overlap=some_overlap, words=66
+2026-08-12 22:34:53 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:34:53 BST - INFO - 
+2026-08-12 22:34:53 BST - INFO - Processing Model [26/42]: mlx-community/Qwen3-VL-2B-Thinking-bf16
+2026-08-12 22:34:53 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:34:53 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3-VL-2B-Thinking-bf16
+2026-08-12 22:35:29 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3-VL-2B-Thinking-bf16
+2026-08-12 22:35:29 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen3-VL-2B-Thinking-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+Got it, let's tackle this step by step. First, the title. The context says Bristol, UK, and the image has boats, seagulls, marina. The title hint is City Centre, Bristol, England, UK, GBR, Europe. So need a concise title. Maybe "Bristol City Centre Marina with Seagulls" but let's check. The image has a marina with boats and seagulls, so "Bristol Marina, Seagulls, City Centre" but need 5-10 words. Let's see: "Bristol City Centre Marina with Seagulls" is 10 words. Wait, maybe "Bristol City Centre Marina, Seagulls, Boats" but the title should be catchy. Wait, the context says Bristol UK, so "Bristol City Centre Marina" is good.
+
+Next, the description. Needs to combine context with main visible subject, setting, action, lighting, distinctive details. Context: capture date/time is 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700N, 2.600800W. The image shows boats docked at a marina, seagulls in the water, buildings including Bristol Cathedral (the Gothic cathedral in the background), the "Coyote Ugly" building, and the Ferris wheel. The lighting is bright, sunny, clear sky. The main visible subject is the marina with boats and seagulls. So the description should mention Bristol City Centre, marina, boats, seagulls, Bristol Cathedral, sunny day, etc.
+
+Then keywords: need 10-18 unique, comma-separated. From context: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina. But need to check which are visible. The image has Bristol Cathedral (yes, the Gothic building in the background), Coyote Ugly building (the green and red building with "Coyote Ugly" sign), marina, boats, seagulls (gulls), harbor, cityscape, Bristol, etc. Let's list visible ones: Architecture (yes, the cathedral
+==========
+Prompt: 16563 tokens, 629.879 tokens-per-sec
+Generation: 500 tokens, 74.647 tokens-per-sec
+Peak memory: 8.392 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 3533.53it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16563 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16563 [00:06<00:45, 320.19tok/s]
+Prefill:  25%|##4       | 4096/16563 [00:06<00:17, 727.38tok/s]
+Prefill:  37%|###7      | 6144/16563 [00:07<00:08, 1227.54tok/s]
+Prefill:  49%|####9     | 8192/16563 [00:07<00:04, 1802.49tok/s]
+Prefill:  62%|######1   | 10240/16563 [00:07<00:02, 2416.16tok/s]
+Prefill:  74%|#######4  | 12288/16563 [00:08<00:01, 2990.33tok/s]
+Prefill:  87%|########6 | 14336/16563 [00:08<00:00, 3430.10tok/s]
+Prefill:  99%|#########8| 16384/16563 [00:08<00:00, 3633.00tok/s]
+Prefill: 100%|#########9| 16562/16563 [00:09<00:00, 1829.43tok/s]
+2026-08-12 22:35:29 BST - DEBUG - Quality analysis for mlx-community/Qwen3-VL-2B-Thinking-bf16: missing_sections=title+description+keywords, thinking_trace=True (<think>), thinking_incomplete=True, likely_capped=True, words=292
+2026-08-12 22:35:29 BST - INFO - Mechanical observations for mlx-community/Qwen3-VL-2B-Thinking-bf16: missing-sections(title+description+keywords), thinking-incomplete, token-cap-truncation
+2026-08-12 22:35:29 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:35:29 BST - INFO - 
+2026-08-12 22:35:29 BST - INFO - Processing Model [27/42]: mlx-community/Qwen3.5-35B-A3B-4bit
+2026-08-12 22:35:29 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:35:29 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-4bit
+2026-08-12 22:36:52 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-4bit
+2026-08-12 22:36:52 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen3.5-35B-A3B-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Title: Seagulls and Boats at Bristol Harbour
+
+Description: A sunny afternoon view of Bristol Harbour featuring numerous boats moored at the quay, with a large flock of seagulls floating on the water in the foreground. The background displays the historic Bristol Cathedral and a modern Ferris wheel rising above the city skyline.
+
+Keywords: Bristol, Harbour, Marina, Seagulls, Boats, Cathedral, Ferris Wheel, Cityscape, Architecture, England, UK, Water, Dock, Quay, Sky, Clouds, Urban, Leisure
+==========
+Prompt: 16576 tokens, 211.901 tokens-per-sec
+Generation: 111 tokens, 101.840 tokens-per-sec
+Peak memory: 24.290 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 2518.89it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16576 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16576 [01:12<08:31, 28.38tok/s]
+Prefill:  25%|##4       | 4096/16576 [01:12<03:03, 67.98tok/s]
+Prefill:  37%|###7      | 6144/16576 [01:13<01:24, 122.77tok/s]
+Prefill:  49%|####9     | 8192/16576 [01:14<00:42, 196.82tok/s]
+Prefill:  62%|######1   | 10240/16576 [01:15<00:21, 294.71tok/s]
+Prefill:  74%|#######4  | 12288/16576 [01:16<00:10, 419.89tok/s]
+Prefill:  86%|########6 | 14336/16576 [01:16<00:03, 571.06tok/s]
+Prefill:  99%|#########8| 16384/16576 [01:17<00:00, 755.43tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:18<00:00, 212.49tok/s]
+2026-08-12 22:36:52 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-35B-A3B-4bit: keyword_overlap=some_overlap, words=72
+2026-08-12 22:36:52 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:36:52 BST - INFO - 
+2026-08-12 22:36:52 BST - INFO - Processing Model [28/42]: mlx-community/Qwen3.5-9B-MLX-4bit
+2026-08-12 22:36:52 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:36:52 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-9B-MLX-4bit
+2026-08-12 22:38:14 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-9B-MLX-4bit
+2026-08-12 22:38:14 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen3.5-9B-MLX-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Title: Bristol Marina with Seagulls and Historic Architecture
+
+Description: Boats are docked at Bristol’s Canons Marsh marina, with seagulls floating and flying over the water, set against a backdrop of historic cathedral spires and modern buildings including the Coyote Ugly Saloon under a partly cloudy sky.
+
+Keywords: Bristol, Marina, Seagulls, Boats, Canons Marsh, Cathedral, Coyote Ugly Saloon, Architecture, Cityscape, England, Europe, Great Britain, Gull, Harbor, Dock, Sky, Clouds, Water
+==========
+Prompt: 16576 tokens, 216.497 tokens-per-sec
+Generation: 117 tokens, 68.022 tokens-per-sec
+Peak memory: 9.982 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 4715.11it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16576 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16576 [01:08<08:04, 29.99tok/s]
+Prefill:  25%|##4       | 4096/16576 [01:09<02:55, 71.28tok/s]
+Prefill:  37%|###7      | 6144/16576 [01:10<01:22, 126.93tok/s]
+Prefill:  49%|####9     | 8192/16576 [01:11<00:41, 201.06tok/s]
+Prefill:  62%|######1   | 10240/16576 [01:12<00:21, 295.53tok/s]
+Prefill:  74%|#######4  | 12288/16576 [01:13<00:10, 411.55tok/s]
+Prefill:  86%|########6 | 14336/16576 [01:14<00:04, 551.73tok/s]
+Prefill:  99%|#########8| 16384/16576 [01:16<00:00, 708.17tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:16<00:00, 720.93tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:16<00:00, 217.29tok/s]
+2026-08-12 22:38:14 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-9B-MLX-4bit: keyword_overlap=some_overlap, words=70
+2026-08-12 22:38:14 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:38:14 BST - INFO - 
+2026-08-12 22:38:14 BST - INFO - Processing Model [29/42]: mlx-community/Qwen3.6-27B-mxfp8
+2026-08-12 22:38:14 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:38:14 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.6-27B-mxfp8
+2026-08-12 22:40:04 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.6-27B-mxfp8
+2026-08-12 22:40:04 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Qwen3.6-27B-mxfp8:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+Title:
+Bristol Harbourside with Cathedral and Ferris Wheel
+
+Description:
+A sunny afternoon view of Bristol's harbourside featuring docked boats and a large flock of seagulls on the water. The background skyline includes the historic Bristol Cathedral, a Ferris wheel, and the Coyote Ugly Saloon building.
+
+Keywords:
+Bristol, Harbourside, Marina, Bristol Cathedral, Ferris Wheel, Seagulls, Boats, Water, Cityscape, England, UK, Europe, Architecture, Canons Marsh, Coyote Ugly, Dock, Birds, Summer
+==========
+Prompt: 16576 tokens, 170.495 tokens-per-sec
+Generation: 125 tokens, 14.993 tokens-per-sec
+Peak memory: 34.667 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 2120.48it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16576 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16576 [01:08<08:02, 30.12tok/s]
+Prefill:  25%|##4       | 4096/16576 [01:11<03:03, 67.88tok/s]
+Prefill:  37%|###7      | 6144/16576 [01:15<01:32, 113.22tok/s]
+Prefill:  49%|####9     | 8192/16576 [01:19<00:50, 164.43tok/s]
+Prefill:  62%|######1   | 10240/16576 [01:23<00:28, 219.27tok/s]
+Prefill:  74%|#######4  | 12288/16576 [01:27<00:15, 272.35tok/s]
+Prefill:  86%|########6 | 14336/16576 [01:31<00:07, 315.23tok/s]
+Prefill:  99%|#########8| 16384/16576 [01:36<00:00, 343.79tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:36<00:00, 343.51tok/s]
+Prefill: 100%|#########9| 16575/16576 [01:36<00:00, 171.25tok/s]
+2026-08-12 22:40:04 BST - DEBUG - Quality analysis for mlx-community/Qwen3.6-27B-mxfp8: keyword_overlap=some_overlap, words=69
+2026-08-12 22:40:04 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:40:04 BST - INFO - 
+2026-08-12 22:40:04 BST - INFO - Processing Model [30/42]: mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-08-12 22:40:04 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:40:04 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-08-12 22:40:11 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-08-12 22:40:11 BST - DEBUG - Captured mlx-vlm console output for mlx-community/SmolVLM2-2.2B-Instruct-mlx:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>User:<image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<end_of_utterance>
+Assistant:
+ Title: Bristol, England, UK, GBR, Europe
+Description: A marina with boats docked, seagulls flying and floating in the water, and a church in the background.
+Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building,
+==========
+Prompt: 441 tokens, 738.684 tokens-per-sec
+Generation: 500 tokens, 114.296 tokens-per-sec
+Peak memory: 5.475 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 3223.29it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:40:12 BST - DEBUG - Quality analysis for mlx-community/SmolVLM2-2.2B-Instruct-mlx: repetitive=True (token=keyword: "marina"), likely_capped=True, keyword_overlap=some_overlap, words=236
+2026-08-12 22:40:12 BST - INFO - Mechanical observations for mlx-community/SmolVLM2-2.2B-Instruct-mlx: repetitive(keyword: "marina"), token-cap-truncation
+2026-08-12 22:40:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:40:12 BST - INFO - 
+2026-08-12 22:40:12 BST - INFO - Processing Model [31/42]: mlx-community/Step-3.7-Flash-oQ2e
+2026-08-12 22:40:12 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:40:12 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Step-3.7-Flash-oQ2e
+2026-08-12 22:40:23 BST - DEBUG - Legacy snapshot note for mlx-community/Step-3.7-Flash-oQ2e: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
+2026-08-12 22:40:50 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Step-3.7-Flash-oQ2e
+2026-08-12 22:40:50 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Step-3.7-Flash-oQ2e:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <｜begin▁of▁sentence｜><|im_start|>user
+<im_patch>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+</think>
+
+
+Title:
+Bristol Marina with Cathedral and Seagulls
+
+Description:
+A marina in Bristol, England, with numerous boats docked at the quay, seagulls floating and flying across the foreground water, and the city's cathedral and a Ferris wheel visible in the background under a bright, partly cloudy sky.
+
+Keywords:
+Bristol, Marina, Boats, Seagulls, Cathedral, Ferris Wheel, Cityscape, Waterfront, England, UK, Architecture, Harbor, Dock, Canons Marsh, Coyote Ugly, Bird, Great Britain, Europe
+==========
+Prompt: 3503 tokens, 154.645 tokens-per-sec
+Generation: 116 tokens, 42.686 tokens-per-sec
+Peak memory: 69.932 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 2793.64it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[22:40:23] DEBUG    Legacy snapshot note for mlx-community/Step-3.7-Flash-oQ2e: processor config missing from snapshot
+                    (preprocessor_config.json, processor_config.json).
+Prefill:   0%|          | 0/3503 [00:00<?, ?tok/s]
+Prefill:  58%|#####8    | 2048/3503 [00:14<00:09, 145.61tok/s]
+Prefill: 100%|#########9| 3502/3503 [00:16<00:00, 244.93tok/s]
+Prefill: 100%|#########9| 3502/3503 [00:16<00:00, 218.75tok/s]
+2026-08-12 22:40:50 BST - DEBUG - Quality analysis for mlx-community/Step-3.7-Flash-oQ2e: keyword_overlap=some_overlap, words=70
+2026-08-12 22:40:50 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:40:50 BST - INFO - 
+2026-08-12 22:40:50 BST - INFO - Processing Model [32/42]: mlx-community/X-Reasoner-7B-8bit
+2026-08-12 22:40:50 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:40:50 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/X-Reasoner-7B-8bit
+2026-08-12 22:41:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/X-Reasoner-7B-8bit
+2026-08-12 22:41:24 BST - DEBUG - Captured mlx-vlm console output for mlx-community/X-Reasoner-7B-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Title:
+Bristol Marina with Ferris Wheel and Cathedral
+
+Description:
+A vibrant scene of boats docked at a marina in Bristol, with the iconic Ferris wheel and Bristol Cathedral rising in the background, while seagulls float and fly in the foreground under a bright, partly cloudy sky.
+
+Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Wheel, Cathedral, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Harbor, Urban, Tourism, Landmark, Gull, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock
+==========
+Prompt: 16572 tokens, 786.114 tokens-per-sec
+Generation: 500 tokens, 48.215 tokens-per-sec
+Peak memory: 13.488 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 4870.30it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/16572 [00:00<?, ?tok/s]
+Prefill:  12%|#2        | 2048/16572 [00:13<01:38, 147.51tok/s]
+Prefill:  25%|##4       | 4096/16572 [00:14<00:38, 327.11tok/s]
+Prefill:  37%|###7      | 6144/16572 [00:15<00:19, 536.08tok/s]
+Prefill:  49%|####9     | 8192/16572 [00:16<00:10, 763.96tok/s]
+Prefill:  62%|######1   | 10240/16572 [00:17<00:06, 995.77tok/s]
+Prefill:  74%|#######4  | 12288/16572 [00:18<00:03, 1211.05tok/s]
+Prefill:  87%|########6 | 14336/16572 [00:19<00:01, 1384.76tok/s]
+Prefill:  99%|#########8| 16384/16572 [00:20<00:00, 1517.54tok/s]
+Prefill: 100%|#########9| 16571/16572 [00:20<00:00, 794.17tok/s]
+2026-08-12 22:41:24 BST - DEBUG - Quality analysis for mlx-community/X-Reasoner-7B-8bit: repetitive=True (token=keyword: "dock"), likely_capped=True, keyword_overlap=some_overlap, words=244
+2026-08-12 22:41:24 BST - INFO - Mechanical observations for mlx-community/X-Reasoner-7B-8bit: repetitive(keyword: "dock"), token-cap-truncation
+2026-08-12 22:41:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:24 BST - INFO - 
+2026-08-12 22:41:24 BST - INFO - Processing Model [33/42]: mlx-community/diffusiongemma-26B-A4B-it-8bit
+2026-08-12 22:41:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/diffusiongemma-26B-A4B-it-8bit
+2026-08-12 22:41:30 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/diffusiongemma-26B-A4B-it-8bit
+2026-08-12 22:41:30 BST - DEBUG - Captured mlx-vlm console output for mlx-community/diffusiongemma-26B-A4B-it-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><|turn>user
+<|image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<turn|>
+<|turn>model
+
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+<|channel>thought
+<channel|>Title: Boats at Canons Marsh Marina in Bristol City Centre
+Description: Numerous boats are docked at the marina in Bristol, featuring a flock of seagulls floating in the water with Bristol Cathedral and a Ferris wheel in the background.
+Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel, Seagull, Cityscape, Architecture, Harbour, Dock, Waterfront, UK, Europe
+==========
+Prompt: 604 tokens, 1308.721 tokens-per-sec
+Generation: 87 tokens, 54.349 tokens-per-sec
+Peak memory: 29.206 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2359.82it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:41:30 BST - DEBUG - Quality analysis for mlx-community/diffusiongemma-26B-A4B-it-8bit: thinking_trace=True (<|channel>thought), unexpected_special_token=True (<|channel>thought,<channel|>), keyword_overlap=some_overlap, words=57
+2026-08-12 22:41:30 BST - INFO - Mechanical observations for mlx-community/diffusiongemma-26B-A4B-it-8bit: unexpected-special-token
+2026-08-12 22:41:30 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:30 BST - INFO - 
+2026-08-12 22:41:30 BST - INFO - Processing Model [34/42]: mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+2026-08-12 22:41:30 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:30 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+2026-08-12 22:41:36 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+2026-08-12 22:41:36 BST - DEBUG - Captured mlx-vlm console output for mlx-community/diffusiongemma-26B-A4B-it-mxfp8:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><|turn>user
+<|image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<turn|>
+<|turn>model
+
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+[Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask] [Mask]
+<|channel>thought
+<channel|>Title: Boats at Canons Marsh Marina near Bristol Cathedral
+Description: Various motorboats are docked at the marina in Bristol, with a flock of seagulls floating and flying over the water in the foreground.
+Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Architecture, Cityscape, England, Europe, Water, Dock, Birds, Waterfront
+==========
+Prompt: 604 tokens, 1548.914 tokens-per-sec
+Generation: 81 tokens, 62.977 tokens-per-sec
+Peak memory: 28.434 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2067.73it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:41:36 BST - DEBUG - Quality analysis for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: thinking_trace=True (<|channel>thought), unexpected_special_token=True (<|channel>thought,<channel|>), keyword_overlap=some_overlap, words=50
+2026-08-12 22:41:36 BST - INFO - Mechanical observations for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: unexpected-special-token
+2026-08-12 22:41:36 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:36 BST - INFO - 
+2026-08-12 22:41:36 BST - INFO - Processing Model [35/42]: mlx-community/gemma-3-27b-it-qat-4bit
+2026-08-12 22:41:36 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:36 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-4bit
+2026-08-12 22:41:45 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-4bit
+2026-08-12 22:41:45 BST - DEBUG - Captured mlx-vlm console output for mlx-community/gemma-3-27b-it-qat-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><start_of_turn>user
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<start_of_image><end_of_turn>
+<start_of_turn>model
+
+Title: Bristol Marina with Clifton Suspension Bridge and Cabot Tower
+
+Description: Captured on 12 August 2026 at 16:45 UTC+01, this image shows boats moored at Bristol Marina, with the Clifton Suspension Bridge and Cabot Tower visible in the background; numerous seagulls are present on the water in the foreground. The foreground also features a distinctive green building labelled “Coyote Ugly”.
+
+Keywords: Bristol, Marina, Boats, Seagulls, Clifton Suspension Bridge, Cabot Tower, Cityscape, Architecture, Water, Dock, Harbour, City Centre, England, Great Britain, Coyote Ugly, Buildings, Waterfront, Daytime
+==========
+Prompt: 603 tokens, 538.223 tokens-per-sec
+Generation: 131 tokens, 29.708 tokens-per-sec
+Peak memory: 18.127 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 2207.45it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:41:45 BST - DEBUG - Quality analysis for mlx-community/gemma-3-27b-it-qat-4bit: keyword_overlap=some_overlap, words=87
+2026-08-12 22:41:45 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:45 BST - INFO - 
+2026-08-12 22:41:45 BST - INFO - Processing Model [36/42]: mlx-community/gemma-3n-E4B-it-bf16
+2026-08-12 22:41:45 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:45 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3n-E4B-it-bf16
+2026-08-12 22:41:48 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3n-E4B-it-bf16
+2026-08-12 22:41:48 BST - DEBUG - Captured mlx-vlm console output for mlx-community/gemma-3n-E4B-it-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><start_of_turn>user
+<image_soft_token>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<end_of_turn>
+<start_of_turn>model
+
+
+==========
+No text generated for this prompt
+Prompt: 602 tokens, 796.193 tokens-per-sec
+Generation: 1 tokens, 84210.504 tokens-per-sec
+Peak memory: 16.970 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 2496.82it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:41:49 BST - DEBUG - Quality analysis for mlx-community/gemma-3n-E4B-it-bf16: missing_sections=title+description+keywords, words=0
+2026-08-12 22:41:49 BST - INFO - Mechanical observations for mlx-community/gemma-3n-E4B-it-bf16: missing-sections(title+description+keywords)
+2026-08-12 22:41:49 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:49 BST - INFO - 
+2026-08-12 22:41:49 BST - INFO - Processing Model [37/42]: mlx-community/gemma-4-26b-a4b-it-4bit
+2026-08-12 22:41:49 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:49 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-4-26b-a4b-it-4bit
+2026-08-12 22:41:53 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-4-26b-a4b-it-4bit
+2026-08-12 22:41:53 BST - DEBUG - Captured mlx-vlm console output for mlx-community/gemma-4-26b-a4b-it-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><|turn>user
+<|image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<turn|>
+<|turn>model
+<|channel>thought
+<channel|>
+Title: Boats Docked at Bristol Harbourside Marina
+Description: Various boats are moored at a marina in Bristol, England, with seagulls floating on the water in the foreground and historic architecture under a bright sky. The cityscape features the prominent towers of Bristol Cathedral and a large ferris wheel in the distance.
+Keywords: Bristol, England, United Kingdom, boats, marina, seagulls, harbour, architecture, cityscape, cathedral, waterfront, Europe, Great Britain, seagulls, boats, city centre
+==========
+Prompt: 608 tokens, 1338.906 tokens-per-sec
+Generation: 100 tokens, 128.614 tokens-per-sec
+Peak memory: 16.247 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 4970.14it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/audio_utils.py:723: UserWarning: At least one mel filter has all zero values. The value for `num_mel_filters` (128) may be set too high. Or, the value for `num_frequency_bins` (257) may be set too low.
+  warnings.warn(
+2026-08-12 22:41:53 BST - DEBUG - Quality analysis for mlx-community/gemma-4-26b-a4b-it-4bit: keyword_overlap=some_overlap, words=71
+2026-08-12 22:41:53 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:41:53 BST - INFO - 
+2026-08-12 22:41:53 BST - INFO - Processing Model [38/42]: mlx-community/gemma-4-31b-it-4bit
+2026-08-12 22:41:53 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:41:53 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-4-31b-it-4bit
+2026-08-12 22:42:01 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-4-31b-it-4bit
+2026-08-12 22:42:01 BST - DEBUG - Captured mlx-vlm console output for mlx-community/gemma-4-31b-it-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <bos><|turn>user
+<|image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<turn|>
+<|turn>model
+<|channel>thought
+<channel|>
+Title: Boats at Canons Marsh, Bristol City Centre
+Description: A variety of boats are docked at a marina in Bristol, England, with seagulls floating in the foreground and the Bristol Cathedral and a Ferris wheel visible in the background. The scene is captured under bright, afternoon daylight.
+Keywords: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Marina
+==========
+Prompt: 608 tokens, 568.875 tokens-per-sec
+Generation: 102 tokens, 27.628 tokens-per-sec
+Peak memory: 19.567 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2092.49it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:42:01 BST - DEBUG - Quality analysis for mlx-community/gemma-4-31b-it-4bit: keyword_overlap=some_overlap, words=70
+2026-08-12 22:42:01 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:01 BST - INFO - 
+2026-08-12 22:42:01 BST - INFO - Processing Model [39/42]: mlx-community/llava-v1.6-mistral-7b-8bit
+2026-08-12 22:42:01 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:42:01 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/llava-v1.6-mistral-7b-8bit
+2026-08-12 22:42:06 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/llava-v1.6-mistral-7b-8bit
+2026-08-12 22:42:06 BST - DEBUG - Captured mlx-vlm console output for mlx-community/llava-v1.6-mistral-7b-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: [INST] <image>
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords: [/INST]
+City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water, Birds, Seagulls, Cityscape, City, Architecture, Church, Canons Marsh, Building, Cathedral, Gull, Harbor,
+==========
+Prompt: 2534 tokens, 951.501 tokens-per-sec
+Generation: 63 tokens, 62.131 tokens-per-sec
+Peak memory: 9.698 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 1709.63it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6150 [00:00<?, ?tok/s]
+Prefill:  33%|###3      | 2048/6150 [00:00<00:01, 2411.64tok/s]
+Prefill:  67%|######6   | 4096/6150 [00:01<00:00, 2486.95tok/s]
+Prefill: 100%|#########9| 6144/6150 [00:02<00:00, 2421.54tok/s]
+Prefill: 100%|#########9| 6149/6150 [00:02<00:00, 2387.68tok/s]
+2026-08-12 22:42:07 BST - DEBUG - Quality analysis for mlx-community/llava-v1.6-mistral-7b-8bit: missing_sections=title+description+keywords, words=24
+2026-08-12 22:42:07 BST - INFO - Mechanical observations for mlx-community/llava-v1.6-mistral-7b-8bit: missing-sections(title+description+keywords)
+2026-08-12 22:42:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:07 BST - INFO - 
+2026-08-12 22:42:07 BST - INFO - Processing Model [40/42]: mlx-community/nanoLLaVA-1.5-4bit
+2026-08-12 22:42:07 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:42:07 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/nanoLLaVA-1.5-4bit
+2026-08-12 22:42:07 BST - DEBUG - Legacy snapshot note for mlx-community/nanoLLaVA-1.5-4bit: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
+2026-08-12 22:42:08 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/nanoLLaVA-1.5-4bit
+2026-08-12 22:42:08 BST - DEBUG - Captured mlx-vlm console output for mlx-community/nanoLLaVA-1.5-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>system
+Answer the questions.<|im_end|><|im_start|>user
+<image>
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|><|im_start|>assistant
+
+Title: City Centre, Bristol, England, UK, GBR, Europe
+Description: This image captures the serene harbor of Bristol, UK, featuring a flock of seagulls flying and floating in the water. The city center is a hub for boating activities, with a marina serving as a central location for the boats. The image is a blend of architectural details, bird activity, and the overall atmosphere of a bustling city.
+==========
+Prompt: 344 tokens, 4228.157 tokens-per-sec
+Generation: 89 tokens, 360.326 tokens-per-sec
+Peak memory: 2.275 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 1860.30it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[22:42:07] DEBUG    Legacy snapshot note for mlx-community/nanoLLaVA-1.5-4bit: processor config missing from snapshot
+                    (preprocessor_config.json, processor_config.json).
+2026-08-12 22:42:08 BST - DEBUG - Quality analysis for mlx-community/nanoLLaVA-1.5-4bit: missing_sections=keywords, words=67
+2026-08-12 22:42:08 BST - INFO - Mechanical observations for mlx-community/nanoLLaVA-1.5-4bit: missing-sections(keywords)
+2026-08-12 22:42:08 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:08 BST - INFO - 
+2026-08-12 22:42:08 BST - INFO - Processing Model [41/42]: mlx-community/paligemma2-3b-pt-896-4bit
+2026-08-12 22:42:08 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:42:08 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-3b-pt-896-4bit
+2026-08-12 22:42:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/paligemma2-3b-pt-896-4bit
+2026-08-12 22:42:24 BST - DEBUG - Captured mlx-vlm console output for mlx-community/paligemma2-3b-pt-896-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+- Architecture, Building, City Centre, Cityscape, Coast, Coastline, Coastal, Coastal, Coastal waters, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline,
+==========
+Prompt: 4431 tokens, 3649.366 tokens-per-sec
+Generation: 500 tokens, 38.720 tokens-per-sec
+Peak memory: 4.330 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]
+Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 2647.68it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/4431 [00:00<?, ?tok/s]
+Prefill:  46%|####6     | 2048/4431 [00:00<00:00, 3044.70tok/s]
+Prefill:  92%|#########2| 4096/4431 [00:01<00:00, 3978.58tok/s]
+Prefill: 100%|#########9| 4430/4431 [00:01<00:00, 3779.22tok/s]
+2026-08-12 22:42:24 BST - DEBUG - Quality analysis for mlx-community/paligemma2-3b-pt-896-4bit: repetitive=True (token=Coastline,), missing_sections=title+description+keywords, likely_capped=True, words=170
+2026-08-12 22:42:24 BST - INFO - Mechanical observations for mlx-community/paligemma2-3b-pt-896-4bit: repetitive(Coastline,), missing-sections(title+description+keywords), token-cap-truncation
+2026-08-12 22:42:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:24 BST - INFO - 
+2026-08-12 22:42:24 BST - INFO - Processing Model [42/42]: mlx-community/pixtral-12b-8bit
+2026-08-12 22:42:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:42:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/pixtral-12b-8bit
+2026-08-12 22:42:32 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/pixtral-12b-8bit
+2026-08-12 22:42:32 BST - DEBUG - Captured mlx-vlm console output for mlx-community/pixtral-12b-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <s>[INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+Title:
+Bristol Marina with Seagulls and Cathedral
+
+Description:
+This image captures a bustling marina in Bristol, England, with numerous boats docked along the waterfront. A flock of seagulls is seen flying and floating in the foreground, with the iconic Bristol Cathedral visible in the background.
+
+Keywords:
+Bristol, Marina, Boats, Seagulls, Bristol Cathedral, England, Europe, Great Britain, Waterfront, Dock, Gull, Cityscape, Architecture, Boat, Harbor, City Centre, Building, Canons Marsh
+==========
+Prompt: 3125 tokens, 1479.824 tokens-per-sec
+Generation: 113 tokens, 39.574 tokens-per-sec
+Peak memory: 15.620 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 1846.23it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/3125 [00:00<?, ?tok/s]
+Prefill:  66%|######5   | 2048/3125 [00:01<00:00, 1521.80tok/s]
+Prefill: 100%|#########9| 3124/3125 [00:01<00:00, 1584.65tok/s]
+Prefill: 100%|#########9| 3124/3125 [00:01<00:00, 1571.77tok/s]
+2026-08-12 22:42:32 BST - DEBUG - Quality analysis for mlx-community/pixtral-12b-8bit: keyword_overlap=some_overlap, words=68
+2026-08-12 22:42:33 BST - ERROR - [RUN 1/42] SUMMARY model=mlx-community/Inkling-Small-mlx-4bit execution=crashed
+2026-08-12 22:42:33 BST - ERROR - usability=not_evaluated maintainer=actionable_failure observations=none stage=Model Error
+2026-08-12 22:42:33 BST - ERROR - phase=model_load code=MLX_VLM_MODEL_LOAD_MODEL package=mlx-vlm type=ValueError
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - Error: Model loading failed: Received 362 parameters not in model: 
+audio_tower.encoder.biases,
+audio_tower.encoder.scales,
+language_model.model.layers.10.mlp.experts.down_proj.biases,
+language_model.model.layers.10.mlp.experts.down_proj.scales,
+language_model.model.layers.10.mlp.experts.down_proj.weight,
+language_model.model.layers.10.mlp.experts.gate_proj.biases,
+language_model.model.layers.10.mlp.experts.gate_proj.scales,
+language_model.model.layers.10.mlp.experts.gate_proj.weight,
+language_model.model.layers.10.mlp.experts.up_proj.biases,
+language_model.model.layers.10.mlp.experts.up_proj.scales,
+language_model.model.layers.10.mlp.experts.up_proj.weight,
+language_model.model.layers.11.mlp.experts.down_proj.biases,
+language_model.model.layers.11.mlp.experts.down_proj.scales,
+language_model.model.layers.11.mlp.experts.down_proj.weight,
+language_model.model.layers.11.mlp.experts.gate_proj.biases,
+language_model.model.layers.11.mlp.experts.gate_proj.scales,
+language_model.model.layers.11.mlp.experts.gate_proj.weight,
+language_model.model.layers.11.mlp.experts.up_proj.biases,
+language_model.model.layers.11.mlp.experts.up_proj.scales,
+language_model.model.layers.11.mlp.experts.up_proj.weight,
+language_model.model.layers.12.mlp.experts.down_proj.biases,
+language_model.model.layers.12.mlp.experts.down_proj.scales,
+language_model.model.layers.12.mlp.experts.down_proj.weight,
+language_model.model.layers.12.mlp.experts.gate_proj.biases,
+language_model.model.layers.12.mlp.experts.gate_proj.scales,
+language_model.model.layers.12.mlp.experts.gate_proj.weight,
+language_model.model.layers.12.mlp.experts.up_proj.biases,
+language_model.model.layers.12.mlp.experts.up_proj.scales,
+language_model.model.layers.12.mlp.experts.up_proj.weight,
+language_model.model.layers.13.mlp.experts.down_proj.biases,
+language_model.model.layers.13.mlp.experts.down_proj.scales,
+language_model.model.layers.13.mlp.experts.down_proj.weight,
+language_model.model.layers.13.mlp.experts.gate_proj.biases,
+language_model.model.layers.13.mlp.experts.gate_proj.scales,
+language_model.model.layers.13.mlp.experts.gate_proj.weight,
+language_model.model.layers.13.mlp.experts.up_proj.biases,
+language_model.model.layers.13.mlp.experts.up_proj.scales,
+language_model.model.layers.13.mlp.experts.up_proj.weight,
+language_model.model.layers.14.mlp.experts.down_proj.biases,
+language_model.model.layers.14.mlp.experts.down_proj.scales,
+language_model.model.layers.14.mlp.experts.down_proj.weight,
+language_model.model.layers.14.mlp.experts.gate_proj.biases,
+language_model.model.layers.14.mlp.experts.gate_proj.scales,
+language_model.model.layers.14.mlp.experts.gate_proj.weight,
+language_model.model.layers.14.mlp.experts.up_proj.biases,
+language_model.model.layers.14.mlp.experts.up_proj.scales,
+language_model.model.layers.14.mlp.experts.up_proj.weight,
+language_model.model.layers.15.mlp.experts.down_proj.biases,
+language_model.model.layers.15.mlp.experts.down_proj.scales,
+language_model.model.layers.15.mlp.experts.down_proj.weight,
+language_model.model.layers.15.mlp.experts.gate_proj.biases,
+language_model.model.layers.15.mlp.experts.gate_proj.scales,
+language_model.model.layers.15.mlp.experts.gate_proj.weight,
+language_model.model.layers.15.mlp.experts.up_proj.biases,
+language_model.model.layers.15.mlp.experts.up_proj.scales,
+language_model.model.layers.15.mlp.experts.up_proj.weight,
+language_model.model.layers.16.mlp.experts.down_proj.biases,
+language_model.model.layers.16.mlp.experts.down_proj.scales,
+language_model.model.layers.16.mlp.experts.down_proj.weight,
+language_model.model.layers.16.mlp.experts.gate_proj.biases,
+language_model.model.layers.16.mlp.experts.gate_proj.scales,
+language_model.model.layers.16.mlp.experts.gate_proj.weight,
+language_model.model.layers.16.mlp.experts.up_proj.biases,
+language_model.model.layers.16.mlp.experts.up_proj.scales,
+language_model.model.layers.16.mlp.experts.up_proj.weight,
+language_model.model.layers.17.mlp.experts.down_proj.biases,
+language_model.model.layers.17.mlp.experts.down_proj.scales,
+language_model.model.layers.17.mlp.experts.down_proj.weight,
+language_model.model.layers.17.mlp.experts.gate_proj.biases,
+language_model.model.layers.17.mlp.experts.gate_proj.scales,
+language_model.model.layers.17.mlp.experts.gate_proj.weight,
+language_model.model.layers.17.mlp.experts.up_proj.biases,
+language_model.model.layers.17.mlp.experts.up_proj.scales,
+language_model.model.layers.17.mlp.experts.up_proj.weight,
+language_model.model.layers.18.mlp.experts.down_proj.biases,
+language_model.model.layers.18.mlp.experts.down_proj.scales,
+language_model.model.layers.18.mlp.experts.down_proj.weight,
+language_model.model.layers.18.mlp.experts.gate_proj.biases,
+language_model.model.layers.18.mlp.experts.gate_proj.scales,
+language_model.model.layers.18.mlp.experts.gate_proj.weight,
+language_model.model.layers.18.mlp.experts.up_proj.biases,
+language_model.model.layers.18.mlp.experts.up_proj.scales,
+language_model.model.layers.18.mlp.experts.up_proj.weight,
+language_model.model.layers.19.mlp.experts.down_proj.biases,
+language_model.model.layers.19.mlp.experts.down_proj.scales,
+language_model.model.layers.19.mlp.experts.down_proj.weight,
+language_model.model.layers.19.mlp.experts.gate_proj.biases,
+language_model.model.layers.19.mlp.experts.gate_proj.scales,
+language_model.model.layers.19.mlp.experts.gate_proj.weight,
+language_model.model.layers.19.mlp.experts.up_proj.biases,
+language_model.model.layers.19.mlp.experts.up_proj.scales,
+language_model.model.layers.19.mlp.experts.up_proj.weight,
+language_model.model.layers.2.mlp.experts.down_proj.biases,
+language_model.model.layers.2.mlp.experts.down_proj.scales,
+language_model.model.layers.2.mlp.experts.down_proj.weight,
+language_model.model.layers.2.mlp.experts.gate_proj.biases,
+language_model.model.layers.2.mlp.experts.gate_proj.scales,
+language_model.model.layers.2.mlp.experts.gate_proj.weight,
+language_model.model.layers.2.mlp.experts.up_proj.biases,
+language_model.model.layers.2.mlp.experts.up_proj.scales,
+language_model.model.layers.2.mlp.experts.up_proj.weight,
+language_model.model.layers.20.mlp.experts.down_proj.biases,
+language_model.model.layers.20.mlp.experts.down_proj.scales,
+language_model.model.layers.20.mlp.experts.down_proj.weight,
+language_model.model.layers.20.mlp.experts.gate_proj.biases,
+language_model.model.layers.20.mlp.experts.gate_proj.scales,
+language_model.model.layers.20.mlp.experts.gate_proj.weight,
+language_model.model.layers.20.mlp.experts.up_proj.biases,
+language_model.model.layers.20.mlp.experts.up_proj.scales,
+language_model.model.layers.20.mlp.experts.up_proj.weight,
+language_model.model.layers.21.mlp.experts.down_proj.biases,
+language_model.model.layers.21.mlp.experts.down_proj.scales,
+language_model.model.layers.21.mlp.experts.down_proj.weight,
+language_model.model.layers.21.mlp.experts.gate_proj.biases,
+language_model.model.layers.21.mlp.experts.gate_proj.scales,
+language_model.model.layers.21.mlp.experts.gate_proj.weight,
+language_model.model.layers.21.mlp.experts.up_proj.biases,
+language_model.model.layers.21.mlp.experts.up_proj.scales,
+language_model.model.layers.21.mlp.experts.up_proj.weight,
+language_model.model.layers.22.mlp.experts.down_proj.biases,
+language_model.model.layers.22.mlp.experts.down_proj.scales,
+language_model.model.layers.22.mlp.experts.down_proj.weight,
+language_model.model.layers.22.mlp.experts.gate_proj.biases,
+language_model.model.layers.22.mlp.experts.gate_proj.scales,
+language_model.model.layers.22.mlp.experts.gate_proj.weight,
+language_model.model.layers.22.mlp.experts.up_proj.biases,
+language_model.model.layers.22.mlp.experts.up_proj.scales,
+language_model.model.layers.22.mlp.experts.up_proj.weight,
+language_model.model.layers.23.mlp.experts.down_proj.biases,
+language_model.model.layers.23.mlp.experts.down_proj.scales,
+language_model.model.layers.23.mlp.experts.down_proj.weight,
+language_model.model.layers.23.mlp.experts.gate_proj.biases,
+language_model.model.layers.23.mlp.experts.gate_proj.scales,
+language_model.model.layers.23.mlp.experts.gate_proj.weight,
+language_model.model.layers.23.mlp.experts.up_proj.biases,
+language_model.model.layers.23.mlp.experts.up_proj.scales,
+language_model.model.layers.23.mlp.experts.up_proj.weight,
+language_model.model.layers.24.mlp.experts.down_proj.biases,
+language_model.model.layers.24.mlp.experts.down_proj.scales,
+language_model.model.layers.24.mlp.experts.down_proj.weight,
+language_model.model.layers.24.mlp.experts.gate_proj.biases,
+language_model.model.layers.24.mlp.experts.gate_proj.scales,
+language_model.model.layers.24.mlp.experts.gate_proj.weight,
+language_model.model.layers.24.mlp.experts.up_proj.biases,
+language_model.model.layers.24.mlp.experts.up_proj.scales,
+language_model.model.layers.24.mlp.experts.up_proj.weight,
+language_model.model.layers.25.mlp.experts.down_proj.biases,
+language_model.model.layers.25.mlp.experts.down_proj.scales,
+language_model.model.layers.25.mlp.experts.down_proj.weight,
+language_model.model.layers.25.mlp.experts.gate_proj.biases,
+language_model.model.layers.25.mlp.experts.gate_proj.scales,
+language_model.model.layers.25.mlp.experts.gate_proj.weight,
+language_model.model.layers.25.mlp.experts.up_proj.biases,
+language_model.model.layers.25.mlp.experts.up_proj.scales,
+language_model.model.layers.25.mlp.experts.up_proj.weight,
+language_model.model.layers.26.mlp.experts.down_proj.biases,
+language_model.model.layers.26.mlp.experts.down_proj.scales,
+language_model.model.layers.26.mlp.experts.down_proj.weight,
+language_model.model.layers.26.mlp.experts.gate_proj.biases,
+language_model.model.layers.26.mlp.experts.gate_proj.scales,
+language_model.model.layers.26.mlp.experts.gate_proj.weight,
+language_model.model.layers.26.mlp.experts.up_proj.biases,
+language_model.model.layers.26.mlp.experts.up_proj.scales,
+language_model.model.layers.26.mlp.experts.up_proj.weight,
+language_model.model.layers.27.mlp.experts.down_proj.biases,
+language_model.model.layers.27.mlp.experts.down_proj.scales,
+language_model.model.layers.27.mlp.experts.down_proj.weight,
+language_model.model.layers.27.mlp.experts.gate_proj.biases,
+language_model.model.layers.27.mlp.experts.gate_proj.scales,
+language_model.model.layers.27.mlp.experts.gate_proj.weight,
+language_model.model.layers.27.mlp.experts.up_proj.biases,
+language_model.model.layers.27.mlp.experts.up_proj.scales,
+language_model.model.layers.27.mlp.experts.up_proj.weight,
+language_model.model.layers.28.mlp.experts.down_proj.biases,
+language_model.model.layers.28.mlp.experts.down_proj.scales,
+language_model.model.layers.28.mlp.experts.down_proj.weight,
+language_model.model.layers.28.mlp.experts.gate_proj.biases,
+language_model.model.layers.28.mlp.experts.gate_proj.scales,
+language_model.model.layers.28.mlp.experts.gate_proj.weight,
+language_model.model.layers.28.mlp.experts.up_proj.biases,
+language_model.model.layers.28.mlp.experts.up_proj.scales,
+language_model.model.layers.28.mlp.experts.up_proj.weight,
+language_model.model.layers.29.mlp.experts.down_proj.biases,
+language_model.model.layers.29.mlp.experts.down_proj.scales,
+language_model.model.layers.29.mlp.experts.down_proj.weight,
+language_model.model.layers.29.mlp.experts.gate_proj.biases,
+language_model.model.layers.29.mlp.experts.gate_proj.scales,
+language_model.model.layers.29.mlp.experts.gate_proj.weight,
+language_model.model.layers.29.mlp.experts.up_proj.biases,
+language_model.model.layers.29.mlp.experts.up_proj.scales,
+language_model.model.layers.29.mlp.experts.up_proj.weight,
+language_model.model.layers.3.mlp.experts.down_proj.biases,
+language_model.model.layers.3.mlp.experts.down_proj.scales,
+language_model.model.layers.3.mlp.experts.down_proj.weight,
+language_model.model.layers.3.mlp.experts.gate_proj.biases,
+language_model.model.layers.3.mlp.experts.gate_proj.scales,
+language_model.model.layers.3.mlp.experts.gate_proj.weight,
+language_model.model.layers.3.mlp.experts.up_proj.biases,
+language_model.model.layers.3.mlp.experts.up_proj.scales,
+language_model.model.layers.3.mlp.experts.up_proj.weight,
+language_model.model.layers.30.mlp.experts.down_proj.biases,
+language_model.model.layers.30.mlp.experts.down_proj.scales,
+language_model.model.layers.30.mlp.experts.down_proj.weight,
+language_model.model.layers.30.mlp.experts.gate_proj.biases,
+language_model.model.layers.30.mlp.experts.gate_proj.scales,
+language_model.model.layers.30.mlp.experts.gate_proj.weight,
+language_model.model.layers.30.mlp.experts.up_proj.biases,
+language_model.model.layers.30.mlp.experts.up_proj.scales,
+language_model.model.layers.30.mlp.experts.up_proj.weight,
+language_model.model.layers.31.mlp.experts.down_proj.biases,
+language_model.model.layers.31.mlp.experts.down_proj.scales,
+language_model.model.layers.31.mlp.experts.down_proj.weight,
+language_model.model.layers.31.mlp.experts.gate_proj.biases,
+language_model.model.layers.31.mlp.experts.gate_proj.scales,
+language_model.model.layers.31.mlp.experts.gate_proj.weight,
+language_model.model.layers.31.mlp.experts.up_proj.biases,
+language_model.model.layers.31.mlp.experts.up_proj.scales,
+language_model.model.layers.31.mlp.experts.up_proj.weight,
+language_model.model.layers.32.mlp.experts.down_proj.biases,
+language_model.model.layers.32.mlp.experts.down_proj.scales,
+language_model.model.layers.32.mlp.experts.down_proj.weight,
+language_model.model.layers.32.mlp.experts.gate_proj.biases,
+language_model.model.layers.32.mlp.experts.gate_proj.scales,
+language_model.model.layers.32.mlp.experts.gate_proj.weight,
+language_model.model.layers.32.mlp.experts.up_proj.biases,
+language_model.model.layers.32.mlp.experts.up_proj.scales,
+language_model.model.layers.32.mlp.experts.up_proj.weight,
+language_model.model.layers.33.mlp.experts.down_proj.biases,
+language_model.model.layers.33.mlp.experts.down_proj.scales,
+language_model.model.layers.33.mlp.experts.down_proj.weight,
+language_model.model.layers.33.mlp.experts.gate_proj.biases,
+language_model.model.layers.33.mlp.experts.gate_proj.scales,
+language_model.model.layers.33.mlp.experts.gate_proj.weight,
+language_model.model.layers.33.mlp.experts.up_proj.biases,
+language_model.model.layers.33.mlp.experts.up_proj.scales,
+language_model.model.layers.33.mlp.experts.up_proj.weight,
+language_model.model.layers.34.mlp.experts.down_proj.biases,
+language_model.model.layers.34.mlp.experts.down_proj.scales,
+language_model.model.layers.34.mlp.experts.down_proj.weight,
+language_model.model.layers.34.mlp.experts.gate_proj.biases,
+language_model.model.layers.34.mlp.experts.gate_proj.scales,
+language_model.model.layers.34.mlp.experts.gate_proj.weight,
+language_model.model.layers.34.mlp.experts.up_proj.biases,
+language_model.model.layers.34.mlp.experts.up_proj.scales,
+language_model.model.layers.34.mlp.experts.up_proj.weight,
+language_model.model.layers.35.mlp.experts.down_proj.biases,
+language_model.model.layers.35.mlp.experts.down_proj.scales,
+language_model.model.layers.35.mlp.experts.down_proj.weight,
+language_model.model.layers.35.mlp.experts.gate_proj.biases,
+language_model.model.layers.35.mlp.experts.gate_proj.scales,
+language_model.model.layers.35.mlp.experts.gate_proj.weight,
+language_model.model.layers.35.mlp.experts.up_proj.biases,
+language_model.model.layers.35.mlp.experts.up_proj.scales,
+language_model.model.layers.35.mlp.experts.up_proj.weight,
+language_model.model.layers.36.mlp.experts.down_proj.biases,
+language_model.model.layers.36.mlp.experts.down_proj.scales,
+language_model.model.layers.36.mlp.experts.down_proj.weight,
+language_model.model.layers.36.mlp.experts.gate_proj.biases,
+language_model.model.layers.36.mlp.experts.gate_proj.scales,
+language_model.model.layers.36.mlp.experts.gate_proj.weight,
+language_model.model.layers.36.mlp.experts.up_proj.biases,
+language_model.model.layers.36.mlp.experts.up_proj.scales,
+language_model.model.layers.36.mlp.experts.up_proj.weight,
+language_model.model.layers.37.mlp.experts.down_proj.biases,
+language_model.model.layers.37.mlp.experts.down_proj.scales,
+language_model.model.layers.37.mlp.experts.down_proj.weight,
+language_model.model.layers.37.mlp.experts.gate_proj.biases,
+language_model.model.layers.37.mlp.experts.gate_proj.scales,
+language_model.model.layers.37.mlp.experts.gate_proj.weight,
+language_model.model.layers.37.mlp.experts.up_proj.biases,
+language_model.model.layers.37.mlp.experts.up_proj.scales,
+language_model.model.layers.37.mlp.experts.up_proj.weight,
+language_model.model.layers.38.mlp.experts.down_proj.biases,
+language_model.model.layers.38.mlp.experts.down_proj.scales,
+language_model.model.layers.38.mlp.experts.down_proj.weight,
+language_model.model.layers.38.mlp.experts.gate_proj.biases,
+language_model.model.layers.38.mlp.experts.gate_proj.scales,
+language_model.model.layers.38.mlp.experts.gate_proj.weight,
+language_model.model.layers.38.mlp.experts.up_proj.biases,
+language_model.model.layers.38.mlp.experts.up_proj.scales,
+language_model.model.layers.38.mlp.experts.up_proj.weight,
+language_model.model.layers.39.mlp.experts.down_proj.biases,
+language_model.model.layers.39.mlp.experts.down_proj.scales,
+language_model.model.layers.39.mlp.experts.down_proj.weight,
+language_model.model.layers.39.mlp.experts.gate_proj.biases,
+language_model.model.layers.39.mlp.experts.gate_proj.scales,
+language_model.model.layers.39.mlp.experts.gate_proj.weight,
+language_model.model.layers.39.mlp.experts.up_proj.biases,
+language_model.model.layers.39.mlp.experts.up_proj.scales,
+language_model.model.layers.39.mlp.experts.up_proj.weight,
+language_model.model.layers.4.mlp.experts.down_proj.biases,
+language_model.model.layers.4.mlp.experts.down_proj.scales,
+language_model.model.layers.4.mlp.experts.down_proj.weight,
+language_model.model.layers.4.mlp.experts.gate_proj.biases,
+language_model.model.layers.4.mlp.experts.gate_proj.scales,
+language_model.model.layers.4.mlp.experts.gate_proj.weight,
+language_model.model.layers.4.mlp.experts.up_proj.biases,
+language_model.model.layers.4.mlp.experts.up_proj.scales,
+language_model.model.layers.4.mlp.experts.up_proj.weight,
+language_model.model.layers.40.mlp.experts.down_proj.biases,
+language_model.model.layers.40.mlp.experts.down_proj.scales,
+language_model.model.layers.40.mlp.experts.down_proj.weight,
+language_model.model.layers.40.mlp.experts.gate_proj.biases,
+language_model.model.layers.40.mlp.experts.gate_proj.scales,
+language_model.model.layers.40.mlp.experts.gate_proj.weight,
+language_model.model.layers.40.mlp.experts.up_proj.biases,
+language_model.model.layers.40.mlp.experts.up_proj.scales,
+language_model.model.layers.40.mlp.experts.up_proj.weight,
+language_model.model.layers.41.mlp.experts.down_proj.biases,
+language_model.model.layers.41.mlp.experts.down_proj.scales,
+language_model.model.layers.41.mlp.experts.down_proj.weight,
+language_model.model.layers.41.mlp.experts.gate_proj.biases,
+language_model.model.layers.41.mlp.experts.gate_proj.scales,
+language_model.model.layers.41.mlp.experts.gate_proj.weight,
+language_model.model.layers.41.mlp.experts.up_proj.biases,
+language_model.model.layers.41.mlp.experts.up_proj.scales,
+language_model.model.layers.41.mlp.experts.up_proj.weight,
+language_model.model.layers.5.mlp.experts.down_proj.biases,
+language_model.model.layers.5.mlp.experts.down_proj.scales,
+language_model.model.layers.5.mlp.experts.down_proj.weight,
+language_model.model.layers.5.mlp.experts.gate_proj.biases,
+language_model.model.layers.5.mlp.experts.gate_proj.scales,
+language_model.model.layers.5.mlp.experts.gate_proj.weight,
+language_model.model.layers.5.mlp.experts.up_proj.biases,
+language_model.model.layers.5.mlp.experts.up_proj.scales,
+language_model.model.layers.5.mlp.experts.up_proj.weight,
+language_model.model.layers.6.mlp.experts.down_proj.biases,
+language_model.model.layers.6.mlp.experts.down_proj.scales,
+language_model.model.layers.6.mlp.experts.down_proj.weight,
+language_model.model.layers.6.mlp.experts.gate_proj.biases,
+language_model.model.layers.6.mlp.experts.gate_proj.scales,
+language_model.model.layers.6.mlp.experts.gate_proj.weight,
+language_model.model.layers.6.mlp.experts.up_proj.biases,
+language_model.model.layers.6.mlp.experts.up_proj.scales,
+language_model.model.layers.6.mlp.experts.up_proj.weight,
+language_model.model.layers.7.mlp.experts.down_proj.biases,
+language_model.model.layers.7.mlp.experts.down_proj.scales,
+language_model.model.layers.7.mlp.experts.down_proj.weight,
+language_model.model.layers.7.mlp.experts.gate_proj.biases,
+language_model.model.layers.7.mlp.experts.gate_proj.scales,
+language_model.model.layers.7.mlp.experts.gate_proj.weight,
+language_model.model.layers.7.mlp.experts.up_proj.biases,
+language_model.model.layers.7.mlp.experts.up_proj.scales,
+language_model.model.layers.7.mlp.experts.up_proj.weight,
+language_model.model.layers.8.mlp.experts.down_proj.biases,
+language_model.model.layers.8.mlp.experts.down_proj.scales,
+language_model.model.layers.8.mlp.experts.down_proj.weight,
+language_model.model.layers.8.mlp.experts.gate_proj.biases,
+language_model.model.layers.8.mlp.experts.gate_proj.scales,
+language_model.model.layers.8.mlp.experts.gate_proj.weight,
+language_model.model.layers.8.mlp.experts.up_proj.biases,
+language_model.model.layers.8.mlp.experts.up_proj.scales,
+language_model.model.layers.8.mlp.experts.up_proj.weight,
+language_model.model.layers.9.mlp.experts.down_proj.biases,
+language_model.model.layers.9.mlp.experts.down_proj.scales,
+language_model.model.layers.9.mlp.experts.down_proj.weight,
+language_model.model.layers.9.mlp.experts.gate_proj.biases,
+language_model.model.layers.9.mlp.experts.gate_proj.scales,
+language_model.model.layers.9.mlp.experts.gate_proj.weight,
+language_model.model.layers.9.mlp.experts.up_proj.biases,
+language_model.model.layers.9.mlp.experts.up_proj.scales,
+language_model.model.layers.9.mlp.experts.up_proj.weight.
+2026-08-12 22:42:33 BST - INFO - Error package: mlx-vlm
+2026-08-12 22:42:33 BST - INFO - Error type: ValueError
+2026-08-12 22:42:33 BST - ERROR - Traceback tail:
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.gate_proj.biases,
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.gate_proj.scales,
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.gate_proj.weight,
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.up_proj.biases,
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.up_proj.scales,
+2026-08-12 22:42:33 BST - ERROR -   language_model.model.layers.9.mlp.experts.up_proj.weight.
+2026-08-12 22:42:33 BST - ERROR - Captured output:
+2026-08-12 22:42:33 BST - ERROR -   === STDERR ===
+2026-08-12 22:42:33 BST - ERROR -   Downloading bytes:           |  0.00B
+2026-08-12 22:42:33 BST - ERROR -   Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+2026-08-12 22:42:33 BST - ERROR -   Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
+2026-08-12 22:42:33 BST - ERROR -   Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
+2026-08-12 22:42:33 BST - ERROR -   Download complete: :           |  0.00B
+2026-08-12 22:42:33 BST - ERROR -   Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:42:33 BST - ERROR -   Download complete: :           |  0.00B
+2026-08-12 22:42:33 BST - ERROR -   Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:42:33 BST - ERROR -   [22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB,
+2026-08-12 22:42:33 BST - ERROR -   files=58
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 2/42] SUMMARY model=mlx-community/nanoLLaVA-1.5-4bit execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: keywords
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 1.44s total (gen=0.89s, load=0.55s, prep=0.00s, first=0.08s) | Memory: 2.3 GB (1.97% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 433 (344 prompt + 89 gen) | Speed: 360 gen/s, 4,228 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 3/42] SUMMARY model=mlx-community/gemma-3n-E4B-it-bf16 execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=observation_needs_reproduction observations=empty_output+missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - INFO - Generated Text:
+2026-08-12 22:42:33 BST - INFO -    <empty>
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 3.67s total (gen=1.28s, load=2.38s, prep=0.00s, first=0.76s) | Memory: 17 GB (14.7% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 603 (602 prompt + 1 gen) | Speed: 84,211 gen/s, 796 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 4/42] SUMMARY model=LiquidAI/LFM2.5-VL-450M-MLX-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 2.85s total (gen=1.36s, load=1.11s, prep=0.01s, first=0.75s) | Memory: 1.2 GB (1.03% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 490 (404 prompt + 86 gen) | Speed: 506 gen/s, 536 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 5/42] SUMMARY model=mlx-community/gemma-4-26b-a4b-it-4bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 4.14s total (gen=1.79s, load=2.32s, prep=0.02s, first=0.45s) | Memory: 16 GB (14.1% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 708 (608 prompt + 100 gen) | Speed: 129 gen/s, 1,339 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 6/42] SUMMARY model=mlx-community/LFM2.5-VL-1.6B-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 2.89s total (gen=2.01s, load=0.87s, prep=0.01s, first=0.43s) | Memory: 4.1 GB (3.56% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 736 (594 prompt + 142 gen) | Speed: 162 gen/s, 1,369 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 7/42] SUMMARY model=mlx-community/FastVLM-0.5B-bf16 execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 3.40s total (gen=2.36s, load=1.03s, prep=0.00s, first=0.84s) | Memory: 1.9 GB (1.68% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 384 (348 prompt + 36 gen) | Speed: 291 gen/s, 413 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 8/42] SUMMARY model=mlx-community/diffusiongemma-26B-A4B-it-mxfp8 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=unexpected_special_token
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected special token wrappers: <|channel>thought, <channel|>
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 5.91s total (gen=2.43s, load=3.47s, prep=0.00s, first=0.39s) | Memory: 28 GB (24.6% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 685 (604 prompt + 81 gen) | Speed: 63 gen/s, 1,549 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 9/42] SUMMARY model=mlx-community/Ministral-3-3B-Instruct-2512-4bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 3.60s total (gen=2.50s, load=1.09s, prep=0.01s, first=1.24s) | Memory: 7.8 GB (6.76% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,039 (2,934 prompt + 105 gen) | Speed: 147 gen/s, 2,362 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 10/42] SUMMARY model=mlx-community/Phi-3.5-vision-instruct-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 3.68s total (gen=2.69s, load=0.98s, prep=0.00s, first=0.38s) | Memory: 9.4 GB (8.14% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 1,242 (1,144 prompt + 98 gen) | Speed: 53.7 gen/s, 3,017 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 11/42] SUMMARY model=mlx-community/diffusiongemma-26B-A4B-it-8bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=unexpected_special_token
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected special token wrappers: <|channel>thought, <channel|>
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 6.22s total (gen=2.79s, load=3.40s, prep=0.02s, first=0.46s) | Memory: 29 GB (25.3% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 691 (604 prompt + 87 gen) | Speed: 54.3 gen/s, 1,309 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 12/42] SUMMARY model=mlx-community/MiniCPM-V-4.6-8bit execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=token_cap_truncation+prompt_instruction_echo+unexpected_catalog_preamble+thinking_trace_incomplete+catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Expected thinking trace did not reach a final answer
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Instruction text appears in output
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected text appears before the Title section
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 5.80s total (gen=4.35s, load=1.43s, prep=0.01s, first=1.44s, stop=max_tokens) | Memory: 3.8 GB (3.26% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 1,445 (945 prompt + 500 gen) | Speed: 226 gen/s, 654 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 13/42] SUMMARY model=mlx-community/llava-v1.6-mistral-7b-8bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=none observations=missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 5.44s total (gen=4.39s, load=1.04s, prep=0.00s, first=2.66s) | Memory: 9.7 GB (8.4% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 2,597 (2,534 prompt + 63 gen) | Speed: 62.1 gen/s, 952 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 14/42] SUMMARY model=mlx-community/Molmo-7B-D-0924-8bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 5.80s total (gen=4.46s, load=1.34s, prep=0.00s, first=0.90s) | Memory: 11 GB (9.68% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 1,662 (1,527 prompt + 135 gen) | Speed: 51.4 gen/s, 1,695 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 15/42] SUMMARY model=mlx-community/gemma-4-31b-it-4bit execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 8.11s total (gen=5.32s, load=2.77s, prep=0.00s, first=1.07s) | Memory: 20 GB (16.9% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 710 (608 prompt + 102 gen) | Speed: 27.6 gen/s, 569 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 16/42] SUMMARY model=mlx-community/pixtral-12b-8bit execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 7.30s total (gen=5.49s, load=1.80s, prep=0.00s, first=2.11s) | Memory: 16 GB (13.5% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,238 (3,125 prompt + 113 gen) | Speed: 39.6 gen/s, 1,480 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 17/42] SUMMARY model=mlx-community/InternVL3-8B-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 7.51s total (gen=5.63s, load=1.86s, prep=0.00s, first=1.21s) | Memory: 17 GB (14.8% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 2,231 (2,127 prompt + 104 gen) | Speed: 28.6 gen/s, 1,755 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 18/42] SUMMARY model=mlx-community/gemma-3-27b-it-qat-4bit execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 8.52s total (gen=6.06s, load=2.45s, prep=0.00s, first=1.12s) | Memory: 18 GB (15.7% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 734 (603 prompt + 131 gen) | Speed: 29.7 gen/s, 538 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 19/42] SUMMARY model=mlx-community/SmolVLM2-2.2B-Instruct-mlx execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=repeated_output+token_cap_truncation+catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Repetitive: 'keyword: "marina"'
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 7.02s total (gen=6.09s, load=0.92s, prep=0.01s, first=0.60s, stop=max_tokens) | Memory: 5.5 GB (4.74% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 941 (441 prompt + 500 gen) | Speed: 114 gen/s, 739 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 20/42] SUMMARY model=mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 7.98s total (gen=6.31s, load=1.66s, prep=0.01s, first=3.87s) | Memory: 13 GB (11.3% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,039 (2,935 prompt + 104 gen) | Speed: 55.8 gen/s, 757 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 21/42] SUMMARY model=mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 9.87s total (gen=8.09s, load=1.76s, prep=0.00s, first=3.78s) | Memory: 13 GB (11.7% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,105 (2,935 prompt + 170 gen) | Speed: 45.8 gen/s, 777 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 22/42] SUMMARY model=mlx-community/Llama-3.2-11B-Vision-Instruct-8bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 11.56s total (gen=9.87s, load=1.68s, prep=0.00s, first=2.17s) | Memory: 15 GB (12.9% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 405 (316 prompt + 89 gen) | Speed: 12.5 gen/s, 146 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 23/42] SUMMARY model=mlx-community/Idefics3-8B-Llama3-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=role_boundary_token_present+catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 13.23s total (gen=11.05s, load=2.16s, prep=0.00s, first=2.48s) | Memory: 18 GB (15.6% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 2,835 (2,627 prompt + 208 gen) | Speed: 26.4 gen/s, 1,059 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 24/42] SUMMARY model=mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 15.92s total (gen=12.62s, load=3.29s, prep=0.01s, first=6.51s) | Memory: 23 GB (19.9% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 2,508 (2,402 prompt + 106 gen) | Speed: 24.8 gen/s, 369 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 25/42] SUMMARY model=mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=none
+2026-08-12 22:42:33 BST - INFO - observations=missing_requested_sections+token_cap_truncation+prompt_instruction_echo+unexpected_catalog_preamble
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, keywords
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Instruction text appears in output
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected text appears before the Title section
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 17.01s total (gen=14.82s, load=2.18s, prep=0.01s, first=2.45s, stop=max_tokens) | Memory: 15 GB (12.7% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,716 (3,216 prompt + 500 gen) | Speed: 42.2 gen/s, 1,314 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 26/42] SUMMARY model=mlx-community/paligemma2-3b-pt-896-4bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=repeated_output+missing_requested_sections+token_cap_truncation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Repetitive: 'Coastline,'
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 16.11s total (gen=14.93s, load=1.16s, prep=0.00s, first=1.21s, stop=max_tokens) | Memory: 4.3 GB (3.75% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 4,931 (4,431 prompt + 500 gen) | Speed: 38.7 gen/s, 3,649 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 27/42] SUMMARY model=Qwen/Qwen3-VL-2B-Instruct execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 16.71s total (gen=16.03s, load=0.66s, prep=0.01s, first=13.97s) | Memory: 8.4 GB (7.26% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,671 (16,561 prompt + 110 gen) | Speed: 92.3 gen/s, 1,185 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 28/42] SUMMARY model=mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=missing_requested_sections+token_cap_truncation+unexpected_catalog_preamble+thinking_trace_incomplete
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Expected thinking trace did not reach a final answer
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected text appears before the Title section
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 32.58s total (gen=21.41s, load=11.15s, prep=0.01s, first=8.04s, stop=max_tokens) | Memory: 60 GB (52% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 2,143 (1,643 prompt + 500 gen) | Speed: 39.5 gen/s, 204 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 29/42] SUMMARY model=mlx-community/GLM-4.6V-Flash-mxfp4 execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=repeated_output+token_cap_truncation+catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Repetitive: 'keyword: "cityscape"'
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 23.21s total (gen=21.72s, load=1.47s, prep=0.01s, first=10.83s, stop=max_tokens) | Memory: 8.4 GB (7.29% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 6,867 (6,367 prompt + 500 gen) | Speed: 48.3 gen/s, 588 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 30/42] SUMMARY model=mlx-community/Step-3.7-Flash-oQ2e execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 38.19s total (gen=26.38s, load=11.79s, prep=0.02s, first=22.65s) | Memory: 70 GB (60.6% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,619 (3,503 prompt + 116 gen) | Speed: 42.7 gen/s, 155 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 31/42] SUMMARY model=mlx-community/GLM-4.1V-9B-Thinking-8bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=missing_requested_sections+token_cap_truncation+thinking_trace_incomplete
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Expected thinking trace did not reach a final answer
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 29.21s total (gen=27.32s, load=1.88s, prep=0.00s, first=9.74s, stop=max_tokens) | Memory: 13 GB (11.6% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 6,863 (6,363 prompt + 500 gen) | Speed: 29.4 gen/s, 653 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 32/42] SUMMARY model=mlx-community/Qwen3-VL-2B-Instruct-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=none observations=catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 30.24s total (gen=29.24s, load=0.99s, prep=0.00s, first=26.61s) | Memory: 8.4 GB (7.27% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,671 (16,561 prompt + 110 gen) | Speed: 83 gen/s, 622 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 33/42] SUMMARY model=mlx-community/MolmoPoint-8B-fp16 execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 32.51s total (gen=30.06s, load=2.44s, prep=0.00s, first=5.29s) | Memory: 24 GB (20.9% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 3,262 (3,140 prompt + 122 gen) | Speed: 5.12 gen/s, 593 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 34/42] SUMMARY model=mlx-community/X-Reasoner-7B-8bit execution=completed usability=unusable
+2026-08-12 22:42:33 BST - INFO - maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=repeated_output+token_cap_truncation+catalog_constraint_violation
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Repetitive: 'keyword: "dock"'
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 33.58s total (gen=32.29s, load=1.28s, prep=0.00s, first=21.08s, stop=max_tokens) | Memory: 13 GB (11.7% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 17,072 (16,572 prompt + 500 gen) | Speed: 48.2 gen/s, 786 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 35/42] SUMMARY model=mlx-community/GLM-4.6V-nvfp4 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=usable_with_caveats maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=unexpected_special_token
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected special token wrappers: <|begin_of_box|>, <|end_of_box|>
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 42.56s total (gen=33.01s, load=9.53s, prep=0.01s, first=28.73s) | Memory: 78 GB (67.3% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 6,464 (6,367 prompt + 97 gen) | Speed: 26.4 gen/s, 222 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 36/42] SUMMARY model=mlx-community/Qwen3-VL-2B-Thinking-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=missing_requested_sections+token_cap_truncation+thinking_trace_incomplete
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title, description, keywords
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Expected thinking trace did not reach a final answer
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 35.39s total (gen=34.33s, load=1.03s, prep=0.02s, first=26.30s, stop=max_tokens) | Memory: 8.4 GB (7.27% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 17,063 (16,563 prompt + 500 gen) | Speed: 74.6 gen/s, 630 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 37/42] SUMMARY model=mlx-community/Qwen3.5-9B-MLX-4bit execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 81.59s total (gen=79.70s, load=1.88s, prep=0.00s, first=76.56s) | Memory: 10.0 GB (8.65% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,693 (16,576 prompt + 117 gen) | Speed: 68 gen/s, 216 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 38/42] SUMMARY model=mlx-community/Qwen3.5-35B-A3B-4bit execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 83.04s total (gen=80.25s, load=2.76s, prep=0.01s, first=78.23s) | Memory: 24 GB (21% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,687 (16,576 prompt + 111 gen) | Speed: 102 gen/s, 212 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 39/42] SUMMARY model=mlx-community/Ornith-1.0-35B-bf16 execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 94.51s total (gen=81.84s, load=12.65s, prep=0.02s, first=76.77s) | Memory: 74 GB (64.2% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,700 (16,576 prompt + 124 gen) | Speed: 59.1 gen/s, 216 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 40/42] SUMMARY model=mlx-community/Qwen2-VL-2B-Instruct-4bit execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=none observations=missing_requested_sections
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: keywords
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 97.69s total (gen=97.15s, load=0.53s, prep=0.00s, first=95.62s) | Memory: 5.1 GB (4.39% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,683 (16,572 prompt + 111 gen) | Speed: 177 gen/s, 173 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 41/42] SUMMARY model=mlx-community/Qwen3.6-27B-mxfp8 execution=completed usability=usable
+2026-08-12 22:42:33 BST - INFO - maintainer=none observations=none
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 110.20s total (gen=106.61s, load=3.56s, prep=0.02s, first=97.22s) | Memory: 35 GB (30% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 16,701 (16,576 prompt + 125 gen) | Speed: 15 gen/s, 170 prompt/s
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - [RUN 42/42] SUMMARY model=mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 execution=completed
+2026-08-12 22:42:33 BST - INFO - usability=unusable maintainer=observation_needs_reproduction
+2026-08-12 22:42:33 BST - INFO - observations=missing_requested_sections+token_cap_truncation+unexpected_catalog_preamble+thinking_trace_incomplete
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Missing sections: title
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Expected thinking trace did not reach a final answer
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Unexpected text appears before the Title section
+2026-08-12 22:42:33 BST - WARNING - ⚠️  Output reached requested token limit (500 tokens)
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 Timing: 119.21s total (gen=115.35s, load=3.84s, prep=0.00s, first=3.74s, stop=max_tokens) | Memory: 40 GB (34.6% of 108 GB recommended working set) peak
+2026-08-12 22:42:33 BST - INFO -    Tokens: 1,838 (1,338 prompt + 500 gen) | Speed: 4.52 gen/s, 358 prompt/s
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - Results Summary
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - Execution outcomes: completed=41, crashed=1
+2026-08-12 22:42:33 BST - INFO - Usability outcomes: unusable=16, usable=14, usable_with_caveats=11, not_evaluated=1
+2026-08-12 22:42:33 BST - INFO - Maintainer outcomes: none=27, observation_needs_reproduction=14, actionable_failure=1
+2026-08-12 22:42:33 BST - INFO - Mechanical observations: missing_requested_sections=12, catalog_constraint_violation=12, token_cap_truncation=10, thinking_trace_incomplete=5, unexpected_catalog_preamble=4, repeated_output=4, unexpected_special_token=3, prompt_instruction_echo=2, empty_output=1, role_boundary_token_present=1
+2026-08-12 22:42:33 BST - INFO - 🏆 Performance Highlights:
+2026-08-12 22:42:33 BST - INFO -    Fastest: LiquidAI/LFM2.5-VL-450M-MLX-bf16 (505.7 tps)
+2026-08-12 22:42:33 BST - INFO -    📊 Average TPS: 77.8 across 25 models
+2026-08-12 22:42:33 BST - INFO -    💾 Lowest peak memory: LiquidAI/LFM2.5-VL-450M-MLX-bf16 (1.2 GB)
+2026-08-12 22:42:33 BST - INFO -    ⚡ Fastest load: Qwen/Qwen3-VL-2B-Instruct (0.66s)
+2026-08-12 22:42:33 BST - INFO - 📈 Resource Usage:
+2026-08-12 22:42:33 BST - INFO -    Average peak memory: 23 GB (19.7% of 108 GB recommended working set)
+2026-08-12 22:42:33 BST - INFO -    Memory efficiency: 243 tokens/GB
+2026-08-12 22:42:33 BST - INFO -    Input image size: 54.58 MP
+2026-08-12 22:42:33 BST - INFO -    Average peak delta from post-load: 3.52 GB
+2026-08-12 22:42:33 BST - INFO -    Peak memory delta / MP: 66 MB/MP
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📋 Model Comparison (current run):
+2026-08-12 22:42:33 BST - INFO -    Recommended working set: 108 GB
+2026-08-12 22:42:33 BST - INFO -    E/U: execution C=completed, X=crashed, I=indeterminate
+2026-08-12 22:42:33 BST - INFO -         usability U=usable, C=caveated, X=unusable, -=not evaluated
+2026-08-12 22:42:33 BST - INFO -    First=prefill/first token; Remain=input preparation + decode
+2026-08-12 22:42:33 BST - INFO -    ╭────┬─────────────┬─────┬──────┬───────┬──────┬───────┬────────┬───────┬───────┬───────┬───────╮
+2026-08-12 22:42:33 BST - INFO -    │ #  │ Model       │ E/U │ Val  │ Load  │ Prep │ First │ Remain │ Clean │ Total │ TPS   │ GB    │
+2026-08-12 22:42:33 BST - INFO -    ├────┼─────────────┼─────┼──────┼───────┼──────┼───────┼────────┼───────┼───────┼───────┼───────┤
+2026-08-12 22:42:33 BST - INFO -    │ 1  │ LFM2.5-VL-4 │ C/C │ 0.37 │ 1.11  │ 0.01 │ 0.75  │ 0.61   │ 0.06  │ 2.85  │ 505.7 │ 1.19  │
+2026-08-12 22:42:33 BST - INFO -    │    │ 50M-MLX...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 2  │ nanoLLaVA-1 │ C/X │ 0.00 │ 0.55  │ 0.00 │ 0.08  │ 0.81   │ 0.08  │ 1.44  │ 360.3 │ 2.28  │
+2026-08-12 22:42:33 BST - INFO -    │    │ .5-4bit     │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 3  │ FastVLM-0.5 │ C/X │ 0.00 │ 1.03  │ 0.00 │ 0.84  │ 1.52   │ 0.09  │ 3.40  │ 290.8 │ 1.94  │
+2026-08-12 22:42:33 BST - INFO -    │    │ B-bf16      │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 4  │ MiniCPM-V-4 │ C/X │ 0.00 │ 1.43  │ 0.01 │ 1.44  │ 2.90   │ 0.14  │ 5.80  │ 226.3 │ 3.77  │
+2026-08-12 22:42:33 BST - INFO -    │    │ .6-8bit     │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 5  │ Qwen2-VL-2B │ C/X │ 0.00 │ 0.53  │ 0.00 │ 95.62 │ 1.53   │ 0.14  │ 97.69 │ 177.5 │ 5.06  │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Instru...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 6  │ LFM2.5-VL-1 │ C/C │ 0.00 │ 0.87  │ 0.01 │ 0.43  │ 1.58   │ 0.09  │ 2.89  │ 161.8 │ 4.11  │
+2026-08-12 22:42:33 BST - INFO -    │    │ .6B-bf16    │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 7  │ Ministral-3 │ C/U │ 0.00 │ 1.09  │ 0.01 │ 1.24  │ 1.26   │ 0.09  │ 3.60  │ 147.0 │ 7.80  │
+2026-08-12 22:42:33 BST - INFO -    │    │ -3B-Ins...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 8  │ gemma-4-26b │ C/C │ 0.00 │ 2.32  │ 0.02 │ 0.45  │ 1.34   │ 0.12  │ 4.14  │ 128.6 │ 16.25 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -a4b-it...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 9  │ SmolVLM2-2. │ C/X │ 0.00 │ 0.92  │ 0.01 │ 0.60  │ 5.49   │ 0.14  │ 7.02  │ 114.3 │ 5.48  │
+2026-08-12 22:42:33 BST - INFO -    │    │ 2B-Inst...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 10 │ Qwen3.5-35B │ C/U │ 0.00 │ 2.76  │ 0.01 │ 78.23 │ 2.03   │ 0.13  │ 83.04 │ 101.8 │ 24.29 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -A3B-4bit   │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 11 │ Qwen3-VL-2B │ C/C │ 0.00 │ 0.66  │ 0.01 │ 13.97 │ 2.06   │ 0.09  │ 16.71 │ 92.3  │ 8.38  │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Instruct   │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 12 │ Qwen3-VL-2B │ C/C │ 0.00 │ 0.99  │ 0.00 │ 26.61 │ 2.63   │ 0.15  │ 30.24 │ 83.0  │ 8.39  │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Instru...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 13 │ Qwen3-VL-2B │ C/X │ 0.00 │ 1.03  │ 0.02 │ 26.30 │ 8.03   │ 0.22  │ 35.39 │ 74.6  │ 8.39  │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Thinki...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 14 │ Qwen3.5-9B- │ C/U │ 0.00 │ 1.88  │ 0.00 │ 76.56 │ 3.14   │ 0.11  │ 81.59 │ 68.0  │ 9.98  │
+2026-08-12 22:42:33 BST - INFO -    │    │ MLX-4bit    │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 15 │ diffusionge │ C/C │ 0.00 │ 3.47  │ 0.00 │ 0.39  │ 2.04   │ 0.13  │ 5.91  │ 63.0  │ 28.43 │
+2026-08-12 22:42:33 BST - INFO -    │    │ mma-26B...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 16 │ llava-v1.6- │ C/X │ 0.00 │ 1.04  │ 0.00 │ 2.66  │ 1.73   │ 0.09  │ 5.44  │ 62.1  │ 9.70  │
+2026-08-12 22:42:33 BST - INFO -    │    │ mistral...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 17 │ Ornith-1.0- │ C/U │ 0.00 │ 12.65 │ 0.02 │ 76.77 │ 5.06   │ 0.28  │ 94.51 │ 59.1  │ 74.11 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 35B-bf16    │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 18 │ Ministral-3 │ C/U │ 0.00 │ 1.66  │ 0.01 │ 3.87  │ 2.44   │ 0.12  │ 7.98  │ 55.8  │ 13.05 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -14B-In...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 19 │ diffusionge │ C/C │ 0.00 │ 3.40  │ 0.02 │ 0.46  │ 2.33   │ 0.15  │ 6.22  │ 54.3  │ 29.21 │
+2026-08-12 22:42:33 BST - INFO -    │    │ mma-26B...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 20 │ Phi-3.5-vis │ C/U │ 0.00 │ 0.98  │ 0.00 │ 0.38  │ 2.31   │ 0.08  │ 3.68  │ 53.7  │ 9.40  │
+2026-08-12 22:42:33 BST - INFO -    │    │ ion-ins...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 21 │ Molmo-7B-D- │ C/C │ 0.00 │ 1.34  │ 0.00 │ 0.90  │ 3.55   │ 0.08  │ 5.80  │ 51.4  │ 11.18 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 0924-8bit   │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 22 │ GLM-4.6V-Fl │ C/X │ 0.00 │ 1.47  │ 0.01 │ 10.83 │ 10.89  │ 0.11  │ 23.21 │ 48.3  │ 8.41  │
+2026-08-12 22:42:33 BST - INFO -    │    │ ash-mxfp4   │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 23 │ X-Reasoner- │ C/X │ 0.00 │ 1.28  │ 0.00 │ 21.08 │ 11.21  │ 0.14  │ 33.58 │ 48.2  │ 13.49 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 7B-8bit     │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 24 │ Ministral-3 │ C/U │ 0.00 │ 1.76  │ 0.00 │ 3.78  │ 4.32   │ 0.15  │ 9.87  │ 45.8  │ 13.48 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -14B-In...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 25 │ Step-3.7-Fl │ C/U │ 0.00 │ 11.79 │ 0.02 │ 22.65 │ 3.72   │ 0.23  │ 38.19 │ 42.7  │ 69.93 │
+2026-08-12 22:42:33 BST - INFO -    │    │ ash-oQ2e    │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 26 │ Apriel-1.5- │ C/X │ 0.00 │ 2.18  │ 0.01 │ 2.45  │ 12.37  │ 0.11  │ 17.01 │ 42.2  │ 14.69 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 15b-Thi...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 27 │ pixtral-12b │ C/U │ 0.00 │ 1.80  │ 0.00 │ 2.11  │ 3.38   │ 0.09  │ 7.30  │ 39.6  │ 15.62 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -8bit       │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 28 │ ERNIE-4.5-V │ C/X │ 0.00 │ 11.15 │ 0.01 │ 8.04  │ 13.37  │ 0.42  │ 32.58 │ 39.5  │ 60.03 │
+2026-08-12 22:42:33 BST - INFO -    │    │ L-28B-A...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 29 │ paligemma2- │ C/X │ 0.00 │ 1.16  │ 0.00 │ 1.21  │ 13.71  │ 0.19  │ 16.11 │ 38.7  │ 4.33  │
+2026-08-12 22:42:33 BST - INFO -    │    │ 3b-pt-8...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 30 │ gemma-3-27b │ C/U │ 0.00 │ 2.45  │ 0.00 │ 1.12  │ 4.94   │ 0.13  │ 8.52  │ 29.7  │ 18.13 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -it-qat...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 31 │ GLM-4.1V-9B │ C/X │ 0.00 │ 1.88  │ 0.00 │ 9.74  │ 17.59  │ 0.10  │ 29.21 │ 29.4  │ 13.41 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Thinki...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 32 │ InternVL3-8 │ C/C │ 0.00 │ 1.86  │ 0.00 │ 1.21  │ 4.42   │ 0.30  │ 7.51  │ 28.6  │ 17.10 │
+2026-08-12 22:42:33 BST - INFO -    │    │ B-bf16      │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 33 │ gemma-4-31b │ C/U │ 0.00 │ 2.77  │ 0.00 │ 1.07  │ 4.26   │ 0.13  │ 8.11  │ 27.6  │ 19.57 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -it-4bit    │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 34 │ GLM-4.6V-nv │ C/C │ 0.00 │ 9.53  │ 0.01 │ 28.73 │ 4.28   │ 0.50  │ 42.56 │ 26.4  │ 77.69 │
+2026-08-12 22:42:33 BST - INFO -    │    │ fp4         │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 35 │ Idefics3-8B │ C/C │ 0.00 │ 2.16  │ 0.00 │ 2.48  │ 8.57   │ 0.35  │ 13.23 │ 26.4  │ 18.07 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Llama3...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 36 │ Devstral-Sm │ C/U │ 0.00 │ 3.29  │ 0.01 │ 6.51  │ 6.11   │ 0.13  │ 15.92 │ 24.8  │ 23.01 │
+2026-08-12 22:42:33 BST - INFO -    │    │ all-2-2...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 37 │ Qwen3.6-27B │ C/U │ 0.00 │ 3.56  │ 0.02 │ 97.22 │ 9.38   │ 0.21  │ 110.2 │ 15.0  │ 34.67 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -mxfp8      │     │      │       │      │       │        │       │ 0     │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 38 │ Llama-3.2-1 │ C/U │ 0.00 │ 1.68  │ 0.00 │ 2.17  │ 7.70   │ 0.16  │ 11.56 │ 12.5  │ 14.94 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 1B-Visi...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 39 │ MolmoPoint- │ C/X │ 0.00 │ 2.44  │ 0.00 │ 5.29  │ 24.77  │ 0.18  │ 32.51 │ 5.1   │ 24.14 │
+2026-08-12 22:42:33 BST - INFO -    │    │ 8B-fp16     │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 40 │ Kimi-VL-A3B │ C/X │ 0.00 │ 3.84  │ 0.00 │ 3.74  │ 111.61 │ 0.32  │ 119.2 │ 4.5   │ 39.94 │
+2026-08-12 22:42:33 BST - INFO -    │    │ -Thinki...  │     │      │       │      │       │        │       │ 1     │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 41 │ gemma-3n-E4 │ C/X │ 0.00 │ 2.38  │ 0.00 │ 0.76  │ 0.53   │ 0.12  │ 3.67  │ -     │ 16.97 │
+2026-08-12 22:42:33 BST - INFO -    │    │ B-it-bf16   │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    │ 42 │ Inkling-Sma │ X/- │ 0.00 │ 0.31  │ -    │ -     │ -      │ 0.16  │ 0.33  │ -     │ -     │
+2026-08-12 22:42:33 BST - INFO -    │    │ ll-mlx-...  │     │      │       │      │       │        │       │       │       │       │
+2026-08-12 22:42:33 BST - INFO -    ╰────┴─────────────┴─────┴──────┴───────┴──────┴───────┴────────┴───────┴───────┴───────┴───────╯
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - 📊 TPS comparison chart:
+2026-08-12 22:42:33 BST - INFO -    LFM2.5-VL-450M-MLX-bf16          ████████████████████████ 505.7 tps
+2026-08-12 22:42:33 BST - INFO -    LFM2.5-VL-1.6B-bf16              ███████▋                 161.8 tps
+2026-08-12 22:42:33 BST - INFO -    Ministral-3-3B-Instruct-2512-... ██████▉                  147.0 tps
+2026-08-12 22:42:33 BST - INFO -    gemma-4-26b-a4b-it-4bit          ██████                   128.6 tps
+2026-08-12 22:42:33 BST - INFO -    Qwen3.5-35B-A3B-4bit             ████▊                    101.8 tps
+2026-08-12 22:42:33 BST - INFO -    Qwen3-VL-2B-Instruct             ████▍                     92.3 tps
+2026-08-12 22:42:33 BST - INFO -    Qwen3-VL-2B-Instruct-bf16        ███▉                      83.0 tps
+2026-08-12 22:42:33 BST - INFO -    Qwen3.5-9B-MLX-4bit              ███▏                      68.0 tps
+2026-08-12 22:42:33 BST - INFO - ⏱ Efficiency chart (higher is faster overall):
+2026-08-12 22:42:33 BST - INFO -    LFM2.5-VL-450M-MLX-bf16          ████████████████████████ 0.351 1/s
+2026-08-12 22:42:33 BST - INFO -    LFM2.5-VL-1.6B-bf16              ███████████████████████▋ 0.346 1/s
+2026-08-12 22:42:33 BST - INFO -    Ministral-3-3B-Instruct-2512-... ██████████████████▉      0.277 1/s
+2026-08-12 22:42:33 BST - INFO -    Phi-3.5-vision-instruct-bf16     ██████████████████▌      0.272 1/s
+2026-08-12 22:42:33 BST - INFO -    gemma-4-26b-a4b-it-4bit          ████████████████▌        0.242 1/s
+2026-08-12 22:42:33 BST - INFO -    Molmo-7B-D-0924-8bit             ███████████▊             0.172 1/s
+2026-08-12 22:42:33 BST - INFO -    diffusiongemma-26B-A4B-it-mxfp8  ███████████▌             0.169 1/s
+2026-08-12 22:42:33 BST - INFO -    diffusiongemma-26B-A4B-it-8bit   ███████████              0.161 1/s
+2026-08-12 22:42:33 BST - INFO - ❌ Failure stage frequency:
+2026-08-12 22:42:33 BST - INFO -    Model Error ████████████████████████ 1 x
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - Completed Models (41):
+2026-08-12 22:42:33 BST - INFO - Unusable (16):
+2026-08-12 22:42:33 BST - INFO -    ╭───────────────────────────────────────────────┬───────────────────────────────────────────────╮
+2026-08-12 22:42:33 BST - INFO -    │ Model                                         │ Observations                                  │
+2026-08-12 22:42:33 BST - INFO -    ├───────────────────────────────────────────────┼───────────────────────────────────────────────┤
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/gemma-3n-E4B-it-bf16            │ empty response; missing required fields       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/GLM-4.6V-Flash-mxfp4            │ repeated text; cut off at token limit;        │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/paligemma2-3b-pt-896-4bit       │ repeated text; missing required fields; cut   │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ off at token limit                            │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/SmolVLM2-2.2B-Instruct-mlx      │ repeated text; cut off at token limit;        │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/X-Reasoner-7B-8bit              │ repeated text; cut off at token limit;        │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX │ missing required fields; echoes instructions; │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ extra text before Title; cut off at token     │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ limit                                         │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-b │ missing required fields; extra text before    │
+2026-08-12 22:42:33 BST - INFO -    │ f16                                           │ Title; cut off at token limit; incomplete     │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ thinking block                                │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/FastVLM-0.5B-bf16               │ missing required fields                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/GLM-4.1V-9B-Thinking-8bit       │ missing required fields; cut off at token     │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ limit; incomplete thinking block              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16  │ missing required fields; extra text before    │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ Title; cut off at token limit; incomplete     │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ thinking block                                │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/llava-v1.6-mistral-7b-8bit      │ missing required fields                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/MolmoPoint-8B-fp16              │ missing required fields                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/nanoLLaVA-1.5-4bit              │ missing required fields                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen2-VL-2B-Instruct-4bit       │ missing required fields                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen3-VL-2B-Thinking-bf16       │ missing required fields; cut off at token     │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ limit; incomplete thinking block              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/MiniCPM-V-4.6-8bit              │ echoes instructions; extra text before Title; │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ cut off at token limit; incomplete thinking   │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ block; title/keyword constraints failed       │
+2026-08-12 22:42:33 BST - INFO -    ╰───────────────────────────────────────────────┴───────────────────────────────────────────────╯
+2026-08-12 22:42:33 BST - INFO - Usable with caveats (11):
+2026-08-12 22:42:33 BST - INFO -    ╭───────────────────────────────────────────────┬───────────────────────────────────────────────╮
+2026-08-12 22:42:33 BST - INFO -    │ Model                                         │ Observations                                  │
+2026-08-12 22:42:33 BST - INFO -    ├───────────────────────────────────────────────┼───────────────────────────────────────────────┤
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/diffusiongemma-26B-A4B-it-8bit  │ control tokens visible                        │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/diffusiongemma-26B-A4B-it-mxfp8 │ control tokens visible                        │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/GLM-4.6V-nvfp4                  │ control tokens visible                        │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Idefics3-8B-Llama3-bf16         │ role tokens visible; title/keyword            │
+2026-08-12 22:42:33 BST - INFO -    │                                               │ constraints failed                            │
+2026-08-12 22:42:33 BST - INFO -    │ LiquidAI/LFM2.5-VL-450M-MLX-bf16              │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/gemma-4-26b-a4b-it-4bit         │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/InternVL3-8B-bf16               │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/LFM2.5-VL-1.6B-bf16             │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Molmo-7B-D-0924-8bit            │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen3-VL-2B-Instruct-bf16       │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    │ Qwen/Qwen3-VL-2B-Instruct                     │ title/keyword constraints failed              │
+2026-08-12 22:42:33 BST - INFO -    ╰───────────────────────────────────────────────┴───────────────────────────────────────────────╯
+2026-08-12 22:42:33 BST - INFO - Usable (14):
+2026-08-12 22:42:33 BST - INFO -    ╭───────────────────────────────────────────────────────╮
+2026-08-12 22:42:33 BST - INFO -    │ Model                                                 │
+2026-08-12 22:42:33 BST - INFO -    ├───────────────────────────────────────────────────────┤
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/gemma-3-27b-it-qat-4bit                 │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/gemma-4-31b-it-4bit                     │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Ministral-3-3B-Instruct-2512-4bit       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Ornith-1.0-35B-bf16                     │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Phi-3.5-vision-instruct-bf16            │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/pixtral-12b-8bit                        │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen3.5-35B-A3B-4bit                    │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen3.5-9B-MLX-4bit                     │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Qwen3.6-27B-mxfp8                       │
+2026-08-12 22:42:33 BST - INFO -    │ mlx-community/Step-3.7-Flash-oQ2e                     │
+2026-08-12 22:42:33 BST - INFO -    ╰───────────────────────────────────────────────────────╯
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - ❌ Crashed Models (1):
+2026-08-12 22:42:33 BST - INFO -   - mlx-community/Inkling-Small-mlx-4bit | phase=model_load | stage=Model Error | module=builtins | package=mlx-vlm | code=MLX_VLM_MODEL_LOAD_MODEL | traceback=available
+2026-08-12 22:42:33 BST - INFO -     -> error=ValueError: Received 362 parameters not in model: 
+audio_tower.encoder.biases,
+audio_tower.encoder.scales,
+language_model.model.layers.10.mlp.experts.down_proj.biases,
+l...
+2026-08-12 22:42:33 BST - INFO -    By package: mlx-vlm=1
+2026-08-12 22:42:33 BST - INFO -    By stage: Model Error=1
+2026-08-12 22:42:33 BST - INFO -    History:      /Users/jrp/Documents/AI/mlx/check_models/src/output/results.history.jsonl
+2026-08-12 22:42:33 BST - INFO - GitHub Issue reports generated for 1 issue(s).
+2026-08-12 22:42:33 BST - INFO -    Issue Report (mlx-community/Inkling-Small-mlx-4bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_mlx-community_Inkling-Small-mlx-4bit.md
+2026-08-12 22:42:33 BST - INFO - 
+2026-08-12 22:42:33 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:33 BST - INFO - Maintainer Summary
+2026-08-12 22:42:33 BST - INFO - Run outcomes: attempted=42, evaluated=42, completed=41, crashed=1, indeterminate=0
+2026-08-12 22:42:33 BST - INFO -    Diagnostics:   /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md
+2026-08-12 22:42:33 BST - INFO -    Crash Draft (mlx-community/Inkling-Small-mlx-4bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_mlx-community_Inkling-Small-mlx-4bit.md
+2026-08-12 22:42:35 BST - INFO - 
+2026-08-12 22:42:35 BST - INFO - 📊 Reports successfully generated:
+2026-08-12 22:42:35 BST - INFO -    Output Index:    /Users/jrp/Documents/AI/mlx/check_models/src/output/index.md
+2026-08-12 22:42:35 BST - INFO -    HTML Report:      /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.html
+2026-08-12 22:42:35 BST - INFO -    Gallery Report:   /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md
+2026-08-12 22:42:35 BST - INFO -    Diagnostics:      /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md
+2026-08-12 22:42:35 BST - INFO -    JSONL Report:     /Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl
+2026-08-12 22:42:35 BST - INFO -    Run JSON:         /Users/jrp/Documents/AI/mlx/check_models/src/output/run.json
+2026-08-12 22:42:35 BST - INFO -    Run Issue:        /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/run_summary.md
+2026-08-12 22:42:35 BST - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log
+2026-08-12 22:42:35 BST - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2026-08-12 22:42:35 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:42:35 BST - INFO - Final Summary
+2026-08-12 22:42:35 BST - INFO - 
+2026-08-12 22:42:35 BST - INFO - ⏱  Overall runtime: 1093.15s
+2026-08-12 22:42:35 BST - INFO - --- Library Versions ---
+2026-08-12 22:42:35 BST - INFO -    ╭─────────────────┬──────────────────────────────╮
+2026-08-12 22:42:35 BST - INFO -    │ Library         │ Version                      │
+2026-08-12 22:42:35 BST - INFO -    ├─────────────────┼──────────────────────────────┤
+2026-08-12 22:42:35 BST - INFO -    │ Pillow          │ 12.3.0                       │
+2026-08-12 22:42:35 BST - INFO -    │ huggingface-hub │ 1.27.0                       │
+2026-08-12 22:42:35 BST - INFO -    │ mlx             │ 0.32.1.dev20260812+52960f80f │
+2026-08-12 22:42:35 BST - INFO -    │ mlx-audio       │ 0.4.8                        │
+2026-08-12 22:42:35 BST - INFO -    │ mlx-lm          │ 0.31.3                       │
+2026-08-12 22:42:35 BST - INFO -    │ mlx-metal       │                              │
+2026-08-12 22:42:35 BST - INFO -    │ mlx-vlm         │ 0.6.13                       │
+2026-08-12 22:42:35 BST - INFO -    │ numpy           │ 2.5.2                        │
+2026-08-12 22:42:35 BST - INFO -    │ tokenizers      │ 0.22.2                       │
+2026-08-12 22:42:35 BST - INFO -    │ transformers    │ 5.15.0                       │
+2026-08-12 22:42:35 BST - INFO -    ╰─────────────────┴──────────────────────────────╯
+2026-08-12 22:42:35 BST - INFO - Generated: 2026-08-12 22:42:35 BST
+2026-08-12 22:42:35 BST - INFO - 
+2026-08-12 22:42:35 BST - INFO - --- System Information ---
+2026-08-12 22:42:35 BST - INFO -    ╭────────────────────────────┬──────────────────────────────────────────────────────────────────╮
+2026-08-12 22:42:35 BST - INFO -    │ Property                   │ Value                                                            │
+2026-08-12 22:42:35 BST - INFO -    ├────────────────────────────┼──────────────────────────────────────────────────────────────────┤
+2026-08-12 22:42:35 BST - INFO -    │ OS                         │ Darwin 25.6.0                                                    │
+2026-08-12 22:42:35 BST - INFO -    │ macOS Version              │ 26.6.1                                                           │
+2026-08-12 22:42:35 BST - INFO -    │ SDK Version                │ 26.5                                                             │
+2026-08-12 22:42:35 BST - INFO -    │ Active Developer Directory │ /Applications/Xcode.app/Contents/Developer                       │
+2026-08-12 22:42:35 BST - INFO -    │ Xcode Version              │ 26.6                                                             │
+2026-08-12 22:42:35 BST - INFO -    │ Xcode Build                │ 17F113                                                           │
+2026-08-12 22:42:35 BST - INFO -    │ SDK Path                   │ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.plat │
+2026-08-12 22:42:35 BST - INFO -    │                            │ form/Developer/SDKs/MacOSX26.5.sdk                               │
+2026-08-12 22:42:35 BST - INFO -    │ Metal SDK                  │ MacOSX26.5.sdk                                                   │
+2026-08-12 22:42:35 BST - INFO -    │ Metal Compiler Version     │ Apple metal version 32023.883 (metalfe-32023.883)                │
+2026-08-12 22:42:35 BST - INFO -    │ Metallib Linker Version    │ AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy    │
+2026-08-12 22:42:35 BST - INFO -    │                            │ metallib linker)                                                 │
+2026-08-12 22:42:35 BST - INFO -    │ Apple Clang Version        │ Apple clang version 21.0.0 (clang-2100.1.1.101)                  │
+2026-08-12 22:42:35 BST - INFO -    │ Python Version             │ 3.13.13                                                          │
+2026-08-12 22:42:35 BST - INFO -    │ Architecture               │ arm64                                                            │
+2026-08-12 22:42:35 BST - INFO -    │ GPU/Chip                   │ Apple M5 Max                                                     │
+2026-08-12 22:42:35 BST - INFO -    │ MLX Device                 │ Apple M5 Max                                                     │
+2026-08-12 22:42:35 BST - INFO -    │ GPU Architecture           │ applegpu_g17s                                                    │
+2026-08-12 22:42:35 BST - INFO -    │ GPU Cores                  │ 40                                                               │
+2026-08-12 22:42:35 BST - INFO -    │ Metal Support              │ Metal 4                                                          │
+2026-08-12 22:42:35 BST - INFO -    │ RAM                        │ 128.0 GB                                                         │
+2026-08-12 22:42:35 BST - INFO -    │ Recommended Working Set    │ 108 GB                                                           │
+2026-08-12 22:42:35 BST - INFO -    │ Fused Attention            │ Available                                                        │
+2026-08-12 22:42:35 BST - INFO -    │ CPU Cores (Physical)       │ 18                                                               │
+2026-08-12 22:42:35 BST - INFO -    │ CPU Cores (Logical)        │ 18                                                               │
+2026-08-12 22:42:35 BST - INFO -    │ MLX Install Type           │ editable local source                                            │
+2026-08-12 22:42:35 BST - INFO -    │ MLX Distribution Root      │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages  │
+2026-08-12 22:42:35 BST - INFO -    │ mlx-metal Distribution     │ not installed; local editable mlx supplies backend               │
+2026-08-12 22:42:35 BST - INFO -    │ MLX Core Extension         │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darw │
+2026-08-12 22:42:35 BST - INFO -    │                            │ in.so                                                            │
+2026-08-12 22:42:35 BST - INFO -    │ MLX Metallib               │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib      │
+2026-08-12 22:42:35 BST - INFO -    │                            │ (174,800,976 bytes,                                              │
+2026-08-12 22:42:35 BST - INFO -    │                            │ sha256=7841f37301ab31cebba1227b6cdc3bb59d91dd35ce1586512266a8997 │
+2026-08-12 22:42:35 BST - INFO -    │                            │ e33b9d6)                                                         │
+2026-08-12 22:42:35 BST - INFO -    │ MLX libmlx.dylib           │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib      │
+2026-08-12 22:42:35 BST - INFO -    │                            │ (21,961,152 bytes,                                               │
+2026-08-12 22:42:35 BST - INFO -    │                            │ sha256=a0d96669c1c798f10b8e9c1be789b0eb6aadba46d0818ed94d2af055e │
+2026-08-12 22:42:35 BST - INFO -    │                            │ 70c36b6)                                                         │
+2026-08-12 22:42:35 BST - INFO -    ╰────────────────────────────┴──────────────────────────────────────────────────────────────────╯

@@ -34,7 +34,7 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
   language_model.model.layers.10.mlp.experts.down_proj.biases.
 - *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002704444
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -42,10 +42,10 @@ builtins.ValueError: Model loading failed: Received 362 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11997, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12108, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11474, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11587, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -55,7 +55,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 756, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 786, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -65,9 +65,9 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 964, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 966, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 840, in load_model
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 842, in load_model
     model.load_weights(list(weights.items()), strict=strict)
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
@@ -441,7 +441,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12427, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12536, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -452,7 +452,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12012, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12123, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -829,20 +829,20 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5373.61it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[20:08:29] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 45,221,684 bytes
-- *Image SHA-256:* c285c098dd74e95801ffa1682a82ee2233a8cbb0baed91714ede8a361b9c6438
+- *Image dimensions:* 9,049 x 6,032 pixels
+- *Image size:* 54,967,584 bytes
+- *Image SHA-256:* 49cac3fb93699eb78136c721288d36296a56b950911c604e4b91a246d8132e9a
 
 <details>
 <summary>Exact prompt</summary>
@@ -853,13 +853,13 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
-- GPS: 50.806659°N, 0.551382°W
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
 
 Descriptive hints:
-- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
-- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
-- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
 
 Write:
 - a concrete 5-10-word title;
@@ -879,28 +879,7 @@ input image is not required: substitute any local image for the placeholder
 path and run one native mlx-vlm process.
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Inkling-Small-mlx-4bit --image any-local-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-08-06 18:26:35 UTC+01:00
-- GPS: 50.806659°N, 0.551382°W
-
-Descriptive hints:
-- Title hint: Arundel Cathedral of Our Lady & St. Philip Howard, Arundel, England, UK, GBR, Europe
-- Description hint: Arundel, UK - October 31, 2021: View of Arundel Cathedral of Our Lady and St Philip Howard
-- Keyword hints: Adobe Stock, Any Vision, Arundel, Arundel Cathedral of Our Lady & St. Philip Howard, Blue sky, Bush, Car, Cathedral, Church, Cottage, England, Europe, Flower, French-Gothic, Neighborhood, Objects, Parking, Red Car, Roof, Sky
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:' --max-tokens 500 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612 --trust-remote-code --prefill-step-size 2048
+python -m mlx_vlm.generate --model mlx-community/Inkling-Small-mlx-4bit --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612 --trust-remote-code
 ```
 
 ## Provenance and Environment
@@ -909,8 +888,8 @@ Keywords:' --max-tokens 500 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03
 
 | Component       | Value                                                           |
 |-----------------|-----------------------------------------------------------------|
-| mlx-vlm         | 0.6.11                                                          |
-| mlx             | 0.32.1.dev20260810+e78d894c8                                    |
+| mlx-vlm         | 0.6.13                                                          |
+| mlx             | 0.32.1.dev20260812+52960f80f                                    |
 | mlx-lm          | 0.31.3                                                          |
 | transformers    | 5.15.0                                                          |
 | tokenizers      | 0.22.2                                                          |
@@ -919,7 +898,7 @@ Keywords:' --max-tokens 500 --temperature 0.0 --revision f0cafad5b1a3e54be06ba03
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6.1                                                          |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.0; revision c37ff98d4113eaaaed386335728148ac4dfb9758; dirty |
+| check_models    | 0.9.1; revision a2c842ef7f598a73b8f8a355d945ff74a642ff89; clean |
 
 ### Full environment evidence
 
