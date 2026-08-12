@@ -543,7 +543,11 @@ run_generate_stubs_command() {
 	fi
 }
 
-# Ensure global Python packaging tools are current
+# Ensure global Python packaging tools are current. Quarantine malformed
+# metadata for only these requested tools before pip attempts an uninstall.
+python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
+	pip wheel setuptools build pyrefly
+
 # Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
 pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly
