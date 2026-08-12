@@ -61,6 +61,11 @@ def quarantine_broken_metadata(
             if not metadata_dir.is_dir():
                 msg = f"metadata path is not a directory: {metadata_dir}"
                 raise RuntimeError(msg)
+            # Missing RECORD marks breakage only in pip-managed environments
+            # (pip always writes it, so its absence means a partial
+            # install/uninstall). Distro/system Pythons legitimately omit
+            # RECORD for system packages; reusing this check outside
+            # update.sh's conda env would quarantine that healthy metadata.
             if not (metadata_dir / "METADATA").is_file() or not (metadata_dir / "RECORD").is_file():
                 broken.append(metadata_dir)
 
