@@ -442,3 +442,1424 @@ Prefill: 100%|#########9| 2401/2402 [00:04<00:00, 588.94tok/s]
 2026-08-12 22:25:12 BST - INFO - Processing Model [5/42]: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 2026-08-12 22:25:12 BST - DEBUG - System: arm64, GPU: Apple M5 Max
 2026-08-12 22:25:12 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+2026-08-12 22:25:45 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+2026-08-12 22:25:45 BST - DEBUG - Captured mlx-vlm console output for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|begin_of_sentence|>You are a multimodal AI assistant called ERNIE developed by Baidu based on the PaddlePaddle framework.
+User:  Picture 1:<|IMAGE_START|><|image@placeholder|><|IMAGE_END|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+Assistant:
+<think>
+
+Let's tackle this step by step. First, the title needs to be concrete, 5-10 words. The context says Bristol, UK, with landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the capture time is 16:45 UTC+01:00, which is late afternoon, not sunset. Wait, the hint says "City Centre, Bristol, England, UK, GBR, Europe" so need to include key landmarks. Let's check the keywords: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Seagulls, Harbour, Cityscape, England, UK, Europe. So title: "Bristol Cathedral and Coyote Ugly Marina with Seagulls at Dusk" (wait, 16:45 is late afternoon, dusk is around that time). Wait, but the hint says "City Centre, Bristol, England, UK, GBR, Europe" so maybe "Bristol City Centre Marina with Bristol Cathedral and Coyote Ugly Bar" but need to be concise. Wait, the user said "concrete 5-10-word title". Let's go with "Bristol Cathedral and Coyote Ugly Marina at Late Afternoon" (that's 8 words).
+
+Next, the description: needs to combine context (capture date/time: 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700°N, 2.600800°W which is Bristol) with main subject (boats at marina), setting (Bristol city centre, near Bristol Cathedral, Coyote Ugly Bar), action (seagulls flying/floating), lighting (late afternoon, since 16:45 is late afternoon). So: "A late afternoon view of boats docked at Bristol's marina near Bristol Cathedral and the Coyote Ugly Bar, with seagulls floating on the water in the city centre."
+
+Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Se
+==========
+Prompt: 1643 tokens, 204.277 tokens-per-sec
+Generation: 500 tokens, 39.503 tokens-per-sec
+Peak memory: 60.029 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 5638.41it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:25:45 BST - DEBUG - Quality analysis for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing_sections=title+description, thinking_trace=True (<think>), thinking_incomplete=True, unexpected_catalog_preamble=True, likely_capped=True, keyword_overlap=some_overlap, words=276
+2026-08-12 22:25:45 BST - INFO - Mechanical observations for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: missing-sections(title+description), thinking-incomplete, unexpected-catalog-preamble, token-cap-truncation
+2026-08-12 22:25:45 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:25:45 BST - INFO - 
+2026-08-12 22:25:45 BST - INFO - Processing Model [6/42]: mlx-community/FastVLM-0.5B-bf16
+2026-08-12 22:25:45 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:25:45 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
+2026-08-12 22:25:48 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/FastVLM-0.5B-bf16
+2026-08-12 22:25:48 BST - DEBUG - Captured mlx-vlm console output for mlx-community/FastVLM-0.5B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+<image>
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grandeur and natural beauty, with a flock of seagulls adding life to the calm waters.
+==========
+Prompt: 348 tokens, 413.195 tokens-per-sec
+Generation: 36 tokens, 290.784 tokens-per-sec
+Peak memory: 1.937 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 1823.08it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:25:49 BST - DEBUG - Quality analysis for mlx-community/FastVLM-0.5B-bf16: missing_sections=title+description+keywords, words=27
+2026-08-12 22:25:49 BST - INFO - Mechanical observations for mlx-community/FastVLM-0.5B-bf16: missing-sections(title+description+keywords)
+2026-08-12 22:25:49 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:25:49 BST - INFO - 
+2026-08-12 22:25:49 BST - INFO - Processing Model [7/42]: mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-12 22:25:49 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:25:49 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-12 22:26:18 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.1V-9B-Thinking-8bit
+2026-08-12 22:26:18 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.1V-9B-Thinking-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|assistant|>
+
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image, it's Bristol's harbor with boats, cathedral, etc. So maybe "Bristol Harbour with Cathedral and Ferris Wheel". Wait, need to keep it concise. Let's check the hints: City Centre, Bristol, England... so maybe "Bristol Marina with Cathedral View". Wait, let's make it 5-10 words. How about "Bristol Harbour Scene with Cathedral and Boats". Hmm, maybe "Bristol City Centre Marina with Cathedral". Wait, let's go with something that's clear. Let's see the image has boats, cathedral, ferris wheel, water with birds. So title could be "Bristol Harbour with Cathedral and Boats". That's about 6 words.
+
+Next, description: need 1-2 sentences. Combine context (capture date/time, GPS) with main visible subject (boats, marina), setting (city centre, harbor), action (seagulls flying/float), lighting (sunny, clear sky), distinctive details (cathedral, ferris wheel, Coyote Ugly building). So: "Captured on 2026-08-12 at 16:45 UTC+01:00, this image shows a marina in Bristol's city centre with boats docked, seagulls in the water, and the Bristol Cathedral and a Ferris wheel in the background under clear daylight." Wait, need to make it 1-2 sentences. Let's adjust: "This image, captured on 2026-08-12 at 16:45 UTC+01:00, depicts a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel visible in the background under bright daylight." That's two sentences? Wait, no, 1-2. Let's make it one: "Captured on 2026-08-12 at 16:45 UTC+01:00, the image shows a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel in the background under clear daylight." That's one sentence.
+
+Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building,
+==========
+Prompt: 6363 tokens, 653.339 tokens-per-sec
+Generation: 500 tokens, 29.353 tokens-per-sec
+Peak memory: 13.407 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 2221.36it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6363 [00:00<?, ?tok/s]
+Prefill:  32%|###2      | 2048/6363 [00:05<00:12, 344.81tok/s]
+Prefill:  64%|######4   | 4096/6363 [00:07<00:03, 608.50tok/s]
+Prefill:  97%|#########6| 6144/6363 [00:09<00:00, 800.42tok/s]
+Prefill: 100%|#########9| 6362/6363 [00:09<00:00, 762.72tok/s]
+Prefill: 100%|#########9| 6362/6363 [00:09<00:00, 663.98tok/s]
+2026-08-12 22:26:18 BST - DEBUG - Quality analysis for mlx-community/GLM-4.1V-9B-Thinking-8bit: missing_sections=title+description+keywords, thinking_trace=True (<think>), thinking_incomplete=True, likely_capped=True, words=335
+2026-08-12 22:26:18 BST - INFO - Mechanical observations for mlx-community/GLM-4.1V-9B-Thinking-8bit: missing-sections(title+description+keywords), thinking-incomplete, token-cap-truncation
+2026-08-12 22:26:18 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:26:18 BST - INFO - 
+2026-08-12 22:26:18 BST - INFO - Processing Model [8/42]: mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-12 22:26:18 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:26:18 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-12 22:26:41 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.6V-Flash-mxfp4
+2026-08-12 22:26:41 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.6V-Flash-mxfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:/nothink<|assistant|>
+<think></think>
+
+Title: Bristol Marina View
+Description: An image of boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture visible in the background.
+Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, City
+==========
+Prompt: 6367 tokens, 587.684 tokens-per-sec
+Generation: 500 tokens, 48.333 tokens-per-sec
+Peak memory: 8.413 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2704.10it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6367 [00:00<?, ?tok/s]
+Prefill:  32%|###2      | 2048/6367 [00:07<00:15, 278.45tok/s]
+Prefill:  64%|######4   | 4096/6367 [00:08<00:04, 520.35tok/s]
+Prefill:  96%|#########6| 6144/6367 [00:10<00:00, 714.67tok/s]
+Prefill: 100%|#########9| 6366/6367 [00:10<00:00, 723.66tok/s]
+Prefill: 100%|#########9| 6366/6367 [00:10<00:00, 592.63tok/s]
+2026-08-12 22:26:41 BST - DEBUG - Quality analysis for mlx-community/GLM-4.6V-Flash-mxfp4: repetitive=True (token=keyword: "cityscape"), likely_capped=True, keyword_overlap=some_overlap, words=260
+2026-08-12 22:26:41 BST - INFO - Mechanical observations for mlx-community/GLM-4.6V-Flash-mxfp4: repetitive(keyword: "cityscape"), token-cap-truncation
+2026-08-12 22:26:41 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:26:41 BST - INFO - 
+2026-08-12 22:26:41 BST - INFO - Processing Model [9/42]: mlx-community/GLM-4.6V-nvfp4
+2026-08-12 22:26:41 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:26:41 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/GLM-4.6V-nvfp4
+2026-08-12 22:27:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/GLM-4.6V-nvfp4
+2026-08-12 22:27:24 BST - DEBUG - Captured mlx-vlm console output for mlx-community/GLM-4.6V-nvfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: [gMASK]<sop><|user|>
+<|begin_of_image|><|image|><|end_of_image|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:/nothink<|assistant|>
+<think></think>
+
+<|begin_of_box|>Title: Bristol Marina with Seagulls and Cathedral
+Description: A marina in Bristol, England, with boats docked at the pier, seagulls floating in the water, and Bristol Cathedral and a Ferris wheel visible in the background under a partly cloudy sky.
+Keywords: Bristol, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel, City Centre, England, UK, Europe, Harbor, Dock, Architecture, Building, Cityscape<|end_of_box|>
+==========
+Prompt: 6367 tokens, 221.623 tokens-per-sec
+Generation: 97 tokens, 26.439 tokens-per-sec
+Peak memory: 77.686 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 21 files:   0%|          | 0/21 [00:00<?, ?it/s]
+Fetching 21 files: 100%|##########| 21/21 [00:00<00:00, 3592.77it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/6367 [00:00<?, ?tok/s]
+Prefill:  32%|###2      | 2048/6367 [00:12<00:27, 157.85tok/s]
+Prefill:  64%|######4   | 4096/6367 [00:17<00:08, 260.13tok/s]
+Prefill:  96%|#########6| 6144/6367 [00:21<00:00, 326.89tok/s]
+Prefill: 100%|#########9| 6366/6367 [00:22<00:00, 314.50tok/s]
+Prefill: 100%|#########9| 6366/6367 [00:22<00:00, 280.29tok/s]
+2026-08-12 22:27:24 BST - DEBUG - Quality analysis for mlx-community/GLM-4.6V-nvfp4: unexpected_special_token=True (<|begin_of_box|>,<|end_of_box|>), keyword_overlap=some_overlap, words=59
+2026-08-12 22:27:24 BST - INFO - Mechanical observations for mlx-community/GLM-4.6V-nvfp4: unexpected-special-token
+2026-08-12 22:27:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:27:24 BST - INFO - 
+2026-08-12 22:27:24 BST - INFO - Processing Model [10/42]: mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-12 22:27:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:27:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-12 22:27:37 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Idefics3-8B-Llama3-bf16
+2026-08-12 22:27:37 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Idefics3-8B-Llama3-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|begin_of_text|>User:<image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<end_of_utterance>
+Assistant:
+ Title: Boats Docked at Bristol Marina with City Centre in the Background.
+Description: This image depicts a marina in Bristol, England, featuring a variety of boats docked along the waterfront. The boats vary in size and design, with some having multiple decks and others appearing more compact. The marina is surrounded by a mix of greenery, including trees and shrubs, which provide a natural backdrop. In the background, the cityscape of Bristol is visible, with notable structures such as the Bristol Cathedral and other buildings. The sky is partly cloudy, with patches of sunlight illuminating the scene. The water in the marina is calm, and a flock of seagulls can be seen flying and floating on the surface. The overall atmosphere is serene and picturesque, capturing the essence of a tranquil day by the water.
+Keywords: Bristol, marina, boats, dock, cityscape, Bristol Cathedral, seagulls, water, trees, shrubs, calm, partly cloudy, sunlight, serene, picturesque.<end_of_utterance>
+==========
+Prompt: 2627 tokens, 1058.778 tokens-per-sec
+Generation: 208 tokens, 26.412 tokens-per-sec
+Peak memory: 18.065 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 2603.54it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2627 [00:00<?, ?tok/s]
+Prefill:  78%|#######7  | 2048/2627 [00:01<00:00, 1039.93tok/s]
+Prefill: 100%|#########9| 2626/2627 [00:02<00:00, 1203.75tok/s]
+Prefill: 100%|#########9| 2626/2627 [00:02<00:00, 1160.89tok/s]
+2026-08-12 22:27:38 BST - DEBUG - Quality analysis for mlx-community/Idefics3-8B-Llama3-bf16: keyword_overlap=some_overlap, words=153
+2026-08-12 22:27:38 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:27:38 BST - INFO - 
+2026-08-12 22:27:38 BST - INFO - Processing Model [11/42]: mlx-community/Inkling-Small-mlx-4bit
+2026-08-12 22:27:38 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:27:38 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Inkling-Small-mlx-4bit
+2026-08-12 22:27:38 BST - DEBUG - Model load failure captured for mlx-community/Inkling-Small-mlx-4bit: Received 362 parameters not in model: 
+audio_tower.encoder.biases,
+audio_tower.encoder.scales,
+language_model.model.layers.10.mlp.experts.down_proj.biases,
+language_model.model.layers.10.mlp.experts.down_proj.scales,
+language_model.model.layers.10.mlp.experts.down_proj.weight,
+language_model.model.layers.10.mlp.experts.gate_proj.biases,
+language_model.model.layers.10.mlp.experts.gate_proj.scales,
+language_model.model.layers.10.mlp.experts.gate_proj.weight,
+language_model.model.layers.10.mlp.experts.up_proj.biases,
+language_model.model.layers.10.mlp.experts.up_proj.scales,
+language_model.model.layers.10.mlp.experts.up_proj.weight,
+language_model.model.layers.11.mlp.experts.down_proj.biases,
+language_model.model.layers.11.mlp.experts.down_proj.scales,
+language_model.model.layers.11.mlp.experts.down_proj.weight,
+language_model.model.layers.11.mlp.experts.gate_proj.biases,
+language_model.model.layers.11.mlp.experts.gate_proj.scales,
+language_model.model.layers.11.mlp.experts.gate_proj.weight,
+language_model.model.layers.11.mlp.experts.up_proj.biases,
+language_model.model.layers.11.mlp.experts.up_proj.scales,
+language_model.model.layers.11.mlp.experts.up_proj.weight,
+language_model.model.layers.12.mlp.experts.down_proj.biases,
+language_model.model.layers.12.mlp.experts.down_proj.scales,
+language_model.model.layers.12.mlp.experts.down_proj.weight,
+language_model.model.layers.12.mlp.experts.gate_proj.biases,
+language_model.model.layers.12.mlp.experts.gate_proj.scales,
+language_model.model.layers.12.mlp.experts.gate_proj.weight,
+language_model.model.layers.12.mlp.experts.up_proj.biases,
+language_model.model.layers.12.mlp.experts.up_proj.scales,
+language_model.model.layers.12.mlp.experts.up_proj.weight,
+language_model.model.layers.13.mlp.experts.down_proj.biases,
+language_model.model.layers.13.mlp.experts.down_proj.scales,
+language_model.model.layers.13.mlp.experts.down_proj.weight,
+language_model.model.layers.13.mlp.experts.gate_proj.biases,
+language_model.model.layers.13.mlp.experts.gate_proj.scales,
+language_model.model.layers.13.mlp.experts.gate_proj.weight,
+language_model.model.layers.13.mlp.experts.up_proj.biases,
+language_model.model.layers.13.mlp.experts.up_proj.scales,
+language_model.model.layers.13.mlp.experts.up_proj.weight,
+language_model.model.layers.14.mlp.experts.down_proj.biases,
+language_model.model.layers.14.mlp.experts.down_proj.scales,
+language_model.model.layers.14.mlp.experts.down_proj.weight,
+language_model.model.layers.14.mlp.experts.gate_proj.biases,
+language_model.model.layers.14.mlp.experts.gate_proj.scales,
+language_model.model.layers.14.mlp.experts.gate_proj.weight,
+language_model.model.layers.14.mlp.experts.up_proj.biases,
+language_model.model.layers.14.mlp.experts.up_proj.scales,
+language_model.model.layers.14.mlp.experts.up_proj.weight,
+language_model.model.layers.15.mlp.experts.down_proj.biases,
+language_model.model.layers.15.mlp.experts.down_proj.scales,
+language_model.model.layers.15.mlp.experts.down_proj.weight,
+language_model.model.layers.15.mlp.experts.gate_proj.biases,
+language_model.model.layers.15.mlp.experts.gate_proj.scales,
+language_model.model.layers.15.mlp.experts.gate_proj.weight,
+language_model.model.layers.15.mlp.experts.up_proj.biases,
+language_model.model.layers.15.mlp.experts.up_proj.scales,
+language_model.model.layers.15.mlp.experts.up_proj.weight,
+language_model.model.layers.16.mlp.experts.down_proj.biases,
+language_model.model.layers.16.mlp.experts.down_proj.scales,
+language_model.model.layers.16.mlp.experts.down_proj.weight,
+language_model.model.layers.16.mlp.experts.gate_proj.biases,
+language_model.model.layers.16.mlp.experts.gate_proj.scales,
+language_model.model.layers.16.mlp.experts.gate_proj.weight,
+language_model.model.layers.16.mlp.experts.up_proj.biases,
+language_model.model.layers.16.mlp.experts.up_proj.scales,
+language_model.model.layers.16.mlp.experts.up_proj.weight,
+language_model.model.layers.17.mlp.experts.down_proj.biases,
+language_model.model.layers.17.mlp.experts.down_proj.scales,
+language_model.model.layers.17.mlp.experts.down_proj.weight,
+language_model.model.layers.17.mlp.experts.gate_proj.biases,
+language_model.model.layers.17.mlp.experts.gate_proj.scales,
+language_model.model.layers.17.mlp.experts.gate_proj.weight,
+language_model.model.layers.17.mlp.experts.up_proj.biases,
+language_model.model.layers.17.mlp.experts.up_proj.scales,
+language_model.model.layers.17.mlp.experts.up_proj.weight,
+language_model.model.layers.18.mlp.experts.down_proj.biases,
+language_model.model.layers.18.mlp.experts.down_proj.scales,
+language_model.model.layers.18.mlp.experts.down_proj.weight,
+language_model.model.layers.18.mlp.experts.gate_proj.biases,
+language_model.model.layers.18.mlp.experts.gate_proj.scales,
+language_model.model.layers.18.mlp.experts.gate_proj.weight,
+language_model.model.layers.18.mlp.experts.up_proj.biases,
+language_model.model.layers.18.mlp.experts.up_proj.scales,
+language_model.model.layers.18.mlp.experts.up_proj.weight,
+language_model.model.layers.19.mlp.experts.down_proj.biases,
+language_model.model.layers.19.mlp.experts.down_proj.scales,
+language_model.model.layers.19.mlp.experts.down_proj.weight,
+language_model.model.layers.19.mlp.experts.gate_proj.biases,
+language_model.model.layers.19.mlp.experts.gate_proj.scales,
+language_model.model.layers.19.mlp.experts.gate_proj.weight,
+language_model.model.layers.19.mlp.experts.up_proj.biases,
+language_model.model.layers.19.mlp.experts.up_proj.scales,
+language_model.model.layers.19.mlp.experts.up_proj.weight,
+language_model.model.layers.2.mlp.experts.down_proj.biases,
+language_model.model.layers.2.mlp.experts.down_proj.scales,
+language_model.model.layers.2.mlp.experts.down_proj.weight,
+language_model.model.layers.2.mlp.experts.gate_proj.biases,
+language_model.model.layers.2.mlp.experts.gate_proj.scales,
+language_model.model.layers.2.mlp.experts.gate_proj.weight,
+language_model.model.layers.2.mlp.experts.up_proj.biases,
+language_model.model.layers.2.mlp.experts.up_proj.scales,
+language_model.model.layers.2.mlp.experts.up_proj.weight,
+language_model.model.layers.20.mlp.experts.down_proj.biases,
+language_model.model.layers.20.mlp.experts.down_proj.scales,
+language_model.model.layers.20.mlp.experts.down_proj.weight,
+language_model.model.layers.20.mlp.experts.gate_proj.biases,
+language_model.model.layers.20.mlp.experts.gate_proj.scales,
+language_model.model.layers.20.mlp.experts.gate_proj.weight,
+language_model.model.layers.20.mlp.experts.up_proj.biases,
+language_model.model.layers.20.mlp.experts.up_proj.scales,
+language_model.model.layers.20.mlp.experts.up_proj.weight,
+language_model.model.layers.21.mlp.experts.down_proj.biases,
+language_model.model.layers.21.mlp.experts.down_proj.scales,
+language_model.model.layers.21.mlp.experts.down_proj.weight,
+language_model.model.layers.21.mlp.experts.gate_proj.biases,
+language_model.model.layers.21.mlp.experts.gate_proj.scales,
+language_model.model.layers.21.mlp.experts.gate_proj.weight,
+language_model.model.layers.21.mlp.experts.up_proj.biases,
+language_model.model.layers.21.mlp.experts.up_proj.scales,
+language_model.model.layers.21.mlp.experts.up_proj.weight,
+language_model.model.layers.22.mlp.experts.down_proj.biases,
+language_model.model.layers.22.mlp.experts.down_proj.scales,
+language_model.model.layers.22.mlp.experts.down_proj.weight,
+language_model.model.layers.22.mlp.experts.gate_proj.biases,
+language_model.model.layers.22.mlp.experts.gate_proj.scales,
+language_model.model.layers.22.mlp.experts.gate_proj.weight,
+language_model.model.layers.22.mlp.experts.up_proj.biases,
+language_model.model.layers.22.mlp.experts.up_proj.scales,
+language_model.model.layers.22.mlp.experts.up_proj.weight,
+language_model.model.layers.23.mlp.experts.down_proj.biases,
+language_model.model.layers.23.mlp.experts.down_proj.scales,
+language_model.model.layers.23.mlp.experts.down_proj.weight,
+language_model.model.layers.23.mlp.experts.gate_proj.biases,
+language_model.model.layers.23.mlp.experts.gate_proj.scales,
+language_model.model.layers.23.mlp.experts.gate_proj.weight,
+language_model.model.layers.23.mlp.experts.up_proj.biases,
+language_model.model.layers.23.mlp.experts.up_proj.scales,
+language_model.model.layers.23.mlp.experts.up_proj.weight,
+language_model.model.layers.24.mlp.experts.down_proj.biases,
+language_model.model.layers.24.mlp.experts.down_proj.scales,
+language_model.model.layers.24.mlp.experts.down_proj.weight,
+language_model.model.layers.24.mlp.experts.gate_proj.biases,
+language_model.model.layers.24.mlp.experts.gate_proj.scales,
+language_model.model.layers.24.mlp.experts.gate_proj.weight,
+language_model.model.layers.24.mlp.experts.up_proj.biases,
+language_model.model.layers.24.mlp.experts.up_proj.scales,
+language_model.model.layers.24.mlp.experts.up_proj.weight,
+language_model.model.layers.25.mlp.experts.down_proj.biases,
+language_model.model.layers.25.mlp.experts.down_proj.scales,
+language_model.model.layers.25.mlp.experts.down_proj.weight,
+language_model.model.layers.25.mlp.experts.gate_proj.biases,
+language_model.model.layers.25.mlp.experts.gate_proj.scales,
+language_model.model.layers.25.mlp.experts.gate_proj.weight,
+language_model.model.layers.25.mlp.experts.up_proj.biases,
+language_model.model.layers.25.mlp.experts.up_proj.scales,
+language_model.model.layers.25.mlp.experts.up_proj.weight,
+language_model.model.layers.26.mlp.experts.down_proj.biases,
+language_model.model.layers.26.mlp.experts.down_proj.scales,
+language_model.model.layers.26.mlp.experts.down_proj.weight,
+language_model.model.layers.26.mlp.experts.gate_proj.biases,
+language_model.model.layers.26.mlp.experts.gate_proj.scales,
+language_model.model.layers.26.mlp.experts.gate_proj.weight,
+language_model.model.layers.26.mlp.experts.up_proj.biases,
+language_model.model.layers.26.mlp.experts.up_proj.scales,
+language_model.model.layers.26.mlp.experts.up_proj.weight,
+language_model.model.layers.27.mlp.experts.down_proj.biases,
+language_model.model.layers.27.mlp.experts.down_proj.scales,
+language_model.model.layers.27.mlp.experts.down_proj.weight,
+language_model.model.layers.27.mlp.experts.gate_proj.biases,
+language_model.model.layers.27.mlp.experts.gate_proj.scales,
+language_model.model.layers.27.mlp.experts.gate_proj.weight,
+language_model.model.layers.27.mlp.experts.up_proj.biases,
+language_model.model.layers.27.mlp.experts.up_proj.scales,
+language_model.model.layers.27.mlp.experts.up_proj.weight,
+language_model.model.layers.28.mlp.experts.down_proj.biases,
+language_model.model.layers.28.mlp.experts.down_proj.scales,
+language_model.model.layers.28.mlp.experts.down_proj.weight,
+language_model.model.layers.28.mlp.experts.gate_proj.biases,
+language_model.model.layers.28.mlp.experts.gate_proj.scales,
+language_model.model.layers.28.mlp.experts.gate_proj.weight,
+language_model.model.layers.28.mlp.experts.up_proj.biases,
+language_model.model.layers.28.mlp.experts.up_proj.scales,
+language_model.model.layers.28.mlp.experts.up_proj.weight,
+language_model.model.layers.29.mlp.experts.down_proj.biases,
+language_model.model.layers.29.mlp.experts.down_proj.scales,
+language_model.model.layers.29.mlp.experts.down_proj.weight,
+language_model.model.layers.29.mlp.experts.gate_proj.biases,
+language_model.model.layers.29.mlp.experts.gate_proj.scales,
+language_model.model.layers.29.mlp.experts.gate_proj.weight,
+language_model.model.layers.29.mlp.experts.up_proj.biases,
+language_model.model.layers.29.mlp.experts.up_proj.scales,
+language_model.model.layers.29.mlp.experts.up_proj.weight,
+language_model.model.layers.3.mlp.experts.down_proj.biases,
+language_model.model.layers.3.mlp.experts.down_proj.scales,
+language_model.model.layers.3.mlp.experts.down_proj.weight,
+language_model.model.layers.3.mlp.experts.gate_proj.biases,
+language_model.model.layers.3.mlp.experts.gate_proj.scales,
+language_model.model.layers.3.mlp.experts.gate_proj.weight,
+language_model.model.layers.3.mlp.experts.up_proj.biases,
+language_model.model.layers.3.mlp.experts.up_proj.scales,
+language_model.model.layers.3.mlp.experts.up_proj.weight,
+language_model.model.layers.30.mlp.experts.down_proj.biases,
+language_model.model.layers.30.mlp.experts.down_proj.scales,
+language_model.model.layers.30.mlp.experts.down_proj.weight,
+language_model.model.layers.30.mlp.experts.gate_proj.biases,
+language_model.model.layers.30.mlp.experts.gate_proj.scales,
+language_model.model.layers.30.mlp.experts.gate_proj.weight,
+language_model.model.layers.30.mlp.experts.up_proj.biases,
+language_model.model.layers.30.mlp.experts.up_proj.scales,
+language_model.model.layers.30.mlp.experts.up_proj.weight,
+language_model.model.layers.31.mlp.experts.down_proj.biases,
+language_model.model.layers.31.mlp.experts.down_proj.scales,
+language_model.model.layers.31.mlp.experts.down_proj.weight,
+language_model.model.layers.31.mlp.experts.gate_proj.biases,
+language_model.model.layers.31.mlp.experts.gate_proj.scales,
+language_model.model.layers.31.mlp.experts.gate_proj.weight,
+language_model.model.layers.31.mlp.experts.up_proj.biases,
+language_model.model.layers.31.mlp.experts.up_proj.scales,
+language_model.model.layers.31.mlp.experts.up_proj.weight,
+language_model.model.layers.32.mlp.experts.down_proj.biases,
+language_model.model.layers.32.mlp.experts.down_proj.scales,
+language_model.model.layers.32.mlp.experts.down_proj.weight,
+language_model.model.layers.32.mlp.experts.gate_proj.biases,
+language_model.model.layers.32.mlp.experts.gate_proj.scales,
+language_model.model.layers.32.mlp.experts.gate_proj.weight,
+language_model.model.layers.32.mlp.experts.up_proj.biases,
+language_model.model.layers.32.mlp.experts.up_proj.scales,
+language_model.model.layers.32.mlp.experts.up_proj.weight,
+language_model.model.layers.33.mlp.experts.down_proj.biases,
+language_model.model.layers.33.mlp.experts.down_proj.scales,
+language_model.model.layers.33.mlp.experts.down_proj.weight,
+language_model.model.layers.33.mlp.experts.gate_proj.biases,
+language_model.model.layers.33.mlp.experts.gate_proj.scales,
+language_model.model.layers.33.mlp.experts.gate_proj.weight,
+language_model.model.layers.33.mlp.experts.up_proj.biases,
+language_model.model.layers.33.mlp.experts.up_proj.scales,
+language_model.model.layers.33.mlp.experts.up_proj.weight,
+language_model.model.layers.34.mlp.experts.down_proj.biases,
+language_model.model.layers.34.mlp.experts.down_proj.scales,
+language_model.model.layers.34.mlp.experts.down_proj.weight,
+language_model.model.layers.34.mlp.experts.gate_proj.biases,
+language_model.model.layers.34.mlp.experts.gate_proj.scales,
+language_model.model.layers.34.mlp.experts.gate_proj.weight,
+language_model.model.layers.34.mlp.experts.up_proj.biases,
+language_model.model.layers.34.mlp.experts.up_proj.scales,
+language_model.model.layers.34.mlp.experts.up_proj.weight,
+language_model.model.layers.35.mlp.experts.down_proj.biases,
+language_model.model.layers.35.mlp.experts.down_proj.scales,
+language_model.model.layers.35.mlp.experts.down_proj.weight,
+language_model.model.layers.35.mlp.experts.gate_proj.biases,
+language_model.model.layers.35.mlp.experts.gate_proj.scales,
+language_model.model.layers.35.mlp.experts.gate_proj.weight,
+language_model.model.layers.35.mlp.experts.up_proj.biases,
+language_model.model.layers.35.mlp.experts.up_proj.scales,
+language_model.model.layers.35.mlp.experts.up_proj.weight,
+language_model.model.layers.36.mlp.experts.down_proj.biases,
+language_model.model.layers.36.mlp.experts.down_proj.scales,
+language_model.model.layers.36.mlp.experts.down_proj.weight,
+language_model.model.layers.36.mlp.experts.gate_proj.biases,
+language_model.model.layers.36.mlp.experts.gate_proj.scales,
+language_model.model.layers.36.mlp.experts.gate_proj.weight,
+language_model.model.layers.36.mlp.experts.up_proj.biases,
+language_model.model.layers.36.mlp.experts.up_proj.scales,
+language_model.model.layers.36.mlp.experts.up_proj.weight,
+language_model.model.layers.37.mlp.experts.down_proj.biases,
+language_model.model.layers.37.mlp.experts.down_proj.scales,
+language_model.model.layers.37.mlp.experts.down_proj.weight,
+language_model.model.layers.37.mlp.experts.gate_proj.biases,
+language_model.model.layers.37.mlp.experts.gate_proj.scales,
+language_model.model.layers.37.mlp.experts.gate_proj.weight,
+language_model.model.layers.37.mlp.experts.up_proj.biases,
+language_model.model.layers.37.mlp.experts.up_proj.scales,
+language_model.model.layers.37.mlp.experts.up_proj.weight,
+language_model.model.layers.38.mlp.experts.down_proj.biases,
+language_model.model.layers.38.mlp.experts.down_proj.scales,
+language_model.model.layers.38.mlp.experts.down_proj.weight,
+language_model.model.layers.38.mlp.experts.gate_proj.biases,
+language_model.model.layers.38.mlp.experts.gate_proj.scales,
+language_model.model.layers.38.mlp.experts.gate_proj.weight,
+language_model.model.layers.38.mlp.experts.up_proj.biases,
+language_model.model.layers.38.mlp.experts.up_proj.scales,
+language_model.model.layers.38.mlp.experts.up_proj.weight,
+language_model.model.layers.39.mlp.experts.down_proj.biases,
+language_model.model.layers.39.mlp.experts.down_proj.scales,
+language_model.model.layers.39.mlp.experts.down_proj.weight,
+language_model.model.layers.39.mlp.experts.gate_proj.biases,
+language_model.model.layers.39.mlp.experts.gate_proj.scales,
+language_model.model.layers.39.mlp.experts.gate_proj.weight,
+language_model.model.layers.39.mlp.experts.up_proj.biases,
+language_model.model.layers.39.mlp.experts.up_proj.scales,
+language_model.model.layers.39.mlp.experts.up_proj.weight,
+language_model.model.layers.4.mlp.experts.down_proj.biases,
+language_model.model.layers.4.mlp.experts.down_proj.scales,
+language_model.model.layers.4.mlp.experts.down_proj.weight,
+language_model.model.layers.4.mlp.experts.gate_proj.biases,
+language_model.model.layers.4.mlp.experts.gate_proj.scales,
+language_model.model.layers.4.mlp.experts.gate_proj.weight,
+language_model.model.layers.4.mlp.experts.up_proj.biases,
+language_model.model.layers.4.mlp.experts.up_proj.scales,
+language_model.model.layers.4.mlp.experts.up_proj.weight,
+language_model.model.layers.40.mlp.experts.down_proj.biases,
+language_model.model.layers.40.mlp.experts.down_proj.scales,
+language_model.model.layers.40.mlp.experts.down_proj.weight,
+language_model.model.layers.40.mlp.experts.gate_proj.biases,
+language_model.model.layers.40.mlp.experts.gate_proj.scales,
+language_model.model.layers.40.mlp.experts.gate_proj.weight,
+language_model.model.layers.40.mlp.experts.up_proj.biases,
+language_model.model.layers.40.mlp.experts.up_proj.scales,
+language_model.model.layers.40.mlp.experts.up_proj.weight,
+language_model.model.layers.41.mlp.experts.down_proj.biases,
+language_model.model.layers.41.mlp.experts.down_proj.scales,
+language_model.model.layers.41.mlp.experts.down_proj.weight,
+language_model.model.layers.41.mlp.experts.gate_proj.biases,
+language_model.model.layers.41.mlp.experts.gate_proj.scales,
+language_model.model.layers.41.mlp.experts.gate_proj.weight,
+language_model.model.layers.41.mlp.experts.up_proj.biases,
+language_model.model.layers.41.mlp.experts.up_proj.scales,
+language_model.model.layers.41.mlp.experts.up_proj.weight,
+language_model.model.layers.5.mlp.experts.down_proj.biases,
+language_model.model.layers.5.mlp.experts.down_proj.scales,
+language_model.model.layers.5.mlp.experts.down_proj.weight,
+language_model.model.layers.5.mlp.experts.gate_proj.biases,
+language_model.model.layers.5.mlp.experts.gate_proj.scales,
+language_model.model.layers.5.mlp.experts.gate_proj.weight,
+language_model.model.layers.5.mlp.experts.up_proj.biases,
+language_model.model.layers.5.mlp.experts.up_proj.scales,
+language_model.model.layers.5.mlp.experts.up_proj.weight,
+language_model.model.layers.6.mlp.experts.down_proj.biases,
+language_model.model.layers.6.mlp.experts.down_proj.scales,
+language_model.model.layers.6.mlp.experts.down_proj.weight,
+language_model.model.layers.6.mlp.experts.gate_proj.biases,
+language_model.model.layers.6.mlp.experts.gate_proj.scales,
+language_model.model.layers.6.mlp.experts.gate_proj.weight,
+language_model.model.layers.6.mlp.experts.up_proj.biases,
+language_model.model.layers.6.mlp.experts.up_proj.scales,
+language_model.model.layers.6.mlp.experts.up_proj.weight,
+language_model.model.layers.7.mlp.experts.down_proj.biases,
+language_model.model.layers.7.mlp.experts.down_proj.scales,
+language_model.model.layers.7.mlp.experts.down_proj.weight,
+language_model.model.layers.7.mlp.experts.gate_proj.biases,
+language_model.model.layers.7.mlp.experts.gate_proj.scales,
+language_model.model.layers.7.mlp.experts.gate_proj.weight,
+language_model.model.layers.7.mlp.experts.up_proj.biases,
+language_model.model.layers.7.mlp.experts.up_proj.scales,
+language_model.model.layers.7.mlp.experts.up_proj.weight,
+language_model.model.layers.8.mlp.experts.down_proj.biases,
+language_model.model.layers.8.mlp.experts.down_proj.scales,
+language_model.model.layers.8.mlp.experts.down_proj.weight,
+language_model.model.layers.8.mlp.experts.gate_proj.biases,
+language_model.model.layers.8.mlp.experts.gate_proj.scales,
+language_model.model.layers.8.mlp.experts.gate_proj.weight,
+language_model.model.layers.8.mlp.experts.up_proj.biases,
+language_model.model.layers.8.mlp.experts.up_proj.scales,
+language_model.model.layers.8.mlp.experts.up_proj.weight,
+language_model.model.layers.9.mlp.experts.down_proj.biases,
+language_model.model.layers.9.mlp.experts.down_proj.scales,
+language_model.model.layers.9.mlp.experts.down_proj.weight,
+language_model.model.layers.9.mlp.experts.gate_proj.biases,
+language_model.model.layers.9.mlp.experts.gate_proj.scales,
+language_model.model.layers.9.mlp.experts.gate_proj.weight,
+language_model.model.layers.9.mlp.experts.up_proj.biases,
+language_model.model.layers.9.mlp.experts.up_proj.scales,
+language_model.model.layers.9.mlp.experts.up_proj.weight.
+2026-08-12 22:27:38 BST - DEBUG - HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+2026-08-12 22:27:38 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Inkling-Small-mlx-4bit:
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+2026-08-12 22:27:38 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:27:38 BST - INFO - 
+2026-08-12 22:27:38 BST - INFO - Processing Model [12/42]: mlx-community/InternVL3-8B-bf16
+2026-08-12 22:27:38 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:27:38 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/InternVL3-8B-bf16
+2026-08-12 22:27:46 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/InternVL3-8B-bf16
+2026-08-12 22:27:46 BST - DEBUG - Captured mlx-vlm console output for mlx-community/InternVL3-8B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: User: <image>
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+Assistant:
+
+Title: Bristol Marina with Seagulls
+Description: Boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture in the background, captured at 16:45 on 12 August 2026.
+Keywords: Bristol, England, Marina, Boats, Seagulls, Dock, Architecture, Bristol Cathedral, Coyote Ugly, Canons Marsh, Cityscape, Great Britain, Europe, Marina, Gull, Harbor
+==========
+Prompt: 2127 tokens, 1754.650 tokens-per-sec
+Generation: 104 tokens, 28.613 tokens-per-sec
+Peak memory: 17.105 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 1585.96it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2127 [00:00<?, ?tok/s]
+Prefill:  96%|#########6| 2048/2127 [00:00<00:00, 2204.48tok/s]
+Prefill: 100%|#########9| 2126/2127 [00:01<00:00, 2065.03tok/s]
+2026-08-12 22:27:46 BST - DEBUG - Quality analysis for mlx-community/InternVL3-8B-bf16: keyword_overlap=some_overlap, words=55
+2026-08-12 22:27:46 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:27:46 BST - INFO - 
+2026-08-12 22:27:46 BST - INFO - Processing Model [13/42]: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-12 22:27:46 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:27:46 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-12 22:29:45 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+2026-08-12 22:29:45 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_system|>system<|im_middle|>You are a helpful assistant<|im_end|><|im_user|>user<|im_middle|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|media_start|>image<|media_content|><|media_pad|><|media_end|><|im_end|><|im_assistant|>assistant<|im_middle|>
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
+
+First, the context says the capture date/time is 2026-08-12 16:45:16 UTC+01:00, and GPS is 51.451700°N, 2.600800°W. The location is City Centre, Bristol, England, UK, GBR, Europe. The description hint mentions boats docked at a marina, Bristol UK, seagulls in the foreground. Keywords include Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina.
+
+Now, the image shows a marina in Bristol with boats docked, seagulls in the water, buildings including what looks like Bristol Cathedral in the background, a Ferris wheel (maybe the "Coyote Ugly" place), and the cityscape. The sky is partly cloudy.
+
+For the title, need a 5-10 word British-English title. Maybe "Bristol Marina with Boats and Seagulls in City Centre". Wait, check the keywords: "Bristol Cathedral" is a key element, so maybe include that. Also, "Coyote Ugly" is a known bar in Bristol, so that's a distinctive detail. So title could be "Bristol City Centre Marina with Boats, Seagulls, and Coyote Ugly". That's 10 words.
+
+Description: Need a 1-2 sentence factual description. Mention the marina, boats, seagulls, city elements like Bristol Cathedral, Coyote Ugly, and the setting. So: "A marina in Bristol's city centre featuring docked boats, seagulls in the water, and the iconic Bristol Cathedral in the background, with the 'Coyote Ugly' establishment visible among buildings under a partly cloudy sky."
+
+Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Marina, Boats, Seagulls, Bristol Cathedral, Coyote Ugly, Building, England, Europe, Cityscape, Dock. That's 10. Maybe add "Harbor" instead of Building? Wait, the image has a harbor. Let's check the hints
+==========
+Prompt: 1338 tokens, 357.571 tokens-per-sec
+Generation: 500 tokens, 4.522 tokens-per-sec
+Peak memory: 39.940 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 21 files:   0%|          | 0/21 [00:00<?, ?it/s]
+Fetching 21 files: 100%|##########| 21/21 [00:00<00:00, 2696.23it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:29:46 BST - DEBUG - Quality analysis for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16: missing_sections=title, thinking_trace=True (◁think▷), thinking_incomplete=True, unexpected_catalog_preamble=True, likely_capped=True, keyword_overlap=some_overlap, words=326
+2026-08-12 22:29:46 BST - INFO - Mechanical observations for mlx-community/Kimi-VL-A3B-Thinking-2506-bf16: missing-sections(title), thinking-incomplete, unexpected-catalog-preamble, token-cap-truncation
+2026-08-12 22:29:46 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:29:46 BST - INFO - 
+2026-08-12 22:29:46 BST - INFO - Processing Model [14/42]: mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-12 22:29:46 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:29:46 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-12 22:29:49 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/LFM2.5-VL-1.6B-bf16
+2026-08-12 22:29:49 BST - DEBUG - Captured mlx-vlm console output for mlx-community/LFM2.5-VL-1.6B-bf16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|startoftext|><|im_start|>user
+<image>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Title: Bristol Marina at Sunset
+
+Description: The image captures a serene scene at Bristol Marina, where boats are docked along the waterfront. A flock of seagulls can be seen flying and floating in the water, adding a lively touch to the tranquil setting. The backdrop features the iconic Bristol Cathedral, with its Gothic architecture standing tall against the sky. The marina is bathed in the warm glow of the setting sun, casting a golden hue over the water and the boats.
+
+Keywords: Bristol, Marina, Seagulls, Sunset, Cathedral, Architecture, Waterfront, Boats, City, England, Europe, Gull, Harbor, Sunset, Golden Hour
+==========
+Prompt: 594 tokens, 1368.813 tokens-per-sec
+Generation: 142 tokens, 161.820 tokens-per-sec
+Peak memory: 4.108 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
+Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 2427.96it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:29:49 BST - DEBUG - Quality analysis for mlx-community/LFM2.5-VL-1.6B-bf16: keyword_overlap=some_overlap, words=98
+2026-08-12 22:29:49 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:29:49 BST - INFO - 
+2026-08-12 22:29:49 BST - INFO - Processing Model [15/42]: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-12 22:29:49 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:29:49 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-12 22:30:00 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+2026-08-12 22:30:00 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|image|><|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+
+Title: Boats and Seagulls at Bristol's Marina
+
+Description: A serene scene unfolds at Bristol's marina, where boats bob gently in the water, while a flock of seagulls flies and floats in the foreground, set against the backdrop of the city's historic architecture and a cloudy sky.
+
+Keywords: Boats, Seagulls, Bristol, Marina, City, Architecture, Cloudy Sky, Water, Birds, Wildlife
+==========
+Prompt: 316 tokens, 145.823 tokens-per-sec
+Generation: 89 tokens, 12.468 tokens-per-sec
+Peak memory: 14.942 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2513.82it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:30:00 BST - DEBUG - Quality analysis for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: keyword_overlap=some_overlap, words=61
+2026-08-12 22:30:00 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:00 BST - INFO - 
+2026-08-12 22:30:00 BST - INFO - Processing Model [16/42]: mlx-community/MiniCPM-V-4.6-8bit
+2026-08-12 22:30:00 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:00 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/MiniCPM-V-4.6-8bit
+2026-08-12 22:30:06 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/MiniCPM-V-4.6-8bit
+2026-08-12 22:30:06 BST - DEBUG - Captured mlx-vlm console output for mlx-community/MiniCPM-V-4.6-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|im_start|>user
+(<image>./</image>)
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+
+<think>
+We need to create a title, description, and keywords based on the image. Let's analyze the image.
+
+The image shows a harbor or marina with boats, seagulls, buildings, and a cathedral (Bristol Cathedral?). There's a ferris wheel and some modern buildings. The context is Bristol, UK.
+
+First, title: need 5-10 words. Let's think: "Boat marina with seagulls and Bristol cathedral". That's 6 words.
+
+Description: Combine relevant context and main visible subject, setting, action, lighting, and distinctive details. The main subject is boats docked at a marina, with seagulls in the water, and background showing Bristol Cathedral and other buildings. Lighting is sunny with clouds.
+
+Keywords: need 10-18 unique, comma-separated. Cover relevant context and visible details. Let's list: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, ferry, trees, sky, Europe, UK, England, Gull, harbor, city, architecture, modern, red building, white boats, etc.
+
+Make sure to be unique and cover the main elements.
+
+Now, structure:
+
+Title: [concrete 5-10 words]
+
+Description: [1-2 sentences]
+
+Keywords: [10-18 unique, comma-separated]
+
+Let's draft.
+
+Title: Boat marina with seagulls and Bristol cathedral.
+
+Description: Shows boats docked at a marina with seagulls in the water, featuring Bristol Cathedral and urban buildings under sunny skies.
+
+Keywords: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees, sky, modern, red building, white boats.
+
+Check count: title 5-10 words: "Boat marina with seagulls and Bristol cathedral" is 5 words. Good.
+
+Description: two sentences, combine context and main visible subject, setting, action, lighting, distinctive details. Looks okay.
+
+Keywords: list 10-18 unique terms. Let's ensure they are unique and cover the relevant context and visible details.
+
+List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees
+==========
+Prompt: 945 tokens, 654.439 tokens-per-sec
+Generation: 500 tokens, 226.302 tokens-per-sec
+Peak memory: 3.767 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2341.88it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:30:06 BST - DEBUG - Quality analysis for mlx-community/MiniCPM-V-4.6-8bit: thinking_trace=True (<think>), thinking_incomplete=True, instruction_echo=True, unexpected_catalog_preamble=True, likely_capped=True, keyword_overlap=some_overlap, words=302
+2026-08-12 22:30:06 BST - INFO - Mechanical observations for mlx-community/MiniCPM-V-4.6-8bit: thinking-incomplete, instruction-echo, unexpected-catalog-preamble, token-cap-truncation
+2026-08-12 22:30:06 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:06 BST - INFO - 
+2026-08-12 22:30:06 BST - INFO - Processing Model [17/42]: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-12 22:30:06 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:06 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-12 22:30:14 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+2026-08-12 22:30:14 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-14B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+Title:
+**Bristol Marina with Boats and Cathedral View**
+
+Description:
+A vibrant marina in Bristol, England, showcases docked boats and seagulls on the water under clear daylight, with the iconic Bristol Cathedral and modern buildings forming a scenic cityscape backdrop.
+
+Keywords:
+Bristol, marina, boats, seagulls, Bristol Cathedral, cityscape, architecture, harbor, Canons Marsh, Coyote Ugly, UK, Europe, daylight, waterfront, buildings, birds
+==========
+Prompt: 2935 tokens, 757.471 tokens-per-sec
+Generation: 104 tokens, 55.752 tokens-per-sec
+Peak memory: 13.055 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2423.56it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2935 [00:00<?, ?tok/s]
+Prefill:  70%|######9   | 2048/2935 [00:02<00:01, 737.22tok/s]
+Prefill: 100%|#########9| 2934/2935 [00:03<00:00, 790.96tok/s]
+Prefill: 100%|#########9| 2934/2935 [00:03<00:00, 779.04tok/s]
+2026-08-12 22:30:14 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-14B-Instruct-2512-mxfp4: keyword_overlap=some_overlap, words=59
+2026-08-12 22:30:14 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:14 BST - INFO - 
+2026-08-12 22:30:14 BST - INFO - Processing Model [18/42]: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-12 22:30:14 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:14 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-12 22:30:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+2026-08-12 22:30:24 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-14B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+**Title:**
+*Bristol Marina & Cathedral, 2026-08-12, UK*
+
+**Description:**
+A vibrant Bristol marina scene captured on **August 12, 2026 (16:45 UTC+1)**, featuring docked boats, a flock of seagulls, and the iconic **Bristol Cathedral** in the background. Coyote Ugly’s landmark building and modern architecture frame the historic riverside, under bright daylight skies.
+
+**Keywords:**
+Bristol, Bristol Cathedral, Marina, Dock, Boats, Coyote Ugly, Seagulls, Canons Marsh, City Centre, UK, England, Cathedral, Cityscape, European Architecture, Historic Harbor, 2026-08-12, European City, UK Landmark
+==========
+Prompt: 2935 tokens, 777.300 tokens-per-sec
+Generation: 170 tokens, 45.757 tokens-per-sec
+Peak memory: 13.478 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]
+Fetching 11 files: 100%|##########| 11/11 [00:00<00:00, 2409.64it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2935 [00:00<?, ?tok/s]
+Prefill:  70%|######9   | 2048/2935 [00:02<00:01, 759.66tok/s]
+Prefill: 100%|#########9| 2934/2935 [00:03<00:00, 809.23tok/s]
+Prefill: 100%|#########9| 2934/2935 [00:03<00:00, 798.29tok/s]
+2026-08-12 22:30:24 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-14B-Instruct-2512-nvfp4: keyword_overlap=some_overlap, words=83
+2026-08-12 22:30:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:24 BST - INFO - 
+2026-08-12 22:30:24 BST - INFO - Processing Model [19/42]: mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-12 22:30:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-12 22:30:28 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-08-12 22:30:28 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Ministral-3-3B-Instruct-2512-4bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <s>[SYSTEM_PROMPT]You are Ministral-3-3B-Instruct-2512, a Large Language Model (LLM) created by Mistral AI, a French startup headquartered in Paris.
+You power an AI assistant called Le Chat.
+Your knowledge base was last updated on 2023-10-01.
+The current date is {today}.
+
+When you're not sure about some information or when the user's request requires up-to-date or specific data, you must use the available tools to fetch the information. Do not hesitate to use tools whenever they can provide a more accurate or complete response. If no relevant tools are available, then clearly state that you don't have the information and avoid making up anything.
+If the user's question is not clear, ambiguous, or does not provide enough context for you to accurately answer the question, you do not try to answer it right away and you rather ask the user to clarify their request (e.g. "What are some good restaurants around me?" => "Where are you?" or "When is the next flight to Tokyo" => "Where do you travel from?").
+You are always very attentive to dates, in particular you try to resolve dates (e.g. "yesterday" is {yesterday}) and when asked about information at specific dates, you discard information that is at another date.
+You follow these instructions in all languages, and always respond to the user in the language they use or request.
+Next sections describe the capabilities that you have.
+
+# WEB BROWSING INSTRUCTIONS
+
+You cannot perform any web search or access internet to open URLs, links etc. If it seems like the user is expecting you to do so, you clarify the situation and ask the user to copy paste the text directly in the chat.
+
+# MULTI-MODAL INSTRUCTIONS
+
+You have the ability to read images, but you cannot generate images. You also cannot transcribe audio files or videos.
+You cannot read nor transcribe audio files or videos.
+
+# TOOL CALLING INSTRUCTIONS
+
+You may have access to tools that you can use to fetch information or perform actions. You must use these tools in the following situations:
+
+1. When the request requires up-to-date information.
+2. When the request requires specific data that you do not have in your knowledge base.
+3. When the request involves actions that you cannot perform without tools.
+
+Always prioritize using tools to provide the most accurate and helpful response. If tools are not available, inform the user that you cannot perform the requested action at the moment.[/SYSTEM_PROMPT][INST][IMG]Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:[/INST]
+Title:
+Bristol Marina with Cathedral and Seagulls
+
+Description:
+A bustling marina in Bristol’s city centre, featuring docked boats alongside historic architecture like the cathedral and modern buildings, under clear skies with a flock of seagulls in the water.
+
+Keywords:
+Boat, Bristol, Bristol Cathedral, Canons Marsh, Church, City Centre, Harbor, Marina, Seagulls, Waterfront, Gothic architecture, Coastal marina, Urban waterfront, Dockside scene, Lighting, Urban skyline.
+==========
+Prompt: 2934 tokens, 2362.366 tokens-per-sec
+Generation: 105 tokens, 146.972 tokens-per-sec
+Peak memory: 7.799 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2689.35it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Prefill:   0%|          | 0/2934 [00:00<?, ?tok/s]
+Prefill:  70%|######9   | 2048/2934 [00:00<00:00, 2108.19tok/s]
+Prefill: 100%|#########9| 2933/2934 [00:01<00:00, 2553.32tok/s]
+Prefill: 100%|#########9| 2933/2934 [00:01<00:00, 2444.84tok/s]
+2026-08-12 22:30:28 BST - DEBUG - Quality analysis for mlx-community/Ministral-3-3B-Instruct-2512-4bit: keyword_overlap=some_overlap, words=64
+2026-08-12 22:30:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:28 BST - INFO - 
+2026-08-12 22:30:28 BST - INFO - Processing Model [20/42]: mlx-community/Molmo-7B-D-0924-8bit
+2026-08-12 22:30:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Molmo-7B-D-0924-8bit
+2026-08-12 22:30:34 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Molmo-7B-D-0924-8bit
+2026-08-12 22:30:34 BST - DEBUG - Captured mlx-vlm console output for mlx-community/Molmo-7B-D-0924-8bit:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: User: Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords: Assistant:
+ Title: Bristol Waterfront Scene with Boats and Seagulls
+
+Description: A marina in Bristol's city center, featuring boats docked along a concrete walkway, with a flock of seagulls flying and floating in the water. The scene is set against a backdrop of historic buildings, including a church and a modern Coyote Ugly establishment, with a Ferris wheel visible in the distance.
+
+Keywords: Architecture, Bird, Boat, Bristol, Cathedral, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Modern, Old, Waterfront
+==========
+Prompt: 1527 tokens, 1695.059 tokens-per-sec
+Generation: 135 tokens, 51.399 tokens-per-sec
+Peak memory: 11.176 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 2928.22it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+2026-08-12 22:30:34 BST - DEBUG - Quality analysis for mlx-community/Molmo-7B-D-0924-8bit: keyword_overlap=some_overlap, words=86
+2026-08-12 22:30:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:30:34 BST - INFO - 
+2026-08-12 22:30:34 BST - INFO - Processing Model [21/42]: mlx-community/MolmoPoint-8B-fp16
+2026-08-12 22:30:34 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:30:34 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/MolmoPoint-8B-fp16
+2026-08-12 22:31:07 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/MolmoPoint-8B-fp16
+2026-08-12 22:31:07 BST - DEBUG - Captured mlx-vlm console output for mlx-community/MolmoPoint-8B-fp16:
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '2', '-', '1', '6', '4', '5', '1', '6', '_', 'D', 'S', 'C', '0', '1', '4', '9', '5', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
+
+Prompt: <|image|><|im_start|>user
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
+- GPS: 51.451700°N, 2.600800°W
+
+Descriptive hints:
+- Title hint: City Centre, Bristol, England, UK, GBR, Europe
+- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
+- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:<|im_end|>
+<|im_start|>assistant
+
+Bristol Marina: Seagulls, Boats, and Cathedral
+
+A bustling Bristol marina scene with seagulls in the foreground, boats docked along the quay, and the iconic Bristol Cathedral visible in the background. The image captures a lively urban waterfront on a sunny day, with the distinctive Coyote Ugly sign adding to the city's character.
+
+Bristol, England, UK, GBR, Europe, Marina, Seagulls, Boats, Cathedral, Cityscape, Coyote Ugly, Dock, Architecture, Bird, Boat, Building, Canons Marsh, Church, Harbor
+==========
+Prompt: 3140 tokens, 593.090 tokens-per-sec
+Generation: 122 tokens, 5.121 tokens-per-sec
+Peak memory: 24.141 GB
+
+=== STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]
+Fetching 26 files: 100%|##########| 26/26 [00:00<00:00, 3424.24it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1074: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
+  warnings.warn(
+Prefill:   0%|          | 0/3140 [00:00<?, ?tok/s]
+Prefill:  65%|######5   | 2048/3140 [00:03<00:02, 543.49tok/s]
+Prefill: 100%|#########9| 3139/3140 [00:04<00:00, 692.47tok/s]
+Prefill: 100%|#########9| 3139/3140 [00:04<00:00, 657.19tok/s]
+2026-08-12 22:31:07 BST - DEBUG - Quality analysis for mlx-community/MolmoPoint-8B-fp16: missing_sections=title+description+keywords, words=74
+2026-08-12 22:31:07 BST - INFO - Mechanical observations for mlx-community/MolmoPoint-8B-fp16: missing-sections(title+description+keywords)
+2026-08-12 22:31:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-08-12 22:31:07 BST - INFO - 
+2026-08-12 22:31:07 BST - INFO - Processing Model [22/42]: mlx-community/Ornith-1.0-35B-bf16
+2026-08-12 22:31:07 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-08-12 22:31:07 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Ornith-1.0-35B-bf16
