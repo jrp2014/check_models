@@ -8,9 +8,10 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, cast
+from typing import cast
 from unittest.mock import patch
 
+import pytest
 from PIL import Image
 
 import check_models
@@ -24,9 +25,6 @@ from check_models import (
     save_jsonl_report,
 )
 from tools import safe_io
-
-if TYPE_CHECKING:
-    import pytest
 
 
 def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
@@ -72,8 +70,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
         output_file,
         prompt="test",
         system_info={},
-        eval_mode="blind",
-        metadata_exposed_to_prompt=False,
+        mode_policy=check_models._build_report_mode_policy(eval_mode="blind"),
     )
 
     assert output_file.exists()
@@ -254,6 +251,7 @@ def test_jsonl_system_provenance_is_public_safe_while_history_stays_raw(
         system_info=system_info,
         library_versions={},
         image_path=check_models.Path("/private/tmp/source.jpg"),
+        eval_mode="blind",
     )
 
     assert header["system"] == {
@@ -798,6 +796,7 @@ def test_working_set_percentage_stays_in_current_run_jsonl(tmp_path: Path) -> No
         prompt="test",
         system_info={},
         library_versions={},
+        eval_mode="blind",
     )
     assert "peak_memory_working_set_pct" not in history["model_results"]["test-model"]
 
@@ -1328,8 +1327,10 @@ def test_jsonl_does_not_back_project_legacy_machine_facts(tmp_path: Path) -> Non
         output_file,
         prompt=prompt,
         system_info={},
-        eval_mode="assisted",
-        metadata_exposed_to_prompt=True,
+        mode_policy=check_models._build_report_mode_policy(
+            eval_mode="assisted",
+            metadata_exposed_to_prompt=True,
+        ),
         report_context=context,
     )
     header, rows = _read_jsonl(output_file)
@@ -1469,6 +1470,7 @@ def test_append_history_record_creates_file(tmp_path: Path) -> None:
         system_info={"OS": "test"},
         library_versions={},
         image_path=None,
+        eval_mode="blind",
     )
 
     assert history_file.exists()
@@ -1517,6 +1519,7 @@ def test_append_history_record_contains_only_raw_execution_and_resource_facts(
         system_info={},
         library_versions={},
         image_path=None,
+        eval_mode="blind",
     )
 
     model_results = _require_present(record.get("model_results"), field_name="model_results")
@@ -1655,6 +1658,7 @@ class TestRuntimeFingerprint:
             prompt="test",
             system_info={},
             runtime_fingerprint=fingerprint,
+            mode_policy=check_models._default_report_mode_policy(),
         )
         assert "runtime_fingerprint" in record
         runtime_fingerprint = _require_present(
@@ -1668,6 +1672,7 @@ class TestRuntimeFingerprint:
         record = check_models._build_jsonl_metadata_record(
             prompt="test",
             system_info={},
+            mode_policy=check_models._default_report_mode_policy(),
         )
         assert "runtime_fingerprint" not in record
 
@@ -1682,6 +1687,7 @@ class TestRuntimeFingerprint:
             system_info={},
             library_versions=cast("check_models.LibraryVersionDict", {}),
             runtime_fingerprint=fingerprint,
+            eval_mode="blind",
         )
         assert record.get("runtime_fingerprint") == fingerprint
         # Verify it's persisted to disk
@@ -1805,8 +1811,19 @@ class TestSchemaVersioning:
         assert data["format_version"] == "1.0"
         assert data["eval_mode"] == "blind"
 
-    def test_legacy_mode_is_resolved_before_history_persistence(self, tmp_path: Path) -> None:
-        """Compatibility aliases should never appear as stored lane identities."""
+    @pytest.mark.parametrize("lane", ["triage", "blind", "assisted"])
+    def test_history_stores_the_caller_resolved_lane_verbatim(
+        self,
+        tmp_path: Path,
+        lane: check_models.EvaluationLane,
+    ) -> None:
+        """History persists resolved lanes as given and never re-resolves.
+
+        Aliases are resolved at the ``_resolve_eval_mode`` funnel before
+        persistence; a silent re-resolution here (with no metadata available)
+        would record ``blind`` for an assisted run if an unresolved mode ever
+        leaked through, so the parameter is typed ``EvaluationLane``.
+        """
         hist = tmp_path / "results.history.jsonl"
 
         check_models.append_history_record(
@@ -1816,11 +1833,11 @@ class TestSchemaVersioning:
             system_info={},
             library_versions={},
             history_path=hist,
-            eval_mode="stress",
+            eval_mode=lane,
         )
 
         data = json.loads(hist.read_text().strip())
-        assert data["eval_mode"] == "blind"
+        assert data["eval_mode"] == lane
 
 
 class TestRerunEvidence:
@@ -1936,7 +1953,7 @@ class TestRerunEvidence:
             params.timeout,
             params.verbose,
         ) == (
-            check_models.RERUN_TRIAGE_PROMPT,
+            check_models.TRIAGE_PROMPT,
             check_models.RERUN_TRIAGE_MAX_TOKENS,
             0.0,
             check_models.RERUN_TRIAGE_TIMEOUT,

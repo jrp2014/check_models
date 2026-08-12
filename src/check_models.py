@@ -226,7 +226,9 @@ __all__ = [
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 NOT_AVAILABLE: Final[str] = "N/A"
-RERUN_TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
+# Shared by the triage evaluation lane and differential reruns; the rerun path
+# applies its own tighter RERUN_TRIAGE_MAX_TOKENS cap.
+TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
 HTML_UNESCAPED_AMPERSAND_RE: Final[re.Pattern[str]] = re.compile(
     r"&(?!lt;|gt;|amp;|#)",
 )
@@ -10569,8 +10571,8 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     # Validate temperature
     validate_temperature(temp=args.temperature)
 
-    # Validate max_tokens
-    if args.max_tokens <= 0:
+    # Validate max_tokens (None means the evaluation lane supplies the default later)
+    if args.max_tokens is not None and args.max_tokens <= 0:
         msg = f"max_tokens must be > 0, got {args.max_tokens}"
         raise ValueError(msg)
 
@@ -13633,7 +13635,10 @@ def _apply_eval_mode_defaults(
     """Apply metadata-aware eval-mode and token-cap defaults to parsed CLI args."""
     requested_eval_mode = str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE))
     if requested_eval_mode == "assisted" and not _metadata_has_descriptive_reference(metadata):
-        msg = "The assisted evaluation lane requires descriptive metadata."
+        msg = (
+            "The assisted evaluation lane requires descriptive metadata "
+            "(even with --prompt, which overrides only the lane prompt)."
+        )
         raise ValueError(msg)
     resolved_eval_mode = _resolve_eval_mode(requested_eval_mode, metadata)
     if requested_eval_mode == DEFAULT_EVAL_MODE:
@@ -13649,15 +13654,25 @@ def _apply_eval_mode_defaults(
             requested_eval_mode,
             resolved_eval_mode,
         )
+    if getattr(args, "prompt", None):
+        logger.info(
+            "--prompt overrides the '%s' lane prompt; the lane still governs the "
+            "default token cap and report labeling.",
+            resolved_eval_mode,
+        )
     args.eval_mode = resolved_eval_mode
 
-    max_tokens = getattr(args, "max_tokens", DEFAULT_MAX_TOKENS)
-    if max_tokens != DEFAULT_MAX_TOKENS:
+    # None marks "not set on the CLI": an explicit --max-tokens always wins, even
+    # when it equals a lane default (the old value-comparison sentinel silently
+    # replaced an explicit 500 with the triage cap).
+    if getattr(args, "max_tokens", None) is not None:
         return
     if resolved_eval_mode == "triage":
         args.max_tokens = TRIAGE_MAX_TOKENS
     elif requested_eval_mode == "quality":
         args.max_tokens = QUALITY_MAX_TOKENS
+    else:
+        args.max_tokens = DEFAULT_MAX_TOKENS
 
 
 def _compact_prompt_text(value: str, *, max_chars: int) -> str:
@@ -13796,7 +13811,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             _build_prompt_preview(prompt, max_chars=max_display_len),
         )
     elif eval_mode == "triage":
-        prompt = RERUN_TRIAGE_PROMPT
+        prompt = TRIAGE_PROMPT
         logger.info("Using triage-mode prompt (minimal context).")
     else:
         include_metadata_hints = eval_mode == "assisted"
@@ -15121,9 +15136,14 @@ def _build_history_run_record(
     library_versions: LibraryVersionDict,
     image_path: Path | None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
-    eval_mode: str = DEFAULT_EVAL_MODE,
+    eval_mode: EvaluationLane,
 ) -> HistoryRunRecord:
-    """Build one append-only run record without current-report semantics."""
+    """Build one append-only run record without current-report semantics.
+
+    ``eval_mode`` must already be a resolved lane: re-resolving here with no
+    metadata would silently record ``blind`` for an assisted run if an
+    unresolved requested mode ever leaked through.
+    """
     record: HistoryRunRecord = {
         "_type": "run",
         "format_version": HISTORY_FORMAT_VERSION,
@@ -15136,7 +15156,7 @@ def _build_history_run_record(
         },
         "system": system_info,
         "library_versions": library_versions,
-        "eval_mode": _resolve_eval_mode(eval_mode, None),
+        "eval_mode": eval_mode,
     }
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
@@ -15152,7 +15172,7 @@ def append_history_record(
     library_versions: LibraryVersionDict,
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
-    eval_mode: str = DEFAULT_EVAL_MODE,
+    eval_mode: EvaluationLane,
 ) -> HistoryRunRecord:
     """Append raw factual run data for optional out-of-band history analysis."""
     record = _build_history_run_record(
@@ -15179,21 +15199,17 @@ def _build_jsonl_metadata_record(
     system_info: dict[str, str],
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
-    eval_mode: str = DEFAULT_EVAL_MODE,
-    metadata_exposed_to_prompt: bool = False,
+    mode_policy: ReportModePolicy,
 ) -> JsonlMetadataRecord:
     """Build shared metadata header row for JSONL results."""
-    resolved_eval_mode = _resolve_eval_mode(eval_mode, None)
     record: JsonlMetadataRecord = {
         "_type": "metadata",
         "format_version": JSONL_FORMAT_VERSION,
         "prompt": prompt,
         "system": {key: _home_relative_report_text(value) for key, value in system_info.items()},
         "timestamp": local_now_str(),
-        "eval_mode": resolved_eval_mode,
-        "metadata_exposed_to_prompt": (
-            metadata_exposed_to_prompt and resolved_eval_mode == "assisted"
-        ),
+        "eval_mode": mode_policy.eval_mode,
+        "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
     }
     if library_versions is not None:
         record["library_versions"] = library_versions
@@ -15361,17 +15377,26 @@ def save_jsonl_report(
     *,
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
-    eval_mode: str = DEFAULT_EVAL_MODE,
-    metadata_exposed_to_prompt: bool = False,
+    mode_policy: ReportModePolicy | None = None,
     requested_revision: str | None = None,
     report_context: ReportRenderContext | None = None,
 ) -> None:
     """Save the narrow JSONL machine contract with complete captured evidence."""
+    resolved_policy = (
+        mode_policy
+        if mode_policy is not None
+        else (
+            report_context.mode_policy
+            if report_context is not None
+            else _default_report_mode_policy()
+        )
+    )
     if report_context is None:
         report_context = _build_report_render_context(
             results=results,
             prompt=prompt,
-            eval_mode=eval_mode,
+            eval_mode=resolved_policy.eval_mode,
+            metadata_exposed_to_prompt=resolved_policy.metadata_exposed_to_prompt,
             system_info=system_info,
         )
     cached_results = {result.model_name: result for result in report_context.result_set.results}
@@ -15382,8 +15407,7 @@ def save_jsonl_report(
         system_info=system_info,
         library_versions=library_versions,
         runtime_fingerprint=runtime_fingerprint,
-        eval_mode=eval_mode,
-        metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+        mode_policy=resolved_policy,
     )
     lines = [json.dumps(header)]
 
@@ -17296,10 +17320,6 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             system_info=inputs.system_info,
             library_versions=inputs.library_versions,
             runtime_fingerprint=inputs.runtime_fingerprint,
-            eval_mode=inputs.report_context.mode_policy.eval_mode,
-            metadata_exposed_to_prompt=(
-                inputs.report_context.mode_policy.metadata_exposed_to_prompt
-            ),
             requested_revision=inputs.model_revision,
             report_context=inputs.report_context,
         ),
@@ -17640,14 +17660,14 @@ def _run_differential_reruns(
             args,
             model_identifier=result.model_name,
             image_path=image_path,
-            prompt=RERUN_TRIAGE_PROMPT,
+            prompt=TRIAGE_PROMPT,
             max_tokens=RERUN_TRIAGE_MAX_TOKENS,
             temperature=0.0,
             timeout=RERUN_TRIAGE_TIMEOUT,
             verbose=False,
         )
         rerun_result = process_image_with_model(params)
-        evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
+        evidence = _build_rerun_evidence(rerun_result, rerun_prompt=TRIAGE_PROMPT)
         updated_result = replace(result, rerun_evidence=evidence)
         logger.info(
             "  Rerun %s: %s (chars=%s)",
@@ -18241,7 +18261,10 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         default=None,
         help=(
             "Prompt text to send to the model. Requires text when provided. If omitted, "
-            "an automatic metadata-verification prompt is used."
+            "the resolved --eval-mode lane supplies the prompt. When provided, it "
+            "overrides the lane prompt only: the lane still governs the default token "
+            "cap and report labeling, and 'assisted' still requires descriptive "
+            "metadata."
         ),
     )
     prompt_group.add_argument(
@@ -18332,15 +18355,21 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
             "200 tokens; 'blind' = structured cataloguing without metadata hints, 500 tokens; "
             "'assisted' = structured cataloguing with metadata hints, 500 tokens. Deprecated "
             "'stress' and 'quality' inputs are aliases, not separate lanes; 'quality' retains "
-            "its 1000-token default."
+            "its 1000-token default. A custom --prompt overrides the lane prompt only; the "
+            "lane still governs the default token cap and report labeling."
         ),
     )
     generation_group.add_argument(
         "-x",
         "--max-tokens",
         type=int,
-        default=DEFAULT_MAX_TOKENS,
-        help="Max new tokens to generate.",
+        default=None,
+        help=(
+            "Max new tokens to generate. When omitted, the resolved evaluation lane "
+            f"supplies the default ({DEFAULT_MAX_TOKENS}; triage {TRIAGE_MAX_TOKENS}; "
+            f"deprecated 'quality' alias {QUALITY_MAX_TOKENS}). An explicit value always "
+            "wins over the lane default."
+        ),
     )
     generation_group.add_argument(
         "-t",

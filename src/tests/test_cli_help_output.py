@@ -56,7 +56,8 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "most recently modified image file in the folder" in normalized_output
     assert str(check_models.DEFAULT_FOLDER) in output
     assert "requires a path when provided" in normalized_output.lower()
-    assert "verification prompt is used" in normalized_output
+    assert "the resolved --eval-mode lane supplies the prompt" in normalized_output
+    assert "overrides the lane prompt only" in normalized_output
     assert "Prompt. (default: None)" not in output
     assert "--eval-mode" in output
     assert "--prune-repro-days" not in output

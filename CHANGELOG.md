@@ -23,6 +23,20 @@ Notable changes to this project will be documented in this file.
 - Update the development-time nanobind stub generator to 2.14.0 after verifying
   that it emits byte-identical `mlx.core` stubs against the current MLX build;
   MLX's separate build-time nanobind pin remains unchanged.
+- Eval-mode hardening from a feature review: `--max-tokens` now defaults to an
+  explicit unset sentinel so an explicit value always wins over the lane
+  default — previously `--max-tokens 500` with `--eval-mode triage` was
+  indistinguishable from "unset" and silently became 200. The
+  `--prompt`/`--eval-mode` interaction is now stated explicitly in the help
+  text, README, and run logs (a custom prompt overrides the lane prompt only;
+  the lane still governs the default token cap and report labeling, and
+  `assisted` still requires descriptive metadata). The exposed-and-assisted
+  disclosure rule is single-sourced through `ReportModePolicy` (the JSONL
+  header builder takes the policy instead of duplicating the AND),
+  history/JSONL serialization requires an already-resolved `EvaluationLane`
+  instead of silently re-resolving with no metadata, and the triage prompt
+  constant is renamed `TRIAGE_PROMPT` (shared by the triage lane and
+  differential reruns, which keep their tighter cap).
 
 ## [0.9.1] - 2026-08-11
 

@@ -564,7 +564,7 @@ python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 
 #### Generation Control
 
-- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `500`.
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`500`; `triage` `200`; deprecated `quality` alias `1000`); an explicit value always wins over the lane default.
 - `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
 
 **Example**:
@@ -1050,6 +1050,11 @@ metadata while retaining authoritative location and capture context when present
 Existing title, description, and keywords are editable hints, not ground truth.
 Literal omission of an optional hint term is evidence, not by itself a fault.
 
+A custom `--prompt` overrides the lane prompt only. The resolved lane still
+governs the default `--max-tokens` cap and how the run is labeled in reports
+and JSONL, and `--eval-mode assisted` still requires descriptive metadata even
+when `--prompt` is supplied; the run logs this interaction explicitly.
+
 Prompt burden is reported independently from quality as `visual input` (image or
 estimated non-text tokens dominate), `text` (text tokens dominate), `mixed`
 (both materially contribute), `normal`, or `unavailable` when the upstream stack
@@ -1087,7 +1092,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
-| `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, the `--eval-mode` lane supplies the prompt. |
+| `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, the `--eval-mode` lane supplies the prompt. When provided, it overrides the lane prompt only: the lane still governs the default token cap and report labeling, and `assisted` still requires descriptive metadata. |
 | `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width after one flag occurrence. |
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
@@ -1098,7 +1103,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
 | `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. Deprecated `stress`/`quality` inputs resolve as aliases, not separate lanes. |
-| `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
+| `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (500; `triage` 200; deprecated `quality` alias 1000); an explicit value always wins over the lane default. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |

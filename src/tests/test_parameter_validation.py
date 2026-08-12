@@ -540,10 +540,7 @@ class TestCliArgumentNormalization:
 
     def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:
         """Auto mode should use metadata-assisted cataloguing when references exist."""
-        args = self._build_args(
-            eval_mode="auto",
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-        )
+        args = self._build_args(eval_mode="auto", max_tokens=None)
 
         check_models._apply_eval_mode_defaults(
             args,
@@ -560,10 +557,7 @@ class TestCliArgumentNormalization:
 
     def test_auto_eval_mode_uses_blind_lane_with_capture_metadata_only(self) -> None:
         """Auto mode should withhold capture-only metadata in the blind lane."""
-        args = self._build_args(
-            eval_mode="auto",
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-        )
+        args = self._build_args(eval_mode="auto", max_tokens=None)
 
         check_models._apply_eval_mode_defaults(
             args,
@@ -580,10 +574,7 @@ class TestCliArgumentNormalization:
 
     def test_auto_eval_mode_uses_blind_lane_without_metadata(self) -> None:
         """Auto mode should run the structured blind benchmark without references."""
-        args = self._build_args(
-            eval_mode="auto",
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-        )
+        args = self._build_args(eval_mode="auto", max_tokens=None)
 
         check_models._apply_eval_mode_defaults(
             args,
@@ -610,22 +601,49 @@ class TestCliArgumentNormalization:
         assert args.eval_mode == "blind"
         assert args.max_tokens == 321
 
-    def test_explicit_assisted_lane_requires_descriptive_metadata(self) -> None:
-        """Assisted selection should fail instead of silently becoming a blind run."""
+    def test_parser_defaults_max_tokens_to_unset_sentinel(self) -> None:
+        """The parser must not pre-fill max_tokens; the lane resolves the default."""
+        parser = check_models._build_cli_parser()
+
+        args = parser.parse_args(["--dry-run"])
+
+        assert args.max_tokens is None
+
+    def test_triage_lane_applies_its_token_cap_when_unset(self) -> None:
+        """An unset token cap should resolve to the triage budget in the triage lane."""
+        args = self._build_args(eval_mode="triage", max_tokens=None)
+
+        check_models._apply_eval_mode_defaults(args, {})
+
+        assert args.eval_mode == "triage"
+        assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
+
+    def test_explicit_default_valued_token_cap_survives_triage(self) -> None:
+        """--max-tokens 500 must survive triage even though it equals the old default.
+
+        The previous value-comparison sentinel could not distinguish an explicit
+        500 from "unset" and silently replaced it with the triage cap.
+        """
         args = self._build_args(
-            eval_mode="assisted",
+            eval_mode="triage",
             max_tokens=check_models.DEFAULT_MAX_TOKENS,
         )
+
+        check_models._apply_eval_mode_defaults(args, {})
+
+        assert args.eval_mode == "triage"
+        assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
+
+    def test_explicit_assisted_lane_requires_descriptive_metadata(self) -> None:
+        """Assisted selection should fail instead of silently becoming a blind run."""
+        args = self._build_args(eval_mode="assisted", max_tokens=None)
 
         with pytest.raises(ValueError, match=r"assisted.*descriptive metadata"):
             check_models._apply_eval_mode_defaults(args, {})
 
     def test_legacy_quality_mode_maps_to_assisted_with_quality_budget(self) -> None:
         """The quality alias should retain its token budget while recording the new lane."""
-        args = self._build_args(
-            eval_mode="quality",
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-        )
+        args = self._build_args(eval_mode="quality", max_tokens=None)
 
         check_models._apply_eval_mode_defaults(args, {"description": "Reference caption"})
 
@@ -638,10 +656,7 @@ class TestCliArgumentNormalization:
         legacy_mode: str,
     ) -> None:
         """Legacy inputs should remain aliases and never become persisted lanes."""
-        args = self._build_args(
-            eval_mode=legacy_mode,
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-        )
+        args = self._build_args(eval_mode=legacy_mode, max_tokens=None)
 
         check_models._apply_eval_mode_defaults(args, {"date": "2026-07-10"})
 
@@ -653,7 +668,7 @@ class TestUpstreamCliParity:
 
     # Flag -> reason the default deliberately differs from upstream generate.
     DELIBERATE_DEFAULT_DIVERGENCES: ClassVar[dict[str, str]] = {
-        "--max-tokens": "bounded diagnostic runs (500) vs upstream free-form 2048",
+        "--max-tokens": "lane-resolved default (500/200/1000) vs upstream free-form 2048",
         "--prompt": "harness builds a metadata-cataloguing prompt when unset",
         "--revision": "None distinguishes requested vs resolved revisions in reports",
         "--thinking-start-token": "None defers to the upstream default at call time",
