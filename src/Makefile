@@ -51,6 +51,17 @@ else
     endif
 endif
 
+# Upgrade pip via whichever manager owns it. When conda owns pip, a pip
+# self-upgrade interleaves two pip versions in site-packages and breaks pip
+# at import time; when pip owns itself (pypi entry only), conda update would
+# fail or reintroduce a second conda-owned copy. `conda list --no-pip` hides
+# pypi-installed packages, so a hit there means conda owns pip.
+ifeq ($(ENV_TYPE),conda)
+    UPGRADE_PIP_CMD := if conda list -n $(CONDA_ENV) --no-pip '^pip$$' 2>/dev/null | grep -qE '^pip[[:space:]]'; then conda update -n $(CONDA_ENV) -y pip; else $(RUN_PY) -m pip install --upgrade pip; fi
+else
+    UPGRADE_PIP_CMD := $(RUN_PY) -m pip install --upgrade pip
+endif
+
 MYPY_CONFIG := pyproject.toml
 FMT_PATHS := check_models.py tests tools check_models_data
 
@@ -87,7 +98,7 @@ install-all: ## Install all optional dependencies (dev + extras + torch)
 
 .PHONY: bootstrap-dev
 bootstrap-dev: ## pip bootstrap runtime + dev + extras + torch + hooks + validation
-	$(RUN_PY) -m pip install --upgrade pip
+	$(UPGRADE_PIP_CMD)
 	$(RUN_PY) -m pip install -e .[dev,extras,torch]
 	$(RUN_PY) -m pip install huggingface_hub
 	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
@@ -202,7 +213,7 @@ update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs
 .PHONY: update-quick
 update-quick: ## Quick in-env refresh: upgrade pip and reinstall project (dev+extras+torch)
 	@echo "[update-quick] Updating pip in environment: $(ENV_NAME) ($(ENV_TYPE))"
-	@$(RUN_PY) -m pip install --upgrade pip
+	@$(UPGRADE_PIP_CMD)
 	@echo "[update-quick] Reinstalling project with all dependencies (dev+extras+torch)..."
 	@$(RUN_PY) -m pip install -e .[dev,extras,torch] --upgrade
 	@echo "✓ Environment updated and project reinstalled"

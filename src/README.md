@@ -564,7 +564,7 @@ python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 
 #### Generation Control
 
-- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`500`; `triage` `200`; deprecated `quality` alias `1000`); an explicit value always wins over the lane default.
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`1000`; `triage` `200`; deprecated `quality` alias `1000`); an explicit value always wins over the lane default.
 - `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
 
 **Example**:
@@ -1036,8 +1036,8 @@ is secondary data and does not alter current-run assessment or report guidance.
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
 | `triage` | Image only; brief caption request | 200 | Compares plain image-caption output while providing a fast MLX-VLM compatibility and mechanical output check. |
-| `blind` | Image only; structured title, description, and keywords request | 500 | Exercises unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model and current-run assessment. |
-| `assisted` | Image plus descriptive title, description, or keyword hints | 500 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
+| `blind` | Image only; structured title, description, and keywords request | 1000 | Exercises unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model and current-run assessment. |
+| `assisted` | Image plus descriptive title, description, or keyword hints | 1000 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
 
 `--eval-mode auto` selects `assisted` when descriptive title, description, or
 keywords are available and `blind` otherwise. `stress` and `quality` remain
@@ -1103,7 +1103,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
 | `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. Deprecated `stress`/`quality` inputs resolve as aliases, not separate lanes. |
-| `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (500; `triage` 200; deprecated `quality` alias 1000); an explicit value always wins over the lane default. |
+| `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200; deprecated `quality` alias 1000); an explicit value always wins over the lane default. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |

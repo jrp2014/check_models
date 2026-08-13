@@ -619,10 +619,11 @@ class TestCliArgumentNormalization:
         assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
 
     def test_explicit_default_valued_token_cap_survives_triage(self) -> None:
-        """--max-tokens 500 must survive triage even though it equals the old default.
+        """An explicit --max-tokens equal to the lane default must survive triage.
 
         The previous value-comparison sentinel could not distinguish an explicit
-        500 from "unset" and silently replaced it with the triage cap.
+        default-valued cap from "unset" and silently replaced it with the triage
+        cap.
         """
         args = self._build_args(
             eval_mode="triage",
