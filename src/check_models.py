@@ -1598,7 +1598,7 @@ def _resolve_generation_stop_reason(
 # =============================================================================
 
 # These constants define default values for various parameters used in the script.
-DEFAULT_MAX_TOKENS: Final[int] = 500
+DEFAULT_MAX_TOKENS: Final[int] = 1000
 DEFAULT_EVAL_MODE: Final[RequestedEvaluationMode] = "auto"
 _UNKNOWN_OWNER: Final[str] = "unknown"
 TRIAGE_MAX_TOKENS: Final[int] = 200
@@ -18383,11 +18383,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         help=(
             "Evaluation lane: 'auto' (default) selects 'assisted' when descriptive metadata "
             "is available and 'blind' otherwise; 'triage' = brief compatibility caption, "
-            "200 tokens; 'blind' = structured cataloguing without metadata hints, 500 tokens; "
-            "'assisted' = structured cataloguing with metadata hints, 500 tokens. Deprecated "
-            "'stress' and 'quality' inputs are aliases, not separate lanes; 'quality' retains "
-            "its 1000-token default. A custom --prompt overrides the lane prompt only; the "
-            "lane still governs the default token cap and report labeling."
+            f"{TRIAGE_MAX_TOKENS} tokens; 'blind' = structured cataloguing without metadata "
+            f"hints, {DEFAULT_MAX_TOKENS} tokens; 'assisted' = structured cataloguing with "
+            f"metadata hints, {DEFAULT_MAX_TOKENS} tokens. Deprecated 'stress' and 'quality' "
+            f"inputs are aliases, not separate lanes; 'quality' retains its "
+            f"{QUALITY_MAX_TOKENS}-token default. A custom --prompt overrides the lane prompt "
+            "only; the lane still governs the default token cap and report labeling."
         ),
     )
     generation_group.add_argument(

@@ -20,6 +20,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `make bootstrap-dev` and `make update-quick` now upgrade pip through
+  whichever manager owns it: in conda environments a runtime check
+  (`conda list --no-pip`) detects a conda-owned pip and routes the upgrade
+  through `conda update pip`; otherwise (pip-owned pip, venvs) the usual
+  `pip install --upgrade pip` runs. A pip self-upgrade over a conda-owned
+  pip leaves two pip versions interleaved in site-packages (both dist-infos
+  present, `ImportError: cannot import name 'get_runnable_pip'` on launch),
+  while `conda update pip` over a pip-owned pip reintroduces the second
+  owner.
+- Double the default generation token cap (`DEFAULT_MAX_TOKENS`) from 500 to
+  1000 for the `blind` and `assisted` lanes. In the 2026-08-12 run, 10 of 16
+  unusable results were truncated at the 500-token cap — 5 with incomplete
+  thinking traces — so the old cap largely predetermined the usability verdict
+  for thinking models. The `triage` (200) and deprecated `quality` alias
+  (1000) caps are unchanged; the lane help text now interpolates the
+  constants instead of hard-coding values.
 - Update the development-time nanobind stub generator to 2.14.0 after verifying
   that it emits byte-identical `mlx.core` stubs against the current MLX build;
   MLX's separate build-time nanobind pin remains unchanged.
