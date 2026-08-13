@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-13 00:08:03 BST
+Generated on: 2026-08-13 23:30:23 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,57 +16,56 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.28s   | 517 tok/s  | 0.04            | 1.2     | 396        | 90      | none                                                                                                                     |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 8.63s   | 81.0 tok/s | 5.66            | 8.4     | 6,348      | 97      | none                                                                                                                     |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.23s   | 34.4 tok/s | 1.25            | 17      | 3,662      | 96      | none                                                                                                                     |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 9.76s   | 19.0 tok/s | 1.65            | 15      | 314        | 116     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.10s   | 67.0 tok/s | 2.32            | 14      | 3,229      | 130     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.36s   | 182 tok/s  | 1.19            | 9.0     | 3,228      | 132     | none                                                                                                                     |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 77.33s  | 63.6 tok/s | 63.40           | 74      | 16,521     | 119     | none                                                                                                                     |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.20s   | 55.6 tok/s | 0.29            | 9.4     | 1,142      | 138     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 64.74s  | 110 tok/s  | 60.43           | 24      | 16,521     | 105     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 65.16s  | 90.5 tok/s | 61.86           | 10.0    | 16,521     | 99      | none                                                                                                                     |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 91.91s  | 16.9 tok/s | 80.98           | 35      | 16,521     | 118     | none                                                                                                                     |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.39s   | 129 tok/s  | 0.33            | 5.5     | 439        | 98      | none                                                                                                                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.13s   | 129 tok/s  | 0.41            | 16      | 617        | 104     | none                                                                                                                     |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.83s   | 26.7 tok/s | 1.06            | 20      | 617        | 99      | none                                                                                                                     |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 17.39s  | 94.8 tok/s | 13.98           | 8.4     | 16,506     | 184     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 10.13s  | 30.5 tok/s | 3.60            | 24      | 2,696      | 119     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 29.98s  | 38.1 tok/s | 18.04           | 78      | 6,348      | 122     | control tokens visible; title/keyword constraints failed                                                                 |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | 1.77s   | 186 tok/s  | 0.08            | 4.1     | 599        | 125     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 8.43s   | 61.2 tok/s | 2.49            | 15      | 3,229      | 248     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.62s   | 53.4 tok/s | 0.65            | 11      | 1,534      | 153     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 22.10s  | 93.1 tok/s | 18.55           | 8.4     | 16,506     | 184     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | 29.58s  | 45.5 tok/s | 18.66           | 70      | 3,503      | 115     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.90s   | 57.5 tok/s | 0.44            | 29      | 613        | 87      | control tokens visible                                                                                                   |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.51s   | 65.8 tok/s | 0.44            | 28      | 613        | 82      | control tokens visible                                                                                                   |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.41s   | 31.5 tok/s | 1.04            | 18      | 606        | 146     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 6.69s   | 39.4 tok/s | 1.87            | 16      | 3,467      | 103     | title/keyword constraints failed                                                                                         |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 16.05s  | 42.7 tok/s | 2.21            | 15      | 3,558      | 500     | missing required fields; echoes instructions; cut off at token limit                                                     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.46s  | 46.7 tok/s | 5.02            | 60      | 1,626      | 500     | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.87s   | 344 tok/s  | 0.10            | 2.1     | 347        | 53      | missing required fields                                                                                                  |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 18.35s  | 47.7 tok/s | 5.66            | 13      | 6,344      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                      |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 4.16s   | 34.2 tok/s | 1.11            | 18      | 2,626      | 16      | missing required fields; role tokens visible                                                                             |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 112.35s | 4.67 tok/s | 1.37            | 40      | 1,296      | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 3.55s   | 276 tok/s  | 0.26            | 3.9     | 1,003      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 27.99s  | 5.97 tok/s | 2.47            | 24      | 3,158      | 134     | missing required fields                                                                                                  |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 72.59s  | 216 tok/s  | 70.70           | 5.1     | 16,517     | 124     | missing required fields                                                                                                  |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 26.19s  | 88.8 tok/s | 18.96           | 8.4     | 16,508     | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 30.87s  | 53.3 tok/s | 19.53           | 13      | 16,517     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 5.32s   | 48.8 tok/s | 0.37            | 17      | 605        | 90      | missing required fields                                                                                                  |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 5.01s   | 62.6 tok/s | 2.49            | 9.7     | 2,739      | 56      | missing required fields                                                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.34s   | 341 tok/s  | 0.08            | 2.4     | 343        | 72      | missing required fields                                                                                                  |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 14.02s  | 45.4 tok/s | 1.10            | 4.3     | 4,433      | 500     | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.20s   | -          | -               | -       | -          | -       | none                                                                                                                     |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                        |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.15s   | 513 tok/s  | 0.05            | 1.2     | 358        | 82      | none                                                                                                |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.33s   | 184 tok/s  | 1.19            | 9.0     | 3,177      | 135     | none                                                                                                |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 77.59s  | 63.7 tok/s | 63.29           | 74      | 16,482     | 124     | none                                                                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 63.98s  | 110 tok/s  | 59.66           | 24      | 16,482     | 120     | none                                                                                                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 58.58s  | 93.5 tok/s | 55.31           | 10.0    | 16,482     | 109     | none                                                                                                |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.63s   | 126 tok/s  | 0.33            | 5.5     | 400        | 116     | none                                                                                                |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 34.30s  | 43.8 tok/s | 20.96           | 70      | 3,468      | 117     | none                                                                                                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.09s   | 130 tok/s  | 0.41            | 16      | 580        | 99      | none                                                                                                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.48s   | 25.0 tok/s | 1.22            | 20      | 580        | 103     | none                                                                                                |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 16.83s  | 94.5 tok/s | 13.94           | 8.4     | 16,467     | 139     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 10.20s  | 29.2 tok/s | 3.59            | 24      | 2,645      | 117     | title/keyword constraints failed                                                                    |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 38.47s  | 33.7 tok/s | 23.66           | 78      | 6,310      | 141     | control tokens visible                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 10.71s  | 31.1 tok/s | 1.22            | 18      | 2,586      | 213     | role tokens visible                                                                                 |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 5.92s   | 34.0 tok/s | 1.41            | 17      | 3,623      | 79      | title/keyword constraints failed                                                                    |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | 1.74s   | 195 tok/s  | 0.11            | 4.1     | 561        | 141     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable_with_caveats` | 9.67s   | 19.1 tok/s | 1.82            | 15      | 275        | 113     | title/keyword constraints failed                                                                    |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | 2.11s   | 270 tok/s  | 0.27            | 3.8     | 964        | 107     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable_with_caveats` | 6.94s   | 65.4 tok/s | 2.35            | 14      | 3,178      | 182     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 7.93s   | 60.7 tok/s | 2.64            | 15      | 3,178      | 207     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.26s   | 52.5 tok/s | 0.66            | 11      | 1,487      | 136     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | 3.29s   | 56.0 tok/s | 0.29            | 9.6     | 1,094      | 94      | title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 71.63s  | 191 tok/s  | 69.91           | 5.1     | 16,478     | 63      | draft hints copied unchanged                                                                        |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 23.05s  | 93.9 tok/s | 19.99           | 8.4     | 16,467     | 139     | title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 83.30s  | 17.8 tok/s | 71.78           | 35      | 16,482     | 131     | title/keyword constraints failed                                                                    |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.68s   | 63.9 tok/s | 0.34            | 29      | 576        | 86      | control tokens visible; title/keyword constraints failed                                            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.21s   | 75.6 tok/s | 0.34            | 28      | 576        | 81      | control tokens visible                                                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.84s   | 27.9 tok/s | 1.13            | 18      | 569        | 139     | title/keyword constraints failed                                                                    |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 6.50s   | 39.4 tok/s | 1.83            | 16      | 3,413      | 99      | title/keyword constraints failed                                                                    |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 16.00s  | 42.5 tok/s | 2.19            | 15      | 3,504      | 500     | missing required fields; echoes instructions; cut off at token limit                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 28.43s  | 58.2 tok/s | 5.69            | 60      | 1,584      | 500     | missing required fields; extra text before Title; cut off at token limit                            |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.95s   | 346 tok/s  | 0.10            | 2.1     | 308        | 83      | missing required fields; echoes instructions                                                        |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 18.46s  | 46.9 tok/s | 5.71            | 13      | 6,306      | 500     | extra text before Title; cut off at token limit; incomplete thinking block                          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 14.33s  | 72.2 tok/s | 5.53            | 8.4     | 6,310      | 500     | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 115.41s | 4.55 tok/s | 1.61            | 40      | 1,257      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 27.46s  | 5.98 tok/s | 2.53            | 24      | 3,100      | 131     | missing required fields                                                                             |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 25.04s  | 90.2 tok/s | 17.99           | 8.4     | 16,469     | 500     | missing required fields; cut off at token limit; incomplete thinking block                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 29.84s  | 53.7 tok/s | 18.58           | 13      | 16,478     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 11.16s  | 48.7 tok/s | 0.38            | 17      | 568        | 391     | missing required fields; extra text before Title                                                    |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 5.58s   | 62.2 tok/s | 2.40            | 9.7     | 2,680      | 102     | missing required fields                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.50s   | 353 tok/s  | 0.08            | 2.2     | 304        | 171     | missing required fields                                                                             |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 15.26s  | 40.8 tok/s | 1.10            | 4.4     | 4,397      | 500     | repeated text; missing required fields; echoes instructions; cut off at token limit                 |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 517 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 513 tok/s
 
-Average clean-completion throughput: 109 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 143 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.2 GB
 
@@ -74,24 +73,21 @@ Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` a
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                                                             |
-|--------------------------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                      |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                      | `unusable`      | missing required fields; role tokens visible                                                                             |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                  | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable`      | missing required fields                                                                                                  |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable`      | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                                                     |
+| Model                                                                                                        | Usability  | Observations                                                                                        |
+|--------------------------------------------------------------------------------------------------------------|------------|-----------------------------------------------------------------------------------------------------|
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable` | missing required fields; echoes instructions; cut off at token limit                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable` | missing required fields; extra text before Title; cut off at token limit                            |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable` | missing required fields; echoes instructions                                                        |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable` | extra text before Title; cut off at token limit; incomplete thinking block                          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                             | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable` | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable` | missing required fields                                                                             |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable` | missing required fields; cut off at token limit; incomplete thinking block                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                             |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable` | missing required fields; extra text before Title                                                    |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable` | missing required fields                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable` | missing required fields                                                                             |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable` | repeated text; missing required fields; echoes instructions; cut off at token limit                 |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -100,61 +96,60 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>The Thekla anchored in Mud Dock, Bristol Harbour<br><br>Description:<br>A black boat with a white mast and red stripe is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe in the background.<br><br>Keywords:<br>Boat, Mud Dock, Bristol Harbour, St Mary Redcliffe, S... |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | Title: Thekla Ship in Bristol Harbour<br>Description: The black ship "Thekla" is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.<br>Keywords: Thekla ship, Bristol Harbour, St Mary Redcliffe Church,...                |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | Title: Thekla Moored in Bristol Harbour<br><br>Description: The Thekla, a ship venue, is moored in Mud Dock with St Mary Redcliffe's church spire visible in the background, under a clear sky.<br><br>Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire,...           |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | Title: Thekla Ship Moored in Bristol Harbour<br><br>Description: The Thekla, a ship venue, is anchored in the tranquil waters of Bristol Harbour on a sunny day, with the historic church of St Mary Redcliffe's steeple visible in the background. The ship's black hull and white mast st...                |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Thekla Ship Venue Moored in Bristol Harbour**<br><br>Description:<br>The historic vessel *Thekla*, a repurposed ship venue, is docked in Mud Dock, Bristol Harbour, under clear daylight skies. The church steeple of St Mary Redcliffe is visible in the background, with mooring li...          |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Thekla in Mud Dock, Bristol Harbour<br><br>Description:<br>The historic sailing vessel *Thekla* is moored in Mud Dock of Bristol Harbour, with the iconic spire of St Mary Redcliffe Church visible under clear skies. Its tall mast and traditional hull, accented with bold red and w...          |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: The Thekla ship moored in Bristol Harbour<br>Description: The Thekla, a former ship turned venue, is moored at the dockside in Bristol Harbour under a clear blue sky. The vessel's black hull and white mast stand in the foreground, with the distinctive spire of St Mary Redc...                   |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Thekla Ship Anchored in Bristol Harbour<br><br>Description: Thekla, a large ship, is moored in Bristol Harbour's Mud Dock, with the church of St Mary Redcliffe's spire visible in the background. The scene captures a clear day in the city centre of Bristol, England, with the s...                |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: The Thekla Ship Moored in Bristol Harbour<br><br>Description: The black-hulled vessel Thekla is moored in Mud Dock, Bristol Harbour, under a clear blue sky, with the stone spire of St Mary Redcliffe church visible in the background.<br><br>Keywords: Thekla, Bristol Harbour, Moored,...          |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Thekla Ship Moored in Bristol Harbour<br><br>Description: The Thekla, a historic ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe Church visible in the background under a clear sky.<br><br>Keywords: Thekla, Ship, Moored, Bristol Harbour, Mud D...          |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>The Thekla ship moored in Bristol Harbour<br><br>Description:<br>The black hull of the historic ship The Thekla is moored in Mud Dock, Bristol, under a clear blue sky. In the background, the distinctive stone spire of St Mary Redcliffe church rises above the trees on the riverba...          |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | Title: Thekla, Bristol, England, UK, GBR, Europe<br>Description: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.<br>Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire,...                |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Thekla ship moored in Bristol Harbour<br><br>Description: The Thekla ship is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear sky. The vessel's black hull and tall white mast are captured in bright dayligh...                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: The Thekla ship venue in Bristol Harbour<br>Description: The Thekla, a black ship venue, is moored in Mud Dock in Bristol, England, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky.<br>Keywords: Architecture, Boat, Bristol, Building,...                |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title:<br>Thekla Ship in Bristol Harbour<br><br>Description:<br>The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white m...          |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Thekla Ship Venue in Bristol Harbour<br><br>Description:<br>The Thekla, a moored ship venue, is anchored in Mud Dock, Bristol Harbour, with the distinctive steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.<br><br>Keywords:<br>Architecture, Boat, Bristo... |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: The Thekla Ship at Mud Dock, Bristol<br>Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.<br>Keywords: Thekla, Ship, Mud Dock, Bristol...              |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Thekla at Bristol Harbour<br><br>Description: The Thekla, a historic ship venue, is moored in the Mud Dock of Bristol Harbour. The vessel is anchored with mooring lines, and the backdrop features the steeple of St Mary Redcliffe Church, adding a touch of architectural eleganc...                |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Thekla Ship Venue Moored in Bristol’s Mud Dock<br><br>**Description:**<br>On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), the historic **Bristol-built wooden ship *Thekla***—a converted venue vessel—is anchored in **Mud Dock, Bristol Harbour**. A...          |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: The Thekla, Bristol's historic ship venue in Mud Dock<br><br>Description: A black ship named Thekla is moored in Bristol Harbour's Mud Dock, with the steeple of St Mary Redcliffe church visible in the background. The scene captures a clear day, showcasing the city's blend of...                 |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title:<br>Thekla Ship in Bristol Harbour<br><br>Description:<br>The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white m...          |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire<br><br>Description:<br>The vessel Thekla, a ship venue, is moored in Mud Dock within Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.<br><br>Keywords:<br>Bris... |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: The Thekla ship venue moored in Bristol Harbour England<br>Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.<br>Keywords: Architec...           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: The Thekla Ship Moored in Bristol Harbour<br>Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.<br>Keywords: Bristol, Harbour, Ship, Boat, Church...           |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: The Thekla, Mud Dock, Bristol Harbour, August 2026<br>Description: Captured on 12 August 2026, The Thekla, a black ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky. The ship disp...                   |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Thekla Moored in Bristol Harbour<br><br>Description:<br>Thekla, a ship venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe church in the background under a clear sky.<br><br>Keywords:<br>Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire,... |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints: Title hint: City Centre, Bristol, England, UK, GBR, Europe. Description hi...                   |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata for this. First, the title. It's got to be concise, descriptive, and accurate. "The Thekla in Bristol Harbour" is a good start, but I can do better. "The Thekla, Bristol Harbour, St...                      |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, bridge, church, church spire, clear sky, dock, England, Europe, flag, harbor, mooring, mooring lines, nautical.                                                                                                                   |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship...                 |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | Thekla in Bristol Harbour with St Mary Redcliffe in the background.<end_of_utterance>                                                                                                                                                                                                                         |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. Let's start with the title. The main subject is the Thekl...                      |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | &lt;think&gt;<br>We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and...             |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Thekla Ship in Mud Dock, Bristol Harbour<br><br>The Thekla, a large black ship with a white mast, is moored in Mud Dock, Bristol Harbour. The steeple of St Mary Redcliffe Church is visible in the background, with a clear blue sky overhead. The ship's name is prominently displayed on...                |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | Title:<br>City Centre, Bristol, England, UK, GBR, Europe<br><br>Description:<br>The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church in the background. The clear sky and calm waters create a serene atmosphere, highlighti...          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The image shows a ship named Thekla anchored in Bristol Harbour. The context mentions Bristol, so the title should be specific. Let's see: "Thekla, Bristol Harbour, Moored" – that's 5 words. Wait, maybe "Thekla Ship, Br...                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>The Thekla in Mud Dock, Bristol<br><br>Description:<br>The historic ship Thekla, now a venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky. The ship's black hull, white mast, and mooring lin...          |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a clear day. The ship's black hull features a red stripe and the name "THEKLA" in white lettering. It is secured to the dock with mooring lines. In the background, the tall spire of St Mary Redcliffe...                       |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical                                                                                                                        |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Thekla in Bristol, England, UK, GBR, Europe<br>Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. The image captures the ship's mooring lines and the surrounding area, with a clear...                   |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Title hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.<br>- Description hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcli...                   |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | Model loading failed: Received 362 parameters not in model:<br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.expe...       |
+| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                                     |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br><br>Description:<br>A street lamp stands on a seaside promenade, with a backdrop of industrial cranes and a clear blue sky.<br><br>Keywords:<br>Seafront, Felixstowe, England, UK, GBR, Europe, street lamp, industrial cranes, seaside promen...                      |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Felixstowe Seafront by the Port Cranes and Ferris Wheel<br><br>Description:<br>A coastal view at Felixstowe, UK, on 2026-08-13, captures a blend of industrial port activity with a leisurely Ferris wheel, under bright daylight with vintage-style street lamps and festive string li...                               |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: Seafront view of Felixstowe pier and port cranes<br><br>Description: A sunlit seafront scene in Felixstowe, Suffolk, featuring a long pier extending over the water with a Ferris wheel visible in the distance. Large container port cranes dominate the hazy background skyline, w...                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Felixstowe Seafront with Pier and Port Cranes<br><br>Description: A sunlit view of the Felixstowe seafront featuring a pier extending into the water, with large port cranes and a Ferris wheel visible in the hazy background. Decorative string lights hang in the foreground alon...                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Felixstowe Seafront with Port Cranes and Ferris Wheel<br><br>Description: A sunlit view of Felixstowe seafront, featuring vintage-style lampposts in the foreground, a pier with string lights, and distant port cranes and a Ferris wheel under a clear sky.<br><br>Keywords: Felixstowe,...                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br>Description:<br>Capture date/time: 2026-08-13 16:08:57 UTC+01:00<br>GPS: 51.961800°N, 1.358500°E<br><br>Keywords:<br>Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront                                                    |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Felixstowe Seafront with Port Cranes and Pier<br><br>Description:<br>A sunny seafront view in Felixstowe, England, featuring a Victorian lamp post in the foreground, a pier stretching across the water, a Ferris wheel, and large port cranes visible across the bay under bright day...                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Seafront view of Felixstowe port and cranes<br>Description: A street lamp in the foreground frames a view of the Felixstowe seafront, featuring industrial port cranes and a pier under a clear sky. The scene captures the coastal landscape of East Suffolk with bright, natura...                                        |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Seafront view of Felixstowe port and pier, Suffolk<br>Description: A view across the seafront in Felixstowe, Suffolk, featuring a pier and the industrial cranes of the port under a clear sky. A traditional lamp post stands in the foreground, framing the distant harbor and...                                         |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title:<br>Felixstowe Seafront at Sunset<br><br>Description:<br>A serene seafront view in Felixstowe, England, featuring a classic black lamppost in the foreground, colorful string lights strung across the water, and a distant pier with a Ferris wheel and large cranes. The scene is bathed...                                |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Seafront View, Felixstowe, England<br><br>Description:<br>A serene seafront scene in Felixstowe, England, featuring a traditional lamp post in the foreground, a calm sea with a distant pier, and industrial cranes in the background under a clear sky.<br><br>Keywords:<br>Adobe Stock, Any V...                      |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Felixstowe Seafront with Cranes and Pier<br>Description: A seafront scene in Felixstowe, England, featuring a pier, Ferris wheel, and industrial cranes in the distance, with lampposts, string lights, and a paddleboarder on the water under clear daylight.<br>Ke...                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Felixstowe Seafront in Suffolk, England, UK.<br>Description: The image depicts a serene seafront in Felixstowe, Suffolk, England, UK, characterized by a calm body of water, likely the North Sea, stretching towards the horizon. In the background, a series of large, industri...                                        |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Felixstowe Seafront at Dusk<br>Description: The image captures a serene seafront in Felixstowe, England, with industrial cranes and a Ferris wheel in the background, under soft evening light.<br>Keywords: Felixstowe, seafront, England, Suffolk, East Suffolk, industrial cranes...                                     |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Felixstowe Seafront at Dusk<br><br>Description: A picturesque view of Felixstowe's seafront, showcasing the iconic East Suffolk pier and the silhouette of the famed Ferris wheel against a twilight sky. The scene is bathed in the warm glow of street lamps, with the calm waters...                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable_with_caveats` | Title: A Seaside Scene in East Suffolk, England<br><br>Description: The image captures a serene seaside scene in East Suffolk, England, with a pier and a large industrial area visible in the background, set against a clear sky and calm waters, with a person paddleboarding in the dis...                                     |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | &lt;think&gt;<br><br>&lt;/think&gt;<br><br>Title:<br>Felixstowe Seafront with Industrial Cranes<br><br>Description:<br>A scenic seafront view with pier and ferris wheel under clear skies, showing industrial cranes and water.<br><br>Keywords: Felixstowe, seafront, England, UK, gbr, Europe, industrial, cranes, pier, fer... |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable_with_caveats` | Title:<br>**Felixstowe Seafront with Industrial Cranes and Ferris Wheel**<br><br>Description:<br>A serene seafront view of Felixstowe, England, captured on 13 August 2026, showcasing the tranquil water, distant industrial cranes, and a Ferris wheel under soft daylight. Decorative string l...                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Felixstowe Seafront: Cranes, Pier, and Sunset Glow*<br><br>**Description:**<br>A serene coastal scene at Felixstowe, England, captured on **August 13, 2026, at 16:08 UTC+1**, showcasing industrial cranes along the docks, a historic pier, and a person stand-up paddleboarding...                               |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: Seafront view of Felixstowe with illuminated pier and Ferris wheel<br><br>Description: A picturesque English seafront scene featuring a brightly lit pier, a Ferris wheel, and industrial cranes in the background. The sky is overcast, creating a moody atmosphere. A lone figure...                                      |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: Felixstowe Seafront View<br><br>Description: A serene view of Felixstowe seafront with a backdrop of industrial cranes and a pier, captured on August 13, 2026, at 4:08 PM UTC+1.<br><br>Keywords: Felixstowe, seafront, industrial, cranes, pier, East Suffolk, England, UK, GBR, waterfront                               |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | Title: Seafront, Felixstowe, England, UK, GBR, Europe<br>Description: Seafront, Felixstowe, England, UK, GBR<br>Keywords: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront                                                                                                           |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title:<br>Felixstowe Seafront at Sunset<br><br>Description:<br>A serene seafront view in Felixstowe, England, featuring a classic black lamppost in the foreground, colorful string lights strung across the water, and a distant pier with a Ferris wheel and large cranes. The scene is bathed...                                |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | Title:<br>Felixstowe Seafront with Port Cranes and Pier<br><br>Description:<br>A view of the Felixstowe seafront in Suffolk, England, featuring a prominent pier and a Ferris wheel in the hazy distance. Foreground elements include a blurred street lamp and festive string lights, while larg...                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Seafront View and Industrial Port in Felixstowe Suffolk<br>Description: A view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel in the distance under a clear sky.<br>Keywords: Felixstowe, Suffolk, England, UK, seaf...                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Seafront view of Port of Felixstowe England<br>Description: A coastal view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel under a clear sky.<br>Keywords: Felixstowe, Suffolk, England, UK, seafront, harbor, port,...                                 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Felixstowe Seafront: Pier, Cranes, and Lamp Posts<br><br>Description: Captured on 13th August 2026 at 16:08 UTC+01, this view shows the Felixstowe seafront with a pier, distant container cranes, and ornate lamp posts in the foreground. A calm sea and clear sky provide a brigh...                                     |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Felixstowe Seafront with Lampposts and Cranes<br><br>Description:<br>The image captures a serene seafront in Felixstowe, England, featuring traditional lampposts and industrial cranes in the background under a clear sky.<br><br>Keywords:<br>Felixstowe, seafront, England, UK, lampposts, c...                      |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not c...                                        |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are pretty clear: "Seafront, Felixstowe, England, UK, GBR, Europe." I'll go with "Seafront at Felixstowe, England, UK." It's concise and accurate.<br><br>Now...                                      |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A tranquil seaside scene in Felixstowe, UK, captured on 2026-08-13 at 16:08:57 UTC+01:00, featuring a concrete 5-10-word title, a 1-2-sentence descriptive description, and 10-18 unique, comma-separated keywords covering relevant context and visible details.                                                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image: seafront, Felixstowe, England, with cranes, pier, Ferris wheel. So maybe "Felixstowe Seafront with Industrial Cranes".<br><br>Then the description: need to combine context (date/time, lo...                               |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | Title: Felixstowe Seafront<br>Description: A view of the Felixstowe seafront, featuring a pier, industrial cranes, street lamps, and a tree-lined waterfront under bright daylight.<br>Keywords: Felixstowe seafront, England UK, pier, industrial cranes, street lamps, waterfront, bright...                                     |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.<br><br>First, the context says the capture date/time is 2026-08-13 16:08:57 UTC+01:00, and GP...                                     |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Felixstowe Seafront: Ferris Wheel, Pier, and Industrial Port<br><br>A scenic Felixstowe seafront view captures a Ferris wheel, pier, and industrial port under a clear sky. The image shows a pier extending into the water, a Ferris wheel in the distance, and a port with cranes and bui...                                     |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, GBR. The image has a seafront with cranes, a Ferris wheel, street lamps. So a title should be specific. Maybe "Felixstowe Seafront, England, UK" but need 5-10 words. Let's see:...                                            |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title: Felixstowe Seafront, East Suffolk, UK<br><br>Description: A sunny view of Felixstowe's seafront, featuring a pier, Ferris wheel, cranes, and decorative string lights, with a lamp post in the foreground and a person paddleboarding in the distance.<br><br>Keywords: Felixstowe, East S...                               |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | ## Image Description<br><br>The image captures a scenic view of a waterfront area, likely a harbor or bay, on a bright day. The foreground is dominated by several black lampposts, with the closest one sharply in focus. The lampposts are ornate, featuring a classic lantern design.<br><br>B...                               |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Seafront, Felixstowe, England, UK, GBR, Europe, 2026-08-13 16:08:57 UTC+01:00, 51.961800°N, 1.358500°E, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront                                                                                                                             |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Seafront, Felixstowe, England, UK, GBR, Europe<br>Description: A 5-10-word title that describes the setting and context of the image, with a focus on the maritime theme. It also includes a 1-2-sentence description that combines relevant information about the location, such...                                        |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR,<br>- Description hint: Seafront, Felixstowe, England, UK, GBR,<br>- Title hint: Seafront, Felixstowe, England, UK, GBR,<br>- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,<br>- Keyword hints...                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.6.13`
-- `mlx`: `0.32.1.dev20260812+52960f80f`
+- `mlx-vlm`: `0.6.14`
+- `mlx`: `0.32.1.dev20260813+a8e24f202`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.15.0`
 - `tokenizers`: `0.22.2`
 - `huggingface-hub`: `1.27.0`
-- *Python Version:* 3.13.13
+- *Python Version:* 3.13.14
 - *OS:* Darwin 25.6.0
 - *macOS Version:* 26.6.1
 - *GPU/Chip:* Apple M5 Max
@@ -166,22 +161,13 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 ## Image Metadata
 
-- *Title:* , City Centre, Bristol, England, UK, GBR, Europe
-- *Description:* The Thekla (a ship venue) anchored in Mud Dock in Bristol
-  Harbour with the steeple of the church of St Mary Redcliffe in the
-  background.
-- *Keywords:* Architecture, Boat, Bridge, Bristol, Building, Church, Church
-  Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor,
-  Mast, Moored, Mooring, Mooring lines, Nautical, Rigging, Ship, Sky,
-  Somerset, Spire, Trees, UK, Water, anchor, black hull, blue sky, bow,
-  british, calm, canal, cityscape, day, destination, docked, english,
-  exterior, floating harbour, harbour, historic, marine, maritime, mud dock,
-  outdoors, port, reflection, river, ropes, scenic, skyline, st mary redcliffe
-  church, summer, sunny, thekla, tourism, transport, transportation, travel,
-  united kingdom, urban, vessel, watercraft, waterfront
-- *Date:* 2026-08-12 17:52:14 UTC+01:00
-- *Time:* 17:52:14
-- *GPS:* 51.448500°N, 2.593000°W
+- *Title:* , Seafront, Felixstowe, England, UK, GBR, Europe
+- *Description:* , Seafront, Felixstowe, England, UK, GBR
+- *Keywords:* Adobe Stock, Any Vision, East Suffolk, England, Europe,
+  Felixstowe, Suffolk, UK, gbr, seafront
+- *Date:* 2026-08-13 16:08:57 UTC+01:00
+- *Time:* 16:08:57
+- *GPS:* 51.961800°N, 1.358500°E
 
 ## Prompt
 
@@ -197,17 +183,14 @@ The first 280 characters of each model's actual output (or failure evidence for 
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-08-12 17:52:14 UTC+01:00
-> &#45; GPS: 51.448500°N, 2.593000°W
+> &#45; Capture date/time: 2026-08-13 16:08:57 UTC+01:00
+> &#45; GPS: 51.961800°N, 1.358500°E
 >
 > &#8203;Descriptive hints:
-> &#45; Title hint: City Centre, Bristol, England, UK, GBR, Europe
-> &#45; Description hint: The Thekla (a ship venue) anchored in Mud Dock in
-> Bristol Harbour with the steeple of the church of St Mary Redcliffe in the
-> background.
-> &#45; Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church,
-> Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag,
-> Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
+> &#45; Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
+> &#45; Description hint: Seafront, Felixstowe, England, UK, GBR
+> &#45; Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe,
+> Felixstowe, Suffolk, UK, gbr, seafront
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -238,18 +221,18 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.39s
-- *Generation time:* 0.59s
-- *Total time:* 1.28s
-- *Input validation time:* 0.302
-- *Prompt preparation time:* 0.00606
-- *First-token latency:* 0.0369
-- *Cleanup time:* 0.0577
-- *Prompt tokens:* 396
-- *Generation tokens:* 90
-- *Total tokens:* 486
-- *Prompt throughput (raw):* 10,741 tok/s
-- *Generation throughput (raw):* 517 tok/s
+- *Model load time:* 0.40s
+- *Generation time:* 0.51s
+- *Total time:* 1.15s
+- *Input validation time:* 0.228
+- *Prompt preparation time:* 0.00631
+- *First-token latency:* 0.0516
+- *Cleanup time:* 0.0616
+- *Prompt tokens:* 358
+- *Generation tokens:* 82
+- *Total tokens:* 440
+- *Prompt throughput (raw):* 6,933 tok/s
+- *Generation throughput (raw):* 513 tok/s
 - *Peak memory:* 1.2
 - *Active memory:* 0.90
 - *Cache memory:* 0.02
@@ -258,7 +241,7 @@ Complete generated or crash evidence for every attempted model.
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1369
+- *Rendered prompt characters:* 1183
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -275,250 +258,13 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-The Thekla anchored in Mud Dock, Bristol Harbour
+Seafront, Felixstowe, England, UK, GBR, Europe
 
 Description:
-A black boat with a white mast and red stripe is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe in the background.
+A street lamp stands on a seaside promenade, with a backdrop of industrial cranes and a clear blue sky.
 
 Keywords:
-Boat, Mud Dock, Bristol Harbour, St Mary Redcliffe, Ship, Masts, Shipyard, City, City Centre, Clear Sky, Dock, England, Europe
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.30s
-- *Generation time:* 7.32s
-- *Total time:* 8.63s
-- *Input validation time:* 4.27e-05
-- *Prompt preparation time:* 0.00712
-- *First-token latency:* 5.66
-- *Cleanup time:* 0.0807
-- *Prompt tokens:* 6,348
-- *Generation tokens:* 97
-- *Total tokens:* 6,445
-- *Prompt throughput (raw):* 1,121 tok/s
-- *Generation throughput (raw):* 81.0 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 6.8
-- *Cache memory:* 0.46
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00211
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1399
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Thekla Ship in Bristol Harbour
-Description: The black ship "Thekla" is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.
-Keywords: Thekla ship, Bristol Harbour, St Mary Redcliffe Church, Mud Dock, Bristol, England, UK, moored ship, black hull, clear sky, Bristol Harbour water, church steeple, dockside setting.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### mlx-community/InternVL3-8B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.58s
-- *Generation time:* 4.64s
-- *Total time:* 6.23s
-- *Input validation time:* 3.01e-05
-- *Prompt preparation time:* 0.00171
-- *First-token latency:* 1.25
-- *Cleanup time:* 0.0982
-- *Prompt tokens:* 3,662
-- *Generation tokens:* 96
-- *Total tokens:* 3,758
-- *Prompt throughput (raw):* 2,918 tok/s
-- *Generation throughput (raw):* 34.4 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.28
-- *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.003
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1323
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Thekla Moored in Bristol Harbour
-
-Description: The Thekla, a ship venue, is moored in Mud Dock with St Mary Redcliffe's church spire visible in the background, under a clear sky.
-
-Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, moored, mooring lines, clear sky, architecture, dock, England, Europe, flag, mast, nautical
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.50s
-- *Generation time:* 8.25s
-- *Total time:* 9.76s
-- *Input validation time:* 3.83e-05
-- *Prompt preparation time:* 0.0013
-- *First-token latency:* 1.65
-- *Cleanup time:* 0.0896
-- *Prompt tokens:* 314
-- *Generation tokens:* 116
-- *Total tokens:* 430
-- *Prompt throughput (raw):* 191 tok/s
-- *Generation throughput (raw):* 19.0 tok/s
-- *Peak memory:* 15
-- *Active memory:* 11
-- *Cache memory:* 0.59
-- *Model-load active memory:* 11.4
-- *Post-cleanup active memory:* 0.00431
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1422
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Thekla Ship Moored in Bristol Harbour
-
-Description: The Thekla, a ship venue, is anchored in the tranquil waters of Bristol Harbour on a sunny day, with the historic church of St Mary Redcliffe's steeple visible in the background. The ship's black hull and white mast stand out against the clear blue sky.
-
-Keywords: Thekla, ship, Bristol Harbour, St Mary Redcliffe, church, harbour, boat, nautical, moored, mooring lines, mast, black hull, white mast, clear blue sky, sunny day.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.34s
-- *Generation time:* 4.75s
-- *Total time:* 6.10s
-- *Input validation time:* 3.48e-05
-- *Prompt preparation time:* 0.00701
-- *First-token latency:* 2.32
-- *Cleanup time:* 0.0817
-- *Prompt tokens:* 3,229
-- *Generation tokens:* 130
-- *Total tokens:* 3,359
-- *Prompt throughput (raw):* 1,394 tok/s
-- *Generation throughput (raw):* 67.0 tok/s
-- *Peak memory:* 14
-- *Active memory:* 8.0
-- *Cache memory:* 0.65
-- *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.0051
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3756
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-**Thekla Ship Venue Moored in Bristol Harbour**
-
-Description:
-The historic vessel *Thekla*, a repurposed ship venue, is docked in Mud Dock, Bristol Harbour, under clear daylight skies. The church steeple of St Mary Redcliffe is visible in the background, with mooring lines and nautical details prominently displayed.
-
-Keywords:
-Boat, Bristol Harbour, Clear Sky, Docked Ship, England, European Heritage, Historic Vessel, Mooring Lines, Mud Dock, Nautical Architecture, Ship Venue, St Mary Redcliffe Steeple, Thekla, UK Landmark, Waterfront
+Seafront, Felixstowe, England, UK, GBR, Europe, street lamp, industrial cranes, seaside promenade, clear sky
 </pre>
 
 </details>
@@ -537,27 +283,27 @@ Boat, Bristol Harbour, Clear Sky, Docked Ship, England, European Heritage, Histo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.94s
-- *Generation time:* 2.41s
-- *Total time:* 3.36s
-- *Input validation time:* 4.95e-05
-- *Prompt preparation time:* 0.00684
+- *Model load time:* 0.98s
+- *Generation time:* 2.35s
+- *Total time:* 3.33s
+- *Input validation time:* 4.5e-05
+- *Prompt preparation time:* 0.00686
 - *First-token latency:* 1.19
-- *Cleanup time:* 0.0721
-- *Prompt tokens:* 3,228
-- *Generation tokens:* 132
-- *Total tokens:* 3,360
-- *Prompt throughput (raw):* 2,711 tok/s
-- *Generation throughput (raw):* 182 tok/s
+- *Cleanup time:* 0.0838
+- *Prompt tokens:* 3,177
+- *Generation tokens:* 135
+- *Total tokens:* 3,312
+- *Prompt throughput (raw):* 2,661 tok/s
+- *Generation throughput (raw):* 184 tok/s
 - *Peak memory:* 9.0
 - *Active memory:* 2.8
-- *Cache memory:* 0.44
+- *Cache memory:* 0.41
 - *Model-load active memory:* 2.75
 - *Post-cleanup active memory:* 0.00562
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3755
+- *Rendered prompt characters:* 3569
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -574,13 +320,13 @@ Boat, Bristol Harbour, Clear Sky, Docked Ship, England, European Heritage, Histo
 
 <pre class="model-output-readable">
 Title:
-Thekla in Mud Dock, Bristol Harbour
+Felixstowe Seafront by the Port Cranes and Ferris Wheel
 
 Description:
-The historic sailing vessel *Thekla* is moored in Mud Dock of Bristol Harbour, with the iconic spire of St Mary Redcliffe Church visible under clear skies. Its tall mast and traditional hull, accented with bold red and white stripes, dominate the scene alongside a serene waterfront and lush greenery.
+A coastal view at Felixstowe, UK, on 2026-08-13, captures a blend of industrial port activity with a leisurely Ferris wheel, under bright daylight with vintage-style street lamps and festive string lights along the rocky promenade.
 
 Keywords:
-Architecture, Boat, Bristol, Church, Church Spire, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical, Redcliffe Church, Steeple, Traditional Ship
+Felixstowe, East Suffolk, UK seafront, UK GBR, Suffolk coast, industrial port, Ferris wheel, vintage street lamps, string lights, coastal promenade, industrial cranes, maritime activity, UK England, European seaside, historic lighting fixtures
 </pre>
 
 </details>
@@ -599,18 +345,18 @@ Architecture, Boat, Bristol, Church, Church Spire, Clear Sky, Dock, England, Eur
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 10.84s
-- *Generation time:* 66.46s
-- *Total time:* 77.33s
-- *Input validation time:* 5.25e-05
-- *Prompt preparation time:* 0.014
-- *First-token latency:* 63.4
-- *Cleanup time:* 0.216
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 119
-- *Total tokens:* 16,640
-- *Prompt throughput (raw):* 261 tok/s
-- *Generation throughput (raw):* 63.6 tok/s
+- *Model load time:* 11.13s
+- *Generation time:* 66.43s
+- *Total time:* 77.59s
+- *Input validation time:* 4.64e-05
+- *Prompt preparation time:* 0.0145
+- *First-token latency:* 63.3
+- *Cleanup time:* 0.225
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 124
+- *Total tokens:* 16,606
+- *Prompt throughput (raw):* 260 tok/s
+- *Generation throughput (raw):* 63.7 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
 - *Cache memory:* 0.88
@@ -619,7 +365,7 @@ Architecture, Boat, Bristol, Church, Church Spire, Clear Sky, Dock, England, Eur
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1409
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -635,68 +381,11 @@ Architecture, Boat, Bristol, Church, Church Spire, Clear Sky, Dock, England, Eur
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: The Thekla ship moored in Bristol Harbour
-Description: The Thekla, a former ship turned venue, is moored at the dockside in Bristol Harbour under a clear blue sky. The vessel's black hull and white mast stand in the foreground, with the distinctive spire of St Mary Redcliffe Church visible in the background.
-Keywords: Thekla, Bristol, Harbour, Ship, Moored, Mast, Hull, Church, Spire, St Mary Redcliffe, Dock, Nautical, Blue Sky, Architecture, England, UK, River Avon, Landmark
-</pre>
+Title: Seafront view of Felixstowe pier and port cranes
 
-</details>
+Description: A sunlit seafront scene in Felixstowe, Suffolk, featuring a long pier extending over the water with a Ferris wheel visible in the distance. Large container port cranes dominate the hazy background skyline, while decorative string lights and traditional lamp posts frame the foreground.
 
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.96s
-- *Generation time:* 3.23s
-- *Total time:* 4.20s
-- *Input validation time:* 4.87e-05
-- *Prompt preparation time:* 0.000886
-- *First-token latency:* 0.291
-- *Cleanup time:* 0.0781
-- *Prompt tokens:* 1,142
-- *Generation tokens:* 138
-- *Total tokens:* 1,280
-- *Prompt throughput (raw):* 3,919 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
-- *Peak memory:* 9.4
-- *Active memory:* 8.3
-- *Cache memory:* 0.52
-- *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00713
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1339
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Thekla Ship Anchored in Bristol Harbour
-
-Description: Thekla, a large ship, is moored in Bristol Harbour's Mud Dock, with the church of St Mary Redcliffe's spire visible in the background. The scene captures a clear day in the city centre of Bristol, England, with the ship's masts and rigging prominently displayed.
-
-Keywords: Thekla, ship, moored, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, city centre, clear sky, nautical, architecture
+Keywords: Felixstowe, Suffolk, England, UK, seafront, pier, Ferris wheel, port cranes, container terminal, lamp post, string lights, trees, water, summer, haze, coastal, East Anglia, GBR
 </pre>
 
 </details>
@@ -715,17 +404,17 @@ Keywords: Thekla, ship, moored, Mud Dock, Bristol Harbour, St Mary Redcliffe, ch
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.51s
-- *Generation time:* 62.21s
-- *Total time:* 64.74s
-- *Input validation time:* 5.67e-05
-- *Prompt preparation time:* 0.0145
-- *First-token latency:* 60.4
-- *Cleanup time:* 0.114
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 105
-- *Total tokens:* 16,626
-- *Prompt throughput (raw):* 273 tok/s
+- *Model load time:* 2.45s
+- *Generation time:* 61.50s
+- *Total time:* 63.98s
+- *Input validation time:* 4.99e-05
+- *Prompt preparation time:* 0.0149
+- *First-token latency:* 59.7
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 120
+- *Total tokens:* 16,602
+- *Prompt throughput (raw):* 276 tok/s
 - *Generation throughput (raw):* 110 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
@@ -735,7 +424,7 @@ Keywords: Thekla, ship, moored, Mud Dock, Bristol Harbour, St Mary Redcliffe, ch
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1409
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -751,11 +440,11 @@ Keywords: Thekla, ship, moored, Mud Dock, Bristol Harbour, St Mary Redcliffe, ch
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: The Thekla Ship Moored in Bristol Harbour
+Title: Felixstowe Seafront with Pier and Port Cranes
 
-Description: The black-hulled vessel Thekla is moored in Mud Dock, Bristol Harbour, under a clear blue sky, with the stone spire of St Mary Redcliffe church visible in the background.
+Description: A sunlit view of the Felixstowe seafront featuring a pier extending into the water, with large port cranes and a Ferris wheel visible in the hazy background. Decorative string lights hang in the foreground alongside classic lampposts and greenery.
 
-Keywords: Thekla, Bristol Harbour, Moored, Church Spire, St Mary Redcliffe, Nautical, Boat, Dock, Clear Sky, England, UK, Europe, Architecture, Building, City Centre, Mooring lines, Mast, Flag
+Keywords: Felixstowe, seafront, pier, port cranes, Ferris wheel, England, UK, Suffolk, East Suffolk, Europe, sea, water, lamppost, string lights, trees, rocks, summer, daylight
 </pre>
 
 </details>
@@ -774,18 +463,18 @@ Keywords: Thekla, Bristol Harbour, Moored, Church Spire, St Mary Redcliffe, Naut
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.38s
-- *Generation time:* 63.77s
-- *Total time:* 65.16s
-- *Input validation time:* 5.24e-05
-- *Prompt preparation time:* 0.00031
-- *First-token latency:* 61.9
-- *Cleanup time:* 0.0824
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 99
-- *Total tokens:* 16,620
-- *Prompt throughput (raw):* 267 tok/s
-- *Generation throughput (raw):* 90.5 tok/s
+- *Model load time:* 1.36s
+- *Generation time:* 57.22s
+- *Total time:* 58.58s
+- *Input validation time:* 4.94e-05
+- *Prompt preparation time:* 0.000336
+- *First-token latency:* 55.3
+- *Cleanup time:* 0.0866
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 109
+- *Total tokens:* 16,591
+- *Prompt throughput (raw):* 298 tok/s
+- *Generation throughput (raw):* 93.5 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.6
 - *Cache memory:* 1.2
@@ -794,7 +483,7 @@ Keywords: Thekla, Bristol Harbour, Moored, Church Spire, St Mary Redcliffe, Naut
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1409
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -810,73 +499,11 @@ Keywords: Thekla, Bristol Harbour, Moored, Church Spire, St Mary Redcliffe, Naut
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Thekla Ship Moored in Bristol Harbour
+Title: Felixstowe Seafront with Port Cranes and Ferris Wheel
 
-Description: The Thekla, a historic ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
+Description: A sunlit view of Felixstowe seafront, featuring vintage-style lampposts in the foreground, a pier with string lights, and distant port cranes and a Ferris wheel under a clear sky.
 
-Keywords: Thekla, Ship, Moored, Bristol Harbour, Mud Dock, St Mary Redcliffe, Church Spire, Clear Sky, England, Europe, Architecture, Nautical, Dock, Mooring Lines, Flag, Mast
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
-
-### mlx-community/Qwen3.6-27B-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.11s
-- *Generation time:* 88.77s
-- *Total time:* 91.91s
-- *Input validation time:* 4.5e-05
-- *Prompt preparation time:* 0.0151
-- *First-token latency:* 81
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 16,521
-- *Generation tokens:* 118
-- *Total tokens:* 16,639
-- *Prompt throughput (raw):* 204 tok/s
-- *Generation throughput (raw):* 16.9 tok/s
-- *Peak memory:* 35
-- *Active memory:* 29
-- *Cache memory:* 1.8
-- *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.0096
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1409
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-The Thekla ship moored in Bristol Harbour
-
-Description:
-The black hull of the historic ship The Thekla is moored in Mud Dock, Bristol, under a clear blue sky. In the background, the distinctive stone spire of St Mary Redcliffe church rises above the trees on the riverbank.
-
-Keywords:
-Bristol, The Thekla, Ship, Mud Dock, St Mary Redcliffe, Church Spire, Harbour, Moored, Mast, Nautical, River, England, UK, Clear Sky, Water, Architecture, Historic, Black Hull
+Keywords: Felixstowe, seafront, port cranes, Ferris wheel, pier, lampposts, string lights, East Suffolk, England, UK, GBR, Europe, coastal view, harbour, summer day
 </pre>
 
 </details>
@@ -895,18 +522,18 @@ Bristol, The Thekla, Ship, Mud Dock, St Mary Redcliffe, Church Spire, Harbour, M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.66s
-- *Generation time:* 1.73s
-- *Total time:* 2.39s
-- *Input validation time:* 5.3e-05
-- *Prompt preparation time:* 0.00184
-- *First-token latency:* 0.331
-- *Cleanup time:* 0.0729
-- *Prompt tokens:* 439
-- *Generation tokens:* 98
-- *Total tokens:* 537
-- *Prompt throughput (raw):* 1,326 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Model load time:* 0.72s
+- *Generation time:* 1.91s
+- *Total time:* 2.63s
+- *Input validation time:* 5.42e-05
+- *Prompt preparation time:* 0.00186
+- *First-token latency:* 0.329
+- *Cleanup time:* 0.0757
+- *Prompt tokens:* 400
+- *Generation tokens:* 116
+- *Total tokens:* 516
+- *Prompt throughput (raw):* 1,216 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.19
@@ -915,7 +542,7 @@ Bristol, The Thekla, Ship, Mud Dock, St Mary Redcliffe, Church Spire, Harbour, M
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1350
+- *Rendered prompt characters:* 1164
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -931,9 +558,76 @@ Bristol, The Thekla, Ship, Mud Dock, St Mary Redcliffe, Church Spire, Harbour, M
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Thekla, Bristol, England, UK, GBR, Europe
-Description: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
-Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mooring, Mooring lines, Nautical
+ Title:
+Seafront, Felixstowe, England, UK, GBR, Europe
+Description:
+Capture date/time: 2026-08-13 16:08:57 UTC+01:00
+GPS: 51.961800°N, 1.358500°E
+
+Keywords:
+Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq2e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ2e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 9.89s
+- *Generation time:* 24.39s
+- *Total time:* 34.30s
+- *Input validation time:* 4.52e-05
+- *Prompt preparation time:* 0.0159
+- *First-token latency:* 21
+- *Cleanup time:* 0.244
+- *Prompt tokens:* 3,468
+- *Generation tokens:* 117
+- *Total tokens:* 3,585
+- *Prompt throughput (raw):* 165 tok/s
+- *Generation throughput (raw):* 43.8 tok/s
+- *Peak memory:* 70
+- *Active memory:* 63
+- *Cache memory:* 0.42
+- *Model-load active memory:* 63
+- *Post-cleanup active memory:* 0.00998
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1210
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Felixstowe Seafront with Port Cranes and Pier
+
+Description:
+A sunny seafront view in Felixstowe, England, featuring a Victorian lamp post in the foreground, a pier stretching across the water, a Ferris wheel, and large port cranes visible across the bay under bright daylight.
+
+Keywords:
+Felixstowe, Suffolk, England, UK, seafront, pier, port cranes, Ferris wheel, Victorian lamp post, coastal view, East Suffolk, Europe, waterfront, maritime, industrial, sunny, blue water, scenic
 </pre>
 
 </details>
@@ -952,27 +646,27 @@ Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, C
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.36s
-- *Generation time:* 1.74s
-- *Total time:* 4.13s
-- *Input validation time:* 4.19e-05
-- *Prompt preparation time:* 0.0201
-- *First-token latency:* 0.411
+- *Model load time:* 2.45s
+- *Generation time:* 1.61s
+- *Total time:* 4.09s
+- *Input validation time:* 5.07e-05
+- *Prompt preparation time:* 0.0205
+- *First-token latency:* 0.413
 - *Cleanup time:* 0.115
-- *Prompt tokens:* 617
-- *Generation tokens:* 104
-- *Total tokens:* 721
-- *Prompt throughput (raw):* 1,503 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt tokens:* 580
+- *Generation tokens:* 99
+- *Total tokens:* 679
+- *Prompt throughput (raw):* 1,404 tok/s
+- *Generation throughput (raw):* 130 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
-- *Cache memory:* 0.21
+- *Cache memory:* 0.20
 - *Model-load active memory:* 15.4
 - *Post-cleanup active memory:* 0.0119
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1372
+- *Rendered prompt characters:* 1186
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -988,11 +682,9 @@ Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, C
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Thekla ship moored in Bristol Harbour
-
-Description: The Thekla ship is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear sky. The vessel's black hull and tall white mast are captured in bright daylight.
-
-Keywords: Architecture, Boat, Bristol, Church, Church Spire, City, Clear Sky, Dock, England, Europe, Harbor, Mast, Moored, Mooring lines, Nautical, Ship, Vessel, Water
+Title: Seafront view of Felixstowe port and cranes
+Description: A street lamp in the foreground frames a view of the Felixstowe seafront, featuring industrial port cranes and a pier under a clear sky. The scene captures the coastal landscape of East Suffolk with bright, natural daylight.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, port, cranes, pier, coast, maritime, industrial, Europe, East Suffolk, street lamp, coastal, water, daytime
 </pre>
 
 </details>
@@ -1011,27 +703,27 @@ Keywords: Architecture, Boat, Bristol, Church, Church Spire, City, Clear Sky, Do
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.52s
-- *Generation time:* 5.30s
-- *Total time:* 7.83s
-- *Input validation time:* 4.92e-05
-- *Prompt preparation time:* 0.0003
-- *First-token latency:* 1.06
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 617
-- *Generation tokens:* 99
-- *Total tokens:* 716
-- *Prompt throughput (raw):* 581 tok/s
-- *Generation throughput (raw):* 26.7 tok/s
+- *Model load time:* 2.69s
+- *Generation time:* 5.78s
+- *Total time:* 8.48s
+- *Input validation time:* 4.77e-05
+- *Prompt preparation time:* 0.000309
+- *First-token latency:* 1.22
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 580
+- *Generation tokens:* 103
+- *Total tokens:* 683
+- *Prompt throughput (raw):* 475 tok/s
+- *Generation throughput (raw):* 25.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.80
+- *Cache memory:* 0.76
 - *Model-load active memory:* 18.4
 - *Post-cleanup active memory:* 0.0124
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1372
+- *Rendered prompt characters:* 1186
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1047,9 +739,9 @@ Keywords: Architecture, Boat, Bristol, Church, Church Spire, City, Clear Sky, Do
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: The Thekla ship venue in Bristol Harbour
-Description: The Thekla, a black ship venue, is moored in Mud Dock in Bristol, England, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky.
-Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Harbor, Mast, Moored, Mooring lines, Nautical, The Thekla
+Title: Seafront view of Felixstowe port and pier, Suffolk
+Description: A view across the seafront in Felixstowe, Suffolk, featuring a pier and the industrial cranes of the port under a clear sky. A traditional lamp post stands in the foreground, framing the distant harbor and Ferris wheel.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, port, harbor, cranes, pier, Ferris wheel, lamp post, industrial, coast, East Suffolk, maritime, Europe, summer
 </pre>
 
 </details>
@@ -1066,21 +758,21 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, Cit
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
-  keywords: england, europe, mooring, mooring lines, nautical, flag
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 25
+  terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.65s
-- *Generation time:* 16.72s
-- *Total time:* 17.39s
-- *Input validation time:* 4.62e-05
-- *Prompt preparation time:* 0.00897
-- *First-token latency:* 14
-- *Cleanup time:* 0.0839
-- *Prompt tokens:* 16,506
-- *Generation tokens:* 184
-- *Total tokens:* 16,690
-- *Prompt throughput (raw):* 1,180 tok/s
-- *Generation throughput (raw):* 94.8 tok/s
+- *Model load time:* 0.67s
+- *Generation time:* 16.14s
+- *Total time:* 16.83s
+- *Input validation time:* 4.74e-05
+- *Prompt preparation time:* 0.0089
+- *First-token latency:* 13.9
+- *Cleanup time:* 0.0841
+- *Prompt tokens:* 16,467
+- *Generation tokens:* 139
+- *Total tokens:* 16,606
+- *Prompt throughput (raw):* 1,182 tok/s
+- *Generation throughput (raw):* 94.5 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -1089,7 +781,7 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, Cit
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1390
+- *Rendered prompt characters:* 1204
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1106,12 +798,12 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, Cit
 
 <pre class="model-output-readable">
 Title:
-Thekla Ship in Bristol Harbour
+Felixstowe Seafront at Sunset
 
 Description:
-The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white mast are prominent, with mooring lines securing it to the dock. The scene captures a serene moment in the city centre, with green trees and other boats in the surrounding water.
+A serene seafront view in Felixstowe, England, featuring a classic black lamppost in the foreground, colorful string lights strung across the water, and a distant pier with a Ferris wheel and large cranes. The scene is bathed in soft, golden light, suggesting late afternoon or early evening.
 
-Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, City Centre, St Mary Redcliffe Church, Church Spire, Dock, Moored, Mooring, Mooring lines, Nautical, Boat, Mast, Clear Sky, Harbor, Flag, Building, Architecture, Bristol, City, England, Europe, Flag, Mooring, Mooring lines, Nautical
+Keywords: Felixstowe, seafront, England, UK, Europe, Suffolk, gbr, coastal, pier, Ferris wheel, cranes, lamppost, sunset, water, sky, trees, light, beach, harbor, maritime, coastal town, seaside, British, landscape, view
 </pre>
 
 </details>
@@ -1128,20 +820,21 @@ Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, Ci
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 22 terms (requested 10-18)
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 21
+  terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.11s
-- *Generation time:* 8.01s
-- *Total time:* 10.13s
-- *Input validation time:* 4.57e-05
-- *Prompt preparation time:* 0.00667
-- *First-token latency:* 3.6
-- *Cleanup time:* 0.0942
-- *Prompt tokens:* 2,696
-- *Generation tokens:* 119
-- *Total tokens:* 2,815
-- *Prompt throughput (raw):* 749 tok/s
-- *Generation throughput (raw):* 30.5 tok/s
+- *Model load time:* 2.15s
+- *Generation time:* 8.04s
+- *Total time:* 10.20s
+- *Input validation time:* 5.23e-05
+- *Prompt preparation time:* 0.00679
+- *First-token latency:* 3.59
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 2,645
+- *Generation tokens:* 117
+- *Total tokens:* 2,762
+- *Prompt throughput (raw):* 737 tok/s
+- *Generation throughput (raw):* 29.2 tok/s
 - *Peak memory:* 24
 - *Active memory:* 18
 - *Cache memory:* 0.52
@@ -1150,7 +843,7 @@ Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, Ci
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1318
+- *Rendered prompt characters:* 1132
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1167,13 +860,13 @@ Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, Ci
 
 <pre class="model-output-readable">
 Title:
-Thekla Ship Venue in Bristol Harbour
+Seafront View, Felixstowe, England
 
 Description:
-The Thekla, a moored ship venue, is anchored in Mud Dock, Bristol Harbour, with the distinctive steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.
+A serene seafront scene in Felixstowe, England, featuring a traditional lamp post in the foreground, a calm sea with a distant pier, and industrial cranes in the background under a clear sky.
 
 Keywords:
-Architecture, Boat, Bristol, Building, Church, Church Spire, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical, Ship Venue, St Mary Redcliffe, Thekla, Waterfront
+Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR, seafront, lamp post, sea, pier, industrial cranes, clear sky, serene, coastal view, traditional, waterfront, summer, daylight
 </pre>
 
 </details>
@@ -1190,21 +883,20 @@ Architecture, Boat, Bristol, Building, Church, Church Spire, City Centre, Clear 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Keyword
-  list has 25 terms (requested 10-18)
+- *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 8.11s
-- *Generation time:* 21.85s
-- *Total time:* 29.98s
-- *Input validation time:* 5.9e-05
-- *Prompt preparation time:* 0.00683
-- *First-token latency:* 18
-- *Cleanup time:* 0.239
-- *Prompt tokens:* 6,348
-- *Generation tokens:* 122
-- *Total tokens:* 6,470
-- *Prompt throughput (raw):* 352 tok/s
-- *Generation throughput (raw):* 38.1 tok/s
+- *Model load time:* 10.09s
+- *Generation time:* 28.36s
+- *Total time:* 38.47s
+- *Input validation time:* 4.61e-05
+- *Prompt preparation time:* 0.00762
+- *First-token latency:* 23.7
+- *Cleanup time:* 0.35
+- *Prompt tokens:* 6,310
+- *Generation tokens:* 141
+- *Total tokens:* 6,451
+- *Prompt throughput (raw):* 267 tok/s
+- *Generation throughput (raw):* 33.7 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1213,7 +905,7 @@ Architecture, Boat, Bristol, Building, Church, Church Spire, City Centre, Clear 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1399
+- *Rendered prompt characters:* 1213
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1229,21 +921,146 @@ Architecture, Boat, Bristol, Building, Church, Church Spire, City Centre, Clear 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: The Thekla Ship at Mud Dock, Bristol
-Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
-Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spire, Moored, Mooring Lines, Black Hull, Red Stripe, White Mast, Clear Sky, England, UK, Europe, Nautical, Dock, Harbor, City Centre, Architecture, Building, Boat, Mast, Flag, City&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: Felixstowe Seafront with Cranes and Pier
+Description: A seafront scene in Felixstowe, England, featuring a pier, Ferris wheel, and industrial cranes in the distance, with lampposts, string lights, and a paddleboarder on the water under clear daylight.
+Keywords: Felixstowe, seafront, England, UK, GBR, pier, Ferris wheel, industrial cranes, lampposts, string lights, paddleboarder, East Suffolk, Europe, 2026-08-13, 16:08:57, 51.961800°N, 1.358500°E&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: The Thekla Ship at Mud Dock, Bristol
-Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
-Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spire, Moored, Mooring Lines, Black Hull, Red Stripe, White Mast, Clear Sky, England, UK, Europe, Nautical, Dock, Harbor, City Centre, Architecture, Building, Boat, Mast, Flag, City<|end_of_box|>
+<|begin_of_box|>Title: Felixstowe Seafront with Cranes and Pier
+Description: A seafront scene in Felixstowe, England, featuring a pier, Ferris wheel, and industrial cranes in the distance, with lampposts, string lights, and a paddleboarder on the water under clear daylight.
+Keywords: Felixstowe, seafront, England, UK, GBR, pier, Ferris wheel, industrial cranes, lampposts, string lights, paddleboarder, East Suffolk, Europe, 2026-08-13, 16:08:57, 51.961800°N, 1.358500°E<|end_of_box|>
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 2.02s
+- *Generation time:* 8.68s
+- *Total time:* 10.71s
+- *Input validation time:* 7.75e-05
+- *Prompt preparation time:* 0.00134
+- *First-token latency:* 1.22
+- *Cleanup time:* 0.24
+- *Prompt tokens:* 2,586
+- *Generation tokens:* 213
+- *Total tokens:* 2,799
+- *Prompt throughput (raw):* 2,126 tok/s
+- *Generation throughput (raw):* 31.1 tok/s
+- *Peak memory:* 18
+- *Active memory:* 17
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.00269
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1169
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Felixstowe Seafront in Suffolk, England, UK.
+Description: The image depicts a serene seafront in Felixstowe, Suffolk, England, UK, characterized by a calm body of water, likely the North Sea, stretching towards the horizon. In the background, a series of large, industrial cranes are visible, indicating a port or shipping area. A pier extends into the water, adorned with decorative lights that create a festive atmosphere. The sky is clear, suggesting a sunny day. The foreground features a row of street lamps, adding to the ambiance of the scene. Trees and greenery are present, providing a natural contrast to the man-made structures. The overall mood of the image is tranquil and picturesque, capturing the beauty of a coastal town with its industrial and natural elements harmoniously coexisting.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, North Sea, cranes, pier, decorative lights, street lamps, trees, greenery, coastal town, industrial, natural, serene, picturesque, tranquil.&lt;end_of_utterance&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ Title: Felixstowe Seafront in Suffolk, England, UK.
+Description: The image depicts a serene seafront in Felixstowe, Suffolk, England, UK, characterized by a calm body of water, likely the North Sea, stretching towards the horizon. In the background, a series of large, industrial cranes are visible, indicating a port or shipping area. A pier extends into the water, adorned with decorative lights that create a festive atmosphere. The sky is clear, suggesting a sunny day. The foreground features a row of street lamps, adding to the ambiance of the scene. Trees and greenery are present, providing a natural contrast to the man-made structures. The overall mood of the image is tranquil and picturesque, capturing the beauty of a coastal town with its industrial and natural elements harmoniously coexisting.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, North Sea, cranes, pier, decorative lights, street lamps, trees, greenery, coastal town, industrial, natural, serene, picturesque, tranquil.<end_of_utterance>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### mlx-community/InternVL3-8B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 4 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
+- *Model load time:* 1.67s
+- *Generation time:* 4.24s
+- *Total time:* 5.92s
+- *Input validation time:* 7.5e-05
+- *Prompt preparation time:* 0.00176
+- *First-token latency:* 1.41
+- *Cleanup time:* 0.111
+- *Prompt tokens:* 3,623
+- *Generation tokens:* 79
+- *Total tokens:* 3,702
+- *Prompt throughput (raw):* 2,568 tok/s
+- *Generation throughput (raw):* 34.0 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.28
+- *Model-load active memory:* 15.9
+- *Post-cleanup active memory:* 0.003
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1137
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Felixstowe Seafront at Dusk
+Description: The image captures a serene seafront in Felixstowe, England, with industrial cranes and a Ferris wheel in the background, under soft evening light.
+Keywords: Felixstowe, seafront, England, Suffolk, East Suffolk, industrial cranes, Ferris wheel, evening light, sea, GBR, Europe
+</pre>
 
 </details>
 
@@ -1259,20 +1076,21 @@ Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spi
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 19
+  terms (requested 10-18); Duplicate keywords: felixstowe, seafront, uk, gbr
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.60s
-- *Generation time:* 1.16s
-- *Total time:* 1.77s
-- *Input validation time:* 5.52e-05
-- *Prompt preparation time:* 0.00342
-- *First-token latency:* 0.0806
-- *Cleanup time:* 0.0684
-- *Prompt tokens:* 599
-- *Generation tokens:* 125
-- *Total tokens:* 724
-- *Prompt throughput (raw):* 7,436 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Model load time:* 0.58s
+- *Generation time:* 1.15s
+- *Total time:* 1.74s
+- *Input validation time:* 3.42e-05
+- *Prompt preparation time:* 0.00338
+- *First-token latency:* 0.109
+- *Cleanup time:* 0.0765
+- *Prompt tokens:* 561
+- *Generation tokens:* 141
+- *Total tokens:* 702
+- *Prompt throughput (raw):* 5,152 tok/s
+- *Generation throughput (raw):* 195 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.02
@@ -1281,7 +1099,7 @@ Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spi
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1369
+- *Rendered prompt characters:* 1183
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1297,11 +1115,217 @@ Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spi
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Thekla at Bristol Harbour
+Title: Felixstowe Seafront at Dusk
 
-Description: The Thekla, a historic ship venue, is moored in the Mud Dock of Bristol Harbour. The vessel is anchored with mooring lines, and the backdrop features the steeple of St Mary Redcliffe Church, adding a touch of architectural elegance to the scene. The clear sky and calm waters highlight the serene atmosphere of the harbor.
+Description: A picturesque view of Felixstowe's seafront, showcasing the iconic East Suffolk pier and the silhouette of the famed Ferris wheel against a twilight sky. The scene is bathed in the warm glow of street lamps, with the calm waters of the English Channel reflecting the serene atmosphere.
 
-Keywords: Thekla, Bristol Harbour, moored, mooring lines, ship venue, historic, architecture, church spire, city, harbor, clear sky, water, dock, England, Europe
+Keywords: Felixstowe, Seafront, East Suffolk, England, UK, GBR, Seafront, Felixstowe, Suffolk, UK, gbr, seafront, Ferris wheel, twilight, street lamps, calm waters, English Channel, warm glow, serene atmosphere
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 21 terms (requested 10-18); Duplicate
+  keywords: trees, water, sky, industrial cranes, buildings
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.51s
+- *Generation time:* 8.15s
+- *Total time:* 9.67s
+- *Input validation time:* 4.57e-05
+- *Prompt preparation time:* 0.00133
+- *First-token latency:* 1.82
+- *Cleanup time:* 0.116
+- *Prompt tokens:* 275
+- *Generation tokens:* 113
+- *Total tokens:* 388
+- *Prompt throughput (raw):* 151 tok/s
+- *Generation throughput (raw):* 19.1 tok/s
+- *Peak memory:* 15
+- *Active memory:* 11
+- *Cache memory:* 0.59
+- *Model-load active memory:* 11.4
+- *Post-cleanup active memory:* 0.00431
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1236
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: A Seaside Scene in East Suffolk, England
+
+Description: The image captures a serene seaside scene in East Suffolk, England, with a pier and a large industrial area visible in the background, set against a clear sky and calm waters, with a person paddleboarding in the distance.
+
+Keywords: East Suffolk, England, seaside, pier, industrial area, clear sky, calm waters, paddleboarding, person, trees, street lamps, rocks, water, sky, industrial cranes, buildings, trees, water, sky, industrial cranes, buildings.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.90s
+- *Generation time:* 1.19s
+- *Total time:* 2.11s
+- *Input validation time:* 5.01e-05
+- *Prompt preparation time:* 0.00815
+- *First-token latency:* 0.27
+- *Cleanup time:* 0.089
+- *Prompt tokens:* 964
+- *Generation tokens:* 107
+- *Total tokens:* 1,071
+- *Prompt throughput (raw):* 3,574 tok/s
+- *Generation throughput (raw):* 270 tok/s
+- *Peak memory:* 3.8
+- *Active memory:* 2.3
+- *Cache memory:* 0.06
+- *Model-load active memory:* 2.32
+- *Post-cleanup active memory:* 0.00483
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1200
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+
+&lt;/think&gt;
+
+Title:
+Felixstowe Seafront with Industrial Cranes
+
+Description:
+A scenic seafront view with pier and ferris wheel under clear skies, showing industrial cranes and water.
+
+Keywords: Felixstowe, seafront, England, UK, gbr, Europe, industrial, cranes, pier, ferriswheel, water, daylight, trees, streetlamps, decorations, rocky, blue, clear, 2026, 16:08:57
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+
+</think>
+
+Title:
+Felixstowe Seafront with Industrial Cranes
+
+Description:
+A scenic seafront view with pier and ferris wheel under clear skies, showing industrial cranes and water.
+
+Keywords: Felixstowe, seafront, England, UK, gbr, Europe, industrial, cranes, pier, ferriswheel, water, daylight, trees, streetlamps, decorations, rocky, blue, clear, 2026, 16:08:57
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.39s
+- *Generation time:* 5.55s
+- *Total time:* 6.94s
+- *Input validation time:* 3.59e-05
+- *Prompt preparation time:* 0.00669
+- *First-token latency:* 2.35
+- *Cleanup time:* 0.0936
+- *Prompt tokens:* 3,178
+- *Generation tokens:* 182
+- *Total tokens:* 3,360
+- *Prompt throughput (raw):* 1,354 tok/s
+- *Generation throughput (raw):* 65.4 tok/s
+- *Peak memory:* 14
+- *Active memory:* 8.0
+- *Cache memory:* 0.65
+- *Model-load active memory:* 8.01
+- *Post-cleanup active memory:* 0.0051
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 3570
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+**Felixstowe Seafront with Industrial Cranes and Ferris Wheel**
+
+Description:
+A serene seafront view of Felixstowe, England, captured on 13 August 2026, showcasing the tranquil water, distant industrial cranes, and a Ferris wheel under soft daylight. Decorative string lights and vintage-style lampposts frame the scene, with a lone paddleboarder adding subtle activity.
+
+Keywords:
+Felixstowe, seafront, England, UK, GBR, Europe, East Suffolk, industrial cranes, Ferris wheel, coastal view, paddleboarding, vintage lampposts, string lights, waterfront, 2026-08-13, 51.961800°N 1.358500°E, daylight, maritime, leisure, infrastructure
 </pre>
 
 </details>
@@ -1318,20 +1342,20 @@ Keywords: Thekla, Bristol Harbour, moored, mooring lines, ship venue, historic, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 22 terms (requested 10-18)
+- *Observations:* Keyword list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.39s
-- *Generation time:* 7.04s
-- *Total time:* 8.43s
-- *Input validation time:* 4.06e-05
-- *Prompt preparation time:* 0.000233
-- *First-token latency:* 2.49
-- *Cleanup time:* 0.0843
-- *Prompt tokens:* 3,229
-- *Generation tokens:* 248
-- *Total tokens:* 3,477
-- *Prompt throughput (raw):* 1,298 tok/s
-- *Generation throughput (raw):* 61.2 tok/s
+- *Model load time:* 1.46s
+- *Generation time:* 6.47s
+- *Total time:* 7.93s
+- *Input validation time:* 3.5e-05
+- *Prompt preparation time:* 0.00025
+- *First-token latency:* 2.64
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 3,178
+- *Generation tokens:* 207
+- *Total tokens:* 3,385
+- *Prompt throughput (raw):* 1,203 tok/s
+- *Generation throughput (raw):* 60.7 tok/s
 - *Peak memory:* 15
 - *Active memory:* 8.4
 - *Cache memory:* 0.65
@@ -1340,7 +1364,7 @@ Keywords: Thekla, Bristol Harbour, moored, mooring lines, ship venue, historic, 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3756
+- *Rendered prompt characters:* 3570
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1357,13 +1381,13 @@ Keywords: Thekla, Bristol Harbour, moored, mooring lines, ship venue, historic, 
 
 <pre class="model-output-readable">
 **Title:**
-*Thekla Ship Venue Moored in Bristol’s Mud Dock
+*Felixstowe Seafront: Cranes, Pier, and Sunset Glow*
 
 **Description:**
-On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), the historic **Bristol-built wooden ship *Thekla***—a converted venue vessel—is anchored in **Mud Dock, Bristol Harbour**. Against a clear blue sky, its black hull and white mast stand out, with **St Mary Redcliffe’s church spire** visible in the background, mooring lines taut along the dockside.
+A serene coastal scene at Felixstowe, England, captured on **August 13, 2026, at 16:08 UTC+1**, showcasing industrial cranes along the docks, a historic pier, and a person stand-up paddleboarding. Decorative string lights and vintage-style lanterns frame the waterfront, bathed in soft evening sunlight.
 
 **Keywords:**
-*Thekla, Bristol, Mud Dock, Bristol Harbour, wooden ship, venue vessel, St Mary Redcliffe, church spire, moored vessel, mooring lines, historic ship, clear sky, dockside, UK architecture, nautical heritage, 2026-08-12, 17:52 UTC+01:00, 51.4485°N 2.593°W, black hull, white mast, clear blue sky, background landmark*
+Felixstowe, England, UK, GBR, Europe, East Suffolk, seafront, industrial cranes, dockyard, pier, stand-up paddleboarding, sunset, coastal lighting, vintage lanterns, decorative string lights, waterfront, historic docks, 2026-08-13, 16:08 UTC+1, 51.961800°N, 1.358500°E
 </pre>
 
 </details>
@@ -1380,22 +1404,21 @@ On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), th
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
-  keywords: church spire, church, city centre, clear sky, dock, england,
-  europe, flag, harbor, mast, moored, mooring lines, nautical
+- *Observations:* Keyword list has 21 terms (requested 10-18); Duplicate
+  keywords: felixstowe, england, uk, gbr, europe
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.20s
-- *Generation time:* 4.42s
-- *Total time:* 5.62s
-- *Input validation time:* 3.67e-05
-- *Prompt preparation time:* 0.00134
-- *First-token latency:* 0.652
-- *Cleanup time:* 0.0775
-- *Prompt tokens:* 1,534
-- *Generation tokens:* 153
-- *Total tokens:* 1,687
-- *Prompt throughput (raw):* 2,354 tok/s
-- *Generation throughput (raw):* 53.4 tok/s
+- *Model load time:* 1.17s
+- *Generation time:* 4.09s
+- *Total time:* 5.26s
+- *Input validation time:* 4.04e-05
+- *Prompt preparation time:* 0.00142
+- *First-token latency:* 0.655
+- *Cleanup time:* 0.0882
+- *Prompt tokens:* 1,487
+- *Generation tokens:* 136
+- *Total tokens:* 1,623
+- *Prompt throughput (raw):* 2,269 tok/s
+- *Generation throughput (raw):* 52.5 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
@@ -1404,7 +1427,7 @@ On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), th
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1314
+- *Rendered prompt characters:* 1128
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1420,11 +1443,128 @@ On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), th
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: The Thekla, Bristol's historic ship venue in Mud Dock
+ Title: Seafront view of Felixstowe with illuminated pier and Ferris wheel
 
-Description: A black ship named Thekla is moored in Bristol Harbour's Mud Dock, with the steeple of St Mary Redcliffe church visible in the background. The scene captures a clear day, showcasing the city's blend of maritime history and urban architecture.
+Description: A picturesque English seafront scene featuring a brightly lit pier, a Ferris wheel, and industrial cranes in the background. The sky is overcast, creating a moody atmosphere. A lone figure stands on the pier, adding a sense of scale to the expansive view.
 
-Keywords: Bristol, Church Spire, Church, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical, Thekla, Church, St Mary Redcliffe, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical
+Keywords: Seafront, Felixstowe, England, UK, GBR, Europe, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, pier, Ferris wheel, industrial cranes, overcast sky, lone figure, expansive view
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 3 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.96s
+- *Generation time:* 2.33s
+- *Total time:* 3.29s
+- *Input validation time:* 5.15e-05
+- *Prompt preparation time:* 0.000892
+- *First-token latency:* 0.291
+- *Cleanup time:* 0.0788
+- *Prompt tokens:* 1,094
+- *Generation tokens:* 94
+- *Total tokens:* 1,188
+- *Prompt throughput (raw):* 3,753 tok/s
+- *Generation throughput (raw):* 56.0 tok/s
+- *Peak memory:* 9.6
+- *Active memory:* 8.3
+- *Cache memory:* 0.52
+- *Model-load active memory:* 8.3
+- *Post-cleanup active memory:* 0.00713
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1153
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Felixstowe Seafront View
+
+Description: A serene view of Felixstowe seafront with a backdrop of industrial cranes and a pier, captured on August 13, 2026, at 4:08 PM UTC+1.
+
+Keywords: Felixstowe, seafront, industrial, cranes, pier, East Suffolk, England, UK, GBR, waterfront
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title, Description and Keywords copy all supplied hints
+  unchanged
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.66s
+- *Generation time:* 70.96s
+- *Total time:* 71.63s
+- *Input validation time:* 4.44e-05
+- *Prompt preparation time:* 0.00336
+- *First-token latency:* 69.9
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 16,478
+- *Generation tokens:* 63
+- *Total tokens:* 16,541
+- *Prompt throughput (raw):* 236 tok/s
+- *Generation throughput (raw):* 191 tok/s
+- *Peak memory:* 5.1
+- *Active memory:* 1.3
+- *Cache memory:* 0.85
+- *Model-load active memory:* 1.26
+- *Post-cleanup active memory:* 0.00744
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1262
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Seafront, Felixstowe, England, UK, GBR, Europe
+Description: Seafront, Felixstowe, England, UK, GBR
+Keywords: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
 </pre>
 
 </details>
@@ -1441,21 +1581,21 @@ Keywords: Bristol, Church Spire, Church, City Centre, Clear Sky, Dock, England, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
-  keywords: england, europe, mooring, mooring lines, nautical, flag
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 25
+  terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.75s
-- *Generation time:* 21.35s
-- *Total time:* 22.10s
-- *Input validation time:* 4e-05
-- *Prompt preparation time:* 0.000211
-- *First-token latency:* 18.6
-- *Cleanup time:* 0.083
-- *Prompt tokens:* 16,506
-- *Generation tokens:* 184
-- *Total tokens:* 16,690
-- *Prompt throughput (raw):* 890 tok/s
-- *Generation throughput (raw):* 93.1 tok/s
+- *Model load time:* 0.73s
+- *Generation time:* 22.32s
+- *Total time:* 23.05s
+- *Input validation time:* 4.96e-05
+- *Prompt preparation time:* 0.00023
+- *First-token latency:* 20
+- *Cleanup time:* 0.0871
+- *Prompt tokens:* 16,467
+- *Generation tokens:* 139
+- *Total tokens:* 16,606
+- *Prompt throughput (raw):* 824 tok/s
+- *Generation throughput (raw):* 93.9 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -1464,7 +1604,7 @@ Keywords: Bristol, Church Spire, Church, City Centre, Clear Sky, Dock, England, 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1390
+- *Rendered prompt characters:* 1204
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1481,60 +1621,59 @@ Keywords: Bristol, Church Spire, Church, City Centre, Clear Sky, Dock, England, 
 
 <pre class="model-output-readable">
 Title:
-Thekla Ship in Bristol Harbour
+Felixstowe Seafront at Sunset
 
 Description:
-The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white mast are prominent, with mooring lines securing it to the dock. The scene captures a serene moment in the city centre, with green trees and other boats in the surrounding water.
+A serene seafront view in Felixstowe, England, featuring a classic black lamppost in the foreground, colorful string lights strung across the water, and a distant pier with a Ferris wheel and large cranes. The scene is bathed in soft, golden light, suggesting late afternoon or early evening.
 
-Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, City Centre, St Mary Redcliffe Church, Church Spire, Dock, Moored, Mooring, Mooring lines, Nautical, Boat, Mast, Clear Sky, Harbor, Flag, Building, Architecture, Bristol, City, England, Europe, Flag, Mooring, Mooring lines, Nautical
+Keywords: Felixstowe, seafront, England, UK, Europe, Suffolk, gbr, coastal, pier, Ferris wheel, cranes, lamppost, sunset, water, sky, trees, light, beach, harbor, maritime, coastal town, seaside, British, landscape, view
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-step-37-flash-oq2e"></a>
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
 
-### mlx-community/Step-3.7-Flash-oQ2e
+### mlx-community/Qwen3.6-27B-mxfp8
 
 <details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 11 words (requested 5-10); Keyword list has 19
-  terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 7.56s
-- *Generation time:* 22.00s
-- *Total time:* 29.58s
-- *Input validation time:* 4.03e-05
-- *Prompt preparation time:* 0.0141
-- *First-token latency:* 18.7
-- *Cleanup time:* 0.204
-- *Prompt tokens:* 3,503
-- *Generation tokens:* 115
-- *Total tokens:* 3,618
-- *Prompt throughput (raw):* 188 tok/s
-- *Generation throughput (raw):* 45.5 tok/s
-- *Peak memory:* 70
-- *Active memory:* 63
-- *Cache memory:* 0.41
-- *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.00998
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 3.20s
+- *Generation time:* 80.08s
+- *Total time:* 83.30s
+- *Input validation time:* 4.81e-05
+- *Prompt preparation time:* 0.0156
+- *First-token latency:* 71.8
+- *Cleanup time:* 0.141
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 131
+- *Total tokens:* 16,613
+- *Prompt throughput (raw):* 230 tok/s
+- *Generation throughput (raw):* 17.8 tok/s
+- *Peak memory:* 35
+- *Active memory:* 29
+- *Cache memory:* 1.8
+- *Model-load active memory:* 28.7
+- *Post-cleanup active memory:* 0.0096
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1396
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1543,13 +1682,13 @@ Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, Ci
 
 <pre class="model-output-readable">
 Title:
-Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire
+Felixstowe Seafront with Port Cranes and Pier
 
 Description:
-The vessel Thekla, a ship venue, is moored in Mud Dock within Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
+A view of the Felixstowe seafront in Suffolk, England, featuring a prominent pier and a Ferris wheel in the hazy distance. Foreground elements include a blurred street lamp and festive string lights, while large industrial port cranes loom over the coastline under a bright, sunny sky.
 
 Keywords:
-Bristol, Thekla, ship venue, moored vessel, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, clear sky, harbour, dock, nautical, architecture, boat, mooring lines, mast, flag, England, UK
+Felixstowe, Suffolk, England, UK, Europe, seafront, port, cranes, pier, Ferris wheel, street lamp, string lights, ocean, coastline, summer, hazy, industrial, landscape, travel
 </pre>
 
 </details>
@@ -1566,20 +1705,21 @@ Bristol, Thekla, ship venue, moored vessel, Mud Dock, Bristol Harbour, St Mary R
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Duplicate
+  keywords: travel
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.26s
-- *Generation time:* 2.61s
-- *Total time:* 5.90s
-- *Input validation time:* 4.72e-05
-- *Prompt preparation time:* 0.0201
-- *First-token latency:* 0.441
-- *Cleanup time:* 0.144
-- *Prompt tokens:* 613
-- *Generation tokens:* 87
-- *Total tokens:* 700
-- *Prompt throughput (raw):* 1,389 tok/s
-- *Generation throughput (raw):* 57.5 tok/s
+- *Model load time:* 3.36s
+- *Generation time:* 2.30s
+- *Total time:* 5.68s
+- *Input validation time:* 4.79e-05
+- *Prompt preparation time:* 0.0206
+- *First-token latency:* 0.337
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 576
+- *Generation tokens:* 86
+- *Total tokens:* 662
+- *Prompt throughput (raw):* 1,710 tok/s
+- *Generation throughput (raw):* 63.9 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1588,7 +1728,7 @@ Bristol, Thekla, ship venue, moored vessel, Mud Dock, Bristol Harbour, St Mary R
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1344
+- *Rendered prompt characters:* 1158
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1605,9 +1745,9 @@ Bristol, Thekla, ship venue, moored vessel, Mud Dock, Bristol Harbour, St Mary R
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: The Thekla ship venue moored in Bristol Harbour England
-Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
-Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, England, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
+&lt;channel|&gt;Title: Seafront View and Industrial Port in Felixstowe Suffolk
+Description: A view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel in the distance under a clear sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, port, cranes, pier, Ferris wheel, coastal, maritime, water, East Suffolk, industrial, travel, travel
 </pre>
 
 <details>
@@ -1615,9 +1755,9 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, Eng
 
 ```text
 <|channel>thought
-<channel|>Title: The Thekla ship venue moored in Bristol Harbour England
-Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
-Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, England, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
+<channel|>Title: Seafront View and Industrial Port in Felixstowe Suffolk
+Description: A view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel in the distance under a clear sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, port, cranes, pier, Ferris wheel, coastal, maritime, water, East Suffolk, industrial, travel, travel
 ```
 
 </details>
@@ -1638,18 +1778,18 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, Eng
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.15s
-- *Generation time:* 2.36s
-- *Total time:* 5.51s
-- *Input validation time:* 4.33e-05
-- *Prompt preparation time:* 0.000295
-- *First-token latency:* 0.438
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 613
-- *Generation tokens:* 82
-- *Total tokens:* 695
-- *Prompt throughput (raw):* 1,401 tok/s
-- *Generation throughput (raw):* 65.8 tok/s
+- *Model load time:* 3.19s
+- *Generation time:* 2.02s
+- *Total time:* 5.21s
+- *Input validation time:* 4.43e-05
+- *Prompt preparation time:* 0.000303
+- *First-token latency:* 0.337
+- *Cleanup time:* 0.151
+- *Prompt tokens:* 576
+- *Generation tokens:* 81
+- *Total tokens:* 657
+- *Prompt throughput (raw):* 1,709 tok/s
+- *Generation throughput (raw):* 75.6 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -1658,7 +1798,7 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, Eng
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1344
+- *Rendered prompt characters:* 1158
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1675,9 +1815,9 @@ Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, Eng
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: The Thekla Ship Moored in Bristol Harbour
-Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.
-Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring lines, Nautical, England, City Centre, Clear Sky, Architecture
+&lt;channel|&gt;Title: Seafront view of Port of Felixstowe England
+Description: A coastal view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel under a clear sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, harbor, port, cranes, pier, Ferris wheel, industrial, coastal, lamp, East Suffolk, Europe
 </pre>
 
 <details>
@@ -1685,9 +1825,9 @@ Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring line
 
 ```text
 <|channel>thought
-<channel|>Title: The Thekla Ship Moored in Bristol Harbour
-Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.
-Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring lines, Nautical, England, City Centre, Clear Sky, Architecture
+<channel|>Title: Seafront view of Port of Felixstowe England
+Description: A coastal view of the Felixstowe seafront featuring a pier, industrial cranes, and a Ferris wheel under a clear sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, harbor, port, cranes, pier, Ferris wheel, industrial, coastal, lamp, East Suffolk, Europe
 ```
 
 </details>
@@ -1706,29 +1846,29 @@ Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring line
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.23s
-- *Generation time:* 6.17s
-- *Total time:* 8.41s
-- *Input validation time:* 4.68e-05
-- *Prompt preparation time:* 0.00275
-- *First-token latency:* 1.04
+- *Model load time:* 2.32s
+- *Generation time:* 6.52s
+- *Total time:* 8.84s
+- *Input validation time:* 5.02e-05
+- *Prompt preparation time:* 0.00314
+- *First-token latency:* 1.13
 - *Cleanup time:* 0.128
-- *Prompt tokens:* 606
-- *Generation tokens:* 146
-- *Total tokens:* 752
-- *Prompt throughput (raw):* 585 tok/s
-- *Generation throughput (raw):* 31.5 tok/s
+- *Prompt tokens:* 569
+- *Generation tokens:* 139
+- *Total tokens:* 708
+- *Prompt throughput (raw):* 502 tok/s
+- *Generation throughput (raw):* 27.9 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
-- *Cache memory:* 0.45
+- *Cache memory:* 0.43
 - *Model-load active memory:* 16.1
 - *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1373
+- *Rendered prompt characters:* 1187
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1744,9 +1884,11 @@ Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring line
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: The Thekla, Mud Dock, Bristol Harbour, August 2026
-Description: Captured on 12 August 2026, The Thekla, a black ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky. The ship displays prominent branding and mooring lines, reflecting its function and location.
-Keywords: The Thekla, Mud Dock, Bristol, Bristol Harbour, St Mary Redcliffe, Church Spire, Ship, Boat, Venue, Moored, Mooring, Architecture, City Centre, England, Clear Sky, Water, Flag, Mast, Branding, August 2026
+Title: Felixstowe Seafront: Pier, Cranes, and Lamp Posts
+
+Description: Captured on 13th August 2026 at 16:08 UTC+01, this view shows the Felixstowe seafront with a pier, distant container cranes, and ornate lamp posts in the foreground. A calm sea and clear sky provide a bright backdrop to the coastal scene.
+
+Keywords: Felixstowe, Suffolk, England, UK, GBR, East Suffolk, Seafront, Pier, Container Cranes, Lamp Post, Coastal, Beach, Summer, Daylight, Blue Sky, Port, Maritime, 2026, UTC+01
 </pre>
 
 </details>
@@ -1763,19 +1905,19 @@ Keywords: The Thekla, Mud Dock, Bristol, Bristol Harbour, St Mary Redcliffe, Chu
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Duplicate keywords: seafront
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.71s
-- *Generation time:* 4.97s
-- *Total time:* 6.69s
-- *Input validation time:* 8.53e-05
-- *Prompt preparation time:* 0.00262
-- *First-token latency:* 1.87
-- *Cleanup time:* 0.0917
-- *Prompt tokens:* 3,467
-- *Generation tokens:* 103
-- *Total tokens:* 3,570
-- *Prompt throughput (raw):* 1,853 tok/s
+- *Model load time:* 1.74s
+- *Generation time:* 4.76s
+- *Total time:* 6.50s
+- *Input validation time:* 0.000124
+- *Prompt preparation time:* 0.00437
+- *First-token latency:* 1.83
+- *Cleanup time:* 0.0932
+- *Prompt tokens:* 3,413
+- *Generation tokens:* 99
+- *Total tokens:* 3,512
+- *Prompt throughput (raw):* 1,864 tok/s
 - *Generation throughput (raw):* 39.4 tok/s
 - *Peak memory:* 16
 - *Active memory:* 13
@@ -1785,7 +1927,7 @@ Keywords: The Thekla, Mud Dock, Bristol, Bristol Harbour, St Mary Redcliffe, Chu
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1318
+- *Rendered prompt characters:* 1132
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1802,13 +1944,13 @@ Keywords: The Thekla, Mud Dock, Bristol, Bristol Harbour, St Mary Redcliffe, Chu
 
 <pre class="model-output-readable">
 Title:
-Thekla Moored in Bristol Harbour
+Felixstowe Seafront with Lampposts and Cranes
 
 Description:
-Thekla, a ship venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe church in the background under a clear sky.
+The image captures a serene seafront in Felixstowe, England, featuring traditional lampposts and industrial cranes in the background under a clear sky.
 
 Keywords:
-Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
+Felixstowe, seafront, England, UK, lampposts, cranes, waterfront, industrial, Europe, Suffolk, East Suffolk, seafront, Adobe Stock, Any Vision
 </pre>
 
 </details>
@@ -1829,18 +1971,18 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.62s
-- *Generation time:* 14.41s
-- *Total time:* 16.05s
-- *Input validation time:* 5.52e-05
-- *Prompt preparation time:* 0.00704
-- *First-token latency:* 2.21
-- *Cleanup time:* 0.0811
-- *Prompt tokens:* 3,558
+- *Model load time:* 1.61s
+- *Generation time:* 14.38s
+- *Total time:* 16.00s
+- *Input validation time:* 5.57e-05
+- *Prompt preparation time:* 0.0067
+- *First-token latency:* 2.19
+- *Cleanup time:* 0.0863
+- *Prompt tokens:* 3,504
 - *Generation tokens:* 500
-- *Total tokens:* 4,058
-- *Prompt throughput (raw):* 1,612 tok/s
-- *Generation throughput (raw):* 42.7 tok/s
+- *Total tokens:* 4,004
+- *Prompt throughput (raw):* 1,600 tok/s
+- *Generation throughput (raw):* 42.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.82
@@ -1849,7 +1991,7 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1692
+- *Rendered prompt characters:* 1506
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1866,15 +2008,13 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints: Title hint: City Centre, Bristol, England, UK, GBR, Europe. Description hint: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical.
+We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them into description if needed (like "captured on 13 August 2026 at 16:08:57 UTC+01:00, at 51.961800°N, 1.358500°E").
 
 We need to produce:
 
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+- a concrete 5-10-word title (so between 5 and 10 words inclusive). Must be concrete, not hint. Should reflect the main subject: seafront with lampposts, ferry, cranes, Ferris wheel, etc. Title: "Felixstowe Seafront at Sunset with Lampposts". That's 7 words: Felixstowe (1) Seafront (2) at (3) Sunset (4) with (5) Lampposts (6). That's 6 words. Could add "and" maybe "and Ferris wheel". "Felixstowe Seafront at Sunset with Lampposts and Ferris Wheel". That's 10 words? Let's count: Felixstowe(1) Seafront(2) at(3) Sunset(4) with(5) Lampposts(6) and(7) Ferris(8) Wheel(9). That's 9 words. Good. Or "Felixstowe Seafront Sunset Lampposts and Cranes". Count: Felixstowe(1) Seafront(2) Sunset(3) Lampposts(4) and(5) Cranes(6). That's 6 words. But we need 5-10 words, so any is fine.
 
-We must treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them in description if needed? The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. We can mention the date/time? Usually description includes date/time? The instruction: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate them as metadata? The description can mention the date/time? Possibly not needed. But we can incorporate the location (Bristol, Mud Dock). The description should be 1-2 sentences. So we can say: "The Thekla, a repurposed ship venue, is moored in Bristol's Mud Dock under a clear blue sky, with St Mary Redcliffe's iconic spire visible in the background." That's one sentence. Could add "The photograph was taken on 12 August 2026 at 17:52 UTC+01:00, with the ship's black hull and red and white stripes prominent." But that might be too many details. The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can mention the clear sky, the ship's black hull, the red and white stripes, the mooring lines, the mast, the church spire. So maybe
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Should be 1-2 sentences. Should mention location (Felixstowe, East Suffolk, England, UK), seafront, lampposts, Ferris wheel, cargo cranes, water, string lights, etc. Also mention time of day: appears to be late
 </pre>
 
 </details>
@@ -1890,32 +2030,31 @@ We must treat capture date/time and GPS as authoritative facts, but not claim th
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Missing or empty fields:
-  Title, Description, Keywords; Response appears cut off at the token limit;
-  Internal reasoning block appears incomplete
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Description, Keywords; Extra text
+  appears before the Title field; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 8.12s
-- *Generation time:* 16.33s
-- *Total time:* 24.46s
-- *Input validation time:* 5.23e-05
-- *Prompt preparation time:* 0.00752
-- *First-token latency:* 5.02
-- *Cleanup time:* 0.212
-- *Prompt tokens:* 1,626
+- *Model load time:* 12.21s
+- *Generation time:* 16.20s
+- *Total time:* 28.43s
+- *Input validation time:* 6.57e-05
+- *Prompt preparation time:* 0.0102
+- *First-token latency:* 5.69
+- *Cleanup time:* 0.228
+- *Prompt tokens:* 1,584
 - *Generation tokens:* 500
-- *Total tokens:* 2,126
-- *Prompt throughput (raw):* 324 tok/s
-- *Generation throughput (raw):* 46.7 tok/s
+- *Total tokens:* 2,084
+- *Prompt throughput (raw):* 279 tok/s
+- *Generation throughput (raw):* 58.2 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
-- *Cache memory:* 0.14
+- *Cache memory:* 0.15
 - *Model-load active memory:* 58.8
 - *Post-cleanup active memory:* 0.00118
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1508
+- *Rendered prompt characters:* 1322
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1931,8 +2070,43 @@ We must treat capture date/time and GPS as authoritative facts, but not claim th
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata for this. First, the title. It's got to be concise, descriptive, and accurate. "The Thekla in Bristol Harbour" is a good start, but I can do better. "The Thekla, Bristol Harbour, St Mary Redcliffe" is even better, but I'll keep it simple. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are pretty clear: "Seafront, Felixstowe, England, UK, GBR, Europe." I'll go with "Seafront at Felixstowe, England, UK." It's concise and accurate.
+
+Now for the description. I need to weave in the context – the date, time, and GPS – with the visual elements. The image is a twilight scene, so I'll mention that. The main subject is the seafront, with the lighthouse and the ferries. The hints mention the ferries, so I'll include that. The lighting is key, so I'll describe the sunset and the warm glow. I'll also mention the ferries and the lighthouse.
+
+Here's my draft: "A twilight view of the Felixstowe seafront at 4:08 PM on August 13, 2026. The scene features a lighthouse against a sunset sky, with ferries and a distant view of the North Sea." That covers the essentials.
+
+Finally, the keywords. I need to be comprehensive. I'll start with the location, then the time of day, the subject matter, and the key objects. I'll also include the style and the mood. I'll make sure to include the authoritative context and the hints.
+
+Here's my final list: Felixstowe, seafront, England, UK, GBR, Europe, twilight, lighthouse, ferries, North Sea, sunset, 2026-08-13, 16:08:57, 51.961800, 1.358500, East Suffolk, Suffolk, Adobe Stock, Any Vision, ferry, lighthouse, North Sea, sunset, twilight, seafront, England, UK, GBR, Europe, Felixstowe, Suffolk, UK, gbr, seafront.
+
+I've checked everything. The title is good, the description is solid, and the keywords are comprehensive. I'm ready to output the final metadata.
+&lt;/think&gt;
+
+Title: Seafront at Felix
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are pretty clear: "Seafront, Felixstowe, England, UK, GBR, Europe." I'll go with "Seafront at Felixstowe, England, UK." It's concise and accurate.
+
+Now for the description. I need to weave in the context – the date, time, and GPS – with the visual elements. The image is a twilight scene, so I'll mention that. The main subject is the seafront, with the lighthouse and the ferries. The hints mention the ferries, so I'll include that. The lighting is key, so I'll describe the sunset and the warm glow. I'll also mention the ferries and the lighthouse.
+
+Here's my draft: "A twilight view of the Felixstowe seafront at 4:08 PM on August 13, 2026. The scene features a lighthouse against a sunset sky, with ferries and a distant view of the North Sea." That covers the essentials.
+
+Finally, the keywords. I need to be comprehensive. I'll start with the location, then the time of day, the subject matter, and the key objects. I'll also include the style and the mood. I'll make sure to include the authoritative context and the hints.
+
+Here's my final list: Felixstowe, seafront, England, UK, GBR, Europe, twilight, lighthouse, ferries, North Sea, sunset, 2026-08-13, 16:08:57, 51.961800, 1.358500, East Suffolk, Suffolk, Adobe Stock, Any Vision, ferry, lighthouse, North Sea, sunset, twilight, seafront, England, UK, GBR, Europe, Felixstowe, Suffolk, UK, gbr, seafront.
+
+I've checked everything. The title is good, the description is solid, and the keywords are comprehensive. I'm ready to output the final metadata.
+</think>
+
+Title: Seafront at Felix
+```
+
+</details>
 
 </details>
 
@@ -1948,21 +2122,23 @@ Alright, let's get to work. I've got the image and the hints, and I need to craf
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Observations:* Missing or empty fields: Title, Description, Keywords;
+  Response repeats the task instructions instead of only returning the
+  requested fields
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.60s
-- *Generation time:* 1.26s
-- *Total time:* 1.87s
-- *Input validation time:* 9.23e-05
-- *Prompt preparation time:* 0.00156
-- *First-token latency:* 0.0977
-- *Cleanup time:* 0.071
-- *Prompt tokens:* 347
-- *Generation tokens:* 53
-- *Total tokens:* 400
-- *Prompt throughput (raw):* 3,553 tok/s
-- *Generation throughput (raw):* 344 tok/s
+- *Model load time:* 0.62s
+- *Generation time:* 1.32s
+- *Total time:* 1.95s
+- *Input validation time:* 6.38e-05
+- *Prompt preparation time:* 0.00169
+- *First-token latency:* 0.0994
+- *Cleanup time:* 0.0712
+- *Prompt tokens:* 308
+- *Generation tokens:* 83
+- *Total tokens:* 391
+- *Prompt throughput (raw):* 3,099 tok/s
+- *Generation throughput (raw):* 346 tok/s
 - *Peak memory:* 2.1
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
@@ -1971,7 +2147,7 @@ Alright, let's get to work. I've got the image and the hints, and I need to craf
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1413
+- *Rendered prompt characters:* 1227
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1987,7 +2163,7 @@ Alright, let's get to work. I've got the image and the hints, and I need to craf
 *Readable output:*
 
 <pre class="model-output-readable">
-Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, bridge, church, church spire, clear sky, dock, England, Europe, flag, harbor, mooring, mooring lines, nautical.
+A tranquil seaside scene in Felixstowe, UK, captured on 2026-08-13 at 16:08:57 UTC+01:00, featuring a concrete 5-10-word title, a 1-2-sentence descriptive description, and 10-18 unique, comma-separated keywords covering relevant context and visible details.
 </pre>
 
 </details>
@@ -2004,22 +2180,21 @@ Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, brid
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Keywords; Extra text appears before
-  the Title field; Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete
+- *Observations:* Extra text appears before the Title field; Response appears
+  cut off at the token limit; Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.75s
-- *Generation time:* 16.60s
-- *Total time:* 18.35s
-- *Input validation time:* 4.09e-05
+- *Model load time:* 1.70s
+- *Generation time:* 16.76s
+- *Total time:* 18.46s
+- *Input validation time:* 4.75e-05
 - *Prompt preparation time:* 0.00166
-- *First-token latency:* 5.66
-- *Cleanup time:* 0.0936
-- *Prompt tokens:* 6,344
+- *First-token latency:* 5.71
+- *Cleanup time:* 0.0898
+- *Prompt tokens:* 6,306
 - *Generation tokens:* 500
-- *Total tokens:* 6,844
-- *Prompt throughput (raw):* 1,120 tok/s
-- *Generation throughput (raw):* 47.7 tok/s
+- *Total tokens:* 6,806
+- *Prompt throughput (raw):* 1,103 tok/s
+- *Generation throughput (raw):* 46.9 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.41
@@ -2028,7 +2203,7 @@ Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, brid
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1375
+- *Rendered prompt characters:* 1189
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2044,34 +2219,38 @@ Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, brid
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background." So title could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
+&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image: seafront, Felixstowe, England, with cranes, pier, Ferris wheel. So maybe "Felixstowe Seafront with Industrial Cranes".
 
-Then the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The ship is moored, clear sky, Bristol Harbour, church steeple. So something like "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's steeple visible under clear blue skies."
+Then the description: need to combine context (date/time, location) with main subjects (seafront, cranes, pier, Ferris wheel, lighting, action). The image has a seafront with industrial cranes, a pier, Ferris wheel, street lamps, string lights, water, and a person maybe. So something like "Seafront view of Felixstowe, England, showing industrial cranes, pier, Ferris wheel, and waterfront with street lamps under bright daylight." Wait, need to include the context like capture date, but maybe not in the description, but the description should mention the setting. Let's make it: "Seafront scene in Felixstowe, England, featuring industrial cranes, a pier, Ferris wheel, and waterfront with street lamps under bright daylight conditions."
 
-Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.
+Keywords need 10-18, unique, comma-separated. From hints: East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Wait, need unique ones. Let's list: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe, England. Wait, let's check the image: street lamps, string lights, water, cranes, pier, Ferris wheel, trees, rocks. So keywords: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe, England, GBR, port, coastal, daylight, string lights, rocks. Let's make sure they are unique.
 
-Now, let's structure each part.
+Now, let's structure each part:
 
-Title: Need 5-10 words. "Thekla Ship in Bristol Harbour" is about 4 words, maybe "Thekla Moored in Bristol Harbour" – 5 words. Or "Bristol Harbour Ship Scene" – 3 words, but need 5-10. Let's go with "Thekla Ship at Bristol Harbour" (5 words).
+Title: "Felixstowe Seafront with Industrial Cranes"
 
-Description: Combine context (date/time, location) with subject, setting, action, lighting, details. So: "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's church steeple visible under clear blue skies." That's two sentences? Wait, need 1-2 sentences. So maybe "Thekla, a ship venue, is moored in Bristol Harbour on 2026-08-12, with the steeple of St Mary Redcliffe church visible under clear blue skies." That's one sentence, covers context, subject, setting
+Description: "Seafront view of Felixstowe, England, showcasing industrial cranes, a pier, Ferris wheel, and waterfront with street lamps under bright daylight conditions."
+
+Keywords: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe,
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background." So title could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
+<think>Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image: seafront, Felixstowe, England, with cranes, pier, Ferris wheel. So maybe "Felixstowe Seafront with Industrial Cranes". 
 
-Then the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The ship is moored, clear sky, Bristol Harbour, church steeple. So something like "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's steeple visible under clear blue skies."
+Then the description: need to combine context (date/time, location) with main subjects (seafront, cranes, pier, Ferris wheel, lighting, action). The image has a seafront with industrial cranes, a pier, Ferris wheel, street lamps, string lights, water, and a person maybe. So something like "Seafront view of Felixstowe, England, showing industrial cranes, pier, Ferris wheel, and waterfront with street lamps under bright daylight." Wait, need to include the context like capture date, but maybe not in the description, but the description should mention the setting. Let's make it: "Seafront scene in Felixstowe, England, featuring industrial cranes, a pier, Ferris wheel, and waterfront with street lamps under bright daylight conditions." 
 
-Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.
+Keywords need 10-18, unique, comma-separated. From hints: East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Wait, need unique ones. Let's list: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe, England. Wait, let's check the image: street lamps, string lights, water, cranes, pier, Ferris wheel, trees, rocks. So keywords: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe, England, GBR, port, coastal, daylight, string lights, rocks. Let's make sure they are unique. 
 
-Now, let's structure each part.
+Now, let's structure each part:
 
-Title: Need 5-10 words. "Thekla Ship in Bristol Harbour" is about 4 words, maybe "Thekla Moored in Bristol Harbour" – 5 words. Or "Bristol Harbour Ship Scene" – 3 words, but need 5-10. Let's go with "Thekla Ship at Bristol Harbour" (5 words).
+Title: "Felixstowe Seafront with Industrial Cranes"
 
-Description: Combine context (date/time, location) with subject, setting, action, lighting, details. So: "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's church steeple visible under clear blue skies." That's two sentences? Wait, need 1-2 sentences. So maybe "Thekla, a ship venue, is moored in Bristol Harbour on 2026-08-12, with the steeple of St Mary Redcliffe church visible under clear blue skies." That's one sentence, covers context, subject, setting
+Description: "Seafront view of Felixstowe, England, showcasing industrial cranes, a pier, Ferris wheel, and waterfront with street lamps under bright daylight conditions."
+
+Keywords: Felixstowe, Suffolk, UK, seafront, industrial cranes, pier, Ferris wheel, street lamps, waterfront, Europe,
 ```
 
 </details>
@@ -2080,66 +2259,62 @@ Description: Combine context (date/time, location) with subject, setting, action
 
 ---
 
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
-### mlx-community/Idefics3-8B-Llama3-bf16
+### mlx-community/GLM-4.6V-Flash-mxfp4
 
 <details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Conversation-role control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.92s
-- *Generation time:* 2.24s
-- *Total time:* 4.16s
-- *Input validation time:* 5.53e-05
-- *Prompt preparation time:* 0.00127
-- *First-token latency:* 1.11
-- *Cleanup time:* 0.0938
-- *Prompt tokens:* 2,626
-- *Generation tokens:* 16
-- *Total tokens:* 2,642
-- *Prompt throughput (raw):* 2,362 tok/s
-- *Generation throughput (raw):* 34.2 tok/s
-- *Peak memory:* 18
-- *Active memory:* 17
-- *Cache memory:* 0.43
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00269
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 2 words (requested 5-10); Keyword list has 146
+  terms (requested 10-18); Duplicate keywords: pier, industrial cranes, street
+  lamps, waterfront, bright daylight, pier view, bright daylight scene, street
+  lamp view, waterfront trees, industrial cranes view, waterfront view, trees
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.42s
+- *Generation time:* 12.90s
+- *Total time:* 14.33s
+- *Input validation time:* 4.52e-05
+- *Prompt preparation time:* 0.00764
+- *First-token latency:* 5.53
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 6,310
+- *Generation tokens:* 500
+- *Total tokens:* 6,810
+- *Prompt throughput (raw):* 1,141 tok/s
+- *Generation throughput (raw):* 72.2 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 6.8
+- *Cache memory:* 0.42
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00211
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1355
+- *Rendered prompt characters:* 1213
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
- Thekla in Bristol Harbour with St Mary Redcliffe in the background.&lt;end_of_utterance&gt;
+Title: Felixstowe Seafront
+Description: A view of the Felixstowe seafront, featuring a pier, industrial cranes, street lamps, and a tree-lined waterfront under bright daylight.
+Keywords: Felixstowe seafront, England UK, pier, industrial cranes, street lamps, waterfront, bright daylight, East Suffolk, Suffolk, UK, gbr, Europe, seafront view, pier view, industrial waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial cranes, waterfront, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, pier view, waterfront view, bright daylight, street lamps, trees, pier, industrial
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- Thekla in Bristol Harbour with St Mary Redcliffe in the background.<end_of_utterance>
-```
-
-</details>
 
 </details>
 
@@ -2155,31 +2330,31 @@ Description: Combine context (date/time, location) with subject, setting, action
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Response appears cut off at the token limit; Internal reasoning block
-  appears incomplete
+- *Observations:* Missing or empty fields: Title; Extra text appears before
+  the Title field; Response appears cut off at the token limit; Internal
+  reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.24s
-- *Generation time:* 109.09s
-- *Total time:* 112.35s
-- *Input validation time:* 4.57e-05
-- *Prompt preparation time:* 0.00184
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.174
-- *Prompt tokens:* 1,296
+- *Model load time:* 3.25s
+- *Generation time:* 112.15s
+- *Total time:* 115.41s
+- *Input validation time:* 4.86e-05
+- *Prompt preparation time:* 0.00177
+- *First-token latency:* 1.61
+- *Cleanup time:* 0.138
+- *Prompt tokens:* 1,257
 - *Generation tokens:* 500
-- *Total tokens:* 1,796
-- *Prompt throughput (raw):* 944 tok/s
-- *Generation throughput (raw):* 4.67 tok/s
+- *Total tokens:* 1,757
+- *Prompt throughput (raw):* 781 tok/s
+- *Generation throughput (raw):* 4.55 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
-- *Cache memory:* 5.6
+- *Cache memory:* 5.5
 - *Model-load active memory:* 32.8
 - *Post-cleanup active memory:* 0.00365
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1505
+- *Rendered prompt characters:* 1319
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2195,101 +2370,20 @@ Description: Combine context (date/time, location) with subject, setting, action
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. Let's start with the title. The main subject is the Thekla ship in Bristol Harbour, with the church steeple in the background. So maybe "Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire visible." That's concise and includes key elements.
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
 
-Next, the description. It should mention the ship, location, time, and key details. The image shows the Thekla in Mud Dock, with the church steeple (St Mary Redcliffe) in the background, clear sky, and the ship's details like the mast and mooring lines. So the description could be: "The Thekla, a historic ship moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe visible against a clear blue sky." That captures the main elements.
+First, the context says the capture date/time is 2026-08-13 16:08:57 UTC+01:00, and GPS is 51.961800°N, 1.358500°E. The location is Felixstowe, England, UK, GBR, Europe. The hints mention seafront, Felixstowe, England, UK, GBR, seafront, etc.
 
-For keywords, list unique terms from the image and context. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, England, Europe, clear sky, bridge (maybe the bridge in the background?), building (like the dark building), trees, water, etc. Let me check the hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. So include those. Maybe: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 14 keywords. Need to make sure they are unique and relevant. Let me count again. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 15. Maybe remove "nautical vessel" as it's redundant with ship. So adjust to: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship,
+Looking at the image: there's a seafront with a pier, lampposts, a Ferris wheel, industrial cranes in the background, water, trees, and a person paddleboarding. The lighting suggests it's daytime, maybe sunny. The scene is Felixstowe's seafront.
+
+Now, the title needs to be a concrete 5-10 words. Let's think: "Felixstowe seafront with pier, lampposts, and paddleboarder at 16:08 UTC+01:00". Wait, but the time is in the future (2026), so maybe just the location and key elements. Maybe "Felixstowe seafront at 16:08 UTC+01:00 with pier, lampposts, and paddleboarder".
+
+Description: Combine context and visible details. So, "A daytime view of Felixstowe's seafront at 16:08 UTC+01:00, featuring a pier, traditional lampposts, a paddleboarder on the water, industrial cranes in the distance, and trees framing the scene."
+
+Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, seafront, England, UK, GBR, UTC+01:00, 2026-08-13, pier, lampposts, paddleboarder, industrial cranes, Ferris wheel, trees, water, Europe.
+
+Wait, check the hints: the hints include Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. But the image might not show Adobe Stock or Any Vision. The context is authoritative, so maybe include those. Wait, the user said to treat capture date/time and GPS as authoritative, but don't claim they are visible. So maybe include them as
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-8bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Keywords; Response repeats
-  the task instructions instead of only returning the requested fields; Extra
-  text appears before the Title field; Response appears cut off at the token
-  limit; Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.85s
-- *Generation time:* 2.68s
-- *Total time:* 3.55s
-- *Input validation time:* 4.12e-05
-- *Prompt preparation time:* 0.00882
-- *First-token latency:* 0.262
-- *Cleanup time:* 0.0797
-- *Prompt tokens:* 1,003
-- *Generation tokens:* 500
-- *Total tokens:* 1,503
-- *Prompt throughput (raw):* 3,834 tok/s
-- *Generation throughput (raw):* 276 tok/s
-- *Peak memory:* 3.9
-- *Active memory:* 2.3
-- *Cache memory:* 0.06
-- *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00483
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1386
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-First, title: should be concrete, short, around 5-10 words. Based on the image: a black ship moored in Bristol harbor with church spire. So title: Black Ship Moored at Bristol Harbor with Church Spire.
-
-But need 5-10 words. Let's count: "Black Ship Moored at Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in Bristol Harbor, Featuring Church Spire". But better to include key elements: ship, harbor, church, clear sky.
-
-Description: The image shows a large black ship moored in Bristol Harbor, with a church steeple visible in the background under clear blue skies.
-
-Now, keywords: need 10-18 unique, covering relevant context and visible details. Let's list:
-
-- ship, boat, harbor, Bristol, church, church spire, mast, moored, dock, England, Europe, clear sky, nautical, architecture, masts, rigging, flags, dockside, green trees, clear weather, harbor water, anchor, S, Thekla, mooring lines, city center, England, UK, GBR, clear, sunny, architecture, building, steeple, church, harbor, dock, England, Europe, nautical, boat, ship, masts, rigging, moored, dockside, trees, clear sky, architecture, building, church spire, harbor, mooring, nautical, England, UK, GBR, clear, sunny, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring lines, anchor, masts, rigging, flags, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring, nautical, ship, harbor,
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-First, title: should be concrete, short, around 5-10 words. Based on the image: a black ship moored in Bristol harbor with church spire. So title: Black Ship Moored at Bristol Harbor with Church Spire.
-
-But need 5-10 words. Let's count: "Black Ship Moored at Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in Bristol Harbor, Featuring Church Spire". But better to include key elements: ship, harbor, church, clear sky.
-
-Description: The image shows a large black ship moored in Bristol Harbor, with a church steeple visible in the background under clear blue skies.
-
-Now, keywords: need 10-18 unique, covering relevant context and visible details. Let's list:
-
-- ship, boat, harbor, Bristol, church, church spire, mast, moored, dock, England, Europe, clear sky, nautical, architecture, masts, rigging, flags, dockside, green trees, clear weather, harbor water, anchor, S, Thekla, mooring lines, city center, England, UK, GBR, clear, sunny, architecture, building, steeple, church, harbor, dock, England, Europe, nautical, boat, ship, masts, rigging, moored, dockside, trees, clear sky, architecture, building, church spire, harbor, mooring, nautical, England, UK, GBR, clear, sunny, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring lines, anchor, masts, rigging, flags, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring, nautical, ship, harbor,
-```
-
-</details>
 
 </details>
 
@@ -2307,18 +2401,18 @@ Now, keywords: need 10-18 unique, covering relevant context and visible details.
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.27s
-- *Generation time:* 25.70s
-- *Total time:* 27.99s
-- *Input validation time:* 4.51e-05
-- *Prompt preparation time:* 0.00481
-- *First-token latency:* 2.47
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 3,158
-- *Generation tokens:* 134
-- *Total tokens:* 3,292
-- *Prompt throughput (raw):* 1,278 tok/s
-- *Generation throughput (raw):* 5.97 tok/s
+- *Model load time:* 2.24s
+- *Generation time:* 25.21s
+- *Total time:* 27.46s
+- *Input validation time:* 4.11e-05
+- *Prompt preparation time:* 0.00472
+- *First-token latency:* 2.53
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 3,100
+- *Generation tokens:* 131
+- *Total tokens:* 3,231
+- *Prompt throughput (raw):* 1,225 tok/s
+- *Generation throughput (raw):* 5.98 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
@@ -2327,7 +2421,7 @@ Now, keywords: need 10-18 unique, covering relevant context and visible details.
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1356
+- *Rendered prompt characters:* 1170
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2343,70 +2437,11 @@ Now, keywords: need 10-18 unique, covering relevant context and visible details.
 *Readable output:*
 
 <pre class="model-output-readable">
-Thekla Ship in Mud Dock, Bristol Harbour
+Felixstowe Seafront: Ferris Wheel, Pier, and Industrial Port
 
-The Thekla, a large black ship with a white mast, is moored in Mud Dock, Bristol Harbour. The steeple of St Mary Redcliffe Church is visible in the background, with a clear blue sky overhead. The ship's name is prominently displayed on its side, and it is secured with mooring lines to the dock.
+A scenic Felixstowe seafront view captures a Ferris wheel, pier, and industrial port under a clear sky. The image shows a pier extending into the water, a Ferris wheel in the distance, and a port with cranes and buildings, creating a contrast between leisure and industry.
 
-Bristol, England, Europe, Thekla, Mud Dock, Ship, Harbour, Church, St Mary Redcliffe, Mooring, Mooring lines, Clear Sky, Nautical, Boat, Dock, Architecture, Building, Mast, Anchor, Ship venue
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* none
-- *Observations:* Missing or empty fields: Keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.50s
-- *Generation time:* 72.08s
-- *Total time:* 72.59s
-- *Input validation time:* 4.71e-05
-- *Prompt preparation time:* 0.00377
-- *First-token latency:* 70.7
-- *Cleanup time:* 0.079
-- *Prompt tokens:* 16,517
-- *Generation tokens:* 124
-- *Total tokens:* 16,641
-- *Prompt throughput (raw):* 234 tok/s
-- *Generation throughput (raw):* 216 tok/s
-- *Peak memory:* 5.1
-- *Active memory:* 1.3
-- *Cache memory:* 1.00
-- *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00744
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1448
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-City Centre, Bristol, England, UK, GBR, Europe
-
-Description:
-The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church in the background. The clear sky and calm waters create a serene atmosphere, highlighting the black hull and red stripe of the ship. The boat is moored with ropes, and the mast is visible, with a black and white flag on top. The scene is set against a backdrop of green trees and a blue sky, creating a picturesque view of the city's harbor.
+Felixstowe, England, UK, GBR, seafront, Ferris wheel, pier, industrial port, cranes, buildings, sky, water, pier lights, trees, rocks, summer, daylight, coastal, East Suffolk, Any Vision, Adobe Stock
 </pre>
 
 </details>
@@ -2427,18 +2462,18 @@ The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, wit
   Response appears cut off at the token limit; Internal reasoning block
   appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.75s
-- *Generation time:* 25.42s
-- *Total time:* 26.19s
-- *Input validation time:* 4.75e-05
-- *Prompt preparation time:* 0.0115
-- *First-token latency:* 19
-- *Cleanup time:* 0.14
-- *Prompt tokens:* 16,508
+- *Model load time:* 0.73s
+- *Generation time:* 24.29s
+- *Total time:* 25.04s
+- *Input validation time:* 5.23e-05
+- *Prompt preparation time:* 0.0117
+- *First-token latency:* 18
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,469
 - *Generation tokens:* 500
-- *Total tokens:* 17,008
-- *Prompt throughput (raw):* 871 tok/s
-- *Generation throughput (raw):* 88.8 tok/s
+- *Total tokens:* 16,969
+- *Prompt throughput (raw):* 915 tok/s
+- *Generation throughput (raw):* 90.2 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
@@ -2447,7 +2482,7 @@ The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, wit
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1398
+- *Rendered prompt characters:* 1212
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2463,11 +2498,13 @@ The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, wit
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this step by step. First, the title. The image shows a ship named Thekla anchored in Bristol Harbour. The context mentions Bristol, so the title should be specific. Let's see: "Thekla, Bristol Harbour, Moored" – that's 5 words. Wait, maybe "Thekla Ship, Bristol Harbour, Moored" but need to be concise. The hint says "City Centre, Bristol, England, UK, GBR, Europe" so title should include Thekla and location.
+Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, GBR. The image has a seafront with cranes, a Ferris wheel, street lamps. So a title should be specific. Maybe "Felixstowe Seafront, England, UK" but need 5-10 words. Let's see: "Felixstowe Seafront, England, UK, Cranes and Ferris Wheel" – that's 10 words. Wait, "Felixstowe Seafront, England, UK" is 7, but maybe "Felixstowe Seafront, England, UK: Cranes and Ferris Wheel" – no, better to be concise. "Felixstowe Seafront, England, UK, Cranes and Ferris Wheel" – 10 words. That works.
 
-Next, the description. Need to combine context with visible subject, setting, action, lighting, details. The ship is Thekla, anchored in Mud Dock (from context), background has St Mary Redcliffe church spire. The sky is clear blue, so lighting is bright. Visible details: black hull, red stripe, mast, mooring lines, trees, church spire. Action: moored. So: "Thekla ship, black hull with red stripe, moored in Bristol Harbour Mud Dock, clear blue sky, with St Mary Redcliffe church spire in background."
+Next, the description. Needs to combine context with visible subject, setting, action, lighting, details. Context: capture date/time, GPS, but we don't claim those. The main visible subject is the seafront with cranes, Ferris wheel, street lamps. Setting: coastal, industrial port. Action: maybe a person on paddleboard? Wait, the image has a person on a board in the water. Lighting: sunny, clear sky. Distinctive details: colorful string lights, old-fashioned street lamps, Ferris wheel, cranes. So: "Sunny seafront at Felixstowe, England, UK, featuring cranes, Ferris wheel, colorful string lights, and vintage street lamps over calm waters with a paddleboarder."
 
-Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Let's check image: ship is moored, so Moored, Mooring lines. Church spire is visible. The ship has a mast. The hull is black with red stripe. So keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. Wait, need to pick 10-18. Let's list: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. That's 17. Let's check if any are missing. The ship has a mast, so Mast. The context says "Thekla (a ship venue)" so maybe include Ship, but the hint says "Ship venue" but the image is a ship. Wait,
+Wait, check the context: the description hint says "Seafront, Felixstowe, England, UK, GBR". So need to include that. Also, the GPS is 51.9618N, 1.3585E, which is Felixstowe, Suffolk, UK. So the description should mention Felixstowe, England, UK, GBR. Let's structure: "Felixstowe seafront, England, UK, featuring cranes, Ferris wheel, colorful string lights, vintage street lamps, and a paddleboarder on calm waters under a clear sky."
+
+Now keywords. Need 10-18 unique, comma-separated. Context: Felixstowe, England, UK, GBR, Suffolk. Visible details: seafront, cr
 </pre>
 
 </details>
@@ -2485,21 +2522,23 @@ Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, B
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 199 terms (requested 10-18); Duplicate
-  keywords: england, europe, flag, building, bridge, dock
+  the token limit; Keyword list has 122 terms (requested 10-18); Duplicate
+  keywords: uk, europe, gbr, uk seafront, uk waterfront, uk ferris wheel, uk
+  cranes, uk sunny day, uk east suffolk, uk felixstowe, uk east anglia, uk
+  industrial port
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.16s
-- *Generation time:* 29.70s
-- *Total time:* 30.87s
-- *Input validation time:* 5.36e-05
-- *Prompt preparation time:* 0.000264
-- *First-token latency:* 19.5
-- *Cleanup time:* 0.0945
-- *Prompt tokens:* 16,517
+- *Model load time:* 1.21s
+- *Generation time:* 28.63s
+- *Total time:* 29.84s
+- *Input validation time:* 5.43e-05
+- *Prompt preparation time:* 0.000296
+- *First-token latency:* 18.6
+- *Cleanup time:* 0.0931
+- *Prompt tokens:* 16,478
 - *Generation tokens:* 500
-- *Total tokens:* 17,017
-- *Prompt throughput (raw):* 846 tok/s
-- *Generation throughput (raw):* 53.3 tok/s
+- *Total tokens:* 16,978
+- *Prompt throughput (raw):* 887 tok/s
+- *Generation throughput (raw):* 53.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.3
@@ -2508,7 +2547,7 @@ Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, B
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1448
+- *Rendered prompt characters:* 1262
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2524,13 +2563,11 @@ Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, B
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-The Thekla in Mud Dock, Bristol
+Title: Felixstowe Seafront, East Suffolk, UK
 
-Description:
-The historic ship Thekla, now a venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky. The ship's black hull, white mast, and mooring lines are prominent, while the surrounding greenery and urban structures frame the scene.
+Description: A sunny view of Felixstowe's seafront, featuring a pier, Ferris wheel, cranes, and decorative string lights, with a lamp post in the foreground and a person paddleboarding in the distance.
 
-Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky, Harbor, Black Hull, White Mast, Moored, Mooring Lines, Nautical, Architecture, Boat, City Centre, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building,
+Keywords: Felixstowe, East Suffolk, England, UK, Europe, seafront, pier, Ferris wheel, cranes, string lights, lamp post, paddleboarding, sunny, waterfront, harbor, industrial, coastal, summer, vacation, travel, landscape, scenic, scenic view, waterfront activity, East Anglia, GBR, United Kingdom, GBR, Great Britain, Europe, British, English, UK, GBR, sea, water, blue, sky, trees, rocks, rocks by the sea, waterfront promenade, East Suffolk coastline, East Anglia seafront, UK seafront, UK waterfront, UK coastal scene, UK industrial landscape, UK scenic view, UK travel destination, UK summer scene, UK waterfront activity, UK Ferris wheel, UK cranes, UK lamp post, UK string lights, UK sunny day, UK paddleboarding, UK waterfront, UK seafront, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK Ferris wheel, UK cranes, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day, UK East Suffolk, UK Felixstowe, UK East Anglia, UK industrial port, UK waterfront, UK sunny day,
 </pre>
 
 </details>
@@ -2547,20 +2584,21 @@ Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky,
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Observations:* Missing or empty fields: Title, Description; Extra text
+  appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.62s
-- *Generation time:* 2.69s
-- *Total time:* 5.32s
-- *Input validation time:* 5.45e-05
-- *Prompt preparation time:* 0.00308
-- *First-token latency:* 0.373
-- *Cleanup time:* 0.119
-- *Prompt tokens:* 605
-- *Generation tokens:* 90
-- *Total tokens:* 695
-- *Prompt throughput (raw):* 1,624 tok/s
-- *Generation throughput (raw):* 48.8 tok/s
+- *Model load time:* 2.36s
+- *Generation time:* 8.80s
+- *Total time:* 11.16s
+- *Input validation time:* 4.51e-05
+- *Prompt preparation time:* 0.00321
+- *First-token latency:* 0.378
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 568
+- *Generation tokens:* 391
+- *Total tokens:* 959
+- *Prompt throughput (raw):* 1,501 tok/s
+- *Generation throughput (raw):* 48.7 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2569,7 +2607,7 @@ Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky,
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1375
+- *Rendered prompt characters:* 1189
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2585,8 +2623,51 @@ Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky,
 *Readable output:*
 
 <pre class="model-output-readable">
-The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a clear day. The ship's black hull features a red stripe and the name "THEKLA" in white lettering. It is secured to the dock with mooring lines. In the background, the tall spire of St Mary Redcliffe Church rises above the surrounding trees. The sky is a bright blue, and the water in the harbor is calm.
+## Image Description
+
+The image captures a scenic view of a waterfront area, likely a harbor or bay, on a bright day. The foreground is dominated by several black lampposts, with the closest one sharply in focus. The lampposts are ornate, featuring a classic lantern design.
+
+Behind the lampposts, a body of water stretches out, reflecting the bright sky. A long pier extends across the water, adorned with strings of lights, suggesting a festive or decorative purpose. In the distance, a large Ferris wheel stands prominently, adding a touch of amusement park charm to the scene.
+
+Further in the background, industrial structures, including large cranes, are visible along the shoreline. These structures indicate a working port or industrial area. The overall atmosphere is one of a bustling waterfront with a mix of recreational and industrial activity. The sky is a pale blue, suggesting clear weather.
+
+## Contextual Information
+
+**Date/Time:** August 13, 2026, 16:08:57 UTC+01:00
+**Location:** 51.961800°N, 1.358500°E (This coordinates point to Felixstowe, England, UK)
+
+**Keywords:** waterfront, harbor, pier, Ferris wheel, cranes, industrial, lights, lampposts, sea, sky, England, UK, Felixstowe, coastal, urban, summer, daytime.
+
+## Additional Details
+
+The image appears to be taken from a slightly elevated position, offering a panoramic view of the waterfront. The focus is primarily on the foreground lampposts, with the background gradually softening into a slightly hazy view. The lighting suggests it is daytime, with ample sunlight illuminating the scene. The presence of the Ferris wheel and decorative lights on the pier hint at a location that caters to both leisure and industrial activities.
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+## Image Description
+
+The image captures a scenic view of a waterfront area, likely a harbor or bay, on a bright day. The foreground is dominated by several black lampposts, with the closest one sharply in focus. The lampposts are ornate, featuring a classic lantern design. 
+
+Behind the lampposts, a body of water stretches out, reflecting the bright sky. A long pier extends across the water, adorned with strings of lights, suggesting a festive or decorative purpose. In the distance, a large Ferris wheel stands prominently, adding a touch of amusement park charm to the scene. 
+
+Further in the background, industrial structures, including large cranes, are visible along the shoreline. These structures indicate a working port or industrial area. The overall atmosphere is one of a bustling waterfront with a mix of recreational and industrial activity. The sky is a pale blue, suggesting clear weather. 
+
+## Contextual Information
+
+**Date/Time:** August 13, 2026, 16:08:57 UTC+01:00
+**Location:** 51.961800°N, 1.358500°E (This coordinates point to Felixstowe, England, UK)
+
+**Keywords:** waterfront, harbor, pier, Ferris wheel, cranes, industrial, lights, lampposts, sea, sky, England, UK, Felixstowe, coastal, urban, summer, daytime. 
+
+## Additional Details
+
+The image appears to be taken from a slightly elevated position, offering a panoramic view of the waterfront. The focus is primarily on the foreground lampposts, with the background gradually softening into a slightly hazy view. The lighting suggests it is daytime, with ample sunlight illuminating the scene. The presence of the Ferris wheel and decorative lights on the pier hint at a location that caters to both leisure and industrial activities.
+```
+
+</details>
 
 </details>
 
@@ -2604,18 +2685,18 @@ The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a c
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 0.94s
-- *Generation time:* 4.06s
-- *Total time:* 5.01s
-- *Input validation time:* 4.4e-05
-- *Prompt preparation time:* 0.00157
-- *First-token latency:* 2.49
-- *Cleanup time:* 0.0869
-- *Prompt tokens:* 2,739
-- *Generation tokens:* 56
-- *Total tokens:* 2,795
-- *Prompt throughput (raw):* 1,098 tok/s
-- *Generation throughput (raw):* 62.6 tok/s
+- *Model load time:* 0.96s
+- *Generation time:* 4.62s
+- *Total time:* 5.58s
+- *Input validation time:* 4.79e-05
+- *Prompt preparation time:* 0.00155
+- *First-token latency:* 2.4
+- *Cleanup time:* 0.0856
+- *Prompt tokens:* 2,680
+- *Generation tokens:* 102
+- *Total tokens:* 2,782
+- *Prompt throughput (raw):* 1,117 tok/s
+- *Generation throughput (raw):* 62.2 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.90
@@ -2624,7 +2705,7 @@ The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a c
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1320
+- *Rendered prompt characters:* 1134
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2640,14 +2721,14 @@ The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a c
 *Readable output:*
 
 <pre class="model-output-readable">
-Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
+Seafront, Felixstowe, England, UK, GBR, Europe, 2026-08-13 16:08:57 UTC+01:00, 51.961800°N, 1.358500°E, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical 
+Seafront, Felixstowe, England, UK, GBR, Europe, 2026-08-13 16:08:57 UTC+01:00, 51.961800°N, 1.358500°E, Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront 
 ```
 
 </details>
@@ -2669,19 +2750,19 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.51s
-- *Generation time:* 0.83s
-- *Total time:* 1.34s
-- *Input validation time:* 4.23e-05
-- *Prompt preparation time:* 0.00133
-- *First-token latency:* 0.0759
-- *Cleanup time:* 0.0809
-- *Prompt tokens:* 343
-- *Generation tokens:* 72
-- *Total tokens:* 415
-- *Prompt throughput (raw):* 4,521 tok/s
-- *Generation throughput (raw):* 341 tok/s
-- *Peak memory:* 2.4
+- *Model load time:* 0.50s
+- *Generation time:* 1.00s
+- *Total time:* 1.50s
+- *Input validation time:* 4.9e-05
+- *Prompt preparation time:* 0.00135
+- *First-token latency:* 0.0798
+- *Cleanup time:* 0.0795
+- *Prompt tokens:* 304
+- *Generation tokens:* 171
+- *Total tokens:* 475
+- *Prompt throughput (raw):* 3,812 tok/s
+- *Generation throughput (raw):* 353 tok/s
+- *Peak memory:* 2.2
 - *Active memory:* 0.61
 - *Cache memory:* 0.30
 - *Model-load active memory:* 0.611
@@ -2689,7 +2770,7 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1404
+- *Rendered prompt characters:* 1218
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2705,8 +2786,8 @@ Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Thekla in Bristol, England, UK, GBR, Europe
-Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. The image captures the ship's mooring lines and the surrounding area, with a clear sky in the background.
+Title: Seafront, Felixstowe, England, UK, GBR, Europe
+Description: A 5-10-word title that describes the setting and context of the image, with a focus on the maritime theme. It also includes a 1-2-sentence description that combines relevant information about the location, such as the name of the town, the country, and the GBR (Great Britain) code, which is a standard for maritime identification in the UK. The description also includes the main visible subject, which is the lamp post, and the distinctive details, such as the lighting and the silhouette of the lamp post. The keywords, which cover relevant context and visible details, are: "Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront."
 </pre>
 
 </details>
@@ -2728,19 +2809,19 @@ Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with th
   of only returning the requested fields; Response appears cut off at the
   token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.12s
-- *Generation time:* 12.89s
-- *Total time:* 14.02s
-- *Input validation time:* 4.19e-05
-- *Prompt preparation time:* 0.000166
+- *Model load time:* 1.20s
+- *Generation time:* 14.05s
+- *Total time:* 15.26s
+- *Input validation time:* 3.96e-05
+- *Prompt preparation time:* 0.000165
 - *First-token latency:* 1.1
-- *Cleanup time:* 0.172
-- *Prompt tokens:* 4,433
+- *Cleanup time:* 0.187
+- *Prompt tokens:* 4,397
 - *Generation tokens:* 500
-- *Total tokens:* 4,933
-- *Prompt throughput (raw):* 4,041 tok/s
-- *Generation throughput (raw):* 45.4 tok/s
-- *Peak memory:* 4.3
+- *Total tokens:* 4,897
+- *Prompt throughput (raw):* 4,007 tok/s
+- *Generation throughput (raw):* 40.8 tok/s
+- *Peak memory:* 4.4
 - *Active memory:* 1.7
 - *Cache memory:* 1.9
 - *Model-load active memory:* 1.73
@@ -2748,7 +2829,7 @@ Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with th
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1304
+- *Rendered prompt characters:* 1118
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2764,867 +2845,35 @@ Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with th
 *Readable output:*
 
 <pre class="model-output-readable">
-- Title hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
-- Description hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
-- Keyword hints: Architecture, Building, Church, Flag, Harbor, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island,
+- Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR,
+- Description hint: Seafront, Felixstowe, England, UK, GBR,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+- Title hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, Suffolk, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England,
+-
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-inkling-small-mlx-4bit"></a>
-
-### mlx-community/Inkling-Small-mlx-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Inkling-Small-mlx-4bit</summary>
-
-- *Execution:* crashed
-- *Usability:* not_evaluated
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Received 362 parameters not in model:
-  <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* Received 362 parameters not in model:
-  <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
-- *Arch supported by installed mlx-vlm:* yes (model_type inkling_mm_model via
-  inkling)
-- *Model load time:* 0.19s
-- *Generation time:* -
-- *Total time:* 0.20s
-- *Input validation time:* 4.56e-05
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.0637
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory:* -
-- *Active memory:* -
-- *Cache memory:* -
-- *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.00269
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* not captured
-- *Image placeholders:* not captured
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Inkling-Small-mlx-4bit/snapshots/f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12108, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11587, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 786, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 966, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 842, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
-    raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
-    )
-ValueError: Received 362 parameters not in model: 
-audio_tower.encoder.biases,
-audio_tower.encoder.scales,
-language_model.model.layers.10.mlp.experts.down_proj.biases,
-language_model.model.layers.10.mlp.experts.down_proj.scales,
-language_model.model.layers.10.mlp.experts.down_proj.weight,
-language_model.model.layers.10.mlp.experts.gate_proj.biases,
-language_model.model.layers.10.mlp.experts.gate_proj.scales,
-language_model.model.layers.10.mlp.experts.gate_proj.weight,
-language_model.model.layers.10.mlp.experts.up_proj.biases,
-language_model.model.layers.10.mlp.experts.up_proj.scales,
-language_model.model.layers.10.mlp.experts.up_proj.weight,
-language_model.model.layers.11.mlp.experts.down_proj.biases,
-language_model.model.layers.11.mlp.experts.down_proj.scales,
-language_model.model.layers.11.mlp.experts.down_proj.weight,
-language_model.model.layers.11.mlp.experts.gate_proj.biases,
-language_model.model.layers.11.mlp.experts.gate_proj.scales,
-language_model.model.layers.11.mlp.experts.gate_proj.weight,
-language_model.model.layers.11.mlp.experts.up_proj.biases,
-language_model.model.layers.11.mlp.experts.up_proj.scales,
-language_model.model.layers.11.mlp.experts.up_proj.weight,
-language_model.model.layers.12.mlp.experts.down_proj.biases,
-language_model.model.layers.12.mlp.experts.down_proj.scales,
-language_model.model.layers.12.mlp.experts.down_proj.weight,
-language_model.model.layers.12.mlp.experts.gate_proj.biases,
-language_model.model.layers.12.mlp.experts.gate_proj.scales,
-language_model.model.layers.12.mlp.experts.gate_proj.weight,
-language_model.model.layers.12.mlp.experts.up_proj.biases,
-language_model.model.layers.12.mlp.experts.up_proj.scales,
-language_model.model.layers.12.mlp.experts.up_proj.weight,
-language_model.model.layers.13.mlp.experts.down_proj.biases,
-language_model.model.layers.13.mlp.experts.down_proj.scales,
-language_model.model.layers.13.mlp.experts.down_proj.weight,
-language_model.model.layers.13.mlp.experts.gate_proj.biases,
-language_model.model.layers.13.mlp.experts.gate_proj.scales,
-language_model.model.layers.13.mlp.experts.gate_proj.weight,
-language_model.model.layers.13.mlp.experts.up_proj.biases,
-language_model.model.layers.13.mlp.experts.up_proj.scales,
-language_model.model.layers.13.mlp.experts.up_proj.weight,
-language_model.model.layers.14.mlp.experts.down_proj.biases,
-language_model.model.layers.14.mlp.experts.down_proj.scales,
-language_model.model.layers.14.mlp.experts.down_proj.weight,
-language_model.model.layers.14.mlp.experts.gate_proj.biases,
-language_model.model.layers.14.mlp.experts.gate_proj.scales,
-language_model.model.layers.14.mlp.experts.gate_proj.weight,
-language_model.model.layers.14.mlp.experts.up_proj.biases,
-language_model.model.layers.14.mlp.experts.up_proj.scales,
-language_model.model.layers.14.mlp.experts.up_proj.weight,
-language_model.model.layers.15.mlp.experts.down_proj.biases,
-language_model.model.layers.15.mlp.experts.down_proj.scales,
-language_model.model.layers.15.mlp.experts.down_proj.weight,
-language_model.model.layers.15.mlp.experts.gate_proj.biases,
-language_model.model.layers.15.mlp.experts.gate_proj.scales,
-language_model.model.layers.15.mlp.experts.gate_proj.weight,
-language_model.model.layers.15.mlp.experts.up_proj.biases,
-language_model.model.layers.15.mlp.experts.up_proj.scales,
-language_model.model.layers.15.mlp.experts.up_proj.weight,
-language_model.model.layers.16.mlp.experts.down_proj.biases,
-language_model.model.layers.16.mlp.experts.down_proj.scales,
-language_model.model.layers.16.mlp.experts.down_proj.weight,
-language_model.model.layers.16.mlp.experts.gate_proj.biases,
-language_model.model.layers.16.mlp.experts.gate_proj.scales,
-language_model.model.layers.16.mlp.experts.gate_proj.weight,
-language_model.model.layers.16.mlp.experts.up_proj.biases,
-language_model.model.layers.16.mlp.experts.up_proj.scales,
-language_model.model.layers.16.mlp.experts.up_proj.weight,
-language_model.model.layers.17.mlp.experts.down_proj.biases,
-language_model.model.layers.17.mlp.experts.down_proj.scales,
-language_model.model.layers.17.mlp.experts.down_proj.weight,
-language_model.model.layers.17.mlp.experts.gate_proj.biases,
-language_model.model.layers.17.mlp.experts.gate_proj.scales,
-language_model.model.layers.17.mlp.experts.gate_proj.weight,
-language_model.model.layers.17.mlp.experts.up_proj.biases,
-language_model.model.layers.17.mlp.experts.up_proj.scales,
-language_model.model.layers.17.mlp.experts.up_proj.weight,
-language_model.model.layers.18.mlp.experts.down_proj.biases,
-language_model.model.layers.18.mlp.experts.down_proj.scales,
-language_model.model.layers.18.mlp.experts.down_proj.weight,
-language_model.model.layers.18.mlp.experts.gate_proj.biases,
-language_model.model.layers.18.mlp.experts.gate_proj.scales,
-language_model.model.layers.18.mlp.experts.gate_proj.weight,
-language_model.model.layers.18.mlp.experts.up_proj.biases,
-language_model.model.layers.18.mlp.experts.up_proj.scales,
-language_model.model.layers.18.mlp.experts.up_proj.weight,
-language_model.model.layers.19.mlp.experts.down_proj.biases,
-language_model.model.layers.19.mlp.experts.down_proj.scales,
-language_model.model.layers.19.mlp.experts.down_proj.weight,
-language_model.model.layers.19.mlp.experts.gate_proj.biases,
-language_model.model.layers.19.mlp.experts.gate_proj.scales,
-language_model.model.layers.19.mlp.experts.gate_proj.weight,
-language_model.model.layers.19.mlp.experts.up_proj.biases,
-language_model.model.layers.19.mlp.experts.up_proj.scales,
-language_model.model.layers.19.mlp.experts.up_proj.weight,
-language_model.model.layers.2.mlp.experts.down_proj.biases,
-language_model.model.layers.2.mlp.experts.down_proj.scales,
-language_model.model.layers.2.mlp.experts.down_proj.weight,
-language_model.model.layers.2.mlp.experts.gate_proj.biases,
-language_model.model.layers.2.mlp.experts.gate_proj.scales,
-language_model.model.layers.2.mlp.experts.gate_proj.weight,
-language_model.model.layers.2.mlp.experts.up_proj.biases,
-language_model.model.layers.2.mlp.experts.up_proj.scales,
-language_model.model.layers.2.mlp.experts.up_proj.weight,
-language_model.model.layers.20.mlp.experts.down_proj.biases,
-language_model.model.layers.20.mlp.experts.down_proj.scales,
-language_model.model.layers.20.mlp.experts.down_proj.weight,
-language_model.model.layers.20.mlp.experts.gate_proj.biases,
-language_model.model.layers.20.mlp.experts.gate_proj.scales,
-language_model.model.layers.20.mlp.experts.gate_proj.weight,
-language_model.model.layers.20.mlp.experts.up_proj.biases,
-language_model.model.layers.20.mlp.experts.up_proj.scales,
-language_model.model.layers.20.mlp.experts.up_proj.weight,
-language_model.model.layers.21.mlp.experts.down_proj.biases,
-language_model.model.layers.21.mlp.experts.down_proj.scales,
-language_model.model.layers.21.mlp.experts.down_proj.weight,
-language_model.model.layers.21.mlp.experts.gate_proj.biases,
-language_model.model.layers.21.mlp.experts.gate_proj.scales,
-language_model.model.layers.21.mlp.experts.gate_proj.weight,
-language_model.model.layers.21.mlp.experts.up_proj.biases,
-language_model.model.layers.21.mlp.experts.up_proj.scales,
-language_model.model.layers.21.mlp.experts.up_proj.weight,
-language_model.model.layers.22.mlp.experts.down_proj.biases,
-language_model.model.layers.22.mlp.experts.down_proj.scales,
-language_model.model.layers.22.mlp.experts.down_proj.weight,
-language_model.model.layers.22.mlp.experts.gate_proj.biases,
-language_model.model.layers.22.mlp.experts.gate_proj.scales,
-language_model.model.layers.22.mlp.experts.gate_proj.weight,
-language_model.model.layers.22.mlp.experts.up_proj.biases,
-language_model.model.layers.22.mlp.experts.up_proj.scales,
-language_model.model.layers.22.mlp.experts.up_proj.weight,
-language_model.model.layers.23.mlp.experts.down_proj.biases,
-language_model.model.layers.23.mlp.experts.down_proj.scales,
-language_model.model.layers.23.mlp.experts.down_proj.weight,
-language_model.model.layers.23.mlp.experts.gate_proj.biases,
-language_model.model.layers.23.mlp.experts.gate_proj.scales,
-language_model.model.layers.23.mlp.experts.gate_proj.weight,
-language_model.model.layers.23.mlp.experts.up_proj.biases,
-language_model.model.layers.23.mlp.experts.up_proj.scales,
-language_model.model.layers.23.mlp.experts.up_proj.weight,
-language_model.model.layers.24.mlp.experts.down_proj.biases,
-language_model.model.layers.24.mlp.experts.down_proj.scales,
-language_model.model.layers.24.mlp.experts.down_proj.weight,
-language_model.model.layers.24.mlp.experts.gate_proj.biases,
-language_model.model.layers.24.mlp.experts.gate_proj.scales,
-language_model.model.layers.24.mlp.experts.gate_proj.weight,
-language_model.model.layers.24.mlp.experts.up_proj.biases,
-language_model.model.layers.24.mlp.experts.up_proj.scales,
-language_model.model.layers.24.mlp.experts.up_proj.weight,
-language_model.model.layers.25.mlp.experts.down_proj.biases,
-language_model.model.layers.25.mlp.experts.down_proj.scales,
-language_model.model.layers.25.mlp.experts.down_proj.weight,
-language_model.model.layers.25.mlp.experts.gate_proj.biases,
-language_model.model.layers.25.mlp.experts.gate_proj.scales,
-language_model.model.layers.25.mlp.experts.gate_proj.weight,
-language_model.model.layers.25.mlp.experts.up_proj.biases,
-language_model.model.layers.25.mlp.experts.up_proj.scales,
-language_model.model.layers.25.mlp.experts.up_proj.weight,
-language_model.model.layers.26.mlp.experts.down_proj.biases,
-language_model.model.layers.26.mlp.experts.down_proj.scales,
-language_model.model.layers.26.mlp.experts.down_proj.weight,
-language_model.model.layers.26.mlp.experts.gate_proj.biases,
-language_model.model.layers.26.mlp.experts.gate_proj.scales,
-language_model.model.layers.26.mlp.experts.gate_proj.weight,
-language_model.model.layers.26.mlp.experts.up_proj.biases,
-language_model.model.layers.26.mlp.experts.up_proj.scales,
-language_model.model.layers.26.mlp.experts.up_proj.weight,
-language_model.model.layers.27.mlp.experts.down_proj.biases,
-language_model.model.layers.27.mlp.experts.down_proj.scales,
-language_model.model.layers.27.mlp.experts.down_proj.weight,
-language_model.model.layers.27.mlp.experts.gate_proj.biases,
-language_model.model.layers.27.mlp.experts.gate_proj.scales,
-language_model.model.layers.27.mlp.experts.gate_proj.weight,
-language_model.model.layers.27.mlp.experts.up_proj.biases,
-language_model.model.layers.27.mlp.experts.up_proj.scales,
-language_model.model.layers.27.mlp.experts.up_proj.weight,
-language_model.model.layers.28.mlp.experts.down_proj.biases,
-language_model.model.layers.28.mlp.experts.down_proj.scales,
-language_model.model.layers.28.mlp.experts.down_proj.weight,
-language_model.model.layers.28.mlp.experts.gate_proj.biases,
-language_model.model.layers.28.mlp.experts.gate_proj.scales,
-language_model.model.layers.28.mlp.experts.gate_proj.weight,
-language_model.model.layers.28.mlp.experts.up_proj.biases,
-language_model.model.layers.28.mlp.experts.up_proj.scales,
-language_model.model.layers.28.mlp.experts.up_proj.weight,
-language_model.model.layers.29.mlp.experts.down_proj.biases,
-language_model.model.layers.29.mlp.experts.down_proj.scales,
-language_model.model.layers.29.mlp.experts.down_proj.weight,
-language_model.model.layers.29.mlp.experts.gate_proj.biases,
-language_model.model.layers.29.mlp.experts.gate_proj.scales,
-language_model.model.layers.29.mlp.experts.gate_proj.weight,
-language_model.model.layers.29.mlp.experts.up_proj.biases,
-language_model.model.layers.29.mlp.experts.up_proj.scales,
-language_model.model.layers.29.mlp.experts.up_proj.weight,
-language_model.model.layers.3.mlp.experts.down_proj.biases,
-language_model.model.layers.3.mlp.experts.down_proj.scales,
-language_model.model.layers.3.mlp.experts.down_proj.weight,
-language_model.model.layers.3.mlp.experts.gate_proj.biases,
-language_model.model.layers.3.mlp.experts.gate_proj.scales,
-language_model.model.layers.3.mlp.experts.gate_proj.weight,
-language_model.model.layers.3.mlp.experts.up_proj.biases,
-language_model.model.layers.3.mlp.experts.up_proj.scales,
-language_model.model.layers.3.mlp.experts.up_proj.weight,
-language_model.model.layers.30.mlp.experts.down_proj.biases,
-language_model.model.layers.30.mlp.experts.down_proj.scales,
-language_model.model.layers.30.mlp.experts.down_proj.weight,
-language_model.model.layers.30.mlp.experts.gate_proj.biases,
-language_model.model.layers.30.mlp.experts.gate_proj.scales,
-language_model.model.layers.30.mlp.experts.gate_proj.weight,
-language_model.model.layers.30.mlp.experts.up_proj.biases,
-language_model.model.layers.30.mlp.experts.up_proj.scales,
-language_model.model.layers.30.mlp.experts.up_proj.weight,
-language_model.model.layers.31.mlp.experts.down_proj.biases,
-language_model.model.layers.31.mlp.experts.down_proj.scales,
-language_model.model.layers.31.mlp.experts.down_proj.weight,
-language_model.model.layers.31.mlp.experts.gate_proj.biases,
-language_model.model.layers.31.mlp.experts.gate_proj.scales,
-language_model.model.layers.31.mlp.experts.gate_proj.weight,
-language_model.model.layers.31.mlp.experts.up_proj.biases,
-language_model.model.layers.31.mlp.experts.up_proj.scales,
-language_model.model.layers.31.mlp.experts.up_proj.weight,
-language_model.model.layers.32.mlp.experts.down_proj.biases,
-language_model.model.layers.32.mlp.experts.down_proj.scales,
-language_model.model.layers.32.mlp.experts.down_proj.weight,
-language_model.model.layers.32.mlp.experts.gate_proj.biases,
-language_model.model.layers.32.mlp.experts.gate_proj.scales,
-language_model.model.layers.32.mlp.experts.gate_proj.weight,
-language_model.model.layers.32.mlp.experts.up_proj.biases,
-language_model.model.layers.32.mlp.experts.up_proj.scales,
-language_model.model.layers.32.mlp.experts.up_proj.weight,
-language_model.model.layers.33.mlp.experts.down_proj.biases,
-language_model.model.layers.33.mlp.experts.down_proj.scales,
-language_model.model.layers.33.mlp.experts.down_proj.weight,
-language_model.model.layers.33.mlp.experts.gate_proj.biases,
-language_model.model.layers.33.mlp.experts.gate_proj.scales,
-language_model.model.layers.33.mlp.experts.gate_proj.weight,
-language_model.model.layers.33.mlp.experts.up_proj.biases,
-language_model.model.layers.33.mlp.experts.up_proj.scales,
-language_model.model.layers.33.mlp.experts.up_proj.weight,
-language_model.model.layers.34.mlp.experts.down_proj.biases,
-language_model.model.layers.34.mlp.experts.down_proj.scales,
-language_model.model.layers.34.mlp.experts.down_proj.weight,
-language_model.model.layers.34.mlp.experts.gate_proj.biases,
-language_model.model.layers.34.mlp.experts.gate_proj.scales,
-language_model.model.layers.34.mlp.experts.gate_proj.weight,
-language_model.model.layers.34.mlp.experts.up_proj.biases,
-language_model.model.layers.34.mlp.experts.up_proj.scales,
-language_model.model.layers.34.mlp.experts.up_proj.weight,
-language_model.model.layers.35.mlp.experts.down_proj.biases,
-language_model.model.layers.35.mlp.experts.down_proj.scales,
-language_model.model.layers.35.mlp.experts.down_proj.weight,
-language_model.model.layers.35.mlp.experts.gate_proj.biases,
-language_model.model.layers.35.mlp.experts.gate_proj.scales,
-language_model.model.layers.35.mlp.experts.gate_proj.weight,
-language_model.model.layers.35.mlp.experts.up_proj.biases,
-language_model.model.layers.35.mlp.experts.up_proj.scales,
-language_model.model.layers.35.mlp.experts.up_proj.weight,
-language_model.model.layers.36.mlp.experts.down_proj.biases,
-language_model.model.layers.36.mlp.experts.down_proj.scales,
-language_model.model.layers.36.mlp.experts.down_proj.weight,
-language_model.model.layers.36.mlp.experts.gate_proj.biases,
-language_model.model.layers.36.mlp.experts.gate_proj.scales,
-language_model.model.layers.36.mlp.experts.gate_proj.weight,
-language_model.model.layers.36.mlp.experts.up_proj.biases,
-language_model.model.layers.36.mlp.experts.up_proj.scales,
-language_model.model.layers.36.mlp.experts.up_proj.weight,
-language_model.model.layers.37.mlp.experts.down_proj.biases,
-language_model.model.layers.37.mlp.experts.down_proj.scales,
-language_model.model.layers.37.mlp.experts.down_proj.weight,
-language_model.model.layers.37.mlp.experts.gate_proj.biases,
-language_model.model.layers.37.mlp.experts.gate_proj.scales,
-language_model.model.layers.37.mlp.experts.gate_proj.weight,
-language_model.model.layers.37.mlp.experts.up_proj.biases,
-language_model.model.layers.37.mlp.experts.up_proj.scales,
-language_model.model.layers.37.mlp.experts.up_proj.weight,
-language_model.model.layers.38.mlp.experts.down_proj.biases,
-language_model.model.layers.38.mlp.experts.down_proj.scales,
-language_model.model.layers.38.mlp.experts.down_proj.weight,
-language_model.model.layers.38.mlp.experts.gate_proj.biases,
-language_model.model.layers.38.mlp.experts.gate_proj.scales,
-language_model.model.layers.38.mlp.experts.gate_proj.weight,
-language_model.model.layers.38.mlp.experts.up_proj.biases,
-language_model.model.layers.38.mlp.experts.up_proj.scales,
-language_model.model.layers.38.mlp.experts.up_proj.weight,
-language_model.model.layers.39.mlp.experts.down_proj.biases,
-language_model.model.layers.39.mlp.experts.down_proj.scales,
-language_model.model.layers.39.mlp.experts.down_proj.weight,
-language_model.model.layers.39.mlp.experts.gate_proj.biases,
-language_model.model.layers.39.mlp.experts.gate_proj.scales,
-language_model.model.layers.39.mlp.experts.gate_proj.weight,
-language_model.model.layers.39.mlp.experts.up_proj.biases,
-language_model.model.layers.39.mlp.experts.up_proj.scales,
-language_model.model.layers.39.mlp.experts.up_proj.weight,
-language_model.model.layers.4.mlp.experts.down_proj.biases,
-language_model.model.layers.4.mlp.experts.down_proj.scales,
-language_model.model.layers.4.mlp.experts.down_proj.weight,
-language_model.model.layers.4.mlp.experts.gate_proj.biases,
-language_model.model.layers.4.mlp.experts.gate_proj.scales,
-language_model.model.layers.4.mlp.experts.gate_proj.weight,
-language_model.model.layers.4.mlp.experts.up_proj.biases,
-language_model.model.layers.4.mlp.experts.up_proj.scales,
-language_model.model.layers.4.mlp.experts.up_proj.weight,
-language_model.model.layers.40.mlp.experts.down_proj.biases,
-language_model.model.layers.40.mlp.experts.down_proj.scales,
-language_model.model.layers.40.mlp.experts.down_proj.weight,
-language_model.model.layers.40.mlp.experts.gate_proj.biases,
-language_model.model.layers.40.mlp.experts.gate_proj.scales,
-language_model.model.layers.40.mlp.experts.gate_proj.weight,
-language_model.model.layers.40.mlp.experts.up_proj.biases,
-language_model.model.layers.40.mlp.experts.up_proj.scales,
-language_model.model.layers.40.mlp.experts.up_proj.weight,
-language_model.model.layers.41.mlp.experts.down_proj.biases,
-language_model.model.layers.41.mlp.experts.down_proj.scales,
-language_model.model.layers.41.mlp.experts.down_proj.weight,
-language_model.model.layers.41.mlp.experts.gate_proj.biases,
-language_model.model.layers.41.mlp.experts.gate_proj.scales,
-language_model.model.layers.41.mlp.experts.gate_proj.weight,
-language_model.model.layers.41.mlp.experts.up_proj.biases,
-language_model.model.layers.41.mlp.experts.up_proj.scales,
-language_model.model.layers.41.mlp.experts.up_proj.weight,
-language_model.model.layers.5.mlp.experts.down_proj.biases,
-language_model.model.layers.5.mlp.experts.down_proj.scales,
-language_model.model.layers.5.mlp.experts.down_proj.weight,
-language_model.model.layers.5.mlp.experts.gate_proj.biases,
-language_model.model.layers.5.mlp.experts.gate_proj.scales,
-language_model.model.layers.5.mlp.experts.gate_proj.weight,
-language_model.model.layers.5.mlp.experts.up_proj.biases,
-language_model.model.layers.5.mlp.experts.up_proj.scales,
-language_model.model.layers.5.mlp.experts.up_proj.weight,
-language_model.model.layers.6.mlp.experts.down_proj.biases,
-language_model.model.layers.6.mlp.experts.down_proj.scales,
-language_model.model.layers.6.mlp.experts.down_proj.weight,
-language_model.model.layers.6.mlp.experts.gate_proj.biases,
-language_model.model.layers.6.mlp.experts.gate_proj.scales,
-language_model.model.layers.6.mlp.experts.gate_proj.weight,
-language_model.model.layers.6.mlp.experts.up_proj.biases,
-language_model.model.layers.6.mlp.experts.up_proj.scales,
-language_model.model.layers.6.mlp.experts.up_proj.weight,
-language_model.model.layers.7.mlp.experts.down_proj.biases,
-language_model.model.layers.7.mlp.experts.down_proj.scales,
-language_model.model.layers.7.mlp.experts.down_proj.weight,
-language_model.model.layers.7.mlp.experts.gate_proj.biases,
-language_model.model.layers.7.mlp.experts.gate_proj.scales,
-language_model.model.layers.7.mlp.experts.gate_proj.weight,
-language_model.model.layers.7.mlp.experts.up_proj.biases,
-language_model.model.layers.7.mlp.experts.up_proj.scales,
-language_model.model.layers.7.mlp.experts.up_proj.weight,
-language_model.model.layers.8.mlp.experts.down_proj.biases,
-language_model.model.layers.8.mlp.experts.down_proj.scales,
-language_model.model.layers.8.mlp.experts.down_proj.weight,
-language_model.model.layers.8.mlp.experts.gate_proj.biases,
-language_model.model.layers.8.mlp.experts.gate_proj.scales,
-language_model.model.layers.8.mlp.experts.gate_proj.weight,
-language_model.model.layers.8.mlp.experts.up_proj.biases,
-language_model.model.layers.8.mlp.experts.up_proj.scales,
-language_model.model.layers.8.mlp.experts.up_proj.weight,
-language_model.model.layers.9.mlp.experts.down_proj.biases,
-language_model.model.layers.9.mlp.experts.down_proj.scales,
-language_model.model.layers.9.mlp.experts.down_proj.weight,
-language_model.model.layers.9.mlp.experts.gate_proj.biases,
-language_model.model.layers.9.mlp.experts.gate_proj.scales,
-language_model.model.layers.9.mlp.experts.gate_proj.weight,
-language_model.model.layers.9.mlp.experts.up_proj.biases,
-language_model.model.layers.9.mlp.experts.up_proj.scales,
-language_model.model.layers.9.mlp.experts.up_proj.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12536, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12123, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 362 parameters not in model: 
-audio_tower.encoder.biases,
-audio_tower.encoder.scales,
-language_model.model.layers.10.mlp.experts.down_proj.biases,
-language_model.model.layers.10.mlp.experts.down_proj.scales,
-language_model.model.layers.10.mlp.experts.down_proj.weight,
-language_model.model.layers.10.mlp.experts.gate_proj.biases,
-language_model.model.layers.10.mlp.experts.gate_proj.scales,
-language_model.model.layers.10.mlp.experts.gate_proj.weight,
-language_model.model.layers.10.mlp.experts.up_proj.biases,
-language_model.model.layers.10.mlp.experts.up_proj.scales,
-language_model.model.layers.10.mlp.experts.up_proj.weight,
-language_model.model.layers.11.mlp.experts.down_proj.biases,
-language_model.model.layers.11.mlp.experts.down_proj.scales,
-language_model.model.layers.11.mlp.experts.down_proj.weight,
-language_model.model.layers.11.mlp.experts.gate_proj.biases,
-language_model.model.layers.11.mlp.experts.gate_proj.scales,
-language_model.model.layers.11.mlp.experts.gate_proj.weight,
-language_model.model.layers.11.mlp.experts.up_proj.biases,
-language_model.model.layers.11.mlp.experts.up_proj.scales,
-language_model.model.layers.11.mlp.experts.up_proj.weight,
-language_model.model.layers.12.mlp.experts.down_proj.biases,
-language_model.model.layers.12.mlp.experts.down_proj.scales,
-language_model.model.layers.12.mlp.experts.down_proj.weight,
-language_model.model.layers.12.mlp.experts.gate_proj.biases,
-language_model.model.layers.12.mlp.experts.gate_proj.scales,
-language_model.model.layers.12.mlp.experts.gate_proj.weight,
-language_model.model.layers.12.mlp.experts.up_proj.biases,
-language_model.model.layers.12.mlp.experts.up_proj.scales,
-language_model.model.layers.12.mlp.experts.up_proj.weight,
-language_model.model.layers.13.mlp.experts.down_proj.biases,
-language_model.model.layers.13.mlp.experts.down_proj.scales,
-language_model.model.layers.13.mlp.experts.down_proj.weight,
-language_model.model.layers.13.mlp.experts.gate_proj.biases,
-language_model.model.layers.13.mlp.experts.gate_proj.scales,
-language_model.model.layers.13.mlp.experts.gate_proj.weight,
-language_model.model.layers.13.mlp.experts.up_proj.biases,
-language_model.model.layers.13.mlp.experts.up_proj.scales,
-language_model.model.layers.13.mlp.experts.up_proj.weight,
-language_model.model.layers.14.mlp.experts.down_proj.biases,
-language_model.model.layers.14.mlp.experts.down_proj.scales,
-language_model.model.layers.14.mlp.experts.down_proj.weight,
-language_model.model.layers.14.mlp.experts.gate_proj.biases,
-language_model.model.layers.14.mlp.experts.gate_proj.scales,
-language_model.model.layers.14.mlp.experts.gate_proj.weight,
-language_model.model.layers.14.mlp.experts.up_proj.biases,
-language_model.model.layers.14.mlp.experts.up_proj.scales,
-language_model.model.layers.14.mlp.experts.up_proj.weight,
-language_model.model.layers.15.mlp.experts.down_proj.biases,
-language_model.model.layers.15.mlp.experts.down_proj.scales,
-language_model.model.layers.15.mlp.experts.down_proj.weight,
-language_model.model.layers.15.mlp.experts.gate_proj.biases,
-language_model.model.layers.15.mlp.experts.gate_proj.scales,
-language_model.model.layers.15.mlp.experts.gate_proj.weight,
-language_model.model.layers.15.mlp.experts.up_proj.biases,
-language_model.model.layers.15.mlp.experts.up_proj.scales,
-language_model.model.layers.15.mlp.experts.up_proj.weight,
-language_model.model.layers.16.mlp.experts.down_proj.biases,
-language_model.model.layers.16.mlp.experts.down_proj.scales,
-language_model.model.layers.16.mlp.experts.down_proj.weight,
-language_model.model.layers.16.mlp.experts.gate_proj.biases,
-language_model.model.layers.16.mlp.experts.gate_proj.scales,
-language_model.model.layers.16.mlp.experts.gate_proj.weight,
-language_model.model.layers.16.mlp.experts.up_proj.biases,
-language_model.model.layers.16.mlp.experts.up_proj.scales,
-language_model.model.layers.16.mlp.experts.up_proj.weight,
-language_model.model.layers.17.mlp.experts.down_proj.biases,
-language_model.model.layers.17.mlp.experts.down_proj.scales,
-language_model.model.layers.17.mlp.experts.down_proj.weight,
-language_model.model.layers.17.mlp.experts.gate_proj.biases,
-language_model.model.layers.17.mlp.experts.gate_proj.scales,
-language_model.model.layers.17.mlp.experts.gate_proj.weight,
-language_model.model.layers.17.mlp.experts.up_proj.biases,
-language_model.model.layers.17.mlp.experts.up_proj.scales,
-language_model.model.layers.17.mlp.experts.up_proj.weight,
-language_model.model.layers.18.mlp.experts.down_proj.biases,
-language_model.model.layers.18.mlp.experts.down_proj.scales,
-language_model.model.layers.18.mlp.experts.down_proj.weight,
-language_model.model.layers.18.mlp.experts.gate_proj.biases,
-language_model.model.layers.18.mlp.experts.gate_proj.scales,
-language_model.model.layers.18.mlp.experts.gate_proj.weight,
-language_model.model.layers.18.mlp.experts.up_proj.biases,
-language_model.model.layers.18.mlp.experts.up_proj.scales,
-language_model.model.layers.18.mlp.experts.up_proj.weight,
-language_model.model.layers.19.mlp.experts.down_proj.biases,
-language_model.model.layers.19.mlp.experts.down_proj.scales,
-language_model.model.layers.19.mlp.experts.down_proj.weight,
-language_model.model.layers.19.mlp.experts.gate_proj.biases,
-language_model.model.layers.19.mlp.experts.gate_proj.scales,
-language_model.model.layers.19.mlp.experts.gate_proj.weight,
-language_model.model.layers.19.mlp.experts.up_proj.biases,
-language_model.model.layers.19.mlp.experts.up_proj.scales,
-language_model.model.layers.19.mlp.experts.up_proj.weight,
-language_model.model.layers.2.mlp.experts.down_proj.biases,
-language_model.model.layers.2.mlp.experts.down_proj.scales,
-language_model.model.layers.2.mlp.experts.down_proj.weight,
-language_model.model.layers.2.mlp.experts.gate_proj.biases,
-language_model.model.layers.2.mlp.experts.gate_proj.scales,
-language_model.model.layers.2.mlp.experts.gate_proj.weight,
-language_model.model.layers.2.mlp.experts.up_proj.biases,
-language_model.model.layers.2.mlp.experts.up_proj.scales,
-language_model.model.layers.2.mlp.experts.up_proj.weight,
-language_model.model.layers.20.mlp.experts.down_proj.biases,
-language_model.model.layers.20.mlp.experts.down_proj.scales,
-language_model.model.layers.20.mlp.experts.down_proj.weight,
-language_model.model.layers.20.mlp.experts.gate_proj.biases,
-language_model.model.layers.20.mlp.experts.gate_proj.scales,
-language_model.model.layers.20.mlp.experts.gate_proj.weight,
-language_model.model.layers.20.mlp.experts.up_proj.biases,
-language_model.model.layers.20.mlp.experts.up_proj.scales,
-language_model.model.layers.20.mlp.experts.up_proj.weight,
-language_model.model.layers.21.mlp.experts.down_proj.biases,
-language_model.model.layers.21.mlp.experts.down_proj.scales,
-language_model.model.layers.21.mlp.experts.down_proj.weight,
-language_model.model.layers.21.mlp.experts.gate_proj.biases,
-language_model.model.layers.21.mlp.experts.gate_proj.scales,
-language_model.model.layers.21.mlp.experts.gate_proj.weight,
-language_model.model.layers.21.mlp.experts.up_proj.biases,
-language_model.model.layers.21.mlp.experts.up_proj.scales,
-language_model.model.layers.21.mlp.experts.up_proj.weight,
-language_model.model.layers.22.mlp.experts.down_proj.biases,
-language_model.model.layers.22.mlp.experts.down_proj.scales,
-language_model.model.layers.22.mlp.experts.down_proj.weight,
-language_model.model.layers.22.mlp.experts.gate_proj.biases,
-language_model.model.layers.22.mlp.experts.gate_proj.scales,
-language_model.model.layers.22.mlp.experts.gate_proj.weight,
-language_model.model.layers.22.mlp.experts.up_proj.biases,
-language_model.model.layers.22.mlp.experts.up_proj.scales,
-language_model.model.layers.22.mlp.experts.up_proj.weight,
-language_model.model.layers.23.mlp.experts.down_proj.biases,
-language_model.model.layers.23.mlp.experts.down_proj.scales,
-language_model.model.layers.23.mlp.experts.down_proj.weight,
-language_model.model.layers.23.mlp.experts.gate_proj.biases,
-language_model.model.layers.23.mlp.experts.gate_proj.scales,
-language_model.model.layers.23.mlp.experts.gate_proj.weight,
-language_model.model.layers.23.mlp.experts.up_proj.biases,
-language_model.model.layers.23.mlp.experts.up_proj.scales,
-language_model.model.layers.23.mlp.experts.up_proj.weight,
-language_model.model.layers.24.mlp.experts.down_proj.biases,
-language_model.model.layers.24.mlp.experts.down_proj.scales,
-language_model.model.layers.24.mlp.experts.down_proj.weight,
-language_model.model.layers.24.mlp.experts.gate_proj.biases,
-language_model.model.layers.24.mlp.experts.gate_proj.scales,
-language_model.model.layers.24.mlp.experts.gate_proj.weight,
-language_model.model.layers.24.mlp.experts.up_proj.biases,
-language_model.model.layers.24.mlp.experts.up_proj.scales,
-language_model.model.layers.24.mlp.experts.up_proj.weight,
-language_model.model.layers.25.mlp.experts.down_proj.biases,
-language_model.model.layers.25.mlp.experts.down_proj.scales,
-language_model.model.layers.25.mlp.experts.down_proj.weight,
-language_model.model.layers.25.mlp.experts.gate_proj.biases,
-language_model.model.layers.25.mlp.experts.gate_proj.scales,
-language_model.model.layers.25.mlp.experts.gate_proj.weight,
-language_model.model.layers.25.mlp.experts.up_proj.biases,
-language_model.model.layers.25.mlp.experts.up_proj.scales,
-language_model.model.layers.25.mlp.experts.up_proj.weight,
-language_model.model.layers.26.mlp.experts.down_proj.biases,
-language_model.model.layers.26.mlp.experts.down_proj.scales,
-language_model.model.layers.26.mlp.experts.down_proj.weight,
-language_model.model.layers.26.mlp.experts.gate_proj.biases,
-language_model.model.layers.26.mlp.experts.gate_proj.scales,
-language_model.model.layers.26.mlp.experts.gate_proj.weight,
-language_model.model.layers.26.mlp.experts.up_proj.biases,
-language_model.model.layers.26.mlp.experts.up_proj.scales,
-language_model.model.layers.26.mlp.experts.up_proj.weight,
-language_model.model.layers.27.mlp.experts.down_proj.biases,
-language_model.model.layers.27.mlp.experts.down_proj.scales,
-language_model.model.layers.27.mlp.experts.down_proj.weight,
-language_model.model.layers.27.mlp.experts.gate_proj.biases,
-language_model.model.layers.27.mlp.experts.gate_proj.scales,
-language_model.model.layers.27.mlp.experts.gate_proj.weight,
-language_model.model.layers.27.mlp.experts.up_proj.biases,
-language_model.model.layers.27.mlp.experts.up_proj.scales,
-language_model.model.layers.27.mlp.experts.up_proj.weight,
-language_model.model.layers.28.mlp.experts.down_proj.biases,
-language_model.model.layers.28.mlp.experts.down_proj.scales,
-language_model.model.layers.28.mlp.experts.down_proj.weight,
-language_model.model.layers.28.mlp.experts.gate_proj.biases,
-language_model.model.layers.28.mlp.experts.gate_proj.scales,
-language_model.model.layers.28.mlp.experts.gate_proj.weight,
-language_model.model.layers.28.mlp.experts.up_proj.biases,
-language_model.model.layers.28.mlp.experts.up_proj.scales,
-language_model.model.layers.28.mlp.experts.up_proj.weight,
-language_model.model.layers.29.mlp.experts.down_proj.biases,
-language_model.model.layers.29.mlp.experts.down_proj.scales,
-language_model.model.layers.29.mlp.experts.down_proj.weight,
-language_model.model.layers.29.mlp.experts.gate_proj.biases,
-language_model.model.layers.29.mlp.experts.gate_proj.scales,
-language_model.model.layers.29.mlp.experts.gate_proj.weight,
-language_model.model.layers.29.mlp.experts.up_proj.biases,
-language_model.model.layers.29.mlp.experts.up_proj.scales,
-language_model.model.layers.29.mlp.experts.up_proj.weight,
-language_model.model.layers.3.mlp.experts.down_proj.biases,
-language_model.model.layers.3.mlp.experts.down_proj.scales,
-language_model.model.layers.3.mlp.experts.down_proj.weight,
-language_model.model.layers.3.mlp.experts.gate_proj.biases,
-language_model.model.layers.3.mlp.experts.gate_proj.scales,
-language_model.model.layers.3.mlp.experts.gate_proj.weight,
-language_model.model.layers.3.mlp.experts.up_proj.biases,
-language_model.model.layers.3.mlp.experts.up_proj.scales,
-language_model.model.layers.3.mlp.experts.up_proj.weight,
-language_model.model.layers.30.mlp.experts.down_proj.biases,
-language_model.model.layers.30.mlp.experts.down_proj.scales,
-language_model.model.layers.30.mlp.experts.down_proj.weight,
-language_model.model.layers.30.mlp.experts.gate_proj.biases,
-language_model.model.layers.30.mlp.experts.gate_proj.scales,
-language_model.model.layers.30.mlp.experts.gate_proj.weight,
-language_model.model.layers.30.mlp.experts.up_proj.biases,
-language_model.model.layers.30.mlp.experts.up_proj.scales,
-language_model.model.layers.30.mlp.experts.up_proj.weight,
-language_model.model.layers.31.mlp.experts.down_proj.biases,
-language_model.model.layers.31.mlp.experts.down_proj.scales,
-language_model.model.layers.31.mlp.experts.down_proj.weight,
-language_model.model.layers.31.mlp.experts.gate_proj.biases,
-language_model.model.layers.31.mlp.experts.gate_proj.scales,
-language_model.model.layers.31.mlp.experts.gate_proj.weight,
-language_model.model.layers.31.mlp.experts.up_proj.biases,
-language_model.model.layers.31.mlp.experts.up_proj.scales,
-language_model.model.layers.31.mlp.experts.up_proj.weight,
-language_model.model.layers.32.mlp.experts.down_proj.biases,
-language_model.model.layers.32.mlp.experts.down_proj.scales,
-language_model.model.layers.32.mlp.experts.down_proj.weight,
-language_model.model.layers.32.mlp.experts.gate_proj.biases,
-language_model.model.layers.32.mlp.experts.gate_proj.scales,
-language_model.model.layers.32.mlp.experts.gate_proj.weight,
-language_model.model.layers.32.mlp.experts.up_proj.biases,
-language_model.model.layers.32.mlp.experts.up_proj.scales,
-language_model.model.layers.32.mlp.experts.up_proj.weight,
-language_model.model.layers.33.mlp.experts.down_proj.biases,
-language_model.model.layers.33.mlp.experts.down_proj.scales,
-language_model.model.layers.33.mlp.experts.down_proj.weight,
-language_model.model.layers.33.mlp.experts.gate_proj.biases,
-language_model.model.layers.33.mlp.experts.gate_proj.scales,
-language_model.model.layers.33.mlp.experts.gate_proj.weight,
-language_model.model.layers.33.mlp.experts.up_proj.biases,
-language_model.model.layers.33.mlp.experts.up_proj.scales,
-language_model.model.layers.33.mlp.experts.up_proj.weight,
-language_model.model.layers.34.mlp.experts.down_proj.biases,
-language_model.model.layers.34.mlp.experts.down_proj.scales,
-language_model.model.layers.34.mlp.experts.down_proj.weight,
-language_model.model.layers.34.mlp.experts.gate_proj.biases,
-language_model.model.layers.34.mlp.experts.gate_proj.scales,
-language_model.model.layers.34.mlp.experts.gate_proj.weight,
-language_model.model.layers.34.mlp.experts.up_proj.biases,
-language_model.model.layers.34.mlp.experts.up_proj.scales,
-language_model.model.layers.34.mlp.experts.up_proj.weight,
-language_model.model.layers.35.mlp.experts.down_proj.biases,
-language_model.model.layers.35.mlp.experts.down_proj.scales,
-language_model.model.layers.35.mlp.experts.down_proj.weight,
-language_model.model.layers.35.mlp.experts.gate_proj.biases,
-language_model.model.layers.35.mlp.experts.gate_proj.scales,
-language_model.model.layers.35.mlp.experts.gate_proj.weight,
-language_model.model.layers.35.mlp.experts.up_proj.biases,
-language_model.model.layers.35.mlp.experts.up_proj.scales,
-language_model.model.layers.35.mlp.experts.up_proj.weight,
-language_model.model.layers.36.mlp.experts.down_proj.biases,
-language_model.model.layers.36.mlp.experts.down_proj.scales,
-language_model.model.layers.36.mlp.experts.down_proj.weight,
-language_model.model.layers.36.mlp.experts.gate_proj.biases,
-language_model.model.layers.36.mlp.experts.gate_proj.scales,
-language_model.model.layers.36.mlp.experts.gate_proj.weight,
-language_model.model.layers.36.mlp.experts.up_proj.biases,
-language_model.model.layers.36.mlp.experts.up_proj.scales,
-language_model.model.layers.36.mlp.experts.up_proj.weight,
-language_model.model.layers.37.mlp.experts.down_proj.biases,
-language_model.model.layers.37.mlp.experts.down_proj.scales,
-language_model.model.layers.37.mlp.experts.down_proj.weight,
-language_model.model.layers.37.mlp.experts.gate_proj.biases,
-language_model.model.layers.37.mlp.experts.gate_proj.scales,
-language_model.model.layers.37.mlp.experts.gate_proj.weight,
-language_model.model.layers.37.mlp.experts.up_proj.biases,
-language_model.model.layers.37.mlp.experts.up_proj.scales,
-language_model.model.layers.37.mlp.experts.up_proj.weight,
-language_model.model.layers.38.mlp.experts.down_proj.biases,
-language_model.model.layers.38.mlp.experts.down_proj.scales,
-language_model.model.layers.38.mlp.experts.down_proj.weight,
-language_model.model.layers.38.mlp.experts.gate_proj.biases,
-language_model.model.layers.38.mlp.experts.gate_proj.scales,
-language_model.model.layers.38.mlp.experts.gate_proj.weight,
-language_model.model.layers.38.mlp.experts.up_proj.biases,
-language_model.model.layers.38.mlp.experts.up_proj.scales,
-language_model.model.layers.38.mlp.experts.up_proj.weight,
-language_model.model.layers.39.mlp.experts.down_proj.biases,
-language_model.model.layers.39.mlp.experts.down_proj.scales,
-language_model.model.layers.39.mlp.experts.down_proj.weight,
-language_model.model.layers.39.mlp.experts.gate_proj.biases,
-language_model.model.layers.39.mlp.experts.gate_proj.scales,
-language_model.model.layers.39.mlp.experts.gate_proj.weight,
-language_model.model.layers.39.mlp.experts.up_proj.biases,
-language_model.model.layers.39.mlp.experts.up_proj.scales,
-language_model.model.layers.39.mlp.experts.up_proj.weight,
-language_model.model.layers.4.mlp.experts.down_proj.biases,
-language_model.model.layers.4.mlp.experts.down_proj.scales,
-language_model.model.layers.4.mlp.experts.down_proj.weight,
-language_model.model.layers.4.mlp.experts.gate_proj.biases,
-language_model.model.layers.4.mlp.experts.gate_proj.scales,
-language_model.model.layers.4.mlp.experts.gate_proj.weight,
-language_model.model.layers.4.mlp.experts.up_proj.biases,
-language_model.model.layers.4.mlp.experts.up_proj.scales,
-language_model.model.layers.4.mlp.experts.up_proj.weight,
-language_model.model.layers.40.mlp.experts.down_proj.biases,
-language_model.model.layers.40.mlp.experts.down_proj.scales,
-language_model.model.layers.40.mlp.experts.down_proj.weight,
-language_model.model.layers.40.mlp.experts.gate_proj.biases,
-language_model.model.layers.40.mlp.experts.gate_proj.scales,
-language_model.model.layers.40.mlp.experts.gate_proj.weight,
-language_model.model.layers.40.mlp.experts.up_proj.biases,
-language_model.model.layers.40.mlp.experts.up_proj.scales,
-language_model.model.layers.40.mlp.experts.up_proj.weight,
-language_model.model.layers.41.mlp.experts.down_proj.biases,
-language_model.model.layers.41.mlp.experts.down_proj.scales,
-language_model.model.layers.41.mlp.experts.down_proj.weight,
-language_model.model.layers.41.mlp.experts.gate_proj.biases,
-language_model.model.layers.41.mlp.experts.gate_proj.scales,
-language_model.model.layers.41.mlp.experts.gate_proj.weight,
-language_model.model.layers.41.mlp.experts.up_proj.biases,
-language_model.model.layers.41.mlp.experts.up_proj.scales,
-language_model.model.layers.41.mlp.experts.up_proj.weight,
-language_model.model.layers.5.mlp.experts.down_proj.biases,
-language_model.model.layers.5.mlp.experts.down_proj.scales,
-language_model.model.layers.5.mlp.experts.down_proj.weight,
-language_model.model.layers.5.mlp.experts.gate_proj.biases,
-language_model.model.layers.5.mlp.experts.gate_proj.scales,
-language_model.model.layers.5.mlp.experts.gate_proj.weight,
-language_model.model.layers.5.mlp.experts.up_proj.biases,
-language_model.model.layers.5.mlp.experts.up_proj.scales,
-language_model.model.layers.5.mlp.experts.up_proj.weight,
-language_model.model.layers.6.mlp.experts.down_proj.biases,
-language_model.model.layers.6.mlp.experts.down_proj.scales,
-language_model.model.layers.6.mlp.experts.down_proj.weight,
-language_model.model.layers.6.mlp.experts.gate_proj.biases,
-language_model.model.layers.6.mlp.experts.gate_proj.scales,
-language_model.model.layers.6.mlp.experts.gate_proj.weight,
-language_model.model.layers.6.mlp.experts.up_proj.biases,
-language_model.model.layers.6.mlp.experts.up_proj.scales,
-language_model.model.layers.6.mlp.experts.up_proj.weight,
-language_model.model.layers.7.mlp.experts.down_proj.biases,
-language_model.model.layers.7.mlp.experts.down_proj.scales,
-language_model.model.layers.7.mlp.experts.down_proj.weight,
-language_model.model.layers.7.mlp.experts.gate_proj.biases,
-language_model.model.layers.7.mlp.experts.gate_proj.scales,
-language_model.model.layers.7.mlp.experts.gate_proj.weight,
-language_model.model.layers.7.mlp.experts.up_proj.biases,
-language_model.model.layers.7.mlp.experts.up_proj.scales,
-language_model.model.layers.7.mlp.experts.up_proj.weight,
-language_model.model.layers.8.mlp.experts.down_proj.biases,
-language_model.model.layers.8.mlp.experts.down_proj.scales,
-language_model.model.layers.8.mlp.experts.down_proj.weight,
-language_model.model.layers.8.mlp.experts.gate_proj.biases,
-language_model.model.layers.8.mlp.experts.gate_proj.scales,
-language_model.model.layers.8.mlp.experts.gate_proj.weight,
-language_model.model.layers.8.mlp.experts.up_proj.biases,
-language_model.model.layers.8.mlp.experts.up_proj.scales,
-language_model.model.layers.8.mlp.experts.up_proj.weight,
-language_model.model.layers.9.mlp.experts.down_proj.biases,
-language_model.model.layers.9.mlp.experts.down_proj.scales,
-language_model.model.layers.9.mlp.experts.down_proj.weight,
-language_model.model.layers.9.mlp.experts.gate_proj.biases,
-language_model.model.layers.9.mlp.experts.gate_proj.scales,
-language_model.model.layers.9.mlp.experts.gate_proj.weight,
-language_model.model.layers.9.mlp.experts.up_proj.biases,
-language_model.model.layers.9.mlp.experts.up_proj.scales,
-language_model.model.layers.9.mlp.experts.up_proj.weight.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4705.94it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[23:55:42] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
-```
 
 </details>
 
