@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-12 22:42:34 BST
+Generated on: 2026-08-13 00:08:03 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,83 +16,82 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                      |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 15.92s  | 24.8 tok/s          | 6.51            | 23      | 2,402      | 106     | none                                                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 11.56s  | 12.5 tok/s          | 2.17            | 15      | 316        | 89      | none                                                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 7.98s   | 55.8 tok/s          | 3.87            | 13      | 2,935      | 104     | none                                                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 9.87s   | 45.8 tok/s          | 3.78            | 13      | 2,935      | 170     | none                                                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.60s   | 147 tok/s           | 1.24            | 7.8     | 2,934      | 105     | none                                                                                                                              |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 94.51s  | 59.1 tok/s          | 76.77           | 74      | 16,576     | 124     | none                                                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 3.68s   | 53.7 tok/s          | 0.38            | 9.4     | 1,144      | 98      | none                                                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 83.04s  | 102 tok/s           | 78.23           | 24      | 16,576     | 111     | none                                                                                                                              |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 81.59s  | 68.0 tok/s          | 76.56           | 10.0    | 16,576     | 117     | none                                                                                                                              |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 110.20s | 15.0 tok/s          | 97.22           | 35      | 16,576     | 125     | none                                                                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 38.19s  | 42.7 tok/s          | 22.65           | 70      | 3,503      | 116     | none                                                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 8.52s   | 29.7 tok/s          | 1.12            | 18      | 603        | 131     | none                                                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.11s   | 27.6 tok/s          | 1.07            | 20      | 608        | 102     | none                                                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 7.30s   | 39.6 tok/s          | 2.11            | 16      | 3,125      | 113     | none                                                                                                                              |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 2.85s   | 506 tok/s           | 0.75            | 1.2     | 404        | 86      | title/keyword constraints failed                                                                                                  |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 16.71s  | 92.3 tok/s          | 13.97           | 8.4     | 16,561     | 110     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 42.56s  | 26.4 tok/s          | 28.73           | 78      | 6,367      | 97      | control tokens visible                                                                                                            |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 13.23s  | 26.4 tok/s          | 2.48            | 18      | 2,627      | 208     | role tokens visible; title/keyword constraints failed                                                                             |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 7.51s   | 28.6 tok/s          | 1.21            | 17      | 2,127      | 104     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | 2.89s   | 162 tok/s           | 0.43            | 4.1     | 594        | 142     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.80s   | 51.4 tok/s          | 0.90            | 11      | 1,527      | 135     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 30.24s  | 83.0 tok/s          | 26.61           | 8.4     | 16,561     | 110     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 6.22s   | 54.3 tok/s          | 0.46            | 29      | 604        | 87      | control tokens visible                                                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.91s   | 63.0 tok/s          | 0.39            | 28      | 604        | 81      | control tokens visible                                                                                                            |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable_with_caveats` | 4.14s   | 129 tok/s           | 0.45            | 16      | 608        | 100     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 17.01s  | 42.2 tok/s          | 2.45            | 15      | 3,216      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 32.58s  | 39.5 tok/s          | 8.04            | 60      | 1,643      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 3.40s   | 291 tok/s           | 0.84            | 1.9     | 348        | 36      | missing required fields                                                                                                           |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.21s  | 29.4 tok/s          | 9.74            | 13      | 6,363      | 500     | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 23.21s  | 48.3 tok/s          | 10.83           | 8.4     | 6,367      | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 119.21s | 4.52 tok/s          | 3.74            | 40      | 1,338      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 5.80s   | 226 tok/s           | 1.44            | 3.8     | 945        | 500     | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 32.51s  | 5.12 tok/s          | 5.29            | 24      | 3,140      | 122     | missing required fields                                                                                                           |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 97.69s  | 177 tok/s           | 95.62           | 5.1     | 16,572     | 111     | missing required fields                                                                                                           |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 35.39s  | 74.6 tok/s          | 26.30           | 8.4     | 16,563     | 500     | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `unusable`            | 7.02s   | 114 tok/s           | 0.60            | 5.5     | 441        | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 33.58s  | 48.2 tok/s          | 21.08           | 13      | 16,572     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 3.67s   | insufficient sample | 0.76            | 17      | 602        | 1       | empty response; missing required fields                                                                                           |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 5.44s   | 62.1 tok/s          | 2.66            | 9.7     | 2,534      | 63      | missing required fields                                                                                                           |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.44s   | 360 tok/s           | 0.08            | 2.3     | 344        | 89      | missing required fields                                                                                                           |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 16.11s  | 38.7 tok/s          | 1.21            | 4.3     | 4,431      | 500     | repeated text; missing required fields; cut off at token limit                                                                    |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.33s   | -                   | -               | -       | -          | -       | none                                                                                                                              |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.28s   | 517 tok/s  | 0.04            | 1.2     | 396        | 90      | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 8.63s   | 81.0 tok/s | 5.66            | 8.4     | 6,348      | 97      | none                                                                                                                     |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.23s   | 34.4 tok/s | 1.25            | 17      | 3,662      | 96      | none                                                                                                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 9.76s   | 19.0 tok/s | 1.65            | 15      | 314        | 116     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.10s   | 67.0 tok/s | 2.32            | 14      | 3,229      | 130     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.36s   | 182 tok/s  | 1.19            | 9.0     | 3,228      | 132     | none                                                                                                                     |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 77.33s  | 63.6 tok/s | 63.40           | 74      | 16,521     | 119     | none                                                                                                                     |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.20s   | 55.6 tok/s | 0.29            | 9.4     | 1,142      | 138     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 64.74s  | 110 tok/s  | 60.43           | 24      | 16,521     | 105     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 65.16s  | 90.5 tok/s | 61.86           | 10.0    | 16,521     | 99      | none                                                                                                                     |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 91.91s  | 16.9 tok/s | 80.98           | 35      | 16,521     | 118     | none                                                                                                                     |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.39s   | 129 tok/s  | 0.33            | 5.5     | 439        | 98      | none                                                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.13s   | 129 tok/s  | 0.41            | 16      | 617        | 104     | none                                                                                                                     |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.83s   | 26.7 tok/s | 1.06            | 20      | 617        | 99      | none                                                                                                                     |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 17.39s  | 94.8 tok/s | 13.98           | 8.4     | 16,506     | 184     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 10.13s  | 30.5 tok/s | 3.60            | 24      | 2,696      | 119     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 29.98s  | 38.1 tok/s | 18.04           | 78      | 6,348      | 122     | control tokens visible; title/keyword constraints failed                                                                 |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | 1.77s   | 186 tok/s  | 0.08            | 4.1     | 599        | 125     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 8.43s   | 61.2 tok/s | 2.49            | 15      | 3,229      | 248     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.62s   | 53.4 tok/s | 0.65            | 11      | 1,534      | 153     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 22.10s  | 93.1 tok/s | 18.55           | 8.4     | 16,506     | 184     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | 29.58s  | 45.5 tok/s | 18.66           | 70      | 3,503      | 115     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.90s   | 57.5 tok/s | 0.44            | 29      | 613        | 87      | control tokens visible                                                                                                   |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.51s   | 65.8 tok/s | 0.44            | 28      | 613        | 82      | control tokens visible                                                                                                   |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.41s   | 31.5 tok/s | 1.04            | 18      | 606        | 146     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 6.69s   | 39.4 tok/s | 1.87            | 16      | 3,467      | 103     | title/keyword constraints failed                                                                                         |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 16.05s  | 42.7 tok/s | 2.21            | 15      | 3,558      | 500     | missing required fields; echoes instructions; cut off at token limit                                                     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.46s  | 46.7 tok/s | 5.02            | 60      | 1,626      | 500     | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.87s   | 344 tok/s  | 0.10            | 2.1     | 347        | 53      | missing required fields                                                                                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 18.35s  | 47.7 tok/s | 5.66            | 13      | 6,344      | 500     | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                      |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 4.16s   | 34.2 tok/s | 1.11            | 18      | 2,626      | 16      | missing required fields; role tokens visible                                                                             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 112.35s | 4.67 tok/s | 1.37            | 40      | 1,296      | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 3.55s   | 276 tok/s  | 0.26            | 3.9     | 1,003      | 500     | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 27.99s  | 5.97 tok/s | 2.47            | 24      | 3,158      | 134     | missing required fields                                                                                                  |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 72.59s  | 216 tok/s  | 70.70           | 5.1     | 16,517     | 124     | missing required fields                                                                                                  |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 26.19s  | 88.8 tok/s | 18.96           | 8.4     | 16,508     | 500     | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 30.87s  | 53.3 tok/s | 19.53           | 13      | 16,517     | 500     | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 5.32s   | 48.8 tok/s | 0.37            | 17      | 605        | 90      | missing required fields                                                                                                  |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 5.01s   | 62.6 tok/s | 2.49            | 9.7     | 2,739      | 56      | missing required fields                                                                                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.34s   | 341 tok/s  | 0.08            | 2.4     | 343        | 72      | missing required fields                                                                                                  |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 14.02s  | 45.4 tok/s | 1.10            | 4.3     | 4,433      | 500     | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.20s   | -          | -               | -       | -          | -       | none                                                                                                                     |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 147 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 517 tok/s
 
-Average clean-completion throughput: 51.6 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 109 tok/s (indicative only: tokenizers and architectures differ across models)
 
-Lowest peak memory among clean completions: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 7.8 GB
+Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.2 GB
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                                                                      |
-|--------------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                                           |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                             | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable`      | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable`      | missing required fields                                                                                                           |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                  | `unusable`      | missing required fields                                                                                                           |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                 | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | empty response; missing required fields                                                                                           |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`      | missing required fields                                                                                                           |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable`      | missing required fields                                                                                                           |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable`      | repeated text; missing required fields; cut off at token limit                                                                    |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                                                              |
+| Model                                                                                                        | Usability       | Observations                                                                                                             |
+|--------------------------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                      |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                      | `unusable`      | missing required fields; role tokens visible                                                                             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                  | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable`      | missing required fields                                                                                                  |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable`      | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                                                     |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -103,47 +102,47 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 | Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | Title:<br>Boats at Canons Marsh Marina, Bristol<br><br>Description:<br>Several boats are docked at Canons Marsh Marina in Bristol, with seagulls flying and floating in the water. In the background, Bristol Cathedral and a Ferris wheel are visible under a partly cloudy sky.<br><br>Keywords:<br>Bris... |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | Title: Boats and Seagulls at Bristol's Marina<br><br>Description: A serene scene unfolds at Bristol's marina, where boats bob gently in the water, while a flock of seagulls flies and floats in the foreground, set against the backdrop of the city's historic architecture and a cloudy...                 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Bristol Marina with Boats and Cathedral View**<br><br>Description:<br>A vibrant marina in Bristol, England, showcases docked boats and seagulls on the water under clear daylight, with the iconic Bristol Cathedral and modern buildings forming a scenic cityscape backdrop.<br><br>Keywo...    |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | **Title:**<br>*Bristol Marina &amp; Cathedral, 2026-08-12, UK*<br><br>**Description:**<br>A vibrant Bristol marina scene captured on **August 12, 2026 (16:45 UTC+1)**, featuring docked boats, a flock of seagulls, and the iconic **Bristol Cathedral** in the background. Coyote Ugly’s landmark b...      |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Bristol Marina with Cathedral and Seagulls<br><br>Description:<br>A bustling marina in Bristol’s city centre, featuring docked boats alongside historic architecture like the cathedral and modern buildings, under clear skies with a flock of seagulls in the water.<br><br>Keywords:<br>Boat,... |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: Boats and Seagulls at Bristol Harbour Marina<br><br>Description: A sunny afternoon view of Bristol Harbour shows numerous leisure boats moored along the waterfront, with a large flock of seagulls floating on the calm water in the foreground. The scene includes the distinctive...                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Bristol City Centre Marina Scene<br><br>Description: A serene view of the Bristol City Centre marina with boats docked and a flock of seagulls in the water, set against the backdrop of the historic Bristol Cathedral and the city's skyline.<br><br>Keywords: Bristol, City Centre, Mar...          |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Seagulls and Boats at Bristol Harbour<br><br>Description: A sunny afternoon view of Bristol Harbour featuring numerous boats moored at the quay, with a large flock of seagulls floating on the water in the foreground. The background displays the historic Bristol Cathedral and...                 |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Bristol Marina with Seagulls and Historic Architecture<br><br>Description: Boats are docked at Bristol’s Canons Marsh marina, with seagulls floating and flying over the water, set against a backdrop of historic cathedral spires and modern buildings including the Coyote Ugly S...                |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Bristol Harbourside with Cathedral and Ferris Wheel<br><br>Description:<br>A sunny afternoon view of Bristol's harbourside featuring docked boats and a large flock of seagulls on the water. The background skyline includes the historic Bristol Cathedral, a Ferris wheel, and the C...          |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Bristol Marina with Cathedral and Seagulls<br><br>Description:<br>A marina in Bristol, England, with numerous boats docked at the quay, seagulls floating and flying across the foreground water, and the city's cathedral and a Ferris wheel visible in the background under a bright,...          |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | Title: Bristol Marina with Clifton Suspension Bridge and Cabot Tower<br><br>Description: Captured on 12 August 2026 at 16:45 UTC+01, this image shows boats moored at Bristol Marina, with the Clifton Suspension Bridge and Cabot Tower visible in the background; numerous seagulls are p...                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Boats at Canons Marsh, Bristol City Centre<br>Description: A variety of boats are docked at a marina in Bristol, England, with seagulls floating in the foreground and the Bristol Cathedral and a Ferris wheel visible in the background. The scene is captured under bright, af...                   |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | Title:<br>Bristol Marina with Seagulls and Cathedral<br><br>Description:<br>This image captures a bustling marina in Bristol, England, with numerous boats docked along the waterfront. A flock of seagulls is seen flying and floating in the foreground, with the iconic Bristol Cathedral visi...          |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | Title:<br>Bristol Marina<br><br>Description:<br>A bustling marina in Bristol, England, with boats docked and seagulls flying in the foreground, under a partly cloudy sky.<br><br>Keywords:<br>Bristol marina, boats, seagulls, city centre, England, GBR, Europe, architecture, harbor, cityscape, city,...  |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title: Bristol Marina with Seagulls<br><br>Description: A bustling marina in Bristol, England, features docked boats and a flock of seagulls in the water, with the city's architecture, including the Bristol Cathedral, visible in the background under a partly cloudy sky.<br><br>Keywords: B...          |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Bristol Marina with Seagulls and Cathedral<br>Description: A marina in Bristol, England, with boats docked at the pier, seagulls floating in the water, and Bristol Cathedral and a Ferris wheel visible in the background under a partly cloudy sky.<br>Keywords: B...              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Boats Docked at Bristol Marina with City Centre in the Background.<br>Description: This image depicts a marina in Bristol, England, featuring a variety of boats docked along the waterfront. The boats vary in size and design, with some having multiple decks and others appea...                   |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Bristol Marina with Seagulls<br>Description: Boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture in the background, captured at 16:45 on 12 August 2026.<br>Keywords: Bristol, England, Marina, Boats, Seagulls, Dock,...                 |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Bristol Marina at Sunset<br><br>Description: The image captures a serene scene at Bristol Marina, where boats are docked along the waterfront. A flock of seagulls can be seen flying and floating in the water, adding a lively touch to the tranquil setting. The backdrop feature...                |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: Bristol Waterfront Scene with Boats and Seagulls<br><br>Description: A marina in Bristol's city center, featuring boats docked along a concrete walkway, with a flock of seagulls flying and floating in the water. The scene is set against a backdrop of historic buildings, inclu...                |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title: Bristol Marina with Seagulls<br><br>Description: A bustling marina in Bristol, England, features docked boats and a flock of seagulls in the water, with the city's architecture, including the Bristol Cathedral, visible in the background under a partly cloudy sky.<br><br>Keywords: B...          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Boats at Canons Marsh Marina in Bristol City Centre<br>Description: Numerous boats are docked at the marina in Bristol, featuring a flock of seagulls floating in the water with Bristol Cathedral and a Ferris wheel in the background.<br>Keywords: Br...           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Boats at Canons Marsh Marina near Bristol Cathedral<br>Description: Various motorboats are docked at the marina in Bristol, with a flock of seagulls floating and flying over the water in the foreground.<br>Keywords: Bristol, Canons Marsh, Cathedral...           |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable_with_caveats` | Title: Boats Docked at Bristol Harbourside Marina<br>Description: Various boats are moored at a marina in Bristol, England, with seagulls floating on the water in the foreground and historic architecture under a bright sky. The cityscape features the prominent towers of Bristol C...                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints give title hint, description hint, keyword hints. We need to treat capture...                    |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Let's tackle this step by step. First, the title needs to be concrete, 5-10 words. The context says Bristol, UK, with landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the capture time i...                      |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grandeur and natural beauty, with a flock of seagulls adding life to the calm waters.                                                                                                                                               |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image, it's Bristol's harbor with boats, cathedral, etc. So maybe "Bristol Harbour with Cathedral and Ferris Wheel". Wait, need to keep it concise. Let's check...                |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | Title: Bristol Marina View<br>Description: An image of boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture visible in the background.<br>Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture,...                 |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.<br><br>First, the context says the capture date/time is 2026-08-12 16:45:16 UTC+01:00, and GP...                |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | &lt;think&gt;<br>We need to create a title, description, and keywords based on the image. Let's analyze the image.<br><br>The image shows a harbor or marina with boats, seagulls, buildings, and a cathedral (Bristol Cathedral?). There's a ferris wheel and some modern buildings. The context is...       |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Bristol Marina: Seagulls, Boats, and Cathedral<br><br>A bustling Bristol marina scene with seagulls in the foreground, boats docked along the quay, and the iconic Bristol Cathedral visible in the background. The image captures a lively urban waterfront on a sunny day, with the disti...                |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | Title:<br>City Centre, Bristol, England, UK, GBR, Europe<br><br>Description:<br>This is an image of boats docked at a marina in the City Centre of Bristol, England. The marina is located near Bristol Cathedral, and a flock of seagulls flies and floats in the water in the foreground. The m...          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The context says Bristol, UK, and the image has boats, seagulls, marina. The title hint is City Centre, Bristol, England, UK, GBR, Europe. So need a concise title. Maybe "Bristol City Centre Marina with Seagulls" but le...                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `unusable`            | Title: Bristol, England, UK, GBR, Europe<br>Description: A marina with boats docked, seagulls flying and floating in the water, and a church in the background.<br>Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, City Centre, Cityscape, Coyote Ugly, Doc...                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>Bristol Marina with Ferris Wheel and Cathedral<br><br>Description:<br>A vibrant scene of boats docked at a marina in Bristol, with the iconic Ferris wheel and Bristol Cathedral rising in the background, while seagulls float and fly in the foreground under a bright, partly cloudy...          |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | empty output                                                                                                                                                                                                                                                                                                  |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water, Birds, Seagulls, Cityscape, City, Architecture, Church, Canons Marsh, Building, Cathedral, Gull, Harbor,                                                                                                                    |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: City Centre, Bristol, England, UK, GBR, Europe<br>Description: This image captures the serene harbor of Bristol, UK, featuring a flock of seagulls flying and floating in the water. The city center is a hub for boating activities, with a marina serving as a central location...                   |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Architecture, Building, City Centre, Cityscape, Coast, Coastline, Coastal, Coastal, Coastal waters, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline,...                      |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>The Thekla anchored in Mud Dock, Bristol Harbour<br><br>Description:<br>A black boat with a white mast and red stripe is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe in the background.<br><br>Keywords:<br>Boat, Mud Dock, Bristol Harbour, St Mary Redcliffe, S... |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | Title: Thekla Ship in Bristol Harbour<br>Description: The black ship "Thekla" is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.<br>Keywords: Thekla ship, Bristol Harbour, St Mary Redcliffe Church,...                |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | Title: Thekla Moored in Bristol Harbour<br><br>Description: The Thekla, a ship venue, is moored in Mud Dock with St Mary Redcliffe's church spire visible in the background, under a clear sky.<br><br>Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire,...           |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | Title: Thekla Ship Moored in Bristol Harbour<br><br>Description: The Thekla, a ship venue, is anchored in the tranquil waters of Bristol Harbour on a sunny day, with the historic church of St Mary Redcliffe's steeple visible in the background. The ship's black hull and white mast st...                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Thekla Ship Venue Moored in Bristol Harbour**<br><br>Description:<br>The historic vessel *Thekla*, a repurposed ship venue, is docked in Mud Dock, Bristol Harbour, under clear daylight skies. The church steeple of St Mary Redcliffe is visible in the background, with mooring li...          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Thekla in Mud Dock, Bristol Harbour<br><br>Description:<br>The historic sailing vessel *Thekla* is moored in Mud Dock of Bristol Harbour, with the iconic spire of St Mary Redcliffe Church visible under clear skies. Its tall mast and traditional hull, accented with bold red and w...          |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: The Thekla ship moored in Bristol Harbour<br>Description: The Thekla, a former ship turned venue, is moored at the dockside in Bristol Harbour under a clear blue sky. The vessel's black hull and white mast stand in the foreground, with the distinctive spire of St Mary Redc...                   |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Thekla Ship Anchored in Bristol Harbour<br><br>Description: Thekla, a large ship, is moored in Bristol Harbour's Mud Dock, with the church of St Mary Redcliffe's spire visible in the background. The scene captures a clear day in the city centre of Bristol, England, with the s...                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: The Thekla Ship Moored in Bristol Harbour<br><br>Description: The black-hulled vessel Thekla is moored in Mud Dock, Bristol Harbour, under a clear blue sky, with the stone spire of St Mary Redcliffe church visible in the background.<br><br>Keywords: Thekla, Bristol Harbour, Moored,...          |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Thekla Ship Moored in Bristol Harbour<br><br>Description: The Thekla, a historic ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe Church visible in the background under a clear sky.<br><br>Keywords: Thekla, Ship, Moored, Bristol Harbour, Mud D...          |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>The Thekla ship moored in Bristol Harbour<br><br>Description:<br>The black hull of the historic ship The Thekla is moored in Mud Dock, Bristol, under a clear blue sky. In the background, the distinctive stone spire of St Mary Redcliffe church rises above the trees on the riverba...          |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | Title: Thekla, Bristol, England, UK, GBR, Europe<br>Description: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.<br>Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire,...                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Thekla ship moored in Bristol Harbour<br><br>Description: The Thekla ship is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear sky. The vessel's black hull and tall white mast are captured in bright dayligh...                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: The Thekla ship venue in Bristol Harbour<br>Description: The Thekla, a black ship venue, is moored in Mud Dock in Bristol, England, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky.<br>Keywords: Architecture, Boat, Bristol, Building,...                |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title:<br>Thekla Ship in Bristol Harbour<br><br>Description:<br>The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white m...          |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Thekla Ship Venue in Bristol Harbour<br><br>Description:<br>The Thekla, a moored ship venue, is anchored in Mud Dock, Bristol Harbour, with the distinctive steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.<br><br>Keywords:<br>Architecture, Boat, Bristo... |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: The Thekla Ship at Mud Dock, Bristol<br>Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.<br>Keywords: Thekla, Ship, Mud Dock, Bristol...              |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Thekla at Bristol Harbour<br><br>Description: The Thekla, a historic ship venue, is moored in the Mud Dock of Bristol Harbour. The vessel is anchored with mooring lines, and the backdrop features the steeple of St Mary Redcliffe Church, adding a touch of architectural eleganc...                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Thekla Ship Venue Moored in Bristol’s Mud Dock<br><br>**Description:**<br>On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), the historic **Bristol-built wooden ship *Thekla***—a converted venue vessel—is anchored in **Mud Dock, Bristol Harbour**. A...          |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: The Thekla, Bristol's historic ship venue in Mud Dock<br><br>Description: A black ship named Thekla is moored in Bristol Harbour's Mud Dock, with the steeple of St Mary Redcliffe church visible in the background. The scene captures a clear day, showcasing the city's blend of...                 |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title:<br>Thekla Ship in Bristol Harbour<br><br>Description:<br>The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white m...          |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire<br><br>Description:<br>The vessel Thekla, a ship venue, is moored in Mud Dock within Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.<br><br>Keywords:<br>Bris... |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: The Thekla ship venue moored in Bristol Harbour England<br>Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.<br>Keywords: Architec...           |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: The Thekla Ship Moored in Bristol Harbour<br>Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.<br>Keywords: Bristol, Harbour, Ship, Boat, Church...           |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: The Thekla, Mud Dock, Bristol Harbour, August 2026<br>Description: Captured on 12 August 2026, The Thekla, a black ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky. The ship disp...                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Thekla Moored in Bristol Harbour<br><br>Description:<br>Thekla, a ship venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe church in the background under a clear sky.<br><br>Keywords:<br>Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire,... |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints: Title hint: City Centre, Bristol, England, UK, GBR, Europe. Description hi...                   |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata for this. First, the title. It's got to be concise, descriptive, and accurate. "The Thekla in Bristol Harbour" is a good start, but I can do better. "The Thekla, Bristol Harbour, St...                      |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, bridge, church, church spire, clear sky, dock, England, Europe, flag, harbor, mooring, mooring lines, nautical.                                                                                                                   |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship...                 |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | Thekla in Bristol Harbour with St Mary Redcliffe in the background.<end_of_utterance>                                                                                                                                                                                                                         |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. Let's start with the title. The main subject is the Thekl...                      |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | &lt;think&gt;<br>We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and...             |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Thekla Ship in Mud Dock, Bristol Harbour<br><br>The Thekla, a large black ship with a white mast, is moored in Mud Dock, Bristol Harbour. The steeple of St Mary Redcliffe Church is visible in the background, with a clear blue sky overhead. The ship's name is prominently displayed on...                |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | Title:<br>City Centre, Bristol, England, UK, GBR, Europe<br><br>Description:<br>The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church in the background. The clear sky and calm waters create a serene atmosphere, highlighti...          |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The image shows a ship named Thekla anchored in Bristol Harbour. The context mentions Bristol, so the title should be specific. Let's see: "Thekla, Bristol Harbour, Moored" – that's 5 words. Wait, maybe "Thekla Ship, Br...                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>The Thekla in Mud Dock, Bristol<br><br>Description:<br>The historic ship Thekla, now a venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky. The ship's black hull, white mast, and mooring lin...          |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a clear day. The ship's black hull features a red stripe and the name "THEKLA" in white lettering. It is secured to the dock with mooring lines. In the background, the tall spire of St Mary Redcliffe...                       |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical                                                                                                                        |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Thekla in Bristol, England, UK, GBR, Europe<br>Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. The image captures the ship's mooring lines and the surrounding area, with a clear...                   |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Title hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.<br>- Description hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcli...                   |
 | [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | Model loading failed: Received 362 parameters not in model:<br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.expe...       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
@@ -168,21 +167,21 @@ The first 280 characters of each model's actual output (or failure evidence for 
 ## Image Metadata
 
 - *Title:* , City Centre, Bristol, England, UK, GBR, Europe
-- *Description:* This is an image of boats docked at a marina. Bristol UK. A
-  flock of seagulls flies and floats in the water in the foreground.
-- *Keywords:* Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral,
-  Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly,
-  Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Pier,
-  Planetarium, Seagulls, Sky, Somerset, Tower, Tree, UK, United Kingdom,
-  Urban, Water, Watercraft, attraction, avon, birds, blue sky, british,
-  buildings, cathedral, clouds, day, destination, english, ferris wheel,
-  harbour, historic, holiday, landmark, landscape, leisure, lifestyle,
-  mooring, nature, outdoor, recreation, reflection, river, scenic, skyline,
-  summer, sunny, tourism, travel, trees, vacation, view, water bird,
-  waterfront, yachts
-- *Date:* 2026-08-12 16:45:16 UTC+01:00
-- *Time:* 16:45:16
-- *GPS:* 51.451700°N, 2.600800°W
+- *Description:* The Thekla (a ship venue) anchored in Mud Dock in Bristol
+  Harbour with the steeple of the church of St Mary Redcliffe in the
+  background.
+- *Keywords:* Architecture, Boat, Bridge, Bristol, Building, Church, Church
+  Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor,
+  Mast, Moored, Mooring, Mooring lines, Nautical, Rigging, Ship, Sky,
+  Somerset, Spire, Trees, UK, Water, anchor, black hull, blue sky, bow,
+  british, calm, canal, cityscape, day, destination, docked, english,
+  exterior, floating harbour, harbour, historic, marine, maritime, mud dock,
+  outdoors, port, reflection, river, ropes, scenic, skyline, st mary redcliffe
+  church, summer, sunny, thekla, tourism, transport, transportation, travel,
+  united kingdom, urban, vessel, watercraft, waterfront
+- *Date:* 2026-08-12 17:52:14 UTC+01:00
+- *Time:* 17:52:14
+- *GPS:* 51.448500°N, 2.593000°W
 
 ## Prompt
 
@@ -198,16 +197,17 @@ The first 280 characters of each model's actual output (or failure evidence for 
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-08-12 16:45:16 UTC+01:00
-> &#45; GPS: 51.451700°N, 2.600800°W
+> &#45; Capture date/time: 2026-08-12 17:52:14 UTC+01:00
+> &#45; GPS: 51.448500°N, 2.593000°W
 >
 > &#8203;Descriptive hints:
 > &#45; Title hint: City Centre, Bristol, England, UK, GBR, Europe
-> &#45; Description hint: This is an image of boats docked at a marina. Bristol
-> UK. A flock of seagulls flies and floats in the water in the foreground.
-> &#45; Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol
-> Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape,
-> Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+> &#45; Description hint: The Thekla (a ship venue) anchored in Mud Dock in
+> Bristol Harbour with the steeple of the church of St Mary Redcliffe in the
+> background.
+> &#45; Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church,
+> Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag,
+> Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -226,62 +226,178 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
 
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 3.29s
-- *Generation time:* 12.62s
-- *Total time:* 15.92s
-- *Input validation time:* 6.6e-05
-- *Prompt preparation time:* 0.00701
-- *First-token latency:* 6.51
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 2,402
-- *Generation tokens:* 106
-- *Total tokens:* 2,508
-- *Prompt throughput (raw):* 369 tok/s
-- *Generation throughput (raw):* 24.8 tok/s
-- *Peak memory:* 23
-- *Active memory:* 18
-- *Cache memory:* 0.47
-- *Model-load active memory:* 18
-- *Post-cleanup active memory:* 0.000968
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.39s
+- *Generation time:* 0.59s
+- *Total time:* 1.28s
+- *Input validation time:* 0.302
+- *Prompt preparation time:* 0.00606
+- *First-token latency:* 0.0369
+- *Cleanup time:* 0.0577
+- *Prompt tokens:* 396
+- *Generation tokens:* 90
+- *Total tokens:* 486
+- *Prompt throughput (raw):* 10,741 tok/s
+- *Generation throughput (raw):* 517 tok/s
+- *Peak memory:* 1.2
+- *Active memory:* 0.90
+- *Cache memory:* 0.02
+- *Model-load active memory:* 0.897
+- *Post-cleanup active memory:* 0.000132
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1320
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1369
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
 Title:
-Boats at Canons Marsh Marina, Bristol
+The Thekla anchored in Mud Dock, Bristol Harbour
 
 Description:
-Several boats are docked at Canons Marsh Marina in Bristol, with seagulls flying and floating in the water. In the background, Bristol Cathedral and a Ferris wheel are visible under a partly cloudy sky.
+A black boat with a white mast and red stripe is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe in the background.
 
 Keywords:
-Bristol, Canons Marsh, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel, Waterfront, Cityscape, Architecture, Gulls, Harbor, Dock, England, UK, Europe
+Boat, Mud Dock, Bristol Harbour, St Mary Redcliffe, Ship, Masts, Shipyard, City, City Centre, Clear Sky, Dock, England, Europe
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### mlx-community/GLM-4.6V-Flash-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.30s
+- *Generation time:* 7.32s
+- *Total time:* 8.63s
+- *Input validation time:* 4.27e-05
+- *Prompt preparation time:* 0.00712
+- *First-token latency:* 5.66
+- *Cleanup time:* 0.0807
+- *Prompt tokens:* 6,348
+- *Generation tokens:* 97
+- *Total tokens:* 6,445
+- *Prompt throughput (raw):* 1,121 tok/s
+- *Generation throughput (raw):* 81.0 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 6.8
+- *Cache memory:* 0.46
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00211
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1399
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Thekla Ship in Bristol Harbour
+Description: The black ship "Thekla" is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.
+Keywords: Thekla ship, Bristol Harbour, St Mary Redcliffe Church, Mud Dock, Bristol, England, UK, moored ship, black hull, clear sky, Bristol Harbour water, church steeple, dockside setting.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### mlx-community/InternVL3-8B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
+- *Model load time:* 1.58s
+- *Generation time:* 4.64s
+- *Total time:* 6.23s
+- *Input validation time:* 3.01e-05
+- *Prompt preparation time:* 0.00171
+- *First-token latency:* 1.25
+- *Cleanup time:* 0.0982
+- *Prompt tokens:* 3,662
+- *Generation tokens:* 96
+- *Total tokens:* 3,758
+- *Prompt throughput (raw):* 2,918 tok/s
+- *Generation throughput (raw):* 34.4 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.28
+- *Model-load active memory:* 15.9
+- *Post-cleanup active memory:* 0.003
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1323
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Thekla Moored in Bristol Harbour
+
+Description: The Thekla, a ship venue, is moored in Mud Dock with St Mary Redcliffe's church spire visible in the background, under a clear sky.
+
+Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, moored, mooring lines, clear sky, architecture, dock, England, Europe, flag, mast, nautical
 </pre>
 
 </details>
@@ -300,27 +416,27 @@ Bristol, Canons Marsh, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.68s
-- *Generation time:* 9.87s
-- *Total time:* 11.56s
-- *Input validation time:* 6.25e-05
-- *Prompt preparation time:* 0.00136
-- *First-token latency:* 2.17
-- *Cleanup time:* 0.163
-- *Prompt tokens:* 316
-- *Generation tokens:* 89
-- *Total tokens:* 405
-- *Prompt throughput (raw):* 146 tok/s
-- *Generation throughput (raw):* 12.5 tok/s
+- *Model load time:* 1.50s
+- *Generation time:* 8.25s
+- *Total time:* 9.76s
+- *Input validation time:* 3.83e-05
+- *Prompt preparation time:* 0.0013
+- *First-token latency:* 1.65
+- *Cleanup time:* 0.0896
+- *Prompt tokens:* 314
+- *Generation tokens:* 116
+- *Total tokens:* 430
+- *Prompt throughput (raw):* 191 tok/s
+- *Generation throughput (raw):* 19.0 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.59
 - *Model-load active memory:* 11.4
-- *Post-cleanup active memory:* 0.00433
+- *Post-cleanup active memory:* 0.00431
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1424
+- *Rendered prompt characters:* 1422
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -336,11 +452,11 @@ Bristol, Canons Marsh, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boats and Seagulls at Bristol's Marina
+Title: Thekla Ship Moored in Bristol Harbour
 
-Description: A serene scene unfolds at Bristol's marina, where boats bob gently in the water, while a flock of seagulls flies and floats in the foreground, set against the backdrop of the city's historic architecture and a cloudy sky.
+Description: The Thekla, a ship venue, is anchored in the tranquil waters of Bristol Harbour on a sunny day, with the historic church of St Mary Redcliffe's steeple visible in the background. The ship's black hull and white mast stand out against the clear blue sky.
 
-Keywords: Boats, Seagulls, Bristol, Marina, City, Architecture, Cloudy Sky, Water, Birds, Wildlife
+Keywords: Thekla, ship, Bristol Harbour, St Mary Redcliffe, church, harbour, boat, nautical, moored, mooring lines, mast, black hull, white mast, clear blue sky, sunny day.
 </pre>
 
 </details>
@@ -359,27 +475,27 @@ Keywords: Boats, Seagulls, Bristol, Marina, City, Architecture, Cloudy Sky, Wate
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.66s
-- *Generation time:* 6.31s
-- *Total time:* 7.98s
-- *Input validation time:* 6.12e-05
-- *Prompt preparation time:* 0.00919
-- *First-token latency:* 3.87
-- *Cleanup time:* 0.115
-- *Prompt tokens:* 2,935
-- *Generation tokens:* 104
-- *Total tokens:* 3,039
-- *Prompt throughput (raw):* 757 tok/s
-- *Generation throughput (raw):* 55.8 tok/s
-- *Peak memory:* 13
+- *Model load time:* 1.34s
+- *Generation time:* 4.75s
+- *Total time:* 6.10s
+- *Input validation time:* 3.48e-05
+- *Prompt preparation time:* 0.00701
+- *First-token latency:* 2.32
+- *Cleanup time:* 0.0817
+- *Prompt tokens:* 3,229
+- *Generation tokens:* 130
+- *Total tokens:* 3,359
+- *Prompt throughput (raw):* 1,394 tok/s
+- *Generation throughput (raw):* 67.0 tok/s
+- *Peak memory:* 14
 - *Active memory:* 8.0
-- *Cache memory:* 0.56
+- *Cache memory:* 0.65
 - *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.00511
+- *Post-cleanup active memory:* 0.0051
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3758
+- *Rendered prompt characters:* 3756
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -396,92 +512,14 @@ Keywords: Boats, Seagulls, Bristol, Marina, City, Architecture, Cloudy Sky, Wate
 
 <pre class="model-output-readable">
 Title:
-**Bristol Marina with Boats and Cathedral View**
+**Thekla Ship Venue Moored in Bristol Harbour**
 
 Description:
-A vibrant marina in Bristol, England, showcases docked boats and seagulls on the water under clear daylight, with the iconic Bristol Cathedral and modern buildings forming a scenic cityscape backdrop.
+The historic vessel *Thekla*, a repurposed ship venue, is docked in Mud Dock, Bristol Harbour, under clear daylight skies. The church steeple of St Mary Redcliffe is visible in the background, with mooring lines and nautical details prominently displayed.
 
 Keywords:
-Bristol, marina, boats, seagulls, Bristol Cathedral, cityscape, architecture, harbor, Canons Marsh, Coyote Ugly, UK, Europe, daylight, waterfront, buildings, birds
+Boat, Bristol Harbour, Clear Sky, Docked Ship, England, European Heritage, Historic Vessel, Mooring Lines, Mud Dock, Nautical Architecture, Ship Venue, St Mary Redcliffe Steeple, Thekla, UK Landmark, Waterfront
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.76s
-- *Generation time:* 8.09s
-- *Total time:* 9.87s
-- *Input validation time:* 6.26e-05
-- *Prompt preparation time:* 0.000311
-- *First-token latency:* 3.78
-- *Cleanup time:* 0.15
-- *Prompt tokens:* 2,935
-- *Generation tokens:* 170
-- *Total tokens:* 3,105
-- *Prompt throughput (raw):* 777 tok/s
-- *Generation throughput (raw):* 45.8 tok/s
-- *Peak memory:* 13
-- *Active memory:* 8.4
-- *Cache memory:* 0.60
-- *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00538
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3758
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-nvfp4/snapshots/28777b889d841a86369c736175cb77258c8134b2
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-**Title:**
-*Bristol Marina &amp; Cathedral, 2026-08-12, UK*
-
-**Description:**
-A vibrant Bristol marina scene captured on **August 12, 2026 (16:45 UTC+1)**, featuring docked boats, a flock of seagulls, and the iconic **Bristol Cathedral** in the background. Coyote Ugly’s landmark building and modern architecture frame the historic riverside, under bright daylight skies.
-
-**Keywords:**
-Bristol, Bristol Cathedral, Marina, Dock, Boats, Coyote Ugly, Seagulls, Canons Marsh, City Centre, UK, England, Cathedral, Cityscape, European Architecture, Historic Harbor, 2026-08-12, European City, UK Landmark
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-**Title:**
-*Bristol Marina & Cathedral, 2026-08-12, UK*
-
-**Description:**
-A vibrant Bristol marina scene captured on **August 12, 2026 (16:45 UTC+1)**, featuring docked boats, a flock of seagulls, and the iconic **Bristol Cathedral** in the background. Coyote Ugly’s landmark building and modern architecture frame the historic riverside, under bright daylight skies.
-
-**Keywords:**
-Bristol, Bristol Cathedral, Marina, Dock, Boats, Coyote Ugly, Seagulls, Canons Marsh, City Centre, UK, England, Cathedral, Cityscape, European Architecture, Historic Harbor, 2026-08-12, European City, UK Landmark
-```
-
-</details>
 
 </details>
 
@@ -499,27 +537,27 @@ Bristol, Bristol Cathedral, Marina, Dock, Boats, Coyote Ugly, Seagulls, Canons M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.09s
-- *Generation time:* 2.50s
-- *Total time:* 3.60s
-- *Input validation time:* 0.000106
-- *Prompt preparation time:* 0.00675
-- *First-token latency:* 1.24
-- *Cleanup time:* 0.0949
-- *Prompt tokens:* 2,934
-- *Generation tokens:* 105
-- *Total tokens:* 3,039
-- *Prompt throughput (raw):* 2,362 tok/s
-- *Generation throughput (raw):* 147 tok/s
-- *Peak memory:* 7.8
+- *Model load time:* 0.94s
+- *Generation time:* 2.41s
+- *Total time:* 3.36s
+- *Input validation time:* 4.95e-05
+- *Prompt preparation time:* 0.00684
+- *First-token latency:* 1.19
+- *Cleanup time:* 0.0721
+- *Prompt tokens:* 3,228
+- *Generation tokens:* 132
+- *Total tokens:* 3,360
+- *Prompt throughput (raw):* 2,711 tok/s
+- *Generation throughput (raw):* 182 tok/s
+- *Peak memory:* 9.0
 - *Active memory:* 2.8
-- *Cache memory:* 0.38
+- *Cache memory:* 0.44
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.00564
+- *Post-cleanup active memory:* 0.00562
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 3757
+- *Rendered prompt characters:* 3755
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -536,13 +574,13 @@ Bristol, Bristol Cathedral, Marina, Dock, Boats, Coyote Ugly, Seagulls, Canons M
 
 <pre class="model-output-readable">
 Title:
-Bristol Marina with Cathedral and Seagulls
+Thekla in Mud Dock, Bristol Harbour
 
 Description:
-A bustling marina in Bristol’s city centre, featuring docked boats alongside historic architecture like the cathedral and modern buildings, under clear skies with a flock of seagulls in the water.
+The historic sailing vessel *Thekla* is moored in Mud Dock of Bristol Harbour, with the iconic spire of St Mary Redcliffe Church visible under clear skies. Its tall mast and traditional hull, accented with bold red and white stripes, dominate the scene alongside a serene waterfront and lush greenery.
 
 Keywords:
-Boat, Bristol, Bristol Cathedral, Canons Marsh, Church, City Centre, Harbor, Marina, Seagulls, Waterfront, Gothic architecture, Coastal marina, Urban waterfront, Dockside scene, Lighting, Urban skyline.
+Architecture, Boat, Bristol, Church, Church Spire, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical, Redcliffe Church, Steeple, Traditional Ship
 </pre>
 
 </details>
@@ -561,27 +599,27 @@ Boat, Bristol, Bristol Cathedral, Canons Marsh, Church, City Centre, Harbor, Mar
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 12.65s
-- *Generation time:* 81.84s
-- *Total time:* 94.51s
-- *Input validation time:* 5.51e-05
-- *Prompt preparation time:* 0.0166
-- *First-token latency:* 76.8
-- *Cleanup time:* 0.285
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 124
-- *Total tokens:* 16,700
-- *Prompt throughput (raw):* 216 tok/s
-- *Generation throughput (raw):* 59.1 tok/s
+- *Model load time:* 10.84s
+- *Generation time:* 66.46s
+- *Total time:* 77.33s
+- *Input validation time:* 5.25e-05
+- *Prompt preparation time:* 0.014
+- *First-token latency:* 63.4
+- *Cleanup time:* 0.216
+- *Prompt tokens:* 16,521
+- *Generation tokens:* 119
+- *Total tokens:* 16,640
+- *Prompt throughput (raw):* 261 tok/s
+- *Generation throughput (raw):* 63.6 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00708
+- *Post-cleanup active memory:* 0.00706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1409
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -597,11 +635,9 @@ Boat, Bristol, Bristol Cathedral, Canons Marsh, Church, City Centre, Harbor, Mar
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boats and Seagulls at Bristol Harbour Marina
-
-Description: A sunny afternoon view of Bristol Harbour shows numerous leisure boats moored along the waterfront, with a large flock of seagulls floating on the calm water in the foreground. The scene includes the distinctive "Coyote Ugly Saloon" building and the historic Bristol Cathedral visible in the background skyline.
-
-Keywords: Bristol, Harbour, Marina, Boats, Seagulls, Gulls, Coyote Ugly, Cathedral, Cityscape, England, UK, Waterfront, Dock, Architecture, Leisure, Birds, Sunny, Skyline
+Title: The Thekla ship moored in Bristol Harbour
+Description: The Thekla, a former ship turned venue, is moored at the dockside in Bristol Harbour under a clear blue sky. The vessel's black hull and white mast stand in the foreground, with the distinctive spire of St Mary Redcliffe Church visible in the background.
+Keywords: Thekla, Bristol, Harbour, Ship, Moored, Mast, Hull, Church, Spire, St Mary Redcliffe, Dock, Nautical, Blue Sky, Architecture, England, UK, River Avon, Landmark
 </pre>
 
 </details>
@@ -620,27 +656,27 @@ Keywords: Bristol, Harbour, Marina, Boats, Seagulls, Gulls, Coyote Ugly, Cathedr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.98s
-- *Generation time:* 2.69s
-- *Total time:* 3.68s
-- *Input validation time:* 5.23e-05
-- *Prompt preparation time:* 0.000933
-- *First-token latency:* 0.379
-- *Cleanup time:* 0.0827
-- *Prompt tokens:* 1,144
-- *Generation tokens:* 98
-- *Total tokens:* 1,242
-- *Prompt throughput (raw):* 3,017 tok/s
-- *Generation throughput (raw):* 53.7 tok/s
+- *Model load time:* 0.96s
+- *Generation time:* 3.23s
+- *Total time:* 4.20s
+- *Input validation time:* 4.87e-05
+- *Prompt preparation time:* 0.000886
+- *First-token latency:* 0.291
+- *Cleanup time:* 0.0781
+- *Prompt tokens:* 1,142
+- *Generation tokens:* 138
+- *Total tokens:* 1,280
+- *Prompt throughput (raw):* 3,919 tok/s
+- *Generation throughput (raw):* 55.6 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
 - *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00714
+- *Post-cleanup active memory:* 0.00713
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1341
+- *Rendered prompt characters:* 1339
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -656,11 +692,11 @@ Keywords: Bristol, Harbour, Marina, Boats, Seagulls, Gulls, Coyote Ugly, Cathedr
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol City Centre Marina Scene
+Title: Thekla Ship Anchored in Bristol Harbour
 
-Description: A serene view of the Bristol City Centre marina with boats docked and a flock of seagulls in the water, set against the backdrop of the historic Bristol Cathedral and the city's skyline.
+Description: Thekla, a large ship, is moored in Bristol Harbour's Mud Dock, with the church of St Mary Redcliffe's spire visible in the background. The scene captures a clear day in the city centre of Bristol, England, with the ship's masts and rigging prominently displayed.
 
-Keywords: Bristol, City Centre, Marina, Boats, Seagulls, Water, Cathedral, Skyline, Historic, Dock
+Keywords: Thekla, ship, moored, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, city centre, clear sky, nautical, architecture
 </pre>
 
 </details>
@@ -679,27 +715,27 @@ Keywords: Bristol, City Centre, Marina, Boats, Seagulls, Water, Cathedral, Skyli
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.76s
-- *Generation time:* 80.25s
-- *Total time:* 83.04s
-- *Input validation time:* 0.000105
-- *Prompt preparation time:* 0.0141
-- *First-token latency:* 78.2
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 111
-- *Total tokens:* 16,687
-- *Prompt throughput (raw):* 212 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Model load time:* 2.51s
+- *Generation time:* 62.21s
+- *Total time:* 64.74s
+- *Input validation time:* 5.67e-05
+- *Prompt preparation time:* 0.0145
+- *First-token latency:* 60.4
+- *Cleanup time:* 0.114
+- *Prompt tokens:* 16,521
+- *Generation tokens:* 105
+- *Total tokens:* 16,626
+- *Prompt throughput (raw):* 273 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00859
+- *Post-cleanup active memory:* 0.00857
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1409
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -715,11 +751,11 @@ Keywords: Bristol, City Centre, Marina, Boats, Seagulls, Water, Cathedral, Skyli
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Seagulls and Boats at Bristol Harbour
+Title: The Thekla Ship Moored in Bristol Harbour
 
-Description: A sunny afternoon view of Bristol Harbour featuring numerous boats moored at the quay, with a large flock of seagulls floating on the water in the foreground. The background displays the historic Bristol Cathedral and a modern Ferris wheel rising above the city skyline.
+Description: The black-hulled vessel Thekla is moored in Mud Dock, Bristol Harbour, under a clear blue sky, with the stone spire of St Mary Redcliffe church visible in the background.
 
-Keywords: Bristol, Harbour, Marina, Seagulls, Boats, Cathedral, Ferris Wheel, Cityscape, Architecture, England, UK, Water, Dock, Quay, Sky, Clouds, Urban, Leisure
+Keywords: Thekla, Bristol Harbour, Moored, Church Spire, St Mary Redcliffe, Nautical, Boat, Dock, Clear Sky, England, UK, Europe, Architecture, Building, City Centre, Mooring lines, Mast, Flag
 </pre>
 
 </details>
@@ -738,27 +774,27 @@ Keywords: Bristol, Harbour, Marina, Seagulls, Boats, Cathedral, Ferris Wheel, Ci
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.88s
-- *Generation time:* 79.70s
-- *Total time:* 81.59s
-- *Input validation time:* 4.63e-05
-- *Prompt preparation time:* 0.000378
-- *First-token latency:* 76.6
-- *Cleanup time:* 0.11
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 117
-- *Total tokens:* 16,693
-- *Prompt throughput (raw):* 216 tok/s
-- *Generation throughput (raw):* 68.0 tok/s
+- *Model load time:* 1.38s
+- *Generation time:* 63.77s
+- *Total time:* 65.16s
+- *Input validation time:* 5.24e-05
+- *Prompt preparation time:* 0.00031
+- *First-token latency:* 61.9
+- *Cleanup time:* 0.0824
+- *Prompt tokens:* 16,521
+- *Generation tokens:* 99
+- *Total tokens:* 16,620
+- *Prompt throughput (raw):* 267 tok/s
+- *Generation throughput (raw):* 90.5 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.6
 - *Cache memory:* 1.2
 - *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00911
+- *Post-cleanup active memory:* 0.00909
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1409
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -774,11 +810,11 @@ Keywords: Bristol, Harbour, Marina, Seagulls, Boats, Cathedral, Ferris Wheel, Ci
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina with Seagulls and Historic Architecture
+Title: Thekla Ship Moored in Bristol Harbour
 
-Description: Boats are docked at Bristol’s Canons Marsh marina, with seagulls floating and flying over the water, set against a backdrop of historic cathedral spires and modern buildings including the Coyote Ugly Saloon under a partly cloudy sky.
+Description: The Thekla, a historic ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
 
-Keywords: Bristol, Marina, Seagulls, Boats, Canons Marsh, Cathedral, Coyote Ugly Saloon, Architecture, Cityscape, England, Europe, Great Britain, Gull, Harbor, Dock, Sky, Clouds, Water
+Keywords: Thekla, Ship, Moored, Bristol Harbour, Mud Dock, St Mary Redcliffe, Church Spire, Clear Sky, England, Europe, Architecture, Nautical, Dock, Mooring Lines, Flag, Mast
 </pre>
 
 </details>
@@ -797,27 +833,27 @@ Keywords: Bristol, Marina, Seagulls, Boats, Canons Marsh, Cathedral, Coyote Ugly
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.56s
-- *Generation time:* 106.61s
-- *Total time:* 110.20s
-- *Input validation time:* 5.83e-05
-- *Prompt preparation time:* 0.02
-- *First-token latency:* 97.2
-- *Cleanup time:* 0.215
-- *Prompt tokens:* 16,576
-- *Generation tokens:* 125
-- *Total tokens:* 16,701
-- *Prompt throughput (raw):* 170 tok/s
-- *Generation throughput (raw):* 15.0 tok/s
+- *Model load time:* 3.11s
+- *Generation time:* 88.77s
+- *Total time:* 91.91s
+- *Input validation time:* 4.5e-05
+- *Prompt preparation time:* 0.0151
+- *First-token latency:* 81
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 16,521
+- *Generation tokens:* 118
+- *Total tokens:* 16,639
+- *Prompt throughput (raw):* 204 tok/s
+- *Generation throughput (raw):* 16.9 tok/s
 - *Peak memory:* 35
 - *Active memory:* 29
-- *Cache memory:* 1.9
+- *Cache memory:* 1.8
 - *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.00962
+- *Post-cleanup active memory:* 0.0096
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1411
+- *Rendered prompt characters:* 1409
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -834,122 +870,117 @@ Keywords: Bristol, Marina, Seagulls, Boats, Canons Marsh, Cathedral, Coyote Ugly
 
 <pre class="model-output-readable">
 Title:
-Bristol Harbourside with Cathedral and Ferris Wheel
+The Thekla ship moored in Bristol Harbour
 
 Description:
-A sunny afternoon view of Bristol's harbourside featuring docked boats and a large flock of seagulls on the water. The background skyline includes the historic Bristol Cathedral, a Ferris wheel, and the Coyote Ugly Saloon building.
+The black hull of the historic ship The Thekla is moored in Mud Dock, Bristol, under a clear blue sky. In the background, the distinctive stone spire of St Mary Redcliffe church rises above the trees on the riverbank.
 
 Keywords:
-Bristol, Harbourside, Marina, Bristol Cathedral, Ferris Wheel, Seagulls, Boats, Water, Cityscape, England, UK, Europe, Architecture, Canons Marsh, Coyote Ugly, Dock, Birds, Summer
+Bristol, The Thekla, Ship, Mud Dock, St Mary Redcliffe, Church Spire, Harbour, Moored, Mast, Nautical, River, England, UK, Clear Sky, Water, Architecture, Historic, Black Hull
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-step-37-flash-oq2e"></a>
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
-### mlx-community/Step-3.7-Flash-oQ2e
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
 <details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 11.79s
-- *Generation time:* 26.38s
-- *Total time:* 38.19s
-- *Input validation time:* 6.76e-05
-- *Prompt preparation time:* 0.0169
-- *First-token latency:* 22.7
-- *Cleanup time:* 0.233
-- *Prompt tokens:* 3,503
-- *Generation tokens:* 116
-- *Total tokens:* 3,619
-- *Prompt throughput (raw):* 155 tok/s
-- *Generation throughput (raw):* 42.7 tok/s
-- *Peak memory:* 70
-- *Active memory:* 63
-- *Cache memory:* 0.41
-- *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.01
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.66s
+- *Generation time:* 1.73s
+- *Total time:* 2.39s
+- *Input validation time:* 5.3e-05
+- *Prompt preparation time:* 0.00184
+- *First-token latency:* 0.331
+- *Cleanup time:* 0.0729
+- *Prompt tokens:* 439
+- *Generation tokens:* 98
+- *Total tokens:* 537
+- *Prompt throughput (raw):* 1,326 tok/s
+- *Generation throughput (raw):* 129 tok/s
+- *Peak memory:* 5.5
+- *Active memory:* 4.5
+- *Cache memory:* 0.19
+- *Model-load active memory:* 4.5
+- *Post-cleanup active memory:* 0.00972
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1398
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1350
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* <end_of_utterance>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Bristol Marina with Cathedral and Seagulls
-
-Description:
-A marina in Bristol, England, with numerous boats docked at the quay, seagulls floating and flying across the foreground water, and the city's cathedral and a Ferris wheel visible in the background under a bright, partly cloudy sky.
-
-Keywords:
-Bristol, Marina, Boats, Seagulls, Cathedral, Ferris Wheel, Cityscape, Waterfront, England, UK, Architecture, Harbor, Dock, Canons Marsh, Coyote Ugly, Bird, Great Britain, Europe
+ Title: Thekla, Bristol, England, UK, GBR, Europe
+Description: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+Keywords: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mooring, Mooring lines, Nautical
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
 
-### mlx-community/gemma-3-27b-it-qat-4bit
+### mlx-community/gemma-4-26b-a4b-it-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.45s
-- *Generation time:* 6.06s
-- *Total time:* 8.52s
-- *Input validation time:* 5.4e-05
-- *Prompt preparation time:* 0.00393
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 603
-- *Generation tokens:* 131
-- *Total tokens:* 734
-- *Prompt throughput (raw):* 538 tok/s
-- *Generation throughput (raw):* 29.7 tok/s
-- *Peak memory:* 18
-- *Active memory:* 16
-- *Cache memory:* 0.45
-- *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.0108
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
+- *Model load time:* 2.36s
+- *Generation time:* 1.74s
+- *Total time:* 4.13s
+- *Input validation time:* 4.19e-05
+- *Prompt preparation time:* 0.0201
+- *First-token latency:* 0.411
+- *Cleanup time:* 0.115
+- *Prompt tokens:* 617
+- *Generation tokens:* 104
+- *Total tokens:* 721
+- *Prompt throughput (raw):* 1,503 tok/s
+- *Generation throughput (raw):* 129 tok/s
+- *Peak memory:* 16
+- *Active memory:* 15
+- *Cache memory:* 0.21
+- *Model-load active memory:* 15.4
+- *Post-cleanup active memory:* 0.0119
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1375
+- *Rendered prompt characters:* 1372
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
@@ -957,11 +988,11 @@ Bristol, Marina, Boats, Seagulls, Cathedral, Ferris Wheel, Cityscape, Waterfront
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina with Clifton Suspension Bridge and Cabot Tower
+Title: Thekla ship moored in Bristol Harbour
 
-Description: Captured on 12 August 2026 at 16:45 UTC+01, this image shows boats moored at Bristol Marina, with the Clifton Suspension Bridge and Cabot Tower visible in the background; numerous seagulls are present on the water in the foreground. The foreground also features a distinctive green building labelled “Coyote Ugly”.
+Description: The Thekla ship is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear sky. The vessel's black hull and tall white mast are captured in bright daylight.
 
-Keywords: Bristol, Marina, Boats, Seagulls, Clifton Suspension Bridge, Cabot Tower, Cityscape, Architecture, Water, Dock, Harbour, City Centre, England, Great Britain, Coyote Ugly, Buildings, Waterfront, Daytime
+Keywords: Architecture, Boat, Bristol, Church, Church Spire, City, Clear Sky, Dock, England, Europe, Harbor, Mast, Moored, Mooring lines, Nautical, Ship, Vessel, Water
 </pre>
 
 </details>
@@ -980,27 +1011,27 @@ Keywords: Bristol, Marina, Boats, Seagulls, Clifton Suspension Bridge, Cabot Tow
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.77s
-- *Generation time:* 5.32s
-- *Total time:* 8.11s
-- *Input validation time:* 5.1e-05
-- *Prompt preparation time:* 0.000315
-- *First-token latency:* 1.07
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 608
-- *Generation tokens:* 102
-- *Total tokens:* 710
-- *Prompt throughput (raw):* 569 tok/s
-- *Generation throughput (raw):* 27.6 tok/s
+- *Model load time:* 2.52s
+- *Generation time:* 5.30s
+- *Total time:* 7.83s
+- *Input validation time:* 4.92e-05
+- *Prompt preparation time:* 0.0003
+- *First-token latency:* 1.06
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 617
+- *Generation tokens:* 99
+- *Total tokens:* 716
+- *Prompt throughput (raw):* 581 tok/s
+- *Generation throughput (raw):* 26.7 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.79
+- *Cache memory:* 0.80
 - *Model-load active memory:* 18.4
 - *Post-cleanup active memory:* 0.0124
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1374
+- *Rendered prompt characters:* 1372
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1016,134 +1047,9 @@ Keywords: Bristol, Marina, Boats, Seagulls, Clifton Suspension Bridge, Cabot Tow
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boats at Canons Marsh, Bristol City Centre
-Description: A variety of boats are docked at a marina in Bristol, England, with seagulls floating in the foreground and the Bristol Cathedral and a Ferris wheel visible in the background. The scene is captured under bright, afternoon daylight.
-Keywords: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Marina
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### mlx-community/pixtral-12b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.80s
-- *Generation time:* 5.49s
-- *Total time:* 7.30s
-- *Input validation time:* 0.000313
-- *Prompt preparation time:* 0.00467
-- *First-token latency:* 2.11
-- *Cleanup time:* 0.0945
-- *Prompt tokens:* 3,125
-- *Generation tokens:* 113
-- *Total tokens:* 3,238
-- *Prompt throughput (raw):* 1,480 tok/s
-- *Generation throughput (raw):* 39.6 tok/s
-- *Peak memory:* 16
-- *Active memory:* 13
-- *Cache memory:* 0.59
-- *Model-load active memory:* 13.5
-- *Post-cleanup active memory:* 0.0144
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1320
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Bristol Marina with Seagulls and Cathedral
-
-Description:
-This image captures a bustling marina in Bristol, England, with numerous boats docked along the waterfront. A flock of seagulls is seen flying and floating in the foreground, with the iconic Bristol Cathedral visible in the background.
-
-Keywords:
-Bristol, Marina, Boats, Seagulls, Bristol Cathedral, England, Europe, Great Britain, Waterfront, Dock, Gull, Cityscape, Architecture, Boat, Harbor, City Centre, Building, Canons Marsh
-</pre>
-
-</details>
-
----
-
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
-
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
-
-<details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 2 words (requested 5-10); Duplicate keywords: city
-  centre, harbor, cityscape
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 1.11s
-- *Generation time:* 1.36s
-- *Total time:* 2.85s
-- *Input validation time:* 0.371
-- *Prompt preparation time:* 0.00668
-- *First-token latency:* 0.754
-- *Cleanup time:* 0.0615
-- *Prompt tokens:* 404
-- *Generation tokens:* 86
-- *Total tokens:* 490
-- *Prompt throughput (raw):* 536 tok/s
-- *Generation throughput (raw):* 506 tok/s
-- *Peak memory:* 1.2
-- *Active memory:* 0.90
-- *Cache memory:* 0.02
-- *Model-load active memory:* 0.897
-- *Post-cleanup active memory:* 0.000132
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1371
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 6c33f49ebc0b50b75385f49ad3beddcb720d0c75
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/6c33f49ebc0b50b75385f49ad3beddcb720d0c75
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Bristol Marina
-
-Description:
-A bustling marina in Bristol, England, with boats docked and seagulls flying in the foreground, under a partly cloudy sky.
-
-Keywords:
-Bristol marina, boats, seagulls, city centre, England, GBR, Europe, architecture, harbor, cityscape, city, city centre, cityscape, Gull, harbor, marina
+Title: The Thekla ship venue in Bristol Harbour
+Description: The Thekla, a black ship venue, is moored in Mud Dock in Bristol, England, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky.
+Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Harbor, Mast, Moored, Mooring lines, Nautical, The Thekla
 </pre>
 
 </details>
@@ -1160,21 +1066,21 @@ Bristol marina, boats, seagulls, city centre, England, GBR, Europe, architecture
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Keyword list has 20
-  terms (requested 10-18); Duplicate keywords: england, marina, harbor, gull
+- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
+  keywords: england, europe, mooring, mooring lines, nautical, flag
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.66s
-- *Generation time:* 16.03s
-- *Total time:* 16.71s
-- *Input validation time:* 4.44e-05
-- *Prompt preparation time:* 0.00926
+- *Model load time:* 0.65s
+- *Generation time:* 16.72s
+- *Total time:* 17.39s
+- *Input validation time:* 4.62e-05
+- *Prompt preparation time:* 0.00897
 - *First-token latency:* 14
-- *Cleanup time:* 0.0883
-- *Prompt tokens:* 16,561
-- *Generation tokens:* 110
-- *Total tokens:* 16,671
-- *Prompt throughput (raw):* 1,185 tok/s
-- *Generation throughput (raw):* 92.3 tok/s
+- *Cleanup time:* 0.0839
+- *Prompt tokens:* 16,506
+- *Generation tokens:* 184
+- *Total tokens:* 16,690
+- *Prompt throughput (raw):* 1,180 tok/s
+- *Generation throughput (raw):* 94.8 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -1183,7 +1089,7 @@ Bristol marina, boats, seagulls, city centre, England, GBR, Europe, architecture
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1392
+- *Rendered prompt characters:* 1390
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1199,11 +1105,75 @@ Bristol marina, boats, seagulls, city centre, England, GBR, Europe, architecture
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina with Seagulls
+Title:
+Thekla Ship in Bristol Harbour
 
-Description: A bustling marina in Bristol, England, features docked boats and a flock of seagulls in the water, with the city's architecture, including the Bristol Cathedral, visible in the background under a partly cloudy sky.
+Description:
+The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white mast are prominent, with mooring lines securing it to the dock. The scene captures a serene moment in the city centre, with green trees and other boats in the surrounding water.
 
-Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Architecture, Cathedral, Gull, Dock, Cityscape, Coyote Ugly, Great Britain, Europe, Bristol Cathedral, England, Gull, Harbor, Marina
+Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, City Centre, St Mary Redcliffe Church, Church Spire, Dock, Moored, Mooring, Mooring lines, Nautical, Boat, Mast, Clear Sky, Harbor, Flag, Building, Architecture, Bristol, City, England, Europe, Flag, Mooring, Mooring lines, Nautical
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+<details>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 22 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.11s
+- *Generation time:* 8.01s
+- *Total time:* 10.13s
+- *Input validation time:* 4.57e-05
+- *Prompt preparation time:* 0.00667
+- *First-token latency:* 3.6
+- *Cleanup time:* 0.0942
+- *Prompt tokens:* 2,696
+- *Generation tokens:* 119
+- *Total tokens:* 2,815
+- *Prompt throughput (raw):* 749 tok/s
+- *Generation throughput (raw):* 30.5 tok/s
+- *Peak memory:* 24
+- *Active memory:* 18
+- *Cache memory:* 0.52
+- *Model-load active memory:* 18
+- *Post-cleanup active memory:* 0.000968
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1318
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Thekla Ship Venue in Bristol Harbour
+
+Description:
+The Thekla, a moored ship venue, is anchored in Mud Dock, Bristol Harbour, with the distinctive steeple of St Mary Redcliffe Church visible in the background under a clear blue sky.
+
+Keywords:
+Architecture, Boat, Bristol, Building, Church, Church Spire, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical, Ship Venue, St Mary Redcliffe, Thekla, Waterfront
 </pre>
 
 </details>
@@ -1220,20 +1190,21 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Keyword
+  list has 25 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 9.53s
-- *Generation time:* 33.01s
-- *Total time:* 42.56s
-- *Input validation time:* 5.16e-05
-- *Prompt preparation time:* 0.00726
-- *First-token latency:* 28.7
-- *Cleanup time:* 0.501
-- *Prompt tokens:* 6,367
-- *Generation tokens:* 97
-- *Total tokens:* 6,464
-- *Prompt throughput (raw):* 222 tok/s
-- *Generation throughput (raw):* 26.4 tok/s
+- *Model load time:* 8.11s
+- *Generation time:* 21.85s
+- *Total time:* 29.98s
+- *Input validation time:* 5.9e-05
+- *Prompt preparation time:* 0.00683
+- *First-token latency:* 18
+- *Cleanup time:* 0.239
+- *Prompt tokens:* 6,348
+- *Generation tokens:* 122
+- *Total tokens:* 6,470
+- *Prompt throughput (raw):* 352 tok/s
+- *Generation throughput (raw):* 38.1 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1242,7 +1213,7 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1401
+- *Rendered prompt characters:* 1399
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1258,148 +1229,21 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Bristol Marina with Seagulls and Cathedral
-Description: A marina in Bristol, England, with boats docked at the pier, seagulls floating in the water, and Bristol Cathedral and a Ferris wheel visible in the background under a partly cloudy sky.
-Keywords: Bristol, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel, City Centre, England, UK, Europe, Harbor, Dock, Architecture, Building, Cityscape&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: The Thekla Ship at Mud Dock, Bristol
+Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
+Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spire, Moored, Mooring Lines, Black Hull, Red Stripe, White Mast, Clear Sky, England, UK, Europe, Nautical, Dock, Harbor, City Centre, Architecture, Building, Boat, Mast, Flag, City&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: Bristol Marina with Seagulls and Cathedral
-Description: A marina in Bristol, England, with boats docked at the pier, seagulls floating in the water, and Bristol Cathedral and a Ferris wheel visible in the background under a partly cloudy sky.
-Keywords: Bristol, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel, City Centre, England, UK, Europe, Harbor, Dock, Architecture, Building, Cityscape<|end_of_box|>
+<|begin_of_box|>Title: The Thekla Ship at Mud Dock, Bristol
+Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
+Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spire, Moored, Mooring Lines, Black Hull, Red Stripe, White Mast, Clear Sky, England, UK, Europe, Nautical, Dock, Harbor, City Centre, Architecture, Building, Boat, Mast, Flag, City<|end_of_box|>
 ```
 
 </details>
-
-</details>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible; Title has
-  11 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.16s
-- *Generation time:* 11.05s
-- *Total time:* 13.23s
-- *Input validation time:* 9.53e-05
-- *Prompt preparation time:* 0.00135
-- *First-token latency:* 2.48
-- *Cleanup time:* 0.354
-- *Prompt tokens:* 2,627
-- *Generation tokens:* 208
-- *Total tokens:* 2,835
-- *Prompt throughput (raw):* 1,059 tok/s
-- *Generation throughput (raw):* 26.4 tok/s
-- *Peak memory:* 18
-- *Active memory:* 17
-- *Cache memory:* 0.46
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00269
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1357
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Boats Docked at Bristol Marina with City Centre in the Background.
-Description: This image depicts a marina in Bristol, England, featuring a variety of boats docked along the waterfront. The boats vary in size and design, with some having multiple decks and others appearing more compact. The marina is surrounded by a mix of greenery, including trees and shrubs, which provide a natural backdrop. In the background, the cityscape of Bristol is visible, with notable structures such as the Bristol Cathedral and other buildings. The sky is partly cloudy, with patches of sunlight illuminating the scene. The water in the marina is calm, and a flock of seagulls can be seen flying and floating on the surface. The overall atmosphere is serene and picturesque, capturing the essence of a tranquil day by the water.
-Keywords: Bristol, marina, boats, dock, cityscape, Bristol Cathedral, seagulls, water, trees, shrubs, calm, partly cloudy, sunlight, serene, picturesque.&lt;end_of_utterance&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- Title: Boats Docked at Bristol Marina with City Centre in the Background.
-Description: This image depicts a marina in Bristol, England, featuring a variety of boats docked along the waterfront. The boats vary in size and design, with some having multiple decks and others appearing more compact. The marina is surrounded by a mix of greenery, including trees and shrubs, which provide a natural backdrop. In the background, the cityscape of Bristol is visible, with notable structures such as the Bristol Cathedral and other buildings. The sky is partly cloudy, with patches of sunlight illuminating the scene. The water in the marina is calm, and a flock of seagulls can be seen flying and floating on the surface. The overall atmosphere is serene and picturesque, capturing the essence of a tranquil day by the water.
-Keywords: Bristol, marina, boats, dock, cityscape, Bristol Cathedral, seagulls, water, trees, shrubs, calm, partly cloudy, sunlight, serene, picturesque.<end_of_utterance>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### mlx-community/InternVL3-8B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Duplicate keywords:
-  marina
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.86s
-- *Generation time:* 5.63s
-- *Total time:* 7.51s
-- *Input validation time:* 7.88e-05
-- *Prompt preparation time:* 0.00252
-- *First-token latency:* 1.21
-- *Cleanup time:* 0.299
-- *Prompt tokens:* 2,127
-- *Generation tokens:* 104
-- *Total tokens:* 2,231
-- *Prompt throughput (raw):* 1,755 tok/s
-- *Generation throughput (raw):* 28.6 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.17
-- *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.00302
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1325
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Bristol Marina with Seagulls
-Description: Boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture in the background, captured at 16:45 on 12 August 2026.
-Keywords: Bristol, England, Marina, Boats, Seagulls, Dock, Architecture, Bristol Cathedral, Coyote Ugly, Canons Marsh, Cityscape, Great Britain, Europe, Marina, Gull, Harbor
-</pre>
 
 </details>
 
@@ -1415,30 +1259,29 @@ Keywords: Bristol, England, Marina, Boats, Seagulls, Dock, Architecture, Bristol
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Duplicate keywords:
-  sunset
+- *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.87s
-- *Generation time:* 2.01s
-- *Total time:* 2.89s
-- *Input validation time:* 0.000107
-- *Prompt preparation time:* 0.00594
-- *First-token latency:* 0.434
-- *Cleanup time:* 0.0866
-- *Prompt tokens:* 594
-- *Generation tokens:* 142
-- *Total tokens:* 736
-- *Prompt throughput (raw):* 1,369 tok/s
-- *Generation throughput (raw):* 162 tok/s
+- *Model load time:* 0.60s
+- *Generation time:* 1.16s
+- *Total time:* 1.77s
+- *Input validation time:* 5.52e-05
+- *Prompt preparation time:* 0.00342
+- *First-token latency:* 0.0806
+- *Cleanup time:* 0.0684
+- *Prompt tokens:* 599
+- *Generation tokens:* 125
+- *Total tokens:* 724
+- *Prompt throughput (raw):* 7,436 tok/s
+- *Generation throughput (raw):* 186 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.02
 - *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.0038
+- *Post-cleanup active memory:* 0.00379
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1371
+- *Rendered prompt characters:* 1369
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1454,11 +1297,73 @@ Keywords: Bristol, England, Marina, Boats, Seagulls, Dock, Architecture, Bristol
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina at Sunset
+Title: Thekla at Bristol Harbour
 
-Description: The image captures a serene scene at Bristol Marina, where boats are docked along the waterfront. A flock of seagulls can be seen flying and floating in the water, adding a lively touch to the tranquil setting. The backdrop features the iconic Bristol Cathedral, with its Gothic architecture standing tall against the sky. The marina is bathed in the warm glow of the setting sun, casting a golden hue over the water and the boats.
+Description: The Thekla, a historic ship venue, is moored in the Mud Dock of Bristol Harbour. The vessel is anchored with mooring lines, and the backdrop features the steeple of St Mary Redcliffe Church, adding a touch of architectural elegance to the scene. The clear sky and calm waters highlight the serene atmosphere of the harbor.
 
-Keywords: Bristol, Marina, Seagulls, Sunset, Cathedral, Architecture, Waterfront, Boats, City, England, Europe, Gull, Harbor, Sunset, Golden Hour
+Keywords: Thekla, Bristol Harbour, moored, mooring lines, ship venue, historic, architecture, church spire, city, harbor, clear sky, water, dock, England, Europe
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 22 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.39s
+- *Generation time:* 7.04s
+- *Total time:* 8.43s
+- *Input validation time:* 4.06e-05
+- *Prompt preparation time:* 0.000233
+- *First-token latency:* 2.49
+- *Cleanup time:* 0.0843
+- *Prompt tokens:* 3,229
+- *Generation tokens:* 248
+- *Total tokens:* 3,477
+- *Prompt throughput (raw):* 1,298 tok/s
+- *Generation throughput (raw):* 61.2 tok/s
+- *Peak memory:* 15
+- *Active memory:* 8.4
+- *Cache memory:* 0.65
+- *Model-load active memory:* 8.43
+- *Post-cleanup active memory:* 0.00536
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 3756
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-nvfp4/snapshots/28777b889d841a86369c736175cb77258c8134b2
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+**Title:**
+*Thekla Ship Venue Moored in Bristol’s Mud Dock
+
+**Description:**
+On **12 August 2026** at **17:52 UTC+01:00** (GPS: **51.4485°N, 2.593°W**), the historic **Bristol-built wooden ship *Thekla***—a converted venue vessel—is anchored in **Mud Dock, Bristol Harbour**. Against a clear blue sky, its black hull and white mast stand out, with **St Mary Redcliffe’s church spire** visible in the background, mooring lines taut along the dockside.
+
+**Keywords:**
+*Thekla, Bristol, Mud Dock, Bristol Harbour, wooden ship, venue vessel, St Mary Redcliffe, church spire, moored vessel, mooring lines, historic ship, clear sky, dockside, UK architecture, nautical heritage, 2026-08-12, 17:52 UTC+01:00, 51.4485°N 2.593°W, black hull, white mast, clear blue sky, background landmark*
 </pre>
 
 </details>
@@ -1475,29 +1380,31 @@ Keywords: Bristol, Marina, Seagulls, Sunset, Cathedral, Architecture, Waterfront
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 21 terms (requested 10-18)
+- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
+  keywords: church spire, church, city centre, clear sky, dock, england,
+  europe, flag, harbor, mast, moored, mooring lines, nautical
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.34s
-- *Generation time:* 4.46s
-- *Total time:* 5.80s
-- *Input validation time:* 5.28e-05
-- *Prompt preparation time:* 0.00136
-- *First-token latency:* 0.901
-- *Cleanup time:* 0.0807
-- *Prompt tokens:* 1,527
-- *Generation tokens:* 135
-- *Total tokens:* 1,662
-- *Prompt throughput (raw):* 1,695 tok/s
-- *Generation throughput (raw):* 51.4 tok/s
+- *Model load time:* 1.20s
+- *Generation time:* 4.42s
+- *Total time:* 5.62s
+- *Input validation time:* 3.67e-05
+- *Prompt preparation time:* 0.00134
+- *First-token latency:* 0.652
+- *Cleanup time:* 0.0775
+- *Prompt tokens:* 1,534
+- *Generation tokens:* 153
+- *Total tokens:* 1,687
+- *Prompt throughput (raw):* 2,354 tok/s
+- *Generation throughput (raw):* 53.4 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
 - *Model-load active memory:* 9.04
-- *Post-cleanup active memory:* 0.00595
+- *Post-cleanup active memory:* 0.00593
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1316
+- *Rendered prompt characters:* 1314
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1513,11 +1420,11 @@ Keywords: Bristol, Marina, Seagulls, Sunset, Cathedral, Architecture, Waterfront
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Bristol Waterfront Scene with Boats and Seagulls
+ Title: The Thekla, Bristol's historic ship venue in Mud Dock
 
-Description: A marina in Bristol's city center, featuring boats docked along a concrete walkway, with a flock of seagulls flying and floating in the water. The scene is set against a backdrop of historic buildings, including a church and a modern Coyote Ugly establishment, with a Ferris wheel visible in the distance.
+Description: A black ship named Thekla is moored in Bristol Harbour's Mud Dock, with the steeple of St Mary Redcliffe church visible in the background. The scene captures a clear day, showcasing the city's blend of maritime history and urban architecture.
 
-Keywords: Architecture, Bird, Boat, Bristol, Cathedral, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Modern, Old, Waterfront
+Keywords: Bristol, Church Spire, Church, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical, Thekla, Church, St Mary Redcliffe, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical
 </pre>
 
 </details>
@@ -1534,30 +1441,30 @@ Keywords: Architecture, Bird, Boat, Bristol, Cathedral, Building, Canons Marsh, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Keyword list has 20
-  terms (requested 10-18); Duplicate keywords: england, marina, harbor, gull
+- *Observations:* Keyword list has 30 terms (requested 10-18); Duplicate
+  keywords: england, europe, mooring, mooring lines, nautical, flag
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.99s
-- *Generation time:* 29.24s
-- *Total time:* 30.24s
-- *Input validation time:* 6.41e-05
-- *Prompt preparation time:* 0.000329
-- *First-token latency:* 26.6
-- *Cleanup time:* 0.15
-- *Prompt tokens:* 16,561
-- *Generation tokens:* 110
-- *Total tokens:* 16,671
-- *Prompt throughput (raw):* 622 tok/s
-- *Generation throughput (raw):* 83.0 tok/s
+- *Model load time:* 0.75s
+- *Generation time:* 21.35s
+- *Total time:* 22.10s
+- *Input validation time:* 4e-05
+- *Prompt preparation time:* 0.000211
+- *First-token latency:* 18.6
+- *Cleanup time:* 0.083
+- *Prompt tokens:* 16,506
+- *Generation tokens:* 184
+- *Total tokens:* 16,690
+- *Prompt throughput (raw):* 890 tok/s
+- *Generation throughput (raw):* 93.1 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00777
+- *Post-cleanup active memory:* 0.00775
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1392
+- *Rendered prompt characters:* 1390
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1573,11 +1480,76 @@ Keywords: Architecture, Bird, Boat, Bristol, Cathedral, Building, Canons Marsh, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina with Seagulls
+Title:
+Thekla Ship in Bristol Harbour
 
-Description: A bustling marina in Bristol, England, features docked boats and a flock of seagulls in the water, with the city's architecture, including the Bristol Cathedral, visible in the background under a partly cloudy sky.
+Description:
+The Thekla, a historic ship venue moored in Mud Dock, Bristol, England, is pictured under a clear blue sky with the spire of St Mary Redcliffe Church visible in the background. The vessel's black hull, red stripe, and white mast are prominent, with mooring lines securing it to the dock. The scene captures a serene moment in the city centre, with green trees and other boats in the surrounding water.
 
-Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Architecture, Cathedral, Gull, Dock, Cityscape, Coyote Ugly, Great Britain, Europe, Bristol Cathedral, England, Gull, Harbor, Marina
+Keywords: Thekla, ship venue, Mud Dock, Bristol Harbour, England, UK, Europe, City Centre, St Mary Redcliffe Church, Church Spire, Dock, Moored, Mooring, Mooring lines, Nautical, Boat, Mast, Clear Sky, Harbor, Flag, Building, Architecture, Bristol, City, England, Europe, Flag, Mooring, Mooring lines, Nautical
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq2e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ2e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 11 words (requested 5-10); Keyword list has 19
+  terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 7.56s
+- *Generation time:* 22.00s
+- *Total time:* 29.58s
+- *Input validation time:* 4.03e-05
+- *Prompt preparation time:* 0.0141
+- *First-token latency:* 18.7
+- *Cleanup time:* 0.204
+- *Prompt tokens:* 3,503
+- *Generation tokens:* 115
+- *Total tokens:* 3,618
+- *Prompt throughput (raw):* 188 tok/s
+- *Generation throughput (raw):* 45.5 tok/s
+- *Peak memory:* 70
+- *Active memory:* 63
+- *Cache memory:* 0.41
+- *Model-load active memory:* 63
+- *Post-cleanup active memory:* 0.00998
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1396
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire
+
+Description:
+The vessel Thekla, a ship venue, is moored in Mud Dock within Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
+
+Keywords:
+Bristol, Thekla, ship venue, moored vessel, Mud Dock, Bristol Harbour, St Mary Redcliffe, church spire, clear sky, harbour, dock, nautical, architecture, boat, mooring lines, mast, flag, England, UK
 </pre>
 
 </details>
@@ -1596,18 +1568,18 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.40s
-- *Generation time:* 2.79s
-- *Total time:* 6.22s
-- *Input validation time:* 5.22e-05
-- *Prompt preparation time:* 0.0222
-- *First-token latency:* 0.462
-- *Cleanup time:* 0.147
-- *Prompt tokens:* 604
+- *Model load time:* 3.26s
+- *Generation time:* 2.61s
+- *Total time:* 5.90s
+- *Input validation time:* 4.72e-05
+- *Prompt preparation time:* 0.0201
+- *First-token latency:* 0.441
+- *Cleanup time:* 0.144
+- *Prompt tokens:* 613
 - *Generation tokens:* 87
-- *Total tokens:* 691
-- *Prompt throughput (raw):* 1,309 tok/s
-- *Generation throughput (raw):* 54.3 tok/s
+- *Total tokens:* 700
+- *Prompt throughput (raw):* 1,389 tok/s
+- *Generation throughput (raw):* 57.5 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1616,7 +1588,7 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1346
+- *Rendered prompt characters:* 1344
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1633,9 +1605,9 @@ Keywords: Bristol, England, City Centre, Marina, Boats, Seagulls, Harbor, Archit
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Boats at Canons Marsh Marina in Bristol City Centre
-Description: Numerous boats are docked at the marina in Bristol, featuring a flock of seagulls floating in the water with Bristol Cathedral and a Ferris wheel in the background.
-Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel, Seagull, Cityscape, Architecture, Harbour, Dock, Waterfront, UK, Europe
+&lt;channel|&gt;Title: The Thekla ship venue moored in Bristol Harbour England
+Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
+Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, England, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 </pre>
 
 <details>
@@ -1643,9 +1615,9 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 
 ```text
 <|channel>thought
-<channel|>Title: Boats at Canons Marsh Marina in Bristol City Centre
-Description: Numerous boats are docked at the marina in Bristol, featuring a flock of seagulls floating in the water with Bristol Cathedral and a Ferris wheel in the background.
-Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel, Seagull, Cityscape, Architecture, Harbour, Dock, Waterfront, UK, Europe
+<channel|>Title: The Thekla ship venue moored in Bristol Harbour England
+Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
+Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, England, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 ```
 
 </details>
@@ -1666,18 +1638,18 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.47s
-- *Generation time:* 2.43s
-- *Total time:* 5.91s
-- *Input validation time:* 5.53e-05
-- *Prompt preparation time:* 0.000316
-- *First-token latency:* 0.39
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 604
-- *Generation tokens:* 81
-- *Total tokens:* 685
-- *Prompt throughput (raw):* 1,549 tok/s
-- *Generation throughput (raw):* 63.0 tok/s
+- *Model load time:* 3.15s
+- *Generation time:* 2.36s
+- *Total time:* 5.51s
+- *Input validation time:* 4.33e-05
+- *Prompt preparation time:* 0.000295
+- *First-token latency:* 0.438
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 613
+- *Generation tokens:* 82
+- *Total tokens:* 695
+- *Prompt throughput (raw):* 1,401 tok/s
+- *Generation throughput (raw):* 65.8 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -1686,7 +1658,7 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1346
+- *Rendered prompt characters:* 1344
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1703,9 +1675,9 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Boats at Canons Marsh Marina near Bristol Cathedral
-Description: Various motorboats are docked at the marina in Bristol, with a flock of seagulls floating and flying over the water in the foreground.
-Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Architecture, Cityscape, England, Europe, Water, Dock, Birds, Waterfront
+&lt;channel|&gt;Title: The Thekla Ship Moored in Bristol Harbour
+Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.
+Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring lines, Nautical, England, City Centre, Clear Sky, Architecture
 </pre>
 
 <details>
@@ -1713,9 +1685,9 @@ Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Ar
 
 ```text
 <|channel>thought
-<channel|>Title: Boats at Canons Marsh Marina near Bristol Cathedral
-Description: Various motorboats are docked at the marina in Bristol, with a flock of seagulls floating and flying over the water in the foreground.
-Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Architecture, Cityscape, England, Europe, Water, Dock, Birds, Waterfront
+<channel|>Title: The Thekla Ship Moored in Bristol Harbour
+Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.
+Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring lines, Nautical, England, City Centre, Clear Sky, Architecture
 ```
 
 </details>
@@ -1724,47 +1696,47 @@ Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Ar
 
 ---
 
-<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
-### mlx-community/gemma-4-26b-a4b-it-4bit
+### mlx-community/gemma-3-27b-it-qat-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: boats, seagulls
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.32s
-- *Generation time:* 1.79s
-- *Total time:* 4.14s
-- *Input validation time:* 4.51e-05
-- *Prompt preparation time:* 0.0202
-- *First-token latency:* 0.454
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 608
-- *Generation tokens:* 100
-- *Total tokens:* 708
-- *Prompt throughput (raw):* 1,339 tok/s
-- *Generation throughput (raw):* 129 tok/s
-- *Peak memory:* 16
-- *Active memory:* 15
-- *Cache memory:* 0.21
-- *Model-load active memory:* 15.4
-- *Post-cleanup active memory:* 0.0119
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.23s
+- *Generation time:* 6.17s
+- *Total time:* 8.41s
+- *Input validation time:* 4.68e-05
+- *Prompt preparation time:* 0.00275
+- *First-token latency:* 1.04
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 606
+- *Generation tokens:* 146
+- *Total tokens:* 752
+- *Prompt throughput (raw):* 585 tok/s
+- *Generation throughput (raw):* 31.5 tok/s
+- *Peak memory:* 18
+- *Active memory:* 16
+- *Cache memory:* 0.45
+- *Model-load active memory:* 16.1
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1374
+- *Rendered prompt characters:* 1373
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
@@ -1772,9 +1744,71 @@ Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Ar
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boats Docked at Bristol Harbourside Marina
-Description: Various boats are moored at a marina in Bristol, England, with seagulls floating on the water in the foreground and historic architecture under a bright sky. The cityscape features the prominent towers of Bristol Cathedral and a large ferris wheel in the distance.
-Keywords: Bristol, England, United Kingdom, boats, marina, seagulls, harbour, architecture, cityscape, cathedral, waterfront, Europe, Great Britain, seagulls, boats, city centre
+Title: The Thekla, Mud Dock, Bristol Harbour, August 2026
+Description: Captured on 12 August 2026, The Thekla, a black ship venue, is moored in Mud Dock, Bristol Harbour, with the spire of St Mary Redcliffe church visible in the background under a clear blue sky. The ship displays prominent branding and mooring lines, reflecting its function and location.
+Keywords: The Thekla, Mud Dock, Bristol, Bristol Harbour, St Mary Redcliffe, Church Spire, Ship, Boat, Venue, Moored, Mooring, Architecture, City Centre, England, Clear Sky, Water, Flag, Mast, Branding, August 2026
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### mlx-community/pixtral-12b-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.71s
+- *Generation time:* 4.97s
+- *Total time:* 6.69s
+- *Input validation time:* 8.53e-05
+- *Prompt preparation time:* 0.00262
+- *First-token latency:* 1.87
+- *Cleanup time:* 0.0917
+- *Prompt tokens:* 3,467
+- *Generation tokens:* 103
+- *Total tokens:* 3,570
+- *Prompt throughput (raw):* 1,853 tok/s
+- *Generation throughput (raw):* 39.4 tok/s
+- *Peak memory:* 16
+- *Active memory:* 13
+- *Cache memory:* 0.64
+- *Model-load active memory:* 13.5
+- *Post-cleanup active memory:* 0.0144
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 1318
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Thekla Moored in Bristol Harbour
+
+Description:
+Thekla, a ship venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe church in the background under a clear sky.
+
+Keywords:
+Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 </pre>
 
 </details>
@@ -1791,32 +1825,31 @@ Keywords: Bristol, England, United Kingdom, boats, marina, seagulls, harbour, ar
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Keywords; Response repeats
-  the task instructions instead of only returning the requested fields; Extra
-  text appears before the Title field; Response appears cut off at the token
-  limit
+- *Observations:* Missing or empty fields: Title, Description, Keywords;
+  Response repeats the task instructions instead of only returning the
+  requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 2.18s
-- *Generation time:* 14.82s
-- *Total time:* 17.01s
-- *Input validation time:* 5.92e-05
-- *Prompt preparation time:* 0.00734
-- *First-token latency:* 2.45
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 3,216
+- *Model load time:* 1.62s
+- *Generation time:* 14.41s
+- *Total time:* 16.05s
+- *Input validation time:* 5.52e-05
+- *Prompt preparation time:* 0.00704
+- *First-token latency:* 2.21
+- *Cleanup time:* 0.0811
+- *Prompt tokens:* 3,558
 - *Generation tokens:* 500
-- *Total tokens:* 3,716
-- *Prompt throughput (raw):* 1,314 tok/s
-- *Generation throughput (raw):* 42.2 tok/s
+- *Total tokens:* 4,058
+- *Prompt throughput (raw):* 1,612 tok/s
+- *Generation throughput (raw):* 42.7 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
-- *Cache memory:* 0.77
+- *Cache memory:* 0.82
 - *Model-load active memory:* 12.6
 - *Post-cleanup active memory:* 0.000706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1694
+- *Rendered prompt characters:* 1692
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1833,11 +1866,15 @@ Keywords: Bristol, England, United Kingdom, boats, marina, seagulls, harbour, ar
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints give title hint, description hint, keyword hints. We need to treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them in description? The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. So we can mention date/time? Usually description includes date/time? The instruction: "Write: a concrete 5-10-word title; a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details; 10-18 unique, comma-separated keywords covering relevant context and visible details." So we can include date/time in description? It says combine relevant context with main visible subject. The capture date/time is a context fact, but not necessarily needed in description. However, we could mention "captured on 12 August 2026" as part of description. But the description is supposed to be factual, describing the image. Including date/time is factual but not describing the image content. The instruction says combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can incorporate date/time as part of context: "Captured on 12 August 2026, this view shows..." That would be okay.
+We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS coordinates. The descriptive hints: Title hint: City Centre, Bristol, England, UK, GBR, Europe. Description hint: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical.
 
-We need to produce a title: 5-10 words, concrete. Something like "Bristol Marina with Cathedral and Seagulls". That's 6 words: "Bristol Marina with Cathedral and Seagulls". That's okay.
+We need to produce:
 
-Description: 1-2 sentences. Should mention the main visible subject: boats docked at a marina, seagulls in water, background includes Bristol Cathedral, a Ferris wheel, modern buildings, trees, etc. Setting: city centre, harbor, Canons Marsh? The hint includes "Canons Marsh". The image shows a marina with many boats, a walkway, a large white building with "Coyote Ugly" signage? Actually the building with "Coyote Ugly" is visible? The image shows a building with "Coyote Ugly" signage? The hint includes "Coyote Ugly". In the image, there is a building with "
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+We must treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them in description if needed? The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. We can mention the date/time? Usually description includes date/time? The instruction: "Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible." So we can incorporate them as metadata? The description can mention the date/time? Possibly not needed. But we can incorporate the location (Bristol, Mud Dock). The description should be 1-2 sentences. So we can say: "The Thekla, a repurposed ship venue, is moored in Bristol's Mud Dock under a clear blue sky, with St Mary Redcliffe's iconic spire visible in the background." That's one sentence. Could add "The photograph was taken on 12 August 2026 at 17:52 UTC+01:00, with the ship's black hull and red and white stripes prominent." But that might be too many details. The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can mention the clear sky, the ship's black hull, the red and white stripes, the mooring lines, the mast, the church spire. So maybe
 </pre>
 
 </details>
@@ -1854,22 +1891,22 @@ Description: 1-2 sentences. Should mention the main visible subject: boats docke
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description; Extra text
-  appears before the Title field; Response appears cut off at the token limit;
+- *Observations:* Response repeats the same text; Missing or empty fields:
+  Title, Description, Keywords; Response appears cut off at the token limit;
   Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 11.15s
-- *Generation time:* 21.41s
-- *Total time:* 32.58s
-- *Input validation time:* 5.77e-05
-- *Prompt preparation time:* 0.00843
-- *First-token latency:* 8.04
-- *Cleanup time:* 0.421
-- *Prompt tokens:* 1,643
+- *Model load time:* 8.12s
+- *Generation time:* 16.33s
+- *Total time:* 24.46s
+- *Input validation time:* 5.23e-05
+- *Prompt preparation time:* 0.00752
+- *First-token latency:* 5.02
+- *Cleanup time:* 0.212
+- *Prompt tokens:* 1,626
 - *Generation tokens:* 500
-- *Total tokens:* 2,143
-- *Prompt throughput (raw):* 204 tok/s
-- *Generation throughput (raw):* 39.5 tok/s
+- *Total tokens:* 2,126
+- *Prompt throughput (raw):* 324 tok/s
+- *Generation throughput (raw):* 46.7 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.14
@@ -1878,7 +1915,7 @@ Description: 1-2 sentences. Should mention the main visible subject: boats docke
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1510
+- *Rendered prompt characters:* 1508
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1894,25 +1931,8 @@ Description: 1-2 sentences. Should mention the main visible subject: boats docke
 *Readable output:*
 
 <pre class="model-output-readable">
-Let's tackle this step by step. First, the title needs to be concrete, 5-10 words. The context says Bristol, UK, with landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the capture time is 16:45 UTC+01:00, which is late afternoon, not sunset. Wait, the hint says "City Centre, Bristol, England, UK, GBR, Europe" so need to include key landmarks. Let's check the keywords: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Seagulls, Harbour, Cityscape, England, UK, Europe. So title: "Bristol Cathedral and Coyote Ugly Marina with Seagulls at Dusk" (wait, 16:45 is late afternoon, dusk is around that time). Wait, but the hint says "City Centre, Bristol, England, UK, GBR, Europe" so maybe "Bristol City Centre Marina with Bristol Cathedral and Coyote Ugly Bar" but need to be concise. Wait, the user said "concrete 5-10-word title". Let's go with "Bristol Cathedral and Coyote Ugly Marina at Late Afternoon" (that's 8 words).
-
-Next, the description: needs to combine context (capture date/time: 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700°N, 2.600800°W which is Bristol) with main subject (boats at marina), setting (Bristol city centre, near Bristol Cathedral, Coyote Ugly Bar), action (seagulls flying/floating), lighting (late afternoon, since 16:45 is late afternoon). So: "A late afternoon view of boats docked at Bristol's marina near Bristol Cathedral and the Coyote Ugly Bar, with seagulls floating on the water in the city centre."
-
-Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Se
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata for this. First, the title. It's got to be concise, descriptive, and accurate. "The Thekla in Bristol Harbour" is a good start, but I can do better. "The Thekla, Bristol Harbour, St Mary Redcliffe" is even better, but I'll keep it simple. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Let's tackle this step by step. First, the title needs to be concrete, 5-10 words. The context says Bristol, UK, with landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the capture time is 16:45 UTC+01:00, which is late afternoon, not sunset. Wait, the hint says "City Centre, Bristol, England, UK, GBR, Europe" so need to include key landmarks. Let's check the keywords: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Seagulls, Harbour, Cityscape, England, UK, Europe. So title: "Bristol Cathedral and Coyote Ugly Marina with Seagulls at Dusk" (wait, 16:45 is late afternoon, dusk is around that time). Wait, but the hint says "City Centre, Bristol, England, UK, GBR, Europe" so maybe "Bristol City Centre Marina with Bristol Cathedral and Coyote Ugly Bar" but need to be concise. Wait, the user said "concrete 5-10-word title". Let's go with "Bristol Cathedral and Coyote Ugly Marina at Late Afternoon" (that's 8 words). 
-
-Next, the description: needs to combine context (capture date/time: 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700°N, 2.600800°W which is Bristol) with main subject (boats at marina), setting (Bristol city centre, near Bristol Cathedral, Coyote Ugly Bar), action (seagulls flying/floating), lighting (late afternoon, since 16:45 is late afternoon). So: "A late afternoon view of boats docked at Bristol's marina near Bristol Cathedral and the Coyote Ugly Bar, with seagulls floating on the water in the city centre." 
-
-Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Se
-```
-
-</details>
 
 </details>
 
@@ -1931,19 +1951,19 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 1.03s
-- *Generation time:* 2.36s
-- *Total time:* 3.40s
-- *Input validation time:* 7.06e-05
-- *Prompt preparation time:* 0.00222
-- *First-token latency:* 0.842
-- *Cleanup time:* 0.0886
-- *Prompt tokens:* 348
-- *Generation tokens:* 36
-- *Total tokens:* 384
-- *Prompt throughput (raw):* 413 tok/s
-- *Generation throughput (raw):* 291 tok/s
-- *Peak memory:* 1.9
+- *Model load time:* 0.60s
+- *Generation time:* 1.26s
+- *Total time:* 1.87s
+- *Input validation time:* 9.23e-05
+- *Prompt preparation time:* 0.00156
+- *First-token latency:* 0.0977
+- *Cleanup time:* 0.071
+- *Prompt tokens:* 347
+- *Generation tokens:* 53
+- *Total tokens:* 400
+- *Prompt throughput (raw):* 3,553 tok/s
+- *Generation throughput (raw):* 344 tok/s
+- *Peak memory:* 2.1
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -1951,7 +1971,7 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1415
+- *Rendered prompt characters:* 1413
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1967,7 +1987,7 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 *Readable output:*
 
 <pre class="model-output-readable">
-A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grandeur and natural beauty, with a flock of seagulls adding life to the calm waters.
+Thekla, Bristol Harbour, City Centre, England, UK, GBR, architecture, boat, bridge, church, church spire, clear sky, dock, England, Europe, flag, harbor, mooring, mooring lines, nautical.
 </pre>
 
 </details>
@@ -1984,22 +2004,22 @@ A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grande
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Response appears cut off at the token limit; Internal reasoning block
-  appears incomplete
+- *Observations:* Missing or empty fields: Keywords; Extra text appears before
+  the Title field; Response appears cut off at the token limit; Internal
+  reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.88s
-- *Generation time:* 27.32s
-- *Total time:* 29.21s
-- *Input validation time:* 4.63e-05
-- *Prompt preparation time:* 0.00172
-- *First-token latency:* 9.74
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 6,363
+- *Model load time:* 1.75s
+- *Generation time:* 16.60s
+- *Total time:* 18.35s
+- *Input validation time:* 4.09e-05
+- *Prompt preparation time:* 0.00166
+- *First-token latency:* 5.66
+- *Cleanup time:* 0.0936
+- *Prompt tokens:* 6,344
 - *Generation tokens:* 500
-- *Total tokens:* 6,863
-- *Prompt throughput (raw):* 653 tok/s
-- *Generation throughput (raw):* 29.4 tok/s
+- *Total tokens:* 6,844
+- *Prompt throughput (raw):* 1,120 tok/s
+- *Generation throughput (raw):* 47.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.41
@@ -2008,7 +2028,7 @@ A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grande
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1377
+- *Rendered prompt characters:* 1375
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2024,22 +2044,34 @@ A tranquil marina scene in Bristol, UK, showcasing a mix of architectural grande
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image, it's Bristol's harbor with boats, cathedral, etc. So maybe "Bristol Harbour with Cathedral and Ferris Wheel". Wait, need to keep it concise. Let's check the hints: City Centre, Bristol, England... so maybe "Bristol Marina with Cathedral View". Wait, let's make it 5-10 words. How about "Bristol Harbour Scene with Cathedral and Boats". Hmm, maybe "Bristol City Centre Marina with Cathedral". Wait, let's go with something that's clear. Let's see the image has boats, cathedral, ferris wheel, water with birds. So title could be "Bristol Harbour with Cathedral and Boats". That's about 6 words.
+&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background." So title could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
 
-Next, description: need 1-2 sentences. Combine context (capture date/time, GPS) with main visible subject (boats, marina), setting (city centre, harbor), action (seagulls flying/float), lighting (sunny, clear sky), distinctive details (cathedral, ferris wheel, Coyote Ugly building). So: "Captured on 2026-08-12 at 16:45 UTC+01:00, this image shows a marina in Bristol's city centre with boats docked, seagulls in the water, and the Bristol Cathedral and a Ferris wheel in the background under clear daylight." Wait, need to make it 1-2 sentences. Let's adjust: "This image, captured on 2026-08-12 at 16:45 UTC+01:00, depicts a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel visible in the background under bright daylight." That's two sentences? Wait, no, 1-2. Let's make it one: "Captured on 2026-08-12 at 16:45 UTC+01:00, the image shows a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel in the background under clear daylight." That's one sentence.
+Then the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The ship is moored, clear sky, Bristol Harbour, church steeple. So something like "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's steeple visible under clear blue skies."
 
-Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building,
+Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.
+
+Now, let's structure each part.
+
+Title: Need 5-10 words. "Thekla Ship in Bristol Harbour" is about 4 words, maybe "Thekla Moored in Bristol Harbour" – 5 words. Or "Bristol Harbour Ship Scene" – 3 words, but need 5-10. Let's go with "Thekla Ship at Bristol Harbour" (5 words).
+
+Description: Combine context (date/time, location) with subject, setting, action, lighting, details. So: "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's church steeple visible under clear blue skies." That's two sentences? Wait, need 1-2 sentences. So maybe "Thekla, a ship venue, is moored in Bristol Harbour on 2026-08-12, with the steeple of St Mary Redcliffe church visible under clear blue skies." That's one sentence, covers context, subject, setting
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image, it's Bristol's harbor with boats, cathedral, etc. So maybe "Bristol Harbour with Cathedral and Ferris Wheel". Wait, need to keep it concise. Let's check the hints: City Centre, Bristol, England... so maybe "Bristol Marina with Cathedral View". Wait, let's make it 5-10 words. How about "Bristol Harbour Scene with Cathedral and Boats". Hmm, maybe "Bristol City Centre Marina with Cathedral". Wait, let's go with something that's clear. Let's see the image has boats, cathedral, ferris wheel, water with birds. So title could be "Bristol Harbour with Cathedral and Boats". That's about 6 words.
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background." So title could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
 
-Next, description: need 1-2 sentences. Combine context (capture date/time, GPS) with main visible subject (boats, marina), setting (city centre, harbor), action (seagulls flying/float), lighting (sunny, clear sky), distinctive details (cathedral, ferris wheel, Coyote Ugly building). So: "Captured on 2026-08-12 at 16:45 UTC+01:00, this image shows a marina in Bristol's city centre with boats docked, seagulls in the water, and the Bristol Cathedral and a Ferris wheel in the background under clear daylight." Wait, need to make it 1-2 sentences. Let's adjust: "This image, captured on 2026-08-12 at 16:45 UTC+01:00, depicts a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel visible in the background under bright daylight." That's two sentences? Wait, no, 1-2. Let's make it one: "Captured on 2026-08-12 at 16:45 UTC+01:00, the image shows a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel in the background under clear daylight." That's one sentence.
+Then the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The ship is moored, clear sky, Bristol Harbour, church steeple. So something like "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's steeple visible under clear blue skies."
 
-Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building,
+Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.
+
+Now, let's structure each part.
+
+Title: Need 5-10 words. "Thekla Ship in Bristol Harbour" is about 4 words, maybe "Thekla Moored in Bristol Harbour" – 5 words. Or "Bristol Harbour Ship Scene" – 3 words, but need 5-10. Let's go with "Thekla Ship at Bristol Harbour" (5 words).
+
+Description: Combine context (date/time, location) with subject, setting, action, lighting, details. So: "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's church steeple visible under clear blue skies." That's two sentences? Wait, need 1-2 sentences. So maybe "Thekla, a ship venue, is moored in Bristol Harbour on 2026-08-12, with the steeple of St Mary Redcliffe church visible under clear blue skies." That's one sentence, covers context, subject, setting
 ```
 
 </details>
@@ -2048,64 +2080,66 @@ Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bir
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
-### mlx-community/GLM-4.6V-Flash-mxfp4
+### mlx-community/Idefics3-8B-Llama3-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Title has 3 words (requested 5-10); Keyword list has 156
-  terms (requested 10-18); Duplicate keywords: bristol marina, bristol uk,
-  boats docked, seagulls, historic architecture, cityscape, england, europe,
-  marina, dock, boat, water, birds, city centre, bristol cathedral, canons
-  marsh, coyote ugly, building, architecture, great britain, gbr, uk, bristol,
-  marina view, docked boats, seagulls in water, historic buildings
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.47s
-- *Generation time:* 21.72s
-- *Total time:* 23.21s
-- *Input validation time:* 5.56e-05
-- *Prompt preparation time:* 0.00697
-- *First-token latency:* 10.8
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 6,367
-- *Generation tokens:* 500
-- *Total tokens:* 6,867
-- *Prompt throughput (raw):* 588 tok/s
-- *Generation throughput (raw):* 48.3 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 6.8
-- *Cache memory:* 0.42
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00211
+- *Observations:* Missing or empty fields: Title, Description, Keywords;
+  Conversation-role control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 1.92s
+- *Generation time:* 2.24s
+- *Total time:* 4.16s
+- *Input validation time:* 5.53e-05
+- *Prompt preparation time:* 0.00127
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.0938
+- *Prompt tokens:* 2,626
+- *Generation tokens:* 16
+- *Total tokens:* 2,642
+- *Prompt throughput (raw):* 2,362 tok/s
+- *Generation throughput (raw):* 34.2 tok/s
+- *Peak memory:* 18
+- *Active memory:* 17
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.00269
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1401
+- *Rendered prompt characters:* 1355
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
 - *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Bristol Marina View
-Description: An image of boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture visible in the background.
-Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, City
+ Thekla in Bristol Harbour with St Mary Redcliffe in the background.&lt;end_of_utterance&gt;
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ Thekla in Bristol Harbour with St Mary Redcliffe in the background.<end_of_utterance>
+```
+
+</details>
 
 </details>
 
@@ -2121,31 +2155,31 @@ Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architect
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title; Extra text appears before
-  the Title field; Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete
+- *Observations:* Missing or empty fields: Title, Description, Keywords;
+  Response appears cut off at the token limit; Internal reasoning block
+  appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.84s
-- *Generation time:* 115.35s
-- *Total time:* 119.21s
-- *Input validation time:* 9.08e-05
-- *Prompt preparation time:* 0.00253
-- *First-token latency:* 3.74
-- *Cleanup time:* 0.316
-- *Prompt tokens:* 1,338
+- *Model load time:* 3.24s
+- *Generation time:* 109.09s
+- *Total time:* 112.35s
+- *Input validation time:* 4.57e-05
+- *Prompt preparation time:* 0.00184
+- *First-token latency:* 1.37
+- *Cleanup time:* 0.174
+- *Prompt tokens:* 1,296
 - *Generation tokens:* 500
-- *Total tokens:* 1,838
-- *Prompt throughput (raw):* 358 tok/s
-- *Generation throughput (raw):* 4.52 tok/s
+- *Total tokens:* 1,796
+- *Prompt throughput (raw):* 944 tok/s
+- *Generation throughput (raw):* 4.67 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.6
 - *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.00367
+- *Post-cleanup active memory:* 0.00365
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1507
+- *Rendered prompt characters:* 1505
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2161,37 +2195,12 @@ Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architect
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. Let's start with the title. The main subject is the Thekla ship in Bristol Harbour, with the church steeple in the background. So maybe "Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire visible." That's concise and includes key elements.
 
-First, the context says the capture date/time is 2026-08-12 16:45:16 UTC+01:00, and GPS is 51.451700°N, 2.600800°W. The location is City Centre, Bristol, England, UK, GBR, Europe. The description hint mentions boats docked at a marina, Bristol UK, seagulls in the foreground. Keywords include Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina.
+Next, the description. It should mention the ship, location, time, and key details. The image shows the Thekla in Mud Dock, with the church steeple (St Mary Redcliffe) in the background, clear sky, and the ship's details like the mast and mooring lines. So the description could be: "The Thekla, a historic ship moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe visible against a clear blue sky." That captures the main elements.
 
-Now, the image shows a marina in Bristol with boats docked, seagulls in the water, buildings including what looks like Bristol Cathedral in the background, a Ferris wheel (maybe the "Coyote Ugly" place), and the cityscape. The sky is partly cloudy.
-
-For the title, need a 5-10 word British-English title. Maybe "Bristol Marina with Boats and Seagulls in City Centre". Wait, check the keywords: "Bristol Cathedral" is a key element, so maybe include that. Also, "Coyote Ugly" is a known bar in Bristol, so that's a distinctive detail. So title could be "Bristol City Centre Marina with Boats, Seagulls, and Coyote Ugly". That's 10 words.
-
-Description: Need a 1-2 sentence factual description. Mention the marina, boats, seagulls, city elements like Bristol Cathedral, Coyote Ugly, and the setting. So: "A marina in Bristol's city centre featuring docked boats, seagulls in the water, and the iconic Bristol Cathedral in the background, with the 'Coyote Ugly' establishment visible among buildings under a partly cloudy sky."
-
-Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Marina, Boats, Seagulls, Bristol Cathedral, Coyote Ugly, Building, England, Europe, Cityscape, Dock. That's 10. Maybe add "Harbor" instead of Building? Wait, the image has a harbor. Let's check the hints
+For keywords, list unique terms from the image and context. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, England, Europe, clear sky, bridge (maybe the bridge in the background?), building (like the dark building), trees, water, etc. Let me check the hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. So include those. Maybe: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 14 keywords. Need to make sure they are unique and relevant. Let me count again. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 15. Maybe remove "nautical vessel" as it's redundant with ship. So adjust to: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship,
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
-
-First, the context says the capture date/time is 2026-08-12 16:45:16 UTC+01:00, and GPS is 51.451700°N, 2.600800°W. The location is City Centre, Bristol, England, UK, GBR, Europe. The description hint mentions boats docked at a marina, Bristol UK, seagulls in the foreground. Keywords include Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina.
-
-Now, the image shows a marina in Bristol with boats docked, seagulls in the water, buildings including what looks like Bristol Cathedral in the background, a Ferris wheel (maybe the "Coyote Ugly" place), and the cityscape. The sky is partly cloudy. 
-
-For the title, need a 5-10 word British-English title. Maybe "Bristol Marina with Boats and Seagulls in City Centre". Wait, check the keywords: "Bristol Cathedral" is a key element, so maybe include that. Also, "Coyote Ugly" is a known bar in Bristol, so that's a distinctive detail. So title could be "Bristol City Centre Marina with Boats, Seagulls, and Coyote Ugly". That's 10 words.
-
-Description: Need a 1-2 sentence factual description. Mention the marina, boats, seagulls, city elements like Bristol Cathedral, Coyote Ugly, and the setting. So: "A marina in Bristol's city centre featuring docked boats, seagulls in the water, and the iconic Bristol Cathedral in the background, with the 'Coyote Ugly' establishment visible among buildings under a partly cloudy sky."
-
-Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Marina, Boats, Seagulls, Bristol Cathedral, Coyote Ugly, Building, England, Europe, Cityscape, Dock. That's 10. Maybe add "Harbor" instead of Building? Wait, the image has a harbor. Let's check the hints
-```
-
-</details>
 
 </details>
 
@@ -2207,33 +2216,32 @@ Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Mar
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the task instructions instead of only
-  returning the requested fields; Extra text appears before the Title field;
-  Response appears cut off at the token limit; Internal reasoning block
-  appears incomplete; Title has 3 words (requested 5-10); Keyword list has 26
-  terms (requested 10-18)
+- *Observations:* Missing or empty fields: Title, Keywords; Response repeats
+  the task instructions instead of only returning the requested fields; Extra
+  text appears before the Title field; Response appears cut off at the token
+  limit; Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.43s
-- *Generation time:* 4.35s
-- *Total time:* 5.80s
-- *Input validation time:* 6.18e-05
-- *Prompt preparation time:* 0.0128
-- *First-token latency:* 1.44
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 945
+- *Model load time:* 0.85s
+- *Generation time:* 2.68s
+- *Total time:* 3.55s
+- *Input validation time:* 4.12e-05
+- *Prompt preparation time:* 0.00882
+- *First-token latency:* 0.262
+- *Cleanup time:* 0.0797
+- *Prompt tokens:* 1,003
 - *Generation tokens:* 500
-- *Total tokens:* 1,445
-- *Prompt throughput (raw):* 654 tok/s
-- *Generation throughput (raw):* 226 tok/s
-- *Peak memory:* 3.8
+- *Total tokens:* 1,503
+- *Prompt throughput (raw):* 3,834 tok/s
+- *Generation throughput (raw):* 276 tok/s
+- *Peak memory:* 3.9
 - *Active memory:* 2.3
 - *Cache memory:* 0.06
 - *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00485
+- *Post-cleanup active memory:* 0.00483
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1388
+- *Rendered prompt characters:* 1386
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2250,41 +2258,17 @@ Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Mar
 
 <pre class="model-output-readable">
 &lt;think&gt;
-We need to create a title, description, and keywords based on the image. Let's analyze the image.
+We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
-The image shows a harbor or marina with boats, seagulls, buildings, and a cathedral (Bristol Cathedral?). There's a ferris wheel and some modern buildings. The context is Bristol, UK.
+First, title: should be concrete, short, around 5-10 words. Based on the image: a black ship moored in Bristol harbor with church spire. So title: Black Ship Moored at Bristol Harbor with Church Spire.
 
-First, title: need 5-10 words. Let's think: "Boat marina with seagulls and Bristol cathedral". That's 6 words.
+But need 5-10 words. Let's count: "Black Ship Moored at Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in Bristol Harbor, Featuring Church Spire". But better to include key elements: ship, harbor, church, clear sky.
 
-Description: Combine relevant context and main visible subject, setting, action, lighting, and distinctive details. The main subject is boats docked at a marina, with seagulls in the water, and background showing Bristol Cathedral and other buildings. Lighting is sunny with clouds.
+Description: The image shows a large black ship moored in Bristol Harbor, with a church steeple visible in the background under clear blue skies.
 
-Keywords: need 10-18 unique, comma-separated. Cover relevant context and visible details. Let's list: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, ferry, trees, sky, Europe, UK, England, Gull, harbor, city, architecture, modern, red building, white boats, etc.
+Now, keywords: need 10-18 unique, covering relevant context and visible details. Let's list:
 
-Make sure to be unique and cover the main elements.
-
-Now, structure:
-
-Title: [concrete 5-10 words]
-
-Description: [1-2 sentences]
-
-Keywords: [10-18 unique, comma-separated]
-
-Let's draft.
-
-Title: Boat marina with seagulls and Bristol cathedral.
-
-Description: Shows boats docked at a marina with seagulls in the water, featuring Bristol Cathedral and urban buildings under sunny skies.
-
-Keywords: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees, sky, modern, red building, white boats.
-
-Check count: title 5-10 words: "Boat marina with seagulls and Bristol cathedral" is 5 words. Good.
-
-Description: two sentences, combine context and main visible subject, setting, action, lighting, distinctive details. Looks okay.
-
-Keywords: list 10-18 unique terms. Let's ensure they are unique and cover the relevant context and visible details.
-
-List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees
+- ship, boat, harbor, Bristol, church, church spire, mast, moored, dock, England, Europe, clear sky, nautical, architecture, masts, rigging, flags, dockside, green trees, clear weather, harbor water, anchor, S, Thekla, mooring lines, city center, England, UK, GBR, clear, sunny, architecture, building, steeple, church, harbor, dock, England, Europe, nautical, boat, ship, masts, rigging, moored, dockside, trees, clear sky, architecture, building, church spire, harbor, mooring, nautical, England, UK, GBR, clear, sunny, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring lines, anchor, masts, rigging, flags, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring, nautical, ship, harbor,
 </pre>
 
 <details>
@@ -2292,41 +2276,17 @@ List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor
 
 ```text
 <think>
-We need to create a title, description, and keywords based on the image. Let's analyze the image.
+We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
-The image shows a harbor or marina with boats, seagulls, buildings, and a cathedral (Bristol Cathedral?). There's a ferris wheel and some modern buildings. The context is Bristol, UK.
+First, title: should be concrete, short, around 5-10 words. Based on the image: a black ship moored in Bristol harbor with church spire. So title: Black Ship Moored at Bristol Harbor with Church Spire.
 
-First, title: need 5-10 words. Let's think: "Boat marina with seagulls and Bristol cathedral". That's 6 words.
+But need 5-10 words. Let's count: "Black Ship Moored at Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in Bristol Harbor, Featuring Church Spire". But better to include key elements: ship, harbor, church, clear sky.
 
-Description: Combine relevant context and main visible subject, setting, action, lighting, and distinctive details. The main subject is boats docked at a marina, with seagulls in the water, and background showing Bristol Cathedral and other buildings. Lighting is sunny with clouds.
+Description: The image shows a large black ship moored in Bristol Harbor, with a church steeple visible in the background under clear blue skies.
 
-Keywords: need 10-18 unique, comma-separated. Cover relevant context and visible details. Let's list: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, ferry, trees, sky, Europe, UK, England, Gull, harbor, city, architecture, modern, red building, white boats, etc.
+Now, keywords: need 10-18 unique, covering relevant context and visible details. Let's list:
 
-Make sure to be unique and cover the main elements.
-
-Now, structure:
-
-Title: [concrete 5-10 words]
-
-Description: [1-2 sentences]
-
-Keywords: [10-18 unique, comma-separated]
-
-Let's draft.
-
-Title: Boat marina with seagulls and Bristol cathedral.
-
-Description: Shows boats docked at a marina with seagulls in the water, featuring Bristol Cathedral and urban buildings under sunny skies.
-
-Keywords: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees, sky, modern, red building, white boats.
-
-Check count: title 5-10 words: "Boat marina with seagulls and Bristol cathedral" is 5 words. Good.
-
-Description: two sentences, combine context and main visible subject, setting, action, lighting, distinctive details. Looks okay.
-
-Keywords: list 10-18 unique terms. Let's ensure they are unique and cover the relevant context and visible details.
-
-List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees
+- ship, boat, harbor, Bristol, church, church spire, mast, moored, dock, England, Europe, clear sky, nautical, architecture, masts, rigging, flags, dockside, green trees, clear weather, harbor water, anchor, S, Thekla, mooring lines, city center, England, UK, GBR, clear, sunny, architecture, building, steeple, church, harbor, dock, England, Europe, nautical, boat, ship, masts, rigging, moored, dockside, trees, clear sky, architecture, building, church spire, harbor, mooring, nautical, England, UK, GBR, clear, sunny, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring lines, anchor, masts, rigging, flags, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring, nautical, ship, harbor,
 ```
 
 </details>
@@ -2347,27 +2307,27 @@ List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.44s
-- *Generation time:* 30.06s
-- *Total time:* 32.51s
-- *Input validation time:* 4.39e-05
-- *Prompt preparation time:* 0.00497
-- *First-token latency:* 5.29
-- *Cleanup time:* 0.184
-- *Prompt tokens:* 3,140
-- *Generation tokens:* 122
-- *Total tokens:* 3,262
-- *Prompt throughput (raw):* 593 tok/s
-- *Generation throughput (raw):* 5.12 tok/s
+- *Model load time:* 2.27s
+- *Generation time:* 25.70s
+- *Total time:* 27.99s
+- *Input validation time:* 4.51e-05
+- *Prompt preparation time:* 0.00481
+- *First-token latency:* 2.47
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 3,158
+- *Generation tokens:* 134
+- *Total tokens:* 3,292
+- *Prompt throughput (raw):* 1,278 tok/s
+- *Generation throughput (raw):* 5.97 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
 - *Model-load active memory:* 17.4
-- *Post-cleanup active memory:* 0.00657
+- *Post-cleanup active memory:* 0.00655
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1358
+- *Rendered prompt characters:* 1356
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2383,11 +2343,11 @@ List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor
 *Readable output:*
 
 <pre class="model-output-readable">
-Bristol Marina: Seagulls, Boats, and Cathedral
+Thekla Ship in Mud Dock, Bristol Harbour
 
-A bustling Bristol marina scene with seagulls in the foreground, boats docked along the quay, and the iconic Bristol Cathedral visible in the background. The image captures a lively urban waterfront on a sunny day, with the distinctive Coyote Ugly sign adding to the city's character.
+The Thekla, a large black ship with a white mast, is moored in Mud Dock, Bristol Harbour. The steeple of St Mary Redcliffe Church is visible in the background, with a clear blue sky overhead. The ship's name is prominently displayed on its side, and it is secured with mooring lines to the dock.
 
-Bristol, England, UK, GBR, Europe, Marina, Seagulls, Boats, Cathedral, Cityscape, Coyote Ugly, Dock, Architecture, Bird, Boat, Building, Canons Marsh, Church, Harbor
+Bristol, England, Europe, Thekla, Mud Dock, Ship, Harbour, Church, St Mary Redcliffe, Mooring, Mooring lines, Clear Sky, Nautical, Boat, Dock, Architecture, Building, Mast, Anchor, Ship venue
 </pre>
 
 </details>
@@ -2406,27 +2366,27 @@ Bristol, England, UK, GBR, Europe, Marina, Seagulls, Boats, Cathedral, Cityscape
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.53s
-- *Generation time:* 97.15s
-- *Total time:* 97.69s
-- *Input validation time:* 4.16e-05
-- *Prompt preparation time:* 0.00393
-- *First-token latency:* 95.6
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 16,572
-- *Generation tokens:* 111
-- *Total tokens:* 16,683
-- *Prompt throughput (raw):* 173 tok/s
-- *Generation throughput (raw):* 177 tok/s
+- *Model load time:* 0.50s
+- *Generation time:* 72.08s
+- *Total time:* 72.59s
+- *Input validation time:* 4.71e-05
+- *Prompt preparation time:* 0.00377
+- *First-token latency:* 70.7
+- *Cleanup time:* 0.079
+- *Prompt tokens:* 16,517
+- *Generation tokens:* 124
+- *Total tokens:* 16,641
+- *Prompt throughput (raw):* 234 tok/s
+- *Generation throughput (raw):* 216 tok/s
 - *Peak memory:* 5.1
 - *Active memory:* 1.3
-- *Cache memory:* 0.86
+- *Cache memory:* 1.00
 - *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00746
+- *Post-cleanup active memory:* 0.00744
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1450
+- *Rendered prompt characters:* 1448
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2446,7 +2406,7 @@ Title:
 City Centre, Bristol, England, UK, GBR, Europe
 
 Description:
-This is an image of boats docked at a marina in the City Centre of Bristol, England. The marina is located near Bristol Cathedral, and a flock of seagulls flies and floats in the water in the foreground. The marina is surrounded by buildings, including a building with a sign that says "Coyote Ugly Saloon" and a Ferris wheel in the background. The sky is clear, and the weather is sunny.
+The Thekla, a historic ship venue, is moored in Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church in the background. The clear sky and calm waters create a serene atmosphere, highlighting the black hull and red stripe of the ship. The boat is moored with ropes, and the mast is visible, with a black and white flag on top. The scene is set against a backdrop of green trees and a blue sky, creating a picturesque view of the city's harbor.
 </pre>
 
 </details>
@@ -2467,27 +2427,27 @@ This is an image of boats docked at a marina in the City Centre of Bristol, Engl
   Response appears cut off at the token limit; Internal reasoning block
   appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.03s
-- *Generation time:* 34.33s
-- *Total time:* 35.39s
-- *Input validation time:* 5.33e-05
-- *Prompt preparation time:* 0.0191
-- *First-token latency:* 26.3
-- *Cleanup time:* 0.217
-- *Prompt tokens:* 16,563
+- *Model load time:* 0.75s
+- *Generation time:* 25.42s
+- *Total time:* 26.19s
+- *Input validation time:* 4.75e-05
+- *Prompt preparation time:* 0.0115
+- *First-token latency:* 19
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 16,508
 - *Generation tokens:* 500
-- *Total tokens:* 17,063
-- *Prompt throughput (raw):* 630 tok/s
-- *Generation throughput (raw):* 74.6 tok/s
+- *Total tokens:* 17,008
+- *Prompt throughput (raw):* 871 tok/s
+- *Generation throughput (raw):* 88.8 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00808
+- *Post-cleanup active memory:* 0.00806
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1400
+- *Rendered prompt characters:* 1398
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2503,71 +2463,11 @@ This is an image of boats docked at a marina in the City Centre of Bristol, Engl
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this step by step. First, the title. The context says Bristol, UK, and the image has boats, seagulls, marina. The title hint is City Centre, Bristol, England, UK, GBR, Europe. So need a concise title. Maybe "Bristol City Centre Marina with Seagulls" but let's check. The image has a marina with boats and seagulls, so "Bristol Marina, Seagulls, City Centre" but need 5-10 words. Let's see: "Bristol City Centre Marina with Seagulls" is 10 words. Wait, maybe "Bristol City Centre Marina, Seagulls, Boats" but the title should be catchy. Wait, the context says Bristol UK, so "Bristol City Centre Marina" is good.
+Got it, let's tackle this step by step. First, the title. The image shows a ship named Thekla anchored in Bristol Harbour. The context mentions Bristol, so the title should be specific. Let's see: "Thekla, Bristol Harbour, Moored" – that's 5 words. Wait, maybe "Thekla Ship, Bristol Harbour, Moored" but need to be concise. The hint says "City Centre, Bristol, England, UK, GBR, Europe" so title should include Thekla and location.
 
-Next, the description. Needs to combine context with main visible subject, setting, action, lighting, distinctive details. Context: capture date/time is 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700N, 2.600800W. The image shows boats docked at a marina, seagulls in the water, buildings including Bristol Cathedral (the Gothic cathedral in the background), the "Coyote Ugly" building, and the Ferris wheel. The lighting is bright, sunny, clear sky. The main visible subject is the marina with boats and seagulls. So the description should mention Bristol City Centre, marina, boats, seagulls, Bristol Cathedral, sunny day, etc.
+Next, the description. Need to combine context with visible subject, setting, action, lighting, details. The ship is Thekla, anchored in Mud Dock (from context), background has St Mary Redcliffe church spire. The sky is clear blue, so lighting is bright. Visible details: black hull, red stripe, mast, mooring lines, trees, church spire. Action: moored. So: "Thekla ship, black hull with red stripe, moored in Bristol Harbour Mud Dock, clear blue sky, with St Mary Redcliffe church spire in background."
 
-Then keywords: need 10-18 unique, comma-separated. From context: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina. But need to check which are visible. The image has Bristol Cathedral (yes, the Gothic building in the background), Coyote Ugly building (the green and red building with "Coyote Ugly" sign), marina, boats, seagulls (gulls), harbor, cityscape, Bristol, etc. Let's list visible ones: Architecture (yes, the cathedral
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 174 terms (requested 10-18); Duplicate
-  keywords: england, europe, marina, church, city, cityscape, coyote ugly,
-  dock, great britain, gull, harbor, architecture, building, canons marsh
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.92s
-- *Generation time:* 6.09s
-- *Total time:* 7.02s
-- *Input validation time:* 8.72e-05
-- *Prompt preparation time:* 0.00505
-- *First-token latency:* 0.597
-- *Cleanup time:* 0.14
-- *Prompt tokens:* 441
-- *Generation tokens:* 500
-- *Total tokens:* 941
-- *Prompt throughput (raw):* 739 tok/s
-- *Generation throughput (raw):* 114 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.24
-- *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00973
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1352
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Bristol, England, UK, GBR, Europe
-Description: A marina with boats docked, seagulls flying and floating in the water, and a church in the background.
-Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building,
+Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Let's check image: ship is moored, so Moored, Mooring lines. Church spire is visible. The ship has a mast. The hull is black with red stripe. So keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. Wait, need to pick 10-18. Let's list: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. That's 17. Let's check if any are missing. The ship has a mast, so Mast. The context says "Thekla (a ship venue)" so maybe include Ship, but the hint says "Ship venue" but the image is a ship. Wait,
 </pre>
 
 </details>
@@ -2585,22 +2485,21 @@ Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, 
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 172 terms (requested 10-18); Duplicate
-  keywords: bristol, england, uk, europe, great britain, marina, ferris wheel,
-  seagulls, waterfront, cityscape, architecture, church, dock, harbor, gull
+  the token limit; Keyword list has 199 terms (requested 10-18); Duplicate
+  keywords: england, europe, flag, building, bridge, dock
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.28s
-- *Generation time:* 32.29s
-- *Total time:* 33.58s
-- *Input validation time:* 4.89e-05
-- *Prompt preparation time:* 0.000276
-- *First-token latency:* 21.1
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 16,572
+- *Model load time:* 1.16s
+- *Generation time:* 29.70s
+- *Total time:* 30.87s
+- *Input validation time:* 5.36e-05
+- *Prompt preparation time:* 0.000264
+- *First-token latency:* 19.5
+- *Cleanup time:* 0.0945
+- *Prompt tokens:* 16,517
 - *Generation tokens:* 500
-- *Total tokens:* 17,072
-- *Prompt throughput (raw):* 786 tok/s
-- *Generation throughput (raw):* 48.2 tok/s
+- *Total tokens:* 17,017
+- *Prompt throughput (raw):* 846 tok/s
+- *Generation throughput (raw):* 53.3 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.3
@@ -2609,7 +2508,7 @@ Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1450
+- *Rendered prompt characters:* 1448
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2626,12 +2525,12 @@ Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, 
 
 <pre class="model-output-readable">
 Title:
-Bristol Marina with Ferris Wheel and Cathedral
+The Thekla in Mud Dock, Bristol
 
 Description:
-A vibrant scene of boats docked at a marina in Bristol, with the iconic Ferris wheel and Bristol Cathedral rising in the background, while seagulls float and fly in the foreground under a bright, partly cloudy sky.
+The historic ship Thekla, now a venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky. The ship's black hull, white mast, and mooring lines are prominent, while the surrounding greenery and urban structures frame the scene.
 
-Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Wheel, Cathedral, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Harbor, Urban, Tourism, Landmark, Gull, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock
+Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky, Harbor, Black Hull, White Mast, Moored, Mooring Lines, Nautical, Architecture, Boat, City Centre, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building,
 </pre>
 
 </details>
@@ -2647,22 +2546,21 @@ Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Whe
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* No response text was returned; Missing or empty fields:
-  Title, Description, Keywords
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.38s
-- *Generation time:* 1.28s
-- *Total time:* 3.67s
-- *Input validation time:* 5.34e-05
-- *Prompt preparation time:* 0.00276
-- *First-token latency:* 0.756
-- *Cleanup time:* 0.124
-- *Prompt tokens:* 602
-- *Generation tokens:* 1
-- *Total tokens:* 603
-- *Prompt throughput (raw):* 796 tok/s
-- *Generation throughput (raw):* 84,211 tok/s
+- *Model load time:* 2.62s
+- *Generation time:* 2.69s
+- *Total time:* 5.32s
+- *Input validation time:* 5.45e-05
+- *Prompt preparation time:* 0.00308
+- *First-token latency:* 0.373
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 605
+- *Generation tokens:* 90
+- *Total tokens:* 695
+- *Prompt throughput (raw):* 1,624 tok/s
+- *Generation throughput (raw):* 48.8 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2671,7 +2569,7 @@ Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Whe
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1377
+- *Rendered prompt characters:* 1375
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2684,9 +2582,11 @@ Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Whe
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
 
-#### Complete generated output
+*Readable output:*
 
-empty output
+<pre class="model-output-readable">
+The Thekla, a historic ship, is moored in the Mud Dock of Bristol Harbour on a clear day. The ship's black hull features a red stripe and the name "THEKLA" in white lettering. It is secured to the dock with mooring lines. In the background, the tall spire of St Mary Redcliffe Church rises above the surrounding trees. The sky is a bright blue, and the water in the harbor is calm.
+</pre>
 
 </details>
 
@@ -2704,18 +2604,18 @@ empty output
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 1.04s
-- *Generation time:* 4.39s
-- *Total time:* 5.44s
-- *Input validation time:* 5.24e-05
-- *Prompt preparation time:* 0.00162
-- *First-token latency:* 2.66
-- *Cleanup time:* 0.0894
-- *Prompt tokens:* 2,534
-- *Generation tokens:* 63
-- *Total tokens:* 2,597
-- *Prompt throughput (raw):* 952 tok/s
-- *Generation throughput (raw):* 62.1 tok/s
+- *Model load time:* 0.94s
+- *Generation time:* 4.06s
+- *Total time:* 5.01s
+- *Input validation time:* 4.4e-05
+- *Prompt preparation time:* 0.00157
+- *First-token latency:* 2.49
+- *Cleanup time:* 0.0869
+- *Prompt tokens:* 2,739
+- *Generation tokens:* 56
+- *Total tokens:* 2,795
+- *Prompt throughput (raw):* 1,098 tok/s
+- *Generation throughput (raw):* 62.6 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.90
@@ -2724,7 +2624,7 @@ empty output
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1322
+- *Rendered prompt characters:* 1320
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2740,14 +2640,14 @@ empty output
 *Readable output:*
 
 <pre class="model-output-readable">
-City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water, Birds, Seagulls, Cityscape, City, Architecture, Church, Canons Marsh, Building, Cathedral, Gull, Harbor,
+Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water, Birds, Seagulls, Cityscape, City, Architecture, Church, Canons Marsh, Building, Cathedral, Gull, Harbor, 
+Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical 
 ```
 
 </details>
@@ -2769,19 +2669,19 @@ City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.55s
-- *Generation time:* 0.89s
-- *Total time:* 1.44s
-- *Input validation time:* 4.41e-05
-- *Prompt preparation time:* 0.00137
-- *First-token latency:* 0.0814
-- *Cleanup time:* 0.0814
-- *Prompt tokens:* 344
-- *Generation tokens:* 89
-- *Total tokens:* 433
-- *Prompt throughput (raw):* 4,228 tok/s
-- *Generation throughput (raw):* 360 tok/s
-- *Peak memory:* 2.3
+- *Model load time:* 0.51s
+- *Generation time:* 0.83s
+- *Total time:* 1.34s
+- *Input validation time:* 4.23e-05
+- *Prompt preparation time:* 0.00133
+- *First-token latency:* 0.0759
+- *Cleanup time:* 0.0809
+- *Prompt tokens:* 343
+- *Generation tokens:* 72
+- *Total tokens:* 415
+- *Prompt throughput (raw):* 4,521 tok/s
+- *Generation throughput (raw):* 341 tok/s
+- *Peak memory:* 2.4
 - *Active memory:* 0.61
 - *Cache memory:* 0.30
 - *Model-load active memory:* 0.611
@@ -2789,7 +2689,7 @@ City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1406
+- *Rendered prompt characters:* 1404
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2805,8 +2705,8 @@ City Centre, Bristol, England, UK, GBR, Europe, Boat, Boats, Marina, Dock, Water
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: City Centre, Bristol, England, UK, GBR, Europe
-Description: This image captures the serene harbor of Bristol, UK, featuring a flock of seagulls flying and floating in the water. The city center is a hub for boating activities, with a marina serving as a central location for the boats. The image is a blend of architectural details, bird activity, and the overall atmosphere of a bustling city.
+Title: Thekla in Bristol, England, UK, GBR, Europe
+Description: A ship named Thekla anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background. The image captures the ship's mooring lines and the surrounding area, with a clear sky in the background.
 </pre>
 
 </details>
@@ -2824,29 +2724,31 @@ Description: This image captures the serene harbor of Bristol, UK, featuring a f
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Missing or empty fields:
-  Title, Description, Keywords; Response appears cut off at the token limit
+  Title, Description, Keywords; Response repeats the task instructions instead
+  of only returning the requested fields; Response appears cut off at the
+  token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.16s
-- *Generation time:* 14.93s
-- *Total time:* 16.11s
-- *Input validation time:* 3.59e-05
-- *Prompt preparation time:* 0.000156
-- *First-token latency:* 1.21
-- *Cleanup time:* 0.193
-- *Prompt tokens:* 4,431
+- *Model load time:* 1.12s
+- *Generation time:* 12.89s
+- *Total time:* 14.02s
+- *Input validation time:* 4.19e-05
+- *Prompt preparation time:* 0.000166
+- *First-token latency:* 1.1
+- *Cleanup time:* 0.172
+- *Prompt tokens:* 4,433
 - *Generation tokens:* 500
-- *Total tokens:* 4,931
-- *Prompt throughput (raw):* 3,649 tok/s
-- *Generation throughput (raw):* 38.7 tok/s
+- *Total tokens:* 4,933
+- *Prompt throughput (raw):* 4,041 tok/s
+- *Generation throughput (raw):* 45.4 tok/s
 - *Peak memory:* 4.3
 - *Active memory:* 1.7
 - *Cache memory:* 1.9
 - *Model-load active memory:* 1.73
-- *Post-cleanup active memory:* 0.0142
+- *Post-cleanup active memory:* 0.0141
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 1306
+- *Rendered prompt characters:* 1304
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2862,7 +2764,9 @@ Description: This image captures the serene harbor of Bristol, UK, featuring a f
 *Readable output:*
 
 <pre class="model-output-readable">
-- Architecture, Building, City Centre, Cityscape, Coast, Coastline, Coastal, Coastal, Coastal waters, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline,
+- Title hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Description hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Keyword hints: Architecture, Building, Church, Flag, Harbor, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island,
 </pre>
 
 </details>
@@ -2893,13 +2797,13 @@ Description: This image captures the serene harbor of Bristol, UK, featuring a f
   <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
 - *Arch supported by installed mlx-vlm:* yes (model_type inkling_mm_model via
   inkling)
-- *Model load time:* 0.31s
+- *Model load time:* 0.19s
 - *Generation time:* -
-- *Total time:* 0.33s
-- *Input validation time:* 8.58e-05
+- *Total time:* 0.20s
+- *Input validation time:* 4.56e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.156
+- *Cleanup time:* 0.0637
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3714,12 +3618,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4705.94it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[23:55:42] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 </details>

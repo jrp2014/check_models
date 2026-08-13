@@ -19,52 +19,48 @@ Maintainer status counts
 | Maintainer status              | Count |
 |--------------------------------|-------|
 | actionable failure             | 1     |
-| none                           | 27    |
-| observation needs reproduction | 14    |
+| none                           | 30    |
+| observation needs reproduction | 11    |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
 | not evaluated       | 1     |
-| unusable            | 16    |
+| unusable            | 15    |
 | usable              | 14    |
-| usable with caveats | 11    |
+| usable with caveats | 12    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| No response text was returned                                                         | 1     |
-| Response repeats the same text                                                        | 4     |
+| Response repeats the same text                                                        | 3     |
 | Unrecognised model control tokens remain visible                                      | 3     |
-| Required fields are missing or empty                                                  | 12    |
-| Response repeats the task instructions instead of only returning the requested fields | 2     |
-| Extra text appears before the Title field                                             | 4     |
-| Response appears cut off at the token limit                                           | 10    |
+| Required fields are missing or empty                                                  | 14    |
+| Response repeats the task instructions instead of only returning the requested fields | 3     |
+| Extra text appears before the Title field                                             | 2     |
+| Response appears cut off at the token limit                                           | 8     |
 | Internal reasoning block appears incomplete                                           | 5     |
 | Conversation-role control tokens remain visible                                       | 1     |
-| Title or keywords do not meet requested constraints                                   | 12    |
+| Title or keywords do not meet requested constraints                                   | 11    |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                                                                      |
-|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                        | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                              |
-| [mlx-community/gemma-3n-E4B-it-bf16](#diagnostic-mlx-community-gemma-3n-e4b-it-bf16)                            | completed | unusable            | observation_needs_reproduction | empty response; missing required fields                                                                                           |
-| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                             | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                                                    |
-| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)                 | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                            |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                            |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                            |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                   | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                               |
-| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                  | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                 | completed | unusable            | observation_needs_reproduction | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible; title/keyword constraints failed                                                                             |
+| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                                                             |
+|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Inkling-Small-mlx-4bit](#diagnostic-mlx-community-inkling-small-mlx-4bit)                        | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                     |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; cut off at token limit                                      |
+| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                  |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                   |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                   |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                                 |
+| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                   | completed | unusable            | observation_needs_reproduction | missing required fields; extra text before Title; cut off at token limit; incomplete thinking block                      |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | unusable            | observation_needs_reproduction | missing required fields; role tokens visible                                                                             |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                               |
+| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                 | completed | unusable            | observation_needs_reproduction | missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block |
+| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                  | completed | unusable            | observation_needs_reproduction | missing required fields; cut off at token limit; incomplete thinking block                                               |
 
 ## Crashes requiring action
 
@@ -897,94 +893,51 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4705.94it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[23:55:42] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-gemma-3n-e4b-it-bf16"></a>
+<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/gemma-3n-E4B-it-bf16 — unusable — empty response; missing required fields</summary>
+<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — repeated text; missing required fields; cut off at token limit; incomplete thinking block</summary>
 
-### mlx-community/gemma-3n-E4B-it-bf16
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 #### Execution and provenance
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* empty_output, missing_requested_sections
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
+- *Observations:* repeated_output, missing_requested_sections,
+  token_cap_truncation, thinking_trace_incomplete
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
 - *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.011388122
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 602
-- *Generation tokens:* 1
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-(empty)
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-flash-mxfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-Flash-mxfp4 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Repeated fragment:* keyword: "cityscape"
-- *Title word count:* 3
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 156
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["bristol marina", "bristol uk", "boats docked",
-  "seagulls", "historic architecture", "cityscape", "england", "europe",
-  "marina", "dock", "boat", "water", "birds", "city centre", "bristol
-  cathedral", "canons marsh", "coyote ugly", "building", "architecture",
-  "great britain", "gbr", "uk", "bristol", "marina view", "docked boats",
-  "seagulls in water", "historic buildings"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Repeated fragment:* phrase: ""the thekla, bristol harbour,..."
+- *Thinking trace markers:* ["&lt;think&gt;"]
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
+  "incomplete_thinking_trace", "abrupt_tail"]
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.002114608
+- *Post-cleanup active memory (GB):* 0.001180718
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6367
+- *Prompt tokens:* 1626
 - *Generation tokens:* 500
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
+- *Configured EOS token ID:* 2
+- *Configured EOS token:* &lt;/s&gt;
 
 #### Complete output
 
 ```text
-Title: Bristol Marina View
-Description: An image of boats docked at a marina in Bristol, England, with seagulls floating in the foreground and historic architecture visible in the background.
-Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, Cityscape, England, Europe, Marina, Dock, Boat, Water, Birds, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Building, Architecture, Great Britain, GBR, Europe, UK, England, Bristol, Marina View, Docked Boats, Seagulls in Water, Historic Buildings, Cityscape, Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architecture, City
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata for this. First, the title. It's got to be concise, descriptive, and accurate. "The Thekla in Bristol Harbour" is a good start, but I can do better. "The Thekla, Bristol Harbour, St Mary Redcliffe" is even better, but I'll keep it simple. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla, Bristol Harbour, St Mary Redcliffe" is a bit long. "The Thekla
 ```
 
 </details>
@@ -992,7 +945,7 @@ Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architect
 <a id="diagnostic-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 <details>
-<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; cut off at token limit</summary>
+<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; echoes instructions; cut off at token limit</summary>
 
 ### mlx-community/paligemma2-3b-pt-896-4bit
 
@@ -1002,18 +955,20 @@ Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architect
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation
+  token_cap_truncation, prompt_instruction_echo
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
 - *Missing sections:* ["title", "description", "keywords"]
-- *Repeated fragment:* Coastline,
+- *Repeated fragment:* phrase: "island, island, island, island..."
+- *Echoed instruction fragments:* ["title hint:", "description hint:",
+  "keyword hints:"]
 - *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail"]
 - *Resolved model revision:* a26bac48c7a661dfdafe1799c90177f818e79925
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.014157064
+- *Post-cleanup active memory (GB):* 0.01414068
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4431
+- *Prompt tokens:* 4433
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
@@ -1021,52 +976,9 @@ Keywords: Bristol Marina, Bristol UK, Boats Docked, Seagulls, Historic Architect
 #### Complete output
 
 ```text
-- Architecture, Building, City Centre, Cityscape, Coast, Coastline, Coastal, Coastal, Coastal waters, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline, Coastline,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-<details>
-<summary>mlx-community/SmolVLM2-2.2B-Instruct-mlx — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Repeated fragment:* keyword: "marina"
-- *Title word count:* 5
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 174
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["england", "europe", "marina", "church", "city",
-  "cityscape", "coyote ugly", "dock", "great britain", "gull", "harbor",
-  "architecture", "building", "canons marsh"]
-- *Token-cap degradation evidence:* ["repetitive_tail"]
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.009733256
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 441
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 49279
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-
-#### Complete output
-
-```text
- Title: Bristol, England, UK, GBR, Europe
-Description: A marina with boats docked, seagulls flying and floating in the water, and a church in the background.
-Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building, Canons Marsh, Church, City, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Architecture, Building,
+- Title hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Description hint: Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Keyword hints: Architecture, Building, Church, Flag, Harbor, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island, Island,
 ```
 
 </details>
@@ -1086,22 +998,21 @@ Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, 
 - *Observations:* repeated_output, token_cap_truncation,
   catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Repeated fragment:* keyword: "dock"
-- *Title word count:* 7
+- *Repeated fragment:* keyword: "england"
+- *Title word count:* 6
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 172
+- *Keyword count:* 199
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["bristol", "england", "uk", "europe", "great
-  britain", "marina", "ferris wheel", "seagulls", "waterfront", "cityscape",
-  "architecture", "church", "dock", "harbor", "gull"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Duplicate keywords:* ["england", "europe", "flag", "building", "bridge",
+  "dock"]
+- *Token-cap degradation evidence:* ["repetitive_tail"]
 - *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.010306732
+- *Post-cleanup active memory (GB):* 0.010290348
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16572
+- *Prompt tokens:* 16517
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
@@ -1110,12 +1021,12 @@ Keywords: Bristol, England, UK, GBR, Europe, Marina, Boat, Boats, Church, City, 
 
 ```text
 Title:
-Bristol Marina with Ferris Wheel and Cathedral
+The Thekla in Mud Dock, Bristol
 
 Description:
-A vibrant scene of boats docked at a marina in Bristol, with the iconic Ferris wheel and Bristol Cathedral rising in the background, while seagulls float and fly in the foreground under a bright, partly cloudy sky.
+The historic ship Thekla, now a venue, is moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe Church visible in the background under a clear blue sky. The ship's black hull, white mast, and mooring lines are prominent, while the surrounding greenery and urban structures frame the scene.
 
-Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Wheel, Cathedral, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Harbor, Urban, Tourism, Landmark, Gull, City Centre, Bristol Cathedral, Canons Marsh, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock, Ferris Wheel, Bristol, England, UK, Europe, Great Britain, Gull, Harbor, Marina, Seagulls, Waterfront, Cityscape, Architecture, Church, Dock
+Keywords: Thekla, Mud Dock, Bristol, St Mary Redcliffe, Church Spire, Clear Sky, Harbor, Black Hull, White Mast, Moored, Mooring Lines, Nautical, Architecture, Boat, City Centre, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building, Bridge, Dock, England, Europe, Flag, Building,
 ```
 
 </details>
@@ -1140,9 +1051,9 @@ Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Whe
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010306752
+- *Post-cleanup active memory (GB):* 0.010290368
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 604
+- *Prompt tokens:* 613
 - *Generation tokens:* 87
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
@@ -1151,9 +1062,9 @@ Keywords: Bristol, England, UK, Europe, Great Britain, Marina, Boats, Ferris Whe
 
 ```text
 <|channel>thought
-<channel|>Title: Boats at Canons Marsh Marina in Bristol City Centre
-Description: Numerous boats are docked at the marina in Bristol, featuring a flock of seagulls floating in the water with Bristol Cathedral and a Ferris wheel in the background.
-Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel, Seagull, Cityscape, Architecture, Harbour, Dock, Waterfront, UK, Europe
+<channel|>Title: The Thekla ship venue moored in Bristol Harbour England
+Description: The Thekla ship venue is moored in Mud Dock within Bristol Harbour with the spire of St Mary Redcliffe Church visible in the background under a clear sky.
+Keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, Dock, England, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 ```
 
 </details>
@@ -1178,10 +1089,10 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010306752
+- *Post-cleanup active memory (GB):* 0.010290368
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 604
-- *Generation tokens:* 81
+- *Prompt tokens:* 613
+- *Generation tokens:* 82
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -1189,9 +1100,9 @@ Keywords: Bristol, England, Canons Marsh, Marina, Boats, Cathedral, Ferris wheel
 
 ```text
 <|channel>thought
-<channel|>Title: Boats at Canons Marsh Marina near Bristol Cathedral
-Description: Various motorboats are docked at the marina in Bristol, with a flock of seagulls floating and flying over the water in the foreground.
-Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Architecture, Cityscape, England, Europe, Water, Dock, Birds, Waterfront
+<channel|>Title: The Thekla Ship Moored in Bristol Harbour
+Description: The Thekla ship venue is moored in Bristol Harbour under a clear sky with the steeple of St Mary Redcliffe church visible in the background.
+Keywords: Bristol, Harbour, Ship, Boat, Church Spire, Mast, Moored, Mooring lines, Nautical, England, City Centre, Clear Sky, Architecture
 ```
 
 </details>
@@ -1199,7 +1110,7 @@ Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Ar
 <a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
 
 <details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible</summary>
+<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/GLM-4.6V-nvfp4
 
@@ -1208,91 +1119,31 @@ Keywords: Bristol, Canons Marsh, Cathedral, Marina, Boats, Seagulls, Harbour, Ar
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token
+- *Observations:* unexpected_special_token, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
 - *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
   "&lt;|end_of_box|&gt;"]
+- *Title word count:* 7
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 25
+- *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
 - *Post-cleanup active memory (GB):* 0.002425916
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6367
-- *Generation tokens:* 97
+- *Prompt tokens:* 6348
+- *Generation tokens:* 122
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 
 #### Complete output
 
 ```text
-<|begin_of_box|>Title: Bristol Marina with Seagulls and Cathedral
-Description: A marina in Bristol, England, with boats docked at the pier, seagulls floating in the water, and Bristol Cathedral and a Ferris wheel visible in the background under a partly cloudy sky.
-Keywords: Bristol, Marina, Boats, Seagulls, Bristol Cathedral, Ferris wheel, City Centre, England, UK, Europe, Harbor, Dock, Architecture, Building, Cityscape<|end_of_box|>
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-<details>
-<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_catalog_preamble, thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Missing sections:* ["title", "description"]
-- *Unexpected text before Title:* Let's tackle this step by step. First, the
-  title needs to be concrete, 5-10 words. The context says Bristol, UK, with
-  landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So
-  maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the
-  capture time is 16:45 UTC+01:00, which is late afternoon, not sunset. Wait,
-  the hint says "City Centre, Bristol, England, UK, GBR, Europe" so need to
-  include key landmarks. Let's check the keywords: Bristol, Bristol Cathedral,
-  Coyote Ugly, Marina, Seagulls, Harbour, Cityscape, England, UK, Europe. So
-  title: "Bristol Cathedral and Coyote Ugly Marina with Seagulls at Dusk"
-  (wait, 16:45 is late afternoon, dusk is around that time). Wait, but the
-  hint says "City Centre, Bristol, England, UK, GBR, Europe" so maybe "Bristol
-  City Centre Marina with Bristol Cathedral and Coyote Ugly Bar" but need to
-  be concise. Wait, the user said "concrete 5-10-word title". Let's go with
-  "Bristol Cathedral and Coyote Ugly Marina at Late Afternoon" (that's 8
-  words).  Next, the description: needs to combine context (capture date/time:
-  2026-08-12 16:45:16 UTC+01:00, GPS 51.451700°N, 2.600800°W which is Bristol)
-  with main subject (boats at marina), setting (Bristol city centre, near
-  Bristol Cathedral, Coyote Ugly Bar), action (seagulls flying/floating),
-  lighting (late afternoon, since 16:45 is late afternoon). So: "A late
-  afternoon view of boats docked at Bristol's marina near Bristol Cathedral
-  and the Coyote Ugly Bar, with seagulls floating on the water in the city
-  centre."
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace", "abrupt_tail"]
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001180718
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1643
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-
-#### Complete output
-
-```text
-Let's tackle this step by step. First, the title needs to be concrete, 5-10 words. The context says Bristol, UK, with landmarks like Bristol Cathedral, Coyote Ugly Bar, marina, seagulls. So maybe "Bristol Cathedral and Coyote Ugly Marina at Sunset" but wait, the capture time is 16:45 UTC+01:00, which is late afternoon, not sunset. Wait, the hint says "City Centre, Bristol, England, UK, GBR, Europe" so need to include key landmarks. Let's check the keywords: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Seagulls, Harbour, Cityscape, England, UK, Europe. So title: "Bristol Cathedral and Coyote Ugly Marina with Seagulls at Dusk" (wait, 16:45 is late afternoon, dusk is around that time). Wait, but the hint says "City Centre, Bristol, England, UK, GBR, Europe" so maybe "Bristol City Centre Marina with Bristol Cathedral and Coyote Ugly Bar" but need to be concise. Wait, the user said "concrete 5-10-word title". Let's go with "Bristol Cathedral and Coyote Ugly Marina at Late Afternoon" (that's 8 words). 
-
-Next, the description: needs to combine context (capture date/time: 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700°N, 2.600800°W which is Bristol) with main subject (boats at marina), setting (Bristol city centre, near Bristol Cathedral, Coyote Ugly Bar), action (seagulls flying/floating), lighting (late afternoon, since 16:45 is late afternoon). So: "A late afternoon view of boats docked at Bristol's marina near Bristol Cathedral and the Coyote Ugly Bar, with seagulls floating on the water in the city centre." 
-
-Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cathedral, Coyote Ugly, Marina, Se
+<|begin_of_box|>Title: The Thekla Ship at Mud Dock, Bristol
+Description: A black ship named Thekla is moored at Mud Dock in Bristol Harbour, with the steeple of St Mary Redcliffe church visible in the background under a clear blue sky.
+Keywords: Thekla, Ship, Mud Dock, Bristol Harbour, St Mary Redcliffe, Church Spire, Moored, Mooring Lines, Black Hull, Red Stripe, White Mast, Clear Sky, England, UK, Europe, Nautical, Dock, Harbor, City Centre, Architecture, Building, Boat, Mast, Flag, City<|end_of_box|>
 ```
 
 </details>
@@ -1300,7 +1151,7 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 <a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
 
 <details>
-<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — missing required fields; cut off at token limit; incomplete thinking block</summary>
+<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
 
 ### mlx-community/GLM-4.1V-9B-Thinking-8bit
 
@@ -1310,19 +1161,37 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  thinking_trace_incomplete
+  unexpected_catalog_preamble, thinking_trace_incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Missing sections:* ["title", "description", "keywords"]
+- *Missing sections:* ["keywords"]
+- *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this task
+  step by step. First, the title needs to be 5-10 words, concrete. The image
+  shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in
+  Bristol Harbour" or something similar. Wait, the description hint says "The
+  Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the
+  steeple of the church of St Mary Redcliffe in the background." So title
+  could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
+  Then the description: need to combine context (date/time, location) with
+  main subject, setting, action, lighting, distinctive details. The ship is
+  moored, clear sky, Bristol Harbour, church steeple. So something like
+  "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary
+  Redcliffe's steeple visible under clear blue skies."  Keywords need to be
+  10-18 unique, comma-separated. Let's list the hints and add visible details.
+  Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church
+  Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor,
+  Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship
+  (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.  Now,
+  let's structure each part.
 - *Thinking trace markers:* ["&lt;think&gt;"]
 - *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace"]
+  "incomplete_thinking_trace", "abrupt_tail"]
 - *Resolved model revision:* 9677807f106500eb7690391c27645d59f6855cfb
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
 - *Post-cleanup active memory (GB):* 0.001803312
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6363
+- *Prompt tokens:* 6344
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
@@ -1330,11 +1199,52 @@ Keywords: Need 10-18 unique, comma-separated. From context: Bristol, Bristol Cat
 #### Complete output
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image, it's Bristol's harbor with boats, cathedral, etc. So maybe "Bristol Harbour with Cathedral and Ferris Wheel". Wait, need to keep it concise. Let's check the hints: City Centre, Bristol, England... so maybe "Bristol Marina with Cathedral View". Wait, let's make it 5-10 words. How about "Bristol Harbour Scene with Cathedral and Boats". Hmm, maybe "Bristol City Centre Marina with Cathedral". Wait, let's go with something that's clear. Let's see the image has boats, cathedral, ferris wheel, water with birds. So title could be "Bristol Harbour with Cathedral and Boats". That's about 6 words.
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows Thekla (a ship venue) in Bristol Harbour, so maybe "Thekla Ship in Bristol Harbour" or something similar. Wait, the description hint says "The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background." So title could be "Thekla Ship at Bristol Harbour" or "Bristol Harbour Ship Scene".
 
-Next, description: need 1-2 sentences. Combine context (capture date/time, GPS) with main visible subject (boats, marina), setting (city centre, harbor), action (seagulls flying/float), lighting (sunny, clear sky), distinctive details (cathedral, ferris wheel, Coyote Ugly building). So: "Captured on 2026-08-12 at 16:45 UTC+01:00, this image shows a marina in Bristol's city centre with boats docked, seagulls in the water, and the Bristol Cathedral and a Ferris wheel in the background under clear daylight." Wait, need to make it 1-2 sentences. Let's adjust: "This image, captured on 2026-08-12 at 16:45 UTC+01:00, depicts a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel visible in the background under bright daylight." That's two sentences? Wait, no, 1-2. Let's make it one: "Captured on 2026-08-12 at 16:45 UTC+01:00, the image shows a marina in Bristol's city centre with boats, seagulls in the water, and the Bristol Cathedral and Ferris wheel in the background under clear daylight." That's one sentence.
+Then the description: need to combine context (date/time, location) with main subject, setting, action, lighting, distinctive details. The ship is moored, clear sky, Bristol Harbour, church steeple. So something like "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's steeple visible under clear blue skies."
 
-Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building,
+Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. Hints include Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Also visible details: ship (Thekla), church steeple, mooring lines, clear sky, Bristol Harbour.
+
+Now, let's structure each part.
+
+Title: Need 5-10 words. "Thekla Ship in Bristol Harbour" is about 4 words, maybe "Thekla Moored in Bristol Harbour" – 5 words. Or "Bristol Harbour Ship Scene" – 3 words, but need 5-10. Let's go with "Thekla Ship at Bristol Harbour" (5 words).
+
+Description: Combine context (date/time, location) with subject, setting, action, lighting, details. So: "Thekla ship moored in Bristol Harbour on 2026-08-12, with St Mary Redcliffe's church steeple visible under clear blue skies." That's two sentences? Wait, need 1-2 sentences. So maybe "Thekla, a ship venue, is moored in Bristol Harbour on 2026-08-12, with the steeple of St Mary Redcliffe church visible under clear blue skies." That's one sentence, covers context, subject, setting
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+<details>
+<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — missing required fields; role tokens visible</summary>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, role_boundary_token_present
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Missing sections:* ["title", "description", "keywords"]
+- *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 2626
+- *Generation tokens:* 16
+- *Configured EOS token ID:* 128001
+- *Configured EOS token:* &lt;|end_of_text|&gt;
+
+#### Complete output
+
+```text
+ Thekla in Bristol Harbour with St Mary Redcliffe in the background.<end_of_utterance>
 ```
 
 </details>
@@ -1342,7 +1252,7 @@ Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bir
 <a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 <details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — unusable — missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — unusable — missing required fields; cut off at token limit; incomplete thinking block</summary>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
@@ -1352,38 +1262,19 @@ Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bir
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_catalog_preamble, thinking_trace_incomplete
+  thinking_trace_incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Missing sections:* ["title"]
-- *Unexpected text before Title:* ◁think▷Got it, let's tackle this. First, I
-  need to create a British-English catalogue metadata based on the image and
-  the provided context. Let's start by analyzing the image and the hints.
-  First, the context says the capture date/time is 2026-08-12 16:45:16
-  UTC+01:00, and GPS is 51.451700°N, 2.600800°W. The location is City Centre,
-  Bristol, England, UK, GBR, Europe. The description hint mentions boats
-  docked at a marina, Bristol UK, seagulls in the foreground. Keywords include
-  Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building,
-  Canons Marsh, Church, City, City Centre, Coyote Ugly, Dock, England, Europe,
-  Great Britain, Gull, Harbor, Marina.  Now, the image shows a marina in
-  Bristol with boats docked, seagulls in the water, buildings including what
-  looks like Bristol Cathedral in the background, a Ferris wheel (maybe the
-  "Coyote Ugly" place), and the cityscape. The sky is partly cloudy.  For the
-  title, need a 5-10 word British-English title. Maybe "Bristol Marina with
-  Boats and Seagulls in City Centre". Wait, check the keywords: "Bristol
-  Cathedral" is a key element, so maybe include that. Also, "Coyote Ugly" is a
-  known bar in Bristol, so that's a distinctive detail. So title could be
-  "Bristol City Centre Marina with Boats, Seagulls, and Coyote Ugly". That's
-  10 words.
+- *Missing sections:* ["title", "description", "keywords"]
 - *Thinking trace markers:* ["\u25c1think\u25b7"]
 - *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace", "abrupt_tail"]
+  "incomplete_thinking_trace"]
 - *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.003671136
+- *Post-cleanup active memory (GB):* 0.003654752
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1338
+- *Prompt tokens:* 1296
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 163594
 - *Configured EOS token:* [EOS]
@@ -1391,17 +1282,74 @@ Then keywords: need 10-18 unique, comma-separated. From hints: Architecture, Bir
 #### Complete output
 
 ```text
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. Let's start with the title. The main subject is the Thekla ship in Bristol Harbour, with the church steeple in the background. So maybe "Thekla ship moored in Bristol Harbour with St Mary Redcliffe spire visible." That's concise and includes key elements.
 
-First, the context says the capture date/time is 2026-08-12 16:45:16 UTC+01:00, and GPS is 51.451700°N, 2.600800°W. The location is City Centre, Bristol, England, UK, GBR, Europe. The description hint mentions boats docked at a marina, Bristol UK, seagulls in the foreground. Keywords include Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina.
+Next, the description. It should mention the ship, location, time, and key details. The image shows the Thekla in Mud Dock, with the church steeple (St Mary Redcliffe) in the background, clear sky, and the ship's details like the mast and mooring lines. So the description could be: "The Thekla, a historic ship moored in Mud Dock, Bristol Harbour, with the steeple of St Mary Redcliffe visible against a clear blue sky." That captures the main elements.
 
-Now, the image shows a marina in Bristol with boats docked, seagulls in the water, buildings including what looks like Bristol Cathedral in the background, a Ferris wheel (maybe the "Coyote Ugly" place), and the cityscape. The sky is partly cloudy. 
+For keywords, list unique terms from the image and context. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, England, Europe, clear sky, bridge (maybe the bridge in the background?), building (like the dark building), trees, water, etc. Let me check the hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. So include those. Maybe: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 14 keywords. Need to make sure they are unique and relevant. Let me count again. Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship, mast, mooring lines, clear sky, bridge, building, England, Europe, nautical vessel, city centre, church spire, water, trees. That's 15. Maybe remove "nautical vessel" as it's redundant with ship. So adjust to: Thekla, Bristol Harbour, Mud Dock, St Mary Redcliffe, ship,
+```
 
-For the title, need a 5-10 word British-English title. Maybe "Bristol Marina with Boats and Seagulls in City Centre". Wait, check the keywords: "Bristol Cathedral" is a key element, so maybe include that. Also, "Coyote Ugly" is a known bar in Bristol, so that's a distinctive detail. So title could be "Bristol City Centre Marina with Boats, Seagulls, and Coyote Ugly". That's 10 words.
+</details>
 
-Description: Need a 1-2 sentence factual description. Mention the marina, boats, seagulls, city elements like Bristol Cathedral, Coyote Ugly, and the setting. So: "A marina in Bristol's city centre featuring docked boats, seagulls in the water, and the iconic Bristol Cathedral in the background, with the 'Coyote Ugly' establishment visible among buildings under a partly cloudy sky."
+<a id="diagnostic-mlx-community-minicpm-v-46-8bit"></a>
 
-Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Marina, Boats, Seagulls, Bristol Cathedral, Coyote Ugly, Building, England, Europe, Cityscape, Dock. That's 10. Maybe add "Harbor" instead of Building? Wait, the image has a harbor. Let's check the hints
+<details>
+<summary>mlx-community/MiniCPM-V-4.6-8bit — unusable — missing required fields; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block</summary>
+
+### mlx-community/MiniCPM-V-4.6-8bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, token_cap_truncation,
+  prompt_instruction_echo, unexpected_catalog_preamble,
+  thinking_trace_incomplete
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Missing sections:* ["title", "keywords"]
+- *Echoed instruction fragments:* ["a 1 2 sentence factual description
+  combining relevant"]
+- *Unexpected text before Title:* &lt;think&gt; We need to create a concrete
+  5-10 word title, then a 1-2 sentence factual description combining relevant
+  context with the main visible subject, setting, action, lighting, and
+  distinctive details. Then 10-18 unique, comma-separated keywords covering
+  relevant context and visible details.  First, title: should be concrete,
+  short, around 5-10 words. Based on the image: a black ship moored in Bristol
+  harbor with church spire. So title: Black Ship Moored at Bristol Harbor with
+  Church Spire.  But need 5-10 words. Let's count: "Black Ship Moored at
+  Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in
+  Bristol Harbor, Featuring Church Spire". But better to include key elements:
+  ship, harbor, church, clear sky.
+- *Thinking trace markers:* ["&lt;think&gt;"]
+- *Token-cap degradation evidence:* ["missing_sections",
+  "incomplete_thinking_trace"]
+- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.004834414
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 1003
+- *Generation tokens:* 500
+- *Configured EOS token ID:* 248046
+- *Configured EOS token:* &lt;|im_end|&gt;
+
+#### Complete output
+
+```text
+<think>
+We need to create a concrete 5-10 word title, then a 1-2 sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Then 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+First, title: should be concrete, short, around 5-10 words. Based on the image: a black ship moored in Bristol harbor with church spire. So title: Black Ship Moored at Bristol Harbor with Church Spire.
+
+But need 5-10 words. Let's count: "Black Ship Moored at Bristol Harbor with Church Spire" is 6 words. Could be "Boat Moored in Bristol Harbor, Featuring Church Spire". But better to include key elements: ship, harbor, church, clear sky.
+
+Description: The image shows a large black ship moored in Bristol Harbor, with a church steeple visible in the background under clear blue skies.
+
+Now, keywords: need 10-18 unique, covering relevant context and visible details. Let's list:
+
+- ship, boat, harbor, Bristol, church, church spire, mast, moored, dock, England, Europe, clear sky, nautical, architecture, masts, rigging, flags, dockside, green trees, clear weather, harbor water, anchor, S, Thekla, mooring lines, city center, England, UK, GBR, clear, sunny, architecture, building, steeple, church, harbor, dock, England, Europe, nautical, boat, ship, masts, rigging, moored, dockside, trees, clear sky, architecture, building, church spire, harbor, mooring, nautical, England, UK, GBR, clear, sunny, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring lines, anchor, masts, rigging, flags, dock, city center, Europe, nautical, ship, harbor, architecture, building, steeple, church, moored, dockside, trees, clear sky, England, UK, GBR, clear, sunny, mooring, nautical, ship, harbor,
 ```
 
 </details>
@@ -1424,14 +1372,14 @@ Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Mar
 - *Missing sections:* ["title", "description", "keywords"]
 - *Thinking trace markers:* ["&lt;think&gt;"]
 - *Token-cap degradation evidence:* ["missing_sections",
-  "incomplete_thinking_trace", "abrupt_tail"]
+  "incomplete_thinking_trace"]
 - *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.00807847
+- *Post-cleanup active memory (GB):* 0.008062086
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16563
+- *Prompt tokens:* 16508
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
@@ -1439,136 +1387,11 @@ Keywords: Need 10-18 unique keywords. Let's list them: Bristol, City Centre, Mar
 #### Complete output
 
 ```text
-Got it, let's tackle this step by step. First, the title. The context says Bristol, UK, and the image has boats, seagulls, marina. The title hint is City Centre, Bristol, England, UK, GBR, Europe. So need a concise title. Maybe "Bristol City Centre Marina with Seagulls" but let's check. The image has a marina with boats and seagulls, so "Bristol Marina, Seagulls, City Centre" but need 5-10 words. Let's see: "Bristol City Centre Marina with Seagulls" is 10 words. Wait, maybe "Bristol City Centre Marina, Seagulls, Boats" but the title should be catchy. Wait, the context says Bristol UK, so "Bristol City Centre Marina" is good.
+Got it, let's tackle this step by step. First, the title. The image shows a ship named Thekla anchored in Bristol Harbour. The context mentions Bristol, so the title should be specific. Let's see: "Thekla, Bristol Harbour, Moored" – that's 5 words. Wait, maybe "Thekla Ship, Bristol Harbour, Moored" but need to be concise. The hint says "City Centre, Bristol, England, UK, GBR, Europe" so title should include Thekla and location.
 
-Next, the description. Needs to combine context with main visible subject, setting, action, lighting, distinctive details. Context: capture date/time is 2026-08-12 16:45:16 UTC+01:00, GPS 51.451700N, 2.600800W. The image shows boats docked at a marina, seagulls in the water, buildings including Bristol Cathedral (the Gothic cathedral in the background), the "Coyote Ugly" building, and the Ferris wheel. The lighting is bright, sunny, clear sky. The main visible subject is the marina with boats and seagulls. So the description should mention Bristol City Centre, marina, boats, seagulls, Bristol Cathedral, sunny day, etc.
+Next, the description. Need to combine context with visible subject, setting, action, lighting, details. The ship is Thekla, anchored in Mud Dock (from context), background has St Mary Redcliffe church spire. The sky is clear blue, so lighting is bright. Visible details: black hull, red stripe, mast, mooring lines, trees, church spire. Action: moored. So: "Thekla ship, black hull with red stripe, moored in Bristol Harbour Mud Dock, clear blue sky, with St Mary Redcliffe church spire in background."
 
-Then keywords: need 10-18 unique, comma-separated. From context: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina. But need to check which are visible. The image has Bristol Cathedral (yes, the Gothic building in the background), Coyote Ugly building (the green and red building with "Coyote Ugly" sign), marina, boats, seagulls (gulls), harbor, cityscape, Bristol, etc. Let's list visible ones: Architecture (yes, the cathedral
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-minicpm-v-46-8bit"></a>
-
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-8bit — unusable — echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed</summary>
-
-### mlx-community/MiniCPM-V-4.6-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* token_cap_truncation, prompt_instruction_echo,
-  unexpected_catalog_preamble, thinking_trace_incomplete,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Echoed instruction fragments:* ["main visible subject setting action
-  lighting and distinctive"]
-- *Unexpected text before Title:* &lt;think&gt; We need to create a title,
-  description, and keywords based on the image. Let's analyze the image.  The
-  image shows a harbor or marina with boats, seagulls, buildings, and a
-  cathedral (Bristol Cathedral?). There's a ferris wheel and some modern
-  buildings. The context is Bristol, UK.  First, title: need 5-10 words. Let's
-  think: "Boat marina with seagulls and Bristol cathedral". That's 6 words.
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 3
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 26
-- *Requested keyword count range:* [10, 18]
-- *Token-cap degradation evidence:* ["incomplete_thinking_trace",
-  "abrupt_tail"]
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.004850798
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 945
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-<think>
-We need to create a title, description, and keywords based on the image. Let's analyze the image.
-
-The image shows a harbor or marina with boats, seagulls, buildings, and a cathedral (Bristol Cathedral?). There's a ferris wheel and some modern buildings. The context is Bristol, UK.
-
-First, title: need 5-10 words. Let's think: "Boat marina with seagulls and Bristol cathedral". That's 6 words.
-
-Description: Combine relevant context and main visible subject, setting, action, lighting, and distinctive details. The main subject is boats docked at a marina, with seagulls in the water, and background showing Bristol Cathedral and other buildings. Lighting is sunny with clouds.
-
-Keywords: need 10-18 unique, comma-separated. Cover relevant context and visible details. Let's list: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, ferry, trees, sky, Europe, UK, England, Gull, harbor, city, architecture, modern, red building, white boats, etc.
-
-Make sure to be unique and cover the main elements.
-
-Now, structure:
-
-Title: [concrete 5-10 words]
-
-Description: [1-2 sentences]
-
-Keywords: [10-18 unique, comma-separated]
-
-Let's draft.
-
-Title: Boat marina with seagulls and Bristol cathedral.
-
-Description: Shows boats docked at a marina with seagulls in the water, featuring Bristol Cathedral and urban buildings under sunny skies.
-
-Keywords: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees, sky, modern, red building, white boats.
-
-Check count: title 5-10 words: "Boat marina with seagulls and Bristol cathedral" is 5 words. Good.
-
-Description: two sentences, combine context and main visible subject, setting, action, lighting, distinctive details. Looks okay.
-
-Keywords: list 10-18 unique terms. Let's ensure they are unique and cover the relevant context and visible details.
-
-List: boat, marina, seagulls, Bristol, cathedral, buildings, water, dock, harbor, city, architecture, England, UK, Europe, Gull, trees
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-<details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — usable_with_caveats — role tokens visible; title/keyword constraints failed</summary>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* role_boundary_token_present, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
-- *Title word count:* 11
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 15
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00268806
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2627
-- *Generation tokens:* 208
-- *Configured EOS token ID:* 128001
-- *Configured EOS token:* &lt;|end_of_text|&gt;
-
-#### Complete output
-
-```text
- Title: Boats Docked at Bristol Marina with City Centre in the Background.
-Description: This image depicts a marina in Bristol, England, featuring a variety of boats docked along the waterfront. The boats vary in size and design, with some having multiple decks and others appearing more compact. The marina is surrounded by a mix of greenery, including trees and shrubs, which provide a natural backdrop. In the background, the cityscape of Bristol is visible, with notable structures such as the Bristol Cathedral and other buildings. The sky is partly cloudy, with patches of sunlight illuminating the scene. The water in the marina is calm, and a flock of seagulls can be seen flying and floating on the surface. The overall atmosphere is serene and picturesque, capturing the essence of a tranquil day by the water.
-Keywords: Bristol, marina, boats, dock, cityscape, Bristol Cathedral, seagulls, water, trees, shrubs, calm, partly cloudy, sunlight, serene, picturesque.<end_of_utterance>
+Then keywords. Need 10-18 unique, comma-separated. From context: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical. Let's check image: ship is moored, so Moored, Mooring lines. Church spire is visible. The ship has a mast. The hull is black with red stripe. So keywords: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. Wait, need to pick 10-18. Let's list: Architecture, Boat, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring lines, Nautical. That's 17. Let's check if any are missing. The ship has a mast, so Mast. The context says "Thekla (a ship venue)" so maybe include Ship, but the hint says "Ship venue" but the image is a ship. Wait,
 ```
 
 </details>
@@ -1583,43 +1406,46 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                         | Usability           | Observations                                                                                  |
-|-----------------------------------------------|---------------------|-----------------------------------------------------------------------------------------------|
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable            | missing required fields; echoes instructions; extra text before Title; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16               | unusable            | missing required fields                                                                       |
-| mlx-community/llava-v1.6-mistral-7b-8bit      | unusable            | missing required fields                                                                       |
-| mlx-community/MolmoPoint-8B-fp16              | unusable            | missing required fields                                                                       |
-| mlx-community/nanoLLaVA-1.5-4bit              | unusable            | missing required fields                                                                       |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit       | unusable            | missing required fields                                                                       |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16              | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/gemma-4-26b-a4b-it-4bit         | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/InternVL3-8B-bf16               | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/LFM2.5-VL-1.6B-bf16             | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/Molmo-7B-D-0924-8bit            | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16       | usable_with_caveats | title/keyword constraints failed                                                              |
-| Qwen/Qwen3-VL-2B-Instruct                     | usable_with_caveats | title/keyword constraints failed                                                              |
+| Model                                                 | Usability           | Observations                                                         |
+|-------------------------------------------------------|---------------------|----------------------------------------------------------------------|
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; cut off at token limit |
+| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                              |
+| mlx-community/gemma-3n-E4B-it-bf16                    | unusable            | missing required fields                                              |
+| mlx-community/llava-v1.6-mistral-7b-8bit              | unusable            | missing required fields                                              |
+| mlx-community/MolmoPoint-8B-fp16                      | unusable            | missing required fields                                              |
+| mlx-community/nanoLLaVA-1.5-4bit                      | unusable            | missing required fields                                              |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit               | unusable            | missing required fields                                              |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/Molmo-7B-D-0924-8bit                    | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/pixtral-12b-8bit                        | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16               | usable_with_caveats | title/keyword constraints failed                                     |
+| mlx-community/Step-3.7-Flash-oQ2e                     | usable_with_caveats | title/keyword constraints failed                                     |
+| Qwen/Qwen3-VL-2B-Instruct                             | usable_with_caveats | title/keyword constraints failed                                     |
 
 ## Clean Completion Context
 
 <details>
 <summary>Clean completions</summary>
 
-| Model                                                 | Runtime identity                                    | Performance                                                                                 |
-|-------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2402 prompt / 106 generated; 24.8 tok/s; 23 GB peak; cleanup 0.000968/0.0 GB active/cache   |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed   | 603 prompt / 131 generated; 29.7 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 608 prompt / 102 generated; 27.6 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      | rev 8451adc50203; MllamaProcessor; stop completed   | 316 prompt / 89 generated; 12.5 tok/s; 15 GB peak; cleanup 0.00433/0.0 GB active/cache      |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 2935 prompt / 104 generated; 55.8 tok/s; 13 GB peak; cleanup 0.00511/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed | 2935 prompt / 170 generated; 45.8 tok/s; 13 GB peak; cleanup 0.00538/0.0 GB active/cache    |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 2934 prompt / 105 generated; 147 tok/s; 7.8 GB peak; cleanup 0.00564/0.0 GB active/cache    |
-| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed  | 16576 prompt / 124 generated; 59.1 tok/s; 74 GB peak; cleanup 0.00708/0.0 GB active/cache   |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed    | 1144 prompt / 98 generated; 53.7 tok/s; 9.4 GB peak; cleanup 0.00714/0.0 GB active/cache    |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3125 prompt / 113 generated; 39.6 tok/s; 16 GB peak; cleanup 0.0144/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16576 prompt / 111 generated; 102 tok/s; 24 GB peak; cleanup 0.00859/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16576 prompt / 117 generated; 68.0 tok/s; 10.0 GB peak; cleanup 0.00911/0.0 GB active/cache |
-| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed  | 16576 prompt / 125 generated; 15.0 tok/s; 35 GB peak; cleanup 0.00962/0.0 GB active/cache   |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3503 prompt / 116 generated; 42.7 tok/s; 70 GB peak; cleanup 0.01/0.0 GB active/cache       |
+| Model                                             | Runtime identity                                        | Performance                                                                                |
+|---------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                  | rev ed71acdae079; Lfm2VlProcessor; stop completed       | 396 prompt / 90 generated; 517 tok/s; 1.2 GB peak; cleanup 0.000132/0.0 GB active/cache    |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 617 prompt / 104 generated; 129 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 617 prompt / 99 generated; 26.7 tok/s; 20 GB peak; cleanup 0.0124/0.0 GB active/cache      |
+| mlx-community/GLM-4.6V-Flash-mxfp4                | rev 773591fa7388; Glm46VProcessor; stop completed       | 6348 prompt / 97 generated; 81.0 tok/s; 8.4 GB peak; cleanup 0.00211/0.0 GB active/cache   |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3662 prompt / 96 generated; 34.4 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache      |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed       | 314 prompt / 116 generated; 19.0 tok/s; 15 GB peak; cleanup 0.00431/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 3229 prompt / 130 generated; 67.0 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache    |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 3228 prompt / 132 generated; 182 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache   |
+| mlx-community/Ornith-1.0-35B-bf16                 | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 16521 prompt / 119 generated; 63.6 tok/s; 74 GB peak; cleanup 0.00706/0.0 GB active/cache  |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 1142 prompt / 138 generated; 55.6 tok/s; 9.4 GB peak; cleanup 0.00713/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 16521 prompt / 105 generated; 110 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 16521 prompt / 99 generated; 90.5 tok/s; 10.0 GB peak; cleanup 0.00909/0.0 GB active/cache |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 16521 prompt / 118 generated; 16.9 tok/s; 35 GB peak; cleanup 0.0096/0.0 GB active/cache   |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx          | rev 844516024a1c; SmolVLMProcessor; stop completed      | 439 prompt / 98 generated; 129 tok/s; 5.5 GB peak; cleanup 0.00972/0.0 GB active/cache     |
 
 </details>
 
@@ -1628,9 +1454,9 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,049 x 6,032 pixels
-- *Image size:* 54,967,584 bytes
-- *Image SHA-256:* 49cac3fb93699eb78136c721288d36296a56b950911c604e4b91a246d8132e9a
+- *Image dimensions:* 6,656 x 8,880 pixels
+- *Image size:* 43,468,745 bytes
+- *Image SHA-256:* a573297b9d6dd57d25635e2acfee43dda709bf6680fa26be27fb1c90fd075bf6
 
 <details>
 <summary>Exact prompt</summary>
@@ -1641,13 +1467,13 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
-- GPS: 51.451700°N, 2.600800°W
+- Capture date/time: 2026-08-12 17:52:14 UTC+01:00
+- GPS: 51.448500°N, 2.593000°W
 
 Descriptive hints:
 - Title hint: City Centre, Bristol, England, UK, GBR, Europe
-- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
-- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+- Description hint: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 
 Write:
 - a concrete 5-10-word title;
@@ -1671,20 +1497,17 @@ original image before filing.
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
 | mlx-community/Inkling-Small-mlx-4bit             | f0cafad5b1a3e54be06ba03fe07b4cd4e8bcc612 |
-| mlx-community/gemma-3n-E4B-it-bf16               | d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a |
-| mlx-community/GLM-4.6V-Flash-mxfp4               | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx         | 844516024a1c4400d34489b89ee067d794e432ed |
 | mlx-community/X-Reasoner-7B-8bit                 | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
 | mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/GLM-4.1V-9B-Thinking-8bit          | 9677807f106500eb7690391c27645d59f6855cfb |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16          | c325e5ea14c215bb08fa0d668c81fa2581f9050b |
-| mlx-community/MiniCPM-V-4.6-8bit                 | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
 | mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
+| mlx-community/MiniCPM-V-4.6-8bit                 | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16          | c325e5ea14c215bb08fa0d668c81fa2581f9050b |
 
 ### Components and system
 

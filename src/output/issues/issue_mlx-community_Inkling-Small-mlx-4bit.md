@@ -829,20 +829,20 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 2939.06it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 4705.94it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:27:38] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[23:55:42] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,049 x 6,032 pixels
-- *Image size:* 54,967,584 bytes
-- *Image SHA-256:* 49cac3fb93699eb78136c721288d36296a56b950911c604e4b91a246d8132e9a
+- *Image dimensions:* 6,656 x 8,880 pixels
+- *Image size:* 43,468,745 bytes
+- *Image SHA-256:* a573297b9d6dd57d25635e2acfee43dda709bf6680fa26be27fb1c90fd075bf6
 
 <details>
 <summary>Exact prompt</summary>
@@ -853,13 +853,13 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-12 16:45:16 UTC+01:00
-- GPS: 51.451700°N, 2.600800°W
+- Capture date/time: 2026-08-12 17:52:14 UTC+01:00
+- GPS: 51.448500°N, 2.593000°W
 
 Descriptive hints:
 - Title hint: City Centre, Bristol, England, UK, GBR, Europe
-- Description hint: This is an image of boats docked at a marina. Bristol UK. A flock of seagulls flies and floats in the water in the foreground.
-- Keyword hints: Architecture, Bird, Boat, Boats, Bristol, Bristol Cathedral, Building, Canons Marsh, Church, City, City Centre, Cityscape, Coyote Ugly, Dock, England, Europe, Great Britain, Gull, Harbor, Marina
+- Description hint: The Thekla (a ship venue) anchored in Mud Dock in Bristol Harbour with the steeple of the church of St Mary Redcliffe in the background.
+- Keyword hints: Architecture, Boat, Bridge, Bristol, Building, Church, Church Spire, City, City Centre, Clear Sky, Dock, England, Europe, Flag, Harbor, Mast, Moored, Mooring, Mooring lines, Nautical
 
 Write:
 - a concrete 5-10-word title;
@@ -898,7 +898,7 @@ python -m mlx_vlm.generate --model mlx-community/Inkling-Small-mlx-4bit --image 
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6.1                                                          |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.9.1; revision a2c842ef7f598a73b8f8a355d945ff74a642ff89; clean |
+| check_models    | 0.9.1; revision fd8a5660b9f858a70a436c0b67ad5bd507283dac; clean |
 
 ### Full environment evidence
 
