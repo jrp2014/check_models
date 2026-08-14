@@ -2,9 +2,9 @@
 
 ## Run at a glance
 
-- Models attempted: 41 (completed 41, crashed 0, indeterminate 0)
-- Usability: usable 9, usable with caveats 19, unusable 13, not evaluated 0
-- Top observations: Response repeats the same text (3), Unrecognised model control tokens remain visible (3), Required fields are missing or empty (10), Response repeats the task instructions instead of only returning the requested fields (3), Extra text appears before the Title field (4)
+- Models attempted: 41 (completed 40, crashed 1, indeterminate 0)
+- Usability: usable 10, usable with caveats 17, unusable 13, not evaluated 1
+- Top observations: Response repeats the same text (4), Unrecognised model control tokens remain visible (3), Required fields are missing or empty (10), Response repeats the task instructions instead of only returning the requested fields (5), Extra text appears before the Title field (2)
 
 ## Artifacts
 
@@ -19,3 +19,7 @@
 ## Paste-ready run issue
 
 - [Run issue summary](https://github.com/jrp2014/check_models/blob/main/src/output/issues/run_summary.md)
+
+## Issue drafts
+
+- [mlx-community/SmolVLM2-2.2B-Instruct-mlx](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_SmolVLM2-2.2B-Instruct-mlx.md)

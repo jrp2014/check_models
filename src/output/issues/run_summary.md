@@ -2,17 +2,79 @@
 
 ## Run summary
 
-- *Run timestamp:* 2026-08-13 23:30:23 BST
+- *Run timestamp:* 2026-08-14 18:45:04 BST
 - *Evaluation mode:* assisted
 - *Models attempted:* 41
-- *Completed:* 41
-- *Crashed:* 0
+- *Completed:* 40
+- *Crashed:* 1
 - *Indeterminate:* 0
-- *Crashes requiring action:* 0
+- *Crashes requiring action:* 1
 - *Other results requiring review:* 10
 
 Observations are mechanical facts from one image, not general model-quality
 judgements.
+
+## Crashes requiring action
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+- *Execution / usability:* crashed / not evaluated
+- *Phase:* decode
+- *Stage:* Model Error
+- *Resolved revision:* 844516024a1c4400d34489b89ee067d794e432ed
+
+Root exception chain
+
+```text
+ValueError: not enough values to unpack (expected 3, got 2)
+caused by: ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: not enough values to unpack (expected 3, got 2)
+```
+
+#### Reproduction inputs
+
+- *Image format:* JPEG
+- *Image dimensions:* 9,836 x 5,952 pixels
+- *Image size:* 60,138,414 bytes
+- *Image SHA-256:* bc3fa055e1e116232f77aa68c1d8d22130a1f596762a98cb8cd691667bbdcab2
+
+<details>
+<summary>Exact prompt</summary>
+
+```text
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-13 17:23:18 UTC+01:00
+- GPS: 51.957967°N, 1.346900°E
+
+Descriptive hints:
+- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+```
+
+</details>
+
+The original local input is not published, so this report does not claim a
+complete reproduction command. Use a shareable equivalent image or add the
+original image before filing.
+
+| Evidence | Link |
+| --- | --- |
+| Full diagnostics | [model evidence](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx) |
+| Detailed issue draft | [crash draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_SmolVLM2-2.2B-Instruct-mlx.md) |
 
 ## Observation clusters
 
@@ -20,47 +82,48 @@ Repeated mechanical observation signatures among results requiring review.
 
 | Observed result | Models |
 | --- | --- |
-| Response repeats the same text; Response appears cut off at the token limit; Title or keywords do not meet requested constraints | 2 |
-| Response repeats the same text; Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Response appears cut off at the token limit | 1 |
-| Unrecognised model control tokens remain visible | 2 |
-| Unrecognised model control tokens remain visible; Title or keywords do not meet requested constraints | 1 |
+| Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit | 1 |
+| Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit; Internal reasoning block appears incomplete | 1 |
+| Response repeats the same text; Response appears cut off at the token limit; Title or keywords do not meet requested constraints | 1 |
+| Response repeats the same text; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
+| Unrecognised model control tokens remain visible; Title or keywords do not meet requested constraints | 2 |
+| Unrecognised model control tokens remain visible | 1 |
 | Required fields are missing or empty; Response appears cut off at the token limit; Internal reasoning block appears incomplete | 1 |
-| Required fields are missing or empty; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete | 1 |
-| Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete | 1 |
+| Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
 | Conversation-role control tokens remain visible | 1 |
 
 ## Completed attempts requiring review
 
 | Model | Usability | Observed result | Evidence |
 | --- | --- | --- | --- |
-| mlx-community/GLM-4.6V-Flash-mxfp4 | unusable | Response repeats the same text; Response appears cut off at the token limit; Title has 2 words (requested 5-10); Keyword list has 146 terms (requested 10-18); Duplicate keywords: pier, industrial cranes, street lamps, waterfront, bright daylight, pier view, bright daylight scene, street lamp view, waterfront trees, industrial cranes view, waterfront view, trees | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-flash-mxfp4) |
-| mlx-community/paligemma2-3b-pt-896-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response repeats the task instructions instead of only returning the requested fields; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit) |
-| mlx-community/X-Reasoner-7B-8bit | unusable | Response repeats the same text; Response appears cut off at the token limit; Keyword list has 122 terms (requested 10-18); Duplicate keywords: uk, europe, gbr, uk seafront, uk waterfront, uk ferris wheel, uk cranes, uk sunny day, uk east suffolk, uk felixstowe, uk east anglia, uk industrial port | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-x-reasoner-7b-8bit) |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | Unrecognised model control tokens remain visible; Duplicate keywords: travel | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) |
-| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | Missing or empty fields: Title; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response appears cut off at the token limit; Internal reasoning block appears incomplete | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | Response repeats the same text; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title has 11 words (requested 5-10); Keyword list has 85 terms (requested 10-18); Duplicate keywords: seafront, england, uk, gbr, europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, birds, beachgoers, utc 01 00, any vision, 2026 08 13, adobe stock | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
+| mlx-community/paligemma2-3b-pt-896-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit) |
+| mlx-community/X-Reasoner-7B-8bit | unusable | Response repeats the same text; Response appears cut off at the token limit; Keyword list has 179 terms (requested 10-18); Duplicate keywords: promenade, east suffolk coastline, east suffolk beach, felixstowe historic buildings, felixstowe historic architecture, felixstowe greenery, felixstowe historic structures, felixstowe historic town, east suffolk beachgoers, east suffolk beach buildings, uk seafront greenery, uk beach greenery | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-x-reasoner-7b-8bit) |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | Unrecognised model control tokens remain visible; Duplicate keywords: coastal | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) |
+| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible; Title has 3 words (requested 5-10) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
 | mlx-community/Qwen3-VL-2B-Thinking-bf16 | unusable | Missing or empty fields: Title, Description, Keywords; Response appears cut off at the token limit; Internal reasoning block appears incomplete | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16) |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title has 4 words (requested 5-10); Keyword list has 69 terms (requested 10-18); Duplicate keywords: felixstowe, suffolk, uk, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, europe, east suffolk, england, gbr, seagulls, seaside, wait, with people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
 | mlx-community/Idefics3-8B-Llama3-bf16 | usable with caveats | Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-idefics3-8b-llama3-bf16) |
 
 ## Clean completions
 
-9 clean completions; 22 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
+10 clean completions; 20 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
 
 ## Run context
 
-- *Image:* JPEG, 8,880 x 6,656 pixels, 25,691,731 bytes
-- *Generation: max_tokens:* 500
+- *Image:* JPEG, 9,836 x 5,952 pixels, 60,138,414 bytes
+- *Generation: max_tokens:* 1000
 - *Generation: prefill_step_size:* 2048
 - *Generation: temperature:* 0.0
 - *Generation: top_p:* 1.0
 - *Trust remote code:* true
 - *check_models version:* 0.9.1
-- *check_models revision:* 67013a33e3fdbe6f7405614218f79bd64c0dbd39
+- *check_models revision:* 31afd35eed71ff34a8310726bf24b8e2719b2403
 - *check_models source dirty:* false
 - *mlx-vlm:* 0.6.14
-- *mlx:* 0.32.1.dev20260813+a8e24f202
+- *mlx:* 0.32.1.dev20260814+3d23f7d87
 - *transformers:* 5.15.0
 - *macOS Version:* 26.6.1
 - *GPU/Chip:* Apple M5 Max
@@ -73,12 +136,11 @@ evidence is required.
 
 ## Full artifacts
 
-Stale retained artifacts omitted because their timestamps fall outside this
-run: `check_models.log`, `environment.log`.
-
 | Artifact | Link |
 | --- | --- |
 | Diagnostics | [diagnostics.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md) |
 | Model gallery | [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md) |
 | Results JSONL | [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl) |
 | Run JSON | [run.json](https://github.com/jrp2014/check_models/blob/main/src/output/run.json) |
+| Environment | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
+| Log | [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log) |
