@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-14
+
 ### Added
 
 - Promote `issues/run_summary.md` to the run's primary entry point. It now
