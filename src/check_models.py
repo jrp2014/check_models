@@ -58,6 +58,7 @@ import stat
 import subprocess
 import sys
 import textwrap
+import threading
 import time
 import traceback
 import webbrowser
@@ -292,6 +293,10 @@ THINKING_TRACE_DELIMITERS: Final[tuple[ThinkingDelimiterPair, ...]] = (
     ThinkingDelimiterPair("<|START_THINKING|>", "<|END_THINKING|>"),
 )
 DEFAULT_THINKING_END_MARKER: Final[str] = THINKING_TRACE_DELIMITERS[0].end
+# Auto thinking budget: reserve answer headroom below the token cap, and skip
+# the mechanism entirely when the cap leaves too little room to think at all.
+AUTO_THINKING_ANSWER_RESERVE_TOKENS: Final[int] = 200
+AUTO_THINKING_BUDGET_MIN_TOKENS: Final[int] = 128
 THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = tuple(
     (pair.start, pair.end) for pair in THINKING_TRACE_DELIMITERS
 )
@@ -970,6 +975,25 @@ class JsonlMetricsRecord(TypedDict, total=False):
     post_cleanup_cache_memory_gb: float
 
 
+class SystemTelemetryRecord(TypedDict, total=False):
+    """Thermal and memory-pressure facts sampled around/during one model run.
+
+    ``mode`` is "snapshot" (one probe pair before load and one after cleanup,
+    outside timed inference) or "continuous" (opt-in background sampling).
+    Per-probe sample counts are recorded separately so an unavailable probe is
+    distinguishable from a clean one.
+    """
+
+    mode: str
+    interval_s: float
+    cpu_samples: int
+    cpu_speed_limit_min_pct: float
+    cpu_throttled_samples: int
+    memory_samples: int
+    memory_pressure_level_max: int
+    memory_pressure_elevated_samples: int
+
+
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
 type ModelUsability = Literal["usable", "usable_with_caveats", "unusable", "not_evaluated"]
 type MaintainerStatus = Literal[
@@ -1201,6 +1225,7 @@ class JsonlResultRecord(TypedDict):
     model_provenance: ModelProvenanceRecord
     prompt_diagnostics: dict[str, JsonLike] | None
     architecture: NotRequired[JsonlArchitectureRecord]
+    system_telemetry: NotRequired[SystemTelemetryRecord]
 
 
 @dataclass(frozen=True)
@@ -1788,6 +1813,8 @@ class PerformanceResult:
     requested_max_tokens: int | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
+    # Thermal/memory-pressure facts sampled while this model ran (darwin only).
+    system_telemetry: SystemTelemetryRecord | None = None
     completed_at: str | None = None
 
 
@@ -2897,6 +2924,10 @@ class ProcessImageParams:
     thinking_mode: str | None = None
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
+    auto_thinking_budget: bool = True
+    # None = snapshot probes outside timed inference (default); True = opt-in
+    # continuous background sampling; False = fully off.
+    system_telemetry: bool | None = None
     context_marker: str = "Context:"
 
 
@@ -8803,10 +8834,14 @@ def _diagnostics_result_facts(
         ("Configured EOS token override", generation_kwargs.get("eos_tokens")),
         ("Configured thinking start token", generation_kwargs.get("thinking_start_token")),
         ("Configured thinking end token", generation_kwargs.get("thinking_end_token")),
+        ("Configured thinking budget", generation_kwargs.get("thinking_budget")),
     )
     rows.extend(
         (label, _diagnostics_fact(value)) for label, value in optional_facts if value is not None
     )
+    telemetry = result.system_telemetry
+    if telemetry is not None:
+        rows.append(("System pressure during run", _telemetry_status_line(telemetry)))
     return tuple(rows)
 
 
@@ -10671,6 +10706,76 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     return extra_kwargs
 
 
+def _prompt_opens_thinking_block(
+    formatted_prompt: str,
+    pair: ThinkingDelimiterPair,
+) -> bool:
+    """True when the prompt's final thinking marker for this pair is unmatched.
+
+    Mirrors mlx-vlm's server-side open-block logic: a start marker followed by
+    its end marker is a closed block (few-shot examples, literal mentions), so
+    only a trailing unclosed start marker counts as the template opening a
+    thinking block for the model to continue.
+    """
+    return formatted_prompt.rfind(pair.start) > formatted_prompt.rfind(pair.end)
+
+
+def _auto_thinking_budget_kwargs(
+    params: ProcessImageParams,
+    formatted_prompt: str,
+) -> GenerateKwargs:
+    """Bound template-opened thinking blocks when no explicit flags are set.
+
+    Upstream's ``ThinkingBudgetCriteria`` only engages when ``enable_thinking``
+    is passed AND the rendered prompt already contains the thinking start
+    token, so this affects only models whose chat template itself opens a
+    thinking block (final marker unmatched, not merely mentioned or closed).
+    Chat-template kwargs are untouched: hybrid models keep their default
+    non-thinking behaviour, and any explicit thinking flag or
+    ``--thinking-mode`` hands full control back to the user.
+    """
+    empty = cast("GenerateKwargs", {})
+    if (
+        not params.auto_thinking_budget
+        or params.enable_thinking
+        or params.thinking_mode is not None
+    ):
+        return empty
+    budget = params.max_tokens - AUTO_THINKING_ANSWER_RESERVE_TOKENS
+    if budget < AUTO_THINKING_BUDGET_MIN_TOKENS:
+        return empty
+    for pair in THINKING_TRACE_DELIMITERS:
+        if _prompt_opens_thinking_block(formatted_prompt, pair):
+            return cast(
+                "GenerateKwargs",
+                {
+                    "enable_thinking": True,
+                    "thinking_budget": budget,
+                    "thinking_start_token": pair.start,
+                    "thinking_end_token": pair.end,
+                },
+            )
+    return empty
+
+
+def _apply_auto_thinking_budget(
+    params: ProcessImageParams,
+    formatted_prompt: str,
+    generate_kwargs: GenerateKwargs,
+) -> None:
+    """Inject the automatic thinking budget when the template opens thinking."""
+    auto_kwargs = _auto_thinking_budget_kwargs(params, formatted_prompt)
+    if not auto_kwargs:
+        return
+    generate_kwargs.update(auto_kwargs)
+    logger.info(
+        "Auto thinking budget: %s tokens for %s (template opens a thinking block; "
+        "disable with --no-auto-thinking-budget)",
+        auto_kwargs.get("thinking_budget"),
+        params.model_identifier,
+    )
+
+
 def _build_generate_kwargs(
     params: ProcessImageParams,
     extra_kwargs: GenerateKwargs,
@@ -12141,6 +12246,7 @@ def _run_model_generation(
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
     generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
+    _apply_auto_thinking_budget(params, formatted_prompt, generate_kwargs)
     prompt_diagnostics = _build_prompt_diagnostics(
         params=params,
         processor=processor,
@@ -12491,11 +12597,225 @@ def _build_exception_process_result(
     return result_payload, stop_reason
 
 
+_TELEMETRY_CPU_SPEED_RE: Final[re.Pattern[str]] = re.compile(r"CPU_Speed_Limit\s*=\s*(\d+)")
+_TELEMETRY_SAMPLE_INTERVAL_S: Final[float] = 2.0
+# kern.memorystatus_vm_pressure_level: 1 = normal, 2 = warning, 4 = critical.
+_MEMORY_PRESSURE_NORMAL_LEVEL: Final[int] = 1
+_MEMORY_PRESSURE_CRITICAL_LEVEL: Final[int] = 4
+_CPU_SPEED_UNTHROTTLED_PCT: Final[float] = 100.0
+
+
+def _sample_thermal_cpu_speed_limit_pct() -> float | None:
+    """Read the macOS thermal CPU speed limit (100 = no throttling).
+
+    On Apple Silicon, nominal thermals report "No CPU power status has been
+    recorded" instead of a CPU_Speed_Limit line; that means unthrottled.
+    """
+    output = _run_macos_toolchain_command(("/usr/bin/pmset", "-g", "therm"), timeout=3)
+    if output is None:
+        return None
+    match = _TELEMETRY_CPU_SPEED_RE.search(output)
+    if match:
+        return float(match.group(1))
+    if "No CPU power status has been recorded" in output:
+        return _CPU_SPEED_UNTHROTTLED_PCT
+    return None
+
+
+def _sample_memory_pressure_level() -> int | None:
+    """Read kern.memorystatus_vm_pressure_level (1 normal, 2 warning, 4 critical)."""
+    output = _run_macos_toolchain_command(
+        ("/usr/sbin/sysctl", "-n", "kern.memorystatus_vm_pressure_level"),
+        timeout=3,
+    )
+    if output is None:
+        return None
+    try:
+        return int(output)
+    except ValueError:
+        return None
+
+
+def _system_telemetry_probe() -> tuple[float | None, int | None]:
+    """Take one (cpu_speed_limit_pct, memory_pressure_level) probe pair."""
+    return _sample_thermal_cpu_speed_limit_pct(), _sample_memory_pressure_level()
+
+
+def _system_telemetry_record_from_probes(
+    probes: Sequence[tuple[float | None, int | None]],
+    *,
+    mode: str,
+    interval_s: float | None = None,
+) -> SystemTelemetryRecord | None:
+    """Aggregate probe pairs, keeping per-probe counts so gaps stay visible."""
+    cpu_limits = [cpu for cpu, _ in probes if cpu is not None]
+    pressure_levels = [level for _, level in probes if level is not None]
+    if not cpu_limits and not pressure_levels:
+        return None
+    record: SystemTelemetryRecord = {
+        "mode": mode,
+        "cpu_samples": len(cpu_limits),
+        "memory_samples": len(pressure_levels),
+    }
+    if interval_s is not None:
+        record["interval_s"] = interval_s
+    if cpu_limits:
+        record["cpu_speed_limit_min_pct"] = min(cpu_limits)
+        record["cpu_throttled_samples"] = sum(
+            limit < _CPU_SPEED_UNTHROTTLED_PCT for limit in cpu_limits
+        )
+    if pressure_levels:
+        record["memory_pressure_level_max"] = max(pressure_levels)
+        record["memory_pressure_elevated_samples"] = sum(
+            level > _MEMORY_PRESSURE_NORMAL_LEVEL for level in pressure_levels
+        )
+    return record
+
+
+class _SystemTelemetrySampler:
+    """Opt-in continuous sampler for thermal and memory-pressure state.
+
+    Each tick shells out to `pmset -g therm` and `sysctl` (sudo-free reads).
+    Because those subprocesses run while inference is being timed, continuous
+    mode is opt-in; the default is a before/after snapshot pair taken outside
+    the timed sections.
+    """
+
+    def __init__(self, interval_s: float = _TELEMETRY_SAMPLE_INTERVAL_S) -> None:
+        self._interval_s = interval_s
+        self._stop_event = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._probes: list[tuple[float | None, int | None]] = []
+
+    def start(self) -> None:
+        """Begin sampling until stop() is called."""
+        self._thread = threading.Thread(
+            target=self._run,
+            name="system-telemetry-sampler",
+            daemon=True,
+        )
+        self._thread.start()
+
+    def stop(self) -> None:
+        """Stop sampling and join; the timeout outlasts both 3s probe caps."""
+        self._stop_event.set()
+        if self._thread is not None:
+            self._thread.join(timeout=self._interval_s + 7.0)
+            self._thread = None
+
+    def _run(self) -> None:
+        while not self._stop_event.is_set():
+            cpu_limit = _sample_thermal_cpu_speed_limit_pct()
+            if self._stop_event.is_set():
+                self._probes.append((cpu_limit, None))
+                return
+            self._probes.append((cpu_limit, _sample_memory_pressure_level()))
+            self._stop_event.wait(self._interval_s)
+
+    def snapshot(self) -> SystemTelemetryRecord | None:
+        """Aggregate captured probes; None when nothing was sampled."""
+        return _system_telemetry_record_from_probes(
+            self._probes,
+            mode="continuous",
+            interval_s=self._interval_s,
+        )
+
+
+def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
+    """Describe throttling or memory pressure worth flagging, if any."""
+    notes: list[str] = []
+    min_limit = telemetry.get("cpu_speed_limit_min_pct")
+    if min_limit is not None and min_limit < _CPU_SPEED_UNTHROTTLED_PCT:
+        notes.append(
+            f"CPU speed limited to {min_limit:.0f}% for "
+            f"{telemetry.get('cpu_throttled_samples', 0)} sample(s)"
+        )
+    max_level = telemetry.get("memory_pressure_level_max")
+    if max_level is not None and max_level > _MEMORY_PRESSURE_NORMAL_LEVEL:
+        label = "critical" if max_level >= _MEMORY_PRESSURE_CRITICAL_LEVEL else "warning"
+        notes.append(
+            f"memory pressure reached {label} for "
+            f"{telemetry.get('memory_pressure_elevated_samples', 0)} sample(s)"
+        )
+    return "; ".join(notes) if notes else None
+
+
+def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
+    """Full per-probe status for diagnostics: gaps are stated, never implied clean."""
+    parts: list[str] = []
+    cpu_samples = telemetry.get("cpu_samples", 0)
+    if cpu_samples:
+        min_limit = telemetry.get("cpu_speed_limit_min_pct", _CPU_SPEED_UNTHROTTLED_PCT)
+        parts.append(f"CPU speed limit min {min_limit:.0f}% over {cpu_samples} sample(s)")
+    else:
+        parts.append("thermal probe unavailable")
+    memory_samples = telemetry.get("memory_samples", 0)
+    if memory_samples:
+        max_level = telemetry.get("memory_pressure_level_max", _MEMORY_PRESSURE_NORMAL_LEVEL)
+        parts.append(f"memory pressure max level {max_level} over {memory_samples} sample(s)")
+    else:
+        parts.append("memory-pressure probe unavailable")
+    parts.append(f"mode {telemetry.get('mode', 'unknown')}")
+    return "; ".join(parts)
+
+
+def _start_system_telemetry(
+    params: ProcessImageParams,
+) -> tuple[_SystemTelemetrySampler | None, list[tuple[float | None, int | None]]]:
+    """Start opt-in continuous sampling or take the leading snapshot probe.
+
+    Called before timing starts so the default snapshot probe stays outside
+    the timed sections; continuous sampling is opt-in because its
+    subprocesses overlap timed inference.
+    """
+    if sys.platform != "darwin" or params.system_telemetry is False:
+        return None, []
+    if params.system_telemetry is True:
+        sampler = _SystemTelemetrySampler()
+        sampler.start()
+        return sampler, []
+    return None, [_system_telemetry_probe()]
+
+
+def _finish_system_telemetry(
+    sampler: _SystemTelemetrySampler | None,
+    probes: list[tuple[float | None, int | None]],
+) -> SystemTelemetryRecord | None:
+    """Stop sampling (or take the trailing snapshot probe) and aggregate."""
+    if sampler is not None:
+        sampler.stop()
+        return sampler.snapshot()
+    if probes:
+        probes.append(_system_telemetry_probe())
+        return _system_telemetry_record_from_probes(probes, mode="snapshot")
+    return None
+
+
+def _attach_system_telemetry(
+    result: PerformanceResult,
+    telemetry: SystemTelemetryRecord | None,
+    model_identifier: str,
+) -> PerformanceResult:
+    """Attach captured telemetry to the result, warning on degradation."""
+    if telemetry is None:
+        return result
+    degradation = _telemetry_degradation_note(telemetry)
+    if degradation is not None:
+        logger.warning(
+            "⚠️  System pressure during %s: %s",
+            model_identifier,
+            degradation,
+        )
+    return replace(result, system_telemetry=telemetry)
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     arch, gpu_info = get_system_info()
     stdout_capture = _TeeCaptureStream(sys.stdout)
     stderr_capture = _TeeCaptureStream(sys.stderr)
+    telemetry_sampler, telemetry_probes = _start_system_telemetry(params)
+    telemetry: SystemTelemetryRecord | None = None
 
     # Track overall timing
     total_start_time = time.perf_counter()
@@ -12578,8 +12898,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = (
             _sample_post_cleanup_memory_gb()
         )
+        telemetry = _finish_system_telemetry(telemetry_sampler, telemetry_probes)
 
-    return _finalize_process_result(
+    final_result = _finalize_process_result(
         result_payload=result_payload,
         params=params,
         phase_timer=phase_timer,
@@ -12590,6 +12911,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
+    return _attach_system_telemetry(final_result, telemetry, params.model_identifier)
 
 
 # =============================================================================
@@ -14257,6 +14579,8 @@ def _process_image_params_from_args(
         thinking_mode=args.thinking_mode,
         thinking_start_token=args.thinking_start_token,
         thinking_end_token=args.thinking_end_token,
+        auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
+        system_telemetry=getattr(args, "system_telemetry", None),
         context_marker=args.context_marker,
     )
 
@@ -15397,6 +15721,8 @@ def _build_jsonl_result_record(
         record["captured_upstream_output"] = _home_relative_report_text(
             result.captured_upstream_output
         )
+    if result.system_telemetry is not None:
+        record["system_telemetry"] = result.system_telemetry
     return record
 
 
@@ -16012,6 +16338,39 @@ def _retained_generation_args(source: RunIssueSummarySource) -> argparse.Namespa
     return argparse.Namespace(**values)
 
 
+_REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
+    "enable_thinking",
+    "thinking_budget",
+    "thinking_start_token",
+    "thinking_end_token",
+)
+
+
+def _effective_repro_args(
+    run_args: argparse.Namespace | None,
+    effective_generate_kwargs: Mapping[str, object] | None,
+) -> argparse.Namespace | None:
+    """Overlay per-model effective generate kwargs onto global repro args.
+
+    The auto thinking budget is applied per model at generation time, so a
+    repro built from global CLI arguments alone would not reproduce the
+    recorded output. The per-model kwargs captured in prompt diagnostics win.
+    """
+    if run_args is None or not effective_generate_kwargs:
+        return run_args
+    overrides = {
+        key: effective_generate_kwargs[key]
+        for key in _REPRO_THINKING_KWARG_KEYS
+        if key in effective_generate_kwargs
+    }
+    if not overrides:
+        return run_args
+    merged = argparse.Namespace(**vars(run_args))
+    for key, value in overrides.items():
+        setattr(merged, key, value)
+    return merged
+
+
 def _reproduction_input_blocks(
     *,
     model_name: str,
@@ -16020,12 +16379,14 @@ def _reproduction_input_blocks(
     run_args: argparse.Namespace | None,
     resolved_revision: str | None,
     crash_phase: str | None = None,
+    effective_generate_kwargs: Mapping[str, object] | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Describe exact inputs and render a command only when it is exact evidence.
 
     A full command is rendered for a verifiable public image, or for model-load
     crashes, which occur before image decoding and so reproduce with any image.
     """
+    run_args = _effective_repro_args(run_args, effective_generate_kwargs)
     blocks: list[ReportBlock] = [
         ReportKeyValues(_reproduction_image_facts(image)),
         ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
@@ -16250,6 +16611,10 @@ def _run_issue_summary_crash_section(
                     run_args=_retained_generation_args(source),
                     resolved_revision=resolved_revision or requested_revision,
                     crash_phase=failure.get("phase") if failure is not None else None,
+                    effective_generate_kwargs=cast(
+                        "Mapping[str, object] | None",
+                        (result.get("prompt_diagnostics") or {}).get("generate_kwargs"),
+                    ),
                 ),
                 level=4,
             ),
@@ -16377,8 +16742,11 @@ def _run_issue_summary_quality_observed(result: JsonlResultRecord) -> str:
         failure = result["failure"]
         phase = failure.get("phase") if isinstance(failure, dict) else None
         return f"crashed during {phase}" if phase else "crashed"
-    observations = assessment["observations"]
-    ordered = tuple(code for code in _OBSERVATION_DISPLAY_PRIORITY if code in set(observations))
+    observations: tuple[ObservationCode, ...] = tuple(assessment["observations"])
+    # The annotation keeps pyright from widening the comprehension to str.
+    ordered: tuple[ObservationCode, ...] = tuple(
+        code for code in _OBSERVATION_DISPLAY_PRIORITY if code in set(observations)
+    )
     glosses = tuple(
         _OBSERVATION_SELECTOR_GLOSSES.get(code, code) for code in (ordered or observations)
     )
@@ -17241,6 +17609,11 @@ def _generate_github_issue_reports(
                         provenance["resolved_revision"] if provenance is not None else None
                     ),
                     crash_phase=result.failure_phase,
+                    effective_generate_kwargs=(
+                        result.prompt_diagnostics.generate_kwargs
+                        if result.prompt_diagnostics is not None
+                        else None
+                    ),
                 ),
             ),
         )
@@ -18476,6 +18849,18 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         default=DEFAULT_THINKING_END_MARKER,
         help="Token marking the end of a thinking block when thinking mode is enabled.",
     )
+    prompt_group.add_argument(
+        "--auto-thinking-budget",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "When no explicit thinking flags are given, cap thinking for models "
+            f"whose chat template opens a thinking block: budget = max-tokens - "
+            f"{AUTO_THINKING_ANSWER_RESERVE_TOKENS} (skipped below "
+            f"{AUTO_THINKING_BUDGET_MIN_TOKENS}). Other models are unaffected; "
+            "the chat template itself is never altered."
+        ),
+    )
 
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
@@ -18596,6 +18981,20 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
 def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> None:
     """Register runtime, workflow, and console presentation arguments."""
     runtime_group = parser.add_argument_group("Runtime and Memory")
+    runtime_group.add_argument(
+        "--system-telemetry",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help=(
+            "macOS thermal CPU speed limit and memory-pressure telemetry via read-only "
+            "probes (pmset -g / sysctl -n; no system settings are changed; darwin only, "
+            "sudo-free). Default: one snapshot probe pair per model, taken outside timed "
+            "inference. --system-telemetry opts into continuous background sampling "
+            "(its subprocesses overlap timed inference); --no-system-telemetry disables "
+            "telemetry entirely. Aggregates are recorded per model in results.jsonl and "
+            "surfaced in diagnostics."
+        ),
+    )
     runtime_group.add_argument(
         "-L",
         "--lazy-load",

@@ -1,6 +1,7 @@
 """Tests for parameter validation functions."""
 
 import argparse
+import dataclasses
 from collections.abc import Callable
 from pathlib import Path
 from typing import ClassVar
@@ -783,3 +784,119 @@ def test_per_tensor_kv_keywords_match_upstream_generate_kwargs() -> None:
         pytest.skip("installed mlx-vlm predates per-tensor KV cache quantization")
 
     assert per_tensor_keys <= set(check_models._SENT_GENERATE_KEYWORDS)
+
+
+def _thinking_params(
+    *,
+    max_tokens: int = 1000,
+    enable_thinking: bool = False,
+    auto_thinking_budget: bool = True,
+) -> check_models.ProcessImageParams:
+    """Build minimal ProcessImageParams for auto-thinking-budget tests."""
+    return check_models.ProcessImageParams(
+        model_identifier="org/thinker",
+        image_path="image.jpg",
+        prompt="Describe this image.",
+        max_tokens=max_tokens,
+        temperature=0.0,
+        timeout=30.0,
+        verbose=False,
+        trust_remote_code=True,
+        top_p=1.0,
+        min_p=0.0,
+        top_k=0,
+        repetition_penalty=None,
+        repetition_context_size=20,
+        lazy=False,
+        max_kv_size=None,
+        kv_bits=None,
+        kv_quant_scheme="uniform",
+        kv_group_size=64,
+        quantized_kv_start=0,
+        enable_thinking=enable_thinking,
+        auto_thinking_budget=auto_thinking_budget,
+    )
+
+
+class TestAutoThinkingBudget:
+    """Auto thinking budget must engage only for template-opened thinking."""
+
+    def test_parser_defaults_auto_thinking_budget_on(self) -> None:
+        """Both features default on; the --no- forms disable them."""
+        parser = check_models._build_cli_parser()
+
+        assert parser.parse_args(["--dry-run"]).auto_thinking_budget is True
+        assert (
+            parser.parse_args(["--dry-run", "--no-auto-thinking-budget"]).auto_thinking_budget
+            is False
+        )
+        assert parser.parse_args(["--dry-run"]).system_telemetry is None
+        assert parser.parse_args(["--dry-run", "--system-telemetry"]).system_telemetry is True
+        assert parser.parse_args(["--dry-run", "--no-system-telemetry"]).system_telemetry is False
+
+    def test_budget_applied_when_prompt_opens_thinking(self) -> None:
+        """A template-opened <think> block gets a reserve-derived budget."""
+        params = _thinking_params(max_tokens=1000)
+
+        kwargs = check_models._auto_thinking_budget_kwargs(params, "user: hi\nassistant: <think>")
+
+        assert kwargs["enable_thinking"] is True
+        assert kwargs["thinking_budget"] == 1000 - check_models.AUTO_THINKING_ANSWER_RESERVE_TOKENS
+        assert kwargs["thinking_start_token"] == "<think>"
+        assert kwargs["thinking_end_token"] == "</think>"
+
+    def test_no_budget_without_thinking_marker(self) -> None:
+        """Prompts that do not open a thinking block stay untouched."""
+        params = _thinking_params(max_tokens=1000)
+
+        assert check_models._auto_thinking_budget_kwargs(params, "user: hi\nassistant:") == {}
+
+    def test_explicit_thinking_flags_disable_auto(self) -> None:
+        """--enable-thinking hands full control to the explicit flags."""
+        params = _thinking_params(enable_thinking=True)
+
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+
+    def test_opt_out_disables_auto(self) -> None:
+        """--no-auto-thinking-budget disables the mechanism entirely."""
+        params = _thinking_params(auto_thinking_budget=False)
+
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+
+    def test_small_caps_skip_auto_budget(self) -> None:
+        """Caps too small to leave a useful budget skip the mechanism."""
+        params = _thinking_params(max_tokens=check_models.AUTO_THINKING_BUDGET_MIN_TOKENS)
+
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+
+    def test_closed_thinking_block_does_not_trigger_auto(self) -> None:
+        """A closed block (few-shot example or literal mention) is not open."""
+        params = _thinking_params(max_tokens=1000)
+
+        prompt = "example: <think>reason here</think> now answer\nassistant:"
+        assert check_models._auto_thinking_budget_kwargs(params, prompt) == {}
+
+    def test_reopened_thinking_block_after_closed_one_triggers_auto(self) -> None:
+        """Only the final unmatched marker counts as template-opened."""
+        params = _thinking_params(max_tokens=1000)
+
+        prompt = "example: <think>x</think>\nassistant: <think>"
+        kwargs = check_models._auto_thinking_budget_kwargs(params, prompt)
+
+        assert kwargs.get("enable_thinking") is True
+
+    def test_explicit_thinking_mode_disables_auto(self) -> None:
+        """--thinking-mode hands template thinking control to the user."""
+        params = _thinking_params(max_tokens=1000)
+        params = dataclasses.replace(params, thinking_mode="disabled")
+
+        assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
+
+    def test_alternate_delimiter_pair_is_matched(self) -> None:
+        """Non-default marker pairs map to their own start/end tokens."""
+        params = _thinking_params(max_tokens=1000)
+
+        kwargs = check_models._auto_thinking_budget_kwargs(params, "assistant: ◁think▷")
+
+        assert kwargs["thinking_start_token"] == "◁think▷"
+        assert kwargs["thinking_end_token"] == "◁/think▷"

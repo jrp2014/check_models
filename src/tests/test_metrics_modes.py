@@ -1504,3 +1504,163 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
     for message in expected:
         assert message in preview_messages
         assert message in verbose_messages
+
+
+class TestSystemTelemetry:
+    """System-pressure telemetry must aggregate per-probe and expose gaps."""
+
+    def test_record_none_when_no_probes_succeeded(self) -> None:
+        """All-None probes yield no record."""
+        record = check_models._system_telemetry_record_from_probes(
+            [(None, None), (None, None)], mode="snapshot"
+        )
+
+        assert record is None
+
+    def test_record_aggregates_min_max_and_per_probe_counts(self) -> None:
+        """Aggregates keep the throttling floor, pressure ceiling, and counts."""
+        record = check_models._system_telemetry_record_from_probes(
+            [(100.0, 1), (62.0, 2), (100.0, None)],
+            mode="continuous",
+            interval_s=1.5,
+        )
+
+        assert record == {
+            "mode": "continuous",
+            "interval_s": 1.5,
+            "cpu_samples": 3,
+            "memory_samples": 2,
+            "cpu_speed_limit_min_pct": 62.0,
+            "cpu_throttled_samples": 1,
+            "memory_pressure_level_max": 2,
+            "memory_pressure_elevated_samples": 1,
+        }
+
+    def test_partial_probe_failure_stays_visible(self) -> None:
+        """A missing probe is reported as unavailable, never as clean."""
+        record = check_models._system_telemetry_record_from_probes(
+            [(100.0, None), (100.0, None)], mode="snapshot"
+        )
+
+        assert record is not None
+        assert record["cpu_samples"] == 2
+        assert record["memory_samples"] == 0
+        status = check_models._telemetry_status_line(record)
+        assert "memory-pressure probe unavailable" in status
+        assert "CPU speed limit min 100% over 2 sample(s)" in status
+        assert "mode snapshot" in status
+
+    def test_degradation_note_reports_throttle_and_pressure(self) -> None:
+        """Throttled CPU and elevated pressure both appear in the note."""
+        note = check_models._telemetry_degradation_note(
+            {
+                "mode": "continuous",
+                "cpu_samples": 4,
+                "cpu_speed_limit_min_pct": 62.0,
+                "cpu_throttled_samples": 2,
+                "memory_samples": 4,
+                "memory_pressure_level_max": 4,
+                "memory_pressure_elevated_samples": 1,
+            }
+        )
+
+        assert note is not None
+        assert "CPU speed limited to 62%" in note
+        assert "critical" in note
+
+    def test_degradation_note_none_when_clean(self) -> None:
+        """An unthrottled, normal-pressure run produces no note."""
+        note = check_models._telemetry_degradation_note(
+            {
+                "mode": "snapshot",
+                "cpu_samples": 2,
+                "cpu_speed_limit_min_pct": 100.0,
+                "cpu_throttled_samples": 0,
+                "memory_samples": 2,
+                "memory_pressure_level_max": 1,
+                "memory_pressure_elevated_samples": 0,
+            }
+        )
+
+        assert note is None
+
+    def test_sampler_snapshot_delegates_to_probe_aggregation(self) -> None:
+        """The continuous sampler aggregates its probe list with its interval."""
+        sampler = check_models._SystemTelemetrySampler(interval_s=1.5)
+        sampler._probes.extend([(100.0, 1), (80.0, 2)])
+
+        snapshot = sampler.snapshot()
+
+        assert snapshot is not None
+        assert snapshot["mode"] == "continuous"
+        assert snapshot["interval_s"] == 1.5
+        assert snapshot["cpu_speed_limit_min_pct"] == 80.0
+
+    def test_thermal_sample_parses_pmset_output(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """CPU_Speed_Limit is extracted from pmset -g therm output."""
+        monkeypatch.setattr(
+            check_models,
+            "_run_macos_toolchain_command",
+            lambda *_args, **_kwargs: "CPU_Speed_Limit \t= 62\nCPU_Available_CPUs \t= 14",
+        )
+
+        assert check_models._sample_thermal_cpu_speed_limit_pct() == 62.0
+
+    def test_thermal_sample_treats_no_power_status_as_unthrottled(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Nominal Apple Silicon thermals report as an unthrottled 100%."""
+        monkeypatch.setattr(
+            check_models,
+            "_run_macos_toolchain_command",
+            lambda *_args, **_kwargs: (
+                "Note: No thermal warning level has been recorded\n"
+                "Note: No performance warning level has been recorded\n"
+                "Note: No CPU power status has been recorded"
+            ),
+        )
+
+        assert check_models._sample_thermal_cpu_speed_limit_pct() == 100.0
+
+    def test_pressure_sample_rejects_non_numeric_output(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Unexpected sysctl output degrades to None instead of raising."""
+        monkeypatch.setattr(
+            check_models,
+            "_run_macos_toolchain_command",
+            lambda *_args, **_kwargs: "not-a-number",
+        )
+
+        assert check_models._sample_memory_pressure_level() is None
+
+    def test_jsonl_record_carries_system_telemetry(self) -> None:
+        """Per-model telemetry lands in the results.jsonl record when present."""
+        telemetry: check_models.SystemTelemetryRecord = {
+            "mode": "snapshot",
+            "cpu_samples": 2,
+            "memory_samples": 2,
+            "cpu_speed_limit_min_pct": 100.0,
+            "cpu_throttled_samples": 0,
+        }
+        result = check_models.PerformanceResult(
+            model_name="org/telemetry",
+            generation=None,
+            success=False,
+            system_telemetry=telemetry,
+        )
+        assessment = check_models._assess_result(result)
+
+        record = check_models._build_jsonl_result_record(
+            result,
+            assessment,
+            requested_revision=None,
+            model_provenance={
+                "model": "org/telemetry",
+                "requested_revision": None,
+                "resolved_revision": "rev",
+                "snapshot_path": None,
+            },
+        )
+
+        assert record["system_telemetry"] == telemetry

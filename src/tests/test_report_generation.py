@@ -5306,3 +5306,51 @@ class TestGithubIssueReportsCleanup:
 
 class TestEmptyRecommendedBucketExplanation:
     """Regression coverage for the empty recommended bucket explanation."""
+
+
+def test_repro_args_overlay_auto_applied_thinking_kwargs() -> None:
+    """Per-model effective thinking kwargs must reach the native repro command."""
+    run_args = Namespace(
+        max_tokens=1000,
+        temperature=0.0,
+        enable_thinking=False,
+        thinking_budget=None,
+        thinking_start_token=None,
+        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
+        trust_remote_code=True,
+    )
+    effective = {
+        "enable_thinking": True,
+        "thinking_budget": 800,
+        "thinking_start_token": "<think>",
+        "thinking_end_token": "</think>",
+        "max_tokens": 1000,  # non-thinking keys must not leak into the overlay
+    }
+
+    merged = check_models._effective_repro_args(run_args, effective)
+
+    assert merged is not None
+    assert merged is not run_args  # the global namespace is never mutated
+    assert run_args.enable_thinking is False
+    assert merged.enable_thinking is True
+    assert merged.thinking_budget == 800
+
+    tokens = check_models._build_native_mlx_vlm_cli_tokens(
+        model_name="org/thinker",
+        prompt="p",
+        image_ref="img.jpg",
+        run_args=merged,
+    )
+    command = " ".join(tokens)
+    assert "--enable-thinking" in command
+    assert "--thinking-budget 800" in command
+    assert "--thinking-start-token <think>" in command
+
+
+def test_repro_args_overlay_is_identity_without_thinking_kwargs() -> None:
+    """No effective thinking kwargs means the global args pass through as-is."""
+    run_args = Namespace(max_tokens=1000)
+
+    assert check_models._effective_repro_args(run_args, None) is run_args
+    assert check_models._effective_repro_args(run_args, {"max_tokens": 500}) is run_args
+    assert check_models._effective_repro_args(None, {"enable_thinking": True}) is None

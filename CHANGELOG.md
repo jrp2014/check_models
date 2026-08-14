@@ -5,6 +5,34 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Automatic thinking budget (`--auto-thinking-budget`, default on): when no
+  explicit thinking flags and no `--thinking-mode` are given and a model's
+  chat template leaves a thinking block open (final start marker unmatched,
+  mirroring mlx-vlm's server-side open-block logic — closed blocks and
+  literal marker mentions are ignored), the run passes upstream's
+  `thinking_budget` / `enable_thinking` generate kwargs with budget =
+  max-tokens − 200 (skipped when that leaves under 128). Upstream then
+  force-closes the thinking block at the budget so the model must produce
+  the requested fields instead of truncating mid-reasoning at the token cap.
+  Chat-template kwargs are never altered, so hybrid models keep their
+  default non-thinking behaviour. The effective per-model budget is
+  recorded in prompt diagnostics, shown in the diagnostics report, and
+  overlaid onto native repro commands so issue drafts reproduce the
+  recorded output. Disable with `--no-auto-thinking-budget`.
+- Per-model system-pressure telemetry (darwin only, read-only `pmset -g` /
+  `sysctl -n` probes, sudo-free; no macOS settings are modified). Default:
+  one snapshot probe pair per model (before load and after cleanup, outside
+  timed inference) so performance comparability is unaffected;
+  `--system-telemetry` opts into continuous 2s background sampling and
+  `--no-system-telemetry` disables telemetry entirely. Aggregates (min CPU
+  speed limit, throttled samples, max memory-pressure level) are stored per
+  model in `results.jsonl` as `system_telemetry` with separate per-probe
+  sample counts, surfaced in the diagnostics provenance block (unavailable
+  probes are reported as unavailable, never as clean), and logged as a
+  warning when a run was throttled or under memory pressure.
+
 ## [0.10.0] - 2026-08-14
 
 ### Added
