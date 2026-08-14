@@ -16331,6 +16331,105 @@ def _run_issue_summary_observation_cluster_section(
     )
 
 
+_RUN_ISSUE_USABILITY_ORDER: Final[dict[ModelUsability, int]] = {
+    "usable": 0,
+    "usable_with_caveats": 1,
+    "unusable": 2,
+    "not_evaluated": 3,
+}
+
+
+def _run_issue_summary_quality_cells(result: JsonlResultRecord) -> tuple[str, str, str]:
+    """Format captured per-model resource facts for the quality table."""
+    metrics = result.get("metrics") or {}
+    timing = result.get("timing") or {}
+    total_time = timing.get("total_time_s")
+    total_cell = (
+        _format_time_seconds(float(total_time))
+        if isinstance(total_time, (int, float)) and total_time >= 0
+        else "-"
+    )
+    generation_tokens = metrics.get("generation_tokens")
+    generation_tps = metrics.get("generation_tps")
+    if (
+        isinstance(generation_tps, (int, float))
+        and isinstance(generation_tokens, int)
+        and generation_tokens >= MIN_THROUGHPUT_SAMPLE_TOKENS
+    ):
+        tps_cell = f"{_format_tps(float(generation_tps))} tok/s"
+    elif isinstance(generation_tokens, int):
+        tps_cell = "insufficient sample"
+    else:
+        tps_cell = "-"
+    peak_memory = metrics.get("peak_memory_gb")
+    peak_cell = (
+        _gallery_metric("peak_memory", float(peak_memory))
+        if isinstance(peak_memory, (int, float)) and peak_memory >= 0
+        else "-"
+    )
+    return total_cell, tps_cell, peak_cell
+
+
+def _run_issue_summary_quality_observed(result: JsonlResultRecord) -> str:
+    """Return the compact observed-result cell for the quality table."""
+    assessment = result["assessment"]
+    if assessment["execution"] == "crashed":
+        failure = result["failure"]
+        phase = failure.get("phase") if isinstance(failure, dict) else None
+        return f"crashed during {phase}" if phase else "crashed"
+    observations = assessment["observations"]
+    ordered = tuple(code for code in _OBSERVATION_DISPLAY_PRIORITY if code in set(observations))
+    glosses = tuple(
+        _OBSERVATION_SELECTOR_GLOSSES.get(code, code) for code in (ordered or observations)
+    )
+    return "; ".join(glosses) if glosses else "none"
+
+
+def _run_issue_summary_quality_section(
+    results: Sequence[JsonlResultRecord],
+) -> ReportSection:
+    """Rank every attempted model by current-run usability with captured facts."""
+    ordered = sorted(
+        results,
+        key=lambda result: (
+            _RUN_ISSUE_USABILITY_ORDER.get(
+                result["assessment"]["usability"],
+                len(_RUN_ISSUE_USABILITY_ORDER),
+            ),
+            result["model"].lower(),
+        ),
+    )
+    rows: list[tuple[ReportCell, ...]] = []
+    for result in ordered:
+        total_cell, tps_cell, peak_cell = _run_issue_summary_quality_cells(result)
+        rows.append(
+            (
+                result["model"],
+                result["assessment"]["usability"].replace("_", " "),
+                total_cell,
+                tps_cell,
+                peak_cell,
+                _run_issue_summary_quality_observed(result),
+            )
+        )
+    return ReportSection(
+        "Model quality at a glance",
+        (
+            ReportParagraph(
+                "Every attempted model ranked by current-run usability, with captured "
+                "resource facts. Usability reflects this single image and prompt only; "
+                "the model gallery holds full outputs and the diagnostics report holds "
+                "maintainer evidence."
+            ),
+            ReportTable(
+                ("Model", "Usability", "Total", "Gen tok/s", "Peak GB", "Observed"),
+                tuple(rows),
+                compact=True,
+            ),
+        ),
+    )
+
+
 def _run_issue_summary_surfaced_sections(
     results: Sequence[JsonlResultRecord],
     *,
@@ -16547,11 +16646,6 @@ def generate_run_issue_summary_report(
         or result["assessment"]["execution"] == "indeterminate"
     )
     other = tuple(result for result in surfaced if result not in actionable)
-    if not surfaced:
-        cleanup_error = _remove_run_issue_summary(output_paths)
-        if cleanup_error is not None:
-            raise cleanup_error
-        return None
 
     counts = Counter(result["assessment"]["execution"] for result in source.results)
     clean_count = sum(
@@ -16590,7 +16684,8 @@ def generate_run_issue_summary_report(
                     "judgements."
                 ),
             ),
-        )
+        ),
+        _run_issue_summary_quality_section(source.results),
     ]
 
     if actionable:
@@ -16619,10 +16714,19 @@ def generate_run_issue_summary_report(
             )
         )
 
-    clean_sentence = f"{_pluralized_count(clean_count, 'clean completion')}."
+    clean_models = sorted(
+        result["model"]
+        for result in source.results
+        if result["assessment"]["execution"] == "completed"
+        and not result["assessment"]["observations"]
+    )
+    clean_phrase = _pluralized_count(clean_count, "clean completion")
+    if clean_models:
+        clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
+    clean_sentence = f"{clean_phrase}."
     if compliance_only_count:
         clean_sentence = (
-            f"{_pluralized_count(clean_count, 'clean completion')}; "
+            f"{clean_phrase}; "
             f"{compliance_only_count} more completed with prompt-compliance "
             "observations only (not maintainer issues)."
         )
@@ -16764,12 +16868,17 @@ def generate_output_index_report(
     md = ["# Check Models Output Index", ""]
     if assessments is not None:
         md.extend(_output_index_dashboard_lines(assessments))
+    if run_issue_summary is not None:
+        md.extend(("## Start here", ""))
+        md.append(
+            f"- {_output_index_link(filename, run_issue_summary, 'Run summary')} — "
+            "per-model quality ranking, crash triage, and paste-ready issue body"
+        )
+        md.append("")
+    if assessments is not None:
         md.append("## Artifacts")
         md.append("")
     md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
-    if run_issue_summary is not None:
-        md.extend(("", "## Paste-ready run issue", ""))
-        md.append(f"- {_output_index_link(filename, run_issue_summary, 'Run issue summary')}")
     if issue_reports:
         md.extend(("", "## Issue drafts", ""))
         md.extend(
@@ -17741,7 +17850,7 @@ def _print_reports_dashboard(
 
     add_row(
         "Run Issue Summary",
-        "Paste-ready whole-run GitHub issue body",
+        "Start here: model-quality ranking and paste-ready GitHub issue body",
         run_issue_summary,
     )
 

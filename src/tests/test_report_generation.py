@@ -422,7 +422,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert "1 clean completion. See the [full model gallery]" in content
+    assert "1 clean completion (`org/clean`). See the [full model gallery]" in content
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -434,7 +434,11 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         assert "pinned to producer commit" in content
     else:
         assert "mutable" in content
-    assert "org/clean" not in content
+    # Clean models appear only in the at-a-glance table and the named clean
+    # completions, never in the review sections.
+    review_sections = content[content.index("## Observation clusters") :]
+    review_sections = review_sections[: review_sections.index("## Clean completions")]
+    assert "org/clean" not in review_sections
     assert "Traceback (most recent call last)" not in content
     assert "generated output that must not be copied" not in content
 
@@ -504,8 +508,9 @@ def test_run_issue_summary_sorts_review_rows_by_observation_severity(tmp_path: P
     if summary is None:
         pytest.fail("the observed results must produce a summary")
     content = summary.read_text(encoding="utf-8")
-    assert content.index("| org/repeated |") < content.index("| org/missing |")
-    assert content.index("| org/missing |") < content.index("| org/count-caveat |")
+    review = content[content.index("## Completed attempts requiring review") :]
+    assert review.index("| org/repeated |") < review.index("| org/missing |")
+    assert review.index("| org/missing |") < review.index("| org/count-caveat |")
     assert "Title has 4 words (requested 5-10)" in content
 
 
@@ -1093,8 +1098,8 @@ def test_run_issue_summary_repro_prefers_resolved_revision(tmp_path: Path) -> No
     assert "--revision moving-branch" not in content
 
 
-def test_run_issue_summary_removes_stale_artifact_for_clean_run(tmp_path: Path) -> None:
-    """A run with no surfaced result should not leave an obsolete issue body."""
+def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
+    """A run with no surfaced result still writes the quality entry point."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     _write_issue_summary_fixture(
         output_paths,
@@ -1104,8 +1109,55 @@ def test_run_issue_summary_removes_stale_artifact_for_clean_run(tmp_path: Path) 
     stale.parent.mkdir(parents=True, exist_ok=True)
     check_models._write_text_file(stale, "stale issue\n")
 
-    assert check_models.generate_run_issue_summary_report(output_paths) is None
-    assert not stale.exists()
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("a clean run must still write the run summary entry point")
+    content = summary.read_text(encoding="utf-8")
+    assert "## Model quality at a glance" in content
+    assert "org/clean" in content
+    assert "## Crashes requiring action" not in content
+    assert "`org/clean`" in content  # clean completions are named
+
+
+def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> None:
+    """The at-a-glance table lists every model sorted by usability rank."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    crash = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    caveat = _issue_summary_result(
+        "org/caveat",
+        usability="usable_with_caveats",
+        maintainer_status="observation_needs_reproduction",
+        observations=["unexpected_special_token"],
+    )
+    clean = _issue_summary_result("org/clean")
+    clean["metrics"] = {
+        "generation_tokens": 100,
+        "generation_tps": 123.4,
+        "peak_memory_gb": 7.5,
+    }
+    clean["timing"] = {"total_time_s": 12.5}
+    _write_issue_summary_fixture(output_paths, results=(crash, caveat, clean))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the fixture run must produce a run summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "## Model quality at a glance" in content
+    # Sorted usable -> caveats -> crashed, and the crash names its phase.
+    assert (
+        content.index("org/clean")
+        < content.index("org/caveat")
+        < content.index("crashed during processor_load")
+    )
+    assert "control tokens visible" in content
+    assert "123 tok/s" in content
 
 
 @pytest.mark.parametrize(
@@ -1634,9 +1686,9 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
 
     index_content = output_paths.index.read_text(encoding="utf-8")
     summary_path = output_paths.index.parent / "issues" / "run_summary.md"
-    assert "[Run issue summary](issues/run_summary.md)" in index_content
+    assert "[Run summary](issues/run_summary.md)" in index_content
     assert "[org/broken](issues/issue_org_broken.md)" in index_content
-    assert index_content.index("[Run issue summary]") < index_content.index("[org/broken]")
+    assert index_content.index("[Run summary]") < index_content.index("[org/broken]")
     assert _report_outcome(outcomes, "run_issue_summary").succeeded
 
     with patch.object(
@@ -1693,7 +1745,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         cleanup_failure_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert summary_path.exists()
-    assert "Run issue summary" not in output_paths.index.read_text(encoding="utf-8")
+    assert "run_summary.md" not in output_paths.index.read_text(encoding="utf-8")
     cleanup_failure = _report_outcome(cleanup_failure_outcomes, "run_issue_summary")
     assert not cleanup_failure.succeeded
     assert "cleanup denied" in (cleanup_failure.error_message or "")
@@ -1715,7 +1767,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         stale_diagnostics_outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
     assert not summary_path.exists()
-    assert "Run issue summary" not in output_paths.index.read_text(encoding="utf-8")
+    assert "run_summary.md" not in output_paths.index.read_text(encoding="utf-8")
     assert not _report_outcome(stale_diagnostics_outcomes, "diagnostics").succeeded
     stale_diagnostics_summary = _report_outcome(
         stale_diagnostics_outcomes,

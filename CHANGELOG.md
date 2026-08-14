@@ -7,6 +7,16 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Promote `issues/run_summary.md` to the run's primary entry point. It now
+  opens with a "Model quality at a glance" table ranking every attempted
+  model by current-run usability with captured facts (total time, generation
+  throughput, peak memory, short observation glosses, crash phase), names the
+  clean completions, and is written on every run — including fully clean runs
+  that previously removed it. `index.md` links it first under a "Start here"
+  heading and the console dashboard labels it accordingly. The crash triage,
+  observation clusters, review tables, and paste-ready issue framing are
+  unchanged, and the table stays well under GitHub's 65,536-character issue
+  limit.
 - Wire the per-tensor KV cache quantization controls added in upstream
   mlx-vlm PR #1807 (`kv_key_bits`, `kv_value_bits`, `kv_key_scheme`,
   `kv_value_scheme`): new `--kv-key-bits`/`--kv-value-bits`/

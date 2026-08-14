@@ -14,6 +14,56 @@
 Observations are mechanical facts from one image, not general model-quality
 judgements.
 
+## Model quality at a glance
+
+Every attempted model ranked by current-run usability, with captured resource
+facts. Usability reflects this single image and prompt only; the model gallery
+holds full outputs and the diagnostics report holds maintainer evidence.
+
+| Model | Usability | Total | Gen tok/s | Peak GB | Observed |
+| --- | --- | --- | --- | --- | --- |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | usable | 1.47s | 515 tok/s | 1.2 | none |
+| mlx-community/gemma-4-26b-a4b-it-4bit | usable | 4.14s | 129 tok/s | 16 | none |
+| mlx-community/gemma-4-31b-it-4bit | usable | 7.48s | 27.2 tok/s | 20 | none |
+| mlx-community/LFM2.5-VL-1.6B-bf16 | usable | 2.87s | 156 tok/s | 4.1 | none |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | usable | 13.46s | 11.7 tok/s | 15 | none |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | usable | 8.19s | 45.6 tok/s | 12 | none |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit | usable | 4.29s | 144 tok/s | 7.1 | none |
+| mlx-community/Ornith-1.0-35B-bf16 | usable | 93.40s | 60.1 tok/s | 74 | none |
+| mlx-community/Qwen3.5-35B-A3B-4bit | usable | 87.25s | 108 tok/s | 24 | none |
+| mlx-community/Qwen3.5-9B-MLX-4bit | usable | 75.86s | 87.7 tok/s | 10.0 | none |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable with caveats | 9.83s | 29.6 tok/s | 22 | title/keyword constraints failed |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | 5.96s | 55.3 tok/s | 29 | control tokens visible |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | 5.91s | 53.0 tok/s | 28 | control tokens visible; title/keyword constraints failed |
+| mlx-community/gemma-3-27b-it-qat-4bit | usable with caveats | 8.98s | 26.6 tok/s | 18 | title/keyword constraints failed |
+| mlx-community/GLM-4.6V-Flash-mxfp4 | usable with caveats | 10.58s | 74.5 tok/s | 8.4 | title/keyword constraints failed |
+| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | 26.92s | 37.5 tok/s | 77 | control tokens visible; title/keyword constraints failed |
+| mlx-community/Idefics3-8B-Llama3-bf16 | usable with caveats | 8.22s | 30.3 tok/s | 18 | role tokens visible |
+| mlx-community/InternVL3-8B-bf16 | usable with caveats | 6.06s | 34.1 tok/s | 17 | title/keyword constraints failed |
+| mlx-community/MiniCPM-V-4.6-8bit | usable with caveats | 2.61s | 238 tok/s | 3.8 | title/keyword constraints failed |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable with caveats | 10.20s | 41.2 tok/s | 13 | title/keyword constraints failed |
+| mlx-community/Molmo-7B-D-0924-8bit | usable with caveats | 6.24s | 38.8 tok/s | 11 | title/keyword constraints failed |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | usable with caveats | 3.31s | 56.3 tok/s | 9.6 | title/keyword constraints failed |
+| mlx-community/pixtral-12b-8bit | usable with caveats | 6.59s | 39.6 tok/s | 15 | title/keyword constraints failed |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16 | usable with caveats | 32.29s | 83.5 tok/s | 8.4 | title/keyword constraints failed |
+| mlx-community/Qwen3.6-27B-mxfp8 | usable with caveats | 114.12s | 14.4 tok/s | 35 | title/keyword constraints failed |
+| mlx-community/Step-3.7-Flash-oQ2e | usable with caveats | 39.57s | 39.9 tok/s | 70 | title/keyword constraints failed |
+| Qwen/Qwen3-VL-2B-Instruct | usable with caveats | 17.08s | 94.2 tok/s | 8.4 | title/keyword constraints failed |
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable | 28.00s | 41.9 tok/s | 14 | missing required fields; echoes instructions; cut off at token limit |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | unusable | 32.00s | 43.7 tok/s | 60 | repeated text; missing required fields; cut off at token limit; incomplete thinking block |
+| mlx-community/FastVLM-0.5B-bf16 | unusable | 2.45s | 338 tok/s | 2.1 | missing required fields; echoes instructions |
+| mlx-community/gemma-3n-E4B-it-bf16 | unusable | 7.46s | 47.4 tok/s | 17 | missing required fields |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | 34.74s | 40.6 tok/s | 13 | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | 220.02s | 4.66 tok/s | 40 | repeated text; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| mlx-community/llava-v1.6-mistral-7b-8bit | unusable | 5.48s | 60.6 tok/s | 9.7 | missing required fields |
+| mlx-community/MolmoPoint-8B-fp16 | unusable | 40.08s | 5.64 tok/s | 24 | missing required fields |
+| mlx-community/nanoLLaVA-1.5-4bit | unusable | 1.56s | 351 tok/s | 2.4 | missing required fields; echoes instructions |
+| mlx-community/paligemma2-3b-pt-896-4bit | unusable | 24.82s | 46.0 tok/s | 4.4 | repeated text; missing required fields; cut off at token limit |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit | unusable | 100.13s | 144 tok/s | 5.1 | missing required fields |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | unusable | 44.58s | 68.1 tok/s | 8.4 | missing required fields; cut off at token limit; incomplete thinking block |
+| mlx-community/X-Reasoner-7B-8bit | unusable | 44.52s | 46.8 tok/s | 13 | repeated text; cut off at token limit; title/keyword constraints failed |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx | not evaluated | 2.03s | - | - | crashed during decode |
+
 ## Crashes requiring action
 
 ### mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -109,7 +159,7 @@ Repeated mechanical observation signatures among results requiring review.
 
 ## Clean completions
 
-10 clean completions; 20 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
+10 clean completions (`LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`, `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`, `mlx-community/Ministral-3-3B-Instruct-2512-4bit`, `mlx-community/Ornith-1.0-35B-bf16`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/gemma-4-26b-a4b-it-4bit`, `mlx-community/gemma-4-31b-it-4bit`); 20 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
 
 ## Run context
 
