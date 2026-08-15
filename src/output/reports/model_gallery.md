@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-14 18:45:05 BST
+Generated on: 2026-08-16 00:48:24 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,79 +16,82 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                                     |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.47s   | 515 tok/s  | 0.06            | 1.2     | 355        | 76      | none                                                                                                                                             |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 2.87s   | 156 tok/s  | 0.12            | 4.1     | 555        | 122     | none                                                                                                                                             |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 13.46s  | 11.7 tok/s | 2.13            | 15      | 275        | 101     | none                                                                                                                                             |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 8.19s   | 45.6 tok/s | 3.49            | 12      | 2,730      | 120     | none                                                                                                                                             |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 4.29s   | 144 tok/s  | 1.15            | 7.1     | 2,729      | 154     | none                                                                                                                                             |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 93.40s  | 60.1 tok/s | 77.26           | 74      | 16,548     | 122     | none                                                                                                                                             |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 87.25s  | 108 tok/s  | 82.39           | 24      | 16,548     | 121     | none                                                                                                                                             |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 75.86s  | 87.7 tok/s | 72.11           | 10.0    | 16,548     | 120     | none                                                                                                                                             |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.14s   | 129 tok/s  | 0.42            | 16      | 587        | 94      | none                                                                                                                                             |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.48s   | 27.2 tok/s | 1.05            | 20      | 587        | 89      | none                                                                                                                                             |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | 17.08s  | 94.2 tok/s | 13.96           | 8.4     | 16,533     | 147     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 9.83s   | 29.6 tok/s | 3.21            | 22      | 2,197      | 112     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 10.58s  | 74.5 tok/s | 7.67            | 8.4     | 6,281      | 73      | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 26.92s  | 37.5 tok/s | 16.81           | 77      | 6,281      | 78      | control tokens visible; title/keyword constraints failed                                                                                         |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 8.22s   | 30.3 tok/s | 1.27            | 18      | 2,586      | 126     | role tokens visible                                                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 6.06s   | 34.1 tok/s | 0.96            | 17      | 2,087      | 93      | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | 2.61s   | 238 tok/s  | 0.27            | 3.8     | 895        | 75      | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 10.20s  | 41.2 tok/s | 3.52            | 13      | 2,730      | 175     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 6.24s   | 38.8 tok/s | 0.91            | 11      | 1,487      | 107     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | 3.31s   | 56.3 tok/s | 0.30            | 9.6     | 1,094      | 84      | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | 32.29s  | 83.5 tok/s | 27.29           | 8.4     | 16,533     | 147     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 114.12s | 14.4 tok/s | 97.68           | 35      | 16,548     | 121     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | 39.57s  | 39.9 tok/s | 22.11           | 70      | 3,468      | 116     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.96s   | 55.3 tok/s | 0.43            | 29      | 583        | 82      | control tokens visible                                                                                                                           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.91s   | 53.0 tok/s | 0.43            | 28      | 583        | 81      | control tokens visible; title/keyword constraints failed                                                                                         |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.98s   | 26.6 tok/s | 0.99            | 18      | 569        | 136     | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 6.59s   | 39.6 tok/s | 1.88            | 15      | 2,828      | 96      | title/keyword constraints failed                                                                                                                 |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.00s  | 41.9 tok/s | 1.86            | 14      | 2,919      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                                             |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 32.00s  | 43.7 tok/s | 2.21            | 60      | 1,569      | 1,000   | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.45s   | 338 tok/s  | 0.09            | 2.1     | 308        | 120     | missing required fields; echoes instructions                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 34.74s  | 40.6 tok/s | 7.77            | 13      | 6,277      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 220.02s | 4.66 tok/s | 1.41            | 40      | 1,269      | 1,000   | repeated text; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 40.08s  | 5.64 tok/s | 4.15            | 24      | 3,100      | 183     | missing required fields                                                                                                                          |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 100.13s | 144 tok/s  | 98.08           | 5.1     | 16,544     | 98      | missing required fields                                                                                                                          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 44.58s  | 68.1 tok/s | 27.41           | 8.4     | 16,535     | 1,000   | missing required fields; cut off at token limit; incomplete thinking block                                                                       |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 44.52s  | 46.8 tok/s | 21.09           | 13      | 16,544     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                                          |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 7.46s   | 47.4 tok/s | 0.39            | 17      | 568        | 199     | missing required fields                                                                                                                          |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 5.48s   | 60.6 tok/s | 2.90            | 9.7     | 2,386      | 53      | missing required fields                                                                                                                          |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.56s   | 351 tok/s  | 0.08            | 2.4     | 304        | 130     | missing required fields; echoes instructions                                                                                                     |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 24.82s  | 46.0 tok/s | 1.09            | 4.4     | 4,397      | 1,000   | repeated text; missing required fields; cut off at token limit                                                                                   |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `not_evaluated`       | 2.03s   | -          | -               | -       | -          | -       | none                                                                                                                                             |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                       |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 2.21s   | 503 tok/s  | 0.05            | 1.1     | 400        | 98      | none                                                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 11.16s  | 15.0 tok/s | 1.72            | 15      | 314        | 106     | none                                                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 7.70s   | 58.3 tok/s | 3.22            | 14      | 3,228      | 143     | none                                                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.60s   | 172 tok/s  | 1.36            | 9.0     | 3,227      | 104     | none                                                                                                               |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 113.30s | 48.9 tok/s | 93.94           | 74      | 16,522     | 105     | none                                                                                                               |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.44s   | 50.9 tok/s | 0.32            | 9.4     | 1,137      | 110     | none                                                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 59.31s  | 90.4 tok/s | 51.74           | 24      | 16,522     | 116     | none                                                                                                               |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 125.25s | 13.0 tok/s | 111.68          | 35      | 16,522     | 114     | none                                                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 5.15s   | 91.3 tok/s | 0.45            | 16      | 619        | 98      | none                                                                                                               |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 10.04s  | 16.3 tok/s | 1.46            | 20      | 619        | 73      | none                                                                                                               |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 14.63s  | 22.2 tok/s | 5.50            | 24      | 2,695      | 95      | title/keyword constraints failed                                                                                   |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 14.03s  | 67.3 tok/s | 10.73           | 8.4     | 6,348      | 81      | title/keyword constraints failed                                                                                   |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 50.48s  | 26.7 tok/s | 36.04           | 78      | 6,348      | 83      | control tokens visible; title/keyword constraints failed                                                           |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 10.10s  | 27.6 tok/s | 1.66            | 18      | 2,626      | 141     | role tokens visible; title/keyword constraints failed                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 7.97s   | 25.9 tok/s | 1.96            | 17      | 3,662      | 86      | title/keyword constraints failed                                                                                   |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 7.81s   | 60.6 tok/s | 3.28            | 15      | 3,228      | 145     | title/keyword constraints failed                                                                                   |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.17s   | 48.3 tok/s | 0.69            | 11      | 1,534      | 106     | title/keyword constraints failed                                                                                   |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 107.81s | 186 tok/s  | 105.63          | 5.1     | 16,517     | 102     | title/keyword constraints failed; draft hints copied unchanged                                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable_with_caveats` | 67.65s  | 83.8 tok/s | 63.61           | 10.0    | 16,522     | 96      | title/keyword constraints failed                                                                                   |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | 39.54s  | 36.1 tok/s | 24.56           | 70      | 3,503      | 106     | title/keyword constraints failed                                                                                   |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 6.05s   | 62.0 tok/s | 0.35            | 29      | 615        | 85      | control tokens visible                                                                                             |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.61s   | 66.2 tok/s | 0.34            | 28      | 615        | 82      | control tokens visible                                                                                             |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 9.05s   | 25.2 tok/s | 1.13            | 18      | 608        | 125     | title/keyword constraints failed                                                                                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | 9.44s   | 34.1 tok/s | 3.59            | 16      | 3,466      | 107     | title/keyword constraints failed                                                                                   |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 20.17s  | 86.8 tok/s | 16.34           | 8.4     | 16,506     | 118     | repeated text; title/keyword constraints failed                                                                    |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 36.13s  | 35.2 tok/s | 3.09            | 15      | 3,557      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 57.57s  | 29.1 tok/s | 6.13            | 60      | 1,627      | 1,000   | extra text before Title; title/keyword constraints failed                                                          |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 3.61s   | 290 tok/s  | 0.11            | 2.1     | 347        | 78      | missing required fields                                                                                            |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 42.63s  | 34.0 tok/s | 10.71           | 13      | 6,344      | 1,000   | repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 189.23s | 4.56 tok/s | 1.77            | 40      | 1,296      | 834     | repeated text; missing required fields; extra text before Title; role tokens visible                               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 7.89s   | 164 tok/s  | 0.11            | 4.1     | 603        | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                            |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.21s   | 247 tok/s  | 0.28            | 3.7     | 1,004      | 41      | missing required fields; extra text before Title                                                                   |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 24.23s  | 6.27 tok/s | 2.89            | 24      | 3,158      | 113     | missing required fields                                                                                            |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | 32.66s  | 92.1 tok/s | 29.51           | 8.4     | 16,506     | 118     | repeated text; title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 38.17s  | 80.9 tok/s | 25.23           | 8.4     | 16,508     | 898     | extra text before Title; title/keyword constraints failed                                                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 49.21s  | 45.8 tok/s | 25.14           | 13      | 16,517     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                            |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 9.93s   | 40.2 tok/s | 0.38            | 17      | 607        | 261     | missing required fields                                                                                            |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 6.14s   | 57.3 tok/s | 3.27            | 9.7     | 2,734      | 53      | missing required fields                                                                                            |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 2.54s   | 186 tok/s  | 0.09            | 2.1     | 343        | 81      | missing required fields                                                                                            |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 26.82s  | 32.1 tok/s | 1.63            | 4.3     | 4,435      | 726     | repeated text; missing required fields; echoes instructions                                                        |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `not_evaluated`       | 2.94s   | -          | -               | -       | -          | -       | none                                                                                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 515 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 503 tok/s
 
-Average clean-completion throughput: 128 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 106 tok/s (indicative only: tokenizers and architectures differ across models)
 
-Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.2 GB
+Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.1 GB
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                                                                                     |
-|--------------------------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                                             |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; missing required fields; cut off at token limit; incomplete thinking block                                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields; echoes instructions                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable`      | repeated text; echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable`      | missing required fields                                                                                                                          |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                  | `unusable`      | missing required fields                                                                                                                          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`      | missing required fields; cut off at token limit; incomplete thinking block                                                                       |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                                          |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                                                          |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`      | missing required fields                                                                                                                          |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable`      | missing required fields; echoes instructions                                                                                                     |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable`      | repeated text; missing required fields; cut off at token limit                                                                                   |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                 | `not_evaluated` | none                                                                                                                                             |
+| Model                                                                                                        | Usability       | Observations                                                                                                       |
+|--------------------------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------|
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                              | `unusable`      | repeated text; title/keyword constraints failed                                                                    |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                               |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | extra text before Title; title/keyword constraints failed                                                          |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                            |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | `unusable`      | repeated text; missing required fields; extra text before Title; role tokens visible                               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                            |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | missing required fields; extra text before Title                                                                   |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable`      | missing required fields                                                                                            |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                  | `unusable`      | repeated text; title/keyword constraints failed                                                                    |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`      | extra text before Title; title/keyword constraints failed                                                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                            |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                            |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`      | missing required fields                                                                                            |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable`      | missing required fields                                                                                            |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable`      | repeated text; missing required fields; echoes instructions                                                        |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                 | `not_evaluated` | none                                                                                                               |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -97,55 +100,55 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                                    |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br><br>Description:<br>A concrete seawall stretches along the coastline of Felixstowe, England, with people enjoying the beach and the sea.<br><br>Keywords:<br>Seafront, Felixstowe, England, UK, GBR, Europe, beach, sea, walkway, coastal scenery                     |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | Title: Seafront at Felixstowe, England, UK, GBR<br><br>Description: A vibrant seaside scene in Felixstowe, England, UK, GBR, captures the lively atmosphere of a popular beachfront. Visitors enjoy the sun, sand, and sea, with the backdrop of historic buildings and lush greenery. The...                                     |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | Title: Summer Afternoon at the Seaside in Felixstove, Suffolk, England<br><br>Description: A serene summer afternoon scene unfolds at the seaside in Felixstove, Suffolk, England, with people enjoying the sun, sea, and sand, surrounded by the picturesque town's buildings and lush gre...                                    |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Felixstowe Seafront Rocks and Beachgoers, August**<br><br>Description:<br>A sunny August afternoon at Felixstowe’s seafront reveals people swimming, wading, and relaxing among the distinctive concrete and rock formations along the tide line, with the town’s green hills and his...                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Felixstowe Seafront Rocks, Golden Hour<br><br>Description:<br>A lively coastal scene at Felixstowe’s seafront on 2026-08-13, featuring stepped concrete breakwaters teeming with swimmers and waders, backed by a hilly residential area under clear blue skies. The warm lighting high...                              |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: Sunny day at Felixstowe seafront with swimmers and rock pools<br>Description: People swim and play in the calm sea and rock pools along the Felixstowe seafront on a bright summer afternoon. The scene features tiered concrete sea defences, a rocky breakwater, and the town's...                                       |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Sunny Seafront at Felixstowe with Rock Pools<br><br>Description: A sunny afternoon scene at Felixstowe, Suffolk, showing people swimming and playing in the calm blue sea and rock pools. The foreground features weathered concrete groynes and a sandy beach, while the background...                                    |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title:<br>Felixstowe Seafront, August 2026, UK<br><br>Description:<br>A sunny day at Felixstowe seafront with people enjoying the water and rocky shoreline under clear skies. The scene includes coastal buildings, a pebble beach, and scattered seagulls near the tide pools.<br><br>Keywords:<br>Felix...                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Seafront with stone groynes in Felixstowe, England<br>Description: People enjoy the seaside at a beach in Felixstowe, England, where stone groynes extend into the blue sea under clear daylight. The coastal town features buildings and greenery overlooking the coastline.<br>Key...                                    |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Seafront and coastal defences at Felixstowe, Suffolk<br>Description: People enjoy the beach and sea along the seafront in Felixstowe, Suffolk, featuring stepped concrete sea walls and rock armour under a clear late afternoon sky.<br>Keywords: Felixstowe, Suffolk, East Suffolk...                                    |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title:<br>Felixstowe Seafront, England<br><br>Description:<br>A bustling seafront in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming, and playing near the rocky breakwaters. The scene is set against a backdrop of historic buildings and lush greenery, with the...                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Felixstowe Seafront, England, UK<br><br>Description:<br>A lively seafront scene in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming in the sea, and walking along the rocky shore, backed by a hillside of houses and greenery.<br><br>Keywords:<br>Felixstowe, Eng...                     |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Felixstowe Seafront<br>Description: A sunny scene at Felixstowe's seafront, with people enjoying the beach and water, backed by coastal buildings and greenery.<br>Keywords: Felixstowe seafront, England UK, beach scene, coastal buildings, sunny weather, people swimming, East S...                                    |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Felixstowe Seafront, England<br>Description: A sunny seafront scene in Felixstowe, England, with people enjoying the beach, rocky shoreline, and coastal buildings under clear skies.<br>Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe,...                                  |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Felixstowe Seafront in Suffolk, England, UK.<br>Description: The seafront in Felixstowe, Suffolk, England, UK, is bustling with activity as people enjoy the sunny day. The sandy beach is lined with large rocks, and the clear blue water of the sea laps gently against the sh...                                       |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Felixstowe Seafront at Sunset<br>Description: A bustling Felixstowe seafront on 2026-08-13, with people enjoying the beach and sea under clear skies, featuring historic buildings and a rocky breakwater.<br>Keywords: Felixstowe, seafront, Suffolk, England, UK, East Suffolk, be...                                    |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | &lt;think&gt;<br><br>&lt;/think&gt;<br><br>Title:<br>Felixstowe Seafront Beach Activity<br><br>Description:<br>A lively seafront scene with people enjoying the water and sand under bright sunlight.<br><br>Keywords: Felixstowe, seafront, beach, activity, sunlight, water, people, rocks, greenery, buildings, Europe, UK,... |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Felixstowe Seafront Beach, UK – Summer Activity*<br><br>**Description:**<br>A lively seaside scene at Felixstowe’s seafront beach on **August 13, 2026 (17:23 UTC+1)**, featuring swimmers, waders, and sunbathers along rocky tide pools and sandy shores. Behind them, a bustlin...                              |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: Felixstowe Seaside Scene, England<br><br>Description: A bustling Felixstowe beach with people enjoying the water and sand, backed by a rocky jetty and framed by trees and buildings under a clear blue sky.<br><br>Keywords: Seafront, Felixstowe, England, UK, GBR, East Suffolk, Englan...                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: Felixstowe Seafront, England<br><br>Description: A serene scene at Felixstowe seafront on August 13, 2026, with people enjoying the beach and the sea, captured on a sunny day.<br><br>Keywords: Felixstowe, seafront, England, UK, GBR, beach, people, sea, sky, rocks, coastline                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable_with_caveats` | Title:<br>Felixstowe Seafront, England<br><br>Description:<br>A bustling seafront in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming, and playing near the rocky breakwaters. The scene is set against a backdrop of historic buildings and lush greenery, with the...                              |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | Title:<br>Seafront at Felixstowe, Suffolk, England<br><br>Description:<br>A sunny late afternoon view of the Felixstowe seafront in Suffolk, England, showing people swimming and playing on the stepped concrete groynes and pebble beach. The background features a hillside lined with residen...                              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Felixstowe Seafront, Suffolk, England<br><br>Description:<br>A sunny day at the Felixstowe seafront in Suffolk, England, with people swimming, sunbathing, and playing on the beach alongside a rocky breakwater, set against a backdrop of coastal buildings and greenery under a clea...                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Sunny seafront at Felixstowe in Suffolk, England<br>Description: People enjoy a sunny day at the Felixstowe seafront, where stone groynes meet the sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, be...                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Sunny day at the seafront in Felixstowe, England<br>Description: People enjoy a sunny day at the stone-tiered sea beach in Felixstowe, Suffolk, under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, se...                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Felixstowe Seafront, Suffolk: Beach and Promenade View<br>Description: Captured on 13th August 2026 at 17:23, this image shows the busy seafront at Felixstowe, Suffolk, with people enjoying the beach, sea and distinctive groynes under a clear blue sky. The promenade buildi...                                       |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>People Enjoying Seafront at Felixstowe, Suffolk, UK<br><br>Description:<br>On a sunny day, people relax and play by the seafront in Felixstowe, Suffolk, UK, with clear skies and calm waters.<br><br>Keywords:<br>Felixstowe, Suffolk, UK, seafront, beach, people, sea, sunny, clear skies, ca...                     |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not c...                                       |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are pretty clear: "Seafront, Felixstowe, England, UK, GBR, Europe." I need something concise, so I'll go with "Seafront at Felixstowe, England, UK." Tha...                                          |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A concrete 5-10-word title: "Felixstowe, UK - Seafront, GBR, East Suffolk, UK, gbr, seafront"<br>A 1-2-sentence factual description: "A vibrant seaside scene with a concrete 5-10-word title, featuring a concrete 5-10-word title, a 1-2-sentence factual description combining releva...                                       |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image, it's a seafront with people, buildings, and the coastal area. So maybe "Felixstowe Seafront Beach Scene" or something similar. Wait, need to be concrete. Let's go with "Felixstowe...                                     |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.<br><br>The image shows a seafront in Felixstowe, England, UK. The capture date is 2026-08-13...                                     |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Felixstowe Seafront, England: Rocky Shore with People and Buildings<br><br>A bustling Felixstowe seafront scene captured on August 13, 2026, at 17:23 UTC+01:00. The image shows a rocky shoreline with people enjoying the water, a prominent clock tower, and a mix of residential and co...                                    |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br><br>Description:<br>The image depicts a lively seafront scene in Felixstowe, England. The beach is bustling with people enjoying the sunny weather, and the coastline is lined with rocks and greenery. The background features a mix...                              |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The image shows a seafront with people, so maybe "Felixstowe Seafront, Suffolk, England". Wait, the title hint was Seafront, Felixstowe, England, UK,...                                          |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>Felixstowe Seafront, East Suffolk, England<br><br>Description:<br>A vibrant seafront scene in Felixstowe, East Suffolk, England, with people enjoying the sunny day at the beach and rocky promenade, set against a backdrop of historic buildings and lush greenery. The image capture...                              |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | A wide shot captures a sunny day at Seafront in Felixstowe, England. The scene is bustling with people enjoying the coastal area. The foreground features a series of low stone walls leading down to the water, where numerous people are wading, swimming, and relaxing. Some indiv...                                          |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Seafront, Felixstowe, England, UK, GBR, Europe, East Suffolk, England, UK, gbr, seafront, Adobe Stock, Any Vision, Felixstowe, Suffolk, UK, gbr,                                                                                                                                                                                  |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Seafront, Felixstowe, England, UK, GBR, Europe<br>Description: A 5-10-word title that describes the image and includes relevant context, such as the location, the photographer's watermark, and the image's metadata. The description also includes the main visible subject, se...                                       |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>- Authoritative context:<br>-...          |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `not_evaluated`       | Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: not enough values to unpack (expected 3, got 2)                                                                                                                                                                                                             |
+| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>Dover Castle, Dover, England, UK, GBR, Europe<br><br>Description:<br>An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.<br><br>Keywords:<br>Dover Castle, England,... |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | Title: Historic Dover Castle Perched on a Steep Hillside<br><br>Description: The medieval stone castle, situated in Dover, England, boasts a striking architecture featuring round towers and an arched entranceway, set against a partly cloudy sky. Built on a steep hillside, the castle...                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Dover Castle’s Medieval Stone Keep and Arched Gateway**<br><br>Description:<br>A dramatic exterior view of Dover Castle’s fortified stone keep, showcasing its robust round towers and grand arched entranceway, perched on a steep, verdant hillside under soft, partly cloudy Augus...          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Dover Castle’s Round Tower Gateway, Kent<br><br>Description:<br>A historic medieval stone fortress captured on a steep grassy hill under partly cloudy skies, featuring robust round towers, an arched entrance, and a small stone bridge—illuminated by natural light in late afternoo...          |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: Dover Castle Gatehouse and Round Towers<br>Description: The historic Dover Castle in Kent, England, features massive medieval stone round towers and a brick gatehouse with an arched entrance. A wooden footbridge connects to the fortress, which rises above a steep, grassy e...                   |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Dover Castle, Historic Medieval Fortress<br><br>Description: A majestic medieval stone castle with round towers and an arched entranceway, perched on a steep grassy hill, showcases the rich history of Dover, England. The castle's architecture, set against a partly cloudy sky,...                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Dover Castle Gatehouse and Round Towers<br><br>Description: This exterior view captures the historic medieval stone gatehouse of Dover Castle, featuring prominent round towers and an arched entranceway set against a partly cloudy sky. The fortress stands atop a steep, grassy...                 |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Exterior view of Dover Castle in Kent, England<br><br>Description:<br>A low-angle exterior view of Dover Castle in Kent, England, showcasing its massive medieval stone walls, round towers, and a prominent arched gateway. The fortress sits atop a steep, grassy hill under a partly...          |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Historic stone towers of Dover Castle in Kent<br>Description: An exterior view of the medieval stone towers and arched entranceway of Dover Castle, built on a steep grassy hill under a partly cloudy sky. The ancient architecture features massive stone walls and round tower...                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Dover Castle in Dover, Kent, England<br>Description: An exterior view of the historic medieval stone fortress featuring round towers and an arched entranceway situated on a steep grassy hill.<br>Keywords: Dover Castle, England, Kent, UK, medieval, fortress, stone, tower, arch...                |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Dover Castle, England<br><br>Description:<br>A historic medieval stone castle with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.<br><br>Keywords:<br>Dover Castle, England, UK, medieval castle, stone architecture, round towers, arched entra... |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Dover Castle Exterior<br>Description: An exterior view of historic medieval stone Dover Castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.<br>Keywords: Dover Castle, England, Europe, Kent, stone c...                |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Dover Castle, Kent, England<br>Description: An exterior view of Dover Castle, a historic medieval stone fortress with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.<br>Keywords: Dover Castle, England, UK, Kent, C...              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Dover Castle, England, UK, Medieval Stone Castle on a Hill.<br>Description: Dover Castle, a historic medieval stone castle, features round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's architecture i...                   |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Dover Castle, Historic England<br>Description: A medieval stone castle with round towers and an arched entranceway stands on a grassy hill under a partly cloudy sky, captured in 2026.<br>Keywords: Dover Castle, England, Castle, Medieval, Stone, Towers, Arched Entrance, Hill,...                 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Dover Castle’s Medieval Towers at Sunset*<br><br>**Description:**<br>A historic stone fortress in Dover, England, captured on **August 15, 2026 (UTC+01:00)**, showcases its robust round towers, arched gateway, and steep hillside vegetation under a partly cloudy sky. Built w...          |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: Dover Castle, Dover, England, UK, GBR, Europe<br><br>Description: A medieval stone fortress perched on a steep grassy hill, featuring round towers, an arched entranceway, and a small bridge, built on a partly cloudy day with ancient architecture and blue skies visible.<br><br>Keywo...          |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | Title: Dover Castle, Dover, England, UK, GBR, Europe<br>Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.<br>Keywords: Adobe Stock, Any Vision,...                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable_with_caveats` | Title: Dover Castle, Kent, England, UK<br><br>Description: An exterior view of Dover Castle, a historic medieval fortress on a grassy hill, featuring stone towers, an arched gateway, and a small bridge under a partly cloudy sky.<br><br>Keywords: Adobe Stock, Any Vision, Arch, Britain, Cas...          |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Dover Castle medieval stone fortress on grassy hill<br><br>Description:<br>An exterior view of historic Dover Castle in Kent, England, featuring round stone towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.<br><br>Keywords:<br>Dove... |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Exterior view of Dover Castle in Kent, England<br>Description: An exterior view of the medieval stone fortifications of Dover Castle, featuring round towers and an arched entranceway atop a steep grassy hill under a partly cloudy sky.<br>Keywords:...            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Medieval Stone Towers of Dover Castle in Kent England<br>Description: An exterior view of the historic medieval stone castle featuring round towers and an arched entranceway situated on a steep grassy hill under a cloudy sky.<br>Keywords: Dover Cas...           |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Dover Castle, Kent: Exterior View, August 2026<br>Description: Dover Castle in Kent is pictured from an exterior angle on 15 August 2026, showing its stone walls and towers rising from a steep, grassy hillside under a partly cloudy sky. A prominent arched entranceway leads...                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Dover Castle, England, United Kingdom<br><br>Description:<br>Dover Castle, located in Dover, England, stands majestically on a grassy hill, showcasing its medieval stone architecture and arched entrance under a partly cloudy sky.<br><br>Keywords:<br>Adobe Stock, Arch, Britain, Castle, Do... |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | Title:<br>Dover Castle Exterior<br><br>Description:<br>An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.<br><br>Keywords: Dover Castle, England, UK, Europe, Fortress...    |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user wants British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. The user wants:<br><br>- a concrete 5-10-word title;<br>- a 1-2-sentence factual descript...          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got the image of Dover Castle in my sights, and I need to generate some metadata. First things first, I'll break down the request. It's a straightforward task: title, description, and keywords. The image is of Dover Castle, and I have the conte...                      |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | Dover Castle, England, UK, GBR, Europe, Medieval, Round Towers, Arched Entranceway, Small Bridge, steep hill, partly cloudy sky, Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, an...                      |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image is of Dover Castle, so maybe "Dover Castle Exterior View". Then the description should combine context (date/time, location) with the main subject, setting, etc. Th...                |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.<br><br>Starting with the title: The image shows Dover Castle, w...                |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | Title: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, Hill, Sky, Architecture, Blue<br><br>Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a...                |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Ancient stone castle on hillside under clear sky.<br><br>Keywords: castle, stone, hill, medieval, arch, tower, bridge, UK, Europe, grassy, sky, fortress, architecture                                                                                                                                        |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Dover Castle: Medieval Stone Fortress on Steep Hillside<br><br>A historic stone castle with round towers and arched entranceway stands atop a steep, grassy hill in Dover, England. Built of brown and white stones, the fortress features a small bridge and is set against a partly cloud...                |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | Title:<br>Dover Castle Exterior<br><br>Description:<br>An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.<br><br>Keywords: Dover Castle, England, UK, Europe, Fortress...    |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this step by step. First, the title. The context says Dover Castle, so the title should be specific. The hint says Dover Castle, so "Dover Castle, England" is good. Need 5-10 words. Let's see: "Dover Castle, England, Historic Medieval Stone Castle on Hill"...                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>Dover Castle, Kent, England<br><br>Description:<br>A historic medieval stone castle with round towers, an arched entranceway, and a small bridge, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00.<br><br>Keywords: Dover Castle, Ken...    |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | ```json<br>{<br>"context": {<br>"title": "Dover Castle",<br>"location": "Dover, England, UK, GBR, Europe",<br>"description": "An exterior view of a historic medieval stone castle, featuring round towers, an arched entrance, and a steep grassy hill under a partly cloudy sky."<br>},<br>"date_time":...  |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Dover Castle, Dover, England, UK, GBR, Europe, historic, medieval, stone, castle, round towers, arched entranceway, steep grassy hill, partly cloudy sky, fortress, ancient, architecture, blue                                                                                                               |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Dover Castle, England, UK, GBR, Europe<br>Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle is situated on a hill under a...                    |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue<br>- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, Un...                   |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `not_evaluated`       | Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do not match: tokens: 81, features 1053                                                                                                                                                                 |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.6.14`
-- `mlx`: `0.32.1.dev20260814+3d23f7d87`
+- `mlx`: `0.32.1.dev20260815+9ab977b56`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.15.0`
 - `tokenizers`: `0.22.2`
@@ -162,13 +165,20 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 ## Image Metadata
 
-- *Title:* , Seafront, Felixstowe, England, UK, GBR, Europe
-- *Description:* , Seafront, Felixstowe, England, UK, GBR
-- *Keywords:* Adobe Stock, Any Vision, East Suffolk, England, Europe,
-  Felixstowe, Suffolk, UK, gbr, seafront
-- *Date:* 2026-08-13 17:23:18 UTC+01:00
-- *Time:* 17:23:18
-- *GPS:* 51.957967°N, 1.346900°E
+- *Title:* , Dover Castle, Dover, England, UK, GBR, Europe
+- *Description:* An exterior view of a historic medieval stone castle,
+  featuring round towers, an arched entranceway, and a small bridge, built on
+  a steep grassy hill under a partly cloudy sky.
+- *Keywords:* Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle,
+  England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United
+  Kingdom, Wall, ancient, architecture, blue, bridge, british, building,
+  defensive, dover, english, exterior, fort, fortification, grass, great,
+  green, heritage, historic, history, keep, kingdom, landmark, landscape,
+  medieval, moat, nature, old, outdoor, outdoors, ruin, scenic, stronghold,
+  summer, tourism, travel, united, view, windows
+- *Date:* 2026-08-15 15:59:46 UTC+01:00
+- *Time:* 15:59:46
+- *GPS:* 51.128800°N, 1.319100°E
 
 ## Prompt
 
@@ -184,14 +194,17 @@ The first 280 characters of each model's actual output (or failure evidence for 
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-08-13 17:23:18 UTC+01:00
-> &#45; GPS: 51.957967°N, 1.346900°E
+> &#45; Capture date/time: 2026-08-15 15:59:46 UTC+01:00
+> &#45; GPS: 51.128800°N, 1.319100°E
 >
 > &#8203;Descriptive hints:
-> &#45; Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
-> &#45; Description hint: Seafront, Felixstowe, England, UK, GBR
-> &#45; Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe,
-> Felixstowe, Suffolk, UK, gbr, seafront
+> &#45; Title hint: Dover Castle, Dover, England, UK, GBR, Europe
+> &#45; Description hint: An exterior view of a historic medieval stone castle,
+> featuring round towers, an arched entranceway, and a small bridge, built on
+> a steep grassy hill under a partly cloudy sky.
+> &#45; Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover
+> Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United
+> Kingdom, Wall, ancient, architecture, blue
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -222,27 +235,27 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.46s
-- *Generation time:* 0.64s
-- *Total time:* 1.47s
-- *Input validation time:* 0.368
-- *Prompt preparation time:* 0.00603
-- *First-token latency:* 0.0608
-- *Cleanup time:* 0.0595
-- *Prompt tokens:* 355
-- *Generation tokens:* 76
-- *Total tokens:* 431
-- *Prompt throughput (raw):* 5,835 tok/s
-- *Generation throughput (raw):* 515 tok/s
-- *Peak memory:* 1.2
+- *Model load time:* 0.88s
+- *Generation time:* 0.83s
+- *Total time:* 2.21s
+- *Input validation time:* 0.501
+- *Prompt preparation time:* 0.00715
+- *First-token latency:* 0.0534
+- *Cleanup time:* 0.0843
+- *Prompt tokens:* 400
+- *Generation tokens:* 98
+- *Total tokens:* 498
+- *Prompt throughput (raw):* 7,486 tok/s
+- *Generation throughput (raw):* 503 tok/s
+- *Peak memory:* 1.1
 - *Active memory:* 0.90
-- *Cache memory:* 0.02
+- *Cache memory:* 0.01
 - *Model-load active memory:* 0.897
 - *Post-cleanup active memory:* 0.000132
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1183
+- *Rendered prompt characters:* 1399
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -259,72 +272,13 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Seafront, Felixstowe, England, UK, GBR, Europe
+Dover Castle, Dover, England, UK, GBR, Europe
 
 Description:
-A concrete seawall stretches along the coastline of Felixstowe, England, with people enjoying the beach and the sea.
+An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
 
 Keywords:
-Seafront, Felixstowe, England, UK, GBR, Europe, beach, sea, walkway, coastal scenery
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
-
-### mlx-community/LFM2.5-VL-1.6B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.09s
-- *Generation time:* 1.77s
-- *Total time:* 2.87s
-- *Input validation time:* 9.39e-05
-- *Prompt preparation time:* 0.00735
-- *First-token latency:* 0.123
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 555
-- *Generation tokens:* 122
-- *Total tokens:* 677
-- *Prompt throughput (raw):* 4,523 tok/s
-- *Generation throughput (raw):* 156 tok/s
-- *Peak memory:* 4.1
-- *Active memory:* 3.2
-- *Cache memory:* 0.02
-- *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.00379
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1183
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Seafront at Felixstowe, England, UK, GBR
-
-Description: A vibrant seaside scene in Felixstowe, England, UK, GBR, captures the lively atmosphere of a popular beachfront. Visitors enjoy the sun, sand, and sea, with the backdrop of historic buildings and lush greenery. The clear blue sky and gentle waves add to the picturesque setting.
-
-Keywords: Felixstowe, England, UK, GBR, Seafront, Beach, Sun, Sand, Sea, Historic Buildings, Greenery, Clear Sky, Waves
+Dover Castle, England, UK, GBR, Europe, castle, medieval, stone, tower, arched entranceway, hill, grassy hill, sky, blue
 </pre>
 
 </details>
@@ -343,18 +297,18 @@ Keywords: Felixstowe, England, UK, GBR, Seafront, Beach, Sun, Sand, Sea, Histori
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.90s
-- *Generation time:* 11.55s
-- *Total time:* 13.46s
-- *Input validation time:* 6.26e-05
-- *Prompt preparation time:* 0.00175
-- *First-token latency:* 2.13
-- *Cleanup time:* 0.155
-- *Prompt tokens:* 275
-- *Generation tokens:* 101
-- *Total tokens:* 376
-- *Prompt throughput (raw):* 129 tok/s
-- *Generation throughput (raw):* 11.7 tok/s
+- *Model load time:* 1.67s
+- *Generation time:* 9.48s
+- *Total time:* 11.16s
+- *Input validation time:* 0.000165
+- *Prompt preparation time:* 0.00162
+- *First-token latency:* 1.72
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 314
+- *Generation tokens:* 106
+- *Total tokens:* 420
+- *Prompt throughput (raw):* 183 tok/s
+- *Generation throughput (raw):* 15.0 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.59
@@ -363,7 +317,7 @@ Keywords: Felixstowe, England, UK, GBR, Seafront, Beach, Sun, Sand, Sea, Histori
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1236
+- *Rendered prompt characters:* 1452
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -379,25 +333,12 @@ Keywords: Felixstowe, England, UK, GBR, Seafront, Beach, Sun, Sand, Sea, Histori
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Summer Afternoon at the Seaside in Felixstove, Suffolk, England
+Title: Historic Dover Castle Perched on a Steep Hillside
 
-Description: A serene summer afternoon scene unfolds at the seaside in Felixstove, Suffolk, England, with people enjoying the sun, sea, and sand, surrounded by the picturesque town's buildings and lush greenery, under a clear blue sky.
+Description: The medieval stone castle, situated in Dover, England, boasts a striking architecture featuring round towers and an arched entranceway, set against a partly cloudy sky. Built on a steep hillside, the castle's imposing structure commands a sense of grandeur and history.
 
-Keywords: seaside, summer, afternoon, Felixstove, Suffolk, England, people, sun, sea, sand, buildings, greenery, blue sky.
+Keywords: Dover Castle, medieval, stone, castle, round towers, arched entranceway, steep hillside, partly cloudy sky, historic, architecture, grandeur, history.
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title: Summer Afternoon at the Seaside in Felixstove, Suffolk, England
-
-Description: A serene summer afternoon scene unfolds at the seaside in Felixstove, Suffolk, England, with people enjoying the sun, sea, and sand, surrounded by the picturesque town's buildings and lush greenery, under a clear blue sky. 
-
-Keywords: seaside, summer, afternoon, Felixstove, Suffolk, England, people, sun, sea, sand, buildings, greenery, blue sky.
-```
-
-</details>
 
 </details>
 
@@ -415,27 +356,27 @@ Keywords: seaside, summer, afternoon, Felixstove, Suffolk, England, people, sun,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.46s
-- *Generation time:* 6.71s
-- *Total time:* 8.19s
-- *Input validation time:* 5.92e-05
-- *Prompt preparation time:* 0.00733
-- *First-token latency:* 3.49
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 2,730
-- *Generation tokens:* 120
-- *Total tokens:* 2,850
-- *Prompt throughput (raw):* 782 tok/s
-- *Generation throughput (raw):* 45.6 tok/s
-- *Peak memory:* 12
+- *Model load time:* 1.35s
+- *Generation time:* 6.33s
+- *Total time:* 7.70s
+- *Input validation time:* 8.62e-05
+- *Prompt preparation time:* 0.00694
+- *First-token latency:* 3.22
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 3,228
+- *Generation tokens:* 143
+- *Total tokens:* 3,371
+- *Prompt throughput (raw):* 1,004 tok/s
+- *Generation throughput (raw):* 58.3 tok/s
+- *Peak memory:* 14
 - *Active memory:* 8.0
-- *Cache memory:* 0.56
+- *Cache memory:* 0.65
 - *Model-load active memory:* 8.01
 - *Post-cleanup active memory:* 0.0051
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3570
+- *Rendered prompt characters:* 3786
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -452,13 +393,13 @@ Keywords: seaside, summer, afternoon, Felixstove, Suffolk, England, people, sun,
 
 <pre class="model-output-readable">
 Title:
-**Felixstowe Seafront Rocks and Beachgoers, August**
+**Dover Castle’s Medieval Stone Keep and Arched Gateway**
 
 Description:
-A sunny August afternoon at Felixstowe’s seafront reveals people swimming, wading, and relaxing among the distinctive concrete and rock formations along the tide line, with the town’s green hills and historic buildings rising in the background.
+A dramatic exterior view of Dover Castle’s fortified stone keep, showcasing its robust round towers and grand arched entranceway, perched on a steep, verdant hillside under soft, partly cloudy August lighting. The structure’s medieval architecture, with narrow windows and weathered stonework, reflects its historical significance as a key British fortress.
 
 Keywords:
-Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, coastal rocks, beachgoers, tide pools, summer swimming, historic seaside town, East Anglia, clear skies, daylight, natural and man-made landscape
+Dover Castle, medieval fortress, stone architecture, round towers, arched gateway, Kent, England, UK, historical landmark, steep hillside, narrow windows, weathered stone, partly cloudy sky, August lighting, British heritage, defensive wall, ancient structure, European history
 </pre>
 
 </details>
@@ -477,27 +418,27 @@ Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, coastal rocks, beachgoe
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.47s
-- *Generation time:* 2.80s
-- *Total time:* 4.29s
-- *Input validation time:* 6.78e-05
-- *Prompt preparation time:* 0.00786
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 2,729
-- *Generation tokens:* 154
-- *Total tokens:* 2,883
+- *Model load time:* 0.97s
+- *Generation time:* 2.62s
+- *Total time:* 3.60s
+- *Input validation time:* 7.02e-05
+- *Prompt preparation time:* 0.0069
+- *First-token latency:* 1.36
+- *Cleanup time:* 0.0777
+- *Prompt tokens:* 3,227
+- *Generation tokens:* 104
+- *Total tokens:* 3,331
 - *Prompt throughput (raw):* 2,364 tok/s
-- *Generation throughput (raw):* 144 tok/s
-- *Peak memory:* 7.1
+- *Generation throughput (raw):* 172 tok/s
+- *Peak memory:* 9.0
 - *Active memory:* 2.8
-- *Cache memory:* 0.38
+- *Cache memory:* 0.44
 - *Model-load active memory:* 2.75
 - *Post-cleanup active memory:* 0.00562
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3569
+- *Rendered prompt characters:* 3785
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -514,13 +455,13 @@ Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, coastal rocks, beachgoe
 
 <pre class="model-output-readable">
 Title:
-Felixstowe Seafront Rocks, Golden Hour
+Dover Castle’s Round Tower Gateway, Kent
 
 Description:
-A lively coastal scene at Felixstowe’s seafront on 2026-08-13, featuring stepped concrete breakwaters teeming with swimmers and waders, backed by a hilly residential area under clear blue skies. The warm lighting highlights activity along the shore and rocky edges, with a mix of leisure and nature.
+A historic medieval stone fortress captured on a steep grassy hill under partly cloudy skies, featuring robust round towers, an arched entrance, and a small stone bridge—illuminated by natural light in late afternoon.
 
 Keywords:
-Felixstowe, Suffolk, UK, GBR, seafront, coastal breakwaters, stepped concrete, beachgoers, wading birds, residential hillside, golden hour lighting, East Anglian seaside, historic stone buildings, rocky shore, summer day, Atlantic Ocean, leisure activities.
+ancient architecture, arched entrance, British stone fortress, Dover Castle, England, European medieval wall, fortified hilltop, Kent, round towers, stone bridge, UK, UK castle, medieval stone castle, blue sky lighting
 </pre>
 
 </details>
@@ -539,27 +480,27 @@ Felixstowe, Suffolk, UK, GBR, seafront, coastal breakwaters, stepped concrete, b
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 13.07s
-- *Generation time:* 80.30s
-- *Total time:* 93.40s
-- *Input validation time:* 0.00013
-- *Prompt preparation time:* 0.0139
-- *First-token latency:* 77.3
-- *Cleanup time:* 0.279
-- *Prompt tokens:* 16,548
-- *Generation tokens:* 122
-- *Total tokens:* 16,670
-- *Prompt throughput (raw):* 214 tok/s
-- *Generation throughput (raw):* 60.1 tok/s
+- *Model load time:* 12.34s
+- *Generation time:* 100.93s
+- *Total time:* 113.30s
+- *Input validation time:* 8.8e-05
+- *Prompt preparation time:* 0.0164
+- *First-token latency:* 93.9
+- *Cleanup time:* 0.353
+- *Prompt tokens:* 16,522
+- *Generation tokens:* 105
+- *Total tokens:* 16,627
+- *Prompt throughput (raw):* 176 tok/s
+- *Generation throughput (raw):* 48.9 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 70.2
 - *Post-cleanup active memory:* 0.00706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1223
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -575,9 +516,68 @@ Felixstowe, Suffolk, UK, GBR, seafront, coastal breakwaters, stepped concrete, b
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sunny day at Felixstowe seafront with swimmers and rock pools
-Description: People swim and play in the calm sea and rock pools along the Felixstowe seafront on a bright summer afternoon. The scene features tiered concrete sea defences, a rocky breakwater, and the town's buildings rising on the hillside under a clear blue sky.
-Keywords: Felixstowe, seafront, England, UK, swimmers, rock pools, beach, summer, sunny, breakwater, promenade, houses, cliff, gulls, leisure, coastal, East Suffolk, Europe
+Title: Dover Castle Gatehouse and Round Towers
+Description: The historic Dover Castle in Kent, England, features massive medieval stone round towers and a brick gatehouse with an arched entrance. A wooden footbridge connects to the fortress, which rises above a steep, grassy embankment under a partly cloudy sky.
+Keywords: Dover Castle, Kent, England, UK, Britain, medieval, fortress, stone, tower, arch, gatehouse, bridge, hill, wall, architecture, ancient, sky, Europe
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### mlx-community/Phi-3.5-vision-instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 1.05s
+- *Generation time:* 3.39s
+- *Total time:* 4.44s
+- *Input validation time:* 0.000186
+- *Prompt preparation time:* 0.0019
+- *First-token latency:* 0.321
+- *Cleanup time:* 0.112
+- *Prompt tokens:* 1,137
+- *Generation tokens:* 110
+- *Total tokens:* 1,247
+- *Prompt throughput (raw):* 3,543 tok/s
+- *Generation throughput (raw):* 50.9 tok/s
+- *Peak memory:* 9.4
+- *Active memory:* 8.3
+- *Cache memory:* 0.52
+- *Model-load active memory:* 8.3
+- *Post-cleanup active memory:* 0.00713
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1369
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Dover Castle, Historic Medieval Fortress
+
+Description: A majestic medieval stone castle with round towers and an arched entranceway, perched on a steep grassy hill, showcases the rich history of Dover, England. The castle's architecture, set against a partly cloudy sky, highlights its ancient and enduring presence.
+
+Keywords: Dover Castle, Historic, Medieval, Stone, Tower, Arch, Hill, Grassy, Steep, Partly Cloudy
 </pre>
 
 </details>
@@ -596,27 +596,27 @@ Keywords: Felixstowe, seafront, England, UK, swimmers, rock pools, beach, summer
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.81s
-- *Generation time:* 84.42s
-- *Total time:* 87.25s
-- *Input validation time:* 0.000111
-- *Prompt preparation time:* 0.0143
-- *First-token latency:* 82.4
-- *Cleanup time:* 0.118
-- *Prompt tokens:* 16,548
-- *Generation tokens:* 121
-- *Total tokens:* 16,669
-- *Prompt throughput (raw):* 201 tok/s
-- *Generation throughput (raw):* 108 tok/s
+- *Model load time:* 5.16s
+- *Generation time:* 54.13s
+- *Total time:* 59.31s
+- *Input validation time:* 0.000101
+- *Prompt preparation time:* 0.0142
+- *First-token latency:* 51.7
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 16,522
+- *Generation tokens:* 116
+- *Total tokens:* 16,638
+- *Prompt throughput (raw):* 319 tok/s
+- *Generation throughput (raw):* 90.4 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
-- *Cache memory:* 0.89
+- *Cache memory:* 0.88
 - *Model-load active memory:* 20.4
 - *Post-cleanup active memory:* 0.00857
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1223
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -632,58 +632,58 @@ Keywords: Felixstowe, seafront, England, UK, swimmers, rock pools, beach, summer
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sunny Seafront at Felixstowe with Rock Pools
+Title: Dover Castle Gatehouse and Round Towers
 
-Description: A sunny afternoon scene at Felixstowe, Suffolk, showing people swimming and playing in the calm blue sea and rock pools. The foreground features weathered concrete groynes and a sandy beach, while the background displays a town with historic buildings and a clock tower on a green hill.
+Description: This exterior view captures the historic medieval stone gatehouse of Dover Castle, featuring prominent round towers and an arched entranceway set against a partly cloudy sky. The fortress stands atop a steep, grassy hillside covered in lush vegetation, with a wooden bridge visible on the right side.
 
-Keywords: Felixstowe, seafront, Suffolk, England, UK, summer, beach, rock pools, groynes, swimming, children, seagulls, town, clock tower, blue sky, coastal, leisure, East Suffolk
+Keywords: Dover Castle, England, UK, medieval, stone, architecture, gatehouse, round towers, arched entrance, grassy hill, vegetation, wooden bridge, sky, historic, fortress, Kent, Europe, ancient
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
 
-### mlx-community/Qwen3.5-9B-MLX-4bit
+### mlx-community/Qwen3.6-27B-mxfp8
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
+<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.48s
-- *Generation time:* 74.38s
-- *Total time:* 75.86s
-- *Input validation time:* 5.28e-05
-- *Prompt preparation time:* 0.000304
-- *First-token latency:* 72.1
-- *Cleanup time:* 0.0851
-- *Prompt tokens:* 16,548
-- *Generation tokens:* 120
-- *Total tokens:* 16,668
-- *Prompt throughput (raw):* 229 tok/s
-- *Generation throughput (raw):* 87.7 tok/s
-- *Peak memory:* 10.0
-- *Active memory:* 6.6
-- *Cache memory:* 1.2
-- *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00909
+- *Model load time:* 3.34s
+- *Generation time:* 121.88s
+- *Total time:* 125.25s
+- *Input validation time:* 0.000131
+- *Prompt preparation time:* 0.0156
+- *First-token latency:* 112
+- *Cleanup time:* 0.236
+- *Prompt tokens:* 16,522
+- *Generation tokens:* 114
+- *Total tokens:* 16,636
+- *Prompt throughput (raw):* 148 tok/s
+- *Generation throughput (raw):* 13.0 tok/s
+- *Peak memory:* 35
+- *Active memory:* 29
+- *Cache memory:* 1.8
+- *Model-load active memory:* 28.7
+- *Post-cleanup active memory:* 0.0096
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1223
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -692,13 +692,13 @@ Keywords: Felixstowe, seafront, Suffolk, England, UK, summer, beach, rock pools,
 
 <pre class="model-output-readable">
 Title:
-Felixstowe Seafront, August 2026, UK
+Exterior view of Dover Castle in Kent, England
 
 Description:
-A sunny day at Felixstowe seafront with people enjoying the water and rocky shoreline under clear skies. The scene includes coastal buildings, a pebble beach, and scattered seagulls near the tide pools.
+A low-angle exterior view of Dover Castle in Kent, England, showcasing its massive medieval stone walls, round towers, and a prominent arched gateway. The fortress sits atop a steep, grassy hill under a partly cloudy sky, with a wooden bridge visible to the right.
 
 Keywords:
-Felixstowe, seafront, Suffolk, England, UK, GBR, Europe, August 2026, rocky shoreline, tide pools, seagulls, coastal buildings, pebble beach, clear skies, people swimming, family activity
+Dover Castle, Kent, England, UK, medieval, fortress, stone, architecture, tower, arch, bridge, hill, sky, historic, ancient, wall, Europe, Britain
 </pre>
 
 </details>
@@ -717,27 +717,27 @@ Felixstowe, seafront, Suffolk, England, UK, GBR, Europe, August 2026, rocky shor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.38s
-- *Generation time:* 1.73s
-- *Total time:* 4.14s
-- *Input validation time:* 4.25e-05
-- *Prompt preparation time:* 0.0216
-- *First-token latency:* 0.415
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 587
-- *Generation tokens:* 94
-- *Total tokens:* 681
-- *Prompt throughput (raw):* 1,413 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Model load time:* 2.77s
+- *Generation time:* 2.34s
+- *Total time:* 5.15s
+- *Input validation time:* 0.000167
+- *Prompt preparation time:* 0.0246
+- *First-token latency:* 0.448
+- *Cleanup time:* 0.208
+- *Prompt tokens:* 619
+- *Generation tokens:* 98
+- *Total tokens:* 717
+- *Prompt throughput (raw):* 1,383 tok/s
+- *Generation throughput (raw):* 91.3 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
-- *Cache memory:* 0.20
+- *Cache memory:* 0.21
 - *Model-load active memory:* 15.4
 - *Post-cleanup active memory:* 0.0118
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1186
+- *Rendered prompt characters:* 1402
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -753,9 +753,9 @@ Felixstowe, seafront, Suffolk, England, UK, GBR, Europe, August 2026, rocky shor
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Seafront with stone groynes in Felixstowe, England
-Description: People enjoy the seaside at a beach in Felixstowe, England, where stone groynes extend into the blue sea under clear daylight. The coastal town features buildings and greenery overlooking the coastline.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, coast, sea, groynes, coastline, summer, tourism, Europe, East Suffolk, water, outdoors
+Title: Historic stone towers of Dover Castle in Kent
+Description: An exterior view of the medieval stone towers and arched entranceway of Dover Castle, built on a steep grassy hill under a partly cloudy sky. The ancient architecture features massive stone walls and round towers overlooking the landscape in Kent, England.
+Keywords: Dover Castle, Kent, England, United Kingdom, Europe, medieval, castle, stone, tower, fortress, architecture, historic, hill, sky, ancient, wall, arch
 </pre>
 
 </details>
@@ -774,27 +774,27 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, coast, sea, groynes
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.55s
-- *Generation time:* 4.92s
-- *Total time:* 7.48s
-- *Input validation time:* 5.13e-05
-- *Prompt preparation time:* 0.000303
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 587
-- *Generation tokens:* 89
-- *Total tokens:* 676
-- *Prompt throughput (raw):* 561 tok/s
-- *Generation throughput (raw):* 27.2 tok/s
+- *Model load time:* 3.31s
+- *Generation time:* 6.72s
+- *Total time:* 10.04s
+- *Input validation time:* 0.000175
+- *Prompt preparation time:* 0.000392
+- *First-token latency:* 1.46
+- *Cleanup time:* 0.219
+- *Prompt tokens:* 619
+- *Generation tokens:* 73
+- *Total tokens:* 692
+- *Prompt throughput (raw):* 425 tok/s
+- *Generation throughput (raw):* 16.3 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.77
+- *Cache memory:* 0.80
 - *Model-load active memory:* 18.4
 - *Post-cleanup active memory:* 0.0123
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1186
+- *Rendered prompt characters:* 1402
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -810,72 +810,9 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, coast, sea, groynes
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Seafront and coastal defences at Felixstowe, Suffolk
-Description: People enjoy the beach and sea along the seafront in Felixstowe, Suffolk, featuring stepped concrete sea walls and rock armour under a clear late afternoon sky.
-Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, coastal defences, sea wall, rock armour, ocean, summer, leisure, tourism, Europe, GBR
-</pre>
-
-</details>
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### Qwen/Qwen3-VL-2B-Instruct
-
-<details>
-<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 3 words (requested 5-10); Keyword list has 28
-  terms (requested 10-18); Duplicate keywords: felixstowe, england, seafront,
-  uk, suffolk, gbr
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.68s
-- *Generation time:* 16.38s
-- *Total time:* 17.08s
-- *Input validation time:* 4.12e-05
-- *Prompt preparation time:* 0.00891
-- *First-token latency:* 14
-- *Cleanup time:* 0.0832
-- *Prompt tokens:* 16,533
-- *Generation tokens:* 147
-- *Total tokens:* 16,680
-- *Prompt throughput (raw):* 1,184 tok/s
-- *Generation throughput (raw):* 94.2 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 4.3
-- *Cache memory:* 2.6
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.000443
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1204
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Felixstowe Seafront, England
-
-Description:
-A bustling seafront in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming, and playing near the rocky breakwaters. The scene is set against a backdrop of historic buildings and lush greenery, with the clear blue sea and sky reflecting the bright sunlight.
-
-Keywords: Felixstowe, England, seafront, beach, people, swimming, rocky breakwaters, historic buildings, greenery, sea, sky, sunlight, beachgoers, coastal, UK, Europe, Suffolk, gbr, seafront, England, UK, gbr, seafront, Felixstowe, Suffolk, UK, gbr, seafront
+Title: Dover Castle in Dover, Kent, England
+Description: An exterior view of the historic medieval stone fortress featuring round towers and an arched entranceway situated on a steep grassy hill.
+Keywords: Dover Castle, England, Kent, UK, medieval, fortress, stone, tower, architecture, hill, castle, Britain, Europe, ancient, wall, arch
 </pre>
 
 </details>
@@ -892,29 +829,29 @@ Keywords: Felixstowe, England, seafront, beach, people, swimming, rocky breakwat
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
+- *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.23s
-- *Generation time:* 7.59s
-- *Total time:* 9.83s
-- *Input validation time:* 5.5e-05
-- *Prompt preparation time:* 0.00761
-- *First-token latency:* 3.21
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 2,197
-- *Generation tokens:* 112
-- *Total tokens:* 2,309
-- *Prompt throughput (raw):* 685 tok/s
-- *Generation throughput (raw):* 29.6 tok/s
-- *Peak memory:* 22
+- *Model load time:* 3.82s
+- *Generation time:* 10.79s
+- *Total time:* 14.63s
+- *Input validation time:* 0.000191
+- *Prompt preparation time:* 0.00928
+- *First-token latency:* 5.5
+- *Cleanup time:* 0.158
+- *Prompt tokens:* 2,695
+- *Generation tokens:* 95
+- *Total tokens:* 2,790
+- *Prompt throughput (raw):* 490 tok/s
+- *Generation throughput (raw):* 22.2 tok/s
+- *Peak memory:* 24
 - *Active memory:* 18
-- *Cache memory:* 0.46
+- *Cache memory:* 0.52
 - *Model-load active memory:* 18
 - *Post-cleanup active memory:* 0.000968
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1132
+- *Rendered prompt characters:* 1348
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -931,13 +868,13 @@ Keywords: Felixstowe, England, seafront, beach, people, swimming, rocky breakwat
 
 <pre class="model-output-readable">
 Title:
-Felixstowe Seafront, England, UK
+Dover Castle, England
 
 Description:
-A lively seafront scene in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming in the sea, and walking along the rocky shore, backed by a hillside of houses and greenery.
+A historic medieval stone castle with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.
 
 Keywords:
-Felixstowe, England, UK, seafront, beach, sea, swimming, people, rocky shore, hillside, houses, greenery, sunny day, coastal town, East Suffolk, Suffolk, Europe, GBR
+Dover Castle, England, UK, medieval castle, stone architecture, round towers, arched entrance, grassy hill, partly cloudy sky, historic fortress, Kent, Europe, blue sky, green hillside, ancient structure, defensive walls, battlements, heritage site
 </pre>
 
 </details>
@@ -954,29 +891,29 @@ Felixstowe, England, UK, seafront, beach, sea, swimming, people, rocky shore, hi
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 2 words (requested 5-10)
+- *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.42s
-- *Generation time:* 9.16s
-- *Total time:* 10.58s
-- *Input validation time:* 4.95e-05
-- *Prompt preparation time:* 0.00674
-- *First-token latency:* 7.67
-- *Cleanup time:* 0.0814
-- *Prompt tokens:* 6,281
-- *Generation tokens:* 73
-- *Total tokens:* 6,354
-- *Prompt throughput (raw):* 819 tok/s
-- *Generation throughput (raw):* 74.5 tok/s
+- *Model load time:* 1.43s
+- *Generation time:* 12.58s
+- *Total time:* 14.03s
+- *Input validation time:* 0.000161
+- *Prompt preparation time:* 0.008
+- *First-token latency:* 10.7
+- *Cleanup time:* 0.116
+- *Prompt tokens:* 6,348
+- *Generation tokens:* 81
+- *Total tokens:* 6,429
+- *Prompt throughput (raw):* 591 tok/s
+- *Generation throughput (raw):* 67.3 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
-- *Cache memory:* 0.45
+- *Cache memory:* 0.46
 - *Model-load active memory:* 6.78
 - *Post-cleanup active memory:* 0.00211
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1213
+- *Rendered prompt characters:* 1429
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -992,9 +929,9 @@ Felixstowe, England, UK, seafront, beach, sea, swimming, people, rocky shore, hi
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Felixstowe Seafront
-Description: A sunny scene at Felixstowe's seafront, with people enjoying the beach and water, backed by coastal buildings and greenery.
-Keywords: Felixstowe seafront, England UK, beach scene, coastal buildings, sunny weather, people swimming, East Suffolk, Europe, gbr, seafront landscape.
+Title: Dover Castle Exterior
+Description: An exterior view of historic medieval stone Dover Castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+Keywords: Dover Castle, England, Europe, Kent, stone castle, historic medieval, round towers, arched entranceway, steep grassy hill, partly cloudy sky.
 </pre>
 
 </details>
@@ -1012,21 +949,21 @@ Keywords: Felixstowe seafront, England UK, beach scene, coastal buildings, sunny
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Title has
-  3 words (requested 5-10)
+  4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 7.47s
-- *Generation time:* 19.43s
-- *Total time:* 26.92s
-- *Input validation time:* 3.85e-05
-- *Prompt preparation time:* 0.00761
-- *First-token latency:* 16.8
-- *Cleanup time:* 0.268
-- *Prompt tokens:* 6,281
-- *Generation tokens:* 78
-- *Total tokens:* 6,359
-- *Prompt throughput (raw):* 374 tok/s
-- *Generation throughput (raw):* 37.5 tok/s
-- *Peak memory:* 77
+- *Model load time:* 10.55s
+- *Generation time:* 39.90s
+- *Total time:* 50.48s
+- *Input validation time:* 0.00011
+- *Prompt preparation time:* 0.0112
+- *First-token latency:* 36
+- *Cleanup time:* 0.56
+- *Prompt tokens:* 6,348
+- *Generation tokens:* 83
+- *Total tokens:* 6,431
+- *Prompt throughput (raw):* 176 tok/s
+- *Generation throughput (raw):* 26.7 tok/s
+- *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
 - *Model-load active memory:* 61.9
@@ -1034,7 +971,7 @@ Keywords: Felixstowe seafront, England UK, beach scene, coastal buildings, sunny
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1213
+- *Rendered prompt characters:* 1429
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1050,18 +987,18 @@ Keywords: Felixstowe seafront, England UK, beach scene, coastal buildings, sunny
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Felixstowe Seafront, England
-Description: A sunny seafront scene in Felixstowe, England, with people enjoying the beach, rocky shoreline, and coastal buildings under clear skies.
-Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe, beach, coastal, people, rocky shoreline, buildings, sunny, clear skies&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: Dover Castle, Kent, England
+Description: An exterior view of Dover Castle, a historic medieval stone fortress with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.
+Keywords: Dover Castle, England, UK, Kent, Castle, Fortress, Stone, Tower, Arch, Hill, Sky, Architecture, Ancient, Britain, Europe, Wall&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: Felixstowe Seafront, England
-Description: A sunny seafront scene in Felixstowe, England, with people enjoying the beach, rocky shoreline, and coastal buildings under clear skies.
-Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe, beach, coastal, people, rocky shoreline, buildings, sunny, clear skies<|end_of_box|>
+<|begin_of_box|>Title: Dover Castle, Kent, England
+Description: An exterior view of Dover Castle, a historic medieval stone fortress with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.
+Keywords: Dover Castle, England, UK, Kent, Castle, Fortress, Stone, Tower, Arch, Hill, Sky, Architecture, Ancient, Britain, Europe, Wall<|end_of_box|>
 ```
 
 </details>
@@ -1080,20 +1017,21 @@ Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe, beac
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
+- *Observations:* Conversation-role control tokens remain visible; Keyword
+  list has 24 terms (requested 10-18); Duplicate keywords: europe, sky
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.03s
-- *Generation time:* 6.18s
-- *Total time:* 8.22s
-- *Input validation time:* 7.45e-05
-- *Prompt preparation time:* 0.00145
-- *First-token latency:* 1.27
-- *Cleanup time:* 0.187
-- *Prompt tokens:* 2,586
-- *Generation tokens:* 126
-- *Total tokens:* 2,712
-- *Prompt throughput (raw):* 2,033 tok/s
-- *Generation throughput (raw):* 30.3 tok/s
+- *Model load time:* 2.28s
+- *Generation time:* 7.80s
+- *Total time:* 10.10s
+- *Input validation time:* 0.000186
+- *Prompt preparation time:* 0.00281
+- *First-token latency:* 1.66
+- *Cleanup time:* 0.4
+- *Prompt tokens:* 2,626
+- *Generation tokens:* 141
+- *Total tokens:* 2,767
+- *Prompt throughput (raw):* 1,584 tok/s
+- *Generation throughput (raw):* 27.6 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
@@ -1102,7 +1040,7 @@ Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe, beac
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1169
+- *Rendered prompt characters:* 1385
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1118,18 +1056,18 @@ Keywords: Felixstowe, seafront, England, UK, East Suffolk, Suffolk, Europe, beac
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Felixstowe Seafront in Suffolk, England, UK.
-Description: The seafront in Felixstowe, Suffolk, England, UK, is bustling with activity as people enjoy the sunny day. The sandy beach is lined with large rocks, and the clear blue water of the sea laps gently against the shore. In the background, there are buildings, trees, and a clock tower. The sky is a bright blue, indicating good weather.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, rocks, water, buildings, trees, clock tower, blue sky, sunny day.&lt;end_of_utterance&gt;
+ Title: Dover Castle, England, UK, Medieval Stone Castle on a Hill.
+Description: Dover Castle, a historic medieval stone castle, features round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's architecture is characterized by its stone walls and towers, and it is a prominent landmark in Dover, England, UK.
+Keywords: castle, dover, england, uk, europe, stone, tower, hill, sky, arch, bridge, grass, cloudy, sky, blue, ancient, architecture, fortification, kent, adobe stock, any vision, united kingdom, europe, gbr.&lt;end_of_utterance&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
- Title: Felixstowe Seafront in Suffolk, England, UK.
-Description: The seafront in Felixstowe, Suffolk, England, UK, is bustling with activity as people enjoy the sunny day. The sandy beach is lined with large rocks, and the clear blue water of the sea laps gently against the shore. In the background, there are buildings, trees, and a clock tower. The sky is a bright blue, indicating good weather.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, rocks, water, buildings, trees, clock tower, blue sky, sunny day.<end_of_utterance>
+ Title: Dover Castle, England, UK, Medieval Stone Castle on a Hill.
+Description: Dover Castle, a historic medieval stone castle, features round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's architecture is characterized by its stone walls and towers, and it is a prominent landmark in Dover, England, UK.
+Keywords: castle, dover, england, uk, europe, stone, tower, hill, sky, arch, bridge, grass, cloudy, sky, blue, ancient, architecture, fortification, kent, adobe stock, any vision, united kingdom, europe, gbr.<end_of_utterance>
 ```
 
 </details>
@@ -1150,27 +1088,27 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, rocks, water, build
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.72s
-- *Generation time:* 4.32s
-- *Total time:* 6.06s
-- *Input validation time:* 6.18e-05
-- *Prompt preparation time:* 0.00188
-- *First-token latency:* 0.957
-- *Cleanup time:* 0.181
-- *Prompt tokens:* 2,087
-- *Generation tokens:* 93
-- *Total tokens:* 2,180
-- *Prompt throughput (raw):* 2,181 tok/s
-- *Generation throughput (raw):* 34.1 tok/s
+- *Model load time:* 1.78s
+- *Generation time:* 6.15s
+- *Total time:* 7.97s
+- *Input validation time:* 0.000198
+- *Prompt preparation time:* 0.0025
+- *First-token latency:* 1.96
+- *Cleanup time:* 0.415
+- *Prompt tokens:* 3,662
+- *Generation tokens:* 86
+- *Total tokens:* 3,748
+- *Prompt throughput (raw):* 1,868 tok/s
+- *Generation throughput (raw):* 25.9 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
-- *Cache memory:* 0.17
+- *Cache memory:* 0.28
 - *Model-load active memory:* 15.9
 - *Post-cleanup active memory:* 0.003
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1137
+- *Rendered prompt characters:* 1353
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1186,94 +1124,10 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, beach, rocks, water, build
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Felixstowe Seafront at Sunset
-Description: A bustling Felixstowe seafront on 2026-08-13, with people enjoying the beach and sea under clear skies, featuring historic buildings and a rocky breakwater.
-Keywords: Felixstowe, seafront, Suffolk, England, UK, East Suffolk, beach, breakwater, historic buildings, clear skies, summer, recreation, shoreline, waterfront, coastal, Europe
+Title: Dover Castle, Historic England
+Description: A medieval stone castle with round towers and an arched entranceway stands on a grassy hill under a partly cloudy sky, captured in 2026.
+Keywords: Dover Castle, England, Castle, Medieval, Stone, Towers, Arched Entrance, Hill, Sky, Partly Cloudy, Kent, Fortress, Architecture, Ancient, Europe, UK, Stone Wall
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-8bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.17s
-- *Generation time:* 1.43s
-- *Total time:* 2.61s
-- *Input validation time:* 7.89e-05
-- *Prompt preparation time:* 0.00799
-- *First-token latency:* 0.266
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 895
-- *Generation tokens:* 75
-- *Total tokens:* 970
-- *Prompt throughput (raw):* 3,363 tok/s
-- *Generation throughput (raw):* 238 tok/s
-- *Peak memory:* 3.8
-- *Active memory:* 2.3
-- *Cache memory:* 0.05
-- *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00483
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1200
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-
-&lt;/think&gt;
-
-Title:
-Felixstowe Seafront Beach Activity
-
-Description:
-A lively seafront scene with people enjoying the water and sand under bright sunlight.
-
-Keywords: Felixstowe, seafront, beach, activity, sunlight, water, people, rocks, greenery, buildings, Europe, UK, GBR, August, tide, recreation
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-
-</think>
-
-Title:
-Felixstowe Seafront Beach Activity
-
-Description:
-A lively seafront scene with people enjoying the water and sand under bright sunlight.
-
-Keywords: Felixstowe, seafront, beach, activity, sunlight, water, people, rocks, greenery, buildings, Europe, UK, GBR, August, tide, recreation
-```
-
-</details>
 
 </details>
 
@@ -1289,29 +1143,29 @@ Keywords: Felixstowe, seafront, beach, activity, sunlight, water, people, rocks,
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.64s
-- *Generation time:* 8.55s
-- *Total time:* 10.20s
-- *Input validation time:* 6.27e-05
-- *Prompt preparation time:* 0.000283
-- *First-token latency:* 3.52
-- *Cleanup time:* 0.149
-- *Prompt tokens:* 2,730
-- *Generation tokens:* 175
-- *Total tokens:* 2,905
-- *Prompt throughput (raw):* 775 tok/s
-- *Generation throughput (raw):* 41.2 tok/s
-- *Peak memory:* 13
+- *Model load time:* 1.47s
+- *Generation time:* 6.34s
+- *Total time:* 7.81s
+- *Input validation time:* 8.36e-05
+- *Prompt preparation time:* 0.000377
+- *First-token latency:* 3.28
+- *Cleanup time:* 0.0887
+- *Prompt tokens:* 3,228
+- *Generation tokens:* 145
+- *Total tokens:* 3,373
+- *Prompt throughput (raw):* 984 tok/s
+- *Generation throughput (raw):* 60.6 tok/s
+- *Peak memory:* 15
 - *Active memory:* 8.4
-- *Cache memory:* 0.56
+- *Cache memory:* 0.65
 - *Model-load active memory:* 8.43
 - *Post-cleanup active memory:* 0.00536
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3570
+- *Rendered prompt characters:* 3786
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1328,13 +1182,13 @@ Keywords: Felixstowe, seafront, beach, activity, sunlight, water, people, rocks,
 
 <pre class="model-output-readable">
 **Title:**
-*Felixstowe Seafront Beach, UK – Summer Activity*
+*Dover Castle’s Medieval Towers at Sunset*
 
 **Description:**
-A lively seaside scene at Felixstowe’s seafront beach on **August 13, 2026 (17:23 UTC+1)**, featuring swimmers, waders, and sunbathers along rocky tide pools and sandy shores. Behind them, a bustling promenade lined with historic buildings, green hills, and clear blue skies frames the vibrant coastal atmosphere.
+A historic stone fortress in Dover, England, captured on **August 15, 2026 (UTC+01:00)**, showcases its robust round towers, arched gateway, and steep hillside vegetation under a partly cloudy sky. Built with medieval architecture, its imposing walls and small bridge highlight its enduring legacy.
 
 **Keywords:**
-Felixstowe, East Suffolk, UK, GBR, Europe, seafront beach, rocky tide pools, sandy shore, summer activity, coastal promenade, historic buildings, clear blue skies, seaside swimming, tide pools, seaside holiday, Suffolk coast, UK seaside, summer beach, seaside setting, seaside lighting
+Dover Castle, medieval architecture, Kent, England, United Kingdom, stone fortress, round towers, arched gateway, steep hillside, partly cloudy sky, historic landmark, ancient walls, defensive bridge, European heritage, sunset lighting, Gothic design, exterior view, Dover, GBR
 </pre>
 
 </details>
@@ -1351,21 +1205,20 @@ Felixstowe, East Suffolk, UK, GBR, Europe, seafront beach, rocky tide pools, san
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Keyword list has 23
-  terms (requested 10-18); Duplicate keywords: felixstowe, england, uk, gbr
+- *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.44s
-- *Generation time:* 4.78s
-- *Total time:* 6.24s
-- *Input validation time:* 5.53e-05
-- *Prompt preparation time:* 0.00191
-- *First-token latency:* 0.913
-- *Cleanup time:* 0.219
-- *Prompt tokens:* 1,487
-- *Generation tokens:* 107
-- *Total tokens:* 1,594
-- *Prompt throughput (raw):* 1,630 tok/s
-- *Generation throughput (raw):* 38.8 tok/s
+- *Model load time:* 1.18s
+- *Generation time:* 3.98s
+- *Total time:* 5.17s
+- *Input validation time:* 5.48e-05
+- *Prompt preparation time:* 0.00165
+- *First-token latency:* 0.688
+- *Cleanup time:* 0.0853
+- *Prompt tokens:* 1,534
+- *Generation tokens:* 106
+- *Total tokens:* 1,640
+- *Prompt throughput (raw):* 2,228 tok/s
+- *Generation throughput (raw):* 48.3 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
@@ -1374,7 +1227,7 @@ Felixstowe, East Suffolk, UK, GBR, Europe, seafront beach, rocky tide pools, san
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1128
+- *Rendered prompt characters:* 1344
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1390,119 +1243,59 @@ Felixstowe, East Suffolk, UK, GBR, Europe, seafront beach, rocky tide pools, san
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Felixstowe Seaside Scene, England
+ Title: Dover Castle, Dover, England, UK, GBR, Europe
 
-Description: A bustling Felixstowe beach with people enjoying the water and sand, backed by a rocky jetty and framed by trees and buildings under a clear blue sky.
+Description: A medieval stone fortress perched on a steep grassy hill, featuring round towers, an arched entranceway, and a small bridge, built on a partly cloudy day with ancient architecture and blue skies visible.
 
-Keywords: Seafront, Felixstowe, England, UK, GBR, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, beach, people, water, sand, rocky jetty, trees, buildings, blue sky, summer, beachgoers, holidaymakers
+Keywords: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
 
-### mlx-community/Phi-3.5-vision-instruct-bf16
+### mlx-community/Qwen2-VL-2B-Instruct-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 3 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.00s
-- *Generation time:* 2.31s
-- *Total time:* 3.31s
-- *Input validation time:* 5.59e-05
-- *Prompt preparation time:* 0.000887
-- *First-token latency:* 0.301
-- *Cleanup time:* 0.0766
-- *Prompt tokens:* 1,094
-- *Generation tokens:* 84
-- *Total tokens:* 1,178
-- *Prompt throughput (raw):* 3,638 tok/s
-- *Generation throughput (raw):* 56.3 tok/s
-- *Peak memory:* 9.6
-- *Active memory:* 8.3
-- *Cache memory:* 0.52
-- *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00713
+- *Observations:* Keyword list has 20 terms (requested 10-18); Title,
+  Description and Keywords copy all supplied hints unchanged
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.59s
+- *Generation time:* 107.21s
+- *Total time:* 107.81s
+- *Input validation time:* 8.22e-05
+- *Prompt preparation time:* 0.00389
+- *First-token latency:* 106
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 16,517
+- *Generation tokens:* 102
+- *Total tokens:* 16,619
+- *Prompt throughput (raw):* 156 tok/s
+- *Generation throughput (raw):* 186 tok/s
+- *Peak memory:* 5.1
+- *Active memory:* 1.3
+- *Cache memory:* 0.86
+- *Model-load active memory:* 1.26
+- *Post-cleanup active memory:* 0.00744
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1153
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Felixstowe Seafront, England
-
-Description: A serene scene at Felixstowe seafront on August 13, 2026, with people enjoying the beach and the sea, captured on a sunny day.
-
-Keywords: Felixstowe, seafront, England, UK, GBR, beach, people, sea, sky, rocks, coastline
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
-
-### mlx-community/Qwen3-VL-2B-Instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 3 words (requested 5-10); Keyword list has 28
-  terms (requested 10-18); Duplicate keywords: felixstowe, england, seafront,
-  uk, suffolk, gbr
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.63s
-- *Generation time:* 30.65s
-- *Total time:* 32.29s
-- *Input validation time:* 0.00015
-- *Prompt preparation time:* 0.00061
-- *First-token latency:* 27.3
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 16,533
-- *Generation tokens:* 147
-- *Total tokens:* 16,680
-- *Prompt throughput (raw):* 606 tok/s
-- *Generation throughput (raw):* 83.5 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 4.3
-- *Cache memory:* 2.6
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00775
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1204
+- *Rendered prompt characters:* 1478
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Instruct-bf16/snapshots/c8a67a84327484ba87f5ec4f8fb927cdafd791aa
+- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1510,60 +1303,56 @@ Keywords: Felixstowe, seafront, England, UK, GBR, beach, people, sea, sky, rocks
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Felixstowe Seafront, England
-
-Description:
-A bustling seafront in Felixstowe, England, on a sunny day, with people enjoying the beach, swimming, and playing near the rocky breakwaters. The scene is set against a backdrop of historic buildings and lush greenery, with the clear blue sea and sky reflecting the bright sunlight.
-
-Keywords: Felixstowe, England, seafront, beach, people, swimming, rocky breakwaters, historic buildings, greenery, sea, sky, sunlight, beachgoers, coastal, UK, Europe, Suffolk, gbr, seafront, England, UK, gbr, seafront, Felixstowe, Suffolk, UK, gbr, seafront
+Title: Dover Castle, Dover, England, UK, GBR, Europe
+Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+Keywords: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
-### mlx-community/Qwen3.6-27B-mxfp8
+### mlx-community/Qwen3.5-9B-MLX-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
+<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 7.02s
-- *Generation time:* 107.07s
-- *Total time:* 114.12s
-- *Input validation time:* 4.15e-05
-- *Prompt preparation time:* 0.0145
-- *First-token latency:* 97.7
-- *Cleanup time:* 0.183
-- *Prompt tokens:* 16,548
-- *Generation tokens:* 121
-- *Total tokens:* 16,669
-- *Prompt throughput (raw):* 169 tok/s
-- *Generation throughput (raw):* 14.4 tok/s
-- *Peak memory:* 35
-- *Active memory:* 29
-- *Cache memory:* 1.9
-- *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.0096
+- *Model load time:* 1.44s
+- *Generation time:* 66.20s
+- *Total time:* 67.65s
+- *Input validation time:* 8.62e-05
+- *Prompt preparation time:* 0.000578
+- *First-token latency:* 63.6
+- *Cleanup time:* 0.146
+- *Prompt tokens:* 16,522
+- *Generation tokens:* 96
+- *Total tokens:* 16,618
+- *Prompt throughput (raw):* 260 tok/s
+- *Generation throughput (raw):* 83.8 tok/s
+- *Peak memory:* 10.0
+- *Active memory:* 6.6
+- *Cache memory:* 1.2
+- *Model-load active memory:* 5.96
+- *Post-cleanup active memory:* 0.00909
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1223
+- *Rendered prompt characters:* 1439
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1571,14 +1360,11 @@ Keywords: Felixstowe, England, seafront, beach, people, swimming, rocky breakwat
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Seafront at Felixstowe, Suffolk, England
+Title: Dover Castle, Kent, England, UK
 
-Description:
-A sunny late afternoon view of the Felixstowe seafront in Suffolk, England, showing people swimming and playing on the stepped concrete groynes and pebble beach. The background features a hillside lined with residential buildings and the Spa Pavilion under a clear blue sky.
+Description: An exterior view of Dover Castle, a historic medieval fortress on a grassy hill, featuring stone towers, an arched gateway, and a small bridge under a partly cloudy sky.
 
-Keywords:
-Felixstowe, Suffolk, England, UK, seafront, beach, groynes, swimming, summer, people, coast, East Suffolk, ocean, concrete steps, Spa Pavilion, seaside, recreation, blue sky, Europe
+Keywords: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
@@ -1595,29 +1381,29 @@ Felixstowe, Suffolk, England, UK, seafront, beach, groynes, swimming, summer, pe
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
+- *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 13.09s
-- *Generation time:* 26.39s
-- *Total time:* 39.57s
-- *Input validation time:* 4.62e-05
-- *Prompt preparation time:* 0.0799
-- *First-token latency:* 22.1
-- *Cleanup time:* 0.305
-- *Prompt tokens:* 3,468
-- *Generation tokens:* 116
-- *Total tokens:* 3,584
-- *Prompt throughput (raw):* 157 tok/s
-- *Generation throughput (raw):* 39.9 tok/s
+- *Model load time:* 11.00s
+- *Generation time:* 28.51s
+- *Total time:* 39.54s
+- *Input validation time:* 0.000211
+- *Prompt preparation time:* 0.0193
+- *First-token latency:* 24.6
+- *Cleanup time:* 0.275
+- *Prompt tokens:* 3,503
+- *Generation tokens:* 106
+- *Total tokens:* 3,609
+- *Prompt throughput (raw):* 143 tok/s
+- *Generation throughput (raw):* 36.1 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
-- *Cache memory:* 0.39
+- *Cache memory:* 0.41
 - *Model-load active memory:* 63
 - *Post-cleanup active memory:* 0.00986
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1210
+- *Rendered prompt characters:* 1426
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1634,13 +1420,13 @@ Felixstowe, Suffolk, England, UK, seafront, beach, groynes, swimming, summer, pe
 
 <pre class="model-output-readable">
 Title:
-Felixstowe Seafront, Suffolk, England
+Dover Castle medieval stone fortress on grassy hill
 
 Description:
-A sunny day at the Felixstowe seafront in Suffolk, England, with people swimming, sunbathing, and playing on the beach alongside a rocky breakwater, set against a backdrop of coastal buildings and greenery under a clear blue sky.
+An exterior view of historic Dover Castle in Kent, England, featuring round stone towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
 
 Keywords:
-Felixstowe, Suffolk, England, UK, seafront, beach, coastline, swimming, sunbathing, breakwater, coastal buildings, blue sky, sunny day, East Suffolk, Europe, GBR, Adobe Stock
+Dover Castle, medieval castle, stone fortress, round towers, arched entrance, stone bridge, grassy hill, Kent, England, UK, Britain, Europe, historic architecture, ancient structure, blue sky, partly cloudy, Adobe Stock, wall, tower
 </pre>
 
 </details>
@@ -1659,18 +1445,18 @@ Felixstowe, Suffolk, England, UK, seafront, beach, coastline, swimming, sunbathi
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.28s
-- *Generation time:* 2.65s
-- *Total time:* 5.96s
-- *Input validation time:* 4.47e-05
-- *Prompt preparation time:* 0.0257
-- *First-token latency:* 0.432
-- *Cleanup time:* 0.146
-- *Prompt tokens:* 583
-- *Generation tokens:* 82
-- *Total tokens:* 665
-- *Prompt throughput (raw):* 1,348 tok/s
-- *Generation throughput (raw):* 55.3 tok/s
+- *Model load time:* 3.43s
+- *Generation time:* 2.59s
+- *Total time:* 6.05s
+- *Input validation time:* 0.000129
+- *Prompt preparation time:* 0.0207
+- *First-token latency:* 0.347
+- *Cleanup time:* 0.142
+- *Prompt tokens:* 615
+- *Generation tokens:* 85
+- *Total tokens:* 700
+- *Prompt throughput (raw):* 1,770 tok/s
+- *Generation throughput (raw):* 62.0 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1679,7 +1465,7 @@ Felixstowe, Suffolk, England, UK, seafront, beach, coastline, swimming, sunbathi
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1158
+- *Rendered prompt characters:* 1374
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1696,9 +1482,9 @@ Felixstowe, Suffolk, England, UK, seafront, beach, coastline, swimming, sunbathi
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Sunny seafront at Felixstowe in Suffolk, England
-Description: People enjoy a sunny day at the Felixstowe seafront, where stone groynes meet the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean, coastal, summer, recreation, tourism, seaside, leisure, water, Europe
+&lt;channel|&gt;Title: Exterior view of Dover Castle in Kent, England
+Description: An exterior view of the medieval stone fortifications of Dover Castle, featuring round towers and an arched entranceway atop a steep grassy hill under a partly cloudy sky.
+Keywords: Dover Castle, England, Kent, UK, castle, fortress, stone, tower, architecture, medieval, ancient, arch, hill, history, Britain, Europe
 </pre>
 
 <details>
@@ -1706,9 +1492,9 @@ Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean
 
 ```text
 <|channel>thought
-<channel|>Title: Sunny seafront at Felixstowe in Suffolk, England
-Description: People enjoy a sunny day at the Felixstowe seafront, where stone groynes meet the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean, coastal, summer, recreation, tourism, seaside, leisure, water, Europe
+<channel|>Title: Exterior view of Dover Castle in Kent, England
+Description: An exterior view of the medieval stone fortifications of Dover Castle, featuring round towers and an arched entranceway atop a steep grassy hill under a partly cloudy sky.
+Keywords: Dover Castle, England, Kent, UK, castle, fortress, stone, tower, architecture, medieval, ancient, arch, hill, history, Britain, Europe
 ```
 
 </details>
@@ -1727,21 +1513,20 @@ Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Duplicate
-  keywords: coastal
+- *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.21s
-- *Generation time:* 2.69s
-- *Total time:* 5.91s
-- *Input validation time:* 4.78e-05
-- *Prompt preparation time:* 0.000318
-- *First-token latency:* 0.428
-- *Cleanup time:* 0.136
-- *Prompt tokens:* 583
-- *Generation tokens:* 81
-- *Total tokens:* 664
-- *Prompt throughput (raw):* 1,362 tok/s
-- *Generation throughput (raw):* 53.0 tok/s
+- *Model load time:* 3.17s
+- *Generation time:* 2.44s
+- *Total time:* 5.61s
+- *Input validation time:* 9.32e-05
+- *Prompt preparation time:* 0.000369
+- *First-token latency:* 0.34
+- *Cleanup time:* 0.131
+- *Prompt tokens:* 615
+- *Generation tokens:* 82
+- *Total tokens:* 697
+- *Prompt throughput (raw):* 1,809 tok/s
+- *Generation throughput (raw):* 66.2 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -1750,7 +1535,7 @@ Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1158
+- *Rendered prompt characters:* 1374
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1767,9 +1552,9 @@ Keywords: Felixstowe, Suffolk, England, UK, East Suffolk, seafront, beach, ocean
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Sunny day at the seafront in Felixstowe, England
-Description: People enjoy a sunny day at the stone-tiered sea beach in Felixstowe, Suffolk, under a clear blue sky.
-Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, sea, summer, coastal, leisure, outdoors, tourism, coastal, Europe
+&lt;channel|&gt;Title: Medieval Stone Towers of Dover Castle in Kent England
+Description: An exterior view of the historic medieval stone castle featuring round towers and an arched entranceway situated on a steep grassy hill under a cloudy sky.
+Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tower, Wall, ancient, architecture, Arch, Medieval, Kent, Europe
 </pre>
 
 <details>
@@ -1777,9 +1562,9 @@ Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, sea, 
 
 ```text
 <|channel>thought
-<channel|>Title: Sunny day at the seafront in Felixstowe, England
-Description: People enjoy a sunny day at the stone-tiered sea beach in Felixstowe, Suffolk, under a clear blue sky.
-Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, sea, summer, coastal, leisure, outdoors, tourism, coastal, Europe
+<channel|>Title: Medieval Stone Towers of Dover Castle in Kent England
+Description: An exterior view of the historic medieval stone castle featuring round towers and an arched entranceway situated on a steep grassy hill under a cloudy sky.
+Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tower, Wall, ancient, architecture, Arch, Medieval, Kent, Europe
 ```
 
 </details>
@@ -1798,29 +1583,29 @@ Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, sea, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 21 terms (requested 10-18)
+- *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.31s
-- *Generation time:* 6.65s
-- *Total time:* 8.98s
-- *Input validation time:* 4.74e-05
-- *Prompt preparation time:* 0.00281
-- *First-token latency:* 0.987
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 569
-- *Generation tokens:* 136
-- *Total tokens:* 705
-- *Prompt throughput (raw):* 576 tok/s
-- *Generation throughput (raw):* 26.6 tok/s
+- *Model load time:* 2.29s
+- *Generation time:* 6.75s
+- *Total time:* 9.05s
+- *Input validation time:* 6.89e-05
+- *Prompt preparation time:* 0.00275
+- *First-token latency:* 1.13
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 608
+- *Generation tokens:* 125
+- *Total tokens:* 733
+- *Prompt throughput (raw):* 540 tok/s
+- *Generation throughput (raw):* 25.2 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
-- *Cache memory:* 0.43
+- *Cache memory:* 0.45
 - *Model-load active memory:* 16.1
 - *Post-cleanup active memory:* 0.0107
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1187
+- *Rendered prompt characters:* 1403
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1836,9 +1621,9 @@ Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, beach, sea, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Felixstowe Seafront, Suffolk: Beach and Promenade View
-Description: Captured on 13th August 2026 at 17:23, this image shows the busy seafront at Felixstowe, Suffolk, with people enjoying the beach, sea and distinctive groynes under a clear blue sky. The promenade buildings and trees form a backdrop to the coastal scene.
-Keywords: Felixstowe, Suffolk, England, UK, GBR, East Suffolk, seafront, beach, promenade, groynes, coastline, sea, summer, people, coastal defence, clear sky, 2026, August, daytime, buildings, trees
+Title: Dover Castle, Kent: Exterior View, August 2026
+Description: Dover Castle in Kent is pictured from an exterior angle on 15 August 2026, showing its stone walls and towers rising from a steep, grassy hillside under a partly cloudy sky. A prominent arched entranceway leads through the castle, with a small bridge visible to the right.
+Keywords: Dover Castle, Kent, England, UK, United Kingdom, castle, fortress, architecture, stone, tower, arch, hill, exterior, August, 2026, grassy, bridge, medieval, walls
 </pre>
 
 </details>
@@ -1855,29 +1640,30 @@ Keywords: Felixstowe, Suffolk, England, UK, GBR, East Suffolk, seafront, beach, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Observations:* Keyword list has 25 terms (requested 10-18); Duplicate
+  keywords: stone
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.73s
-- *Generation time:* 4.85s
-- *Total time:* 6.59s
-- *Input validation time:* 4.66e-05
-- *Prompt preparation time:* 0.00231
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.0889
-- *Prompt tokens:* 2,828
-- *Generation tokens:* 96
-- *Total tokens:* 2,924
-- *Prompt throughput (raw):* 1,506 tok/s
-- *Generation throughput (raw):* 39.6 tok/s
-- *Peak memory:* 15
+- *Model load time:* 1.97s
+- *Generation time:* 7.45s
+- *Total time:* 9.44s
+- *Input validation time:* 0.000135
+- *Prompt preparation time:* 0.00885
+- *First-token latency:* 3.59
+- *Cleanup time:* 0.0992
+- *Prompt tokens:* 3,466
+- *Generation tokens:* 107
+- *Total tokens:* 3,573
+- *Prompt throughput (raw):* 966 tok/s
+- *Generation throughput (raw):* 34.1 tok/s
+- *Peak memory:* 16
 - *Active memory:* 13
-- *Cache memory:* 0.54
+- *Cache memory:* 0.64
 - *Model-load active memory:* 13.5
 - *Post-cleanup active memory:* 0.0143
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1132
+- *Rendered prompt characters:* 1348
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1894,13 +1680,77 @@ Keywords: Felixstowe, Suffolk, England, UK, GBR, East Suffolk, seafront, beach, 
 
 <pre class="model-output-readable">
 Title:
-People Enjoying Seafront at Felixstowe, Suffolk, UK
+Dover Castle, England, United Kingdom
 
 Description:
-On a sunny day, people relax and play by the seafront in Felixstowe, Suffolk, UK, with clear skies and calm waters.
+Dover Castle, located in Dover, England, stands majestically on a grassy hill, showcasing its medieval stone architecture and arched entrance under a partly cloudy sky.
 
 Keywords:
-Felixstowe, Suffolk, UK, seafront, beach, people, sea, sunny, clear skies, calm waters, rocks, buildings, birds, swimming, playing, summer, coastal, England, Europe
+Adobe Stock, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue, cloudy, grassy, historic, medieval, stone, structure
+</pre>
+
+</details>
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### Qwen/Qwen3-VL-2B-Instruct
+
+<details>
+<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Title has 3 words (requested
+  5-10); Keyword list has 33 terms (requested 10-18); Duplicate keywords:
+  england, uk, europe, fortress, castle, stone, tower, wall, hill, sky,
+  ancient, architecture, united kingdom
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 1.22s
+- *Generation time:* 18.93s
+- *Total time:* 20.17s
+- *Input validation time:* 7.79e-05
+- *Prompt preparation time:* 0.0103
+- *First-token latency:* 16.3
+- *Cleanup time:* 0.162
+- *Prompt tokens:* 16,506
+- *Generation tokens:* 118
+- *Total tokens:* 16,624
+- *Prompt throughput (raw):* 1,010 tok/s
+- *Generation throughput (raw):* 86.8 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.6
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.000443
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1420
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Dover Castle Exterior
+
+Description:
+An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.
+
+Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wall, Hill, Sky, Arch, Ancient, Architecture, Britain, Kent, United Kingdom, Stone, Wall, Castle, England, Europe, Fortress, Hill, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
@@ -1921,27 +1771,27 @@ Felixstowe, Suffolk, UK, seafront, beach, people, sea, sunny, clear skies, calm 
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.72s
-- *Generation time:* 26.27s
-- *Total time:* 28.00s
-- *Input validation time:* 5.54e-05
-- *Prompt preparation time:* 0.00679
-- *First-token latency:* 1.86
-- *Cleanup time:* 0.0945
-- *Prompt tokens:* 2,919
+- *Model load time:* 3.70s
+- *Generation time:* 32.41s
+- *Total time:* 36.13s
+- *Input validation time:* 0.000139
+- *Prompt preparation time:* 0.0114
+- *First-token latency:* 3.09
+- *Cleanup time:* 0.172
+- *Prompt tokens:* 3,557
 - *Generation tokens:* 1,000
-- *Total tokens:* 3,919
-- *Prompt throughput (raw):* 1,570 tok/s
-- *Generation throughput (raw):* 41.9 tok/s
-- *Peak memory:* 14
+- *Total tokens:* 4,557
+- *Prompt throughput (raw):* 1,152 tok/s
+- *Generation throughput (raw):* 35.2 tok/s
+- *Peak memory:* 15
 - *Active memory:* 13
-- *Cache memory:* 0.82
+- *Cache memory:* 0.92
 - *Model-load active memory:* 12.6
 - *Post-cleanup active memory:* 0.000706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1506
+- *Rendered prompt characters:* 1722
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1958,23 +1808,25 @@ Felixstowe, Suffolk, UK, seafront, beach, people, sea, sunny, clear skies, calm 
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them into description if needed (like "captured on 13 August 2026 at 17:23 UTC+01:00").
+The user wants British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. The user wants:
 
-We need to produce:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
-- a concrete 5-10-word title (so between 5 and 10 words inclusive). Should be concrete, not generic. Should reflect the image: seafront of Felixstowe, with people, rock pools, sea, etc. Title: "Felixstowe Seafront at Sunset with Swimmers". That's 7 words? Let's count: Felixstowe (1) Seafront (2) at (3) Sunset (4) with (5) Swimmers (6). That's 6 words. Could add "and Rock Pools" to make 8 words: "Felixstowe Seafront at Sunset with Swimmers and Rock Pools". That's 9 words. That's within 5-10. Good.
+We must return exactly three sections: Title:, Description:, Keywords: and nothing else.
 
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details. Should be 1-2 sentences. Should mention location (Felixstowe, East Suffolk, England), date/time, maybe mention the sea, the rock pools, the people swimming, the promenade, the sea wall, the buildings on the hill, the lighting (sunset, warm light). Should be factual, not interpretive. Should incorporate capture date/time and GPS as authoritative facts, but not claim they are visible. So we can say "Captured on 13 August 2026 at 17:23 UTC+01:00 at 51.957967°N, 1.346900°E". Then describe the scene: "The image shows the Felixstowe seafront with a pebbled beach, tidal rock pools, and a promenade lined with walkers and swimmers, while the sea reflects the warm evening light. In the background, a hillside of residential buildings and a historic pier extends along the coast." That's two sentences. That's fine.
+We need to treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate them in description if needed, but we must not claim they are visible. The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details.
 
-- 10-18 unique, comma-separated keywords covering relevant context and visible details. Should be British English. Should include location, date, time, maybe "Felixstowe", "East Suffolk", "England", "UK", "GBR", "Europe", "seafront", "rock pools", "swimmers", "pebble beach", "promenade", "sunset", "coastal town", "historic pier", "sea wall", "people", "coastline", "tidal pools", "coastal architecture". Must be 10-18 unique keywords. Let's count: Felixstowe, East Suffolk, England, United Kingdom, GBR, Europe, seafront, rock pools, swimmers, pebble beach, promenade, sunset, historic pier, sea wall, coastal town, tidal pools, coastal architecture, people. That's 18. Good.
+We need to ensure British English spelling (e.g., "favourite" vs "favorite"? Not needed). Use British English.
 
-We need to ensure we have exactly three sections: Title, Description, Keywords. No extra text. Title: 5-10 words. Description: 1-2 sentences. Keywords: 10-18 unique, comma-separated.
+We need to incorporate the visible details: The image shows a medieval stone castle with round towers, an arched entrance, a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle is Dover Castle, Dover, England, UK. The image shows stone walls, crenellations, battlements, windows, a gatehouse with an arch, a small bridge leading to the gate, a grassy hill with vegetation, partly cloudy sky.
 
-We need to ensure British English spelling: "behaviour"? Not needed. Use "programme"? Not needed. Use "coastline". Use "coastal". Use "seafront". Use "pier". Use "swimmers". Use "people". Use "rock pools". Use "tidal pools". Use "pebble beach". Use "promenade". Use "historic pier". Use "coastal town". Use "East Suffolk". Use "England". Use "United Kingdom". Use "GBR". Use "Europe". Use "2026-08-13". Use "17:23". Use "UTC+01:00". Use "51.957967°N". Use "1.346900°E". But we need to include date/time and GPS in description, not in keywords. The keywords can include date/time? Possibly but not required. The description should incorporate them.
+We need to produce a title of 5-10 words. Something like "Dover Castle on a Grassy Hill". That's 6 words. Or "Dover Castle, Round Towers, Hilltop View". That's 7 words. Or "Dover Castle: Hilltop Stone Fortress". That's 5 words. Or "Dover Castle, Hilltop Stone Fortress". That's 5 words. Or "Dover Castle, Hilltop Medieval Fortress". That's 5 words. Or "Dover Castle, Hilltop Medieval Castle". That's 5 words. Or "Dover Castle, Hilltop Stone Castle". That's 5 words. Or "Dover Castle, Hilltop Stone Fortress". That's 5 words. Let's pick "Dover Castle, Hilltop Stone Fortress". That's 5 words? Let's count: Dover (1) Castle, (2) Hilltop (3) Stone (4) Fortress (5). Yes, 5 words. That's within 5-10.
 
-Now we need to ensure the description is 1-2 sentences. Let's craft:
+Now description: 1-2 sentences. Must combine relevant context with main visible subject, setting, action, lighting, distinctive details. So something like: "The image captures Dover Castle perched on a steep, grassy hill in Kent, England, under a partly cloudy sky. Its round stone towers, crenellated walls, arched gatehouse and a small bridge are illuminated by bright daylight, highlighting the medieval stonework." That's two sentences. That includes context: Dover Castle, location, date/time? We could mention capture date/time: "Captured on 15 August 2026 at 15:59 UTC+01:00". But we need to incorporate relevant context. The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can mention the date/time and GPS as context, but not claim they are visible. So we can say "Captured on 15 August 2026 at 15:59 UTC+01:00, the photograph shows Dover Castle perched on a steep grassy hill in Kent, England, under a partly cloudy sky." That's one sentence. Then second sentence: "The stone fortress features round towers, crenellated battlements, an arched entrance, and a small bridge, all bathed in bright daylight that accentuates the historic stonework." That's two sentences. That's fine.
 
-"Captured on 13 August 20
+Now keywords: 10-18 unique, comma-separated keywords covering relevant context and visible details. Must be British English. Should include: Dover Castle, Dover, England, United Kingdom, Europe, Kent, hill, grassy, medieval, stone, fortress, round towers, crenellated, battlements, arched entrance, bridge, sky, partly cloudy, daylight, architecture, historic, Adobe Stock, Any Vision? The hints include "Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue". We need 10-18 unique keywords. Let's pick 14. Something like: Dover Castle, Kent, England, United Kingdom, Europe, medieval fortress, stone architecture, round towers, crenellated walls, arched gate
 </pre>
 
 </details>
@@ -1990,23 +1842,23 @@ Now we need to ensure the description is 1-2 sentences. Let's craft:
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Missing or empty fields:
-  Title, Description, Keywords; Response appears cut off at the token limit;
-  Internal reasoning block appears incomplete
+- *Maintainer status:* none
+- *Observations:* Extra text appears before the Title field; Title has 4 words
+  (requested 5-10); Keyword list has 44 terms (requested 10-18); Duplicate
+  keywords: uk, europe, architecture
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 5.72s
-- *Generation time:* 26.26s
-- *Total time:* 32.00s
-- *Input validation time:* 8.93e-05
-- *Prompt preparation time:* 0.009
-- *First-token latency:* 2.21
-- *Cleanup time:* 0.198
-- *Prompt tokens:* 1,569
+- *Model load time:* 11.30s
+- *Generation time:* 46.24s
+- *Total time:* 57.57s
+- *Input validation time:* 0.000134
+- *Prompt preparation time:* 0.0121
+- *First-token latency:* 6.13
+- *Cleanup time:* 0.739
+- *Prompt tokens:* 1,627
 - *Generation tokens:* 1,000
-- *Total tokens:* 2,569
-- *Prompt throughput (raw):* 710 tok/s
-- *Generation throughput (raw):* 43.7 tok/s
+- *Total tokens:* 2,627
+- *Prompt throughput (raw):* 265 tok/s
+- *Generation throughput (raw):* 29.1 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.17
@@ -2015,7 +1867,7 @@ Now we need to ensure the description is 1-2 sentences. Let's craft:
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1322
+- *Rendered prompt characters:* 1538
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2024,19 +1876,56 @@ Now we need to ensure the description is 1-2 sentences. Let's craft:
 - *Requested model revision:* not requested
 - *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
 - *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. The hints are pretty clear: "Seafront, Felixstowe, England, UK, GBR, Europe." I need something concise, so I'll go with "Seafront at Felixstowe, England, UK." That's five words, right in the sweet spot.
+Alright, let's get to work. I've got the image of Dover Castle in my sights, and I need to generate some metadata. First things first, I'll break down the request. It's a straightforward task: title, description, and keywords. The image is of Dover Castle, and I have the context: the date, time, and GPS coordinates. I'll use those as my foundation.
 
-Now for the description. I'll need to weave in the context – the date, time, and location – with the visual elements. The image is a wide shot of a beach, so I'll start there. I see a bustling beach scene with people enjoying the water and the sand. The lighting is bright, suggesting a sunny day. I'll mention the location and the time of day. I'll also include the key details like the seawall and the distant town. I'll make sure to mention the people and the activity. I'll refine it to be a single, concise sentence. Okay, here it is: "A wide-angle, sunlit photograph of a bustling beach at Felixstowe, England, UK, taken on August 13, 2026, at 5:23 PM, showing people on the sand and in the water with a town and seafront in the background."
+Now, the image itself. It's a classic view of the castle, a medieval fortress with those iconic round towers and the massive stone walls. The sky is partly cloudy, and the castle is perched on a grassy hill. I can see the arched entrance, and there's a small bridge over a moat or ditch. The lighting is bright, and the overall feel is historical and imposing.
 
-Finally, the keywords. I need to cover the location, the subject matter, the time of day, and the general atmosphere. I'll start with the location: Felixstowe, England, UK, GBR, Europe, Suffolk, East Suffolk. Then the subject: beach, seashore, seafront, coast, shoreline, waterfront, shore, sand, sandy beach, shoreline, seawall, cliffs, rocks, rocks, rocks, rocks, rocks. People and activity: people, crowd, family, couple, group, children, kids, teenagers, adults, swimming, bathing, wading, playing, relaxing, strolling, walking, sunbathing, tourists, holidaymakers, beachgoers, lifeguard, lifeguard tower, lifeguard tower. Nature and environment: sea, ocean, water, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves, waves,
+I'll start with the title. "Dover Castle, England" is a good start, but I can do better. "Dover Castle on a Hill" is a bit too generic. "Dover Castle, Kent, England" is accurate, but I want something more evocative. "Dover Castle on a Steep Hill" is a good option. I'll go with "Dover Castle, Kent, England" as it's concise and accurate.
+
+Next, the description. I need to weave in the context: the date, time, and location. I'll start with the main subject: "An exterior view of Dover Castle, a historic medieval fortress..." Then, I'll add the setting: "...perched on a steep grassy hill under a partly cloudy sky." I'll include the distinctive architectural details: "...featuring its iconic round towers and arched entranceway." And finally, I'll mention the bridge: "A small bridge crosses a ditch in the foreground." That should be a solid, factual description.
+
+Finally, the keywords. I need to cover the subject, location, and key features. I'll start with the obvious: "Dover Castle, England, UK, Europe, Kent, Dover, Castle, Fortress, Architecture, Medieval, Stone, Tower, Hill, Wall, Hillfort, Ruin, Historic, Ancient, Defensive Wall, Partly Cloudy Sky, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Grassy Hill, Steep Hill, UK, United Kingdom, GBR, British, Europe, Architecture, History, Ancient History, Medieval History, Landmark, Tourist Attraction, Travel, Landscape, Scenery, Sky, Clouds, Damp, Green, Vegetation, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round
+&lt;/think&gt;
+
+Title: Dover Castle, Kent, England
+
+Description: An exterior view of Dover Castle, a historic medieval fortress perched on a steep grassy hill under a partly cloudy sky. The iconic round towers and arched entranceway are visible, with a small bridge crossing a ditch in the foreground.
+
+Keywords: Dover Castle, England, UK, Europe, Kent, Dover, Castle, Fortress, Architecture, Medieval, Stone, Tower, Hill, Wall, Hillfort, Ruin, Historic, Ancient, Defensive Wall, Partly Cloudy Sky, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Grassy Hill, Steep Hill, UK, United Kingdom, GBR, British, Europe, Architecture, History, Ancient History, Medieval History, Landmark, Tourist Attraction, Travel, Landscape, Scenery, Sky, Clouds,
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. I've got the image of Dover Castle in my sights, and I need to generate some metadata. First things first, I'll break down the request. It's a straightforward task: title, description, and keywords. The image is of Dover Castle, and I have the context: the date, time, and GPS coordinates. I'll use those as my foundation.
+
+Now, the image itself. It's a classic view of the castle, a medieval fortress with those iconic round towers and the massive stone walls. The sky is partly cloudy, and the castle is perched on a grassy hill. I can see the arched entrance, and there's a small bridge over a moat or ditch. The lighting is bright, and the overall feel is historical and imposing.
+
+I'll start with the title. "Dover Castle, England" is a good start, but I can do better. "Dover Castle on a Hill" is a bit too generic. "Dover Castle, Kent, England" is accurate, but I want something more evocative. "Dover Castle on a Steep Hill" is a good option. I'll go with "Dover Castle, Kent, England" as it's concise and accurate.
+
+Next, the description. I need to weave in the context: the date, time, and location. I'll start with the main subject: "An exterior view of Dover Castle, a historic medieval fortress..." Then, I'll add the setting: "...perched on a steep grassy hill under a partly cloudy sky." I'll include the distinctive architectural details: "...featuring its iconic round towers and arched entranceway." And finally, I'll mention the bridge: "A small bridge crosses a ditch in the foreground." That should be a solid, factual description.
+
+Finally, the keywords. I need to cover the subject, location, and key features. I'll start with the obvious: "Dover Castle, England, UK, Europe, Kent, Dover, Castle, Fortress, Architecture, Medieval, Stone, Tower, Hill, Wall, Hillfort, Ruin, Historic, Ancient, Defensive Wall, Partly Cloudy Sky, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Grassy Hill, Steep Hill, UK, United Kingdom, GBR, British, Europe, Architecture, History, Ancient History, Medieval History, Landmark, Tourist Attraction, Travel, Landscape, Scenery, Sky, Clouds, Damp, Green, Vegetation, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Hill, Steep Hill, Grass, Vegetation, Sky, Clouds, Damp, Green, Grass, Ditch, Moat, Bridge, Round
+</think>
+
+Title: Dover Castle, Kent, England
+
+Description: An exterior view of Dover Castle, a historic medieval fortress perched on a steep grassy hill under a partly cloudy sky. The iconic round towers and arched entranceway are visible, with a small bridge crossing a ditch in the foreground.
+
+Keywords: Dover Castle, England, UK, Europe, Kent, Dover, Castle, Fortress, Architecture, Medieval, Stone, Tower, Hill, Wall, Hillfort, Ruin, Historic, Ancient, Defensive Wall, Partly Cloudy Sky, Ditch, Moat, Bridge, Round Tower, Arched Entrance, Exterior View, Grassy Hill, Steep Hill, UK, United Kingdom, GBR, British, Europe, Architecture, History, Ancient History, Medieval History, Landmark, Tourist Attraction, Travel, Landscape, Scenery, Sky, Clouds,
+```
+
+</details>
 
 </details>
 
@@ -2052,23 +1941,21 @@ Finally, the keywords. I need to cover the location, the subject matter, the tim
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Response repeats the task instructions instead of only returning the
-  requested fields
+- *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.84s
-- *Generation time:* 1.60s
-- *Total time:* 2.45s
-- *Input validation time:* 3.86e-05
-- *Prompt preparation time:* 0.00171
-- *First-token latency:* 0.0943
-- *Cleanup time:* 0.0972
-- *Prompt tokens:* 308
-- *Generation tokens:* 120
-- *Total tokens:* 428
-- *Prompt throughput (raw):* 3,268 tok/s
-- *Generation throughput (raw):* 338 tok/s
+- *Model load time:* 1.29s
+- *Generation time:* 2.31s
+- *Total time:* 3.61s
+- *Input validation time:* 0.000213
+- *Prompt preparation time:* 0.0029
+- *First-token latency:* 0.109
+- *Cleanup time:* 0.102
+- *Prompt tokens:* 347
+- *Generation tokens:* 78
+- *Total tokens:* 425
+- *Prompt throughput (raw):* 3,180 tok/s
+- *Generation throughput (raw):* 290 tok/s
 - *Peak memory:* 2.1
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
@@ -2077,7 +1964,7 @@ Finally, the keywords. I need to cover the location, the subject matter, the tim
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1227
+- *Rendered prompt characters:* 1443
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2093,8 +1980,7 @@ Finally, the keywords. I need to cover the location, the subject matter, the tim
 *Readable output:*
 
 <pre class="model-output-readable">
-A concrete 5-10-word title: "Felixstowe, UK - Seafront, GBR, East Suffolk, UK, gbr, seafront"
-A 1-2-sentence factual description: "A vibrant seaside scene with a concrete 5-10-word title, featuring a concrete 5-10-word title, a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details, and 10-18 unique, comma-separated keywords covering relevant context and visible details."
+Dover Castle, England, UK, GBR, Europe, Medieval, Round Towers, Arched Entranceway, Small Bridge, steep hill, partly cloudy sky, Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue.
 </pre>
 
 </details>
@@ -2111,28 +1997,22 @@ A 1-2-sentence factual description: "A vibrant seaside scene with a concrete 5-1
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the task instructions instead of only
-  returning the requested fields; Extra text appears before the Title field;
-  Response appears cut off at the token limit; Internal reasoning block
-  appears incomplete; Title has 4 words (requested 5-10); Keyword list has 69
-  terms (requested 10-18); Duplicate keywords: felixstowe, suffolk, uk,
-  seafront, coastal steps, beach, people, swimming, historic buildings,
-  daylight, europe, east suffolk, england, gbr, seagulls, seaside, wait, with
-  people swimming and walking near distinctive coastal steps, under clear
-  daylight with historic buildings in the background
+- *Observations:* Response repeats the same text; Missing or empty fields:
+  Title; Extra text appears before the Title field; Response appears cut off
+  at the token limit; Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.80s
-- *Generation time:* 32.93s
-- *Total time:* 34.74s
-- *Input validation time:* 4.26e-05
-- *Prompt preparation time:* 0.0017
-- *First-token latency:* 7.77
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 6,277
+- *Model load time:* 1.78s
+- *Generation time:* 40.83s
+- *Total time:* 42.63s
+- *Input validation time:* 8.54e-05
+- *Prompt preparation time:* 0.00205
+- *First-token latency:* 10.7
+- *Cleanup time:* 0.207
+- *Prompt tokens:* 6,344
 - *Generation tokens:* 1,000
-- *Total tokens:* 7,277
-- *Prompt throughput (raw):* 808 tok/s
-- *Generation throughput (raw):* 40.6 tok/s
+- *Total tokens:* 7,344
+- *Prompt throughput (raw):* 592 tok/s
+- *Generation throughput (raw):* 34.0 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.43
@@ -2141,7 +2021,7 @@ A 1-2-sentence factual description: "A vibrant seaside scene with a concrete 5-1
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1189
+- *Rendered prompt characters:* 1405
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2157,58 +2037,26 @@ A 1-2-sentence factual description: "A vibrant seaside scene with a concrete 5-1
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image, it's a seafront with people, buildings, and the coastal area. So maybe "Felixstowe Seafront Beach Scene" or something similar. Wait, need to be concrete. Let's go with "Felixstowe Coastal Promenade" maybe, but let's check the hints. The title hint says Seafront, Felixstowe... so maybe "Felixstowe Seafront with Coastal Steps".
+&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image is of Dover Castle, so maybe "Dover Castle Exterior View". Then the description should combine context (date/time, location) with the main subject, setting, etc. The image shows a historic medieval stone castle with round towers, arched entrance, steep grassy hill, partly cloudy sky. So the description should mention the castle, its features, the setting, and the time. Then keywords need to be 10-18 unique ones, covering context and visible details.
 
-Then the description: need to combine context (date/time, location) with main subject (seafront, people, setting, action, lighting, distinctive details). The image shows people swimming, walking on the beach, coastal steps, buildings, clear sky. So something like "Seafront scene in Felixstowe, England, showing people enjoying the beach with distinctive coastal steps and historic buildings under clear daylight."
+First, title: Let's make it "Dover Castle Exterior with Round Towers". Wait, need 5-10 words. Maybe "Dover Castle Medieval Exterior". Wait, let's check the hints. The title hint is Dover Castle, Dover, England... so maybe "Dover Castle Exterior View". That's 3 words, maybe add more. "Dover Castle Historic Exterior with Round Towers" – that's 6 words. Okay.
 
-Wait, let's make sure. The description should be 1-2 sentences. Let's structure it: "Seafront in Felixstowe, England, with people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
+Description: Combine context (capture date/time, location) with main subject (historic medieval stone castle), setting (steep grassy hill), lighting (partly cloudy sky), distinctive details (round towers, arched entrance). So: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00 in Dover, England." Wait, need 1-2 sentences. Let's make it concise. "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15." That's two sentences? Wait, no, 1-2 sentences. Let's try: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That's one sentence. Wait, need to include the context (capture date/time, location) and the main visible subject, setting, etc. So maybe: "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15 15:59:46 UTC+01:00." That's a bit long, but maybe shorten. "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That works.
 
-Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not, since the image might not be from those, but the hints include them? Wait, the hints say keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Also visible details: people swimming, coastal steps, buildings, beach, sea, seagulls, etc. So keywords could be: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade.
-
-Wait, let's check the hints again. The keyword hints include: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. So need to include those, plus visible details. So keywords: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade.
-
-Now, let's put it all together.
-
-Title: "Felixstowe Coastal Steps Seafront"
-
-Description: "Seafront scene in Felixstowe, England, showing people swimming and enjoying the beach near distinctive coastal steps, with historic buildings and clear daylight in the background."
-
-Keywords: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade
-
-Wait, let's check the word count. Title should be 5-10 words. "Felixstowe Coastal Steps Seafront" is 6 words. Description is 1-2 sentences, let's make it 2 sentences? Wait, the user said 1-2 sentence. Let's make it one sentence. "Seafront scene in Felixstowe, England, with people swimming and walking near distinctive coastal steps, historic buildings, and clear daylight." That's one sentence. Or two: "Seafront scene in Felixstowe, England, shows people enjoying the beach near distinctive coastal steps. Historic buildings and clear daylight are visible in the background." But maybe better to combine. Let's do: "Seafront scene in Felixstowe, England, with people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
-
-Keywords need to be unique, comma-separated. Let's list them: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade. That's 17 keywords, which is within 10-18. Let's check if all are unique. Yes. Now, make sure to include the authoritative context: capture date/time and GPS, but in the description, maybe mention the date/time? Wait, the description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. So maybe: "Seafront scene in Felixstowe, England, captured on 2026-08-13 at 17:23:18 UTC+01:00, showing people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
-
-Wait, the description hint says "Seafront, Felixstowe, England, UK, GBR" so maybe include the date. Let's adjust description: "Seafront scene in Felixstowe, England, captured on
+Keywords: Need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not, since the image might not be from those, but the hints include them? Wait, the hints say "Adobe Stock, Any Vision" as keyword hints? Wait, the context says "Descriptive hints" include those, but maybe the keywords should include the ones from hints plus others. Let's list: Dover Castle, England, Europe, Kent, Castle, Fortress, Hill, Sky, Stone, Tower, Wall, ancient, architecture, blue, Britain, UK, United Kingdom, Arch, Bridge. Wait, the image has a small bridge, so Bridge. Let's check the hints: keyword hints are Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. So combine these, remove duplicates. Let's list unique ones: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. Wait, need 10-18. Let's count: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue – that's 18, but maybe some can be combined. Wait, "United Kingdom" and "UK" are similar, but keep both? Or pick one. Let's do: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue. That's 17. Add Bridge if visible. The image has a small bridge, so Bridge. So Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue, Bridge. That's
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this. First, the title needs to be 5-10 words. Looking at the image, it's a seafront with people, buildings, and the coastal area. So maybe "Felixstowe Seafront Beach Scene" or something similar. Wait, need to be concrete. Let's go with "Felixstowe Coastal Promenade" maybe, but let's check the hints. The title hint says Seafront, Felixstowe... so maybe "Felixstowe Seafront with Coastal Steps".
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image is of Dover Castle, so maybe "Dover Castle Exterior View". Then the description should combine context (date/time, location) with the main subject, setting, etc. The image shows a historic medieval stone castle with round towers, arched entrance, steep grassy hill, partly cloudy sky. So the description should mention the castle, its features, the setting, and the time. Then keywords need to be 10-18 unique ones, covering context and visible details.
 
-Then the description: need to combine context (date/time, location) with main subject (seafront, people, setting, action, lighting, distinctive details). The image shows people swimming, walking on the beach, coastal steps, buildings, clear sky. So something like "Seafront scene in Felixstowe, England, showing people enjoying the beach with distinctive coastal steps and historic buildings under clear daylight."
+First, title: Let's make it "Dover Castle Exterior with Round Towers". Wait, need 5-10 words. Maybe "Dover Castle Medieval Exterior". Wait, let's check the hints. The title hint is Dover Castle, Dover, England... so maybe "Dover Castle Exterior View". That's 3 words, maybe add more. "Dover Castle Historic Exterior with Round Towers" – that's 6 words. Okay.
 
-Wait, let's make sure. The description should be 1-2 sentences. Let's structure it: "Seafront in Felixstowe, England, with people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
+Description: Combine context (capture date/time, location) with main subject (historic medieval stone castle), setting (steep grassy hill), lighting (partly cloudy sky), distinctive details (round towers, arched entrance). So: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00 in Dover, England." Wait, need 1-2 sentences. Let's make it concise. "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15." That's two sentences? Wait, no, 1-2 sentences. Let's try: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That's one sentence. Wait, need to include the context (capture date/time, location) and the main visible subject, setting, etc. So maybe: "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15 15:59:46 UTC+01:00." That's a bit long, but maybe shorten. "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That works.
 
-Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not, since the image might not be from those, but the hints include them? Wait, the hints say keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Also visible details: people swimming, coastal steps, buildings, beach, sea, seagulls, etc. So keywords could be: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade.
-
-Wait, let's check the hints again. The keyword hints include: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. So need to include those, plus visible details. So keywords: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade.
-
-Now, let's put it all together.
-
-Title: "Felixstowe Coastal Steps Seafront"
-
-Description: "Seafront scene in Felixstowe, England, showing people swimming and enjoying the beach near distinctive coastal steps, with historic buildings and clear daylight in the background."
-
-Keywords: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade
-
-Wait, let's check the word count. Title should be 5-10 words. "Felixstowe Coastal Steps Seafront" is 6 words. Description is 1-2 sentences, let's make it 2 sentences? Wait, the user said 1-2 sentence. Let's make it one sentence. "Seafront scene in Felixstowe, England, with people swimming and walking near distinctive coastal steps, historic buildings, and clear daylight." That's one sentence. Or two: "Seafront scene in Felixstowe, England, shows people enjoying the beach near distinctive coastal steps. Historic buildings and clear daylight are visible in the background." But maybe better to combine. Let's do: "Seafront scene in Felixstowe, England, with people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
-
-Keywords need to be unique, comma-separated. Let's list them: Felixstowe, Suffolk, UK, seafront, coastal steps, beach, people, swimming, historic buildings, daylight, Europe, East Suffolk, England, GBR, seagulls, seaside, promenade. That's 17 keywords, which is within 10-18. Let's check if all are unique. Yes. Now, make sure to include the authoritative context: capture date/time and GPS, but in the description, maybe mention the date/time? Wait, the description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. So maybe: "Seafront scene in Felixstowe, England, captured on 2026-08-13 at 17:23:18 UTC+01:00, showing people swimming and walking near distinctive coastal steps, under clear daylight with historic buildings in the background."
-
-Wait, the description hint says "Seafront, Felixstowe, England, UK, GBR" so maybe include the date. Let's adjust description: "Seafront scene in Felixstowe, England, captured on 
+Keywords: Need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not, since the image might not be from those, but the hints include them? Wait, the hints say "Adobe Stock, Any Vision" as keyword hints? Wait, the context says "Descriptive hints" include those, but maybe the keywords should include the ones from hints plus others. Let's list: Dover Castle, England, Europe, Kent, Castle, Fortress, Hill, Sky, Stone, Tower, Wall, ancient, architecture, blue, Britain, UK, United Kingdom, Arch, Bridge. Wait, the image has a small bridge, so Bridge. Let's check the hints: keyword hints are Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. So combine these, remove duplicates. Let's list unique ones: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. Wait, need 10-18. Let's count: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue – that's 18, but maybe some can be combined. Wait, "United Kingdom" and "UK" are similar, but keep both? Or pick one. Let's do: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue. That's 17. Add Bridge if visible. The image has a small bridge, so Bridge. So Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue, Bridge. That's
 ```
 
 </details>
@@ -2227,36 +2075,31 @@ Wait, the description hint says "Seafront, Felixstowe, England, UK, GBR" so mayb
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response repeats the task
-  instructions instead of only returning the requested fields; Extra text
-  appears before the Title field; Response appears cut off at the token limit;
-  Internal reasoning block appears incomplete; Title has 11 words (requested
-  5-10); Keyword list has 85 terms (requested 10-18); Duplicate keywords:
-  seafront, england, uk, gbr, europe, rocky shoreline, people, coastal
-  buildings, clear sky, calm sea, birds, beachgoers, utc 01 00, any vision,
-  2026 08 13, adobe stock
+- *Observations:* Response repeats the same text; Missing or empty fields:
+  Title; Extra text appears before the Title field; Conversation-role control
+  tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.29s
-- *Generation time:* 216.72s
-- *Total time:* 220.02s
-- *Input validation time:* 5.19e-05
-- *Prompt preparation time:* 0.00179
-- *First-token latency:* 1.41
-- *Cleanup time:* 0.343
-- *Prompt tokens:* 1,269
-- *Generation tokens:* 1,000
-- *Total tokens:* 2,269
-- *Prompt throughput (raw):* 901 tok/s
-- *Generation throughput (raw):* 4.66 tok/s
+- *Model load time:* 3.57s
+- *Generation time:* 185.63s
+- *Total time:* 189.23s
+- *Input validation time:* 0.000424
+- *Prompt preparation time:* 0.0025
+- *First-token latency:* 1.77
+- *Cleanup time:* 0.515
+- *Prompt tokens:* 1,296
+- *Generation tokens:* 834
+- *Total tokens:* 2,130
+- *Prompt throughput (raw):* 730 tok/s
+- *Generation throughput (raw):* 4.56 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.8
 - *Model-load active memory:* 32.8
 - *Post-cleanup active memory:* 0.00365
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1319
+- *Rendered prompt characters:* 1535
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2272,53 +2115,152 @@ Wait, the description hint says "Seafront, Felixstowe, England, UK, GBR" so mayb
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.
 
-The image shows a seafront in Felixstowe, England, UK. The capture date is 2026-08-13 17:23:18 UTC+01:00, GPS is 51.957967°N, 1.346900°E. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, Adobe Stock, Any Vision, East Suffolk, Suffolk, UK. The description hints are similar.
+Starting with the title: The image shows Dover Castle, which is in the context given. The castle is a historic medieval stone structure with round towers, an arched entrance, and a bridge. The setting is a grassy hill under a partly cloudy sky. So the title should be concise. Maybe "Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers." That's 10 words.
 
-First, the title needs to be a concrete 5-10 words. Let's see the main elements: seafront, people, rocky shore, buildings, sea, clear sky. Maybe "Felixstowe seafront with people on rocky shore and coastal buildings." Wait, that's 9 words. Maybe "Felixstowe seafront scene with rocky shoreline and coastal buildings." That's 9 words.
+Next, the description: It needs to combine context and visible details. The capture date and GPS are authoritative but not visible, so focus on the image. The castle is on a grassy hill, has stone walls, round towers, an arched entrance, and a bridge. The sky is partly cloudy. So the description could be: "Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky." That's 25 words, which is a bit long but fits the requirement.
 
-Next, the description: 1-2 sentences. It should combine context (date/time, GPS) with main subject, setting, action, lighting, details. So: "A sunny day at Felixstowe's seafront on August 13, 2026, showing people enjoying the rocky shoreline, coastal buildings, and calm sea under clear skies." Wait, the capture date is 2026-08-13 17:23:18 UTC+01:00, so maybe include that. Also, GPS is 51.957967°N, 1.346900°E. So: "On August 13, 2026, at 17:23 UTC+01:00, the sunny Felixstowe seafront at 51.957967°N, 1.346900°E features people on a rocky shore, coastal buildings, and calm waters." That's a bit long but includes the date, time, location, and elements.
-
-Keywords: Need 10-18 unique, comma-separated. Let's list elements: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, birds, beachgoers, UTC+01:00, 2026-08-13. Wait, but the hints mention Adobe Stock, Any Vision, East Suffolk. Maybe include those? Wait, the hints are hints, but the image might not have those. The image shows Adobe Stock watermark? Wait, the image is from Adobe Stock, so maybe include that. Also, East Suffolk is a county. So keywords: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk. That's 15 keywords. Let me check: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk. That's 15. Maybe add birds? The image has birds in the water. So include birds. So 16. Let's adjust: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk, birds. That's 16.
-
-Wait, the user said "unique, comma-separated keywords covering relevant context and visible details". So visible details: people, rocky shore, buildings, sea, sky, birds, beachgoers, etc. Context: date, time, location. So include those. Let's finalize:
-
-Title: Felixstowe seafront scene with people on rocky shore and coastal buildings.
-
-Description: A sunny day at Felixstowe's seafront on August 13, 2026, at 17:23 UTC+01:00, featuring people enjoying the rocky shoreline, coastal buildings, and calm sea under clear skies.
-
-Keywords: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk, birds.
-
-Wait, the description should be 1-2 sentences. Let me check the example. The user's example might have a more concise version. Let me adjust the description to be 1-2 sentences. Maybe: "Sunny Felixstowe seafront at 51.
+Keywords: Need 10-18 unique terms. From the context and image: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue (sky), United Kingdom, Britain, fortification, wall. Let me count: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue, United Kingdom, Britain, fortification, wall. That's 17 keywords. Need to check if they are unique and relevant. Maybe "UK" and "United Kingdom" are redundant, so replace one. Let's remove "United Kingdom" and keep UK. Also, "Britain" is similar to UK. So revised: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, Kent, England. Wait, Kent is already in the title. Maybe include "Dover Castle" as a keyword. Let me check again. The context mentions Dover Castle, so that's essential. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, UK. That's 16 keywords. Maybe add "sky" instead of "blue sky" but "blue" is in the hints. Hmm, the hints have "blue" as a keyword. So include that. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue, UK. That's 16. Maybe add "sky" instead of "blue" if needed, but the hint says to prefer image evidence. The sky is partly cloudy, so "partly cloudy sky" is better. So keep "partly cloudy sky". Alright, that should work.◁/think▷Title: Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers
+Description: Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky.
+Keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, UK&lt;|im_assistant|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image and the hints.
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. 
 
-The image shows a seafront in Felixstowe, England, UK. The capture date is 2026-08-13 17:23:18 UTC+01:00, GPS is 51.957967°N, 1.346900°E. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, Adobe Stock, Any Vision, East Suffolk, Suffolk, UK. The description hints are similar. 
+Starting with the title: The image shows Dover Castle, which is in the context given. The castle is a historic medieval stone structure with round towers, an arched entrance, and a bridge. The setting is a grassy hill under a partly cloudy sky. So the title should be concise. Maybe "Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers." That's 10 words.
 
-First, the title needs to be a concrete 5-10 words. Let's see the main elements: seafront, people, rocky shore, buildings, sea, clear sky. Maybe "Felixstowe seafront with people on rocky shore and coastal buildings." Wait, that's 9 words. Maybe "Felixstowe seafront scene with rocky shoreline and coastal buildings." That's 9 words.
+Next, the description: It needs to combine context and visible details. The capture date and GPS are authoritative but not visible, so focus on the image. The castle is on a grassy hill, has stone walls, round towers, an arched entrance, and a bridge. The sky is partly cloudy. So the description could be: "Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky." That's 25 words, which is a bit long but fits the requirement.
 
-Next, the description: 1-2 sentences. It should combine context (date/time, GPS) with main subject, setting, action, lighting, details. So: "A sunny day at Felixstowe's seafront on August 13, 2026, showing people enjoying the rocky shoreline, coastal buildings, and calm sea under clear skies." Wait, the capture date is 2026-08-13 17:23:18 UTC+01:00, so maybe include that. Also, GPS is 51.957967°N, 1.346900°E. So: "On August 13, 2026, at 17:23 UTC+01:00, the sunny Felixstowe seafront at 51.957967°N, 1.346900°E features people on a rocky shore, coastal buildings, and calm waters." That's a bit long but includes the date, time, location, and elements.
-
-Keywords: Need 10-18 unique, comma-separated. Let's list elements: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, birds, beachgoers, UTC+01:00, 2026-08-13. Wait, but the hints mention Adobe Stock, Any Vision, East Suffolk. Maybe include those? Wait, the hints are hints, but the image might not have those. The image shows Adobe Stock watermark? Wait, the image is from Adobe Stock, so maybe include that. Also, East Suffolk is a county. So keywords: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk. That's 15 keywords. Let me check: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk. That's 15. Maybe add birds? The image has birds in the water. So include birds. So 16. Let's adjust: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk, birds. That's 16.
-
-Wait, the user said "unique, comma-separated keywords covering relevant context and visible details". So visible details: people, rocky shore, buildings, sea, sky, birds, beachgoers, etc. Context: date, time, location. So include those. Let's finalize:
-
-Title: Felixstowe seafront scene with people on rocky shore and coastal buildings.
-
-Description: A sunny day at Felixstowe's seafront on August 13, 2026, at 17:23 UTC+01:00, featuring people enjoying the rocky shoreline, coastal buildings, and calm sea under clear skies.
-
-Keywords: Felixstowe, seafront, England, UK, GBR, Europe, rocky shoreline, people, coastal buildings, clear sky, calm sea, beachgoers, UTC+01:00, 2026-08-13, Adobe Stock, Any Vision, East Suffolk, birds.
-
-Wait, the description should be 1-2 sentences. Let me check the example. The user's example might have a more concise version. Let me adjust the description to be 1-2 sentences. Maybe: "Sunny Felixstowe seafront at 51.
+Keywords: Need 10-18 unique terms. From the context and image: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue (sky), United Kingdom, Britain, fortification, wall. Let me count: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue, United Kingdom, Britain, fortification, wall. That's 17 keywords. Need to check if they are unique and relevant. Maybe "UK" and "United Kingdom" are redundant, so replace one. Let's remove "United Kingdom" and keep UK. Also, "Britain" is similar to UK. So revised: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, Kent, England. Wait, Kent is already in the title. Maybe include "Dover Castle" as a keyword. Let me check again. The context mentions Dover Castle, so that's essential. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, UK. That's 16 keywords. Maybe add "sky" instead of "blue sky" but "blue" is in the hints. Hmm, the hints have "blue" as a keyword. So include that. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue, UK. That's 16. Maybe add "sky" instead of "blue" if needed, but the hint says to prefer image evidence. The sky is partly cloudy, so "partly cloudy sky" is better. So keep "partly cloudy sky". Alright, that should work.◁/think▷Title: Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers  
+Description: Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky.  
+Keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, UK<|im_assistant|>
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
+
+### mlx-community/LFM2.5-VL-1.6B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 13 words (requested 5-10); Keyword list has 454
+  terms (requested 10-18); Duplicate keywords: uk, architecture, blue, castle
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.81s
+- *Generation time:* 7.07s
+- *Total time:* 7.89s
+- *Input validation time:* 0.000641
+- *Prompt preparation time:* 0.00625
+- *First-token latency:* 0.114
+- *Cleanup time:* 0.215
+- *Prompt tokens:* 603
+- *Generation tokens:* 1,000
+- *Total tokens:* 1,603
+- *Prompt throughput (raw):* 5,300 tok/s
+- *Generation throughput (raw):* 164 tok/s
+- *Peak memory:* 4.1
+- *Active memory:* 3.2
+- *Cache memory:* 0.03
+- *Model-load active memory:* 3.2
+- *Post-cleanup active memory:* 0.00379
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1399
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, Hill, Sky, Architecture, Blue
+
+Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's imposing structure and intricate design reflect its rich history and architectural significance.
+
+Keywords: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, Hill, Sky, Architecture, Blue, Castle, Kent, UK, Ancient, Blue, Architecture, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle,
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description; Extra text
+  appears before the Title field
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.94s
+- *Generation time:* 1.25s
+- *Total time:* 2.21s
+- *Input validation time:* 8.74e-05
+- *Prompt preparation time:* 0.0118
+- *First-token latency:* 0.277
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 1,004
+- *Generation tokens:* 41
+- *Total tokens:* 1,045
+- *Prompt throughput (raw):* 3,629 tok/s
+- *Generation throughput (raw):* 247 tok/s
+- *Peak memory:* 3.7
+- *Active memory:* 2.3
+- *Cache memory:* 0.06
+- *Model-load active memory:* 2.32
+- *Post-cleanup active memory:* 0.00483
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1416
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Ancient stone castle on hillside under clear sky.
+
+Keywords: castle, stone, hill, medieval, arch, tower, bridge, UK, Europe, grassy, sky, fortress, architecture
+</pre>
 
 </details>
 
@@ -2336,18 +2278,18 @@ Wait, the description should be 1-2 sentences. Let me check the example. The use
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.58s
-- *Generation time:* 37.47s
-- *Total time:* 40.08s
-- *Input validation time:* 8.27e-05
-- *Prompt preparation time:* 0.00507
-- *First-token latency:* 4.15
-- *Cleanup time:* 0.397
-- *Prompt tokens:* 3,100
-- *Generation tokens:* 183
-- *Total tokens:* 3,283
-- *Prompt throughput (raw):* 747 tok/s
-- *Generation throughput (raw):* 5.64 tok/s
+- *Model load time:* 2.27s
+- *Generation time:* 21.95s
+- *Total time:* 24.23s
+- *Input validation time:* 0.000169
+- *Prompt preparation time:* 0.0052
+- *First-token latency:* 2.89
+- *Cleanup time:* 0.185
+- *Prompt tokens:* 3,158
+- *Generation tokens:* 113
+- *Total tokens:* 3,271
+- *Prompt throughput (raw):* 1,091 tok/s
+- *Generation throughput (raw):* 6.27 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
@@ -2356,7 +2298,7 @@ Wait, the description should be 1-2 sentences. Let me check the example. The use
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1170
+- *Rendered prompt characters:* 1386
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2372,58 +2314,61 @@ Wait, the description should be 1-2 sentences. Let me check the example. The use
 *Readable output:*
 
 <pre class="model-output-readable">
-Felixstowe Seafront, England: Rocky Shore with People and Buildings
+Dover Castle: Medieval Stone Fortress on Steep Hillside
 
-A bustling Felixstowe seafront scene captured on August 13, 2026, at 17:23 UTC+01:00. The image shows a rocky shoreline with people enjoying the water, a prominent clock tower, and a mix of residential and commercial buildings in the background. The sky is clear and blue, indicating a pleasant summer day.
+A historic stone castle with round towers and arched entranceway stands atop a steep, grassy hill in Dover, England. Built of brown and white stones, the fortress features a small bridge and is set against a partly cloudy blue sky, with sunlight casting shadows on the hillside.
 
-Felixstowe, England, UK, GBR, East Suffolk, seafront, rocky shore, clock tower, residential buildings, commercial buildings, people swimming, people walking, clear blue sky, summer day, 2026, 17:23, UTC+01:00, 51.957967°N, 1.346900°E
+Dover Castle, England, UK, Europe, Stone, Fortress, Hill, Kent, Sky, Tower, Arch, Bridge, Medieval, Castle, Wall, Ancient, Architecture, Blue, Sunlight, Shadows
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
 
-### mlx-community/Qwen2-VL-2B-Instruct-4bit
+### mlx-community/Qwen3-VL-2B-Instruct-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* none
-- *Observations:* Missing or empty fields: Keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.52s
-- *Generation time:* 99.60s
-- *Total time:* 100.13s
-- *Input validation time:* 4.54e-05
-- *Prompt preparation time:* 0.00392
-- *First-token latency:* 98.1
-- *Cleanup time:* 0.183
-- *Prompt tokens:* 16,544
-- *Generation tokens:* 98
-- *Total tokens:* 16,642
-- *Prompt throughput (raw):* 169 tok/s
-- *Generation throughput (raw):* 144 tok/s
-- *Peak memory:* 5.1
-- *Active memory:* 1.3
-- *Cache memory:* 0.86
-- *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00744
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Title has 3 words (requested
+  5-10); Keyword list has 33 terms (requested 10-18); Duplicate keywords:
+  england, uk, europe, fortress, castle, stone, tower, wall, hill, sky,
+  ancient, architecture, united kingdom
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.76s
+- *Generation time:* 31.90s
+- *Total time:* 32.66s
+- *Input validation time:* 0.000115
+- *Prompt preparation time:* 0.000339
+- *First-token latency:* 29.5
+- *Cleanup time:* 0.0893
+- *Prompt tokens:* 16,506
+- *Generation tokens:* 118
+- *Total tokens:* 16,624
+- *Prompt throughput (raw):* 559 tok/s
+- *Generation throughput (raw):* 92.1 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.6
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00775
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1262
+- *Rendered prompt characters:* 1420
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Instruct-bf16/snapshots/c8a67a84327484ba87f5ec4f8fb927cdafd791aa
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2432,10 +2377,12 @@ Felixstowe, England, UK, GBR, East Suffolk, seafront, rocky shore, clock tower, 
 
 <pre class="model-output-readable">
 Title:
-Seafront, Felixstowe, England, UK, GBR, Europe
+Dover Castle Exterior
 
 Description:
-The image depicts a lively seafront scene in Felixstowe, England. The beach is bustling with people enjoying the sunny weather, and the coastline is lined with rocks and greenery. The background features a mix of residential buildings and a clock tower, adding to the picturesque charm of the location. The clear blue sky and the presence of seagulls add to the overall serene atmosphere.
+An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.
+
+Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wall, Hill, Sky, Arch, Ancient, Architecture, Britain, Kent, United Kingdom, Stone, Wall, Castle, England, Europe, Fortress, Hill, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
@@ -2451,32 +2398,31 @@ The image depicts a lively seafront scene in Felixstowe, England. The beach is b
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Response appears cut off at the token limit; Internal reasoning block
-  appears incomplete
+- *Maintainer status:* none
+- *Observations:* Extra text appears before the Title field; Title has 11
+  words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.99s
-- *Generation time:* 43.55s
-- *Total time:* 44.58s
-- *Input validation time:* 5.85e-05
-- *Prompt preparation time:* 0.0198
-- *First-token latency:* 27.4
-- *Cleanup time:* 0.238
-- *Prompt tokens:* 16,535
-- *Generation tokens:* 1,000
-- *Total tokens:* 17,535
-- *Prompt throughput (raw):* 603 tok/s
-- *Generation throughput (raw):* 68.1 tok/s
+- *Model load time:* 0.75s
+- *Generation time:* 37.39s
+- *Total time:* 38.17s
+- *Input validation time:* 7.51e-05
+- *Prompt preparation time:* 0.0112
+- *First-token latency:* 25.2
+- *Cleanup time:* 0.142
+- *Prompt tokens:* 16,508
+- *Generation tokens:* 898
+- *Total tokens:* 17,406
+- *Prompt throughput (raw):* 654 tok/s
+- *Generation throughput (raw):* 80.9 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
-- *Cache memory:* 2.4
+- *Cache memory:* 2.7
 - *Model-load active memory:* 4.26
 - *Post-cleanup active memory:* 0.00806
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1212
+- *Rendered prompt characters:* 1428
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2485,21 +2431,72 @@ The image depicts a lively seafront scene in Felixstowe, England. The beach is b
 - *Requested model revision:* not requested
 - *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The image shows a seafront with people, so maybe "Felixstowe Seafront, Suffolk, England". Wait, the title hint was Seafront, Felixstowe, England, UK, GBR, Europe. So need to make it 5-10 words. Let's check: "Felixstowe Seafront, Suffolk, England, UK" – that's 10 words? Wait, no, "Felixstowe Seafront, Suffolk, England, UK" is 8 words. Maybe "Felixstowe Seafront, Suffolk, England, UK" is okay. Wait, the title should be concrete. Let's see: "Felixstowe Seafront, Suffolk, England" – that's 7 words. Maybe "Felixstowe Seafront, Suffolk, England, UK" is better. Wait, the hint says "Seafront, Felixstowe, England, UK, GBR, Europe" so the title should capture that. Let's go with "Felixstowe Seafront, Suffolk, England, UK".
+Got it, let's tackle this step by step. First, the title. The context says Dover Castle, so the title should be specific. The hint says Dover Castle, so "Dover Castle, England" is good. Need 5-10 words. Let's see: "Dover Castle, England, Historic Medieval Stone Castle on Hill" – that's 10 words. Wait, maybe "Dover Castle, England: Exterior of Historic Medieval Stone Castle" – but need to check if the image matches. The image shows a castle with round towers, arch, bridge, hill. So title should be precise.
 
-Next, the description. Need 1-2 sentences. Context has capture date/time, GPS, but we don't claim them visible. The main visible subject is the seafront with people, setting is a coastal area with rocky breakwaters, people swimming, walking, beach. Lighting is sunny, clear blue sky. Distinctive details: the rocky breakwaters, the buildings in the background (like the Spa Pavilion), people in the water, seagulls. So: "A sunny day at Felixstowe seafront, England, featuring rocky breakwaters, people swimming and walking along the shore, with historic buildings and seagulls visible in the background under a clear blue sky."
+Next, description. Need 1-2 sentences. Context has capture date, GPS, but we don't claim those. The main subject is the castle. Visible details: exterior view, round towers, arched entrance, small bridge, steep grassy hill, partly cloudy sky. So: "An exterior view of Dover Castle, England, showcasing its historic stone construction, round towers, arched entranceway, and a small bridge atop a steep grassy hill under a partly cloudy sky."
 
-Wait, check the context: capture date/time is 2026-08-13 17:23:18 UTC+01:00, but we don't claim that's visible. The description should combine relevant context (Felixstowe, England, UK) with main visible subject (seafront), setting (coastal area with breakwaters), action (people swimming, walking), lighting (sunny, clear sky), distinctive details (rocky breakwaters, historic buildings like Spa Pavilion, seagulls). So the description: "Sunny day at Felixstowe seafront, England, with rocky breakwaters, people swimming and wading in the water, historic buildings and seagulls visible under a clear blue sky."
+Then keywords. Need 10-18 unique, comma-separated. From context: Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. But check the image: the castle is stone, round towers, arch, bridge, hill, sky. So include those. Let's list: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. Wait, need to pick 10-18. Let's see: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. That's 15. Let's check if all are visible. The image has stone, towers, arch, hill, sky, blue sky (partly cloudy, so blue is visible). So keywords: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. Wait, but the context has "Britain" and "UK", so maybe include those. Let's make sure they are unique and cover context and visible details.
 
-Now keywords. Need 10-18 unique, comma-separated. Context: East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Visible details: seafront, Felixstowe, Suffolk, England, UK, gbr, seafront, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. Wait, the keyword hints include Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. So need to pick unique ones. Let's list: Felixstowe, Suffolk, England, UK, gbr, seafront, East Suffolk, Europe, England, UK, gbr, seafront. Wait, but need 10-18. Let's check the image: the buildings have a Spa Pavilion, so maybe "Spa Pavilion" is a detail. Also, the rocky breakwaters, people in the water, seagulls. So keywords: Felixstowe, Suffolk, England, UK, gbr, seafront, East Suffolk, Europe, England, UK, gbr, seafront, Spa Pavilion, seagulls, beach, people, water, sunny, clear sky. Wait, but need to be unique. Let's count: Felixstowe, Suffolk, England, UK, gbr, seafront, East Suffolk, Europe, England, UK, gbr, seafront, Spa Pavilion, seagulls, beach, people, water, sunny, clear sky. Wait, but the context says "East Suffolk" is a hint, so include that. Also, "Suffolk" is in the keyword hints. Let's make sure they are unique. Let's list: Felixstowe, Suffolk, England, UK, gbr, seafront, East Suffolk, Europe, England, UK, gbr, seafront, Spa Pavilion, seagulls, beach, people, water, sunny, clear sky. Wait, but the keyword hints include "Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront". So we
+Wait, the descriptive hints have "Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue". So need to pick from those, but not repeat. Let's list:
+
+Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture.
+
+Wait, "Wall" is in the context but not visible. The image has a wall (the castle walls), so "Wall" is a keyword. Let's check: the castle has walls, so "Wall" is good. So include Wall. Let's see:
+
+Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture, Wall.
+
+That's 16. Let's check if all are visible. The image has a castle (Castle), stone walls (Stone), towers (Tower), arch (Arch), hill (Hill), sky (Sky), blue (partly cloudy, so blue is visible), Fortress (since it's a fort), Kent (the location is Kent, England), UK, Ancient (the castle is ancient), Wall (the walls), and Dover Castle (title). So that's good.
+
+Now, title: "Dover Castle, England: Exterior of Historic Medieval Stone Castle on Hill" –
+&lt;/think&gt;
+
+Title: Dover Castle, England: Exterior of Historic Medieval Stone Castle on Hill
+
+Description: An exterior view of Dover Castle, England, showcasing its historic stone construction, round towers, arched entranceway, and a small bridge atop a steep grassy hill under a partly cloudy sky.
+
+Keywords: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture, Wall
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Got it, let's tackle this step by step. First, the title. The context says Dover Castle, so the title should be specific. The hint says Dover Castle, so "Dover Castle, England" is good. Need 5-10 words. Let's see: "Dover Castle, England, Historic Medieval Stone Castle on Hill" – that's 10 words. Wait, maybe "Dover Castle, England: Exterior of Historic Medieval Stone Castle" – but need to check if the image matches. The image shows a castle with round towers, arch, bridge, hill. So title should be precise.
+
+Next, description. Need 1-2 sentences. Context has capture date, GPS, but we don't claim those. The main subject is the castle. Visible details: exterior view, round towers, arched entrance, small bridge, steep grassy hill, partly cloudy sky. So: "An exterior view of Dover Castle, England, showcasing its historic stone construction, round towers, arched entranceway, and a small bridge atop a steep grassy hill under a partly cloudy sky."
+
+Then keywords. Need 10-18 unique, comma-separated. From context: Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. But check the image: the castle is stone, round towers, arch, bridge, hill, sky. So include those. Let's list: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. Wait, need to pick 10-18. Let's see: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. That's 15. Let's check if all are visible. The image has stone, towers, arch, hill, sky, blue sky (partly cloudy, so blue is visible). So keywords: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture. Wait, but the context has "Britain" and "UK", so maybe include those. Let's make sure they are unique and cover context and visible details.
+
+Wait, the descriptive hints have "Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue". So need to pick from those, but not repeat. Let's list:
+
+Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture.
+
+Wait, "Wall" is in the context but not visible. The image has a wall (the castle walls), so "Wall" is a keyword. Let's check: the castle has walls, so "Wall" is good. So include Wall. Let's see:
+
+Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture, Wall.
+
+That's 16. Let's check if all are visible. The image has a castle (Castle), stone walls (Stone), towers (Tower), arch (Arch), hill (Hill), sky (Sky), blue (partly cloudy, so blue is visible), Fortress (since it's a fort), Kent (the location is Kent, England), UK, Ancient (the castle is ancient), Wall (the walls), and Dover Castle (title). So that's good.
+
+Now, title: "Dover Castle, England: Exterior of Historic Medieval Stone Castle on Hill" – 
+</think>
+
+Title: Dover Castle, England: Exterior of Historic Medieval Stone Castle on Hill
+
+Description: An exterior view of Dover Castle, England, showcasing its historic stone construction, round towers, arched entranceway, and a small bridge atop a steep grassy hill under a partly cloudy sky.
+
+Keywords: Dover Castle, England, Historic, Medieval, Stone, Castle, Tower, Arch, Hill, Sky, Blue, Fortress, Kent, UK, Ancient, Architecture, Wall
+```
+
+</details>
 
 </details>
 
@@ -2516,25 +2513,23 @@ Now keywords. Need 10-18 unique, comma-separated. Context: East Suffolk, England
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 179 terms (requested 10-18); Duplicate
-  keywords: promenade, east suffolk coastline, east suffolk beach, felixstowe
-  historic buildings, felixstowe historic architecture, felixstowe greenery,
-  felixstowe historic structures, felixstowe historic town, east suffolk
-  beachgoers, east suffolk beach buildings, uk seafront greenery, uk beach
-  greenery
+  the token limit; Title has 4 words (requested 5-10); Keyword list has 357
+  terms (requested 10-18); Duplicate keywords: kent, england, uk, europe,
+  medieval, stone, round towers, small bridge, grassy hill, partly cloudy sky,
+  architecture, ancient, arched entranceway, historic, fortress
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.20s
-- *Generation time:* 43.32s
-- *Total time:* 44.52s
-- *Input validation time:* 5.63e-05
-- *Prompt preparation time:* 0.000257
-- *First-token latency:* 21.1
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,544
+- *Model load time:* 1.18s
+- *Generation time:* 48.02s
+- *Total time:* 49.21s
+- *Input validation time:* 8.62e-05
+- *Prompt preparation time:* 0.000483
+- *First-token latency:* 25.1
+- *Cleanup time:* 0.166
+- *Prompt tokens:* 16,517
 - *Generation tokens:* 1,000
-- *Total tokens:* 17,544
-- *Prompt throughput (raw):* 784 tok/s
-- *Generation throughput (raw):* 46.8 tok/s
+- *Total tokens:* 17,517
+- *Prompt throughput (raw):* 657 tok/s
+- *Generation throughput (raw):* 45.8 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.3
@@ -2543,7 +2538,7 @@ Now keywords. Need 10-18 unique, comma-separated. Context: East Suffolk, England
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1262
+- *Rendered prompt characters:* 1478
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2560,12 +2555,12 @@ Now keywords. Need 10-18 unique, comma-separated. Context: East Suffolk, England
 
 <pre class="model-output-readable">
 Title:
-Felixstowe Seafront, East Suffolk, England
+Dover Castle, Kent, England
 
 Description:
-A vibrant seafront scene in Felixstowe, East Suffolk, England, with people enjoying the sunny day at the beach and rocky promenade, set against a backdrop of historic buildings and lush greenery. The image captures the lively atmosphere of a typical summer day at the seaside town.
+A historic medieval stone castle with round towers, an arched entranceway, and a small bridge, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00.
 
-Keywords: Felixstowe, East Suffolk, England, UK, GBR, seafront, beach, promenade, historic buildings, greenery, sunny day, people, summer, historic architecture, coastal town, East Anglia, United Kingdom, Europe, seaside, promenade, beachgoers, historic structures, waterfront, East Suffolk coastline, British seaside, Felixstowe beach, East Anglia coast, UK seafront, historic Felixstowe, East Suffolk beach, UK coastal town, Felixstowe promenade, East Anglia seafront, UK beach scene, Felixstowe historic buildings, East Suffolk coastline, UK seaside town, Felixstowe beachgoers, East Suffolk promenade, UK seafront scene, Felixstowe historic architecture, East Suffolk beach, UK coastal promenade, Felixstowe greenery, East Suffolk buildings, UK seafront buildings, Felixstowe historic structures, East Suffolk waterfront, UK beach buildings, Felixstowe promenade buildings, East Suffolk seafront, UK beach promenade, Felixstowe historic town, East Suffolk beachgoers, UK seafront town, Felixstowe historic buildings, East Suffolk promenade buildings, UK beach town, Felixstowe greenery, East Suffolk beach buildings, UK seafront greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic town, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures, East Suffolk beach buildings, UK beach greenery, Felixstowe historic architecture, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic buildings, East Suffolk beach buildings, UK beach greenery, Felixstowe historic structures, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic architecture, East Suffolk beach buildings, UK beach greenery, Felixstowe historic buildings, East Suffolk beachgoers, UK seafront greenery, Felixstowe historic structures
+Keywords: Dover Castle, Kent, England, UK, Europe, medieval, stone, round towers, arched entrance, small bridge, grassy hill, partly cloudy sky, historic architecture, ancient fortress, stone walls, medieval castle, United Kingdom, Europe, architecture, blue sky, greenery, stone bridge, medieval structure, stone towers, historical landmark, Kent, England, UK, Europe, ancient, architecture, blue, grass, sky, stone, tower, wall, entrance, bridge, castle, Dover, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent
 </pre>
 
 </details>
@@ -2584,18 +2579,18 @@ Keywords: Felixstowe, East Suffolk, England, UK, GBR, seafront, beach, promenade
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.32s
-- *Generation time:* 5.13s
-- *Total time:* 7.46s
-- *Input validation time:* 4.89e-05
-- *Prompt preparation time:* 0.00331
-- *First-token latency:* 0.386
-- *Cleanup time:* 0.119
-- *Prompt tokens:* 568
-- *Generation tokens:* 199
-- *Total tokens:* 767
-- *Prompt throughput (raw):* 1,472 tok/s
-- *Generation throughput (raw):* 47.4 tok/s
+- *Model load time:* 2.35s
+- *Generation time:* 7.54s
+- *Total time:* 9.93s
+- *Input validation time:* 9.41e-05
+- *Prompt preparation time:* 0.00278
+- *First-token latency:* 0.381
+- *Cleanup time:* 0.292
+- *Prompt tokens:* 607
+- *Generation tokens:* 261
+- *Total tokens:* 868
+- *Prompt throughput (raw):* 1,595 tok/s
+- *Generation throughput (raw):* 40.2 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2604,7 +2599,7 @@ Keywords: Felixstowe, East Suffolk, England, UK, GBR, seafront, beach, promenade
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1189
+- *Rendered prompt characters:* 1405
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2620,12 +2615,81 @@ Keywords: Felixstowe, East Suffolk, England, UK, GBR, seafront, beach, promenade
 *Readable output:*
 
 <pre class="model-output-readable">
-A wide shot captures a sunny day at Seafront in Felixstowe, England. The scene is bustling with people enjoying the coastal area. The foreground features a series of low stone walls leading down to the water, where numerous people are wading, swimming, and relaxing. Some individuals are standing in the shallow water, while others are further out. Several seagulls are scattered around, some near the people and others perched on the stone walls.
-
-The middle ground shows the beach area, with people sunbathing and walking along the sand. A long row of rocky breakwaters extends into the sea, providing a barrier against the waves. Beyond the breakwaters, the calm, blue sea stretches out to the horizon under a clear sky.
-
-The background is dominated by a collection of buildings, mostly residential, with varying architectural styles. Lush green trees are interspersed among the buildings, adding a touch of nature to the urban landscape. The overall atmosphere is one of leisure and relaxation on a pleasant summer day.
+&#96;&#96;&#96;json
+{
+  "context": {
+    "title": "Dover Castle",
+    "location": "Dover, England, UK, GBR, Europe",
+    "description": "An exterior view of a historic medieval stone castle, featuring round towers, an arched entrance, and a steep grassy hill under a partly cloudy sky."
+  },
+  "date_time": "2026-08-15 15:59:46 UTC+01:00",
+  "gps": "51.128800°N, 1.319100°E",
+  "keywords": [
+    "Adobe Stock",
+    "Aerial View",
+    "Arch",
+    "Britain",
+    "Castle",
+    "Dover Castle",
+    "England",
+    "Europe",
+    "Fortress",
+    "Hill",
+    "Kent",
+    "Sky",
+    "Stone",
+    "Tower",
+    "UK",
+    "United Kingdom",
+    "Wall",
+    "Ancient",
+    "Architecture",
+    "Blue"
+  ]
+}
+&#96;&#96;&#96;
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+````text
+```json
+{
+  "context": {
+    "title": "Dover Castle",
+    "location": "Dover, England, UK, GBR, Europe",
+    "description": "An exterior view of a historic medieval stone castle, featuring round towers, an arched entrance, and a steep grassy hill under a partly cloudy sky."
+  },
+  "date_time": "2026-08-15 15:59:46 UTC+01:00",
+  "gps": "51.128800°N, 1.319100°E",
+  "keywords": [
+    "Adobe Stock",
+    "Aerial View",
+    "Arch",
+    "Britain",
+    "Castle",
+    "Dover Castle",
+    "England",
+    "Europe",
+    "Fortress",
+    "Hill",
+    "Kent",
+    "Sky",
+    "Stone",
+    "Tower",
+    "UK",
+    "United Kingdom",
+    "Wall",
+    "Ancient",
+    "Architecture",
+    "Blue"
+  ]
+}
+```
+````
+
+</details>
 
 </details>
 
@@ -2644,17 +2708,17 @@ The background is dominated by a collection of buildings, mostly residential, wi
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
 - *Model load time:* 0.97s
-- *Generation time:* 4.51s
-- *Total time:* 5.48s
-- *Input validation time:* 4.56e-05
-- *Prompt preparation time:* 0.00155
-- *First-token latency:* 2.9
-- *Cleanup time:* 0.0848
-- *Prompt tokens:* 2,386
+- *Generation time:* 5.16s
+- *Total time:* 6.14s
+- *Input validation time:* 0.000113
+- *Prompt preparation time:* 0.00217
+- *First-token latency:* 3.27
+- *Cleanup time:* 0.115
+- *Prompt tokens:* 2,734
 - *Generation tokens:* 53
-- *Total tokens:* 2,439
-- *Prompt throughput (raw):* 824 tok/s
-- *Generation throughput (raw):* 60.6 tok/s
+- *Total tokens:* 2,787
+- *Prompt throughput (raw):* 836 tok/s
+- *Generation throughput (raw):* 57.3 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.90
@@ -2663,7 +2727,7 @@ The background is dominated by a collection of buildings, mostly residential, wi
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1134
+- *Rendered prompt characters:* 1350
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2679,14 +2743,14 @@ The background is dominated by a collection of buildings, mostly residential, wi
 *Readable output:*
 
 <pre class="model-output-readable">
-Seafront, Felixstowe, England, UK, GBR, Europe, East Suffolk, England, UK, gbr, seafront, Adobe Stock, Any Vision, Felixstowe, Suffolk, UK, gbr,
+Dover Castle, Dover, England, UK, GBR, Europe, historic, medieval, stone, castle, round towers, arched entranceway, steep grassy hill, partly cloudy sky, fortress, ancient, architecture, blue
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Seafront, Felixstowe, England, UK, GBR, Europe, East Suffolk, England, UK, gbr, seafront, Adobe Stock, Any Vision, Felixstowe, Suffolk, UK, gbr, 
+Dover Castle, Dover, England, UK, GBR, Europe, historic, medieval, stone, castle, round towers, arched entranceway, steep grassy hill, partly cloudy sky, fortress, ancient, architecture, blue 
 ```
 
 </details>
@@ -2705,31 +2769,30 @@ Seafront, Felixstowe, England, UK, GBR, Europe, East Suffolk, England, UK, gbr, 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Keywords; Response repeats the task
-  instructions instead of only returning the requested fields
+- *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.52s
-- *Generation time:* 1.03s
-- *Total time:* 1.56s
-- *Input validation time:* 4.5e-05
-- *Prompt preparation time:* 0.00401
-- *First-token latency:* 0.0781
-- *Cleanup time:* 0.0799
-- *Prompt tokens:* 304
-- *Generation tokens:* 130
-- *Total tokens:* 434
-- *Prompt throughput (raw):* 3,893 tok/s
-- *Generation throughput (raw):* 351 tok/s
-- *Peak memory:* 2.4
+- *Model load time:* 0.79s
+- *Generation time:* 1.74s
+- *Total time:* 2.54s
+- *Input validation time:* 9.73e-05
+- *Prompt preparation time:* 0.00258
+- *First-token latency:* 0.0877
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 343
+- *Generation tokens:* 81
+- *Total tokens:* 424
+- *Prompt throughput (raw):* 3,909 tok/s
+- *Generation throughput (raw):* 186 tok/s
+- *Peak memory:* 2.1
 - *Active memory:* 0.61
-- *Cache memory:* 0.30
+- *Cache memory:* 0.28
 - *Model-load active memory:* 0.611
 - *Post-cleanup active memory:* 0.013
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1218
+- *Rendered prompt characters:* 1434
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2745,8 +2808,8 @@ Seafront, Felixstowe, England, UK, GBR, Europe, East Suffolk, England, UK, gbr, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Seafront, Felixstowe, England, UK, GBR, Europe
-Description: A 5-10-word title that describes the image and includes relevant context, such as the location, the photographer's watermark, and the image's metadata. The description also includes the main visible subject, setting, action, lighting, and distinctive details, such as the seafront, the location, the photographer's watermark, and the metadata. The keywords are carefully chosen to cover the most important details, such as the location, the photographer's watermark, and the metadata, while also including the main visible subject, setting, and action.
+Title: Dover Castle, England, UK, GBR, Europe
+Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle is situated on a hill under a partly cloudy sky, and it is a part of the historic medieval architecture in England.
 </pre>
 
 </details>
@@ -2764,29 +2827,30 @@ Description: A 5-10-word title that describes the image and includes relevant co
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Missing or empty fields:
-  Title, Description, Keywords; Response appears cut off at the token limit
+  Title, Description, Keywords; Response repeats the task instructions instead
+  of only returning the requested fields
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.13s
-- *Generation time:* 23.67s
-- *Total time:* 24.82s
-- *Input validation time:* 3.41e-05
-- *Prompt preparation time:* 0.000169
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.124
-- *Prompt tokens:* 4,397
-- *Generation tokens:* 1,000
-- *Total tokens:* 5,397
-- *Prompt throughput (raw):* 4,019 tok/s
-- *Generation throughput (raw):* 46.0 tok/s
-- *Peak memory:* 4.4
+- *Model load time:* 1.42s
+- *Generation time:* 25.38s
+- *Total time:* 26.82s
+- *Input validation time:* 0.000109
+- *Prompt preparation time:* 0.000251
+- *First-token latency:* 1.63
+- *Cleanup time:* 0.226
+- *Prompt tokens:* 4,435
+- *Generation tokens:* 726
+- *Total tokens:* 5,161
+- *Prompt throughput (raw):* 2,719 tok/s
+- *Generation throughput (raw):* 32.1 tok/s
+- *Peak memory:* 4.3
 - *Active memory:* 1.7
-- *Cache memory:* 2.1
+- *Cache memory:* 2.0
 - *Model-load active memory:* 1.73
 - *Post-cleanup active memory:* 0.014
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1118
+- *Rendered prompt characters:* 1334
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2802,173 +2866,23 @@ Description: A 5-10-word title that describes the image and includes relevant co
 *Readable output:*
 
 <pre class="model-output-readable">
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context:
-- Authoritative context
+- Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 </pre>
 
 </details>
@@ -2992,19 +2906,20 @@ Description: A 5-10-word title that describes the image and includes relevant co
 - *Error type:* ValueError
 - *Error package:* mlx-vlm
 - *Error message:* Model generation failed for
-  mlx-community/SmolVLM2-2.2B-Instruct-mlx: not enough values to unpack
-  (expected 3, got 2)
+  mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do
+  not match: tokens: 81, features 1053
 - *Root exception type:* ValueError
 - *Root exception module:* builtins
-- *Root exception message:* not enough values to unpack (expected 3, got 2)
+- *Root exception message:* Image features and image tokens do not match:
+  tokens: 81, features 1053
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.70s
-- *Generation time:* 1.33s
-- *Total time:* 2.03s
-- *Input validation time:* 4.82e-05
-- *Prompt preparation time:* 0.00196
+- *Model load time:* 0.82s
+- *Generation time:* 2.11s
+- *Total time:* 2.94s
+- *Input validation time:* 0.000169
+- *Prompt preparation time:* 0.00511
 - *First-token latency:* -
-- *Cleanup time:* 0.0764
+- *Cleanup time:* 0.122
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3018,7 +2933,7 @@ Description: A 5-10-word title that describes the image and includes relevant co
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1164
+- *Rendered prompt characters:* 1380
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -3035,22 +2950,22 @@ Description: A 5-10-word title that describes the image and includes relevant co
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11827, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11966, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12175, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12315, in _generate_once
     return strict_generate(
         model=model,
     ...<3 lines>...
         **generate_kwargs,
     )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1158, in generate
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1159, in generate
     for response in stream_generate(
                     ~~~~~~~~~~~~~~~^
         model, processor, prompt, image, audio, video, verbose=verbose, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ):
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 977, in stream_generate
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 978, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 393, in generate_step
@@ -3061,15 +2976,16 @@ Traceback (most recent call last):
     final_inputs_embeds = self._prepare_inputs_for_multimodal(
         image_features, inputs_embeds, input_ids
     )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/smolvlm/smolvlm.py", line 13, in _prepare_inputs_for_multimodal
-    N, S, D_img = image_features.shape
-    ^^^^^^^^^^^
-ValueError: not enough values to unpack (expected 3, got 2)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/idefics3/idefics3.py", line 174, in _prepare_inputs_for_multimodal
+    raise ValueError(
+        f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}"
+    )
+ValueError: Image features and image tokens do not match: tokens: 81, features 1053
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12536, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12893, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3080,14 +2996,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12188, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12328, in _run_model_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11834, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_generation_guarded
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: not enough values to unpack (expected 3, got 2)
+ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do not match: tokens: 81, features 1053
 
 ```
 
@@ -3096,20 +3012,20 @@ ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '3', '-', '1', '7', '2', '3', '1', '8', '_', 'D', 'S', 'C', '0', '1', '5', '2', '5', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '5', '-', '1', '5', '5', '9', '4', '6', '_', 'D', 'S', 'C', '0', '1', '5', '6', '8', '.', 'j', 'p', 'g'] 
 
 Prompt: <|im_start|>User:<image>Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-13 17:23:18 UTC+01:00
-- GPS: 51.957967°N, 1.346900°E
+- Capture date/time: 2026-08-15 15:59:46 UTC+01:00
+- GPS: 51.128800°N, 1.319100°E
 
 Descriptive hints:
-- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
-- Description hint: Seafront, Felixstowe, England, UK, GBR
-- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
+- Title hint: Dover Castle, Dover, England, UK, GBR, Europe
+- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
 
 Write:
 - a concrete 5-10-word title;
@@ -3126,13 +3042,13 @@ Assistant:
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 1898.38it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 3113.43it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[18:42:19] ERROR    Generation error for mlx-community/SmolVLM2-2.2B-Instruct-mlx
-                    ValueError: not enough values to unpack (expected 3, got 2)
+[00:45:18] ERROR    Generation error for mlx-community/SmolVLM2-2.2B-Instruct-mlx
+                    ValueError: Image features and image tokens do not match: tokens: 81, features 1053
 ```
 
 </details>
