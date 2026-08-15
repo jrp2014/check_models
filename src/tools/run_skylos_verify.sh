@@ -39,4 +39,8 @@ quality_setup_python
 quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"
 
 echo "=== Skylos Verify ==="
+# Deliberately the one skylos call without a </dev/null guard: --stdin feeds the
+# payload on stdin, so closing it would break the documented mode above. Safe
+# because `verify` has no gate interaction and no prompts; if that ever changes,
+# guard the non---stdin path only.
 quality_run_python_tool skylos verify . --project-context "$@"

@@ -105,8 +105,17 @@ quality_run_pyrefly_check "$@"
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
 
-# </dev/null keeps skylos non-interactive: on a TTY, a failing gate can launch
-# a "Continue anyway?" prompt and a deployment wizard that offers to push.
+# A failing skylos gate can offer a "Continue anyway?" prompt and a deployment
+# wizard that pushes commits. </dev/null alone does NOT prevent that: 4.33.x
+# decides from stdout.isatty(), not stdin, so a terminal run gets the prompt and
+# then aborts on the EOF. Only calls reaching run_gate_interaction can prompt —
+# `skylos cicd gate` and a bare `--gate` scan with no `--format`. Both calls
+# below are safe by construction: `--format concise --gate` routes to skylos's
+# quiet gate path, and `-a` without `--gate` never gates at all. </dev/null
+# stays as defence in depth. If you add a skylos call that can prompt, pipe its
+# stdout and read the status from PIPESTATUS (see run_skylos_danger_advisory.sh)
+# rather than reaching for --strict, which discards the configured
+# [tool.skylos.gate] thresholds in favour of fail-on-any-finding.
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
     quality_run_python_tool skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
