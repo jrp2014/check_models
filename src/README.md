@@ -693,7 +693,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.9" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.0" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -701,6 +701,14 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.
 
 - **Python**: 3.13+ (3.13 is the tested baseline)
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
+
+The working `mlx-vlm` env stays on the tested baseline. To see whether a newer
+Python has become viable without touching that env, run
+`make probe-python-next` (defaults to 3.14): it installs the PyPI stack into a
+throwaway `mlx-vlm-314` conda env, verifies imports and the fast test lane, and
+optionally (`PROBE_SOURCE_BUILD=1`) compiles the local mlx source tree — the one
+signal PyPI wheels cannot give and the thing that would actually break
+`tools/update.sh` after a switch. `PROBE_PYTHON=3.15` targets a later version.
 
 ### Advanced Configuration
 
@@ -842,7 +850,6 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | Model cache / discovery | `huggingface-hub` | `>=1.10.1` |
 | PEP 440 version parsing | `packaging` | `>=26.0` |
 | Console rendering | `rich` | `>=14.1.0` |
-| Reporting / tables | `tabulate` | `>=0.9.0` |
 | Configuration loading | `PyYAML` | `>=6.0` |
 | Language model utilities | `mlx-lm` | `>=0.31.3` |
 
@@ -887,7 +894,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.9" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.0" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 

@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import Final
 
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.31.2",
+    "mlx": "0.32.0",
     "mlx-lm": "0.31.3",
-    "mlx-vlm": "0.6.9",
-    "transformers": "5.7.0",
+    "mlx-vlm": "0.6.13",
+    "transformers": "5.14.0",
     "huggingface-hub": "1.10.1",
 }
 
@@ -25,10 +25,10 @@ PROJECT_RUNTIME_STACK_SPECS: Final[dict[str, str]] = {
 }
 
 UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.31.2",
+    "mlx": "0.32.0",
     "mlx-lm": "0.31.3",
     "mlx-audio": "0.4.3",
-    "transformers": "5.5.0",
+    "transformers": "5.14.0",
 }
 
 UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
@@ -56,7 +56,6 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     "defusedxml": ">=0.7.1",
     "packaging": ">=26.0",
     "Pillow": f">={PROJECT_PILLOW_MINIMUM_VERSION}",
-    "tabulate": ">=0.9.0",
     "wcwidth": ">=0.2.13",
     "PyYAML": ">=6.0",
 }

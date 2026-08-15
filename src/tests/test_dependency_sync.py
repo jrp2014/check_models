@@ -341,14 +341,16 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
 
 
 def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
-    """Project and upstream mlx-lm policy should share the current Transformers floor."""
-    assert dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS["transformers"] == "5.7.0"
+    """The project floor tracks the released mlx-vlm stack (0.6.13 metadata)."""
+    assert dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS["transformers"] == "5.14.0"
+    assert dependency_policy.UPSTREAM_MLX_VLM_MINIMUMS["transformers"] == "5.14.0"
+    # mlx-lm's own, lower floor remains a separate upstream fact.
     assert dependency_policy.UPSTREAM_MLX_LM_MINIMUMS["transformers"] == "5.7.0"
 
 
 def test_dependency_policy_does_not_cap_transformers() -> None:
     """Transformers should retain its floor without an upper version bound."""
-    assert dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC == ">=5.7.0"
+    assert dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC == ">=5.14.0"
 
 
 def test_pillow_floor_uses_security_fixed_release() -> None:

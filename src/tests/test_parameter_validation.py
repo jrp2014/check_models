@@ -869,6 +869,13 @@ class TestAutoThinkingBudget:
 
         assert check_models._auto_thinking_budget_kwargs(params, "<think>") == {}
 
+    def test_literal_marker_mention_does_not_trigger_auto(self) -> None:
+        """A literal marker mention in user text is not an open template block."""
+        params = _thinking_params(max_tokens=1000)
+
+        prompt = "user: explain <think>\nassistant:"
+        assert check_models._auto_thinking_budget_kwargs(params, prompt) == {}
+
     def test_closed_thinking_block_does_not_trigger_auto(self) -> None:
         """A closed block (few-shot example or literal mention) is not open."""
         params = _thinking_params(max_tokens=1000)

@@ -1141,13 +1141,13 @@ class TestPreflightDependencyDiagnostics:
                 "huggingface-hub": "1.9.9",
             },
         )
-        assert any("mlx==0.29.9" in issue and "0.31.2" in issue for issue in issues)
+        assert any("mlx==0.29.9" in issue and "0.32.0" in issue for issue in issues)
         assert any(
             "mlx-vlm==0.4.1" in issue and mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"] in issue
             for issue in issues
         )
         assert any("mlx-lm==0.30.9" in issue and "0.31.3" in issue for issue in issues)
-        assert any("transformers==5.3.9" in issue and "5.7.0" in issue for issue in issues)
+        assert any("transformers==5.3.9" in issue and "5.14.0" in issue for issue in issues)
         assert any("huggingface-hub==1.9.9" in issue and "1.10.1" in issue for issue in issues)
 
     def test_detect_upstream_version_issues_accepts_transformers_without_upper_cap(
@@ -1157,11 +1157,11 @@ class TestPreflightDependencyDiagnostics:
         """Transformers releases above 5.12 should be accepted after the MLX fix."""
         issues = mod._detect_upstream_version_issues(
             {
-                "mlx-vlm": "0.6.9",
+                "mlx-vlm": "0.6.13",
                 "mlx-lm": "0.31.3",
-                "mlx": "0.31.2",
+                "mlx": "0.32.0",
                 "mlx-audio": "0.4.3",
-                "transformers": "5.13.0",
+                "transformers": "5.15.0",
                 "huggingface-hub": "1.10.1",
             },
         )

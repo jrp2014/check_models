@@ -1038,7 +1038,7 @@ diagnostics report the same requirements that packaging installs. When
 module, `src/pyproject.toml`, and regenerated README install snippets together.
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-lm`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `tabulate`, `wcwidth`, `PyYAML`
+`mlx`, `mlx-lm`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `wcwidth`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 
@@ -1187,9 +1187,9 @@ All dependencies are defined in `src/pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "mlx>=0.31.2",
-    "mlx-vlm>=0.5.0",
-    "Pillow>=10.3.0",
+    "mlx>=0.32.0",
+    "mlx-vlm>=0.6.13",
+    "Pillow[xmp]>=12.3.0",
     # ...
 ]
 
@@ -1208,10 +1208,10 @@ All dependencies are defined in `src/pyproject.toml` as the single source of tru
 ```toml
 [project]
 dependencies = [
-    "mlx>=0.31.2",
+    "mlx>=0.32.0",
     "mlx-lm>=0.31.3",
-    "mlx-vlm>=0.6.2",
-    "transformers>=5.7.0",
+    "mlx-vlm>=0.6.13",
+    "transformers>=5.14.0",
     # ...
 ]
 
@@ -1342,7 +1342,7 @@ package==1.2.3
 
 ```ini
 # Example of a temporary compatibility cap when an upstream release regresses.
-mlx>=0.31.2,<0.32.0
+mlx>=0.32.0,<0.33.0
 ```
 
 ## Makefile Targets Reference

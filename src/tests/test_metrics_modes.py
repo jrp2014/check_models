@@ -1509,13 +1509,16 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
 class TestSystemTelemetry:
     """System-pressure telemetry must aggregate per-probe and expose gaps."""
 
-    def test_record_none_when_no_probes_succeeded(self) -> None:
-        """All-None probes yield no record."""
+    def test_total_probe_failure_yields_zero_count_record(self) -> None:
+        """All-None probes still produce a record so the gap is visible."""
         record = check_models._system_telemetry_record_from_probes(
             [(None, None), (None, None)], mode="snapshot"
         )
 
-        assert record is None
+        assert record == {"mode": "snapshot", "cpu_samples": 0, "memory_samples": 0}
+        status = check_models._telemetry_status_line(record)
+        assert "thermal probe unavailable" in status
+        assert "memory-pressure probe unavailable" in status
 
     def test_record_aggregates_min_max_and_per_probe_counts(self) -> None:
         """Aggregates keep the throttling floor, pressure ceiling, and counts."""

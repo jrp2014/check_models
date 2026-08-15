@@ -8841,7 +8841,13 @@ def _diagnostics_result_facts(
     )
     telemetry = result.system_telemetry
     if telemetry is not None:
-        rows.append(("System pressure during run", _telemetry_status_line(telemetry)))
+        label = (
+            "System pressure snapshots (before/after; cannot rule out transient "
+            "pressure during inference)"
+            if telemetry.get("mode") == "snapshot"
+            else "System pressure during run"
+        )
+        rows.append((label, _telemetry_status_line(telemetry)))
     return tuple(rows)
 
 
@@ -10230,12 +10236,38 @@ def get_system_characteristics() -> dict[str, str]:
             if logical_cores:
                 info["CPU Cores (Logical)"] = str(logical_cores)
 
+        # Concise psutil memory/swap context facts (environmental evidence,
+        # not proof of an MLX or model defect); degrade gracefully.
+        info.update(_get_psutil_memory_facts())
+
         info.update(_get_mlx_backend_artifact_info())
 
     except (OSError, RuntimeError, ValueError) as err:
         logger.debug("Error gathering system characteristics: %s", err)
 
     return info
+
+
+def _get_psutil_memory_facts() -> dict[str, str]:
+    """Return available-memory and swap-use context facts when psutil exposes them."""
+    facts: dict[str, str] = {}
+    if psutil is None:
+        return facts
+    try:
+        available = psutil.virtual_memory().available
+        if type(available) is int and available > 0:
+            facts["Available Memory (run start)"] = f"{available / (1024**3):.1f} GB"
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError):
+        logger.debug("psutil virtual_memory unavailable", exc_info=True)
+    try:
+        swap = psutil.swap_memory()
+        if type(swap.total) is int and swap.total >= 0:
+            facts["Swap Used (run start)"] = (
+                f"{swap.used / (1024**3):.1f} GB of {swap.total / (1024**3):.1f} GB"
+            )
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError):
+        logger.debug("psutil swap_memory unavailable", exc_info=True)
+    return facts
 
 
 def _probe_fused_attention() -> RuntimeProbeResult:
@@ -10710,14 +10742,16 @@ def _prompt_opens_thinking_block(
     formatted_prompt: str,
     pair: ThinkingDelimiterPair,
 ) -> bool:
-    """True when the prompt's final thinking marker for this pair is unmatched.
+    r"""True when the rendered prompt terminates with an open thinking marker.
 
-    Mirrors mlx-vlm's server-side open-block logic: a start marker followed by
-    its end marker is a closed block (few-shot examples, literal mentions), so
-    only a trailing unclosed start marker counts as the template opening a
-    thinking block for the model to continue.
+    A chat template that opens a thinking block for the model to continue ends
+    the prompt with the start marker (optionally followed by whitespace) —
+    e.g. ``...assistant\n<think>``. A terminal check rejects closed blocks
+    (``<think></think>`` no-think stubs), few-shot examples, and literal
+    marker mentions in user text, all of which the model is not meant to
+    continue.
     """
-    return formatted_prompt.rfind(pair.start) > formatted_prompt.rfind(pair.end)
+    return formatted_prompt.rstrip().endswith(pair.start)
 
 
 def _auto_thinking_budget_kwargs(
@@ -12646,12 +12680,15 @@ def _system_telemetry_record_from_probes(
     *,
     mode: str,
     interval_s: float | None = None,
-) -> SystemTelemetryRecord | None:
-    """Aggregate probe pairs, keeping per-probe counts so gaps stay visible."""
+) -> SystemTelemetryRecord:
+    """Aggregate probe pairs, keeping per-probe counts so gaps stay visible.
+
+    Total probe failure still yields a record (both sample counts zero) so
+    diagnostics can distinguish "telemetry ran but probes were unavailable"
+    from telemetry being disabled.
+    """
     cpu_limits = [cpu for cpu, _ in probes if cpu is not None]
     pressure_levels = [level for _, level in probes if level is not None]
-    if not cpu_limits and not pressure_levels:
-        return None
     record: SystemTelemetryRecord = {
         "mode": mode,
         "cpu_samples": len(cpu_limits),
@@ -12712,8 +12749,8 @@ class _SystemTelemetrySampler:
             self._probes.append((cpu_limit, _sample_memory_pressure_level()))
             self._stop_event.wait(self._interval_s)
 
-    def snapshot(self) -> SystemTelemetryRecord | None:
-        """Aggregate captured probes; None when nothing was sampled."""
+    def snapshot(self) -> SystemTelemetryRecord:
+        """Aggregate captured probes; zero sample counts stay visible."""
         return _system_telemetry_record_from_probes(
             self._probes,
             mode="continuous",
@@ -16346,6 +16383,21 @@ _REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
 )
 
 
+def _repro_thinking_overrides(
+    run_args: argparse.Namespace | None,
+    effective_generate_kwargs: Mapping[str, object] | None,
+) -> dict[str, object]:
+    """Return per-model thinking kwargs that differ from the global CLI args."""
+    if run_args is None or not effective_generate_kwargs:
+        return {}
+    return {
+        key: effective_generate_kwargs[key]
+        for key in _REPRO_THINKING_KWARG_KEYS
+        if key in effective_generate_kwargs
+        and effective_generate_kwargs[key] != getattr(run_args, key, None)
+    }
+
+
 def _effective_repro_args(
     run_args: argparse.Namespace | None,
     effective_generate_kwargs: Mapping[str, object] | None,
@@ -16356,19 +16408,44 @@ def _effective_repro_args(
     repro built from global CLI arguments alone would not reproduce the
     recorded output. The per-model kwargs captured in prompt diagnostics win.
     """
-    if run_args is None or not effective_generate_kwargs:
-        return run_args
-    overrides = {
-        key: effective_generate_kwargs[key]
-        for key in _REPRO_THINKING_KWARG_KEYS
-        if key in effective_generate_kwargs
-    }
-    if not overrides:
+    overrides = _repro_thinking_overrides(run_args, effective_generate_kwargs)
+    if run_args is None or not overrides:
         return run_args
     merged = argparse.Namespace(**vars(run_args))
     for key, value in overrides.items():
         setattr(merged, key, value)
     return merged
+
+
+def _shared_repro_thinking_caveat(
+    highlighted_results: Sequence[PerformanceResult],
+    run_args: argparse.Namespace | None,
+) -> ReportParagraph | None:
+    """Warn when per-model automatic thinking flags diverge from the shared command.
+
+    The shared reproduction command is rendered once with ``MODEL_ID``
+    substitution, so it cannot carry flags that were auto-applied per model.
+    """
+    affected: list[str] = []
+    for result in highlighted_results:
+        diagnostics = result.prompt_diagnostics
+        overrides = _repro_thinking_overrides(
+            run_args,
+            diagnostics.generate_kwargs if diagnostics is not None else None,
+        )
+        if overrides:
+            budget = overrides.get("thinking_budget")
+            flags = "--enable-thinking"
+            if budget is not None:
+                flags += f" --thinking-budget {budget}"
+            affected.append(f"`{result.model_name}` ({flags})")
+    if not affected:
+        return None
+    return ReportParagraph(
+        "The shared command omits per-model automatic thinking flags. When "
+        "substituting these models, append the flags recorded in their "
+        "diagnostics blocks: " + "; ".join(affected) + "."
+    )
 
 
 def _reproduction_input_blocks(
@@ -17525,18 +17602,22 @@ def _diagnostics_shared_context_blocks(
         if component_rows
         else ReportParagraph("Environment and component provenance unavailable.")
     )
+    thinking_caveat = _shared_repro_thinking_caveat(highlighted_results, run_args)
+    reproduction_blocks: tuple[ReportBlock, ...] = _reproduction_input_blocks(
+        model_name="MODEL_ID",
+        prompt=prompt,
+        image=image,
+        run_args=run_args,
+        resolved_revision="RESOLVED_REVISION",
+    )
+    if thinking_caveat is not None:
+        reproduction_blocks = (*reproduction_blocks, thinking_caveat)
     return (
         _report_section(
             "Shared Reproduction and Provenance",
             _report_section(
                 "Reproduction inputs",
-                *_reproduction_input_blocks(
-                    model_name="MODEL_ID",
-                    prompt=prompt,
-                    image=image,
-                    run_args=run_args,
-                    resolved_revision="RESOLVED_REVISION",
-                ),
+                *reproduction_blocks,
                 level=3,
             ),
             _report_section("Highlighted model revisions", model_block, level=3),

@@ -7,6 +7,29 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- `make probe-python-next` / `tools/probe_python_next.sh`: check whether a
+  newer Python (default 3.14, `PROBE_PYTHON=3.15` for later) is viable for the
+  MLX stack in a throwaway, minor-pinned conda env (`mlx-vlm-314`) that never
+  touches the working `mlx-vlm` env. It verifies the PyPI stack installs and
+  imports (including Metal availability), runs the fast pytest lane against
+  it, and with `PROBE_SOURCE_BUILD=1` compiles the local mlx source tree — the
+  signal PyPI wheels cannot provide and the thing that would actually break
+  `tools/update.sh` after a switch. The working env stays on the tested 3.13
+  baseline until that probe is green.
+- Begin implementing the accepted mlx-vlm upstream alignment design
+  (docs/superpowers/specs/2026-08-14-mlx-vlm-upstream-alignment-design.md):
+  raise runtime floors to the released mlx-vlm 0.6.13 stack (`mlx>=0.32.0`,
+  `mlx-vlm>=0.6.13`, `transformers>=5.14.0`; mlx-lm keeps its own 5.7.0
+  Transformers floor as a separate upstream fact), remove the last `tabulate`
+  references from the validation fallback and docs, and record concise psutil
+  available-memory and swap-use context facts in the system evidence when
+  psutil is present. Capability-aware discovery and the coverage matrix
+  remain to follow.
+- Make the upstream thinking-budget issue draft maintainer-ready: regenerable
+  test image script, pinned model revisions, and observed side-by-side native
+  output showing Qwen3-VL-2B-Thinking force-closed at a 20-token budget while
+  GLM-4.1V-9B-Thinking ignores the same flag.
+
 - Automatic thinking budget (`--auto-thinking-budget`, default on): when no
   explicit thinking flags and no `--thinking-mode` are given and a model's
   chat template leaves a thinking block open (final start marker unmatched,
@@ -32,6 +55,23 @@ Notable changes to this project will be documented in this file.
   sample counts, surfaced in the diagnostics provenance block (unavailable
   probes are reported as unavailable, never as clean), and logged as a
   warning when a run was throttled or under memory pressure.
+
+### Fixed
+
+- Auto thinking budget detection now requires the rendered prompt to
+  *terminate* with an open thinking marker, so closed `<think></think>`
+  no-think stubs, few-shot examples, and literal marker mentions in user text
+  no longer activate budgeting (regression-tested against the real rendered
+  prompts of ERNIE, Qwen3-VL-Thinking, MiniCPM, and GLM-4.6V).
+- The shared diagnostics `MODEL_ID` reproduction command now discloses when
+  per-model automatic thinking flags diverge from the global arguments,
+  listing each affected model with the exact flags to append; per-model
+  overlays now trigger only on real value differences.
+- Total telemetry probe failure now retains a zero-count record instead of
+  silently omitting telemetry, so "both probes unavailable" is
+  distinguishable from "telemetry disabled"; the snapshot-mode diagnostics
+  label states that before/after snapshots cannot rule out transient
+  pressure during inference.
 
 ## [0.10.0] - 2026-08-14
 

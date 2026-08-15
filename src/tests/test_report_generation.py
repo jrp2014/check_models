@@ -5354,3 +5354,60 @@ def test_repro_args_overlay_is_identity_without_thinking_kwargs() -> None:
     assert check_models._effective_repro_args(run_args, None) is run_args
     assert check_models._effective_repro_args(run_args, {"max_tokens": 500}) is run_args
     assert check_models._effective_repro_args(None, {"enable_thinking": True}) is None
+
+
+def test_shared_repro_caveat_lists_auto_thinking_models() -> None:
+    """The shared MODEL_ID command must disclose per-model auto thinking flags."""
+    run_args = Namespace(
+        enable_thinking=False,
+        thinking_budget=None,
+        thinking_start_token=None,
+        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
+    )
+    auto_result = check_models.PerformanceResult(
+        model_name="org/auto-thinker",
+        generation=None,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={
+                "enable_thinking": True,
+                "thinking_budget": 800,
+                "thinking_start_token": "<think>",
+                "thinking_end_token": "</think>",
+            }
+        ),
+    )
+    plain_result = check_models.PerformanceResult(
+        model_name="org/plain",
+        generation=None,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(generate_kwargs={}),
+    )
+
+    caveat = check_models._shared_repro_thinking_caveat([auto_result, plain_result], run_args)
+
+    assert caveat is not None
+    text = caveat.text
+    assert "org/auto-thinker" in text
+    assert "--thinking-budget 800" in text
+    assert "org/plain" not in text
+
+    assert check_models._shared_repro_thinking_caveat([plain_result], run_args) is None
+
+
+def test_repro_overrides_require_value_difference() -> None:
+    """Kwargs equal to the global args are not treated as per-model overrides."""
+    run_args = Namespace(
+        enable_thinking=True,
+        thinking_budget=500,
+        thinking_start_token=None,
+        thinking_end_token=check_models.DEFAULT_THINKING_END_MARKER,
+    )
+    same = {
+        "enable_thinking": True,
+        "thinking_budget": 500,
+        "thinking_end_token": check_models.DEFAULT_THINKING_END_MARKER,
+    }
+
+    assert check_models._repro_thinking_overrides(run_args, same) == {}
+    assert check_models._effective_repro_args(run_args, same) is run_args

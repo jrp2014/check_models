@@ -124,6 +124,10 @@ update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs
 update-quick: ## Quick in-env refresh: upgrade pip and reinstall project dependencies
 	$(MAKE) -C $(SRC) update-quick
 
+.PHONY: probe-python-next
+probe-python-next: ## Check whether the next Python is viable in a throwaway conda env (never touches mlx-vlm)
+	$(MAKE) -C $(SRC) probe-python-next
+
 .PHONY: update-env
 update-env: update ## Alias for 'update' target
 

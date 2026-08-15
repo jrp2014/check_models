@@ -1,22 +1,23 @@
 # Draft upstream issue: thinking_budget cannot bound models that emit their own thinking start token
 
-Status: draft, not filed. Paste-ready body below the line. Evidence from the
-2026-08-14 41-model sweep (`src/output/results.jsonl`, max_tokens=1000,
-temperature 0.0, image cataloguing prompt).
+Status: draft, not filed. Paste-ready body below the line. Native-run evidence
+captured 2026-08-15 on the pinned revisions shown; sweep evidence from the
+2026-08-14 41-model run (`src/output/results.jsonl`).
 
 ---
 
-## `thinking_budget` never engages for models that emit the thinking start token during generation (e.g. GLM-4.1V-Thinking, Kimi-VL-Thinking)
+## `thinking_budget` is silently ignored when the model emits its own thinking start token (GLM-4.1V-Thinking, Kimi-VL-Thinking)
 
 ### Summary
 
-`ThinkingBudgetCriteria` can only bound a thinking block whose start token is
-already present in the **prompt** (i.e. the chat template pre-opens
-`<think>`). Models whose templates do *not* pre-open the block, but which emit
-the start token as their first generated token — GLM-4.1V-9B-Thinking emits
-`<think>`, Kimi-VL-A3B-Thinking emits `◁think▷` — can never be budgeted: they
-reason until `max_tokens` and the requested answer is truncated away, no
-matter what `--thinking-budget` is set to.
+`ThinkingBudgetCriteria` only engages when the thinking start token is already
+present in the **prompt** (i.e. the chat template pre-opens `<think>`). Models
+whose templates do *not* pre-open the block, but which emit the start token as
+their first generated token — GLM-4.1V-9B-Thinking emits `<think>`,
+Kimi-VL-A3B-Thinking emits `◁think▷` — can never be budgeted: the same
+`--thinking-budget` that visibly bounds Qwen3-VL-Thinking does nothing for
+them, and on longer tasks they reason until `max_tokens` so the requested
+answer is truncated away.
 
 Verified at current `main` (`8683ec19`) and in the `v0.6.13` release (same
 code at `mlx_vlm/generate/dispatch.py:917`).
@@ -27,13 +28,9 @@ code at `mlx_vlm/generate/dispatch.py:917`).
    (`mlx_vlm/generate/dispatch.py:913-921`):
 
    ```python
-   if thinking_budget is not None:
-       thinking_start_token_id = tokenizer.encode(
-           thinking_start_token, add_special_tokens=False
-       )[-1]
-       enable_thinking = enable_thinking and (
-           thinking_start_token_id in input_ids.flatten().tolist()
-       )
+   enable_thinking = enable_thinking and (
+       thinking_start_token_id in input_ids.flatten().tolist()
+   )
    ```
 
    If the rendered prompt lacks the start token, the criteria is constructed
@@ -53,58 +50,101 @@ code at `mlx_vlm/generate/dispatch.py:917`).
 
 ### Reproduction
 
-Any image works; the model is the variable.
+Generate a small test image (any image works; this one is regenerable):
+
+```python
+from PIL import Image, ImageDraw
+img = Image.new("RGB", (512, 384), (70, 130, 180))
+draw = ImageDraw.Draw(img)
+draw.rectangle([40, 250, 470, 350], fill=(240, 220, 130))
+draw.ellipse([380, 40, 460, 120], fill=(255, 215, 0))
+draw.polygon([(120, 250), (180, 160), (240, 250)], fill=(178, 34, 34))
+img.save("repro.png")
+```
+
+Run the same command against both models with a deliberately tight budget:
 
 ```bash
 python -m mlx_vlm.generate \
   --model mlx-community/GLM-4.1V-9B-Thinking-8bit \
-  --image any-local-image.jpg \
+  --revision 9677807f106500eb7690391c27645d59f6855cfb \
+  --image repro.png \
   --prompt "Give a one-sentence description." \
-  --max-tokens 300 \
-  --temperature 0.0 \
-  --enable-thinking \
-  --thinking-budget 100
+  --max-tokens 300 --temperature 0.0 \
+  --enable-thinking --thinking-budget 20
 ```
 
-**Expected:** after ~100 thinking tokens, the forced `\n</think>` sequence
-closes the block and the model produces the answer within 300 tokens.
+```bash
+python -m mlx_vlm.generate \
+  --model mlx-community/Qwen3-VL-2B-Thinking-bf16 \
+  --revision c325e5ea14c215bb08fa0d668c81fa2581f9050b \
+  --image repro.png \
+  --prompt "Give a one-sentence description." \
+  --max-tokens 300 --temperature 0.0 \
+  --enable-thinking --thinking-budget 20
+```
 
-**Actual:** the rendered GLM-4.1V prompt contains no `<think>`, so the budget
-is disabled by the prompt-containment AND; the model emits `<think>` as its
-first generated token, reasons for all 300 tokens, and the output is cut off
-mid-reasoning with no answer. Same behaviour for
-`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16` with
-`--thinking-start-token "◁think▷" --thinking-end-token "◁/think▷"`.
+### Observed output (macOS 26.6.1, M5 Max, mlx 0.32.1.dev20260814+3d23f7d87)
 
-### Evidence from a 41-model sweep (max_tokens=1000, temperature 0.0)
+**Qwen3-VL-2B-Thinking** (template pre-opens `<think>` — budget works):
+thinking is force-closed mid-sentence at the 20-token budget and generation
+continues outside the block:
 
-| Model | Start token in rendered prompt? | Start token emitted in output? | Budgetable today? | Outcome at cap |
-| --- | --- | --- | --- | --- |
-| Qwen3-VL-2B-Thinking-bf16 | yes (`<think>`) | — | yes | truncated (budget not set in this run) |
-| ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | yes (`<think>`) | — | yes | truncated (budget not set in this run) |
-| GLM-4.1V-9B-Thinking-8bit | **no** | **yes** (`<think>`) | **no** | truncated, no answer |
-| Kimi-VL-A3B-Thinking-2506-bf16 | **no** | **yes** (`◁think▷`) | **no** | truncated, no answer |
-| MiniCPM-V-4.6-8bit | yes (`<think>`) | yes (self-closes) | yes | completed |
+```text
+Got it, let's see. The image has a blue background, a yellow sun in the top right
+</think>
 
-(Apriel-1.5-Thinker and X-Reasoner also burn the cap on free-form reasoning,
-but emit no recognisable marker at all — out of scope for a token-based
-budget.)
+A blue background features a yellow sun in the top right corner, a red triangle
+partially above a light yellow rectangle.
+```
+
+**GLM-4.1V-9B-Thinking** (emits `<think>` itself — budget silently ignored):
+the thinking block runs ~75 tokens, far past the 20-token budget, and closes
+only when the model chooses to:
+
+```text
+<think>Got it, let's look at the image. There's a blue background, a yellow
+rectangle (maybe a ground or platform), a red triangle (like a hill or shape),
+and a yellow circle (like a sun). So the description should include the main
+elements: a blue sky with a yellow sun, a red triangle on a yellow rectangle.
+Let's make a one-sentence description.</think><answer>The image shows a blue
+background with a yellow sun, a red triangle on a yellow rectangular platform.
+```
+
+On this trivial image GLM recovers because its reasoning is naturally short;
+on real tasks the unbounded block routinely consumes the entire token budget.
+In a 41-model catalogue sweep (max_tokens=1000, temperature 0.0), both
+GLM-4.1V-9B-Thinking and Kimi-VL-A3B-Thinking spent all 1000 tokens inside
+their self-opened thinking blocks and produced no answer, while the
+template-opened thinkers (Qwen3-VL-Thinking, ERNIE-4.5-VL-Thinking) are
+bounded by the same flag. Note the budget mechanism guarantees only closure
+of the block; whether the remaining tokens suffice for a complete answer
+still depends on `max_tokens` headroom.
+
+### Sweep evidence (which models can be budgeted today)
+
+| Model | Start token in rendered prompt? | Start token emitted in output? | Budgetable today? |
+| --- | --- | --- | --- |
+| Qwen3-VL-2B-Thinking-bf16 | yes (`<think>`) | — | yes (verified above) |
+| ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | yes (`<think>`) | — | yes |
+| GLM-4.1V-9B-Thinking-8bit | **no** | **yes** (`<think>`) | **no** (verified above) |
+| Kimi-VL-A3B-Thinking-2506-bf16 | **no** | **yes** (`◁think▷`) | **no** |
+| MiniCPM-V-4.6-8bit | closed stub (`<think>\n\n</think>`) | self-closes | n/a |
+
+(Kimi-VL needs `--thinking-start-token "◁think▷" --thinking-end-token
+"◁/think▷"`. Apriel-1.5-Thinker and X-Reasoner reason free-form with no
+marker at all — out of scope for a token-based budget.)
 
 ### Suggested fix
 
 Let the criteria arm itself on an **emitted** start token instead of relying
-on the prompt-containment AND:
-
-- In `ThinkingBudgetCriteria.__call__`, detect
-  `token_id == self.thinking_start_token_id` unconditionally (or gate it on
-  the user's original `enable_thinking` rather than the ANDed value) and set
-  `in_thinking = True` from that point.
-- Keep the existing prompt-containment path for templates that pre-open the
-  block (`in_thinking = True` from token 0).
-
-That makes `--thinking-budget` uniformly effective for both template-opened
-and self-opened thinking models, with no behaviour change for models that
-never emit the token.
+on the prompt-containment AND: in `ThinkingBudgetCriteria.__call__`, detect
+`token_id == self.thinking_start_token_id` unconditionally (or gate it on the
+user's original `enable_thinking` rather than the ANDed value) and set
+`in_thinking = True` from that point, keeping the existing prompt-containment
+path for templates that pre-open the block. That makes `--thinking-budget`
+uniformly effective for both template-opened and self-opened thinking models,
+with no behaviour change for models that never emit the token.
 
 ### Environment
 

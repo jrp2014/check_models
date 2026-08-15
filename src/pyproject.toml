@@ -31,12 +31,11 @@ classifiers = [
 # upstream dependency graphs change.
 dependencies = [
     # Core MLX runtime stack required by benchmark execution
-    "mlx>=0.31.2",
+    "mlx>=0.32.0",
     "mlx-lm>=0.31.3",
-    "mlx-vlm>=0.6.9", # >=0.6.9: BPE detokenizer UTF-8 flush fix (retired local workaround)
-    # Project-level compatibility floor for the MLX ecosystem; current
-    # mlx-lm GitHub main supports Transformers 5.13.0 and later.
-    "transformers>=5.7.0",
+    "mlx-vlm>=0.6.13", # latest released direct-API surface this project validates against
+    # Floor matches mlx-vlm 0.6.13 release metadata for the direct API surface.
+    "transformers>=5.14.0",
     "defusedxml>=0.7.1",
     "Pillow[xmp]>=12.3.0",
     "huggingface-hub[torch,typing]>=1.10.1",

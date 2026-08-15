@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from packaging.specifiers import SpecifierSet
 
+import check_models
 from check_models_data import dependency_policy
 from tools import validate_env
 
@@ -72,7 +73,7 @@ def test_version_matches_specifier_accepts_dev_build_above_floor() -> None:
     """PEP 440 version handling should accept dev builds above the declared floor."""
     assert validate_env._version_matches_specifier(
         package_name="mlx",
-        installed_version="0.31.3.dev20260410+a33b7916",
+        installed_version="0.32.1.dev20260410+a33b7916",
         version_spec=f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
     )
 
@@ -110,3 +111,41 @@ def test_load_pyproject_deps_tracks_transformers_optional_compatibility() -> Non
     )
     assert extras_deps["torch"] == dependency_policy.PROJECT_TORCH_EXTRA_COMPAT_SPECS["torch"]
     assert extras_deps["timm"] == dependency_policy.PROJECT_TORCH_EXTRA_COMPAT_SPECS["timm"]
+
+
+def test_psutil_memory_facts_capture_available_and_swap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Available-memory and swap facts are captured when psutil exposes them."""
+
+    class _VM:
+        available = 64 * 1024**3
+
+    class _Swap:
+        total = 2 * 1024**3
+        used = 1 * 1024**3
+
+    class _Psutil:
+        @staticmethod
+        def virtual_memory() -> object:
+            return _VM()
+
+        @staticmethod
+        def swap_memory() -> object:
+            return _Swap()
+
+    monkeypatch.setattr(check_models, "psutil", _Psutil)
+
+    facts = check_models._get_psutil_memory_facts()
+
+    assert facts["Available Memory (run start)"] == "64.0 GB"
+    assert facts["Swap Used (run start)"] == "1.0 GB of 2.0 GB"
+
+
+def test_psutil_memory_facts_degrade_without_psutil(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Missing psutil yields no facts instead of raising."""
+    monkeypatch.setattr(check_models, "psutil", None)
+
+    assert check_models._get_psutil_memory_facts() == {}
