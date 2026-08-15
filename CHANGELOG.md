@@ -72,6 +72,18 @@ Notable changes to this project will be documented in this file.
   distinguishable from "telemetry disabled"; the snapshot-mode diagnostics
   label states that before/after snapshots cannot rule out transient
   pressure during inference.
+- `tools/run_skylos_danger_advisory.sh` no longer ends a failing gate on a
+  half-drawn "Continue anyway? [y/n]:" prompt. Skylos 4.33.x decides whether
+  to offer that prompt from `stdout.isatty()` rather than stdin, so the
+  existing `</dev/null` guard stopped suppressing it and the EOF aborted the
+  script before it could print its own verdict. The gate's stdout is now
+  piped, its exit code is read from `PIPESTATUS`, and an exit code above 1
+  (analysis incomplete) is reported as an operational failure rather than a
+  gate verdict.
+- Extracted `_run_issue_summary_clean_completions_section()` from
+  `generate_run_issue_summary_report()`, dropping the latter's cyclomatic
+  complexity from 25 to 13 and clearing the `SKY-Q301` audit finding
+  (repo threshold 24). Report output is unchanged.
 
 ## [0.10.0] - 2026-08-14
 

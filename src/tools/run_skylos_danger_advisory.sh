@@ -140,9 +140,23 @@ fi
 if [ "$MODE" = "diff" ]; then
     gate_args+=(--diff-base "$DIFF_BASE")
 fi
-# </dev/null keeps skylos non-interactive: on a TTY, a failing gate launches a
-# "Continue anyway?" prompt and a deployment wizard that offers to push commits.
-quality_run_python_tool skylos "${gate_args[@]}" </dev/null
+# Skylos 4.33.x decides whether to offer the "Continue anyway?" prompt (and the
+# deployment wizard behind it) from stdout.isatty(), not stdin, so </dev/null
+# alone no longer suppresses it: on a terminal a failing gate printed a
+# half-drawn prompt and then aborted this script on the EOF, before it could
+# report its own verdict. Piping stdout keeps the gate non-interactive whichever
+# stream skylos consults, and PIPESTATUS keeps the gate's real exit code.
+set +e
+quality_run_python_tool skylos "${gate_args[@]}" </dev/null | cat
+gate_exit_code="${PIPESTATUS[0]}"
+set -e
+
+# 0 = gate passed, 1 = gate failed; anything higher means skylos could not
+# complete the analysis, which is an operational failure rather than a verdict.
+if [ "$gate_exit_code" -gt 1 ]; then
+    echo "❌ Skylos gate reporting failed with exit code $gate_exit_code." >&2
+    exit "$gate_exit_code"
+fi
 
 danger_count="$($QUALITY_PYTHON - "$report_path" <<'PY'
 from __future__ import annotations
@@ -181,10 +195,14 @@ if [ "$WRITE_LLM_REPORT" -eq 1 ]; then
     echo "LLM triage report: $llm_report_path"
 fi
 
-if [ "$danger_count" -eq 0 ]; then
+if [ "$danger_count" -eq 0 ] && [ "$gate_exit_code" -eq 0 ]; then
     echo "✅ Skylos danger scan found no issues. JSON report: $report_path"
 elif [ "$GATE_MODE" -eq 1 ]; then
-    echo "❌ Skylos danger gate: $danger_count blocking finding(s). JSON report: $report_path" >&2
+    if [ "$danger_count" -eq 0 ]; then
+        echo "❌ Skylos gate failed on non-danger thresholds; see the gate output above. JSON report: $report_path" >&2
+    else
+        echo "❌ Skylos danger gate: $danger_count blocking finding(s). JSON report: $report_path" >&2
+    fi
     exit 1
 else
     echo "⚠️  Skylos danger advisory reported $danger_count findings. JSON report: $report_path"

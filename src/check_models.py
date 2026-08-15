@@ -17066,6 +17066,58 @@ def _run_issue_summary_artifacts_section(
     return ReportSection("Full artifacts", tuple(content))
 
 
+def _run_issue_summary_clean_completions_section(
+    results: Sequence[JsonlResultRecord],
+    *,
+    output_paths: ReportOutputPaths,
+    summary_path: Path,
+    include_gallery_markdown: bool,
+) -> ReportSection:
+    """Name the models that completed with nothing for a maintainer to look at."""
+    clean_count = sum(
+        result["assessment"]["execution"] == "completed"
+        and not result["assessment"]["observations"]
+        for result in results
+    )
+    compliance_only_count = sum(
+        result["assessment"]["execution"] == "completed"
+        and result["assessment"]["maintainer_status"] == "none"
+        and bool(result["assessment"]["observations"])
+        for result in results
+    )
+    clean_models = sorted(
+        result["model"]
+        for result in results
+        if result["assessment"]["execution"] == "completed"
+        and not result["assessment"]["observations"]
+    )
+    clean_phrase = _pluralized_count(clean_count, "clean completion")
+    if clean_models:
+        clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
+    clean_sentence = f"{clean_phrase}."
+    if compliance_only_count:
+        clean_sentence = (
+            f"{clean_phrase}; "
+            f"{compliance_only_count} more completed with prompt-compliance "
+            "observations only (not maintainer issues)."
+        )
+    if include_gallery_markdown:
+        gallery_link = _run_issue_summary_artifact_link(
+            summary_path=summary_path,
+            artifact_path=output_paths.gallery_markdown,
+            label="full model gallery",
+        )
+        clean_sentence += f" See the {_render_report_cell_markdown(gallery_link, escaped=False)}."
+    return ReportSection(
+        "Clean completions",
+        (
+            ReportRaw(
+                markdown_lines=(clean_sentence,),
+            ),
+        ),
+    )
+
+
 def generate_run_issue_summary_report(
     output_paths: ReportOutputPaths,
     *,
@@ -17093,17 +17145,6 @@ def generate_run_issue_summary_report(
     other = tuple(result for result in surfaced if result not in actionable)
 
     counts = Counter(result["assessment"]["execution"] for result in source.results)
-    clean_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and not result["assessment"]["observations"]
-        for result in source.results
-    )
-    compliance_only_count = sum(
-        result["assessment"]["execution"] == "completed"
-        and result["assessment"]["maintainer_status"] == "none"
-        and bool(result["assessment"]["observations"])
-        for result in source.results
-    )
     title = (
         "# mlx-vlm compatibility findings across "
         f"{len(source.results)} cached vision-language models"
@@ -17159,37 +17200,12 @@ def generate_run_issue_summary_report(
             )
         )
 
-    clean_models = sorted(
-        result["model"]
-        for result in source.results
-        if result["assessment"]["execution"] == "completed"
-        and not result["assessment"]["observations"]
-    )
-    clean_phrase = _pluralized_count(clean_count, "clean completion")
-    if clean_models:
-        clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
-    clean_sentence = f"{clean_phrase}."
-    if compliance_only_count:
-        clean_sentence = (
-            f"{clean_phrase}; "
-            f"{compliance_only_count} more completed with prompt-compliance "
-            "observations only (not maintainer issues)."
-        )
-    if include_gallery_markdown:
-        gallery_link = _run_issue_summary_artifact_link(
-            summary_path=summary_path,
-            artifact_path=output_paths.gallery_markdown,
-            label="full model gallery",
-        )
-        clean_sentence += f" See the {_render_report_cell_markdown(gallery_link, escaped=False)}."
     blocks.append(
-        ReportSection(
-            "Clean completions",
-            (
-                ReportRaw(
-                    markdown_lines=(clean_sentence,),
-                ),
-            ),
+        _run_issue_summary_clean_completions_section(
+            source.results,
+            output_paths=output_paths,
+            summary_path=summary_path,
+            include_gallery_markdown=include_gallery_markdown,
         )
     )
 
