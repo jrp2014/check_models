@@ -215,3 +215,43 @@ def test_cli_accepts_valid_parameters(capsys: pytest.CaptureFixture[str]) -> Non
     )
     assert "--output-jsonl" in output
     assert "--output-gallery-markdown" in output
+
+
+def test_cli_rejects_url_passed_to_image(capsys: pytest.CaptureFixture[str]) -> None:
+    """--image with a URL must fail with guidance, not a mangled-path ENOENT.
+
+    argparse wraps the value in a Path, so a URL previously surfaced only as
+    "No such file: .../src/https:/github.com/..." after resolution.
+    """
+    result = _run_cli(
+        [
+            *_get_test_output_args(),
+            "--image",
+            "https://github.com/Blaizzy/mlx-vlm/blob/main/examples/images/cats.jpg",
+        ],
+        capsys,
+    )
+
+    assert result.exit_code != 0
+    output = result.stdout + result.stderr
+    assert "expects a local file path, not a URL" in output
+    assert "--image-source-url" in output
+    assert "/raw/" in output
+    assert "No such file" not in output
+
+
+@pytest.mark.parametrize(
+    ("value", "url_like"),
+    [
+        ("https://github.com/x/y.jpg", True),
+        ("http://host/i.jpg", True),
+        ("file:///tmp/a.jpg", True),
+        ("cats.jpg", False),
+        ("/Users/someone/Pictures/a.jpg", False),
+        ("C:/photos/a.jpg", False),  # single-letter drive spec is a path, not a scheme
+        ("./sub/dir/a.jpg", False),
+    ],
+)
+def test_url_like_image_argument_detection(value: str, url_like: bool) -> None:
+    """URL schemes are detected after Path() collapses '://' to ':/'; paths are not."""
+    assert bool(check_models._URL_LIKE_IMAGE_ARG_RE.match(str(Path(value)))) is url_like

@@ -91,6 +91,26 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `--image` given a URL now fails immediately with guidance instead of a
+  mangled-path ENOENT: argparse wraps the value in a `Path`, so a URL used to
+  surface only as "No such file: .../src/https:/github.com/...". The error
+  states that `--image` expects a local file path, points at the `/raw/`
+  form for GitHub links, and mentions `--image-source-url` for recording
+  provenance so issue drafts get a complete reproduction command. A
+  single-letter drive spec such as `C:/` is never mistaken for a scheme.
+- A per-model timeout that expires while a checkpoint is still downloading
+  is now classified `indeterminate` (not evaluated, no maintainer action)
+  rather than a `crashed` / `actionable_failure` with a maintainer-facing
+  issue draft: the model was never loaded, let alone run, so it is a local
+  environment condition, not an mlx-vlm or model defect. Detected from the
+  recorded facts (load phase, `TimeoutError`, Hugging Face Hub download
+  progress in the captured output); a hung *inference* timeout and a load
+  timeout on a cached model remain crashes. Because the outcome is still
+  user-actionable, every surface — console summary, diagnostics summary line
+  and facts, and the run-summary review table — states the root cause and
+  the remedy explicitly: re-run (Hub resumes partial downloads), pre-fetch
+  with `hf download <model>`, or raise `--timeout` for the cold run.
+
 - Thinking delimiters are protected from the generic special-token strip for
   every recognised `THINKING_TRACE_DELIMITER_PAIRS` marker plus any custom
   configured pair, at the `analyze_generation_text` layer. The previous fix

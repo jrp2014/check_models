@@ -7268,6 +7268,45 @@ def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
     return _has_external_connectivity_signal(combined)
 
 
+# huggingface-hub download progress markers that show a load-phase timeout
+# fired while the checkpoint was still being fetched, i.e. the model was
+# never actually loaded or exercised.
+_HF_DOWNLOAD_PROGRESS_NEEDLES: Final[tuple[str, ...]] = (
+    "fetching ",  # "Fetching 13 files:  77%"
+    "downloading bytes",
+    "reconstructing (incomplete total",
+    "not found in hf cache",
+)
+
+
+DOWNLOAD_TIMEOUT_REMEDY: Final[str] = (
+    "the per-model timeout expired while the checkpoint was still downloading, so the "
+    "model was never loaded or tested. This is a local environment condition, not an "
+    "mlx-vlm or model defect. Hugging Face Hub resumes partial downloads, so simply "
+    "re-run to finish; or pre-fetch once with `hf download <model>` so the harness only "
+    "sees a cached model; or give this cold run more headroom with --timeout."
+)
+
+
+def _is_download_timeout_failure(result: PerformanceResult) -> bool:
+    """Return whether the per-model timeout expired mid-download.
+
+    A cold first-time download of a large checkpoint can legitimately exceed
+    the timeout that exists to bound hung *inference*. That is an
+    environmental, indeterminate outcome — the model was never loaded, let
+    alone run — not evidence of an mlx-vlm or model defect, so it must not
+    become an actionable crash with a maintainer-facing issue draft.
+    """
+    if result.success or result.failure_phase != "model_load":
+        return False
+    if result.root_error_type != "TimeoutError" and result.error_type != "TimeoutError":
+        chain_types = {entry.exception_type for entry in result.exception_chain}
+        if "TimeoutError" not in chain_types:
+            return False
+    captured = (result.captured_output_on_fail or "").casefold()
+    return any(needle in captured for needle in _HF_DOWNLOAD_PROGRESS_NEEDLES)
+
+
 def _advance_upstream_boundary(
     boundary: UpstreamBoundary,
     phase: str,
@@ -7989,8 +8028,13 @@ class GalleryRow:
 
 
 def _execution_status(result: PerformanceResult) -> ExecutionStatus:
-    """Classify the conclusive execution state for one model attempt."""
-    if _is_indeterminate_connectivity_failure(result):
+    """Classify the conclusive execution state for one model attempt.
+
+    Connectivity failures and download-phase timeouts are *indeterminate*:
+    the environment prevented a conclusive attempt, so they are neither a
+    completion nor a crash attributable to the model or mlx-vlm.
+    """
+    if _is_indeterminate_connectivity_failure(result) or _is_download_timeout_failure(result):
         return "indeterminate"
     return "completed" if result.success else "crashed"
 
@@ -8949,6 +8993,8 @@ def _diagnostics_result_facts(
     rows.extend(
         (label, _diagnostics_fact(value)) for label, value in optional_facts if value is not None
     )
+    if assessment.execution == "indeterminate":
+        rows.append(("Indeterminate root cause", _indeterminate_reason(result)))
     telemetry = result.system_telemetry
     if telemetry is not None:
         label = (
@@ -9151,11 +9197,12 @@ def _diagnostics_partition_blocks(
         if presentation == "expanded":
             entry: ReportBlock = ReportSection(result.model_name, evidence, level=3)
         else:
-            detail = (
-                _gallery_observation_labels(assessment.observations)
-                if presentation == "observation"
-                else "indeterminate"
-            )
+            if presentation == "observation":
+                detail = _gallery_observation_labels(assessment.observations)
+            elif _is_download_timeout_failure(result):
+                detail = "indeterminate: download timeout (re-run, pre-fetch, or raise --timeout)"
+            else:
+                detail = "indeterminate: connectivity failure"
             entry = ReportDetails(
                 f"{result.model_name} — {assessment.usability} — {detail}",
                 (ReportSection(result.model_name, evidence, level=3),),
@@ -14267,9 +14314,33 @@ def _raise_for_missing_runtime_dependencies() -> None:
     raise RuntimeError(error_message)
 
 
+# Path() collapses "://" to ":/", so a URL given to --image arrives as
+# "https:/host/...". Require a scheme of at least two characters so a
+# single-letter drive spec such as "C:/" is never mistaken for a URL.
+_URL_LIKE_IMAGE_ARG_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z][a-z0-9+.-]+:/", re.IGNORECASE)
+
+
+def _reject_url_image_argument(image: Path) -> None:
+    """Fail clearly when --image is given a URL instead of a local file path.
+
+    argparse has already wrapped the value in a Path, so resolving and opening
+    it would otherwise surface only a confusing ENOENT for a mangled path.
+    """
+    raw = str(image)
+    if not _URL_LIKE_IMAGE_ARG_RE.match(raw):
+        return
+    exit_with_cli_error(
+        f"--image expects a local file path, not a URL ({raw}). Download the file "
+        "first (for a GitHub link use the /raw/ form), pass its path to --image, and "
+        "optionally record the public location with --image-source-url so issue "
+        "drafts get a complete reproduction command. Exiting.",
+    )
+
+
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     if getattr(args, "image", None) is not None:
+        _reject_url_image_argument(args.image)
         return _validate_selected_image(args.image.resolve())
 
     folder_path: Path = args.folder.resolve()
@@ -16010,14 +16081,25 @@ def _log_completed_models_list(
         )
 
 
+def _indeterminate_reason(result: PerformanceResult) -> str:
+    """Return the root cause and remedy for an indeterminate attempt."""
+    if _is_download_timeout_failure(result):
+        return f"download timeout: {DOWNLOAD_TIMEOUT_REMEDY}"
+    return result.error_message or "external connectivity failure"
+
+
 def _log_indeterminate_models_summary(indeterminate: Sequence[PerformanceResult]) -> None:
-    """Log attempts whose external connectivity prevented a conclusive evaluation."""
+    """Log attempts the environment prevented from being conclusively evaluated.
+
+    Each line states the root cause and what to do about it, so an
+    indeterminate outcome never reads as "nothing happened".
+    """
     logger.info("Indeterminate Models (%d):", len(indeterminate))
     for result in indeterminate:
         logger.info(
-            "  - %s | error=%s",
+            "  - %s | %s",
             result.model_name,
-            result.error_message or "external connectivity failure",
+            _indeterminate_reason(result),
             extra={"style_hint": LogStyles.WARNING},
         )
 
@@ -17355,6 +17437,28 @@ def _run_issue_summary_crash_section(
     )
 
 
+def _run_issue_failure_observed_result(failure: JsonlFailureRecord, captured: str) -> str:
+    """Describe a recorded failure for the review tables, root cause first."""
+    phase = failure.get("phase")
+    phase_label = _failure_phase_human_label(phase)
+    message = failure.get("message") or ""
+    if "connection reset" in message.casefold():
+        return f"Network connection reset during {phase_label}"
+    if (
+        phase == "model_load"
+        and "timed out" in message.casefold()
+        and any(needle in captured for needle in _HF_DOWNLOAD_PROGRESS_NEEDLES)
+    ):
+        return f"Download timeout: {DOWNLOAD_TIMEOUT_REMEDY}"
+    stage = failure.get("stage")
+    if stage:
+        return f"{stage} during {phase_label}"
+    exception_type = failure.get("exception_type")
+    if exception_type:
+        return f"{exception_type} during {phase_label}"
+    return f"Attempt stopped during {phase_label}"
+
+
 def _run_issue_summary_observed_result(result: JsonlResultRecord) -> str:
     """Render one model row's observed result for the paste-ready review tables."""
     assessment = result["assessment"]
@@ -17366,18 +17470,8 @@ def _run_issue_summary_observed_result(result: JsonlResultRecord) -> str:
     failure = result.get("failure")
     if failure is None:
         return "No assessment evidence was captured"
-    phase = failure.get("phase")
-    phase_label = _failure_phase_human_label(phase)
-    message = failure.get("message") or ""
-    if "connection reset" in message.casefold():
-        return f"Network connection reset during {phase_label}"
-    stage = failure.get("stage")
-    if stage:
-        return f"{stage} during {phase_label}"
-    exception_type = failure.get("exception_type")
-    if exception_type:
-        return f"{exception_type} during {phase_label}"
-    return f"Attempt stopped during {phase_label}"
+    captured = (result.get("captured_output_on_fail") or "").casefold()
+    return _run_issue_failure_observed_result(failure, captured)
 
 
 def _run_issue_observation_cluster_key(result: JsonlResultRecord) -> tuple[str, ...]:

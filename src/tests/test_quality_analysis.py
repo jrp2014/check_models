@@ -1245,3 +1245,95 @@ def test_tokenizer_special_thinking_tokens_survive_without_configured_budget() -
     assert analysis.has_thinking_trace is True
     assert analysis.unexpected_catalog_preamble is None
     assert check_models._assess_result(populated).usability == "usable"
+
+
+class TestDownloadTimeoutClassification:
+    """A per-model timeout that fires mid-download is indeterminate, not a crash."""
+
+    DOWNLOAD_CAPTURE = (
+        "Downloading bytes: #########7| 15.7GB, 32.9MB/s\n"
+        "Reconstructing (incomplete total...): 100%|##########| 16.1GB / 16.1GB\n"
+        "Fetching 13 files:  77%|#######6  | 10/13 [07:37<02:17, 45.70s/it]\n"
+        "[21:00:52] DEBUG    Model org/big not found in HF cache (may need to download)"
+    )
+
+    def _timeout_result(self, *, phase: str, captured: str) -> check_models.PerformanceResult:
+        chain = (
+            check_models.FailureException(
+                exception_type="TimeoutError",
+                module="builtins",
+                message="Operation timed out after 300.0 seconds",
+                origin="check_models.py",
+            ),
+        )
+        return check_models.PerformanceResult(
+            model_name="org/big",
+            generation=None,
+            success=False,
+            failure_phase=phase,
+            error_type="ValueError",
+            root_error_type="TimeoutError",
+            exception_chain=chain,
+            error_message="Model loading failed: Operation timed out after 300.0 seconds",
+            captured_output_on_fail=captured,
+        )
+
+    def test_download_timeout_is_indeterminate_and_not_maintainer_actionable(self) -> None:
+        """The model was never loaded: indeterminate, not evaluated, no issue draft."""
+        result = self._timeout_result(phase="model_load", captured=self.DOWNLOAD_CAPTURE)
+
+        assert check_models._is_download_timeout_failure(result) is True
+        assessment = check_models._assess_result(result)
+        assert assessment.execution == "indeterminate"
+        assert assessment.usability == "not_evaluated"
+        assert assessment.maintainer_status == "none"
+
+    def test_download_timeout_reason_names_root_cause_and_remedy(self) -> None:
+        """The outcome is user-actionable: the reason says exactly what to do."""
+        result = self._timeout_result(phase="model_load", captured=self.DOWNLOAD_CAPTURE)
+
+        reason = check_models._indeterminate_reason(result)
+
+        assert reason.startswith("download timeout:")
+        assert "never loaded" in reason
+        assert "re-run" in reason
+        assert "hf download" in reason
+        assert "--timeout" in reason
+
+    def test_hung_decode_timeout_stays_an_actionable_crash(self) -> None:
+        """A timeout during inference is what the timeout exists for: still a crash."""
+        result = self._timeout_result(phase="decode", captured="Fetching 13 files: 100%")
+
+        assert check_models._is_download_timeout_failure(result) is False
+        assessment = check_models._assess_result(result)
+        assert assessment.execution == "crashed"
+        assert assessment.maintainer_status == "actionable_failure"
+
+    def test_load_timeout_without_download_evidence_stays_a_crash(self) -> None:
+        """A load-phase timeout on a fully cached model is not a download problem."""
+        result = self._timeout_result(phase="model_load", captured="")
+
+        assert check_models._is_download_timeout_failure(result) is False
+        assert check_models._assess_result(result).execution == "crashed"
+
+    def test_run_summary_row_states_download_timeout_remedy(self) -> None:
+        """The paste-ready review table carries the root cause, not a bare stage."""
+        failure: check_models.JsonlFailureRecord = {
+            "phase": "model_load",
+            "stage": "Model Error",
+            "message": "Model loading failed: Operation timed out after 300.0 seconds",
+            "exception_type": "ValueError",
+        }
+
+        cell = check_models._run_issue_failure_observed_result(
+            failure, self.DOWNLOAD_CAPTURE.casefold()
+        )
+
+        assert cell.startswith("Download timeout:")
+        assert "hf download" in cell
+
+        # Without download evidence the same failure falls back to its stage.
+        assert (
+            check_models._run_issue_failure_observed_result(failure, "")
+            == "Model Error during model loading"
+        )
