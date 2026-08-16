@@ -192,6 +192,13 @@ skip-magic-trailing-comma = false
 # Enable every stable rule in Ruff 0.16+ (including rules stabilised later), then
 # selectively ignore only formatter conflicts and documented project policies.
 select = ["ALL"]
+# Preview mode is deliberately OFF. Individual preview rules (e.g. RUF069
+# float-equality-comparison) cannot be selected without enabling preview
+# globally, and global preview silently changes the behaviour of *stable*
+# rules (S603/S106 stop firing on this codebase, breaking the suppression
+# audit). The monolith already has zero exact float comparisons; revisit
+# RUF069 when it stabilises. Pyrefly currently provides the strictest
+# type-level checking in the gate.
 
 ignore = [
     # === Formatter compatibility (ruff format handles these) ===
@@ -246,6 +253,7 @@ ignore = [
     "PLR2004", # Magic values in test assertions - values match test parameters
     "SLF001",  # Private member access - tests need to verify internal functions
     "ARG001",  # Unused argument - pytest fixtures may have unused params
+    "PLR0915", # Statement count - long scenario tests read better whole than fragmented
 ]
 "src/tests/**" = [
     "S101",    # Use of assert - required for pytest
@@ -254,6 +262,7 @@ ignore = [
     "PLR2004", # Magic values in test assertions - values match test parameters
     "SLF001",  # Private member access - tests need to verify internal functions
     "ARG001",  # Unused argument - pytest fixtures may have unused params
+    "PLR0915", # Statement count - long scenario tests read better whole than fragmented
 ]
 # Tools: allow intentional CLI prints and fixed-command robustness patterns.
 "tools/**" = [
@@ -277,17 +286,22 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.mccabe]
-# Maximum cyclomatic complexity - balance between strictness and practicality
-max-complexity = 75
+# Measured ceiling: the most complex function in the monolith is 15 after
+# splitting the report orchestrator, so 15 guards against regression rather
+# than sitting far above real usage (the previous 75 was ~4x any function).
+max-complexity = 15
 
 
 [tool.ruff.lint.pylint]
-# Pylint-specific settings
+# Pylint-specific settings. Argument ceilings reflect the keyword-only, typed
+# report-builder signatures; folding those into parameter objects would add
+# code without removing complexity, so they stay. Statement/branch ceilings
+# are set to the measured maxima so any growth is a deliberate decision.
 max-args = 10
 # Preserve the positional compatibility of the established report API.
 max-positional-args = 11
 max-branches = 15
-max-statements = 60
+max-statements = 50
 
 [tool.pyright]
 # Pyright/Pylance configuration

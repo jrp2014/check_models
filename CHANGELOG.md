@@ -222,6 +222,28 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tighten the ruff quality ceilings to measured maxima so they guard against
+  regression instead of sitting far above real usage: `max-complexity`
+  75 → 15 (the previous ceiling was ~4× the most complex function) and
+  `max-statements` 60 → 50. The one production function over both new
+  limits, the report orchestrator `_generate_reports_and_log_outputs`, is
+  split along its two natural seams (`_run_diagnostics_artifact` and
+  `_log_report_generation_outcomes`) and now sits exactly at the ceiling.
+  Long scenario tests are exempt from the statement count (they read better
+  whole than fragmented). Argument ceilings are unchanged: they reflect the
+  keyword-only, typed report-builder signatures, and folding those into
+  parameter objects would add code without removing complexity.
+- Evaluated enabling the preview rule `RUF069` (float-equality-comparison)
+  and deliberately did not: individual preview rules require global
+  `preview = true`, which silently changes the behaviour of *stable* rules
+  (S603/S106 stop firing on this codebase, breaking the suppression audit).
+  The monolith already has zero exact float comparisons — the 47 hits are
+  all correct round-trip assertions in tests — so the rule would guard
+  against nothing today at the cost of altering the whole ruleset. The
+  decision and its reason are recorded in `pyproject.toml`; revisit when
+  the rule stabilises.
+
+
 - `_run_model_generation` is split at one seam: `_prepare_generation`
   (prompt, processor, kwargs, diagnostics) and `_execute_prepared_generation`
   (upstream call, decode timing, synchronisation, exception tagging), joined

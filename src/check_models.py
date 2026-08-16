@@ -18784,6 +18784,73 @@ def _generate_run_issue_summary_output(
     return generated, outcome
 
 
+def _run_diagnostics_artifact(
+    inputs: ReportGenerationInputs,
+    outcomes: list[ReportArtifactOutcome],
+) -> tuple[DiagnosticsArtifacts, bool]:
+    """Write the diagnostics artifacts, recording the outcome; never raises.
+
+    Returns the artifacts (falling back to outcome counts only on failure) and
+    whether the write succeeded, mirroring the per-artifact runner but keeping
+    the diagnostics payload the later index/summary steps depend on.
+    """
+    diagnostics_path = inputs.output_paths.diagnostics
+    try:
+        artifacts = _write_diagnostics_artifacts(
+            args=inputs.run_args or argparse.Namespace(),
+            library_versions=inputs.library_versions,
+            system_info=inputs.system_info,
+            prompt=inputs.prompt,
+            image_path=inputs.image_path,
+            diagnostics_path=diagnostics_path,
+            report_context=inputs.report_context,
+        )
+    except (OSError, TypeError, ValueError, RuntimeError) as error:
+        logger.exception("Failed to generate diagnostics report.")
+        outcomes.append(
+            ReportArtifactOutcome(
+                key="diagnostics",
+                path=diagnostics_path,
+                succeeded=False,
+                error_message=str(error),
+            )
+        )
+        fallback = DiagnosticsArtifacts(
+            outcome_counts=_run_outcome_counts(inputs.report_context.assessments)
+        )
+        return fallback, False
+    outcomes.append(ReportArtifactOutcome(key="diagnostics", path=diagnostics_path, succeeded=True))
+    return artifacts, True
+
+
+def _log_report_generation_outcomes(
+    inputs: ReportGenerationInputs,
+    *,
+    artifacts: Sequence[ReportArtifact],
+    outcomes: Sequence[ReportArtifactOutcome],
+    run_issue_summary: Path | None,
+) -> None:
+    """Log the report-generation verdict and every successfully written path."""
+    failures = [outcome for outcome in outcomes if not outcome.succeeded]
+    logger.info("")
+    if failures:
+        logger.warning("Reports generated with %d failure(s):", len(failures))
+        for outcome in failures:
+            logger.warning("   %s: %s", outcome.key, outcome.error_message)
+    else:
+        log_success("Reports successfully generated:", prefix="📊")
+    successful_keys = {outcome.key for outcome in outcomes if outcome.succeeded}
+    for artifact in artifacts:
+        if artifact.key in successful_keys:
+            log_file_path(artifact.path, label=artifact.label)
+    if run_issue_summary is not None:
+        log_file_path(run_issue_summary, label="   Run Issue:       ")
+
+    log_file_path(inputs.output_paths.log, label="   Log File:")
+    if inputs.output_paths.environment.exists():
+        log_file_path(inputs.output_paths.environment, label="   Environment:")
+
+
 def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> tuple[ReportArtifactOutcome, ...]:
@@ -18827,39 +18894,7 @@ def _generate_reports_and_log_outputs(
 
     jsonl_succeeded = run_artifact(by_key["jsonl"])
 
-    diagnostics_artifacts = DiagnosticsArtifacts(
-        outcome_counts=_run_outcome_counts(inputs.report_context.assessments)
-    )
-    diagnostics_succeeded = False
-    try:
-        diagnostics_artifacts = _write_diagnostics_artifacts(
-            args=inputs.run_args or argparse.Namespace(),
-            library_versions=inputs.library_versions,
-            system_info=inputs.system_info,
-            prompt=inputs.prompt,
-            image_path=inputs.image_path,
-            diagnostics_path=inputs.output_paths.diagnostics,
-            report_context=inputs.report_context,
-        )
-    except (OSError, TypeError, ValueError, RuntimeError) as error:
-        logger.exception("Failed to generate diagnostics report.")
-        outcomes.append(
-            ReportArtifactOutcome(
-                key="diagnostics",
-                path=inputs.output_paths.diagnostics,
-                succeeded=False,
-                error_message=str(error),
-            )
-        )
-    else:
-        diagnostics_succeeded = True
-        outcomes.append(
-            ReportArtifactOutcome(
-                key="diagnostics",
-                path=inputs.output_paths.diagnostics,
-                succeeded=True,
-            )
-        )
+    diagnostics_artifacts, diagnostics_succeeded = _run_diagnostics_artifact(inputs, outcomes)
     _log_maintainer_summary(
         artifacts=diagnostics_artifacts,
         diagnostics_path=inputs.output_paths.diagnostics,
@@ -18905,24 +18940,12 @@ def _generate_reports_and_log_outputs(
         }:
             run_artifact(artifact)
 
-    failures = [outcome for outcome in outcomes if not outcome.succeeded]
-    logger.info("")
-    if failures:
-        logger.warning("Reports generated with %d failure(s):", len(failures))
-        for outcome in failures:
-            logger.warning("   %s: %s", outcome.key, outcome.error_message)
-    else:
-        log_success("Reports successfully generated:", prefix="📊")
-    successful_keys = {outcome.key for outcome in outcomes if outcome.succeeded}
-    for artifact in artifacts:
-        if artifact.key in successful_keys:
-            log_file_path(artifact.path, label=artifact.label)
-    if run_issue_summary is not None:
-        log_file_path(run_issue_summary, label="   Run Issue:       ")
-
-    log_file_path(inputs.output_paths.log, label="   Log File:")
-    if inputs.output_paths.environment.exists():
-        log_file_path(inputs.output_paths.environment, label="   Environment:")
+    _log_report_generation_outcomes(
+        inputs,
+        artifacts=artifacts,
+        outcomes=outcomes,
+        run_issue_summary=run_issue_summary,
+    )
     return tuple(outcomes)
 
 
