@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-16
+
 ### Added
 
 - mlx-vlm coverage matrix (upstream alignment design §6): an authoritative
