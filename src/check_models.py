@@ -7177,14 +7177,32 @@ def _gallery_model_anchor(model_name: str) -> str:
     return f"model-{collapsed or 'entry'}"
 
 
+def _component_source_revision(provenance: object, name: str) -> str | None:
+    """Return the recorded git revision for one component, when it has one."""
+    if not isinstance(provenance, dict):
+        return None
+    entry = provenance.get(name)
+    if not isinstance(entry, dict):
+        return None
+    revision = entry.get("source_revision") or entry.get("vcs_revision")
+    return revision if isinstance(revision, str) and revision else None
+
+
 def _collect_report_component_rows(
     *,
     versions: LibraryVersionDict,
     system_info: Mapping[str, str],
     library_names: Sequence[str] | None = None,
     system_keys: Sequence[str] | None = None,
+    provenance: Mapping[str, object] | None = None,
 ) -> list[tuple[str, str]]:
-    """Collect shared library/system rows for human-facing report artifacts."""
+    """Collect shared library/system rows for human-facing report artifacts.
+
+    When ``provenance`` (the component_provenance mapping) is supplied, an
+    editable/git install's exact source revision is listed beside its version:
+    a version string such as 0.6.14 spans many upstream commits, including
+    numerics fixes, so the revision is what pins a run's behaviour.
+    """
     rows: list[tuple[str, str]] = []
     selected_library_names = tuple(library_names) if library_names is not None else tuple(versions)
     selected_system_keys = tuple(system_keys) if system_keys is not None else tuple(system_info)
@@ -7193,6 +7211,9 @@ def _collect_report_component_rows(
         version_value = versions.get(library_name)
         if version_value:
             rows.append((library_name, version_value))
+            revision = _component_source_revision(provenance, library_name)
+            if revision is not None:
+                rows.append((f"{library_name} source revision", revision))
 
     for system_key in selected_system_keys:
         system_value = system_info.get(system_key)
@@ -17703,12 +17724,18 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
         if (dirty := producer.get("dirty")) is not None:
             rows.append(("check_models source dirty", str(dirty).lower()))
     versions = source.metadata.get("library_versions", {})
+    provenance = source.metadata.get("component_provenance", {})
     if isinstance(versions, dict):
-        rows.extend(
-            (name, str(versions[name]))
-            for name in ("mlx-vlm", "mlx", "transformers")
-            if versions.get(name)
-        )
+        for name in ("mlx-vlm", "mlx", "transformers"):
+            if not versions.get(name):
+                continue
+            rows.append((name, str(versions[name])))
+            # An editable/git install's version string does not identify the
+            # code (0.6.14 covers many upstream commits, including numerics
+            # fixes), so surface the exact source revision beside it.
+            revision = _component_source_revision(provenance, name)
+            if revision is not None:
+                rows.append((f"{name} source revision", revision))
     system = source.metadata["system"]
     rows.extend(
         (label, system[label])
@@ -18354,6 +18381,7 @@ def _diagnostics_shared_context_blocks(
             system_info=dict(system_info),
             library_names=_DIAGNOSTICS_LIB_NAMES,
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
+            provenance=_collect_component_provenance(library_versions),
         )
     )
     model_block: ReportBlock = (

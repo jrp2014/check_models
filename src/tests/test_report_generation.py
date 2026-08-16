@@ -5411,3 +5411,61 @@ def test_repro_overrides_require_value_difference() -> None:
 
     assert check_models._repro_thinking_overrides(run_args, same) == {}
     assert check_models._effective_repro_args(run_args, same) is run_args
+
+
+def test_component_rows_surface_editable_source_revision() -> None:
+    """Editable/git installs list their exact revision beside the version.
+
+    A version string such as 0.6.14 spans many upstream commits (including
+    numerics fixes), so the revision is what pins a run's behaviour; installed
+    (non-git) packages must not gain a spurious row.
+    """
+    provenance = {
+        "mlx-vlm": {
+            "version": "0.6.14",
+            "install_type": "editable",
+            "source_revision": "edf7b77f0000000000000000000000000000abcd",
+            "vcs_revision": None,
+        },
+        "mlx": {
+            "version": "0.32.1",
+            "install_type": "installed",
+            "source_revision": None,
+            "vcs_revision": None,
+        },
+    }
+
+    rows = check_models._collect_report_component_rows(
+        versions={"mlx-vlm": "0.6.14", "mlx": "0.32.1"},
+        system_info={},
+        provenance=provenance,
+    )
+
+    assert rows == [
+        ("mlx-vlm", "0.6.14"),
+        ("mlx-vlm source revision", "edf7b77f0000000000000000000000000000abcd"),
+        ("mlx", "0.32.1"),
+    ]
+    # Without provenance the rows are unchanged from before.
+    assert check_models._collect_report_component_rows(
+        versions={"mlx-vlm": "0.6.14"}, system_info={}
+    ) == [("mlx-vlm", "0.6.14")]
+
+
+def test_component_source_revision_prefers_source_then_vcs() -> None:
+    """The helper reads source_revision first, falls back to vcs_revision, else None."""
+    assert (
+        check_models._component_source_revision(
+            {"x": {"source_revision": "aaa", "vcs_revision": "bbb"}}, "x"
+        )
+        == "aaa"
+    )
+    assert (
+        check_models._component_source_revision(
+            {"x": {"source_revision": None, "vcs_revision": "bbb"}}, "x"
+        )
+        == "bbb"
+    )
+    assert check_models._component_source_revision({"x": {"source_revision": None}}, "x") is None
+    assert check_models._component_source_revision(None, "x") is None
+    assert check_models._component_source_revision({}, "missing") is None

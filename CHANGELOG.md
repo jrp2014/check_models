@@ -9,6 +9,19 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Human-facing reports now surface each editable/git-installed component's
+  exact source revision beside its version — `run_summary.md` "Run context"
+  and the diagnostics "Components and system" table gain e.g.
+  `mlx-vlm source revision: 0558cbee…` (and likewise for an editable `mlx`).
+  The value was already recorded machine-readably in `run.json` and the JSONL
+  header under `component_provenance.<name>.source_revision`; it just was not
+  visible where a reader compares runs. A version string such as 0.6.14 spans
+  many upstream commits, including numerics changes (e.g. the RoPE-scaling
+  correction in mlx-vlm #1927), so the revision is what pins a run's model
+  behaviour and explains cross-run deltas that are not due to the image,
+  prompt, or harness. Installed (non-git) packages gain no row.
+
+
 - mlx-vlm coverage matrix (upstream alignment design §6): an authoritative
   table in `src/README.md` recording which upstream surfaces this project
   exercises (direct load / image / chat-template / generate APIs, sampling,
