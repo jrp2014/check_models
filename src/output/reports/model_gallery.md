@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-16 17:50:02 BST
+Generated on: 2026-08-16 18:47:12 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -19,53 +19,53 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                 |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------|
 | [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 1.36s   | 138 tok/s           | 0.09            | 5.2     | 409        | 82      | none                                                                                                         |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 4.60s   | 34.4 tok/s          | 1.20            | 17      | 3,435      | 60      | none                                                                                                         |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.23s   | 185 tok/s           | 0.07            | 4.1     | 350        | 100     | none                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 3.21s   | 69.5 tok/s          | 0.67            | 9.8     | 1,070      | 81      | none                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 3.76s   | 64.6 tok/s          | 0.76            | 10      | 1,070      | 106     | none                                                                                                         |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 1.84s   | 193 tok/s           | 0.28            | 4.5     | 1,069      | 85      | none                                                                                                         |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 3.32s   | 53.7 tok/s          | 0.43            | 11      | 843        | 89      | none                                                                                                         |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 15.80s  | 6.21 tok/s          | 0.89            | 23      | 860        | 78      | none                                                                                                         |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 2.36s   | 59.6 tok/s          | 0.21            | 9.3     | 883        | 68      | none                                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 1.48s   | 129 tok/s           | 0.09            | 5.3     | 409        | 82      | none                                                                                                         |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 3.60s   | 121 tok/s           | 0.35            | 21      | 421        | 89      | none                                                                                                         |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 2.53s   | 101 tok/s           | 0.28            | 7.1     | 421        | 86      | none                                                                                                         |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 9.52s   | 19.2 tok/s          | 0.84            | 30      | 421        | 107     | none                                                                                                         |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 13.23s  | 44.2 tok/s          | 3.77            | 65      | 286        | 105     | none                                                                                                         |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.11s   | 66.1 tok/s          | 0.27            | 10      | 511        | 106     | none                                                                                                         |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 5.91s   | 31.6 tok/s          | 0.76            | 18      | 379        | 90      | none                                                                                                         |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.28s   | 130 tok/s           | 0.37            | 16      | 390        | 73      | none                                                                                                         |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.28s   | 28.1 tok/s          | 0.83            | 19      | 390        | 80      | none                                                                                                         |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 4.89s   | 40.5 tok/s          | 0.98            | 15      | 1,335      | 89      | none                                                                                                         |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 0.64s   | 516 tok/s           | 0.08            | 1.3     | 350        | 63      | title/keyword constraints failed                                                                             |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 6.33s   | 31.2 tok/s          | 0.98            | 20      | 537        | 100     | title/keyword constraints failed                                                                             |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 2.33s   | 92.0 tok/s          | 0.32            | 7.8     | 499        | 61      | title/keyword constraints failed                                                                             |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 13.99s  | 52.6 tok/s          | 4.69            | 63      | 499        | 89      | control tokens visible                                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 121.10s | 4.83 tok/s          | 1.17            | 40      | 489        | 562     | role tokens visible                                                                                          |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 18.97s  | 66.2 tok/s          | 5.49            | 71      | 421        | 133     | title/keyword constraints failed                                                                             |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 0.83s   | 307 tok/s           | 0.15            | 2.5     | 511        | 40      | title/keyword constraints failed                                                                             |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 1.34s   | 125 tok/s           | 0.38            | 5.5     | 1,204      | 31      | title/keyword constraints failed                                                                             |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 4.92s   | 60.8 tok/s          | 0.31            | 29      | 386        | 72      | control tokens visible; title/keyword constraints failed                                                     |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 4.90s   | 59.3 tok/s          | 0.30            | 28      | 386        | 74      | control tokens visible                                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 4.08s   | 47.8 tok/s          | 0.35            | 17      | 378        | 63      | title/keyword constraints failed                                                                             |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 25.25s  | 44.0 tok/s          | 0.96            | 14      | 1,426      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 27.62s  | 57.9 tok/s          | 2.68            | 60      | 545        | 944     | repeated text; extra text before Title; title/keyword constraints failed                                     |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.03s   | 343 tok/s           | 0.30            | 2.2     | 120        | 32      | missing required fields                                                                                      |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 21.89s  | 50.4 tok/s          | 0.37            | 13      | 495        | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 3.37s   | insufficient sample | 1.04            | 18      | 2,418      | 13      | missing required fields; role tokens visible                                                                 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 65.99s  | 15.9 tok/s          | 1.64            | 15      | 107        | 1,000   | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.22s   | 278 tok/s           | 0.10            | 3.0     | 330        | 58      | missing required fields; extra text before Title                                                             |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 7.62s   | 130 tok/s           | 0.08            | 5.3     | 411        | 872     | echoes instructions; extra text before Title                                                                 |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 21.33s  | 54.7 tok/s          | 2.11            | 9.7     | 2,469      | 1,000   | repeated text; missing required fields; cut off at token limit                                               |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 0.83s   | 381 tok/s           | 0.07            | 2.1     | 116        | 97      | missing required fields                                                                                      |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 23.79s  | 47.0 tok/s          | 1.10            | 4.2     | 4,207      | 1,000   | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.08s   | 35.8 tok/s          | 1.79            | 17      | 3,435      | 60      | none                                                                                                         |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.25s   | 184 tok/s           | 0.07            | 4.1     | 350        | 100     | none                                                                                                         |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 3.20s   | 69.7 tok/s          | 0.69            | 9.8     | 1,070      | 81      | none                                                                                                         |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 3.75s   | 64.9 tok/s          | 0.75            | 10      | 1,070      | 106     | none                                                                                                         |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 1.73s   | 194 tok/s           | 0.25            | 4.5     | 1,069      | 85      | none                                                                                                         |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 3.29s   | 53.6 tok/s          | 0.42            | 11      | 843        | 89      | none                                                                                                         |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 16.24s  | 6.04 tok/s          | 0.85            | 23      | 860        | 78      | none                                                                                                         |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 2.39s   | 57.7 tok/s          | 0.20            | 9.3     | 883        | 68      | none                                                                                                         |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 1.62s   | 135 tok/s           | 0.08            | 5.3     | 409        | 82      | none                                                                                                         |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 7.54s   | 131 tok/s           | 0.09            | 5.3     | 411        | 872     | none                                                                                                         |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 3.55s   | 124 tok/s           | 0.25            | 21      | 421        | 89      | none                                                                                                         |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 2.63s   | 101 tok/s           | 0.29            | 7.1     | 421        | 86      | none                                                                                                         |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 9.90s   | 18.4 tok/s          | 0.84            | 30      | 421        | 107     | none                                                                                                         |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 15.65s  | 43.4 tok/s          | 4.91            | 65      | 286        | 105     | none                                                                                                         |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.09s   | 65.9 tok/s          | 0.26            | 10      | 511        | 106     | none                                                                                                         |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 6.04s   | 30.3 tok/s          | 0.79            | 18      | 379        | 90      | none                                                                                                         |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.41s   | 125 tok/s           | 0.37            | 16      | 390        | 73      | none                                                                                                         |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.49s   | 27.0 tok/s          | 0.85            | 19      | 390        | 80      | none                                                                                                         |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 4.90s   | 40.4 tok/s          | 0.96            | 15      | 1,335      | 89      | none                                                                                                         |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 0.62s   | 516 tok/s           | 0.04            | 1.4     | 350        | 63      | title/keyword constraints failed                                                                             |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 6.12s   | 30.9 tok/s          | 0.74            | 20      | 537        | 100     | title/keyword constraints failed                                                                             |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | 23.49s  | 55.6 tok/s          | 1.21            | 60      | 545        | 944     | title/keyword constraints failed                                                                             |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 2.44s   | 89.8 tok/s          | 0.32            | 7.8     | 499        | 61      | title/keyword constraints failed                                                                             |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 14.17s  | 49.9 tok/s          | 4.72            | 63      | 499        | 89      | control tokens visible                                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 121.53s | 4.8 tok/s           | 0.84            | 40      | 489        | 562     | role tokens visible                                                                                          |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 18.87s  | 64.8 tok/s          | 6.22            | 71      | 421        | 133     | title/keyword constraints failed                                                                             |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 0.90s   | 311 tok/s           | 0.15            | 2.5     | 511        | 40      | title/keyword constraints failed                                                                             |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 1.36s   | 124 tok/s           | 0.38            | 5.5     | 1,204      | 31      | title/keyword constraints failed                                                                             |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.25s   | 49.0 tok/s          | 0.31            | 29      | 386        | 75      | control tokens visible                                                                                       |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.47s   | 41.7 tok/s          | 0.32            | 28      | 386        | 68      | control tokens visible                                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 4.11s   | 45.8 tok/s          | 0.34            | 17      | 378        | 63      | title/keyword constraints failed                                                                             |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 25.39s  | 43.7 tok/s          | 0.94            | 14      | 1,426      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 0.81s   | 341 tok/s           | 0.08            | 2.1     | 120        | 32      | missing required fields                                                                                      |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 23.02s  | 47.7 tok/s          | 0.36            | 13      | 495        | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 3.37s   | insufficient sample | 1.05            | 18      | 2,418      | 13      | missing required fields; role tokens visible                                                                 |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 66.18s  | 15.9 tok/s          | 1.61            | 15      | 107        | 1,000   | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.23s   | 278 tok/s           | 0.10            | 3.0     | 330        | 58      | missing required fields; extra text before Title                                                             |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 23.37s  | 51.0 tok/s          | 2.78            | 9.7     | 2,469      | 1,000   | repeated text; missing required fields; cut off at token limit                                               |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 0.88s   | 349 tok/s           | 0.07            | 2.0     | 116        | 97      | missing required fields                                                                                      |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 24.91s  | 45.1 tok/s          | 1.19            | 4.2     | 4,207      | 1,000   | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 193 tok/s
+Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 194 tok/s
 
-Average clean-completion throughput: 79.7 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 82.3 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-1.6B-bf16` at 4.1 GB
 
@@ -76,13 +76,11 @@ Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-1.6B-bf16` 
 | Model                                                                                                        | Usability  | Observations                                                                                                 |
 |--------------------------------------------------------------------------------------------------------------|------------|--------------------------------------------------------------------------------------------------------------|
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable` | missing required fields; echoes instructions; extra text before Title; cut off at token limit                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable` | repeated text; extra text before Title; title/keyword constraints failed                                     |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable` | missing required fields                                                                                      |
 | [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable` | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                      | `unusable` | missing required fields; role tokens visible                                                                 |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `unusable` | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
 | [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable` | missing required fields; extra text before Title                                                             |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable` | echoes instructions; extra text before Title                                                                 |
 | [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable` | repeated text; missing required fields; cut off at token limit                                               |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable` | missing required fields                                                                                      |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable` | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
@@ -106,6 +104,7 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | Title: Two Cats Resting on Pink Blanket with Remote Controls<br><br>Description: Two cats are sleeping on a pink blanket. A pink couch is visible in the background. Two remote controls are placed on the blanket. The cats appear to be in a relaxed state.<br><br>Keywords: cats, pink blanket...                                                |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
 | [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
 | [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Two Tabby Cats Sleeping on Pink Sofa<br><br>Description: Two tabby cats lie asleep on a bright pink sofa, each positioned near a white remote control. The scene is lit by even indoor lighting, highlighting the cats’ striped fur and relaxed postures.<br><br>Keywords: tabby cats, pin...                                                |
 | [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Two Cats Sleeping on a Pink Couch<br><br>Description: Two tabby cats are lying on a pink couch, each with a remote control nearby. The scene is well-lit, highlighting the texture of the couch and the fur of the cats.<br><br>Keywords: cats, tabby, pink couch, remote control, sleepin...                                                |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats are lying on a pink sofa, one near a white remote control and the other beside a blue remote. The scene is brightly lit, highlighting the cats' striped fur and relaxed postures.<br><br>Keywords: tabby cats, pink...                                                |
@@ -117,23 +116,22 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic...                                       |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | Title:<br>Cats on a Pink Sofa<br><br>Description:<br>Two cats are lying on a pink sofa, one is stretched out with its paws extended, while the other is curled up with its head resting on the sofa.<br><br>Keywords:<br>cats, sofa, pink, relaxation, fur, stripes, sleeping                                                                       |
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Two cats resting on a pink sofa<br><br>Description:<br>Two tabby cats are lying on a pink sofa, one on its back and the other on its side, with a remote control nearby. The lighting is natural, and the cats have distinctive striped fur patterns.<br><br>Keywords: cats, tabby, sofa, pin...                                          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual p...                                                            |
 | [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Two Cats on Pink Sofa<br>Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.<br>Keywords: two tabby cats, pink fabric sofa, remote control, head down                                                                             |
 | [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Two cats on a pink couch<br>Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.<br>Keywords: cats, pink couch, remote controls, sleeping, relaxed, stripe...                                                    |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, li...                                                            |
 | [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes<br><br>Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its hea...                                                      |
 | [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | Title: Two Cats Sleeping on a Pink Couch<br>Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.<br>Keywords: cats, sleeping, pink couch, remote controls                                                                                                                                                      |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Two Cats on a Couch<br>Description: Two cats are sleeping on a pink couch.<br>Keywords: cats, couch, sleeping, pink                                                                                                                                                                                                                          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats rest on a bright pink blanket atop a red sofa. Two remote controls lie near the sleeping animals.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indo...                                                 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two tabby cats are lying down on a pink blanket on a red sofa. Two remote controls are visible near the cats.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, red, indoor, remote, co...                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, in...                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, str...                                                 |
 | [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | **Title:** Cozy Naptime<br><br>**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.<br><br>**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, domestic, comfort, home, furry, striped, peaceful, indoors.                                                           |
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.<br><br>Write:<br>- a concrete 5-10-word title;<br>- a 1-2-sentence...                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual p...                                                            |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.                                                                                                                                                                                                  |
 | [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats),...                                                      |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | Two cats laying on a pink blanket with remotes.<end_of_utterance>                                                                                                                                                                                                                                                                                   |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | Here is the information in the format you requested:<br><br>**Title:** Two Cats on a Pink Blanket<br><br>**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed....                                                |
 | [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Two cats sleeping on pink blanket with remote controls<br><br>Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.<br><br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting                                                   |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
 | [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, felin...                                                            |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: "A Study in Stripes"<br>Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the...                                                         |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | Action:<br>Lighting:<br>Brand:<br>Species:<br>Period:<br>Event:<br>Date:<br>Name:<br>Intent:<br>Brand:<br>Date:<br>Name:<br>Description:<br>Action:<br>Lighting:<br>Keywords:<br>Return exactly these three sections and nothing else:<br>Title:<br>Description:<br>- 10-18 unique, comma-separated keywords.<br>- 10-18 unique, comma-separated... |
@@ -196,14 +194,14 @@ Complete generated or crash evidence for every attempted model.
 - *Model load time:* 0.64s
 - *Generation time:* 0.71s
 - *Total time:* 1.36s
-- *Input validation time:* 7.71e-05
-- *Prompt preparation time:* 0.00916
-- *First-token latency:* 0.0861
-- *Cleanup time:* 0.0688
+- *Input validation time:* 6.89e-05
+- *Prompt preparation time:* 0.00904
+- *First-token latency:* 0.086
+- *Cleanup time:* 0.0683
 - *Prompt tokens:* 409
 - *Generation tokens:* 82
 - *Total tokens:* 491
-- *Prompt throughput (raw):* 4,748 tok/s
+- *Prompt throughput (raw):* 4,753 tok/s
 - *Generation throughput (raw):* 138 tok/s
 - *Peak memory:* 5.2
 - *Active memory:* 4.3
@@ -252,18 +250,18 @@ Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, co
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.61s
-- *Generation time:* 2.98s
-- *Total time:* 4.60s
-- *Input validation time:* 8.75e-05
-- *Prompt preparation time:* 0.00197
-- *First-token latency:* 1.2
-- *Cleanup time:* 0.098
+- *Model load time:* 1.58s
+- *Generation time:* 3.49s
+- *Total time:* 5.08s
+- *Input validation time:* 9.02e-05
+- *Prompt preparation time:* 0.00199
+- *First-token latency:* 1.79
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 3,435
 - *Generation tokens:* 60
 - *Total tokens:* 3,495
-- *Prompt throughput (raw):* 2,864 tok/s
-- *Generation throughput (raw):* 34.4 tok/s
+- *Prompt throughput (raw):* 1,922 tok/s
+- *Generation throughput (raw):* 35.8 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.27
@@ -309,18 +307,18 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxed, blanket
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.58s
+- *Model load time:* 0.60s
 - *Generation time:* 0.64s
-- *Total time:* 1.23s
-- *Input validation time:* 8.14e-05
-- *Prompt preparation time:* 0.00365
-- *First-token latency:* 0.0723
-- *Cleanup time:* 0.0745
+- *Total time:* 1.25s
+- *Input validation time:* 0.00011
+- *Prompt preparation time:* 0.00368
+- *First-token latency:* 0.0681
+- *Cleanup time:* 0.0708
 - *Prompt tokens:* 350
 - *Generation tokens:* 100
 - *Total tokens:* 450
-- *Prompt throughput (raw):* 4,839 tok/s
-- *Generation throughput (raw):* 185 tok/s
+- *Prompt throughput (raw):* 5,140 tok/s
+- *Generation throughput (raw):* 184 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.01
@@ -368,18 +366,18 @@ Keywords: cats, pink blanket, sleeping, green collar, relaxed posture, soft ligh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.31s
-- *Generation time:* 1.89s
-- *Total time:* 3.21s
-- *Input validation time:* 6.81e-05
-- *Prompt preparation time:* 0.00673
-- *First-token latency:* 0.672
-- *Cleanup time:* 0.0867
+- *Model load time:* 1.33s
+- *Generation time:* 1.87s
+- *Total time:* 3.20s
+- *Input validation time:* 8.19e-05
+- *Prompt preparation time:* 0.00668
+- *First-token latency:* 0.689
+- *Cleanup time:* 0.0859
 - *Prompt tokens:* 1,070
 - *Generation tokens:* 81
 - *Total tokens:* 1,151
-- *Prompt throughput (raw):* 1,592 tok/s
-- *Generation throughput (raw):* 69.5 tok/s
+- *Prompt throughput (raw):* 1,552 tok/s
+- *Generation throughput (raw):* 69.7 tok/s
 - *Peak memory:* 9.8
 - *Active memory:* 8.0
 - *Cache memory:* 0.23
@@ -430,18 +428,18 @@ cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.34s
-- *Generation time:* 2.41s
-- *Total time:* 3.76s
-- *Input validation time:* 8.27e-05
-- *Prompt preparation time:* 0.000349
-- *First-token latency:* 0.759
-- *Cleanup time:* 0.0864
+- *Model load time:* 1.35s
+- *Generation time:* 2.39s
+- *Total time:* 3.75s
+- *Input validation time:* 8.8e-05
+- *Prompt preparation time:* 0.000355
+- *First-token latency:* 0.748
+- *Cleanup time:* 0.0853
 - *Prompt tokens:* 1,070
 - *Generation tokens:* 106
 - *Total tokens:* 1,176
-- *Prompt throughput (raw):* 1,410 tok/s
-- *Generation throughput (raw):* 64.6 tok/s
+- *Prompt throughput (raw):* 1,430 tok/s
+- *Generation throughput (raw):* 64.9 tok/s
 - *Peak memory:* 10
 - *Active memory:* 8.4
 - *Cache memory:* 0.23
@@ -492,18 +490,18 @@ kittens, tabby, pink cushion, remote controls, relaxed posture, indoor setting, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.05s
-- *Generation time:* 0.77s
-- *Total time:* 1.84s
-- *Input validation time:* 7.06e-05
-- *Prompt preparation time:* 0.0126
-- *First-token latency:* 0.279
-- *Cleanup time:* 0.125
+- *Model load time:* 1.00s
+- *Generation time:* 0.72s
+- *Total time:* 1.73s
+- *Input validation time:* 7.11e-05
+- *Prompt preparation time:* 0.00675
+- *First-token latency:* 0.254
+- *Cleanup time:* 0.0767
 - *Prompt tokens:* 1,069
 - *Generation tokens:* 85
 - *Total tokens:* 1,154
-- *Prompt throughput (raw):* 3,837 tok/s
-- *Generation throughput (raw):* 193 tok/s
+- *Prompt throughput (raw):* 4,214 tok/s
+- *Generation throughput (raw):* 194 tok/s
 - *Peak memory:* 4.5
 - *Active memory:* 2.8
 - *Cache memory:* 0.16
@@ -554,18 +552,18 @@ pink sofa, remote controls, young tabbies, indoor setting, cozy scene, pet photo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.20s
-- *Generation time:* 2.11s
-- *Total time:* 3.32s
-- *Input validation time:* 0.000111
-- *Prompt preparation time:* 0.00161
-- *First-token latency:* 0.427
-- *Cleanup time:* 0.0827
+- *Model load time:* 1.18s
+- *Generation time:* 2.10s
+- *Total time:* 3.29s
+- *Input validation time:* 7.91e-05
+- *Prompt preparation time:* 0.00164
+- *First-token latency:* 0.42
+- *Cleanup time:* 0.0813
 - *Prompt tokens:* 843
 - *Generation tokens:* 89
 - *Total tokens:* 932
-- *Prompt throughput (raw):* 1,972 tok/s
-- *Generation throughput (raw):* 53.7 tok/s
+- *Prompt throughput (raw):* 2,007 tok/s
+- *Generation throughput (raw):* 53.6 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.08
@@ -613,18 +611,18 @@ Keywords: Pink, sofa, cats, remote controls, green collar, artificial light, coz
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.21s
-- *Generation time:* 13.57s
-- *Total time:* 15.80s
-- *Input validation time:* 9.64e-05
-- *Prompt preparation time:* 0.00503
-- *First-token latency:* 0.891
-- *Cleanup time:* 0.168
+- *Model load time:* 2.33s
+- *Generation time:* 13.90s
+- *Total time:* 16.24s
+- *Input validation time:* 7.81e-05
+- *Prompt preparation time:* 0.00511
+- *First-token latency:* 0.853
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 860
 - *Generation tokens:* 78
 - *Total tokens:* 938
-- *Prompt throughput (raw):* 965 tok/s
-- *Generation throughput (raw):* 6.21 tok/s
+- *Prompt throughput (raw):* 1,008 tok/s
+- *Generation throughput (raw):* 6.04 tok/s
 - *Peak memory:* 23
 - *Active memory:* 19
 - *Cache memory:* 4.3
@@ -673,17 +671,17 @@ Keywords: cats, pink blanket, remote controls, couch, sleeping, relaxed, feline,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Model load time:* 0.93s
-- *Generation time:* 1.42s
-- *Total time:* 2.36s
-- *Input validation time:* 0.000101
-- *Prompt preparation time:* 0.00115
-- *First-token latency:* 0.214
-- *Cleanup time:* 0.0827
+- *Generation time:* 1.45s
+- *Total time:* 2.39s
+- *Input validation time:* 0.000108
+- *Prompt preparation time:* 0.00114
+- *First-token latency:* 0.203
+- *Cleanup time:* 0.083
 - *Prompt tokens:* 883
 - *Generation tokens:* 68
 - *Total tokens:* 951
-- *Prompt throughput (raw):* 4,126 tok/s
-- *Generation throughput (raw):* 59.6 tok/s
+- *Prompt throughput (raw):* 4,349 tok/s
+- *Generation throughput (raw):* 57.7 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.42
@@ -731,18 +729,18 @@ Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, ind
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.72s
-- *Generation time:* 0.76s
-- *Total time:* 1.48s
-- *Input validation time:* 8.24e-05
-- *Prompt preparation time:* 0.000337
-- *First-token latency:* 0.0865
-- *Cleanup time:* 0.0882
+- *Model load time:* 0.89s
+- *Generation time:* 0.73s
+- *Total time:* 1.62s
+- *Input validation time:* 7.5e-05
+- *Prompt preparation time:* 0.000314
+- *First-token latency:* 0.0843
+- *Cleanup time:* 0.0855
 - *Prompt tokens:* 409
 - *Generation tokens:* 82
 - *Total tokens:* 491
-- *Prompt throughput (raw):* 4,728 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 4,855 tok/s
+- *Generation throughput (raw):* 135 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
 - *Cache memory:* 0.07
@@ -778,6 +776,110 @@ Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, co
 
 ---
 
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.77s
+- *Generation time:* 6.76s
+- *Total time:* 7.54s
+- *Input validation time:* 7.12e-05
+- *Prompt preparation time:* 0.0115
+- *First-token latency:* 0.0865
+- *Cleanup time:* 0.0831
+- *Prompt tokens:* 411
+- *Generation tokens:* 872
+- *Total tokens:* 1,283
+- *Prompt throughput (raw):* 4,754 tok/s
+- *Generation throughput (raw):* 131 tok/s
+- *Peak memory:* 5.3
+- *Active memory:* 4.3
+- *Cache memory:* 0.19
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00805
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 552
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
+
+Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
+
+Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
+
+Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
+
+Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
+
+Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
+&lt;/think&gt;
+
+Title:
+Two tabby cats resting on pink couch with remotes
+
+Description:
+Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
+
+Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
+
+Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
+
+Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
+
+Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
+
+Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
+
+Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
+</think>
+
+Title:
+Two tabby cats resting on pink couch with remotes
+
+Description:
+Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
+
+Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
 
 ### mlx-community/Qwen3.5-35B-A3B-4bit
@@ -790,18 +892,18 @@ Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, co
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.49s
-- *Generation time:* 1.09s
-- *Total time:* 3.60s
-- *Input validation time:* 0.00012
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 0.348
-- *Cleanup time:* 0.11
+- *Model load time:* 2.45s
+- *Generation time:* 1.08s
+- *Total time:* 3.55s
+- *Input validation time:* 7.14e-05
+- *Prompt preparation time:* 0.0142
+- *First-token latency:* 0.25
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 421
 - *Generation tokens:* 89
 - *Total tokens:* 510
-- *Prompt throughput (raw):* 1,209 tok/s
-- *Generation throughput (raw):* 121 tok/s
+- *Prompt throughput (raw):* 1,686 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory:* 21
 - *Active memory:* 21
 - *Cache memory:* 0.10
@@ -849,17 +951,17 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, domestic interi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.37s
+- *Model load time:* 1.47s
 - *Generation time:* 1.15s
-- *Total time:* 2.53s
-- *Input validation time:* 0.000105
-- *Prompt preparation time:* 0.000573
-- *First-token latency:* 0.282
-- *Cleanup time:* 0.0861
+- *Total time:* 2.63s
+- *Input validation time:* 9.3e-05
+- *Prompt preparation time:* 0.00066
+- *First-token latency:* 0.288
+- *Cleanup time:* 0.085
 - *Prompt tokens:* 421
 - *Generation tokens:* 86
 - *Total tokens:* 507
-- *Prompt throughput (raw):* 1,491 tok/s
+- *Prompt throughput (raw):* 1,464 tok/s
 - *Generation throughput (raw):* 101 tok/s
 - *Peak memory:* 7.1
 - *Active memory:* 6.6
@@ -908,18 +1010,18 @@ Keywords: cats, tabby, pink couch, remote control, sleeping, fur, texture, light
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.05s
-- *Generation time:* 6.44s
-- *Total time:* 9.52s
-- *Input validation time:* 8.1e-05
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 0.844
-- *Cleanup time:* 0.132
+- *Model load time:* 3.20s
+- *Generation time:* 6.68s
+- *Total time:* 9.90s
+- *Input validation time:* 7.1e-05
+- *Prompt preparation time:* 0.0145
+- *First-token latency:* 0.841
+- *Cleanup time:* 0.156
 - *Prompt tokens:* 421
 - *Generation tokens:* 107
 - *Total tokens:* 528
-- *Prompt throughput (raw):* 499 tok/s
-- *Generation throughput (raw):* 19.2 tok/s
+- *Prompt throughput (raw):* 501 tok/s
+- *Generation throughput (raw):* 18.4 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -967,18 +1069,18 @@ Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, bright l
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 7.01s
-- *Generation time:* 6.20s
-- *Total time:* 13.23s
-- *Input validation time:* 8.28e-05
-- *Prompt preparation time:* 0.0163
-- *First-token latency:* 3.77
-- *Cleanup time:* 0.215
+- *Model load time:* 8.24s
+- *Generation time:* 7.39s
+- *Total time:* 15.65s
+- *Input validation time:* 9.62e-05
+- *Prompt preparation time:* 0.0166
+- *First-token latency:* 4.91
+- *Cleanup time:* 0.214
 - *Prompt tokens:* 286
 - *Generation tokens:* 105
 - *Total tokens:* 391
-- *Prompt throughput (raw):* 75.8 tok/s
-- *Generation throughput (raw):* 44.2 tok/s
+- *Prompt throughput (raw):* 58.2 tok/s
+- *Generation throughput (raw):* 43.4 tok/s
 - *Peak memory:* 65
 - *Active memory:* 63
 - *Cache memory:* 0.11
@@ -1029,18 +1131,18 @@ cats, pink blanket, couch, remote controls, sleeping, striped coat, green collar
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.16s
+- *Model load time:* 1.14s
 - *Generation time:* 1.95s
-- *Total time:* 3.11s
-- *Input validation time:* 8.79e-05
-- *Prompt preparation time:* 0.00047
-- *First-token latency:* 0.271
-- *Cleanup time:* 0.0975
+- *Total time:* 3.09s
+- *Input validation time:* 0.000104
+- *Prompt preparation time:* 0.000601
+- *First-token latency:* 0.261
+- *Cleanup time:* 0.0973
 - *Prompt tokens:* 511
 - *Generation tokens:* 106
 - *Total tokens:* 617
-- *Prompt throughput (raw):* 1,884 tok/s
-- *Generation throughput (raw):* 66.1 tok/s
+- *Prompt throughput (raw):* 1,959 tok/s
+- *Generation throughput (raw):* 65.9 tok/s
 - *Peak memory:* 10
 - *Active memory:* 9.5
 - *Cache memory:* 0.06
@@ -1088,18 +1190,18 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxed, st
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.26s
-- *Generation time:* 3.63s
-- *Total time:* 5.91s
-- *Input validation time:* 9.85e-05
-- *Prompt preparation time:* 0.00286
-- *First-token latency:* 0.764
-- *Cleanup time:* 0.12
+- *Model load time:* 2.25s
+- *Generation time:* 3.78s
+- *Total time:* 6.04s
+- *Input validation time:* 0.000105
+- *Prompt preparation time:* 0.00288
+- *First-token latency:* 0.789
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 379
 - *Generation tokens:* 90
 - *Total tokens:* 469
-- *Prompt throughput (raw):* 496 tok/s
-- *Generation throughput (raw):* 31.6 tok/s
+- *Prompt throughput (raw):* 480 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.33
@@ -1147,21 +1249,21 @@ Keywords: cats, tabby, pink, fabric, remote control, sleeping, lying down, indoo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.31s
-- *Generation time:* 0.94s
-- *Total time:* 3.28s
-- *Input validation time:* 9.18e-05
-- *Prompt preparation time:* 0.0204
-- *First-token latency:* 0.37
-- *Cleanup time:* 0.112
+- *Model load time:* 2.41s
+- *Generation time:* 0.97s
+- *Total time:* 3.41s
+- *Input validation time:* 8.72e-05
+- *Prompt preparation time:* 0.0214
+- *First-token latency:* 0.374
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 390
 - *Generation tokens:* 73
 - *Total tokens:* 463
-- *Prompt throughput (raw):* 1,055 tok/s
-- *Generation throughput (raw):* 130 tok/s
+- *Prompt throughput (raw):* 1,043 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
-- *Cache memory:* 0.15
+- *Cache memory:* 0.16
 - *Model-load active memory:* 15.4
 - *Post-cleanup active memory:* 0.0119
 - *Post-cleanup cache memory:* 0.0
@@ -1206,18 +1308,18 @@ Keywords: tabby, cats, pink, fabric, remote control, lying, indoor, domestic, st
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.57s
-- *Generation time:* 3.70s
-- *Total time:* 6.28s
-- *Input validation time:* 7.53e-05
-- *Prompt preparation time:* 0.000361
-- *First-token latency:* 0.832
-- *Cleanup time:* 0.129
+- *Model load time:* 2.64s
+- *Generation time:* 3.84s
+- *Total time:* 6.49s
+- *Input validation time:* 0.000105
+- *Prompt preparation time:* 0.000353
+- *First-token latency:* 0.854
+- *Cleanup time:* 0.135
 - *Prompt tokens:* 390
 - *Generation tokens:* 80
 - *Total tokens:* 470
-- *Prompt throughput (raw):* 469 tok/s
-- *Generation throughput (raw):* 28.1 tok/s
+- *Prompt throughput (raw):* 457 tok/s
+- *Generation throughput (raw):* 27.0 tok/s
 - *Peak memory:* 19
 - *Active memory:* 18
 - *Cache memory:* 0.59
@@ -1263,18 +1365,18 @@ Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.69s
-- *Generation time:* 3.19s
-- *Total time:* 4.89s
-- *Input validation time:* 8.82e-05
-- *Prompt preparation time:* 0.00401
-- *First-token latency:* 0.975
-- *Cleanup time:* 0.097
+- *Model load time:* 1.70s
+- *Generation time:* 3.18s
+- *Total time:* 4.90s
+- *Input validation time:* 9.17e-05
+- *Prompt preparation time:* 0.00824
+- *First-token latency:* 0.963
+- *Cleanup time:* 0.096
 - *Prompt tokens:* 1,335
 - *Generation tokens:* 89
 - *Total tokens:* 1,424
-- *Prompt throughput (raw):* 1,369 tok/s
-- *Generation throughput (raw):* 40.5 tok/s
+- *Prompt throughput (raw):* 1,386 tok/s
+- *Generation throughput (raw):* 40.4 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.27
@@ -1325,19 +1427,19 @@ cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, do
 - *Maintainer status:* none
 - *Observations:* Keyword list has 7 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.41s
-- *Generation time:* 0.21s
-- *Total time:* 0.64s
-- *Input validation time:* 0.00218
-- *Prompt preparation time:* 0.00604
-- *First-token latency:* 0.0831
-- *Cleanup time:* 0.0598
+- *Model load time:* 0.45s
+- *Generation time:* 0.17s
+- *Total time:* 0.62s
+- *Input validation time:* 0.0018
+- *Prompt preparation time:* 0.00611
+- *First-token latency:* 0.0363
+- *Cleanup time:* 0.0584
 - *Prompt tokens:* 350
 - *Generation tokens:* 63
 - *Total tokens:* 413
-- *Prompt throughput (raw):* 4,212 tok/s
+- *Prompt throughput (raw):* 9,637 tok/s
 - *Generation throughput (raw):* 516 tok/s
-- *Peak memory:* 1.3
+- *Peak memory:* 1.4
 - *Active memory:* 0.90
 - *Cache memory:* 0.02
 - *Model-load active memory:* 0.897
@@ -1387,18 +1489,18 @@ cats, sofa, pink, relaxation, fur, stripes, sleeping
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.11s
-- *Generation time:* 4.20s
-- *Total time:* 6.33s
-- *Input validation time:* 7.54e-05
-- *Prompt preparation time:* 0.0067
-- *First-token latency:* 0.981
-- *Cleanup time:* 0.101
+- *Model load time:* 2.10s
+- *Generation time:* 4.01s
+- *Total time:* 6.12s
+- *Input validation time:* 8.42e-05
+- *Prompt preparation time:* 0.00663
+- *First-token latency:* 0.744
+- *Cleanup time:* 0.0917
 - *Prompt tokens:* 537
 - *Generation tokens:* 100
 - *Total tokens:* 637
-- *Prompt throughput (raw):* 548 tok/s
-- *Generation throughput (raw):* 31.2 tok/s
+- *Prompt throughput (raw):* 721 tok/s
+- *Generation throughput (raw):* 30.9 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.14
@@ -1436,684 +1538,6 @@ Keywords: cats, tabby, sofa, pink, remote control, resting, lying, natural light
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.32s
-- *Generation time:* 0.99s
-- *Total time:* 2.33s
-- *Input validation time:* 8.25e-05
-- *Prompt preparation time:* 0.00795
-- *First-token latency:* 0.32
-- *Cleanup time:* 0.0842
-- *Prompt tokens:* 499
-- *Generation tokens:* 61
-- *Total tokens:* 560
-- *Prompt throughput (raw):* 1,559 tok/s
-- *Generation throughput (raw):* 92.0 tok/s
-- *Peak memory:* 7.8
-- *Active memory:* 6.8
-- *Cache memory:* 0.05
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00211
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats on Pink Sofa
-Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.
-Keywords: two tabby cats, pink fabric sofa, remote control, head down
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title: Two Cats on Pink Sofa
-Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down. 
-Keywords: two tabby cats, pink fabric sofa, remote control, head down
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 7.59s
-- *Generation time:* 6.39s
-- *Total time:* 13.99s
-- *Input validation time:* 7.3e-05
-- *Prompt preparation time:* 0.00709
-- *First-token latency:* 4.69
-- *Cleanup time:* 0.232
-- *Prompt tokens:* 499
-- *Generation tokens:* 89
-- *Total tokens:* 588
-- *Prompt throughput (raw):* 106 tok/s
-- *Generation throughput (raw):* 52.6 tok/s
-- *Peak memory:* 63
-- *Active memory:* 62
-- *Cache memory:* 0.16
-- *Model-load active memory:* 61.9
-- *Post-cleanup active memory:* 0.00243
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship&lt;|end_of_box|&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|begin_of_box|>Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.23s
-- *Generation time:* 117.87s
-- *Total time:* 121.10s
-- *Input validation time:* 0.000101
-- *Prompt preparation time:* 0.00208
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.15
-- *Prompt tokens:* 489
-- *Generation tokens:* 562
-- *Total tokens:* 1,051
-- *Prompt throughput (raw):* 417 tok/s
-- *Generation throughput (raw):* 4.83 tok/s
-- *Peak memory:* 40
-- *Active memory:* 33
-- *Cache memory:* 5.2
-- *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.00365
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 659
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room.
-
-First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
-
-Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
-
-Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby
-Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.
-Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment&lt;|im_assistant|&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room. 
-
-First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
-
-Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
-
-Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby  
-Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.  
-Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment<|im_assistant|>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-ornith-10-35b-bf16"></a>
-
-### mlx-community/Ornith-1.0-35B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 11.18s
-- *Generation time:* 7.76s
-- *Total time:* 18.97s
-- *Input validation time:* 9.02e-05
-- *Prompt preparation time:* 0.0138
-- *First-token latency:* 5.49
-- *Cleanup time:* 0.255
-- *Prompt tokens:* 421
-- *Generation tokens:* 133
-- *Total tokens:* 554
-- *Prompt throughput (raw):* 76.7 tok/s
-- *Generation throughput (raw):* 66.2 tok/s
-- *Peak memory:* 71
-- *Active memory:* 70
-- *Cache memory:* 0.10
-- *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00705
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes
-
-Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its head down.
-
-Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxation, striped fur, cozy setting, indoor scene, pet comfort, soft lighting, domestic life, animal companionship, resting pets, home environment, tranquil moment, feline behavior, sofa bedding, remote placement, cat napping, peaceful atmosphere
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.52s
-- *Generation time:* 0.30s
-- *Total time:* 0.83s
-- *Input validation time:* 8.89e-05
-- *Prompt preparation time:* 0.00358
-- *First-token latency:* 0.15
-- *Cleanup time:* 0.0876
-- *Prompt tokens:* 511
-- *Generation tokens:* 40
-- *Total tokens:* 551
-- *Prompt throughput (raw):* 3,403 tok/s
-- *Generation throughput (raw):* 307 tok/s
-- *Peak memory:* 2.5
-- *Active memory:* 1.3
-- *Cache memory:* 0.03
-- *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00742
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 602
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats Sleeping on a Pink Couch
-Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.
-Keywords: cats, sleeping, pink couch, remote controls
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.62s
-- *Generation time:* 0.71s
-- *Total time:* 1.34s
-- *Input validation time:* 0.000107
-- *Prompt preparation time:* 0.00239
-- *First-token latency:* 0.379
-- *Cleanup time:* 0.0809
-- *Prompt tokens:* 1,204
-- *Generation tokens:* 31
-- *Total tokens:* 1,235
-- *Prompt throughput (raw):* 3,180 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.30
-- *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00968
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 504
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Two Cats on a Couch
-Description: Two cats are sleeping on a pink couch.
-Keywords: cats, couch, sleeping, pink
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Duplicate
-  keywords: domestic
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.24s
-- *Generation time:* 1.65s
-- *Total time:* 4.92s
-- *Input validation time:* 8.29e-05
-- *Prompt preparation time:* 0.0202
-- *First-token latency:* 0.314
-- *Cleanup time:* 0.135
-- *Prompt tokens:* 386
-- *Generation tokens:* 72
-- *Total tokens:* 458
-- *Prompt throughput (raw):* 1,231 tok/s
-- *Generation throughput (raw):* 60.8 tok/s
-- *Peak memory:* 29
-- *Active memory:* 28
-- *Cache memory:* 0.01
-- *Model-load active memory:* 28
-- *Post-cleanup active memory:* 0.0103
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a bright pink blanket atop a red sofa. Two remote controls lie near the sleeping animals.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, striped, resting, feline, domestic, domestic
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a bright pink blanket atop a red sofa. Two remote controls lie near the sleeping animals.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, striped, resting, feline, domestic, domestic
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.17s
-- *Generation time:* 1.72s
-- *Total time:* 4.90s
-- *Input validation time:* 9.91e-05
-- *Prompt preparation time:* 0.00038
-- *First-token latency:* 0.302
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 386
-- *Generation tokens:* 74
-- *Total tokens:* 460
-- *Prompt throughput (raw):* 1,279 tok/s
-- *Generation throughput (raw):* 59.3 tok/s
-- *Peak memory:* 28
-- *Active memory:* 27
-- *Cache memory:* 0.01
-- *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0103
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats are lying down on a pink blanket on a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, red, indoor, remote, controls, feline, resting, domestic, fur, soft
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats are lying down on a pink blanket on a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, red, indoor, remote, controls, feline, resting, domestic, fur, soft
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
-
-### mlx-community/gemma-3n-E4B-it-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 2 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.38s
-- *Generation time:* 1.69s
-- *Total time:* 4.08s
-- *Input validation time:* 0.000105
-- *Prompt preparation time:* 0.00292
-- *First-token latency:* 0.355
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 378
-- *Generation tokens:* 63
-- *Total tokens:* 441
-- *Prompt throughput (raw):* 1,066 tok/s
-- *Generation throughput (raw):* 47.8 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.04
-- *Model-load active memory:* 15.7
-- *Post-cleanup active memory:* 0.0113
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 529
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-**Title:** Cozy Naptime
-
-**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.
-
-**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, domestic, comfort, home, furry, striped, peaceful, indoors.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
-
-### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-<details>
-<summary>Complete evidence: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description; Response
-  repeats the task instructions instead of only returning the requested
-  fields; Extra text appears before the Title field; Response appears cut off
-  at the token limit
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.53s
-- *Generation time:* 23.71s
-- *Total time:* 25.25s
-- *Input validation time:* 8.37e-05
-- *Prompt preparation time:* 0.00667
-- *First-token latency:* 0.959
-- *Cleanup time:* 0.0869
-- *Prompt tokens:* 1,426
-- *Generation tokens:* 1,000
-- *Total tokens:* 2,426
-- *Prompt throughput (raw):* 1,488 tok/s
-- *Generation throughput (raw):* 44.0 tok/s
-- *Peak memory:* 14
-- *Active memory:* 13
-- *Cache memory:* 0.51
-- *Model-load active memory:* 12.6
-- *Post-cleanup active memory:* 0.000706
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 846
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Apriel-1.5-15b-Thinker-6bit-MLX/snapshots/24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Here are my reasoning steps:
-The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:"
-
-We need to produce a title (5-10 words), a description (1-2 sentences), and a list of 10-18 unique keywords, separated by commas.
-
-We must use only clearly visible facts from the image. The image shows two cats lying on a pink couch, sleeping. There's a remote control on the couch near them. The cats are tabby, with brown, black, and tan stripes. They appear to be sleeping, curled up. The couch is pink. The remote is a typical TV remote with buttons. The lighting appears to be natural or indoor, but we can say "soft indoor lighting" maybe. The cats are lying on their sides, one is curled up with its head on the couch, the other is lying on its side with its head near the remote. The remote is a standard TV remote, but we cannot assume brand. The couch is a pink fabric. The cats are domestic short-haired tabby. The image is presumably taken from above, showing the cats from a top-down perspective.
-
-We need to avoid uncertain details: we cannot assume location (like "living room") unless it's clearly visible. The couch is pink, but we cannot be sure it's a living room. We can say "couch" or "sofa". The remote is present, but we cannot assume it's a TV remote? It looks like a remote control, but we can say "remote control". The cats are sleeping. The lighting is soft, maybe "ambient indoor lighting". The cats are tabby. The couch is pink. The remote is white with colored buttons. The cats are curled up. The cats are domestic. The cats are lying on a pink surface. The remote is placed near them.
-
-We need to produce British English catalogue metadata. So we need to use British spelling, e.g., "colour" vs "color". But we can just use British English.
-
-We need to produce a title of 5-10 words. Something like "Two Tabby Cats Napping on Pink Couch". That's 7 words: "Two Tabby Cats Napping on Pink Couch". That's 7 words. That works.
-
-Description: 1-2 sentences. Something like: "Two domestic tabby cats are sleeping side‑by‑side on a bright pink sofa, one curled with its head on the fabric, the other stretched with its head near a white remote control. Soft indoor lighting highlights the cats' striped fur and the pink upholstery." That's two sentences. That includes main subject (two tabby cats), setting (bright pink sofa), action (sleeping side‑by‑side), lighting (soft indoor lighting), distinctive details (striped fur, remote control). That's fine.
-
-Keywords: 10-18 unique, comma-separated. Something like: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination". That's 10 keywords. We can add a few more: "fabric upholstery, relaxed posture, top‑down view". That would bring to 13. Let's count: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination, fabric upholstery, relaxed posture, top‑down view". That's 13 keywords. Good.
-
-We need to ensure we have exactly three sections: Title:, Description:, Keywords:. No extra text. The title must be 5-10 words. "Two Tabby Cats Napping on Pink Couch" is 7 words. Good.
-
-Check for British English: "couch" is fine, but "sofa" might be more British. The title uses "couch". Could use "sofa". "Two Tabby Cats Napping on Pink Sofa". That's 7 words. "Two Tabby Cats Napping on Pink Sofa". That is British. Let's use "sofa". So title: "Two Tabby Cats Napping on Pink Sofa". That's 7 words.
-
-Description: "Two domestic tabby cats are sleeping side‑by‑side on a
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 ### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
@@ -2122,25 +1546,24 @@ Description: "Two domestic tabby cats are sleeping side‑by‑side on a
 <summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Extra text appears before
-  the Title field; Keyword list has 33 terms (requested 10-18); Duplicate
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 33 terms (requested 10-18); Duplicate
   keywords: couch, pet, sofa, remote, television, television remote, blurry,
   indoor, home, furniture, domestic cat, animal sleeping
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 7.07s
-- *Generation time:* 20.54s
-- *Total time:* 27.62s
-- *Input validation time:* 8.08e-05
-- *Prompt preparation time:* 0.00798
-- *First-token latency:* 2.68
-- *Cleanup time:* 0.225
+- *Model load time:* 4.85s
+- *Generation time:* 18.62s
+- *Total time:* 23.49s
+- *Input validation time:* 8.9e-05
+- *Prompt preparation time:* 0.00769
+- *First-token latency:* 1.21
+- *Cleanup time:* 0.179
 - *Prompt tokens:* 545
 - *Generation tokens:* 944
 - *Total tokens:* 1,489
-- *Prompt throughput (raw):* 203 tok/s
-- *Generation throughput (raw):* 57.9 tok/s
+- *Prompt throughput (raw):* 450 tok/s
+- *Generation throughput (raw):* 55.6 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.10
@@ -2213,6 +1636,683 @@ Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, res
 
 ---
 
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### mlx-community/GLM-4.6V-Flash-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 4 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.41s
+- *Generation time:* 1.01s
+- *Total time:* 2.44s
+- *Input validation time:* 0.000104
+- *Prompt preparation time:* 0.00807
+- *First-token latency:* 0.319
+- *Cleanup time:* 0.0939
+- *Prompt tokens:* 499
+- *Generation tokens:* 61
+- *Total tokens:* 560
+- *Prompt throughput (raw):* 1,563 tok/s
+- *Generation throughput (raw):* 89.8 tok/s
+- *Peak memory:* 7.8
+- *Active memory:* 6.8
+- *Cache memory:* 0.05
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00211
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 553
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Cats on Pink Sofa
+Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.
+Keywords: two tabby cats, pink fabric sofa, remote control, head down
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title: Two Cats on Pink Sofa
+Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down. 
+Keywords: two tabby cats, pink fabric sofa, remote control, head down
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 7.65s
+- *Generation time:* 6.51s
+- *Total time:* 14.17s
+- *Input validation time:* 0.0001
+- *Prompt preparation time:* 0.00735
+- *First-token latency:* 4.72
+- *Cleanup time:* 0.228
+- *Prompt tokens:* 499
+- *Generation tokens:* 89
+- *Total tokens:* 588
+- *Prompt throughput (raw):* 106 tok/s
+- *Generation throughput (raw):* 49.9 tok/s
+- *Peak memory:* 63
+- *Active memory:* 62
+- *Cache memory:* 0.16
+- *Model-load active memory:* 61.9
+- *Post-cleanup active memory:* 0.00243
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 553
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|begin_of_box|&gt;Title: Two cats on a pink couch
+Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
+Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship&lt;|end_of_box|&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|begin_of_box|>Title: Two cats on a pink couch
+Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
+Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 3.27s
+- *Generation time:* 118.24s
+- *Total time:* 121.53s
+- *Input validation time:* 8.77e-05
+- *Prompt preparation time:* 0.00211
+- *First-token latency:* 0.844
+- *Cleanup time:* 0.169
+- *Prompt tokens:* 489
+- *Generation tokens:* 562
+- *Total tokens:* 1,051
+- *Prompt throughput (raw):* 579 tok/s
+- *Generation throughput (raw):* 4.8 tok/s
+- *Peak memory:* 40
+- *Active memory:* 33
+- *Cache memory:* 5.2
+- *Model-load active memory:* 32.8
+- *Post-cleanup active memory:* 0.00365
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 659
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room.
+
+First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+
+Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+
+Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby
+Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.
+Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment&lt;|im_assistant|&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room. 
+
+First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+
+Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+
+Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby  
+Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.  
+Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment<|im_assistant|>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ornith-10-35b-bf16"></a>
+
+### mlx-community/Ornith-1.0-35B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
+- *Model load time:* 10.44s
+- *Generation time:* 8.40s
+- *Total time:* 18.87s
+- *Input validation time:* 9.15e-05
+- *Prompt preparation time:* 0.0138
+- *First-token latency:* 6.22
+- *Cleanup time:* 0.257
+- *Prompt tokens:* 421
+- *Generation tokens:* 133
+- *Total tokens:* 554
+- *Prompt throughput (raw):* 67.7 tok/s
+- *Generation throughput (raw):* 64.8 tok/s
+- *Peak memory:* 71
+- *Active memory:* 70
+- *Cache memory:* 0.10
+- *Model-load active memory:* 70.2
+- *Post-cleanup active memory:* 0.00705
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 563
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes
+
+Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its head down.
+
+Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxation, striped fur, cozy setting, indoor scene, pet comfort, soft lighting, domestic life, animal companionship, resting pets, home environment, tranquil moment, feline behavior, sofa bedding, remote placement, cat napping, peaceful atmosphere
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 4 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.59s
+- *Generation time:* 0.30s
+- *Total time:* 0.90s
+- *Input validation time:* 9.32e-05
+- *Prompt preparation time:* 0.00367
+- *First-token latency:* 0.149
+- *Cleanup time:* 0.0768
+- *Prompt tokens:* 511
+- *Generation tokens:* 40
+- *Total tokens:* 551
+- *Prompt throughput (raw):* 3,421 tok/s
+- *Generation throughput (raw):* 311 tok/s
+- *Peak memory:* 2.5
+- *Active memory:* 1.3
+- *Cache memory:* 0.03
+- *Model-load active memory:* 1.26
+- *Post-cleanup active memory:* 0.00742
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 602
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Cats Sleeping on a Pink Couch
+Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.
+Keywords: cats, sleeping, pink couch, remote controls
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 4 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.64s
+- *Generation time:* 0.72s
+- *Total time:* 1.36s
+- *Input validation time:* 0.000103
+- *Prompt preparation time:* 0.00264
+- *First-token latency:* 0.381
+- *Cleanup time:* 0.0796
+- *Prompt tokens:* 1,204
+- *Generation tokens:* 31
+- *Total tokens:* 1,235
+- *Prompt throughput (raw):* 3,161 tok/s
+- *Generation throughput (raw):* 124 tok/s
+- *Peak memory:* 5.5
+- *Active memory:* 4.5
+- *Cache memory:* 0.30
+- *Model-load active memory:* 4.5
+- *Post-cleanup active memory:* 0.00968
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 504
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Two Cats on a Couch
+Description: Two cats are sleeping on a pink couch.
+Keywords: cats, couch, sleeping, pink
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.22s
+- *Generation time:* 2.00s
+- *Total time:* 5.25s
+- *Input validation time:* 7.74e-05
+- *Prompt preparation time:* 0.0207
+- *First-token latency:* 0.307
+- *Cleanup time:* 0.124
+- *Prompt tokens:* 386
+- *Generation tokens:* 75
+- *Total tokens:* 461
+- *Prompt throughput (raw):* 1,256 tok/s
+- *Generation throughput (raw):* 49.0 tok/s
+- *Peak memory:* 29
+- *Active memory:* 28
+- *Cache memory:* 0.01
+- *Model-load active memory:* 28
+- *Post-cleanup active memory:* 0.0103
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 498
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
+Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|channel>thought
+<channel|>Title: Two tabby cats sleeping on a pink blanket
+Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.34s
+- *Generation time:* 2.12s
+- *Total time:* 5.47s
+- *Input validation time:* 9.36e-05
+- *Prompt preparation time:* 0.000367
+- *First-token latency:* 0.315
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 386
+- *Generation tokens:* 68
+- *Total tokens:* 454
+- *Prompt throughput (raw):* 1,225 tok/s
+- *Generation throughput (raw):* 41.7 tok/s
+- *Peak memory:* 28
+- *Active memory:* 27
+- *Cache memory:* 0.01
+- *Model-load active memory:* 27.2
+- *Post-cleanup active memory:* 0.0103
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 498
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|channel&gt;thought
+&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
+Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|channel>thought
+<channel|>Title: Two tabby cats sleeping on a pink blanket
+Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+
+### mlx-community/gemma-3n-E4B-it-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 2 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
+- *Model load time:* 2.37s
+- *Generation time:* 1.73s
+- *Total time:* 4.11s
+- *Input validation time:* 9.76e-05
+- *Prompt preparation time:* 0.00301
+- *First-token latency:* 0.338
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 378
+- *Generation tokens:* 63
+- *Total tokens:* 441
+- *Prompt throughput (raw):* 1,118 tok/s
+- *Generation throughput (raw):* 45.8 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.04
+- *Model-load active memory:* 15.7
+- *Post-cleanup active memory:* 0.0113
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 529
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+**Title:** Cozy Naptime
+
+**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.
+
+**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, domestic, comfort, home, furry, striped, peaceful, indoors.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+
+### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+<details>
+<summary>Complete evidence: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description; Response
+  repeats the task instructions instead of only returning the requested
+  fields; Extra text appears before the Title field; Response appears cut off
+  at the token limit
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.56s
+- *Generation time:* 23.82s
+- *Total time:* 25.39s
+- *Input validation time:* 7.72e-05
+- *Prompt preparation time:* 0.00657
+- *First-token latency:* 0.94
+- *Cleanup time:* 0.0845
+- *Prompt tokens:* 1,426
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,426
+- *Prompt throughput (raw):* 1,518 tok/s
+- *Generation throughput (raw):* 43.7 tok/s
+- *Peak memory:* 14
+- *Active memory:* 13
+- *Cache memory:* 0.51
+- *Model-load active memory:* 12.6
+- *Post-cleanup active memory:* 0.000706
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 846
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Apriel-1.5-15b-Thinker-6bit-MLX/snapshots/24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Here are my reasoning steps:
+The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:"
+
+We need to produce a title (5-10 words), a description (1-2 sentences), and a list of 10-18 unique keywords, separated by commas.
+
+We must use only clearly visible facts from the image. The image shows two cats lying on a pink couch, sleeping. There's a remote control on the couch near them. The cats are tabby, with brown, black, and tan stripes. They appear to be sleeping, curled up. The couch is pink. The remote is a typical TV remote with buttons. The lighting appears to be natural or indoor, but we can say "soft indoor lighting" maybe. The cats are lying on their sides, one is curled up with its head on the couch, the other is lying on its side with its head near the remote. The remote is a standard TV remote, but we cannot assume brand. The couch is a pink fabric. The cats are domestic short-haired tabby. The image is presumably taken from above, showing the cats from a top-down perspective.
+
+We need to avoid uncertain details: we cannot assume location (like "living room") unless it's clearly visible. The couch is pink, but we cannot be sure it's a living room. We can say "couch" or "sofa". The remote is present, but we cannot assume it's a TV remote? It looks like a remote control, but we can say "remote control". The cats are sleeping. The lighting is soft, maybe "ambient indoor lighting". The cats are tabby. The couch is pink. The remote is white with colored buttons. The cats are curled up. The cats are domestic. The cats are lying on a pink surface. The remote is placed near them.
+
+We need to produce British English catalogue metadata. So we need to use British spelling, e.g., "colour" vs "color". But we can just use British English.
+
+We need to produce a title of 5-10 words. Something like "Two Tabby Cats Napping on Pink Couch". That's 7 words: "Two Tabby Cats Napping on Pink Couch". That's 7 words. That works.
+
+Description: 1-2 sentences. Something like: "Two domestic tabby cats are sleeping side‑by‑side on a bright pink sofa, one curled with its head on the fabric, the other stretched with its head near a white remote control. Soft indoor lighting highlights the cats' striped fur and the pink upholstery." That's two sentences. That includes main subject (two tabby cats), setting (bright pink sofa), action (sleeping side‑by‑side), lighting (soft indoor lighting), distinctive details (striped fur, remote control). That's fine.
+
+Keywords: 10-18 unique, comma-separated. Something like: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination". That's 10 keywords. We can add a few more: "fabric upholstery, relaxed posture, top‑down view". That would bring to 13. Let's count: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination, fabric upholstery, relaxed posture, top‑down view". That's 13 keywords. Good.
+
+We need to ensure we have exactly three sections: Title:, Description:, Keywords:. No extra text. The title must be 5-10 words. "Two Tabby Cats Napping on Pink Couch" is 7 words. Good.
+
+Check for British English: "couch" is fine, but "sofa" might be more British. The title uses "couch". Could use "sofa". "Two Tabby Cats Napping on Pink Sofa". That's 7 words. "Two Tabby Cats Napping on Pink Sofa". That is British. Let's use "sofa". So title: "Two Tabby Cats Napping on Pink Sofa". That's 7 words.
+
+Description: "Two domestic tabby cats are sleeping side‑by‑side on a
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-fastvlm-05b-bf16"></a>
 
 ### mlx-community/FastVLM-0.5B-bf16
@@ -2227,18 +2327,18 @@ Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, res
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
 - *Model load time:* 0.59s
-- *Generation time:* 0.43s
-- *Total time:* 1.03s
-- *Input validation time:* 9.45e-05
-- *Prompt preparation time:* 0.00177
-- *First-token latency:* 0.299
+- *Generation time:* 0.21s
+- *Total time:* 0.81s
+- *Input validation time:* 9.61e-05
+- *Prompt preparation time:* 0.00183
+- *First-token latency:* 0.0796
 - *Cleanup time:* 0.0746
 - *Prompt tokens:* 120
 - *Generation tokens:* 32
 - *Total tokens:* 152
-- *Prompt throughput (raw):* 401 tok/s
-- *Generation throughput (raw):* 343 tok/s
-- *Peak memory:* 2.2
+- *Prompt throughput (raw):* 1,508 tok/s
+- *Generation throughput (raw):* 341 tok/s
+- *Peak memory:* 2.1
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -2283,18 +2383,18 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
   cut off at the token limit; Internal reasoning block appears incomplete;
   Title has 21 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.65s
-- *Generation time:* 20.23s
-- *Total time:* 21.89s
-- *Input validation time:* 6.81e-05
-- *Prompt preparation time:* 0.0019
-- *First-token latency:* 0.372
-- *Cleanup time:* 0.0962
+- *Model load time:* 1.67s
+- *Generation time:* 21.34s
+- *Total time:* 23.02s
+- *Input validation time:* 6.31e-05
+- *Prompt preparation time:* 0.00192
+- *First-token latency:* 0.364
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 495
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,495
-- *Prompt throughput (raw):* 1,330 tok/s
-- *Generation throughput (raw):* 50.4 tok/s
+- *Prompt throughput (raw):* 1,360 tok/s
+- *Generation throughput (raw):* 47.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.08
@@ -2420,18 +2520,18 @@ Keywords: cats, tabby, blanket,
 - *Observations:* Missing or empty fields: Title, Description, Keywords;
   Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.90s
-- *Generation time:* 1.47s
+- *Model load time:* 1.88s
+- *Generation time:* 1.48s
 - *Total time:* 3.37s
-- *Input validation time:* 7.68e-05
+- *Input validation time:* 9.45e-05
 - *Prompt preparation time:* 0.00147
-- *First-token latency:* 1.04
-- *Cleanup time:* 0.104
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.0984
 - *Prompt tokens:* 2,418
 - *Generation tokens:* 13
 - *Total tokens:* 2,431
-- *Prompt throughput (raw):* 2,323 tok/s
-- *Generation throughput (raw):* 34.8 tok/s
+- *Prompt throughput (raw):* 2,312 tok/s
+- *Generation throughput (raw):* 34.6 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.39
@@ -2486,17 +2586,17 @@ Keywords: cats, tabby, blanket,
   the Title field; Response appears cut off at the token limit; Keyword list
   has 313 terms (requested 10-18); Duplicate keywords: household frames
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.55s
-- *Generation time:* 64.44s
-- *Total time:* 65.99s
-- *Input validation time:* 7.83e-05
-- *Prompt preparation time:* 0.00161
-- *First-token latency:* 1.64
-- *Cleanup time:* 0.0934
+- *Model load time:* 1.57s
+- *Generation time:* 64.60s
+- *Total time:* 66.18s
+- *Input validation time:* 8.3e-05
+- *Prompt preparation time:* 0.00157
+- *First-token latency:* 1.61
+- *Cleanup time:* 0.0933
 - *Prompt tokens:* 107
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,107
-- *Prompt throughput (raw):* 65.3 tok/s
+- *Prompt throughput (raw):* 66.6 tok/s
 - *Generation throughput (raw):* 15.9 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
@@ -2548,21 +2648,21 @@ Here is the information in the format you requested:
 - *Observations:* Missing or empty fields: Title; Extra text appears before
   the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.86s
+- *Model load time:* 0.87s
 - *Generation time:* 0.34s
-- *Total time:* 1.22s
-- *Input validation time:* 8.22e-05
+- *Total time:* 1.23s
+- *Input validation time:* 8.11e-05
 - *Prompt preparation time:* 0.00842
-- *First-token latency:* 0.0978
-- *Cleanup time:* 0.0841
+- *First-token latency:* 0.103
+- *Cleanup time:* 0.0843
 - *Prompt tokens:* 330
 - *Generation tokens:* 58
 - *Total tokens:* 388
-- *Prompt throughput (raw):* 3,375 tok/s
+- *Prompt throughput (raw):* 3,216 tok/s
 - *Generation throughput (raw):* 278 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.3
-- *Cache memory:* 0.04
+- *Cache memory:* 0.05
 - *Model-load active memory:* 2.32
 - *Post-cleanup active memory:* 0.00482
 - *Post-cleanup cache memory:* 0.0
@@ -2595,111 +2695,6 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 
 ---
 
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* none
-- *Observations:* Response repeats the task instructions instead of only
-  returning the requested fields; Extra text appears before the Title field
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.78s
-- *Generation time:* 6.81s
-- *Total time:* 7.62s
-- *Input validation time:* 8.3e-05
-- *Prompt preparation time:* 0.0114
-- *First-token latency:* 0.0843
-- *Cleanup time:* 0.149
-- *Prompt tokens:* 411
-- *Generation tokens:* 872
-- *Total tokens:* 1,283
-- *Prompt throughput (raw):* 4,875 tok/s
-- *Generation throughput (raw):* 130 tok/s
-- *Peak memory:* 5.3
-- *Active memory:* 4.3
-- *Cache memory:* 0.19
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00805
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 552
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
-
-Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
-
-Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
-
-Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
-
-Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
-
-Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
-&lt;/think&gt;
-
-Title:
-Two tabby cats resting on pink couch with remotes
-
-Description:
-Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
-
-Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
-
-Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
-
-Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
-
-Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
-
-Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
-
-Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
-</think>
-
-Title:
-Two tabby cats resting on pink couch with remotes
-
-Description:
-Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
-
-Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
 ### mlx-community/llava-v1.6-mistral-7b-8bit
@@ -2713,18 +2708,18 @@ Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, lig
 - *Observations:* Response repeats the same text; Missing or empty fields:
   Title, Description, Keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 0.91s
-- *Generation time:* 20.42s
-- *Total time:* 21.33s
-- *Input validation time:* 9.01e-05
-- *Prompt preparation time:* 0.00187
-- *First-token latency:* 2.11
-- *Cleanup time:* 0.14
+- *Model load time:* 0.96s
+- *Generation time:* 22.41s
+- *Total time:* 23.37s
+- *Input validation time:* 0.000109
+- *Prompt preparation time:* 0.002
+- *First-token latency:* 2.78
+- *Cleanup time:* 0.117
 - *Prompt tokens:* 2,469
 - *Generation tokens:* 1,000
 - *Total tokens:* 3,469
-- *Prompt throughput (raw):* 1,170 tok/s
-- *Generation throughput (raw):* 54.7 tok/s
+- *Prompt throughput (raw):* 889 tok/s
+- *Generation throughput (raw):* 51.0 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.92
@@ -2769,19 +2764,19 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.49s
-- *Generation time:* 0.34s
-- *Total time:* 0.83s
-- *Input validation time:* 8.98e-05
-- *Prompt preparation time:* 0.00172
-- *First-token latency:* 0.072
-- *Cleanup time:* 0.0873
+- *Model load time:* 0.51s
+- *Generation time:* 0.37s
+- *Total time:* 0.88s
+- *Input validation time:* 9.69e-05
+- *Prompt preparation time:* 0.00186
+- *First-token latency:* 0.0711
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 116
 - *Generation tokens:* 97
 - *Total tokens:* 213
-- *Prompt throughput (raw):* 1,611 tok/s
-- *Generation throughput (raw):* 381 tok/s
-- *Peak memory:* 2.1
+- *Prompt throughput (raw):* 1,632 tok/s
+- *Generation throughput (raw):* 349 tok/s
+- *Peak memory:* 2.0
 - *Active memory:* 0.61
 - *Cache memory:* 0.25
 - *Model-load active memory:* 0.611
@@ -2828,18 +2823,18 @@ Description: A close-up of a person wearing a striped shirt, with a focus on the
   requested fields; Extra text appears before the Title field; Response
   appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.15s
-- *Generation time:* 22.62s
-- *Total time:* 23.79s
-- *Input validation time:* 8.77e-05
-- *Prompt preparation time:* 0.000209
-- *First-token latency:* 1.1
-- *Cleanup time:* 0.136
+- *Model load time:* 1.28s
+- *Generation time:* 23.61s
+- *Total time:* 24.91s
+- *Input validation time:* 8.13e-05
+- *Prompt preparation time:* 0.000227
+- *First-token latency:* 1.19
+- *Cleanup time:* 0.154
 - *Prompt tokens:* 4,207
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,207
-- *Prompt throughput (raw):* 3,810 tok/s
-- *Generation throughput (raw):* 47.0 tok/s
+- *Prompt throughput (raw):* 3,526 tok/s
+- *Generation throughput (raw):* 45.1 tok/s
 - *Peak memory:* 4.2
 - *Active memory:* 1.7
 - *Cache memory:* 2.0

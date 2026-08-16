@@ -130,11 +130,12 @@ Notable changes to this project will be documented in this file.
   reranker loaders from the server endpoints; `mlx-lm` is no longer described
   as core in the README install snippet, dependency table, or implementation
   guide.
-- **Retained-run caveat:** the published 2026-08-16 artefacts (producer
-  `157c9b18`) predate the thinking-marker fixes above; their two thinker rows
-  (Qwen3-VL-2B-Thinking, ERNIE-4.5-VL-Thinking) are graded `unusable` where
-  the fixed analyser grades them `usable` / `usable with caveats`. Retained
-  outputs are not hand-edited; the next full run regrades them.
+- **Retained-run note:** the published 2026-08-16 18:47 artefacts (producer
+  `519ba509`, blind lane, 41 models) are the first set produced entirely by
+  the fixed analyser and supersede the earlier pre-fix snapshot; the only
+  changes versus that snapshot are the two thinker rows regrading exactly as
+  the fixed analyser predicted (Qwen3-VL-2B-Thinking → `usable`,
+  ERNIE-4.5-VL-Thinking → `usable with caveats`).
 
 - Configured thinking start/end markers are no longer pre-stripped from the
   analysis copy as generic control-token wrappers. Whenever a thinking budget

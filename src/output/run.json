@@ -84,7 +84,7 @@
     {
       "arch_supported": true,
       "capability_evidence": [
-        "image-input keys: image_grid_pinpoints, mm_vision_select_layer, vision_config"
+        "image-input keys: mm_vision_select_layer, vision_config"
       ],
       "capability_verdict": "yes",
       "layout_reasons": [],
@@ -599,7 +599,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "157c9b18be54da6d0bb09fc96208e9fb46078f91",
+      "source_revision": "519ba509eb8dbc03125dc283e5936c4ca584b953",
       "vcs_revision": null,
       "version": "0.10.0"
     },
@@ -684,7 +684,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "blind",
-  "generated_at": "2026-08-16 17:50:02 BST",
+  "generated_at": "2026-08-16 18:47:12 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -962,7 +962,7 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "157c9b18be54da6d0bb09fc96208e9fb46078f91",
+    "git_revision": "519ba509eb8dbc03125dc283e5936c4ca584b953",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.10.0"
@@ -1300,6 +1300,6 @@
   },
   "prompt_sha256": "30c9a84b2d1e2936a381e9025c6144d4cc4f436e6ab5c531fa8682af8d95e593",
   "schema_version": "2.0",
-  "total_runtime_seconds": 478.381,
+  "total_runtime_seconds": 484.154,
   "trust_remote_code": true
 }

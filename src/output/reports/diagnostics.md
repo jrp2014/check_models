@@ -18,40 +18,39 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 31    |
-| observation needs reproduction | 10    |
+| none                           | 32    |
+| observation needs reproduction | 9     |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
-| unusable            | 11    |
-| usable              | 19    |
-| usable with caveats | 11    |
+| unusable            | 9     |
+| usable              | 20    |
+| usable with caveats | 12    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| Response repeats the same text                                                        | 4     |
+| Response repeats the same text                                                        | 3     |
 | Unrecognised model control tokens remain visible                                      | 3     |
 | Required fields are missing or empty                                                  | 7     |
-| Response repeats the task instructions instead of only returning the requested fields | 3     |
-| Extra text appears before the Title field                                             | 7     |
+| Response repeats the task instructions instead of only returning the requested fields | 2     |
+| Extra text appears before the Title field                                             | 5     |
 | Response appears cut off at the token limit                                           | 5     |
 | Internal reasoning block appears incomplete                                           | 1     |
 | Conversation-role control tokens remain visible                                       | 2     |
-| Title or keywords do not meet requested constraints                                   | 11    |
+| Title or keywords do not meet requested constraints                                   | 10    |
 
 ## Triage
 
 | Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                                                 |
 |-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------|
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; title/keyword constraints failed                                     |
 | [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
 | [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                               |
 | [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                     |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
 | [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
 | [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | unusable            | observation_needs_reproduction | missing required fields; role tokens visible                                                                 |
@@ -63,114 +62,6 @@ Observation counts
 None.
 
 ## Completed Runs with Observations
-
-<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-<details>
-<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — repeated text; extra text before Title; title/keyword constraints failed</summary>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, unexpected_catalog_preamble,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Repeated fragment:* phrase: "too general. i'll also..."
-- *Unexpected text before Title:* Alright, let's get to work. I need to
-  generate some metadata for this image, and the instructions are very
-  specific. First, I need a title, a description, and a list of keywords. The
-  title has to be between five and ten words, and the description needs to be
-  a short, factual paragraph. The keywords are crucial; they have to be unique
-  and relevant, and I can only use what's *clearly* visible. No guessing, no
-  assumptions.  Okay, let's break down the image. I see two cats, definitely.
-  One is a calico, and the other is a tabby. They're on a red couch, and
-  there's a remote control nearby. The lighting seems to be indoor, probably
-  from a lamp or the sun. The cats are sleeping, and the image is a bit
-  blurry.  Now, the title. I need something short and descriptive. "Two cats
-  sleeping on a red couch" is a good start, but I can do better. "Calico and
-  tabby cats resting on a red couch" is more specific, but maybe too long.
-  "Two cats sleeping on a red couch with a remote" is also good. I'll go with
-  "Two cats sleeping on a red couch with a remote." It's concise and accurate.
-  Next, the description. I need to cover the main subject, setting, action,
-  lighting, and any distinctive details. The main subjects are the two cats.
-  The setting is a red couch. They're sleeping. The lighting is soft, and the
-  image is a bit blurry. The distinctive details are the calico and tabby
-  patterns, the red couch, and the remote. I'll write: "A calico cat and a
-  tabby cat are sleeping side-by-side on a red couch. A remote control lies
-  nearby. The image is slightly blurry, capturing a quiet moment indoors."
-  That's two sentences, factual, and covers everything.  Finally, the
-  keywords. I need to be very careful here. I'll list the obvious things: cat,
-  cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting,
-  couch, sofa, remote, television, television remote, blurry, indoor, home,
-  furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure
-  they are all unique and relevant. I'll remove "couch" and "sofa" since they
-  are the same thing. I'll also remove "television" and "television remote"
-  because the remote is the only thing that is related to a television. I'll
-  also remove "blurry" because it is not a fact. I'll also remove "pet" and
-  "domestic cat" because they are too general. I'll also remove "animal"
-  because it is too general. I'll also remove "animal sleeping" because it is
-  too general. I'll also remove "home" because it is too general. I'll also
-  remove "furniture" because it is too general. I'll also remove "television"
-  because it is too general. I'll also remove "television remote" because it
-  is too general. I'll also remove "blurry" because it is not a fact. I'll
-  also remove "indoor" because it is too general. I'll also remove "pet"
-  because it is too general. I'll also remove "domestic cat" because it is too
-  general. I'll also remove "animal" because it is too general. I'll also
-  remove "animal sleeping" because it is too general. I'll also remove "home"
-  because it is too general. I'll also remove "furniture" because it is too
-  general. I'll also remove
-- *Declared generation wrappers in output:* ["&lt;/think&gt;"]
-- *Thinking trace markers:* ["&lt;think&gt;", "&lt;/think&gt;"]
-- *Title word count:* 10
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 33
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["couch", "pet", "sofa", "remote", "television",
-  "television remote", "blurry", "indoor", "home", "furniture", "domestic
-  cat", "animal sleeping"]
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.001180718
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 545
-- *Generation tokens:* 944
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-- *Configured thinking start token:* &lt;think&gt;
-- *Configured thinking end token:* &lt;/think&gt;
-- *Configured thinking budget:* 800
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
-
-Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
-
-Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
-
-Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
-
-Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all unique and relevant. I'll remove "couch" and "sofa" since they are the same thing. I'll also remove "television" and "television remote" because the remote is the only thing that is related to a television. I'll also remove "blurry" because it is not a fact. I'll also remove "pet" and "domestic cat" because they are too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove "television" because it is too general. I'll also remove "television remote" because it is too general. I'll also remove "blurry" because it is not a fact. I'll also remove "indoor" because it is too general. I'll also remove "pet" because it is too general. I'll also remove "domestic cat" because it is too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove
-</think>
-
-Title: Two cats sleeping on a red couch with a remote
-
-Description: A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors.
-
-Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet, domestic cat, animal sleeping
-```
-
-</details>
 
 <a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
@@ -394,7 +285,7 @@ Description:
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-8bit
 
@@ -403,15 +294,10 @@ Description:
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token, catalog_constraint_violation
+- *Observations:* unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
-- *Title word count:* 8
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 14
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["domestic"]
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -419,7 +305,7 @@ Description:
 - *Post-cleanup active memory (GB):* 0.010257588
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 72
+- *Generation tokens:* 75
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -431,8 +317,8 @@ Description:
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a bright pink blanket atop a red sofa. Two remote controls lie near the sleeping animals.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, striped, resting, feline, domestic, domestic
+Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
 ```
 
 </details>
@@ -460,7 +346,7 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, stri
 - *Post-cleanup active memory (GB):* 0.010257588
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 74
+- *Generation tokens:* 68
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -472,8 +358,8 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, stri
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats are lying down on a pink blanket on a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, red, indoor, remote, controls, feline, resting, domestic, fur, soft
+Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
 ```
 
 </details>
@@ -706,9 +592,9 @@ is in the model gallery.
 | mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                                                       |
 | mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                                              |
 | mlx-community/nanoLLaVA-1.5-4bit                      | unusable            | missing required fields                                                                       |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | unusable            | echoes instructions; extra text before Title                                                  |
 | LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16      | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/gemma-3n-E4B-it-bf16                    | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/GLM-4.6V-Flash-mxfp4                    | usable_with_caveats | title/keyword constraints failed                                                              |
 | mlx-community/Ornith-1.0-35B-bf16                     | usable_with_caveats | title/keyword constraints failed                                                              |
@@ -722,24 +608,25 @@ is in the model gallery.
 
 | Model                                             | Runtime identity                                        | Performance                                                                              |
 |---------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------|
-| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 31.6 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 130 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache     |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 28.1 tok/s; 19 GB peak; cleanup 0.0124/0.0 GB active/cache    |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 60 generated; 34.4 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
-| mlx-community/LFM2.5-VL-1.6B-bf16                 | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 350 prompt / 100 generated; 185 tok/s; 4.1 GB peak; cleanup 0.00379/0.0 GB active/cache  |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.5 tok/s; 9.8 GB peak; cleanup 0.00508/0.0 GB active/cache |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 64.6 tok/s; 10 GB peak; cleanup 0.00534/0.0 GB active/cache |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 193 tok/s; 4.5 GB peak; cleanup 0.0056/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 843 prompt / 89 generated; 53.7 tok/s; 11 GB peak; cleanup 0.00592/0.0 GB active/cache   |
-| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 6.21 tok/s; 23 GB peak; cleanup 0.00654/0.0 GB active/cache   |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 59.6 tok/s; 9.3 GB peak; cleanup 0.00711/0.0 GB active/cache  |
-| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.5 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache   |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16           | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 129 tok/s; 5.3 GB peak; cleanup 0.00773/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 121 tok/s; 21 GB peak; cleanup 0.00855/0.0 GB active/cache    |
+| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 30.3 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache    |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 125 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache     |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 27.0 tok/s; 19 GB peak; cleanup 0.0124/0.0 GB active/cache    |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 60 generated; 35.8 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
+| mlx-community/LFM2.5-VL-1.6B-bf16                 | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 350 prompt / 100 generated; 184 tok/s; 4.1 GB peak; cleanup 0.00379/0.0 GB active/cache  |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.7 tok/s; 9.8 GB peak; cleanup 0.00508/0.0 GB active/cache |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 64.9 tok/s; 10 GB peak; cleanup 0.00534/0.0 GB active/cache |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 194 tok/s; 4.5 GB peak; cleanup 0.0056/0.0 GB active/cache   |
+| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 843 prompt / 89 generated; 53.6 tok/s; 11 GB peak; cleanup 0.00592/0.0 GB active/cache   |
+| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 6.04 tok/s; 23 GB peak; cleanup 0.00654/0.0 GB active/cache   |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 57.7 tok/s; 9.3 GB peak; cleanup 0.00711/0.0 GB active/cache  |
+| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.4 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache   |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16           | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 135 tok/s; 5.3 GB peak; cleanup 0.00773/0.0 GB active/cache   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 411 prompt / 872 generated; 131 tok/s; 5.3 GB peak; cleanup 0.00805/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 124 tok/s; 21 GB peak; cleanup 0.00855/0.0 GB active/cache    |
 | mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 101 tok/s; 7.1 GB peak; cleanup 0.00906/0.0 GB active/cache   |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 19.2 tok/s; 30 GB peak; cleanup 0.00957/0.0 GB active/cache  |
-| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 105 generated; 44.2 tok/s; 65 GB peak; cleanup 0.00995/0.0 GB active/cache  |
-| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 66.1 tok/s; 10 GB peak; cleanup 0.0103/0.0 GB active/cache   |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 18.4 tok/s; 30 GB peak; cleanup 0.00957/0.0 GB active/cache  |
+| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 105 generated; 43.4 tok/s; 65 GB peak; cleanup 0.00995/0.0 GB active/cache  |
+| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 65.9 tok/s; 10 GB peak; cleanup 0.0103/0.0 GB active/cache   |
 | Qwen/Qwen3-VL-2B-Instruct                         | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 138 tok/s; 5.2 GB peak; cleanup 0.000443/0.0 GB active/cache  |
 
 </details>
@@ -776,16 +663,10 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
-The shared command omits per-model automatic thinking flags. When substituting
-these models, append the flags recorded in their diagnostics blocks:
-`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (--enable-thinking
---thinking-budget 800).
-
 ### Highlighted model revisions
 
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
 | mlx-community/llava-v1.6-mistral-7b-8bit         | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
 | mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
