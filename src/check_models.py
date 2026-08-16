@@ -250,11 +250,6 @@ ERROR_PILLOW_MISSING: Final[str] = (
 ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
-ERROR_MLX_LM_MISSING: Final[str] = (
-    "Core dependency missing: mlx-lm. Please reinstall the runtime "
-    "(`pip install -e .`) or the full model-support stack "
-    '(`pip install -e ".[extras,torch]"`) from `src/`.'
-)
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
@@ -282,6 +277,12 @@ class ThinkingDelimiterPair(NamedTuple):
     start: str
     end: str
     reports_when_empty: bool = False
+    # ``auto_budget_eligible`` separates pairs that are safe to hand to
+    # upstream's ThinkingBudgetCriteria for automatic budgeting (single-token
+    # start/end markers that templates open) from pairs recognised only as
+    # output evidence. Transport-syntax pairs stay evidence-only: forcing a
+    # closing sequence there would inject control tokens into final text.
+    auto_budget_eligible: bool = True
 
 
 THINKING_TRACE_DELIMITERS: Final[tuple[ThinkingDelimiterPair, ...]] = (
@@ -289,7 +290,12 @@ THINKING_TRACE_DELIMITERS: Final[tuple[ThinkingDelimiterPair, ...]] = (
     ThinkingDelimiterPair("◁think▷", "◁/think▷"),
     # Marker pairs recognised by mlx-vlm's server-side thinking splitter
     # (mlx_vlm/server/responses_state.py ThinkingStreamState defaults).
-    ThinkingDelimiterPair("<|channel>thought", "<channel|>", reports_when_empty=True),
+    ThinkingDelimiterPair(
+        "<|channel>thought",
+        "<channel|>",
+        reports_when_empty=True,
+        auto_budget_eligible=False,
+    ),
     ThinkingDelimiterPair("<|START_THINKING|>", "<|END_THINKING|>"),
 )
 DEFAULT_THINKING_END_MARKER: Final[str] = THINKING_TRACE_DELIMITERS[0].end
@@ -809,10 +815,14 @@ if mlx_vlm_probe_error is None:
 else:
     MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
 
+# mlx-lm is ecosystem provenance, not a runtime requirement: this project has
+# no direct mlx_lm import, and upstream mlx-vlm dropped its own mlx-lm
+# dependency in 738e4406 (vendored the ported models). Its version is still
+# recorded in reports when present, but its absence must not abort a run.
 try:
     version("mlx-lm")
 except PackageNotFoundError:
-    MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
+    logger.debug("mlx-lm distribution not installed; recording provenance as unavailable")
 
 
 # =============================================================================
@@ -975,6 +985,9 @@ class JsonlMetricsRecord(TypedDict, total=False):
     post_cleanup_cache_memory_gb: float
 
 
+type SystemTelemetryMode = Literal["snapshot", "continuous", "off"]
+
+
 class SystemTelemetryRecord(TypedDict, total=False):
     """Thermal and memory-pressure facts sampled around/during one model run.
 
@@ -984,7 +997,7 @@ class SystemTelemetryRecord(TypedDict, total=False):
     distinguishable from a clean one.
     """
 
-    mode: str
+    mode: SystemTelemetryMode
     interval_s: float
     cpu_samples: int
     cpu_speed_limit_min_pct: float
@@ -1742,6 +1755,10 @@ class PromptDiagnostics:
     special_token_ids: tuple[JsonLike, ...] = ()
     special_tokens: tuple[str, ...] = ()
     generate_kwargs: dict[str, JsonLike] = dataclass_field(default_factory=dict)
+    # How the thinking budget in generate_kwargs was chosen: "auto" when the
+    # harness applied it because the template opened a thinking block,
+    # "explicit" when the user passed thinking flags, None when no budget.
+    thinking_budget_source: Literal["auto", "explicit"] | None = None
 
 
 @dataclass(frozen=True)
@@ -2925,9 +2942,7 @@ class ProcessImageParams:
     thinking_start_token: str | None = None
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
     auto_thinking_budget: bool = True
-    # None = snapshot probes outside timed inference (default); True = opt-in
-    # continuous background sampling; False = fully off.
-    system_telemetry: bool | None = None
+    system_telemetry: SystemTelemetryMode = "snapshot"
     context_marker: str = "Context:"
 
 
@@ -3584,6 +3599,51 @@ def _strip_empty_thinking_wrappers(text: str) -> str:
     return _EMPTY_THINKING_WRAPPER_RE.sub(" ", text)
 
 
+def _final_answer_view(
+    text: str,
+    *,
+    delimiter_pairs: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
+    seeded_text: str = "",
+) -> str:
+    """Return the text after removing every *complete* recognised thinking trace.
+
+    Structural checks (catalogue sections, preamble, repetition, instruction
+    echo, constraints) should judge the model's final answer, not its
+    reasoning. Two shapes are removed:
+
+    - ``<start>...<end>`` blocks emitted in the output;
+    - a leading ``...<end>`` tail whose ``<start>`` lives in the prompt (a
+      template- or seed-opened block the model merely closed).
+
+    Incomplete traces (a start marker with no end) are left untouched so the
+    incomplete-trace observation still sees them. Raw text and markers stay
+    available to callers as neutral evidence.
+    """
+    if not text:
+        return text
+    view = text
+    seeded_lower = seeded_text.casefold()
+    for start_marker, end_marker in delimiter_pairs:
+        # Complete emitted blocks (non-greedy, may span lines).
+        block_re = re.compile(
+            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
+            re.IGNORECASE | re.DOTALL,
+        )
+        view = block_re.sub(" ", view)
+        # A closing marker whose opener was seeded by the prompt: everything
+        # from the start of the output through that first end marker is
+        # reasoning that continues the seeded block.
+        start_lower = start_marker.casefold()
+        end_lower = end_marker.casefold()
+        seeded_open = seeded_lower.rfind(start_lower) > seeded_lower.rfind(end_lower)
+        if seeded_open:
+            view_lower = view.casefold()
+            end_position = view_lower.find(end_lower)
+            if end_position >= 0 and view_lower.find(start_lower, 0, end_position) < 0:
+                view = view[end_position + len(end_marker) :]
+    return view.strip()
+
+
 @dataclass(frozen=True)
 class NormalizedOutput:
     """Mechanical-analysis copy plus configured wrappers removed from consideration."""
@@ -4085,6 +4145,10 @@ def _detect_likely_cutoff(
             reasons.append("abrupt_tail")
         if re.search(r"(?:^|\n)\s*(?:[-+*]|\d+[.)])(?:\s+\*{1,3})?\s*$", tail):
             reasons.append("dangling_markdown")
+        # A capped answer ending mid-list (e.g. "Keywords: ..., Clouds,") was
+        # still emitting comma-separated items when the budget ran out.
+        if re.search(r"[,;]\s*$", tail):
+            reasons.append("unfinished_list")
     return True, _dedupe_preserve_order(reasons)
 
 
@@ -4366,13 +4430,21 @@ def analyze_generation_text(
         text,
         known_special_tokens=known_special_tokens,
     )
-    # Wrapper-aware semantic copy: drop empty thinking wrappers and generic
-    # control-token wrappers before structural analysis, so a model that
-    # produced the requested fields inside a leaked wrapper (e.g.
-    # "<|begin_of_box|>Title: ...") is assessed on those fields. The leak
-    # itself is still detected and reported from the raw text below.
+    # Final-answer semantic copy: drop complete thinking traces (emitted or
+    # prompt-seeded), empty thinking wrappers, and generic control-token
+    # wrappers before structural analysis, so a model that reasoned and then
+    # produced the requested fields — or produced them inside a leaked wrapper
+    # (e.g. "<|begin_of_box|>Title: ...") — is assessed on those fields. The
+    # trace and any leak are still detected and reported from the raw text.
     analysis_text = CONTROL_TOKEN_WRAPPER_RE.sub(
-        " ", _strip_empty_thinking_wrappers(normalized.text)
+        " ",
+        _strip_empty_thinking_wrappers(
+            _final_answer_view(
+                normalized.text,
+                delimiter_pairs=thinking_trace_delimiters,
+                seeded_text=seeded_thinking_text,
+            )
+        ),
     )
     is_repetitive, repeated_token = _detect_repetitive_output(analysis_text)
     prompt_signals = _collect_prompt_quality_signals(
@@ -5040,8 +5112,10 @@ def _collect_upstream_requirements(
         _record_requirement(package_name, minimum_version, "check_models")
 
     if versions.get("mlx-vlm"):
-        # mlx-vlm requirements.txt currently specifies:
-        #   mlx>=0.31.2, mlx-lm>=0.31.3, transformers>=5.5.0
+        # mlx-vlm 0.6.13 release requirements.txt specifies:
+        #   mlx>=0.32.0, mlx-lm>=0.31.3, transformers>=5.14.0
+        # (upstream main has since dropped mlx-lm in 738e4406; the released
+        # floors govern here, and mlx-lm is optional provenance for us).
         for package_name, minimum_version in UPSTREAM_MLX_VLM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-vlm")
 
@@ -10779,6 +10853,8 @@ def _auto_thinking_budget_kwargs(
     if budget < AUTO_THINKING_BUDGET_MIN_TOKENS:
         return empty
     for pair in THINKING_TRACE_DELIMITERS:
+        if not pair.auto_budget_eligible:
+            continue
         if _prompt_opens_thinking_block(formatted_prompt, pair):
             return cast(
                 "GenerateKwargs",
@@ -10796,11 +10872,14 @@ def _apply_auto_thinking_budget(
     params: ProcessImageParams,
     formatted_prompt: str,
     generate_kwargs: GenerateKwargs,
-) -> None:
-    """Inject the automatic thinking budget when the template opens thinking."""
+) -> bool:
+    """Inject the automatic thinking budget when the template opens thinking.
+
+    Returns True when a budget was applied automatically.
+    """
     auto_kwargs = _auto_thinking_budget_kwargs(params, formatted_prompt)
     if not auto_kwargs:
-        return
+        return False
     generate_kwargs.update(auto_kwargs)
     logger.info(
         "Auto thinking budget: %s tokens for %s (template opens a thinking block; "
@@ -10808,6 +10887,7 @@ def _apply_auto_thinking_budget(
         auto_kwargs.get("thinking_budget"),
         params.model_identifier,
     )
+    return True
 
 
 def _build_generate_kwargs(
@@ -10964,6 +11044,7 @@ def _build_prompt_diagnostics(
     formatted_prompt: str,
     generate_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
+    thinking_budget_source: Literal["auto", "explicit"] | None = None,
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -10990,6 +11071,7 @@ def _build_prompt_diagnostics(
         eos_token=str(eos_token) if eos_token is not None else None,
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
+        thinking_budget_source=thinking_budget_source,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
             processor_passthrough_kwargs=processor_passthrough_kwargs,
@@ -11016,6 +11098,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "image_patch_count",
         "eos_token_id",
         "eos_token",
+        "thinking_budget_source",
     ):
         value = getattr(diagnostics, key)
         if value is not None:
@@ -12215,17 +12298,156 @@ def _finalize_process_result(
     return replace(result_payload, runtime_diagnostics=runtime_diagnostics)
 
 
+class _PreparedGeneration(NamedTuple):
+    """Everything the execute step needs after load and prompt preparation."""
+
+    model: nn.Module
+    generation_processor: ProcessorLike | PreTrainedTokenizer
+    formatted_prompt: str
+    generate_kwargs: GenerateKwargs
+    processor_passthrough_kwargs: Mapping[str, object]
+    prompt_diagnostics: PromptDiagnostics
+
+
+def _prepare_generation(
+    params: ProcessImageParams,
+    *,
+    model: nn.Module,
+    processor: ProcessorMixin,
+    config: PreTrainedConfig | Mapping[str, object] | None,
+    phase_callback: Callable[[str], None] | None,
+    phase_timer: PhaseTimer | None,
+) -> _PreparedGeneration:
+    """Render the prompt and resolve the processor, kwargs, and diagnostics.
+
+    This is the preparation half of a model run: it does not touch the
+    upstream generate call, decode timing, or synchronisation.
+    """
+    formatted = _prepare_generation_prompt(
+        params=params,
+        processor=processor,
+        config=config,
+        phase_callback=phase_callback,
+        phase_timer=phase_timer,
+    )
+    # Handle list return from apply_chat_template
+    formatted_prompt = (
+        "\n".join(str(m) for m in formatted) if isinstance(formatted, list) else formatted
+    )
+
+    extra_kwargs = _build_generate_extra_kwargs(params)
+    processor_passthrough_kwargs = params.processor_kwargs or {}
+    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
+    auto_budget_applied = _apply_auto_thinking_budget(params, formatted_prompt, generate_kwargs)
+    if auto_budget_applied:
+        thinking_budget_source: Literal["auto", "explicit"] | None = "auto"
+    elif generate_kwargs.get("thinking_budget") is not None:
+        thinking_budget_source = "explicit"
+    else:
+        thinking_budget_source = None
+    prompt_diagnostics = _build_prompt_diagnostics(
+        params=params,
+        processor=processor,
+        config=config,
+        formatted_prompt=formatted_prompt,
+        generate_kwargs=generate_kwargs,
+        processor_passthrough_kwargs=processor_passthrough_kwargs,
+        thinking_budget_source=thinking_budget_source,
+    )
+    if _is_generation_processor(processor):
+        generation_processor: ProcessorLike | PreTrainedTokenizer = processor
+    else:
+        tokenizer = _extract_processor_tokenizer(processor)
+        if tokenizer is None or not _is_generation_processor(tokenizer):
+            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
+            raise TypeError(msg)
+        generation_processor = tokenizer
+    return _PreparedGeneration(
+        model=model,
+        generation_processor=generation_processor,
+        formatted_prompt=formatted_prompt,
+        generate_kwargs=generate_kwargs,
+        processor_passthrough_kwargs=processor_passthrough_kwargs,
+        prompt_diagnostics=prompt_diagnostics,
+    )
+
+
+def _execute_prepared_generation(
+    params: ProcessImageParams,
+    prepared: _PreparedGeneration,
+    *,
+    phase_callback: Callable[[str], None] | None,
+    phase_timer: PhaseTimer | None,
+) -> tuple[GenerationResult | SupportsGenerationResult, float]:
+    """Run the upstream generate call and return (output, synchronised duration).
+
+    This is the execution half: it owns the upstream call, decode-phase
+    timing, MLX synchronisation, and exception tagging with prompt
+    diagnostics. Metric attachment stays with the caller.
+    """
+    if TYPE_CHECKING:
+        strict_generate = _mlx_vlm_generate_typecheck
+    else:
+        strict_generate = generate
+
+    def _generate_once() -> GenerationResult | SupportsGenerationResult:
+        if prepared.processor_passthrough_kwargs:
+            return _generate_with_processor_passthrough(
+                generate_fn=generate,
+                model=prepared.model,
+                processor=prepared.generation_processor,
+                params=params,
+                formatted_prompt=prepared.formatted_prompt,
+                generate_kwargs=prepared.generate_kwargs,
+            )
+        return strict_generate(
+            model=prepared.model,
+            processor=prepared.generation_processor,
+            prompt=prepared.formatted_prompt,
+            image=str(params.image_path),
+            **prepared.generate_kwargs,
+        )
+
+    # Time the generation process manually since MLX VLM doesn't include timing.
+    timer = PerfCounterTimer()
+    timer.start()
+    if phase_timer is not None:
+        phase_timer.start("decode")
+    _set_failure_phase(phase_callback, "decode")
+    try:
+        output = _run_generation_guarded(
+            params=params,
+            generate_once=_generate_once,
+        )
+        # MLX is lazy: synchronize *before* stopping either timer so the
+        # decode phase and the local generation duration both include all
+        # pending GPU work and agree with each other.
+        mx.synchronize()
+        duration = timer.stop()
+    except (TimeoutError, ValueError) as generation_err:
+        _tag_exception_prompt_diagnostics(generation_err, prepared.prompt_diagnostics)
+        raise
+    finally:
+        # On the success path the decode timer stops after synchronization;
+        # this only closes it when an exception escaped before that point.
+        if phase_timer is not None:
+            phase_timer.stop("decode")
+    return output, duration
+
+
 def _run_model_generation(
     params: ProcessImageParams,
     phase_callback: Callable[[str], None] | None = None,
     phase_timer: PhaseTimer | None = None,
 ) -> GenerationResult | SupportsGenerationResult:
-    """Load model + processor, apply chat template, run generation, time it.
+    """Load model + processor, prepare the request, execute it, attach metrics.
 
-    We keep all loading + formatting + generation steps together because they
-    form a tightly coupled sequence (tokenizer/model/config interplay varies by
-    repo). Errors are wrapped with traceback context so upstream summaries can
-    show concise messages while verbose logs retain full detail.
+    Load, prepare, and execute stay in one call because they form a tightly
+    coupled sequence (tokenizer/model/config interplay varies by repo), but
+    preparation (:func:`_prepare_generation`) and execution
+    (:func:`_execute_prepared_generation`) are separate seams. Errors are
+    wrapped with traceback context so upstream summaries can show concise
+    messages while verbose logs retain full detail.
 
     Args:
         params: The parameters for the image processing.
@@ -12263,82 +12485,20 @@ def _run_model_generation(
 
     model_load_active_memory_gb = _sample_active_memory_gb()
 
-    formatted_prompt = _prepare_generation_prompt(
-        params=params,
+    prepared = _prepare_generation(
+        params,
+        model=model,
         processor=processor,
         config=config,
         phase_callback=phase_callback,
         phase_timer=phase_timer,
     )
-    # Handle list return from apply_chat_template
-    if isinstance(formatted_prompt, list):
-        formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
-
-    # Time the generation process manually since MLX VLM doesn't include timing.
-    timer = PerfCounterTimer()
-
-    extra_kwargs = _build_generate_extra_kwargs(params)
-    processor_passthrough_kwargs = params.processor_kwargs or {}
-    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
-    _apply_auto_thinking_budget(params, formatted_prompt, generate_kwargs)
-    prompt_diagnostics = _build_prompt_diagnostics(
-        params=params,
-        processor=processor,
-        config=config,
-        formatted_prompt=formatted_prompt,
-        generate_kwargs=generate_kwargs,
-        processor_passthrough_kwargs=processor_passthrough_kwargs,
+    output, duration = _execute_prepared_generation(
+        params,
+        prepared,
+        phase_callback=phase_callback,
+        phase_timer=phase_timer,
     )
-    if _is_generation_processor(processor):
-        generation_processor = processor
-    else:
-        tokenizer = _extract_processor_tokenizer(processor)
-        if tokenizer is None or not _is_generation_processor(tokenizer):
-            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
-            raise TypeError(msg)
-        generation_processor = tokenizer
-    if TYPE_CHECKING:
-        strict_generate = _mlx_vlm_generate_typecheck
-    else:
-        strict_generate = generate
-
-    def _generate_once() -> GenerationResult | SupportsGenerationResult:
-        if processor_passthrough_kwargs:
-            return _generate_with_processor_passthrough(
-                generate_fn=generate,
-                model=model,
-                processor=generation_processor,
-                params=params,
-                formatted_prompt=formatted_prompt,
-                generate_kwargs=generate_kwargs,
-            )
-        return strict_generate(
-            model=model,
-            processor=generation_processor,
-            prompt=formatted_prompt,
-            image=str(params.image_path),
-            **generate_kwargs,
-        )
-
-    timer.start()
-    if phase_timer is not None:
-        phase_timer.start("decode")
-    _set_failure_phase(phase_callback, "decode")
-    try:
-        output = _run_generation_guarded(
-            params=params,
-            generate_once=_generate_once,
-        )
-    except (TimeoutError, ValueError) as generation_err:
-        _tag_exception_prompt_diagnostics(generation_err, prompt_diagnostics)
-        raise
-    finally:
-        if phase_timer is not None:
-            phase_timer.stop("decode")
-
-    # Force GPU synchronization to ensures timing includes all pending compute (MLX is lazy)
-    mx.synchronize()
-    duration = timer.stop()
 
     # Capture local timing plus active/cache memory snapshots while model state is intact.
     result = _attach_generation_runtime_metrics(output, duration=duration)
@@ -12346,14 +12506,14 @@ def _run_model_generation(
         result,
         model_load_active_memory_gb=model_load_active_memory_gb,
     )
-    setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prompt_diagnostics)
+    setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prepared.prompt_diagnostics)
     return result
 
 
 def _build_failure_result(
     *,
     model_name: str,
-    error: TimeoutError | OSError | ValueError | RuntimeError,
+    error: BaseException,
     captured_output: str | None,
     quality_issues: str | None = None,
     quality_analysis: GenerationQualityAnalysis | None = None,
@@ -12580,7 +12740,7 @@ def _build_success_process_result(
 def _build_exception_process_result(
     *,
     params: ProcessImageParams,
-    error: TimeoutError | OSError | ValueError | RuntimeError,
+    error: BaseException,
     stdout_text: str,
     stderr_text: str,
     current_phase: str,
@@ -12678,7 +12838,7 @@ def _system_telemetry_probe() -> tuple[float | None, int | None]:
 def _system_telemetry_record_from_probes(
     probes: Sequence[tuple[float | None, int | None]],
     *,
-    mode: str,
+    mode: SystemTelemetryMode,
     interval_s: float | None = None,
 ) -> SystemTelemetryRecord:
     """Aggregate probe pairs, keeping per-probe counts so gaps stay visible.
@@ -12796,6 +12956,15 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
     return "; ".join(parts)
 
 
+def _resolve_system_telemetry_mode(flag: bool | None) -> SystemTelemetryMode:
+    """Translate the BooleanOptionalAction value into the telemetry mode once."""
+    if flag is True:
+        return "continuous"
+    if flag is False:
+        return "off"
+    return "snapshot"
+
+
 def _start_system_telemetry(
     params: ProcessImageParams,
 ) -> tuple[_SystemTelemetrySampler | None, list[tuple[float | None, int | None]]]:
@@ -12805,9 +12974,9 @@ def _start_system_telemetry(
     the timed sections; continuous sampling is opt-in because its
     subprocesses overlap timed inference.
     """
-    if sys.platform != "darwin" or params.system_telemetry is False:
+    if sys.platform != "darwin" or params.system_telemetry == "off":
         return None, []
-    if params.system_telemetry is True:
+    if params.system_telemetry == "continuous":
         sampler = _SystemTelemetrySampler()
         sampler.start()
         return sampler, []
@@ -12910,7 +13079,16 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             stdout_text=stdout_capture.getvalue(),
             stderr_text=stderr_capture.getvalue(),
         )
-    except (TimeoutError, OSError, ValueError, RuntimeError) as e:
+    except (KeyboardInterrupt, SystemExit):
+        # Never swallow operator interrupts or explicit exits: the sweep must
+        # stop, not record the model as failed and continue.
+        raise
+    except Exception as e:  # noqa: BLE001 - per-model isolation boundary
+        # This is the boundary that keeps one model's failure from aborting the
+        # whole sweep. Processors and upstream APIs can raise anything
+        # (TypeError, KeyError, AttributeError, custom errors); anticipating
+        # each is brittle, so record any exception as a phase-tagged failure
+        # with its traceback and move on to the next model.
         result_payload, stop_reason = _build_exception_process_result(
             params=params,
             error=e,
@@ -14617,7 +14795,7 @@ def _process_image_params_from_args(
         thinking_start_token=args.thinking_start_token,
         thinking_end_token=args.thinking_end_token,
         auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
-        system_telemetry=getattr(args, "system_telemetry", None),
+        system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
         context_marker=args.context_marker,
     )
 

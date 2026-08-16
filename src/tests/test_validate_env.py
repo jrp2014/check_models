@@ -89,12 +89,13 @@ def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:
     assert SpecifierSet(core_deps["transformers"]) == SpecifierSet(
         dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC
     )
-    assert core_deps["mlx-lm"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}"
+    assert "mlx-lm" not in core_deps
     assert core_deps["huggingface-hub"] == (
         f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
     )
     assert core_deps["packaging"] == ">=26.0"
-    assert "mlx-lm" not in extras_deps
+    # mlx-lm is optional ecosystem provenance, declared in extras.
+    assert extras_deps["mlx-lm"] == dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS["mlx-lm"]
 
 
 def test_load_pyproject_deps_tracks_transformers_optional_compatibility() -> None:

@@ -1121,7 +1121,10 @@ class TestPreflightDependencyDiagnostics:
         assert requirements["mlx"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx"]
         assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
         assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
-        assert requirements["mlx-lm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-lm"]
+        # mlx-lm is no longer a project runtime floor; its requirement comes
+        # only from the installed mlx-vlm release stack.
+        assert requirements["mlx-lm"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx-lm"]
+        assert requirements["mlx-lm"][1] == {"mlx-vlm"}
         assert (
             requirements["huggingface-hub"][0]
             == mod.PROJECT_RUNTIME_STACK_MINIMUMS["huggingface-hub"]

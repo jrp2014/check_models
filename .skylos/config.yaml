@@ -39,7 +39,6 @@ ignore:
   - SKY-Q802 # I/A/D module metrics are advisory for CLI/tool modules.
   - SKY-Q803 # Zone-of-pain module metrics are advisory for policy constants.
   - SKY-R104 # Package-local scans run below the repo-level pre-commit config.
-  - SKY-U005 # mlx-lm is a required runtime stack dependency even without imports.
 
 gate:
   fail_on_critical: true

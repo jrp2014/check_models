@@ -101,7 +101,6 @@ SKYLOS_ADVISORY_QUALITY_IGNORES = {
     "SKY-Q802",
     "SKY-Q803",
     "SKY-R104",
-    "SKY-U005",
 }
 SKYLOS_MONOLITH_QUALITY_LIMITS = {
     "complexity": 24,
@@ -330,14 +329,18 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     extras_deps = pyproject["project"]["optional-dependencies"]["extras"]
 
     assert f"mlx>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}" in runtime_deps
-    assert f"mlx-lm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}" in runtime_deps
     assert f"mlx-vlm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}" in runtime_deps
     assert f"transformers{dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC}" in runtime_deps
     assert (
         f"huggingface-hub[torch,typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
         in runtime_deps
     )
-    assert not any(dep.startswith("mlx-lm>=") for dep in extras_deps)
+    # mlx-lm is optional ecosystem provenance (no direct import; upstream
+    # mlx-vlm dropped it), so it lives in extras rather than the runtime set.
+    assert not any(dep.startswith("mlx-lm>=") for dep in runtime_deps)
+    assert (
+        f"mlx-lm{dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS['mlx-lm']}" in extras_deps
+    )
 
 
 def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:

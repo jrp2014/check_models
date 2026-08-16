@@ -1068,3 +1068,79 @@ def test_failure_phase_labels_cover_the_full_vocabulary() -> None:
         "upstream_prefill_first_token",
         "input_preparation_and_decode",
     }
+
+
+class TestFinalAnswerView:
+    """Complete thinking traces must not count as unwanted final-answer text."""
+
+    GOOD_ANSWER = (
+        "Title: Dover Castle Exterior on a Grassy Hill\n\n"
+        "Description: An exterior view of the historic stone castle under a cloudy sky.\n\n"
+        "Keywords: Dover, Castle, England, Historic, Medieval, Stone, Tower, Arch, "
+        "Hill, Sky, Fortress, Kent"
+    )
+
+    def test_view_strips_emitted_complete_trace(self) -> None:
+        """An emitted <think>...</think> block is removed; the answer remains."""
+        text = "<think>Let me look at the image carefully.</think>\n" + self.GOOD_ANSWER
+
+        assert check_models._final_answer_view(text) == self.GOOD_ANSWER
+
+    def test_view_strips_prompt_seeded_trace(self) -> None:
+        """A closing marker whose opener lives in the prompt removes the seeded tail."""
+        text = "Reasoning that continues the seeded block.\n</think>\n" + self.GOOD_ANSWER
+
+        view = check_models._final_answer_view(text, seeded_text="assistant\n<think>")
+
+        assert view == self.GOOD_ANSWER
+
+    def test_view_keeps_incomplete_trace(self) -> None:
+        """An unclosed trace is left intact so the incomplete-trace signal still fires."""
+        text = "<think>Still reasoning with no end marker"
+
+        assert check_models._final_answer_view(text) == text
+
+    def test_view_keeps_prompt_seeded_open_without_end_marker(self) -> None:
+        """A seeded opener with no emitted end marker leaves the text untouched."""
+        text = "Reasoning that never closes"
+
+        assert check_models._final_answer_view(text, seeded_text="assistant\n<think>") == text
+
+    def test_completed_trace_then_answer_is_not_preamble(self) -> None:
+        """Regression: Qwen3-VL-Thinking shape — reasoning, close, then all three fields."""
+        text = (
+            "Got it, let's tackle this step by step. The title should be specific.\n"
+            "</think>\n\n" + self.GOOD_ANSWER
+        )
+
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=400,
+            requested_max_tokens=1000,
+            prompt=CATALOG_PROMPT,
+            seeded_thinking_text="assistant\n<think>",
+        )
+
+        assert analysis.has_thinking_trace is True
+        assert analysis.thinking_trace_incomplete is False
+        assert analysis.unexpected_catalog_preamble is None
+        assert analysis.missing_sections == []
+        assert analysis.instruction_echo is False
+
+    def test_capped_comma_tail_reports_unfinished_list(self) -> None:
+        """Regression: ERNIE shape — capped answer ending mid keyword list."""
+        text = (
+            "Title: Dover Castle Exterior on a Grassy Hill\n\n"
+            "Description: An exterior view of the historic castle.\n\n"
+            "Keywords: Dover, Castle, England, Historic, Medieval, Stone, Sky, Clouds,"
+        )
+
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=1000,
+            requested_max_tokens=1000,
+            prompt=CATALOG_PROMPT,
+        )
+
+        assert analysis.likely_capped is True
+        assert "unfinished_list" in analysis.token_cap_reasons

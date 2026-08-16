@@ -6,7 +6,6 @@ from typing import Final
 
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.32.0",
-    "mlx-lm": "0.31.3",
     "mlx-vlm": "0.6.13",
     "transformers": "5.14.0",
     "huggingface-hub": "1.10.1",
@@ -18,7 +17,6 @@ PROJECT_PILLOW_MINIMUM_VERSION: Final[str] = "12.3.0"
 
 PROJECT_RUNTIME_STACK_SPECS: Final[dict[str, str]] = {
     "mlx": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
-    "mlx-lm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}",
     "mlx-vlm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}",
     "transformers": PROJECT_TRANSFORMERS_VERSION_SPEC,
     "huggingface-hub": f">={PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}",
@@ -37,6 +35,9 @@ UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
 }
 
 PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS: Final[dict[str, str]] = {
+    # Ecosystem provenance only: no direct import; upstream mlx-vlm dropped
+    # its own mlx-lm dependency (738e4406). Recorded in reports when present.
+    "mlx-lm": ">=0.31.3",
     "psutil": ">=5.9.0",
     "tokenizers": "<0.23.0,>=0.22.0",
     "einops": ">=0.6.0",

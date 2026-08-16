@@ -1236,3 +1236,61 @@ def test_sent_generate_keywords_mirror_the_kwargs_builders(test_image: Path) -> 
     )
 
     assert set(sent) == set(check_models._SENT_GENERATE_KEYWORDS)
+
+
+class TestPerModelIsolationBoundary:
+    """process_image_with_model must isolate any per-model exception."""
+
+    def test_unexpected_exception_recorded_as_model_failure(self, test_image: Path) -> None:
+        """A TypeError raised inside generation becomes a failure result, not an abort."""
+        params = _build_params(test_image)
+
+        def _raise_type_error(*_args: object, **_kwargs: object) -> None:
+            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
+            raise TypeError(msg)
+
+        with patch.object(check_models, "_run_model_generation", side_effect=_raise_type_error):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        assert result.error_type == "TypeError"
+        assert "generation-compatible processor" in (result.error_message or "")
+        assert result.error_traceback is not None
+        assert result.failure_phase is not None
+
+    def test_arbitrary_exception_class_is_isolated(self, test_image: Path) -> None:
+        """Even a custom exception type from a processor is recorded, not propagated."""
+        params = _build_params(test_image)
+
+        class ProcessorQuirkError(Exception):
+            pass
+
+        def _raise_custom(*_args: object, **_kwargs: object) -> None:
+            msg = "unexpected processor state"
+            raise ProcessorQuirkError(msg)
+
+        with patch.object(check_models, "_run_model_generation", side_effect=_raise_custom):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        assert result.error_type == "ProcessorQuirkError"
+
+    def test_keyboard_interrupt_propagates(self, test_image: Path) -> None:
+        """Operator interrupts must escape the boundary and stop the sweep."""
+        params = _build_params(test_image)
+
+        with (
+            patch.object(check_models, "_run_model_generation", side_effect=KeyboardInterrupt),
+            pytest.raises(KeyboardInterrupt),
+        ):
+            check_models.process_image_with_model(params)
+
+    def test_system_exit_propagates(self, test_image: Path) -> None:
+        """SystemExit must escape the boundary and stop the sweep."""
+        params = _build_params(test_image)
+
+        with (
+            patch.object(check_models, "_run_model_generation", side_effect=SystemExit(3)),
+            pytest.raises(SystemExit),
+        ):
+            check_models.process_image_with_model(params)

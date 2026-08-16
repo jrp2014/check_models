@@ -5,6 +5,77 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Completed thinking traces no longer make a good answer "unusable". A new
+  final-answer view (`_final_answer_view`) removes every *complete* recognised
+  thinking trace — emitted `<start>…<end>` blocks and prompt-seeded blocks the
+  model merely closed — before catalogue parsing, repetition, instruction-echo,
+  preamble, and constraint checks run; the raw text and markers stay as
+  neutral evidence and incomplete traces are still flagged. Replaying the
+  2026-08-16 run: Qwen3-VL-2B-Thinking loses its false "extra text before
+  Title" and regrades to usable-with-caveats on its genuine 11-word title;
+  ERNIE-4.5-VL-Thinking likewise loses the false preamble.
+- Decode timing now synchronises MLX *before* stopping the decode-phase and
+  local generation timers, so `decode_time_s` includes all pending lazy GPU
+  work and agrees with the attached generation duration; the `finally` only
+  closes the phase timer when an exception escaped first.
+- The per-model isolation boundary in `process_image_with_model` now catches
+  any `Exception` (recording it as a phase-tagged failure with traceback)
+  while letting `KeyboardInterrupt` and `SystemExit` propagate — an
+  unexpected `TypeError` from a processor or upstream API can no longer abort
+  the whole model sweep.
+- Capped catalogue answers that end mid-list (`Keywords: …, Clouds,`) now
+  record an `unfinished_list` token-cap reason instead of being missed as
+  truncation evidence.
+- Auto thinking budget detection now requires the rendered prompt to
+  *terminate* with an open thinking marker, so closed `<think></think>`
+  no-think stubs, few-shot examples, and literal marker mentions in user text
+  no longer activate budgeting (regression-tested against the real rendered
+  prompts of ERNIE, Qwen3-VL-Thinking, MiniCPM, and GLM-4.6V).
+- The shared diagnostics `MODEL_ID` reproduction command now discloses when
+  per-model automatic thinking flags diverge from the global arguments,
+  listing each affected model with the exact flags to append; per-model
+  overlays now trigger only on real value differences.
+- Total telemetry probe failure now retains a zero-count record instead of
+  silently omitting telemetry, so "both probes unavailable" is
+  distinguishable from "telemetry disabled"; the snapshot-mode diagnostics
+  label states that before/after snapshots cannot rule out transient
+  pressure during inference.
+- `tools/run_skylos_danger_advisory.sh` no longer ends a failing gate on a
+  half-drawn "Continue anyway? [y/n]:" prompt. Skylos 4.33.x decides whether
+  to offer that prompt from `stdout.isatty()` rather than stdin, so the
+  existing `</dev/null` guard stopped suppressing it and the EOF aborted the
+  script before it could print its own verdict. The gate's stdout is now
+  piped, its exit code is read from `PIPESTATUS`, and an exit code above 1
+  (analysis incomplete) is reported as an operational failure rather than a
+  gate verdict.
+- Extracted `_run_issue_summary_clean_completions_section()` from
+  `generate_run_issue_summary_report()`, dropping the latter's cyclomatic
+  complexity from 25 to 13 and clearing the `SKY-Q301` audit finding
+  (repo threshold 24). Report output is unchanged.
+
+### Changed
+
+- `_run_model_generation` is split at one seam: `_prepare_generation`
+  (prompt, processor, kwargs, diagnostics) and `_execute_prepared_generation`
+  (upstream call, decode timing, synchronisation, exception tagging), joined
+  by a small `_PreparedGeneration` NamedTuple.
+- Telemetry mode is an explicit `SystemTelemetryMode`
+  (`"snapshot" | "continuous" | "off"`) on `ProcessImageParams` and
+  `SystemTelemetryRecord`, translated once from the `--system-telemetry`
+  BooleanOptionalAction value.
+- `ThinkingDelimiterPair` gains `auto_budget_eligible`; the transport-syntax
+  `<|channel>thought` pair is evidence-only and never handed to automatic
+  budgeting. Prompt diagnostics record `thinking_budget_source`
+  (`"auto"` / `"explicit"`).
+- `mlx-lm` is optional ecosystem provenance rather than a hard runtime
+  dependency: this project has no direct `mlx_lm` import and upstream mlx-vlm
+  dropped its own mlx-lm dependency (738e4406). It moves from core
+  `dependencies` to the `extras` group, its absence no longer aborts a run,
+  and the stale `SKY-U005` suppression is removed. Stale README references
+  to mlx-vlm 0.6.2 / transformers 5.7.0 are corrected.
+
 ### Added
 
 - `make probe-python-next` / `tools/probe_python_next.sh`: check whether a
@@ -55,35 +126,6 @@ Notable changes to this project will be documented in this file.
   sample counts, surfaced in the diagnostics provenance block (unavailable
   probes are reported as unavailable, never as clean), and logged as a
   warning when a run was throttled or under memory pressure.
-
-### Fixed
-
-- Auto thinking budget detection now requires the rendered prompt to
-  *terminate* with an open thinking marker, so closed `<think></think>`
-  no-think stubs, few-shot examples, and literal marker mentions in user text
-  no longer activate budgeting (regression-tested against the real rendered
-  prompts of ERNIE, Qwen3-VL-Thinking, MiniCPM, and GLM-4.6V).
-- The shared diagnostics `MODEL_ID` reproduction command now discloses when
-  per-model automatic thinking flags diverge from the global arguments,
-  listing each affected model with the exact flags to append; per-model
-  overlays now trigger only on real value differences.
-- Total telemetry probe failure now retains a zero-count record instead of
-  silently omitting telemetry, so "both probes unavailable" is
-  distinguishable from "telemetry disabled"; the snapshot-mode diagnostics
-  label states that before/after snapshots cannot rule out transient
-  pressure during inference.
-- `tools/run_skylos_danger_advisory.sh` no longer ends a failing gate on a
-  half-drawn "Continue anyway? [y/n]:" prompt. Skylos 4.33.x decides whether
-  to offer that prompt from `stdout.isatty()` rather than stdin, so the
-  existing `</dev/null` guard stopped suppressing it and the EOF aborted the
-  script before it could print its own verdict. The gate's stdout is now
-  piped, its exit code is read from `PIPESTATUS`, and an exit code above 1
-  (analysis incomplete) is reported as an operational failure rather than a
-  gate verdict.
-- Extracted `_run_issue_summary_clean_completions_section()` from
-  `generate_run_issue_summary_report()`, dropping the latter's cyclomatic
-  complexity from 25 to 13 and clearing the `SKY-Q301` audit finding
-  (repo threshold 24). Report output is unchanged.
 
 ## [0.10.0] - 2026-08-14
 
