@@ -1851,8 +1851,13 @@ def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
     assert 'quality_run_python_tool skylos verify . --project-context "$@"' in script
 
 
-def test_defusedxml_probe_avoids_unused_import_suppression() -> None:
-    """The defusedxml availability probe should not require a dead import suppression."""
+def test_defusedxml_probe_is_a_real_import_without_suppression() -> None:
+    """Defusedxml is bound as a nullable module: scanner-visible, no lint suppression.
+
+    A bare ``find_spec`` probe hid the dependency from static dependency
+    scanners (SKY-U005 false positive), while a plain guarded import needed an
+    F401 suppression. Binding the module (the psutil pattern) satisfies both.
+    """
     check_models_source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
     defusedxml_probe = check_models_source[
         check_models_source.index("defusedxml is required") : check_models_source.index(
@@ -1860,9 +1865,12 @@ def test_defusedxml_probe_avoids_unused_import_suppression() -> None:
         )
     ]
 
-    assert 'find_spec("defusedxml.ElementTree")' in defusedxml_probe
-    assert "import defusedxml.ElementTree" not in defusedxml_probe
+    assert "import defusedxml.ElementTree as _DefusedElementTree" in defusedxml_probe
+    assert "defusedxml_etree = _DefusedElementTree" in defusedxml_probe
+    assert 'find_spec("defusedxml.ElementTree")' not in defusedxml_probe
     assert "F401" not in defusedxml_probe
+    assert "noqa" not in defusedxml_probe
+    assert check_models._defusedxml_available is (check_models.defusedxml_etree is not None)
 
 
 @pytest.mark.subprocess

@@ -141,7 +141,7 @@ running them from `src/`. From the repository root, prefer `make install`,
 Install the core runtime or add optional model coverage as needed:
 
 ```bash
-# Runtime only (includes mlx, mlx-lm, and mlx-vlm)
+# Runtime only (includes mlx and mlx-vlm; mlx-lm is an optional extra)
 pip install -e .
 
 # Add optional extras and torch-backed loaders for broader model coverage
@@ -458,7 +458,8 @@ FastAPI server. Where those controls map directly to `mlx_vlm.generate()`,
 
 `check_models` is a focused single-image benchmark that calls the direct
 `mlx_vlm` load, chat-template, image-loading, and generation APIs, one model at
-a time, in an isolated process state. As mlx-vlm has grown into a serving
+a time — sequentially in one interpreter, with per-model exception isolation and
+resource cleanup between models. As mlx-vlm has grown into a serving
 runtime, this table is the authoritative statement of which upstream surfaces
 this project exercises and which it deliberately leaves to native mlx-vlm
 tools. (The upstream contract this project validates against is
@@ -475,14 +476,14 @@ tools. (The upstream contract this project validates against is
 | Thinking controls (`--enable-thinking`, `--thinking-budget`, start/end tokens, `--thinking-mode`, automatic budget) | **Exercised** | See the `--enable-thinking`, `--thinking-budget`, and `--auto-thinking-budget` entries in the Command Line Reference. |
 | KV-cache controls (`--max-kv-size`, uniform and per-tensor `--kv-*-bits`/`--kv-*-scheme`, `--quantized-kv-start`) | **Exercised** | Per-tensor fields are sent only when set, so PyPI releases predating them are unaffected. |
 | Timing, throughput, MLX peak/active/cache memory, allocator evidence, system-pressure telemetry | **Exercised** | Harness-side measurement around the direct call, not an upstream surface. |
-| Multi-image, audio, and video inputs | Deliberately unexercised | Out of scope for a single-image description benchmark; use `python -m mlx_vlm.generate` / `mlx_vlm.video_generate` natively. |
+| Multi-image, audio, and video inputs | Deliberately unexercised | Out of scope for a single-image description benchmark; use `python -m mlx_vlm.generate` (which accepts multi-image, audio, and video inputs) natively. |
 | Speculative decoding (draft models, DFlash) | Deliberately unexercised | A drafter is a second model and changes timing, memory, provenance, and failure attribution; it belongs in a future explicit benchmark lane, never the baseline. |
-| Prompt cache / vision-feature cache reuse across calls | Deliberately unexercised | Each model runs cold in an isolated process state; no `prompt_cache`, `vision_cache`, or `prompt_cache_state` is constructed or reused. |
+| Prompt cache / vision-feature cache reuse across calls | Deliberately unexercised | Each model runs cold, once, with cleanup between models; no `prompt_cache`, `vision_cache`, or `prompt_cache_state` is constructed or reused. |
 | Image/video generation and image editing pipelines | Deliberately unexercised | Different model kind; cached generation pipelines classify as non-image and are skipped by default discovery with an explicit reason. |
 | OpenAI / Anthropic / Responses / realtime protocols, streaming envelopes, top-logprobs | Server-only | `python -m mlx_vlm.server`; not a per-model benchmark kwarg. |
 | Continuous batching, request queues, `/v1/cache/*`, `/unload`, `/health`, `/metrics` | Server-only | Serving-runtime concerns with no direct-API equivalent. |
 | Automatic prefix caching (APC), including PR #1713 | Server-only | See the note below. |
-| Embeddings and reranking endpoints/model kinds | Server-only | Their cached model repos classify as non-image and are skipped by default discovery. |
+| Embedding and reranker models (direct loaders `mlx_vlm.embeddings` / `mlx_vlm.reranker`, and the server endpoints) | Deliberately unexercised / Server-only | Different model kinds; their cached repos classify as non-image and are skipped by default discovery with an explicit reason. |
 | Structured outputs, tool calling, MCP | Server-only | Protocol features layered on the server, not on `generate()`. |
 | Model conversion / quantisation, fine-tuning (LoRA), evaluation suites, distributed inference | Separate workflows | Native mlx-vlm CLIs; this project only consumes already-converted cached repos. |
 
@@ -889,12 +890,12 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | PEP 440 version parsing | `packaging` | `>=26.0` |
 | Console rendering | `rich` | `>=14.1.0` |
 | Configuration loading | `PyYAML` | `>=6.0` |
-| Language model utilities | `mlx-lm` | `>=0.31.3` |
 
 Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
+| Ecosystem provenance (version recorded in reports; not imported, not required by mlx-vlm ≥ 0.6.14) | `mlx-lm>=0.31.3` | `extras` | `pip install -e "src/[extras]"` |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
 | Fast tokenizer backends | `tokenizers>=0.22.0,<0.23.0` | `extras` | `pip install -e "src/[extras]"` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |

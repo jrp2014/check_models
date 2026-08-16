@@ -1121,14 +1121,27 @@ class TestPreflightDependencyDiagnostics:
         assert requirements["mlx"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx"]
         assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
         assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
-        # mlx-lm is no longer a project runtime floor; its requirement comes
-        # only from the installed mlx-vlm release stack.
-        assert requirements["mlx-lm"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx-lm"]
+        # mlx-lm is no longer a project runtime floor; the fixture's mlx-vlm
+        # 0.4.1 predates 0.6.14, so the legacy upstream requirement still applies.
+        assert requirements["mlx-lm"][0] == mod.UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM
         assert requirements["mlx-lm"][1] == {"mlx-vlm"}
         assert (
             requirements["huggingface-hub"][0]
             == mod.PROJECT_RUNTIME_STACK_MINIMUMS["huggingface-hub"]
         )
+
+    def test_mlx_lm_requirement_is_version_sensitive(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """mlx-lm is required by mlx-vlm < 0.6.14 only; newer installs never warn."""
+        base = {"mlx": "0.32.0", "transformers": "5.15.0", "huggingface-hub": "1.10.1"}
+
+        legacy = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.13"})
+        assert any("mlx-lm is missing" in issue for issue in legacy)
+
+        current = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.14"})
+        assert not any("mlx-lm" in issue for issue in current)
 
     def test_detect_upstream_version_issues_reports_below_floor(
         self,

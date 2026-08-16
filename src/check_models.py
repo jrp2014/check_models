@@ -131,6 +131,8 @@ from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
     UPSTREAM_MLX_LM_MINIMUMS,
+    UPSTREAM_MLX_VLM_FIRST_VERSION_WITHOUT_MLX_LM,
+    UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM,
     UPSTREAM_MLX_VLM_MINIMUMS,
 )
 
@@ -738,10 +740,17 @@ else:
 # defusedxml is required by Pillow's Image.getxmp() for safe XMP/XML parsing.
 # Declared explicitly in pyproject.toml even though Pillow[xmp] may also pull it
 # transitively, so _extract_xmp_metadata() fails clearly if the environment drifts.
+# Bound as a nullable module (same pattern as psutil above) so the dependency's
+# use is a real reference — visible to static dependency scanners with no lint
+# suppression — while Pillow still performs the actual parsing.
+defusedxml_etree: types.ModuleType | None
 try:
-    _defusedxml_available = find_spec("defusedxml.ElementTree") is not None
-except (ImportError, AttributeError, ValueError):
-    _defusedxml_available = False
+    import defusedxml.ElementTree as _DefusedElementTree
+except ImportError:  # pragma: no cover - optional
+    defusedxml_etree = None
+else:
+    defusedxml_etree = _DefusedElementTree
+_defusedxml_available = defusedxml_etree is not None
 if not _defusedxml_available:
     logger.warning(
         "defusedxml not installed — XMP metadata extraction will be disabled. "
@@ -4442,9 +4451,16 @@ def analyze_generation_text(
     seeded_thinking_text: str = "",
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts."""
+    # Thinking delimiters — every recognised pair plus any custom configured
+    # pair — are structural markers that ``_final_answer_view`` must still see
+    # to recognise a complete trace. Never let the generic special-token strip
+    # remove them, even when the tokenizer declares them as special tokens.
+    protected_markers = {marker for pair in thinking_trace_delimiters for marker in pair if marker}
     normalized = _normalize_output_for_analysis(
         text,
-        known_special_tokens=known_special_tokens,
+        known_special_tokens=[
+            token for token in known_special_tokens if token not in protected_markers
+        ],
     )
     # Final-answer semantic copy: drop complete thinking traces (emitted or
     # prompt-seeded), empty thinking wrappers, and generic control-token
@@ -5127,13 +5143,17 @@ def _collect_upstream_requirements(
     for package_name, minimum_version in PROJECT_RUNTIME_STACK_MINIMUMS.items():
         _record_requirement(package_name, minimum_version, "check_models")
 
-    if versions.get("mlx-vlm"):
+    mlx_vlm_version = versions.get("mlx-vlm")
+    if mlx_vlm_version:
         # mlx-vlm 0.6.13 release requirements.txt specifies:
-        #   mlx>=0.32.0, mlx-lm>=0.31.3, transformers>=5.14.0
-        # (upstream main has since dropped mlx-lm in 738e4406; the released
-        # floors govern here, and mlx-lm is optional provenance for us).
+        #   mlx>=0.32.0, transformers>=5.14.0 (+ mlx-lm>=0.31.3, see below)
         for package_name, minimum_version in UPSTREAM_MLX_VLM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-vlm")
+        # mlx-lm was an mlx-vlm dependency only before 0.6.14 (738e4406
+        # vendored the ported models). Applying it unconditionally produced a
+        # false "mlx-lm is missing" warning on the documented minimal install.
+        if not _is_version_at_least(mlx_vlm_version, UPSTREAM_MLX_VLM_FIRST_VERSION_WITHOUT_MLX_LM):
+            _record_requirement("mlx-lm", UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM, "mlx-vlm")
 
     if versions.get("mlx-lm"):
         # mlx-lm setup.py currently specifies:
@@ -11201,6 +11221,13 @@ class HFCacheScanState:
     attempted: bool = False
     info: HFCacheInfo | None = None
     error: OSError | ValueError | HFValidationError | None = None
+    # Classified eligibility (layout + capability + arch pre-check) memoised
+    # per scan: classification reads config.json per repo, and callers such
+    # as the per-model arch pre-check would otherwise recompute it O(n²).
+    # Keyed on the identity of the HFCacheInfo it was computed from, so a
+    # refresh or a substituted cache info invalidates it automatically.
+    eligibility: tuple[CachedModelEligibility, ...] | None = None
+    eligibility_source_id: int | None = None
 
 
 type ImageCapabilityVerdict = Literal["yes", "no", "unknown"]
@@ -11212,6 +11239,7 @@ type ModelPurposeClass = Literal[
     "speculative_drafter",
     "image_or_video_generation",
     "audio_or_other_generation",
+    "image_understanding_non_generative",
     "unknown",
 ]
 
@@ -11251,6 +11279,10 @@ _MODEL_PURPOSE_LABELS: Final[dict[ModelPurposeClass, str]] = {
     "speculative_drafter": "speculative drafter",
     "image_or_video_generation": "image/video generation pipeline, not image-to-text generation",
     "audio_or_other_generation": "audio-only or other non-image generation",
+    "image_understanding_non_generative": (
+        "image-consuming but non-text-generating model (classification, detection, "
+        "segmentation, or multimodal embedding)"
+    ),
     "unknown": "unknown",
 }
 
@@ -11308,6 +11340,8 @@ def _get_hf_cache_info_cached(*, refresh: bool = False) -> HFCacheInfo:
         state.attempted = False
         state.info = None
         state.error = None
+        state.eligibility = None
+        state.eligibility_source_id = None
 
     if state.attempted:
         if state.info is not None:
@@ -12418,6 +12452,19 @@ def _prepare_generation(
     This is the preparation half of a model run: it does not touch the
     upstream generate call, decode timing, or synchronisation.
     """
+    # Resolve the generation-compatible processor/tokenizer *before* rendering
+    # the prompt, so a missing tokenizer is attributed to processor loading
+    # rather than to the prefill phase the prompt render enters.
+    _set_failure_phase(phase_callback, "processor_load")
+    if _is_generation_processor(processor):
+        generation_processor: ProcessorLike | PreTrainedTokenizer = processor
+    else:
+        tokenizer = _extract_processor_tokenizer(processor)
+        if tokenizer is None or not _is_generation_processor(tokenizer):
+            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
+            raise _tag_exception_failure_phase(TypeError(msg), "processor_load")
+        generation_processor = tokenizer
+
     formatted = _prepare_generation_prompt(
         params=params,
         processor=processor,
@@ -12449,14 +12496,6 @@ def _prepare_generation(
         processor_passthrough_kwargs=processor_passthrough_kwargs,
         thinking_budget_source=thinking_budget_source,
     )
-    if _is_generation_processor(processor):
-        generation_processor: ProcessorLike | PreTrainedTokenizer = processor
-    else:
-        tokenizer = _extract_processor_tokenizer(processor)
-        if tokenizer is None or not _is_generation_processor(tokenizer):
-            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
-            raise TypeError(msg)
-        generation_processor = tokenizer
     return _PreparedGeneration(
         model=model,
         generation_processor=generation_processor,
@@ -13067,28 +13106,42 @@ def _start_system_telemetry(
 
     Called before timing starts so the default snapshot probe stays outside
     the timed sections; continuous sampling is opt-in because its
-    subprocesses overlap timed inference.
+    subprocesses overlap timed inference. Telemetry is strictly best-effort:
+    any failure here is logged and telemetry is simply absent for the model —
+    it must never become a model failure or abort the sweep.
     """
     if sys.platform != "darwin" or params.system_telemetry == "off":
         return None, []
-    if params.system_telemetry == "continuous":
-        sampler = _SystemTelemetrySampler()
-        sampler.start()
-        return sampler, []
-    return None, [_system_telemetry_probe()]
+    try:
+        if params.system_telemetry == "continuous":
+            sampler = _SystemTelemetrySampler()
+            sampler.start()
+            return sampler, []
+        return None, [_system_telemetry_probe()]
+    except Exception:
+        logger.debug("System telemetry could not start; continuing without it", exc_info=True)
+        return None, []
 
 
 def _finish_system_telemetry(
     sampler: _SystemTelemetrySampler | None,
     probes: list[tuple[float | None, int | None]],
 ) -> SystemTelemetryRecord | None:
-    """Stop sampling (or take the trailing snapshot probe) and aggregate."""
-    if sampler is not None:
-        sampler.stop()
-        return sampler.snapshot()
-    if probes:
-        probes.append(_system_telemetry_probe())
-        return _system_telemetry_record_from_probes(probes, mode="snapshot")
+    """Stop sampling (or take the trailing snapshot probe) and aggregate.
+
+    Runs from the per-model ``finally`` block, so it must never raise: a
+    failure here would otherwise convert a completed model into an exception
+    or escape the isolation boundary entirely.
+    """
+    try:
+        if sampler is not None:
+            sampler.stop()
+            return sampler.snapshot()
+        if probes:
+            probes.append(_system_telemetry_probe())
+            return _system_telemetry_record_from_probes(probes, mode="snapshot")
+    except Exception:
+        logger.debug("System telemetry could not finish; recording none", exc_info=True)
     return None
 
 
@@ -14630,6 +14683,41 @@ _IMAGE_INPUT_CONFIG_KEYS: Final[frozenset[str]] = frozenset(
 _SEQUENCE_CLASSIFIER_RERANKER_TYPES: Final[frozenset[str]] = frozenset(
     {"bert", "modernbert", "xlm_roberta"}
 )
+# Architecture-name markers for text-generating models (surveyed across every
+# cached VLM family) versus image-consuming architectures that do not generate
+# text (segmentation, detection, classification, multimodal embedding).
+_GENERATIVE_ARCH_MARKERS: Final[tuple[str, ...]] = (
+    "ForConditionalGeneration",
+    "ForCausalLM",
+    "ForBlockDiffusion",
+    "ChatModel",
+    "ForVision2Seq",
+    "ForImageTextToText",
+)
+_NON_GENERATIVE_IMAGE_ARCH_MARKERS: Final[tuple[str, ...]] = (
+    "ForImageClassification",
+    "ForObjectDetection",
+    "ForSemanticSegmentation",
+    "ForInstanceSegmentation",
+    "ForUniversalSegmentation",
+    "ForZeroShotImageClassification",
+    "ForZeroShotObjectDetection",
+    "ForImageSegmentation",
+    "ForMaskedImageModeling",
+    "ForDepthEstimation",
+    "ForImageEmbedding",
+    "CLIPModel",
+    "SiglipModel",
+)
+
+
+def _meaningful_config_value(value: JsonLike) -> bool:
+    """True when a config key carries real evidence (not null/empty/false)."""
+    if value is None or value is False:
+        return False
+    if isinstance(value, (str, list, dict)):
+        return bool(value)
+    return True
 
 
 def _capability_negative_signal(
@@ -14671,6 +14759,52 @@ def _capability_negative_signal(
     return None
 
 
+def _capability_from_image_evidence(
+    config: Mapping[str, JsonLike],
+    *,
+    architectures: tuple[str, ...],
+) -> ImageCapability | None:
+    """Classify from image-input evidence; None when the config carries none.
+
+    Only keys carrying real values count: FastVLM ships image_grid_pinpoints as
+    null alongside genuine vision keys, and ``"vision_config": null`` must not
+    be positive evidence on its own. A positive verdict also requires a
+    text-generating architecture; image evidence without one is ``unknown``
+    (still run), while known non-generative image architectures
+    (classification, detection, segmentation, multimodal embedding) are a
+    confident exclusion.
+    """
+    image_keys = tuple(
+        sorted(k for k in _IMAGE_INPUT_CONFIG_KEYS if _meaningful_config_value(config.get(k)))
+    )
+    arch_text = " ".join(architectures)
+    generative_arch = any(m in arch_text for m in _GENERATIVE_ARCH_MARKERS)
+    non_generative_image_arch = next(
+        (a for a in architectures if any(m in a for m in _NON_GENERATIVE_IMAGE_ARCH_MARKERS)),
+        None,
+    )
+    if non_generative_image_arch is not None and not generative_arch:
+        return ImageCapability(
+            "no",
+            "image_understanding_non_generative",
+            (f"architectures={non_generative_image_arch}",),
+        )
+    if not image_keys:
+        return None
+    if generative_arch:
+        return ImageCapability(
+            "yes", "image_to_text", (f"image-input keys: {', '.join(image_keys)}",)
+        )
+    return ImageCapability(
+        "unknown",
+        "unknown",
+        (
+            f"image-input keys: {', '.join(image_keys)}",
+            f"no generative-text architecture (architectures={arch_text or '?'})",
+        ),
+    )
+
+
 def _classify_image_capability(repo: object) -> ImageCapability:
     """Classify a cached repo's fit for the single-image description benchmark.
 
@@ -14704,27 +14838,27 @@ def _classify_image_capability(repo: object) -> ImageCapability:
     if negative is not None:
         return negative
 
-    image_keys = tuple(sorted(k for k in _IMAGE_INPUT_CONFIG_KEYS if k in config))
-    if image_keys:
-        return ImageCapability(
-            "yes", "image_to_text", (f"image-input keys: {', '.join(image_keys)}",)
-        )
+    image_verdict = _capability_from_image_evidence(config, architectures=architectures)
+    if image_verdict is not None:
+        return image_verdict
 
     # No image-input evidence. Text-only mirrors upstream's _is_text_only_config
     # (no vision/audio/dflash config); audio-only takes audio but not images.
-    arch_text = " ".join(architectures)
-    generative_arch = any(
-        m in arch_text
-        for m in ("ForConditionalGeneration", "ForCausalLM", "ForBlockDiffusion", "ChatModel")
+    generative_arch = any(m in " ".join(architectures) for m in _GENERATIVE_ARCH_MARKERS)
+    has_audio = any(
+        _meaningful_config_value(config.get(k)) for k in ("audio_config", "audio_token_id")
     )
-    has_audio = any(k in config for k in ("audio_config", "audio_token_id"))
     modality_keys = ("vision_config", "audio_config", "dflash_config")
     verdict: ImageCapability
     if has_audio and generative_arch:
         verdict = ImageCapability(
             "no", "audio_or_other_generation", ("audio_config present, no image-input keys",)
         )
-    elif model_type and generative_arch and not any(k in config for k in modality_keys):
+    elif (
+        model_type
+        and generative_arch
+        and not any(_meaningful_config_value(config.get(k)) for k in modality_keys)
+    ):
         verdict = ImageCapability(
             "no", "text_only", (f"model_type={model_type}", "no vision_config/image token keys")
         )
@@ -14799,7 +14933,12 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
 
 
 def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
-    """Return supported/skipped classifications for Hugging Face cache repos."""
+    """Return supported/skipped classifications for Hugging Face cache repos.
+
+    Memoised per cache scan (invalidated with the scan on refresh), so
+    per-model callers do not re-read every repo's config.json.
+    """
+    state = _HF_CACHE_SCAN_STATE
     try:
         cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
@@ -14811,12 +14950,17 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
     except (OSError, ValueError) as e:
         logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
         return ()
-    return tuple(
+    if state.eligibility is not None and state.eligibility_source_id == id(cache_info):
+        return state.eligibility
+    eligibility = tuple(
         sorted(
             (_cached_repo_model_eligibility(repo) for repo in cache_info.repos),
             key=lambda entry: entry.repo_id,
         )
     )
+    state.eligibility = eligibility
+    state.eligibility_source_id = id(cache_info)
+    return eligibility
 
 
 def _cache_discovery_records() -> list[CacheDiscoveryEntryRecord]:
@@ -15352,6 +15496,9 @@ def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[
     if diagnostics is None:
         return ()
 
+    # analyze_generation_text additionally protects every recognised
+    # THINKING_TRACE_DELIMITER_PAIRS marker; this filter covers the custom
+    # configured pair so the reported wrapper list stays honest.
     thinking_markers = set(_configured_thinking_markers(diagnostics))
     wrappers = [
         wrapper

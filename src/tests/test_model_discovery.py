@@ -514,7 +514,7 @@ class TestImageCapabilityClassifier:
                 {
                     "model_type": "voice_gen",
                     "architectures": ["VoiceGenForConditionalGeneration"],
-                    "audio_config": {},
+                    "audio_config": {"sample_rate": 16000},
                 },
                 None,
                 "audio_or_other_generation",
@@ -536,6 +536,82 @@ class TestImageCapabilityClassifier:
         assert cap.evidence
         assert cap.skip_reason is not None
         assert cap.skip_reason.startswith("model purpose: ")
+
+    def test_null_vision_config_is_not_positive_evidence(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A null/empty image key carries no evidence; the verdict is not yes."""
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "textish",
+                "architectures": ["TextishForCausalLM"],
+                "vision_config": None,
+                "image_grid_pinpoints": [],
+            },
+        )
+
+        assert cap.verdict != "yes"
+        assert cap.purpose == "text_only"
+
+    def test_null_key_beside_real_vision_keys_still_yes(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """FastVLM shape: image_grid_pinpoints null but genuine vision keys present."""
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "llava_qwen2",
+                "architectures": ["LlavaQwen2ForCausalLM"],
+                "image_grid_pinpoints": None,
+                "mm_vision_select_layer": -2,
+                "vision_config": {"hidden_size": 1024},
+            },
+        )
+
+        assert cap.verdict == "yes"
+
+    def test_image_evidence_without_generative_arch_is_unknown(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Image keys but no text-generating architecture: run, but not confident."""
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "mystery_vision",
+                "architectures": ["MysteryVisionModel"],
+                "vision_config": {"hidden_size": 768},
+            },
+        )
+
+        assert cap.verdict == "unknown"
+        assert any("no generative-text architecture" in e for e in cap.evidence)
+
+    @pytest.mark.parametrize(
+        "architecture",
+        [
+            "SegformerForSemanticSegmentation",
+            "DetrForObjectDetection",
+            "ViTForImageClassification",
+            "CLIPModel",
+        ],
+    )
+    def test_non_generative_image_architectures_are_no(
+        self, monkeypatch: pytest.MonkeyPatch, architecture: str
+    ) -> None:
+        """Image-consuming but non-text-generating models are confidently excluded."""
+        cap = _capability_for(
+            monkeypatch,
+            config={
+                "model_type": "vision_thing",
+                "architectures": [architecture],
+                "vision_config": {"hidden_size": 768},
+            },
+        )
+
+        assert cap.verdict == "no"
+        assert cap.purpose == "image_understanding_non_generative"
+        assert architecture in cap.evidence[0]
 
     def test_id2label_alone_does_not_mean_reranker(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Real VLM configs carry id2label; only sequence-classifier signals count."""

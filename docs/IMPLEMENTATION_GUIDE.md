@@ -1041,11 +1041,12 @@ rg "UNUSED_CONSTANT" src/
 The MLX stack floors are also mirrored in
 `src/check_models_data/dependency_policy.py` so preflight and `validate_env`
 diagnostics report the same requirements that packaging installs. When
-`mlx-lm` or `mlx-vlm` raises an upstream dependency floor, update the policy
-module, `src/pyproject.toml`, and regenerated README install snippets together.
+`mlx-vlm` raises an upstream dependency floor, update the policy module,
+`src/pyproject.toml`, and regenerated README install snippets together.
+(`mlx-lm` is optional ecosystem provenance in `extras`, not a runtime floor.)
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-lm`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `wcwidth`, `PyYAML`
+`mlx`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `wcwidth`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 
@@ -1216,7 +1217,6 @@ All dependencies are defined in `src/pyproject.toml` as the single source of tru
 [project]
 dependencies = [
     "mlx>=0.32.0",
-    "mlx-lm>=0.31.3",
     "mlx-vlm>=0.6.13",
     "transformers>=5.14.0",
     # ...

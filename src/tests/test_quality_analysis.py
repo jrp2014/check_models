@@ -1200,3 +1200,48 @@ def test_configured_thinking_markers_are_not_prestripped_from_analysis() -> None
     assert analysis.unexpected_catalog_preamble is None
     assert analysis.instruction_echo is False
     assert check_models._assess_result(populated).usability == "usable"
+
+
+def test_tokenizer_special_thinking_tokens_survive_without_configured_budget() -> None:
+    """Regression: <think>/</think> declared as tokenizer special tokens, no budget.
+
+    With no thinking flags configured, ``_configured_output_wrappers`` had
+    nothing to protect and the tokenizer's own special-token list stripped
+    the delimiters before ``_final_answer_view`` ran, so a completed trace was
+    again read as preamble. Protection now covers every recognised delimiter
+    pair regardless of configuration.
+    """
+    diagnostics = check_models.PromptDiagnostics(
+        rendered_prompt="<|im_start|>assistant\n",
+        special_tokens=("<think>", "</think>", "<|im_end|>"),
+        generate_kwargs={},  # no thinking budget or flags at all
+    )
+
+    class _Gen:
+        text = (
+            "<think>Consider the scene: two cats, a couch, remotes.</think>\n\n"
+            "Title: Two Tabby Cats Resting on a Pink Couch\n\n"
+            "Description: Two tabby cats rest on a pink couch with remotes nearby.\n\n"
+            "Keywords: cats, tabby, couch, pink, remote, resting, indoor, pets, fur, "
+            "sofa, cushion, home"
+        )
+        generation_tokens = 120
+        prompt_tokens = 900
+
+    result = check_models.PerformanceResult(
+        model_name="org/special-token-thinker",
+        generation=_Gen(),
+        success=True,
+        requested_max_tokens=1000,
+        prompt_diagnostics=diagnostics,
+    )
+
+    populated = check_models._populate_result_quality_analysis(
+        result, prompt=CATALOG_PROMPT, requested_max_tokens=1000
+    )
+
+    analysis = populated.quality_analysis
+    assert analysis is not None
+    assert analysis.has_thinking_trace is True
+    assert analysis.unexpected_catalog_preamble is None
+    assert check_models._assess_result(populated).usability == "usable"

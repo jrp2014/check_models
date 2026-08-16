@@ -91,6 +91,51 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Thinking delimiters are protected from the generic special-token strip for
+  every recognised `THINKING_TRACE_DELIMITER_PAIRS` marker plus any custom
+  configured pair, at the `analyze_generation_text` layer. The previous fix
+  protected only markers present in generation kwargs, so when a tokenizer
+  declares `<think>`/`</think>` as special tokens and no thinking budget or
+  flags are configured, the delimiters were still stripped and a completed
+  trace read as preamble (reproduced through the production analysis path;
+  now regression-tested).
+- Image-capability classification requires meaningful evidence: image-input
+  keys count only when they carry real values (`"vision_config": null` and
+  FastVLM's `"image_grid_pinpoints": null` are not evidence), and a positive
+  `yes` also requires a text-generating architecture. Image evidence without
+  one is `unknown` (still run, with the reason), while known image-consuming
+  non-generative architectures (classification, detection, segmentation,
+  multimodal embedding such as CLIP/SigLIP) are a confident `no` with the new
+  `image_understanding_non_generative` purpose. Re-validated on the full
+  local cache: all 41 real VLMs remain `yes`.
+- The upstream `mlx-lm` requirement is version-sensitive: mlx-vlm required
+  mlx-lm only through the 0.6.13 release (0.6.14 / `738e4406` vendored the
+  ported models), so the documented minimal install on a current mlx-vlm no
+  longer reports a false "mlx-lm is missing; mlx-vlm expects mlx-lm>=0.31.3"
+  warning, while a genuine 0.6.13 install still does.
+- System telemetry is best-effort end to end: start and finish are guarded
+  so a sampler, thread, or probe error is logged and telemetry is simply
+  absent — it can never become a model failure or escape the isolation
+  boundary from the per-model `finally`.
+- Generation-processor resolution now happens under the `processor_load`
+  phase before the prompt render, so a missing generation-compatible
+  tokenizer is attributed to processor preparation rather than `prefill`.
+- Cache eligibility (layout + capability + arch pre-check) is memoised per
+  cache scan and keyed on the scan's identity, removing repeated per-model
+  config.json reads and O(n²) reporting work.
+- Docs: the coverage matrix no longer claims models run in isolated
+  processes (they run sequentially in one interpreter with per-model
+  exception isolation and cleanup), no longer names a non-existent
+  `mlx_vlm.video_generate` command, and distinguishes direct embedding /
+  reranker loaders from the server endpoints; `mlx-lm` is no longer described
+  as core in the README install snippet, dependency table, or implementation
+  guide.
+- **Retained-run caveat:** the published 2026-08-16 artefacts (producer
+  `157c9b18`) predate the thinking-marker fixes above; their two thinker rows
+  (Qwen3-VL-2B-Thinking, ERNIE-4.5-VL-Thinking) are graded `unusable` where
+  the fixed analyser grades them `usable` / `usable with caveats`. Retained
+  outputs are not hand-edited; the next full run regrades them.
+
 - Configured thinking start/end markers are no longer pre-stripped from the
   analysis copy as generic control-token wrappers. Whenever a thinking budget
   was configured (auto or explicit), `_configured_output_wrappers` fed
