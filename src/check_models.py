@@ -1148,6 +1148,21 @@ class RunPromptBurdenRecord(TypedDict):
     image_patch_count: int | None
 
 
+class CacheDiscoveryEntryRecord(TypedDict):
+    """One cached repo's default-discovery classification and decision."""
+
+    repo_id: str
+    selected: bool
+    layout_supported: bool
+    layout_reasons: list[str]
+    capability_verdict: ImageCapabilityVerdict
+    model_purpose: ModelPurposeClass
+    capability_evidence: list[str]
+    skip_reasons: list[str]
+    model_type: str | None
+    arch_supported: bool | None
+
+
 class RunJsonReportRecord(TypedDict):
     """Stable run-level machine artifact schema."""
 
@@ -1168,6 +1183,7 @@ class RunJsonReportRecord(TypedDict):
     trust_remote_code: bool
     model_provenance: dict[str, ModelProvenanceRecord]
     prompt_burden: dict[str, RunPromptBurdenRecord]
+    cache_discovery: NotRequired[list[CacheDiscoveryEntryRecord]]
 
 
 class JsonlAssessmentRecord(TypedDict):
@@ -11187,9 +11203,67 @@ class HFCacheScanState:
     error: OSError | ValueError | HFValidationError | None = None
 
 
+type ImageCapabilityVerdict = Literal["yes", "no", "unknown"]
+type ModelPurposeClass = Literal[
+    "image_to_text",
+    "text_only",
+    "embedding",
+    "reranker",
+    "speculative_drafter",
+    "image_or_video_generation",
+    "audio_or_other_generation",
+    "unknown",
+]
+
+
+@dataclass(frozen=True)
+class ImageCapability:
+    """Evidence-backed classification of whether a cached repo fits this benchmark.
+
+    ``verdict`` is tri-state for the single-image description benchmark:
+    ``yes`` (positive evidence the model consumes image input and produces
+    text), ``no`` (positive evidence it is a different model kind), or
+    ``unknown`` (insufficient or contradictory evidence). Default discovery
+    runs ``yes`` and ``unknown`` and skips only ``no``, so an unfamiliar new
+    VLM is tried rather than silently excluded. ``evidence`` names the config
+    keys/values that drove the decision so the skip reason is reproducible.
+    """
+
+    verdict: ImageCapabilityVerdict
+    purpose: ModelPurposeClass
+    evidence: tuple[str, ...] = ()
+
+    @property
+    def skip_reason(self) -> str | None:
+        """Human-readable default-discovery exclusion reason, if excluded."""
+        if self.verdict != "no":
+            return None
+        label = _MODEL_PURPOSE_LABELS[self.purpose]
+        detail = f" ({'; '.join(self.evidence)})" if self.evidence else ""
+        return f"model purpose: {label}{detail}"
+
+
+_MODEL_PURPOSE_LABELS: Final[dict[ModelPurposeClass, str]] = {
+    "image_to_text": "image-to-text generation",
+    "text_only": "text-only generation",
+    "embedding": "embedding model",
+    "reranker": "sequence-classifier reranker",
+    "speculative_drafter": "speculative drafter",
+    "image_or_video_generation": "image/video generation pipeline, not image-to-text generation",
+    "audio_or_other_generation": "audio-only or other non-image generation",
+    "unknown": "unknown",
+}
+
+
 @dataclass(frozen=True)
 class CachedModelEligibility:
-    """Auto-discovery eligibility for one cached Hugging Face repository."""
+    """Auto-discovery eligibility for one cached Hugging Face repository.
+
+    Two independent layers: ``supported`` is the mlx-vlm server-style cache
+    *layout* test (files present), while ``capability`` is whether the repo
+    appears to be an image-consuming text generator — the benchmark's actual
+    requirement. ``selected`` combines them for default discovery.
+    """
 
     repo_id: str
     supported: bool
@@ -11200,6 +11274,27 @@ class CachedModelEligibility:
     model_type: str | None = None
     resolved_model_type: str | None = None
     arch_supported: bool | None = None
+    capability: ImageCapability = dataclass_field(
+        default_factory=lambda: ImageCapability(
+            verdict="unknown",
+            purpose="unknown",
+            evidence=("capability not classified",),
+        )
+    )
+
+    @property
+    def selected(self) -> bool:
+        """True when default discovery should run this repo."""
+        return self.supported and self.capability.verdict != "no"
+
+    @property
+    def skip_reasons(self) -> tuple[str, ...]:
+        """Every concrete reason default discovery omits this repo."""
+        reasons = tuple(f"cache layout: {reason}" for reason in self.reasons)
+        capability_reason = self.capability.skip_reason
+        if capability_reason is not None:
+            reasons = (*reasons, capability_reason)
+        return reasons
 
 
 _HF_CACHE_SCAN_STATE = HFCacheScanState()
@@ -14492,6 +14587,159 @@ def _mlx_vlm_model_remapping() -> Mapping[str, str]:
     return {}
 
 
+def _read_cached_repo_json(repo: object, file_name: str) -> dict[str, JsonLike] | None:
+    """Read one bounded JSON metadata file from a cached repo's main snapshot.
+
+    HF cache snapshots link files into blobs/ by design, so resolve the link
+    but require containment inside this repo's cache directory before
+    reading. Returns None when the file is absent, unreadable, or not an
+    object.
+    """
+    snapshot = _hf_cache_main_snapshot_path(repo)
+    if snapshot is None:
+        return None
+    path = snapshot / file_name
+    try:
+        cache_repo_root = snapshot.parent.parent.resolve(strict=True)
+        resolved = path.resolve(strict=True)
+        if not resolved.is_relative_to(cache_repo_root):
+            return None
+        payload = json.loads(_read_text_file(resolved))
+    except (OSError, ValueError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+# Positive image-input evidence: keys mlx-vlm VLM configs carry (surveyed across
+# every cached VLM family: vision_config plus image/vision token ids).
+_IMAGE_INPUT_CONFIG_KEYS: Final[frozenset[str]] = frozenset(
+    {
+        "vision_config",
+        "image_token_id",
+        "image_token_index",
+        "image_start_token_id",
+        "image_end_token_id",
+        "vision_start_token_id",
+        "vision_end_token_id",
+        "mm_vision_select_layer",
+        "image_grid_pinpoints",
+        "vision_soft_tokens_per_image",
+    }
+)
+# Sequence-classifier reranker model types (mirrors mlx_vlm.reranker kinds).
+_SEQUENCE_CLASSIFIER_RERANKER_TYPES: Final[frozenset[str]] = frozenset(
+    {"bert", "modernbert", "xlm_roberta"}
+)
+
+
+def _capability_negative_signal(
+    config: Mapping[str, JsonLike],
+    *,
+    model_type: str,
+    architectures: tuple[str, ...],
+) -> ImageCapability | None:
+    """Return a confident non-image classification, or None if no such signal.
+
+    Checks the most specific signals first. ``id2label``/``num_labels`` alone
+    are NOT reranker signals — surveyed VLM configs carry them too — so the
+    reranker rule requires a sequence-classifier model type or architecture.
+    """
+    if config.get("speculators_model_type"):
+        return ImageCapability(
+            "no",
+            "speculative_drafter",
+            (f"speculators_model_type={config['speculators_model_type']}",),
+        )
+    embeddings_meta = config.get("mlx_embeddings")
+    if isinstance(embeddings_meta, dict) and embeddings_meta.get("kind") == "embedding":
+        return ImageCapability("no", "embedding", ("mlx_embeddings.kind=embedding",))
+    seq_arch = next((a for a in architectures if "ForSequenceClassification" in a), None)
+    if model_type in _SEQUENCE_CLASSIFIER_RERANKER_TYPES or seq_arch is not None:
+        evidence = (
+            f"model_type={model_type}",
+            *((f"architectures={seq_arch}",) if seq_arch else ()),
+        )
+        return ImageCapability("no", "reranker", evidence)
+    has_image_keys = any(k in config for k in _IMAGE_INPUT_CONFIG_KEYS)
+    pipeline_keys = ("unet_config", "vae_config", "transformer_config")
+    if any(k in config for k in pipeline_keys) and not has_image_keys:
+        return ImageCapability(
+            "no",
+            "image_or_video_generation",
+            ("generation-pipeline config keys without image-input keys",),
+        )
+    return None
+
+
+def _classify_image_capability(repo: object) -> ImageCapability:
+    """Classify a cached repo's fit for the single-image description benchmark.
+
+    Reads only bounded metadata already in the snapshot (config.json and, when
+    present, model_index.json) and derives a tri-state verdict from explicit
+    keys, model type, architectures, and task stamps. It never infers policy
+    from repo names and never rejects an unfamiliar layout solely because its
+    capability cannot be inferred (that is ``unknown``, which still runs).
+    """
+    model_index = _read_cached_repo_json(repo, "model_index.json")
+    if model_index is not None:
+        # Diffusers-style pipelines declare themselves in model_index.json.
+        class_name = str(model_index.get("_class_name", "")) or "present"
+        return ImageCapability(
+            "no",
+            "image_or_video_generation",
+            (f"model_index.json _class_name={class_name}",),
+        )
+    config = _read_cached_repo_json(repo, "config.json")
+    if config is None:
+        return ImageCapability("unknown", "unknown", ("no readable config.json",))
+
+    model_type = str(config.get("model_type") or "").lower().replace("-", "_")
+    raw_architectures = config.get("architectures")
+    architectures = (
+        tuple(str(a) for a in raw_architectures if a) if isinstance(raw_architectures, list) else ()
+    )
+    negative = _capability_negative_signal(
+        config, model_type=model_type, architectures=architectures
+    )
+    if negative is not None:
+        return negative
+
+    image_keys = tuple(sorted(k for k in _IMAGE_INPUT_CONFIG_KEYS if k in config))
+    if image_keys:
+        return ImageCapability(
+            "yes", "image_to_text", (f"image-input keys: {', '.join(image_keys)}",)
+        )
+
+    # No image-input evidence. Text-only mirrors upstream's _is_text_only_config
+    # (no vision/audio/dflash config); audio-only takes audio but not images.
+    arch_text = " ".join(architectures)
+    generative_arch = any(
+        m in arch_text
+        for m in ("ForConditionalGeneration", "ForCausalLM", "ForBlockDiffusion", "ChatModel")
+    )
+    has_audio = any(k in config for k in ("audio_config", "audio_token_id"))
+    modality_keys = ("vision_config", "audio_config", "dflash_config")
+    verdict: ImageCapability
+    if has_audio and generative_arch:
+        verdict = ImageCapability(
+            "no", "audio_or_other_generation", ("audio_config present, no image-input keys",)
+        )
+    elif model_type and generative_arch and not any(k in config for k in modality_keys):
+        verdict = ImageCapability(
+            "no", "text_only", (f"model_type={model_type}", "no vision_config/image token keys")
+        )
+    else:
+        verdict = ImageCapability(
+            "unknown",
+            "unknown",
+            (
+                f"model_type={model_type or '?'}",
+                "no image-input keys and no confident non-image signal",
+            ),
+        )
+    return verdict
+
+
 def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | None]:
     """Check the cached config's model_type against installed mlx-vlm model packages.
 
@@ -14501,20 +14749,8 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
     ``None`` when indeterminate (no config, unreadable config, or no installed
     mlx-vlm package to compare against).
     """
-    snapshot = _hf_cache_main_snapshot_path(repo)
-    if snapshot is None:
-        return None, None, None
-    config_path = snapshot / "config.json"
-    try:
-        # HF cache snapshots link config.json into blobs/ by design, so resolve
-        # the link but require containment inside this repo's cache directory
-        # and a regular, size-capped file before reading.
-        cache_repo_root = snapshot.parent.parent.resolve(strict=True)
-        resolved_config = config_path.resolve(strict=True)
-        if not resolved_config.is_relative_to(cache_repo_root):
-            return None, None, None
-        config = json.loads(_read_text_file(resolved_config))
-    except (OSError, ValueError):
+    config = _read_cached_repo_json(repo, "config.json")
+    if config is None:
         return None, None, None
     raw_model_type = config.get("model_type") or config.get("speculators_model_type")
     if not isinstance(raw_model_type, str) or not raw_model_type:
@@ -14558,6 +14794,7 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         model_type=model_type,
         resolved_model_type=resolved_model_type,
         arch_supported=arch_supported,
+        capability=_classify_image_capability(repo),
     )
 
 
@@ -14580,6 +14817,30 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
             key=lambda entry: entry.repo_id,
         )
     )
+
+
+def _cache_discovery_records() -> list[CacheDiscoveryEntryRecord]:
+    """Serialise every cached repo's classification for machine artifacts.
+
+    Retained in run.json so downstream tools can distinguish an intentional
+    non-test (capability exclusion) from a crash or an unavailable model.
+    Skipped non-image models never enter the per-model results.
+    """
+    return [
+        {
+            "repo_id": entry.repo_id,
+            "selected": entry.selected,
+            "layout_supported": entry.supported,
+            "layout_reasons": list(entry.reasons),
+            "capability_verdict": entry.capability.verdict,
+            "model_purpose": entry.capability.purpose,
+            "capability_evidence": list(entry.capability.evidence),
+            "skip_reasons": list(entry.skip_reasons),
+            "model_type": entry.model_type,
+            "arch_supported": entry.arch_supported,
+        }
+        for entry in get_cached_model_eligibility()
+    ]
 
 
 def _arch_precheck_for_model(model_id: str) -> tuple[str | None, str | None, bool | None]:
@@ -14609,26 +14870,63 @@ def _all_cached_repo_ids() -> list[str]:
     return sorted(entry.repo_id for entry in get_cached_model_eligibility())
 
 
+def _warn_explicit_non_image_models(model_identifiers: Sequence[str]) -> None:
+    """Warn when an explicitly requested cached model classifies as non-image."""
+    by_id = {entry.repo_id: entry for entry in get_cached_model_eligibility()}
+    for model_id in model_identifiers:
+        entry = by_id.get(model_id)
+        if entry is None or entry.capability.verdict != "no":
+            continue
+        logger.warning(
+            "Explicitly requested %s classifies as non-image (%s); running outside the "
+            "default benchmark scope, so interpret its result accordingly.",
+            model_id,
+            entry.capability.skip_reason,
+        )
+
+
+def _log_capability_unknown_warnings(entries: Sequence[CachedModelEligibility]) -> None:
+    """Warn about selected repos whose image capability could not be inferred."""
+    unknown = [
+        entry for entry in entries if entry.selected and entry.capability.verdict == "unknown"
+    ]
+    if not unknown:
+        return
+    logger.warning(
+        "%d selected cached repo(s) have unknown image capability (running anyway; "
+        "interpret results with the evidence below):",
+        len(unknown),
+    )
+    for entry in unknown:
+        logger.warning("   - %s: %s", entry.repo_id, "; ".join(entry.capability.evidence))
+
+
 def _supported_cached_model_ids_with_skipped_logging(
     eligibility: Iterable[CachedModelEligibility],
 ) -> list[str]:
-    """Return supported cached model IDs and log skipped local repos with reasons."""
+    """Return selected cached model IDs and log every skipped repo with its reasons.
+
+    Skips fall into two explicit classes: cache-layout failures (the mlx-vlm
+    server-style file test) and capability exclusions (confident non-image
+    model kinds). No cached repo disappears silently.
+    """
     entries = tuple(eligibility)
-    skipped = [entry for entry in entries if not entry.supported]
+    skipped = [entry for entry in entries if not entry.selected]
     if skipped:
         logger.warning(
-            "Skipped %d cached repo(s) that mlx-vlm server-style discovery would not run:",
+            "Skipped %d cached repo(s) that default discovery will not run:",
             len(skipped),
         )
         for entry in skipped:
-            reason_text = "; ".join(entry.reasons) if entry.reasons else "unsupported cache layout"
-            logger.warning("   - %s: %s", entry.repo_id, reason_text)
-    return sorted(entry.repo_id for entry in entries if entry.supported)
+            reasons = entry.skip_reasons or ("unsupported cache layout",)
+            logger.warning("   - %s: %s", entry.repo_id, "; ".join(reasons))
+    _log_capability_unknown_warnings(entries)
+    return sorted(entry.repo_id for entry in entries if entry.selected)
 
 
 def get_cached_model_ids() -> list[str]:
-    """Return cached model IDs eligible for mlx-vlm server-style auto-discovery."""
-    return sorted(entry.repo_id for entry in get_cached_model_eligibility() if entry.supported)
+    """Return cached model IDs selected by default discovery (layout + capability)."""
+    return sorted(entry.repo_id for entry in get_cached_model_eligibility() if entry.selected)
 
 
 def validate_model_identifier(model_id: str) -> None:
@@ -14827,13 +15125,16 @@ def process_models(
             args.exclude or [],
             "explicit list",
         )
+        # Explicit selection overrides the capability filter, but the
+        # classification stays visible so the result is interpreted correctly.
+        _warn_explicit_non_image_models(model_identifiers)
     else:
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
         cache_eligibility = get_cached_model_eligibility()
         model_identifiers = _supported_cached_model_ids_with_skipped_logging(cache_eligibility)
         if not model_identifiers:
-            skipped_count = sum(1 for entry in cache_eligibility if not entry.supported)
+            skipped_count = sum(1 for entry in cache_eligibility if not entry.selected)
             skipped_hint = (
                 f" {skipped_count} cached repo(s) were present but skipped as unsupported; "
                 "see the skipped-repo warnings above."
@@ -16161,6 +16462,9 @@ def save_run_json_report(
         },
         "prompt_burden": _run_prompt_burden_records(results, report_context.image_profile),
     }
+    discovery = _cache_discovery_records()
+    if discovery:
+        payload["cache_discovery"] = discovery
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
@@ -18802,7 +19106,7 @@ def _handle_dry_run(
         model_identifiers = _supported_cached_model_ids_with_skipped_logging(
             get_cached_model_eligibility()
         )
-        logger.info("📦 Server-supported models discovered in cache:")
+        logger.info("📦 Cached models selected by default discovery (layout + image capability):")
         selection_context = "cached models"
 
     model_identifiers = apply_exclusions(
@@ -18815,8 +19119,17 @@ def _handle_dry_run(
         logger.warning("   ⚠️  No models to process!")
     else:
         unsupported_arch_count = 0
+        capability_by_id = {
+            entry.repo_id: entry.capability for entry in get_cached_model_eligibility()
+        }
         for idx, model_id in enumerate(model_identifiers, start=1):
             model_type, resolved, arch_supported = _arch_precheck_for_model(model_id)
+            capability = capability_by_id.get(model_id)
+            capability_note = (
+                f"  ❔ image capability unknown ({'; '.join(capability.evidence)})"
+                if capability is not None and capability.verdict == "unknown"
+                else ""
+            )
             if arch_supported is False:
                 unsupported_arch_count += 1
                 resolved_note = (
@@ -18830,7 +19143,7 @@ def _handle_dry_run(
                     resolved_note,
                 )
             else:
-                logger.info("   %2d. %s", idx, model_id)
+                logger.info("   %2d. %s%s", idx, model_id, capability_note)
         if unsupported_arch_count:
             logger.warning(
                 "   %d model(s) use architectures not supported by the installed mlx-vlm "

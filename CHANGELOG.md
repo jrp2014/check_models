@@ -5,6 +5,80 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Capability-aware default discovery (upstream alignment design §1–3). Cache
+  discovery now has two independent layers: the existing mlx-vlm server-style
+  cache-layout filter, plus a tri-state image-capability classification
+  (`ImageCapability(verdict, purpose, evidence)`) read from bounded snapshot
+  metadata (`config.json`, `model_index.json`). `yes` (positive image-input
+  evidence such as `vision_config`/`image_token_id`) and `unknown`
+  (insufficient evidence — still selected, with a warning naming the
+  evidence) both run; only confident `no` is skipped, with a specific reason
+  per model kind: text-only generation (mirrors upstream
+  `_is_text_only_config`), embedding (`mlx_embeddings.kind`),
+  sequence-classifier reranker, speculative drafter
+  (`speculators_model_type`), image/video generation pipeline
+  (`model_index.json` / pipeline config keys), or audio-only generation.
+  Every skipped repo is named with `cache layout: …` and/or
+  `model purpose: …` reasons in console and `--dry-run` output; explicit
+  `--models` overrides the capability filter but logs the classification;
+  and `run.json` retains a `cache_discovery` record (verdict, purpose,
+  evidence, decision) for every cached repo so an intentional non-test is
+  distinguishable from a crash. Validated against the full local cache: all
+  41 real VLMs classify `yes` with zero false negatives. `id2label` alone is
+  deliberately not a reranker signal (real VLM configs carry it). Docs, the
+  `hf-cache-mlx-vlm-models` skill, and copilot instructions stop describing
+  the layout filter as VLM proof.
+- `make probe-python-next` / `tools/probe_python_next.sh`: check whether a
+  newer Python (default 3.14, `PROBE_PYTHON=3.15` for later) is viable for the
+  MLX stack in a throwaway, minor-pinned conda env (`mlx-vlm-314`) that never
+  touches the working `mlx-vlm` env. It verifies the PyPI stack installs and
+  imports (including Metal availability), runs the fast pytest lane against
+  it, and with `PROBE_SOURCE_BUILD=1` compiles the local mlx source tree — the
+  signal PyPI wheels cannot provide and the thing that would actually break
+  `tools/update.sh` after a switch. The working env stays on the tested 3.13
+  baseline until that probe is green.
+- Begin implementing the accepted mlx-vlm upstream alignment design
+  (docs/superpowers/specs/2026-08-14-mlx-vlm-upstream-alignment-design.md):
+  raise runtime floors to the released mlx-vlm 0.6.13 stack (`mlx>=0.32.0`,
+  `mlx-vlm>=0.6.13`, `transformers>=5.14.0`; mlx-lm keeps its own 5.7.0
+  Transformers floor as a separate upstream fact), remove the last `tabulate`
+  references from the validation fallback and docs, and record concise psutil
+  available-memory and swap-use context facts in the system evidence when
+  psutil is present. Capability-aware discovery and the coverage matrix
+  remain to follow.
+- Make the upstream thinking-budget issue draft maintainer-ready: regenerable
+  test image script, pinned model revisions, and observed side-by-side native
+  output showing Qwen3-VL-2B-Thinking force-closed at a 20-token budget while
+  GLM-4.1V-9B-Thinking ignores the same flag.
+
+- Automatic thinking budget (`--auto-thinking-budget`, default on): when no
+  explicit thinking flags and no `--thinking-mode` are given and a model's
+  chat template leaves a thinking block open (final start marker unmatched,
+  mirroring mlx-vlm's server-side open-block logic — closed blocks and
+  literal marker mentions are ignored), the run passes upstream's
+  `thinking_budget` / `enable_thinking` generate kwargs with budget =
+  max-tokens − 200 (skipped when that leaves under 128). Upstream then
+  force-closes the thinking block at the budget so the model must produce
+  the requested fields instead of truncating mid-reasoning at the token cap.
+  Chat-template kwargs are never altered, so hybrid models keep their
+  default non-thinking behaviour. The effective per-model budget is
+  recorded in prompt diagnostics, shown in the diagnostics report, and
+  overlaid onto native repro commands so issue drafts reproduce the
+  recorded output. Disable with `--no-auto-thinking-budget`.
+- Per-model system-pressure telemetry (darwin only, read-only `pmset -g` /
+  `sysctl -n` probes, sudo-free; no macOS settings are modified). Default:
+  one snapshot probe pair per model (before load and after cleanup, outside
+  timed inference) so performance comparability is unaffected;
+  `--system-telemetry` opts into continuous 2s background sampling and
+  `--no-system-telemetry` disables telemetry entirely. Aggregates (min CPU
+  speed limit, throttled samples, max memory-pressure level) are stored per
+  model in `results.jsonl` as `system_telemetry` with separate per-probe
+  sample counts, surfaced in the diagnostics provenance block (unavailable
+  probes are reported as unavailable, never as clean), and logged as a
+  warning when a run was throttled or under memory pressure.
+
 ### Fixed
 
 - Completed thinking traces no longer make a good answer "unusable". A new
@@ -75,57 +149,6 @@ Notable changes to this project will be documented in this file.
   `dependencies` to the `extras` group, its absence no longer aborts a run,
   and the stale `SKY-U005` suppression is removed. Stale README references
   to mlx-vlm 0.6.2 / transformers 5.7.0 are corrected.
-
-### Added
-
-- `make probe-python-next` / `tools/probe_python_next.sh`: check whether a
-  newer Python (default 3.14, `PROBE_PYTHON=3.15` for later) is viable for the
-  MLX stack in a throwaway, minor-pinned conda env (`mlx-vlm-314`) that never
-  touches the working `mlx-vlm` env. It verifies the PyPI stack installs and
-  imports (including Metal availability), runs the fast pytest lane against
-  it, and with `PROBE_SOURCE_BUILD=1` compiles the local mlx source tree — the
-  signal PyPI wheels cannot provide and the thing that would actually break
-  `tools/update.sh` after a switch. The working env stays on the tested 3.13
-  baseline until that probe is green.
-- Begin implementing the accepted mlx-vlm upstream alignment design
-  (docs/superpowers/specs/2026-08-14-mlx-vlm-upstream-alignment-design.md):
-  raise runtime floors to the released mlx-vlm 0.6.13 stack (`mlx>=0.32.0`,
-  `mlx-vlm>=0.6.13`, `transformers>=5.14.0`; mlx-lm keeps its own 5.7.0
-  Transformers floor as a separate upstream fact), remove the last `tabulate`
-  references from the validation fallback and docs, and record concise psutil
-  available-memory and swap-use context facts in the system evidence when
-  psutil is present. Capability-aware discovery and the coverage matrix
-  remain to follow.
-- Make the upstream thinking-budget issue draft maintainer-ready: regenerable
-  test image script, pinned model revisions, and observed side-by-side native
-  output showing Qwen3-VL-2B-Thinking force-closed at a 20-token budget while
-  GLM-4.1V-9B-Thinking ignores the same flag.
-
-- Automatic thinking budget (`--auto-thinking-budget`, default on): when no
-  explicit thinking flags and no `--thinking-mode` are given and a model's
-  chat template leaves a thinking block open (final start marker unmatched,
-  mirroring mlx-vlm's server-side open-block logic — closed blocks and
-  literal marker mentions are ignored), the run passes upstream's
-  `thinking_budget` / `enable_thinking` generate kwargs with budget =
-  max-tokens − 200 (skipped when that leaves under 128). Upstream then
-  force-closes the thinking block at the budget so the model must produce
-  the requested fields instead of truncating mid-reasoning at the token cap.
-  Chat-template kwargs are never altered, so hybrid models keep their
-  default non-thinking behaviour. The effective per-model budget is
-  recorded in prompt diagnostics, shown in the diagnostics report, and
-  overlaid onto native repro commands so issue drafts reproduce the
-  recorded output. Disable with `--no-auto-thinking-budget`.
-- Per-model system-pressure telemetry (darwin only, read-only `pmset -g` /
-  `sysctl -n` probes, sudo-free; no macOS settings are modified). Default:
-  one snapshot probe pair per model (before load and after cleanup, outside
-  timed inference) so performance comparability is unaffected;
-  `--system-telemetry` opts into continuous 2s background sampling and
-  `--no-system-telemetry` disables telemetry entirely. Aggregates (min CPU
-  speed limit, throttled samples, max memory-pressure level) are stored per
-  model in `results.jsonl` as `system_telemetry` with separate per-probe
-  sample counts, surfaced in the diagnostics provenance block (unavailable
-  probes are reported as unavailable, never as clean), and logged as a
-  warning when a run was throttled or under memory pressure.
 
 ## [0.10.0] - 2026-08-14
 

@@ -3,7 +3,7 @@
 `check_models.py` is a comprehensive benchmarking and inspection tool designed for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It streamlines the process of validating model performance, quality, and resource usage across your local model collection.
 
 > [!NOTE]
-> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs locally cached models that match the `mlx-vlm` server-supported cache layout, making it effortless to benchmark compatible local models.
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs locally cached models that pass the `mlx-vlm` server-style cache-layout filter *and* classify as image-consuming text generators, making it effortless to benchmark the local models that actually fit an image-description benchmark.
 
 ## Who is this for?
 
@@ -58,7 +58,7 @@ python -m check_models --dry-run
 
 ## Capabilities
 
-- **Model Discovery**: Auto-discovers locally cached MLX VLMs using the `mlx-vlm` server-supported cache filter, or processes an explicit model list with `--models`
+- **Model Discovery**: Auto-discovers locally cached MLX VLMs using the `mlx-vlm` server-style cache-layout filter plus an image-capability classification (confident non-image repos — text-only, embedding, reranker, drafter, image/audio generation — are skipped with an explicit reason; unknown ones still run with a warning), or processes an explicit model list with `--models`
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
 - **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
@@ -87,7 +87,7 @@ python -m check_models --dry-run
 
 | Area | Notes |
 | ---- | ----- |
-| Model discovery | Scans Hugging Face cache for `mlx-vlm` server-supported repos; explicit `--models` overrides. |
+| Model discovery | Scans the Hugging Face cache with two layers: the `mlx-vlm` server-style cache-layout filter plus a tri-state image-capability classification (`yes`/`unknown` run, confident `no` is skipped with an explicit `model purpose:` reason). Explicit `--models` overrides. |
 | Selection control | `--exclude` works with cache scan or explicit list. |
 | Prompting | `--prompt` overrides; otherwise structured cataloguing prompt with IPTC/XMP keyword seeding. |
 | Performance | generation_time, model_load_time, total_time, token counts, TPS, peak memory. |

@@ -1,24 +1,35 @@
 ---
 name: hf-cache-mlx-vlm-models
 description: >
-  List or reason about local Hugging Face cache models that match the mlx-vlm
-  server-supported discovery filter used by check_models default model
-  selection. Use for cache-dir questions, skipped-repo reasons, dry-run model
-  lists, or aligning discovery with /v1/models. This is a file-presence check,
-  not a generation proof. This repo uses conda + pip, never uv.
+  List or reason about local Hugging Face cache models under check_models
+  default discovery: the mlx-vlm server-style cache-layout filter plus a
+  second image-capability classification. Use for cache-dir questions,
+  skipped-repo reasons, dry-run model lists, or aligning discovery with
+  /v1/models. Neither layer is a generation proof. This repo uses conda + pip,
+  never uv.
 ---
 
-# HF Cache Models (mlx-vlm server filter)
+# HF Cache Models (layout filter + image capability)
 
-Default `check_models` discovery intentionally matches the **mlx-vlm server
-`/v1/models` cache filter**, not “every repo in the HF cache”.
+Default `check_models` discovery has **two independent layers**:
+
+1. the **mlx-vlm server `/v1/models` cache-layout filter** (files present),
+   which tracks upstream's local model discovery; and
+2. an **image-capability classification** of what the cached repo *is*, which
+   is the benchmark's actual requirement.
+
+The layout filter alone is no longer proof of VLM suitability: mlx-vlm now
+also hosts text-only, embedding, reranking, drafter, and image/audio
+generation models whose repos pass the file test. A repo is **selected** only
+when it passes the layout filter **and** its capability is not a confident
+`no`.
 
 Adapted from upstream mlx-vlm support skills
 ([Blaizzy/mlx-vlm#1343](https://github.com/Blaizzy/mlx-vlm/pull/1343)).
 
-## Supported-model rule
+## Layer 1: cache-layout rule (server-style)
 
-A cached repo is treated as server-supported when **all** of the following hold:
+A cached repo passes the layout filter when **all** of the following hold:
 
 - repo type is `model`
 - a `main` revision exists in the cache
@@ -28,7 +39,46 @@ A cached repo is treated as server-supported when **all** of the following hold:
   `*.safetensors` file
 
 This is a **cache/file-presence** check. It does not load the model or prove
-generation works.
+generation works. Layout failures are reported as `cache layout: <reason>`.
+
+## Layer 2: image-capability classification (tri-state)
+
+`_classify_image_capability` reads only bounded snapshot metadata
+(`config.json`, and `model_index.json` when present) and returns an
+`ImageCapability(verdict, purpose, evidence)`:
+
+- `yes` — positive image-input evidence (`vision_config`, `image_token_id`,
+  `image_token_index`, `vision_start_token_id`, … — the keys surveyed across
+  every cached VLM family). Purpose `image_to_text`.
+- `no` — positive evidence of a different model kind, most specific first:
+  `speculators_model_type` → speculative drafter; `mlx_embeddings.kind=
+  embedding` → embedding; sequence-classifier model type/architecture
+  (`bert`, `modernbert`, `xlm_roberta`, `*ForSequenceClassification`) →
+  reranker; `model_index.json` or pipeline config keys without image keys →
+  image/video generation; `audio_config` without image keys → audio-only
+  generation; generative architecture with no vision/audio/dflash config →
+  text-only (mirrors upstream `_is_text_only_config`).
+- `unknown` — insufficient or contradictory evidence (e.g. no readable
+  config, unfamiliar layout). **Still selected**, with a warning that names
+  the evidence, so a new VLM is tried rather than silently excluded.
+
+`id2label`/`num_labels` alone are **not** reranker signals — real VLM configs
+carry them. Repo names are never used as evidence.
+
+Skips are reported as `model purpose: <label> (<evidence>)`. Explicit
+`--models` overrides the capability filter (the model runs) but logs the
+classification so the result is interpreted correctly.
+
+Every cached repo's classification, evidence, and decision is retained in
+`run.json` under `cache_discovery`, so downstream tools can distinguish an
+intentional non-test from a crash. Skipped non-image models never enter the
+per-model results, quality tables, or mlx-vlm failure counts.
+
+Live sites: `ImageCapability`, `_classify_image_capability`,
+`_capability_negative_signal`, `CachedModelEligibility.selected` /
+`.skip_reasons`, `_cache_discovery_records` in `src/check_models.py`; locked
+by `TestImageCapabilityClassifier` / `TestCapabilityAwareSelection` in
+`src/tests/test_model_discovery.py`.
 
 ## Architecture pre-check (upstream `--check-arch` tier)
 

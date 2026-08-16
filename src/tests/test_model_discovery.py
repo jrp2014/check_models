@@ -175,10 +175,8 @@ def test_auto_cache_discovery_logs_skipped_models(caplog: pytest.LogCaptureFixtu
         selected = check_models._supported_cached_model_ids_with_skipped_logging(eligibility)
 
     assert selected == ["org/supported-model"]
-    assert (
-        "Skipped 1 cached repo(s) that mlx-vlm server-style discovery would not run" in caplog.text
-    )
-    assert "org/no-tokenizer: missing tokenizer_config.json" in caplog.text
+    assert "Skipped 1 cached repo(s) that default discovery will not run" in caplog.text
+    assert "org/no-tokenizer: cache layout: missing tokenizer_config.json" in caplog.text
 
 
 def test_cache_integrity_uses_exact_repo_id_matching(
@@ -427,3 +425,233 @@ def test_arch_precheck_summary_renders_verdict(monkeypatch: pytest.MonkeyPatch) 
         lambda _model: (None, None, None),
     )
     assert check_models._arch_precheck_summary("org/model") is None
+
+
+# --- Capability-aware discovery (upstream alignment design §1-3) ---------------
+
+
+def _capability_for(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    config: dict[str, object] | None,
+    model_index: dict[str, object] | None = None,
+) -> check_models.ImageCapability:
+    """Classify a fake repo whose config.json / model_index.json are supplied inline."""
+
+    def _read(_repo: object, file_name: str) -> dict[str, object] | None:
+        if file_name == "config.json":
+            return config
+        if file_name == "model_index.json":
+            return model_index
+        return None
+
+    monkeypatch.setattr(check_models, "_read_cached_repo_json", _read)
+    return check_models._classify_image_capability(object())
+
+
+VLM_CONFIG: dict[str, object] = {
+    "model_type": "qwen3_vl",
+    "architectures": ["Qwen3VLForConditionalGeneration"],
+    "vision_config": {"depth": 24},
+    "image_token_id": 151655,
+    "id2label": {"0": "LABEL_0"},  # present on real VLMs; must not read as reranker
+}
+
+
+class TestImageCapabilityClassifier:
+    """Tri-state capability classification with explicit evidence."""
+
+    def test_vlm_config_is_yes(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A config with vision evidence is a positive image-to-text verdict."""
+        cap = _capability_for(monkeypatch, config=VLM_CONFIG)
+
+        assert cap.verdict == "yes"
+        assert cap.purpose == "image_to_text"
+        assert "image_token_id" in cap.evidence[0]
+        assert cap.skip_reason is None
+
+    def test_text_only_config_is_no(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A generative config with no modality evidence is text-only."""
+        cap = _capability_for(
+            monkeypatch,
+            config={"model_type": "afm7", "architectures": ["Afm7ForCausalLM"]},
+        )
+
+        assert cap.verdict == "no"
+        assert cap.purpose == "text_only"
+        assert cap.skip_reason == (
+            "model purpose: text-only generation "
+            "(model_type=afm7; no vision_config/image token keys)"
+        )
+
+    @pytest.mark.parametrize(
+        ("config", "model_index", "purpose"),
+        [
+            (
+                {"model_type": "bert", "mlx_embeddings": {"kind": "embedding"}},
+                None,
+                "embedding",
+            ),
+            (
+                {
+                    "model_type": "xlm_roberta",
+                    "architectures": ["XLMRobertaForSequenceClassification"],
+                },
+                None,
+                "reranker",
+            ),
+            (
+                {"model_type": "qwen3", "speculators_model_type": "eagle3"},
+                None,
+                "speculative_drafter",
+            ),
+            (
+                {"model_type": "flux"},
+                {"_class_name": "FluxPipeline"},
+                "image_or_video_generation",
+            ),
+            (
+                {
+                    "model_type": "voice_gen",
+                    "architectures": ["VoiceGenForConditionalGeneration"],
+                    "audio_config": {},
+                },
+                None,
+                "audio_or_other_generation",
+            ),
+        ],
+    )
+    def test_non_image_kinds_are_no_with_distinct_reasons(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        config: dict[str, object],
+        model_index: dict[str, object] | None,
+        purpose: str,
+    ) -> None:
+        """Each non-image model kind yields a distinct explicit skip reason."""
+        cap = _capability_for(monkeypatch, config=config, model_index=model_index)
+
+        assert cap.verdict == "no"
+        assert cap.purpose == purpose
+        assert cap.evidence
+        assert cap.skip_reason is not None
+        assert cap.skip_reason.startswith("model purpose: ")
+
+    def test_id2label_alone_does_not_mean_reranker(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Real VLM configs carry id2label; only sequence-classifier signals count."""
+        cap = _capability_for(
+            monkeypatch,
+            config={"model_type": "mystery", "id2label": {"0": "x"}, "num_labels": 1},
+        )
+
+        assert cap.purpose != "reranker"
+
+    def test_unfamiliar_config_is_unknown_and_selected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Insufficient evidence yields unknown, which default discovery still runs."""
+        cap = _capability_for(monkeypatch, config={"model_type": "brand_new_arch"})
+
+        assert cap.verdict == "unknown"
+        assert cap.skip_reason is None
+        entry = check_models.CachedModelEligibility(
+            repo_id="org/new", supported=True, capability=cap
+        )
+        assert entry.selected is True
+        assert entry.skip_reasons == ()
+
+    def test_missing_config_is_unknown(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """No readable config cannot be classified and stays unknown."""
+        cap = _capability_for(monkeypatch, config=None)
+
+        assert cap.verdict == "unknown"
+        assert cap.evidence == ("no readable config.json",)
+
+
+class TestCapabilityAwareSelection:
+    """Discovery skips only confident non-image repos and reports every skip."""
+
+    def _entries(self) -> tuple[check_models.CachedModelEligibility, ...]:
+        yes = check_models.ImageCapability(
+            "yes", "image_to_text", ("image-input keys: vision_config",)
+        )
+        no = check_models.ImageCapability(
+            "no", "text_only", ("model_type=afm7", "no vision_config/image token keys")
+        )
+        unknown = check_models.ImageCapability("unknown", "unknown", ("model_type=new",))
+        return (
+            check_models.CachedModelEligibility("org/vlm", supported=True, capability=yes),
+            check_models.CachedModelEligibility("org/text-only", supported=True, capability=no),
+            check_models.CachedModelEligibility("org/new-arch", supported=True, capability=unknown),
+            check_models.CachedModelEligibility(
+                "org/bad-layout",
+                supported=False,
+                reasons=("missing tokenizer_config.json",),
+                capability=yes,
+            ),
+        )
+
+    def test_selection_runs_yes_and_unknown_and_skips_no(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Default discovery runs yes+unknown, skips no, and names every skip."""
+        with caplog.at_level(logging.WARNING):
+            selected = check_models._supported_cached_model_ids_with_skipped_logging(
+                self._entries()
+            )
+
+        assert selected == ["org/new-arch", "org/vlm"]
+        text = caplog.text
+        # Every skipped repo is named with a concrete reason.
+        assert "org/text-only: model purpose: text-only generation" in text
+        assert "org/bad-layout: cache layout: missing tokenizer_config.json" in text
+        # Unknown is a warning on a selected model, not an exclusion.
+        assert "unknown image capability" in text
+        assert "org/new-arch" in text
+
+    def test_combined_skip_reasons_layout_and_capability(self) -> None:
+        """Layout and capability reasons are both reported, in that order."""
+        entry = check_models.CachedModelEligibility(
+            "org/both",
+            supported=False,
+            reasons=("missing config.json",),
+            capability=check_models.ImageCapability(
+                "no", "embedding", ("mlx_embeddings.kind=embedding",)
+            ),
+        )
+
+        assert entry.selected is False
+        assert entry.skip_reasons == (
+            "cache layout: missing config.json",
+            "model purpose: embedding model (mlx_embeddings.kind=embedding)",
+        )
+
+    def test_explicit_models_override_with_visible_warning(
+        self, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Explicit --models runs a non-image repo but keeps the classification visible."""
+        monkeypatch.setattr(check_models, "get_cached_model_eligibility", self._entries)
+
+        with caplog.at_level(logging.WARNING):
+            check_models._warn_explicit_non_image_models(["org/text-only", "org/vlm"])
+
+        assert "org/text-only classifies as non-image" in caplog.text
+        assert "org/vlm classifies" not in caplog.text
+
+    def test_cache_discovery_records_retain_classification(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """run.json retains classification, evidence, and decision per cached repo."""
+        monkeypatch.setattr(check_models, "get_cached_model_eligibility", self._entries)
+
+        records = check_models._cache_discovery_records()
+
+        by_id = {r["repo_id"]: r for r in records}
+        assert by_id["org/text-only"]["selected"] is False
+        assert by_id["org/text-only"]["capability_verdict"] == "no"
+        assert by_id["org/text-only"]["model_purpose"] == "text_only"
+        assert by_id["org/text-only"]["skip_reasons"] == [
+            "model purpose: text-only generation (model_type=afm7; no vision_config/image token keys)"
+        ]
+        assert by_id["org/vlm"]["selected"] is True
+        assert by_id["org/new-arch"]["capability_verdict"] == "unknown"

@@ -358,6 +358,12 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
+    # cache_discovery is optional: present only when a local HF cache scan
+    # yields entries, so it is validated separately rather than required here.
+    discovery = payload.pop("cache_discovery", None)
+    if discovery is not None:
+        assert isinstance(discovery, list)
+        assert {"repo_id", "selected", "capability_verdict", "skip_reasons"} <= set(discovery[0])
     assert set(payload) == {
         "schema_version",
         "generated_at",
