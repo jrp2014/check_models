@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-16 18:47:12 BST
+Generated on: 2026-08-16 22:30:27 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,74 +16,80 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                 |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------|
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 1.36s   | 138 tok/s           | 0.09            | 5.2     | 409        | 82      | none                                                                                                         |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.08s   | 35.8 tok/s          | 1.79            | 17      | 3,435      | 60      | none                                                                                                         |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.25s   | 184 tok/s           | 0.07            | 4.1     | 350        | 100     | none                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 3.20s   | 69.7 tok/s          | 0.69            | 9.8     | 1,070      | 81      | none                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 3.75s   | 64.9 tok/s          | 0.75            | 10      | 1,070      | 106     | none                                                                                                         |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 1.73s   | 194 tok/s           | 0.25            | 4.5     | 1,069      | 85      | none                                                                                                         |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 3.29s   | 53.6 tok/s          | 0.42            | 11      | 843        | 89      | none                                                                                                         |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 16.24s  | 6.04 tok/s          | 0.85            | 23      | 860        | 78      | none                                                                                                         |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 2.39s   | 57.7 tok/s          | 0.20            | 9.3     | 883        | 68      | none                                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 1.62s   | 135 tok/s           | 0.08            | 5.3     | 409        | 82      | none                                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 7.54s   | 131 tok/s           | 0.09            | 5.3     | 411        | 872     | none                                                                                                         |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 3.55s   | 124 tok/s           | 0.25            | 21      | 421        | 89      | none                                                                                                         |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 2.63s   | 101 tok/s           | 0.29            | 7.1     | 421        | 86      | none                                                                                                         |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 9.90s   | 18.4 tok/s          | 0.84            | 30      | 421        | 107     | none                                                                                                         |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 15.65s  | 43.4 tok/s          | 4.91            | 65      | 286        | 105     | none                                                                                                         |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.09s   | 65.9 tok/s          | 0.26            | 10      | 511        | 106     | none                                                                                                         |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 6.04s   | 30.3 tok/s          | 0.79            | 18      | 379        | 90      | none                                                                                                         |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.41s   | 125 tok/s           | 0.37            | 16      | 390        | 73      | none                                                                                                         |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.49s   | 27.0 tok/s          | 0.85            | 19      | 390        | 80      | none                                                                                                         |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 4.90s   | 40.4 tok/s          | 0.96            | 15      | 1,335      | 89      | none                                                                                                         |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 0.62s   | 516 tok/s           | 0.04            | 1.4     | 350        | 63      | title/keyword constraints failed                                                                             |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 6.12s   | 30.9 tok/s          | 0.74            | 20      | 537        | 100     | title/keyword constraints failed                                                                             |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | 23.49s  | 55.6 tok/s          | 1.21            | 60      | 545        | 944     | title/keyword constraints failed                                                                             |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 2.44s   | 89.8 tok/s          | 0.32            | 7.8     | 499        | 61      | title/keyword constraints failed                                                                             |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 14.17s  | 49.9 tok/s          | 4.72            | 63      | 499        | 89      | control tokens visible                                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 121.53s | 4.8 tok/s           | 0.84            | 40      | 489        | 562     | role tokens visible                                                                                          |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 18.87s  | 64.8 tok/s          | 6.22            | 71      | 421        | 133     | title/keyword constraints failed                                                                             |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 0.90s   | 311 tok/s           | 0.15            | 2.5     | 511        | 40      | title/keyword constraints failed                                                                             |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 1.36s   | 124 tok/s           | 0.38            | 5.5     | 1,204      | 31      | title/keyword constraints failed                                                                             |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.25s   | 49.0 tok/s          | 0.31            | 29      | 386        | 75      | control tokens visible                                                                                       |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.47s   | 41.7 tok/s          | 0.32            | 28      | 386        | 68      | control tokens visible                                                                                       |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 4.11s   | 45.8 tok/s          | 0.34            | 17      | 378        | 63      | title/keyword constraints failed                                                                             |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 25.39s  | 43.7 tok/s          | 0.94            | 14      | 1,426      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 0.81s   | 341 tok/s           | 0.08            | 2.1     | 120        | 32      | missing required fields                                                                                      |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 23.02s  | 47.7 tok/s          | 0.36            | 13      | 495        | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 3.37s   | insufficient sample | 1.05            | 18      | 2,418      | 13      | missing required fields; role tokens visible                                                                 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 66.18s  | 15.9 tok/s          | 1.61            | 15      | 107        | 1,000   | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.23s   | 278 tok/s           | 0.10            | 3.0     | 330        | 58      | missing required fields; extra text before Title                                                             |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 23.37s  | 51.0 tok/s          | 2.78            | 9.7     | 2,469      | 1,000   | repeated text; missing required fields; cut off at token limit                                               |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 0.88s   | 349 tok/s           | 0.07            | 2.0     | 116        | 97      | missing required fields                                                                                      |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 24.91s  | 45.1 tok/s          | 1.19            | 4.2     | 4,207      | 1,000   | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                           |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.51s   | 479 tok/s  | 0.21            | 1.9     | 2,072      | 132     | none                                                                                                   |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.88s  | 29.9 tok/s | 3.80            | 24      | 2,658      | 131     | none                                                                                                   |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 2.27s   | 186 tok/s  | 0.50            | 4.2     | 2,072      | 140     | none                                                                                                   |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.74s   | 66.3 tok/s | 2.47            | 14      | 3,191      | 162     | none                                                                                                   |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.24s   | 188 tok/s  | 1.14            | 9.0     | 3,190      | 123     | none                                                                                                   |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 68.72s  | 109 tok/s  | 64.45           | 24      | 16,482     | 95      | none                                                                                                   |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 76.50s  | 91.2 tok/s | 73.02           | 10.0    | 16,482     | 113     | none                                                                                                   |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 101.65s | 25.9 tok/s | 93.79           | 22      | 16,482     | 127     | none                                                                                                   |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.42s   | 126 tok/s  | 0.44            | 5.5     | 1,400      | 89      | none                                                                                                   |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 24.87s  | 44.0 tok/s | 15.49           | 70      | 3,468      | 114     | none                                                                                                   |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.11s   | 130 tok/s  | 0.44            | 16      | 580        | 98      | none                                                                                                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.21s   | 27.7 tok/s | 1.03            | 20      | 580        | 111     | none                                                                                                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 6.91s   | 39.7 tok/s | 2.31            | 16      | 3,429      | 99      | none                                                                                                   |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 23.32s  | 40.9 tok/s | 14.85           | 78      | 6,311      | 96      | control tokens visible; title/keyword constraints failed                                               |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 8.49s   | 32.6 tok/s | 1.08            | 18      | 2,587      | 160     | role tokens visible                                                                                    |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 5.94s   | 34.1 tok/s | 1.27            | 17      | 3,623      | 85      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 180.49s | 4.66 tok/s | 1.37            | 40      | 1,257      | 817     | role tokens visible; title/keyword constraints failed                                                  |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | 2.01s   | 271 tok/s  | 0.26            | 3.8     | 964        | 75      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 6.85s   | 64.0 tok/s | 2.27            | 15      | 3,191      | 174     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.06s   | 52.7 tok/s | 0.65            | 11      | 1,495      | 122     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 64.94s  | 63.9 tok/s | 54.09           | 74      | 16,482     | 111     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | 3.12s   | 56.8 tok/s | 0.24            | 9.6     | 1,094      | 81      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | 29.54s  | 90.6 tok/s | 17.97           | 8.4     | 16,469     | 903     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 103.41s | 15.4 tok/s | 91.78           | 35      | 16,482     | 117     | title/keyword constraints failed                                                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | 26.34s  | 51.8 tok/s | 19.74           | 13      | 16,478     | 241     | title/keyword constraints failed                                                                       |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.74s   | 55.5 tok/s | 0.34            | 29      | 576        | 83      | control tokens visible; title/keyword constraints failed                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.56s   | 58.1 tok/s | 0.33            | 28      | 576        | 82      | control tokens visible                                                                                 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.04s   | 31.0 tok/s | 0.97            | 18      | 569        | 132     | title/keyword constraints failed                                                                       |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.95s  | 93.4 tok/s | 13.84           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.36s  | 41.4 tok/s | 2.19            | 15      | 3,520      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; title/keyword constraints failed |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.49s  | 59.2 tok/s | 1.77            | 60      | 1,584      | 1,000   | cut off at token limit; title/keyword constraints failed                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.03s   | 353 tok/s  | 0.10            | 2.2     | 308        | 147     | missing required fields; echoes instructions; extra text before Title                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 31.53s  | 44.6 tok/s | 7.14            | 13      | 6,307      | 994     | missing required fields; extra text before Title                                                       |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 22.35s  | 74.2 tok/s | 7.12            | 8.4     | 6,311      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 51.57s  | 20.8 tok/s | 1.43            | 15      | 275        | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 29.22s  | 6.04 tok/s | 2.61            | 24      | 3,119      | 142     | missing required fields                                                                                |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 70.47s  | 223 tok/s  | 64.67           | 5.1     | 16,478     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | 28.98s  | 91.2 tok/s | 16.41           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 6.45s   | 48.8 tok/s | 0.37            | 17      | 568        | 162     | missing required fields                                                                                |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 4.54s   | 64.3 tok/s | 2.68            | 9.7     | 2,692      | 18      | missing required fields                                                                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.46s   | 374 tok/s  | 0.07            | 2.4     | 304        | 151     | missing required fields; echoes instructions                                                           |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 23.81s  | 48.0 tok/s | 1.09            | 4.4     | 4,397      | 1,000   | repeated text; missing required fields; echoes instructions; cut off at token limit                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/Ministral-3-3B-Instruct-2512-4bit` at 194 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 479 tok/s
 
-Average clean-completion throughput: 82.3 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 119 tok/s (indicative only: tokenizers and architectures differ across models)
 
-Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-1.6B-bf16` at 4.1 GB
+Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Usability  | Observations                                                                                                 |
-|--------------------------------------------------------------------------------------------------------------|------------|--------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable` | missing required fields; echoes instructions; extra text before Title; cut off at token limit                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable` | missing required fields                                                                                      |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable` | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                      | `unusable` | missing required fields; role tokens visible                                                                 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `unusable` | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable` | missing required fields; extra text before Title                                                             |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable` | repeated text; missing required fields; cut off at token limit                                               |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable` | missing required fields                                                                                      |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable` | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| Model                                                                                                        | Usability  | Observations                                                                                           |
+|--------------------------------------------------------------------------------------------------------------|------------|--------------------------------------------------------------------------------------------------------|
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                              | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable` | echoes instructions; extra text before Title; cut off at token limit; title/keyword constraints failed |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable` | cut off at token limit; title/keyword constraints failed                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable` | missing required fields; echoes instructions; extra text before Title                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable` | missing required fields; extra text before Title                                                       |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                             | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                | `unusable` | missing required fields                                                                                |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                  | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                  | `unusable` | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable` | missing required fields                                                                                |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable` | missing required fields                                                                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `unusable` | missing required fields; echoes instructions                                                           |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                  | `unusable` | repeated text; missing required fields; echoes instructions; cut off at token limit                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -92,49 +98,50 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                                                      |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | Title: Two Cats Sleeping on Pink Blanket<br>Description: Two tabby cats are lying on a pink blanket with remote controls nearby, in a relaxed sleeping position.<br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxed, blanket, resting, pets, cozy, indoor                                                                   |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | Title: Two Cats Resting on a Pink Blanket<br><br>Description: Two cats are lying on a pink blanket, one is stretched out while the other is curled up. The cats appear to be sleeping peacefully, with one having a green collar. The lighting is soft and warm, highlighting the relaxed p...                                                      |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>Two Cats Relaxing on Pink Cushioned Surface<br><br>Description:<br>Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The lighting is natural, and the cats appear calm and at ease.<br><br>Keywords:<br>cats, pink cushioned surface, remote controls, re...                                       |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | **Title:**<br>Relaxed Tabby Kittens on Pink Cushion<br><br>**Description:**<br>Two tabby kittens lie stretched out on a pink cushion, positioned near remote controls. Their relaxed postures and soft fur highlight a calm, indoor setting.<br><br>**Keywords:**<br>kittens, tabby, pink cushion, remote...                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Two Sleeping Tabby Kittens on Pink Couch<br><br>Description:<br>Two young tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft lighting casts gentle shadows across their fur.<br><br>Keywords:<br>pink sofa, remote controls, young tabbies, indoo...                                       |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | Title: Two feline friends on a cozy sofa.<br><br>Description: Two cats, one larger and one smaller, rest on a pink blanket-covered sofa. One wears a green collar. Two remote controls lie between them. The scene is bathed in warm, artificial light.<br><br>Keywords: Pink, sofa, cats, remote...                                                |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | Title: Two Cats Resting on Pink Blanket with Remote Controls<br><br>Description: Two cats are sleeping on a pink blanket. A pink couch is visible in the background. Two remote controls are placed on the blanket. The cats appear to be in a relaxed state.<br><br>Keywords: cats, pink blanket...                                                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Two Tabby Cats Sleeping on Pink Sofa<br><br>Description: Two tabby cats lie asleep on a bright pink sofa, each positioned near a white remote control. The scene is lit by even indoor lighting, highlighting the cats’ striped fur and relaxed postures.<br><br>Keywords: tabby cats, pin...                                                |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Two Cats Sleeping on a Pink Couch<br><br>Description: Two tabby cats are lying on a pink couch, each with a remote control nearby. The scene is well-lit, highlighting the texture of the couch and the fur of the cats.<br><br>Keywords: cats, tabby, pink couch, remote control, sleepin...                                                |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats are lying on a pink sofa, one near a white remote control and the other beside a blue remote. The scene is brightly lit, highlighting the cats' striped fur and relaxed postures.<br><br>Keywords: tabby cats, pink...                                                |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Two cats sleeping on a pink blanket<br><br>Description:<br>Two cats are lying on a pink blanket on a couch, with remote controls placed nearby. One cat is smaller with a green collar, while the other is larger with a striped coat. Both appear relaxed and asleep under indoor ligh...                                                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | Title: Cats Sleeping on Pink Couch with Remotes<br><br>Description: Two tabby cats lie on a pink couch, one curled up, the other stretched out, with a remote control between them. The setting is indoors, with soft lighting highlighting their relaxed postures. The couch's vibrant pin...                                                      |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | Title: Two Tabby Cats Resting on Pink Fabric<br><br>Description: Two tabby cats lie prone on a pink fabric surface, each with a remote control nearby. Both cats are asleep with paws extended, exhibiting striped fur patterns.<br><br>Keywords: cats, tabby, pink, fabric, remote control, slee...                                                |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Two tabby cats lying on a pink surface<br><br>Description: Two tabby cats lie on a bright pink fabric surface next to two remote controls. The cats are positioned with their heads facing in opposite directions.<br><br>Keywords: tabby, cats, pink, fabric, remote control, lying, indo...                                                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Two tabby cats lying on a pink blanket<br>Description: Two tabby cats lie on a pink blanket atop a red sofa next to two remote controls. The scene is captured under bright, direct lighting.<br>Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets, i...                                                      |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic...                                       |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | Title:<br>Cats on a Pink Sofa<br><br>Description:<br>Two cats are lying on a pink sofa, one is stretched out with its paws extended, while the other is curled up with its head resting on the sofa.<br><br>Keywords:<br>cats, sofa, pink, relaxation, fur, stripes, sleeping                                                                       |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Two cats resting on a pink sofa<br><br>Description:<br>Two tabby cats are lying on a pink sofa, one on its back and the other on its side, with a remote control nearby. The lighting is natural, and the cats have distinctive striped fur patterns.<br><br>Keywords: cats, tabby, sofa, pin...                                          |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual p...                                                            |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Two Cats on Pink Sofa<br>Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.<br>Keywords: two tabby cats, pink fabric sofa, remote control, head down                                                                             |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Two cats on a pink couch<br>Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.<br>Keywords: cats, pink couch, remote controls, sleeping, relaxed, stripe...                                                    |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, li...                                                            |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes<br><br>Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its hea...                                                      |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | Title: Two Cats Sleeping on a Pink Couch<br>Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.<br>Keywords: cats, sleeping, pink couch, remote controls                                                                                                                                                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Two Cats on a Couch<br>Description: Two cats are sleeping on a pink couch.<br>Keywords: cats, couch, sleeping, pink                                                                                                                                                                                                                          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, in...                                                 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, str...                                                 |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | **Title:** Cozy Naptime<br><br>**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.<br><br>**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, domestic, comfort, home, furry, striped, peaceful, indoors.                                                           |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.<br><br>Write:<br>- a concrete 5-10-word title;<br>- a 1-2-sentence...                                              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.                                                                                                                                                                                                  |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats),...                                                      |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | Two cats laying on a pink blanket with remotes.<end_of_utterance>                                                                                                                                                                                                                                                                                   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | Here is the information in the format you requested:<br><br>**Title:** Two Cats on a Pink Blanket<br><br>**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed....                                                |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Two cats sleeping on pink blanket with remote controls<br><br>Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.<br><br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting                                                   |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, felin...                                                            |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: "A Study in Stripes"<br>Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the...                                                         |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | Action:<br>Lighting:<br>Brand:<br>Species:<br>Period:<br>Event:<br>Date:<br>Name:<br>Intent:<br>Brand:<br>Date:<br>Name:<br>Description:<br>Action:<br>Lighting:<br>Keywords:<br>Return exactly these three sections and nothing else:<br>Title:<br>Description:<br>- 10-18 unique, comma-separated keywords.<br>- 10-18 unique, comma-separated... |
+| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                                     |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br><br>Description:<br>A tall, white column stands prominently on a coastal promenade, overlooking the sea. The column is adorned with a statue of an eagle perched atop, and a string of colorful lights runs along its base. The scene...                               |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | Title:<br>War Memorial by the Sea<br><br>Description:<br>A tall stone war memorial column topped with a winged figure stands on a seafront promenade in Felixstowe, England, overlooking the North Sea. The monument is flanked by a lamp post with barbed wire decorations and surrounded by roc...                               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | Title: Seafront War Memorial, Felixstowe, England, UK, GBR<br><br>Description: A war memorial stands prominently on a seaside promenade in Felixstowe, England, overlooking the ocean. The monument features a tall column topped with an eagle statue, surrounded by a decorative light fi...                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Felixstowe War Memorial and Seafront View**<br><br>Description:<br>A tall classical war memorial column stands prominently on Felixstowe’s seafront, overlooking the ocean under clear blue skies. The monument features engraved plaques and a bronze eagle finial, with two modern...                                |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>War Memorial Column at Felixstowe Seafront<br><br>Description:<br>A tall, classical column stands prominently at the seafront of Felixstowe, England, dedicated to honoring fallen soldiers. It features inscriptions, a sculpted eagle atop, and is surrounded by coastal rocks under...                                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: War Memorial Column on Felixstowe Seafront<br><br>Description: A tall stone column topped with a bronze eagle stands on a plinth inscribed with names, situated on a paved promenade overlooking the sea under a clear blue sky.<br><br>Keywords: Felixstowe, seafront, war memorial, colu...                               |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title: Felixstowe Seafront Memorial Column with Eagle<br><br>Description: A tall stone column topped with an eagle statue stands on a seafront promenade in Felixstowe, England, under clear blue skies, with the sea and festive string lights visible in the background.<br><br>Keywords: Felix...                               |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | Title:<br>War Memorial Column on the Felixstowe Seafront<br><br>Description:<br>A tall, fluted stone column topped with a bronze eagle stands on a stepped plinth inscribed with names, set against a calm blue sea and clear sky. The monument is situated on a paved promenade with a blue lamp...                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br>Description:<br>A tall, white column stands on a rocky beach, overlooking the ocean. The column is topped with a statue of an eagle, and there are several plaques on the column.<br>Keywords:<br>Felixstowe, England, UK, GBR, Europe,...                             |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Column monument on Felixstowe seafront<br><br>Description:<br>A tall column monument topped with a bird statue stands on a paved seafront area in Felixstowe, Suffolk, England, overlooking the ocean under a clear blue sky, with two men walking nearby and decorative streetlights a...                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: War Memorial Column on Felixstowe Seafront<br>Description: A tall stone war memorial column topped with a bird sculpture stands against a clear blue sky on the Felixstowe seafront. The monument features inscribed plaques and is set against a backdrop of the sea and rocky c...                                        |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: War Memorial on the Seafront in Felixstowe, Suffolk<br>Description: A tall, fluted Corinthian column topped with an eagle sculpture stands on the seafront in Felixstowe, England, under a clear blue sky. The monument features inscribed plaques at its base, overlooking the c...                                        |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | Title:<br>Seafront Monument in Felixstowe, England<br><br>Description:<br>A tall column monument with an eagle statue at the top stands prominently by the seaside in Felixstowe, England, with a clear blue sky and calm sea in the background.<br><br>Keywords:<br>Felixstowe, England, UK, seafront, mo...                      |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Seafront monument, Felixstowe, England<br>Description: A tall stone column with an eagle statue atop stands on a paved plaza by the sea, with rocky shores, the ocean, and two men walking in the background under a clear blue sky.<br>Keywords: seafront, Felixsto...                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Felixstowe Seafront Monument with Ocean View.<br>Description: The image depicts a monument situated on the seafront in Felixstowe, England, UK. The monument is a tall, white column with a Doric column style, topped with a statue of an eagle. The column is surrounded by a b...                                        |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Felixstowe Seafront Monument<br>Description: A tall column with an eagle statue stands on a seafront promenade in Felixstowe, England, under clear blue skies, with people walking nearby and festive lights strung overhead.<br>Keywords: Felixstowe, seafront, monument, eagle sta...                                     |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top...                                           |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | &lt;think&gt;<br><br>&lt;/think&gt;<br><br>Title:<br>War Memorial by Seafront<br><br>Description:<br>A tall war memorial stands by the sea, under clear skies, with people walking nearby.<br><br>Keywords: war memorial, seafront, Felixstowe, England, UK, gbr, ocean, rocks, pedestrians, clear sky, decorative lights, ston... |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Felixstowe War Memorial, Seafront, Suffolk, UK*<br><br>**Description:**<br>A classical stone column monument dedicated to WWI and WWII servicemen stands on Felixstowe’s seafront, overlooking the North Sea under clear daylight. Decorated with inscriptions, plaques, and toppe...                               |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | Title: Felixstowe Seafront, England, UK, GBR<br><br>Description: A man in a blue shirt walks along a concrete path near a tall white column with a bird statue, surrounded by rocks and water, with a blue pole and string lights in the background. The scene is bathed in warm sunlight,...                                      |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | Title: War memorial column on Felixstowe seafront<br>Description: A tall fluted stone column topped with a bronze eagle stands on a stepped plinth inscribed with names, set against the blue sea and clear sky at Felixstowe seafront. Festive bunting and a modern communications mast...                                        |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: Felixstowe Seafront Monument<br><br>Description: A prominent white column with a bird sculpture at the top stands at the seafront in Felixstowe, England, UK, with a clear blue sky and the sea in the background.<br><br>Keywords: Felixstowe, seafront, monument, column, bird sculpture...                               |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The main subject is the memorial column. Let's see: "Felixstowe Seafront Memorial Column" – that's 10 words, which is good.<br><br>Next, the description. N...                                     |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | Title:<br>Felixstowe War Memorial Column by the Seafront<br><br>Description:<br>A tall stone column topped with a bronze bird statue stands on a paved promenade overlooking the sea. The monument features inscribed plaques and is situated near a blue lamppost with festive lights, under a c...                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | Title:<br>Felixstowe War Memorial, Seafront<br><br>Description:<br>A tall, ornate war memorial stands on the seafront at Felixstowe, East Suffolk, UK, with a bronze eagle perched atop, set against a clear blue sky and the calm sea. The structure bears inscriptions and plaques, marking its...                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial on the Felixstowe Seafront, Suffolk<br>Description: A tall fluted stone column topped with a bronze eagle stands on the coastal promenade overlooking the sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK, seafro...                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial Column on the Felixstowe Seafront<br>Description: A tall fluted stone war memorial topped with a bronze eagle stands on the coast overlooking the North Sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK, seafront...                                |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Felixstowe War Memorial, Seafront, Suffolk<br><br>Description: Captured on 13th August 2026, this image shows the War Memorial on the seafront at Felixstowe, Suffolk, bathed in bright sunlight. The memorial stands prominently on a stone plinth overlooking the North Sea, with...                                      |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | Title:<br>Felixstowe Seafront Memorial<br><br>Description:<br>A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.<br><br>Keywords: Felixs...                         |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user wants British-English catalogue metadata from the image and supplied context. They want:<br><br>- Title: a concrete 5-10-word title.<br>- Description: 1-2 sentences factual description combining relevant context with main visible subject, setting,...                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got an image of a seaside scene, and I need to generate some metadata for it. First things first, I need to break down the request. The core task is to create a title, description, and keywords for this image, all in British English. The image...                                            |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A concrete 5-10-word title: "Felixstowe, UK, Seafront, GBR, East Suffolk, England, Europe, GBR, Seafront"<br>Description: The image features a prominent 5-10-word title describing a concrete 5-10-word description of a seafront in Felixstowe, UK, with a GBR (Great Britain) locatio...                                        |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. The image shows a monument by the sea, so maybe "Felixstowe Seafront Monument". Then the description should combine context (date, location) with the main subject (monument), setting (seafront), action...                                      |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | Title: Felixstowe War Memorial<br>Description: The Felixstowe War Memorial, a tall stone column topped with an eagle, stands by the seafront in Felixstowe, England.<br>Keywords: Felixstowe War Memorial, seafront, Felixstowe, Suffolk, England, UK, gbr, Europe, war memorial, stone col...                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | Title:<br>Felixstowe Seafront Memorial Column<br><br>Description:<br>The image features a prominent memorial column situated on the seafront in Felixstowe, England, with a columnar structure and a bird statue at the top, set against a clear blue sky and the calm sea in the background.<br><br>Ke...                         |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | Felixstowe War Memorial, East Suffolk Coast<br><br>The image shows a war memorial monument on a rocky seafront in Felixstowe, England. A tall white column with an eagle statue stands prominently, surrounded by a stone base with plaques. The memorial overlooks the ocean, with a clear...                                     |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | Title:<br>Seafront, Felixstowe, England, UK, GBR, Europe<br><br>Description:<br>The Seafront of Felixstowe, England, UK, GBR, Europe, features a prominent seafront monument with a stone column and a bird statue on top. The monument is situated near the sea, with a clear blue sky and a cal...                               |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | Title:<br>Felixstowe Seafront Memorial<br><br>Description:<br>A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.<br><br>Keywords: Felixs...                         |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | A tall, light-colored stone monument stands prominently on a rocky coastline under a clear blue sky. The monument features a fluted column topped with a bronze eagle with outstretched wings. The base of the monument is multi-tiered and adorned with several dark plaques bearing...                                           |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | Seafront, Felixstowe, England, UK, GBR, Europe,                                                                                                                                                                                                                                                                                    |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | Title: Seafront, Felixstowe, England, UK, GBR, Europe<br>Description: A concrete 5-10-word title, followed by a 1-2-sentence factual description that combines relevant context with the main visible subject, setting, action, lighting, and distinctive details. The description inclu...                                        |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | - Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR,<br>- Description hint: Seafront, Felixstowe, England, UK, GBR,<br>- Description hint: Seafront, Felixstowe, England, UK, GBR,<br>- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Euro...                                  |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
@@ -155,19 +162,45 @@ The first 280 characters of each model's actual output (or failure evidence for 
 - *Recommended Working Set:* 108 GB
 - *Fused Attention:* Available
 
+## Image Metadata
+
+- *Title:* , Seafront, Felixstowe, England, UK, GBR, Europe
+- *Description:* , Seafront, Felixstowe, England, UK, GBR
+- *Keywords:* Adobe Stock, Any Vision, East Suffolk, England, Europe,
+  Felixstowe, Suffolk, UK, gbr, seafront
+- *Date:* 2026-08-13 17:14:49 UTC+01:00
+- *Time:* 17:14:49
+- *GPS:* 51.959333°N, 1.349050°E
+
 ## Prompt
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Create British-English catalogue metadata using only clearly visible facts.
-> Omit uncertain details and unsupported identity, location, event, brand,
-> species, period, or intent.
+> Create British-English catalogue metadata from the image and supplied
+> context.
+>
+> Treat any capture date/time and GPS as authoritative facts, but do not claim
+> they are visible. Descriptive hints may be incomplete or wrong: retain
+> details supported by the image, correct conflicts, and add important visible
+> details. Prefer image evidence when a hint conflicts, and omit uncertain
+> details.
+>
+> Context: Authoritative context:
+> &#45; Capture date/time: 2026-08-13 17:14:49 UTC+01:00
+> &#45; GPS: 51.959333°N, 1.349050°E
+>
+> &#8203;Descriptive hints:
+> &#45; Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
+> &#45; Description hint: Seafront, Felixstowe, England, UK, GBR
+> &#45; Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe,
+> Felixstowe, Suffolk, UK, gbr, seafront
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
-> &#45; a 1-2-sentence factual description of the main subject, setting, action,
-> lighting, and distinctive details;
-> &#45; 10-18 unique, comma-separated keywords.
+> &#45; a 1-2-sentence factual description combining relevant context with the
+> main visible subject, setting, action, lighting, and distinctive details;
+> &#45; 10-18 unique, comma-separated keywords covering relevant context and
+> visible details.
 >
 > &#8203;Return exactly these three sections and nothing else:
 > &#8203;Title:
@@ -179,47 +212,47 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
 
-### Qwen/Qwen3-VL-2B-Instruct
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
 
 <details>
-<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.64s
-- *Generation time:* 0.71s
-- *Total time:* 1.36s
-- *Input validation time:* 6.89e-05
-- *Prompt preparation time:* 0.00904
-- *First-token latency:* 0.086
-- *Cleanup time:* 0.0683
-- *Prompt tokens:* 409
-- *Generation tokens:* 82
-- *Total tokens:* 491
-- *Prompt throughput (raw):* 4,753 tok/s
-- *Generation throughput (raw):* 138 tok/s
-- *Peak memory:* 5.2
-- *Active memory:* 4.3
-- *Cache memory:* 0.07
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.000443
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.39s
+- *Generation time:* 0.87s
+- *Total time:* 1.51s
+- *Input validation time:* 0.25
+- *Prompt preparation time:* 0.00618
+- *First-token latency:* 0.205
+- *Cleanup time:* 0.0604
+- *Prompt tokens:* 2,072
+- *Generation tokens:* 132
+- *Total tokens:* 2,204
+- *Prompt throughput (raw):* 10,088 tok/s
+- *Generation throughput (raw):* 479 tok/s
+- *Peak memory:* 1.9
+- *Active memory:* 0.90
+- *Cache memory:* 0.08
+- *Model-load active memory:* 0.897
+- *Post-cleanup active memory:* 0.000132
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 544
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1183
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -227,68 +260,76 @@ Complete generated or crash evidence for every attempted model.
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two cats on a pink couch
+Title:
+Seafront, Felixstowe, England, UK, GBR, Europe
 
-Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.
+Description:
+A tall, white column stands prominently on a coastal promenade, overlooking the sea. The column is adorned with a statue of an eagle perched atop, and a string of colorful lights runs along its base. The scene is set against a clear blue sky, with a few people walking along the promenade, and the ocean stretches out in the background.
 
-Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, comfort, pet, blanket, lounging
+Keywords:
+Seafront, Felixstowe, England, UK, GBR, Europe, statue, eagle, coastal promenade, lights, sky, sea
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
-### mlx-community/InternVL3-8B-bf16
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
 <details>
-<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.58s
-- *Generation time:* 3.49s
-- *Total time:* 5.08s
-- *Input validation time:* 9.02e-05
-- *Prompt preparation time:* 0.00199
-- *First-token latency:* 1.79
-- *Cleanup time:* 0.128
-- *Prompt tokens:* 3,435
-- *Generation tokens:* 60
-- *Total tokens:* 3,495
-- *Prompt throughput (raw):* 1,922 tok/s
-- *Generation throughput (raw):* 35.8 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.27
-- *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.003
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.18s
+- *Generation time:* 8.68s
+- *Total time:* 10.88s
+- *Input validation time:* 7.54e-05
+- *Prompt preparation time:* 0.00753
+- *First-token latency:* 3.8
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 2,658
+- *Generation tokens:* 131
+- *Total tokens:* 2,789
+- *Prompt throughput (raw):* 700 tok/s
+- *Generation throughput (raw):* 29.9 tok/s
+- *Peak memory:* 24
+- *Active memory:* 18
+- *Cache memory:* 0.52
+- *Model-load active memory:* 18
+- *Post-cleanup active memory:* 0.000968
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 477
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1132
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Sleeping on Pink Blanket
-Description: Two tabby cats are lying on a pink blanket with remote controls nearby, in a relaxed sleeping position.
-Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxed, blanket, resting, pets, cozy, indoor
+Title:
+War Memorial by the Sea
+
+Description:
+A tall stone war memorial column topped with a winged figure stands on a seafront promenade in Felixstowe, England, overlooking the North Sea. The monument is flanked by a lamp post with barbed wire decorations and surrounded by rocky outcrops, with people walking nearby under a clear blue sky.
+
+Keywords:
+war memorial, seafront, Felixstowe, England, UK, North Sea, stone column, winged figure, barbed wire, lamp post, rocky outcrops, promenade, clear sky, people walking, historical monument, coastal view, Suffolk, Europe
 </pre>
 
 </details>
@@ -307,27 +348,27 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxed, blanket
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.60s
-- *Generation time:* 0.64s
-- *Total time:* 1.25s
-- *Input validation time:* 0.00011
-- *Prompt preparation time:* 0.00368
-- *First-token latency:* 0.0681
-- *Cleanup time:* 0.0708
-- *Prompt tokens:* 350
-- *Generation tokens:* 100
-- *Total tokens:* 450
-- *Prompt throughput (raw):* 5,140 tok/s
-- *Generation throughput (raw):* 184 tok/s
-- *Peak memory:* 4.1
+- *Model load time:* 0.57s
+- *Generation time:* 1.69s
+- *Total time:* 2.27s
+- *Input validation time:* 7.18e-05
+- *Prompt preparation time:* 0.00379
+- *First-token latency:* 0.504
+- *Cleanup time:* 0.0726
+- *Prompt tokens:* 2,072
+- *Generation tokens:* 140
+- *Total tokens:* 2,212
+- *Prompt throughput (raw):* 4,113 tok/s
+- *Generation throughput (raw):* 186 tok/s
+- *Peak memory:* 4.2
 - *Active memory:* 3.2
-- *Cache memory:* 0.01
+- *Cache memory:* 0.06
 - *Model-load active memory:* 3.2
 - *Post-cleanup active memory:* 0.00379
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 523
+- *Rendered prompt characters:* 1183
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -343,11 +384,11 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxed, blanket
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Resting on a Pink Blanket
+Title: Seafront War Memorial, Felixstowe, England, UK, GBR
 
-Description: Two cats are lying on a pink blanket, one is stretched out while the other is curled up. The cats appear to be sleeping peacefully, with one having a green collar. The lighting is soft and warm, highlighting the relaxed posture of the cats.
+Description: A war memorial stands prominently on a seaside promenade in Felixstowe, England, overlooking the ocean. The monument features a tall column topped with an eagle statue, surrounded by a decorative light fixture and a plaque listing names of the fallen. The scene is bathed in bright daylight, with clear blue skies and a few people strolling along the path.
 
-Keywords: cats, pink blanket, sleeping, green collar, relaxed posture, soft lighting, warm tones, peaceful, curled up, stretched out, comfortable
+Keywords: Seafront, Felixstowe, England, UK, GBR, War Memorial, Eagle Statue, Light Fixture, Plaque, Ocean View, Promenade, Daylight, People
 </pre>
 
 </details>
@@ -366,27 +407,27 @@ Keywords: cats, pink blanket, sleeping, green collar, relaxed posture, soft ligh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.33s
-- *Generation time:* 1.87s
-- *Total time:* 3.20s
-- *Input validation time:* 8.19e-05
-- *Prompt preparation time:* 0.00668
-- *First-token latency:* 0.689
-- *Cleanup time:* 0.0859
-- *Prompt tokens:* 1,070
-- *Generation tokens:* 81
-- *Total tokens:* 1,151
-- *Prompt throughput (raw):* 1,552 tok/s
-- *Generation throughput (raw):* 69.7 tok/s
-- *Peak memory:* 9.8
+- *Model load time:* 1.35s
+- *Generation time:* 5.38s
+- *Total time:* 6.74s
+- *Input validation time:* 7.42e-05
+- *Prompt preparation time:* 0.00681
+- *First-token latency:* 2.47
+- *Cleanup time:* 0.0867
+- *Prompt tokens:* 3,191
+- *Generation tokens:* 162
+- *Total tokens:* 3,353
+- *Prompt throughput (raw):* 1,292 tok/s
+- *Generation throughput (raw):* 66.3 tok/s
+- *Peak memory:* 14
 - *Active memory:* 8.0
-- *Cache memory:* 0.23
+- *Cache memory:* 0.65
 - *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.00508
+- *Post-cleanup active memory:* 0.0051
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 2910
+- *Rendered prompt characters:* 3570
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -403,75 +444,13 @@ Keywords: cats, pink blanket, sleeping, green collar, relaxed posture, soft ligh
 
 <pre class="model-output-readable">
 Title:
-Two Cats Relaxing on Pink Cushioned Surface
+**Felixstowe War Memorial and Seafront View**
 
 Description:
-Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The lighting is natural, and the cats appear calm and at ease.
+A tall classical war memorial column stands prominently on Felixstowe’s seafront, overlooking the ocean under clear blue skies. The monument features engraved plaques and a bronze eagle finial, with two modern lamp posts and decorative string lights nearby. Two individuals are seen walking along the paved path beside the rocky shore.
 
 Keywords:
-cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, natural lighting, striped fur, resting, cushioned fabric, domestic scene
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.35s
-- *Generation time:* 2.39s
-- *Total time:* 3.75s
-- *Input validation time:* 8.8e-05
-- *Prompt preparation time:* 0.000355
-- *First-token latency:* 0.748
-- *Cleanup time:* 0.0853
-- *Prompt tokens:* 1,070
-- *Generation tokens:* 106
-- *Total tokens:* 1,176
-- *Prompt throughput (raw):* 1,430 tok/s
-- *Generation throughput (raw):* 64.9 tok/s
-- *Peak memory:* 10
-- *Active memory:* 8.4
-- *Cache memory:* 0.23
-- *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00534
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 2910
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-nvfp4/snapshots/28777b889d841a86369c736175cb77258c8134b2
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-**Title:**
-Relaxed Tabby Kittens on Pink Cushion
-
-**Description:**
-Two tabby kittens lie stretched out on a pink cushion, positioned near remote controls. Their relaxed postures and soft fur highlight a calm, indoor setting.
-
-**Keywords:**
-kittens, tabby, pink cushion, remote controls, relaxed posture, indoor setting, soft fur, calm atmosphere, stretched out, pink fabric, resting, domestic scene, fur patterns, cushioned surface, laid-back pose, domestic pets
+Felixstowe, Suffolk, UK, GBR, Europe, seafront, war memorial, ocean view, classical column, engraved plaques, bronze eagle, lamp posts, string lights, rocky shore, coastal path, 2026-08-13, 51.959333°N, 1.349050°E
 </pre>
 
 </details>
@@ -490,27 +469,27 @@ kittens, tabby, pink cushion, remote controls, relaxed posture, indoor setting, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.00s
-- *Generation time:* 0.72s
-- *Total time:* 1.73s
-- *Input validation time:* 7.11e-05
-- *Prompt preparation time:* 0.00675
-- *First-token latency:* 0.254
-- *Cleanup time:* 0.0767
-- *Prompt tokens:* 1,069
-- *Generation tokens:* 85
-- *Total tokens:* 1,154
-- *Prompt throughput (raw):* 4,214 tok/s
-- *Generation throughput (raw):* 194 tok/s
-- *Peak memory:* 4.5
+- *Model load time:* 0.96s
+- *Generation time:* 2.27s
+- *Total time:* 3.24s
+- *Input validation time:* 6.69e-05
+- *Prompt preparation time:* 0.00671
+- *First-token latency:* 1.14
+- *Cleanup time:* 0.079
+- *Prompt tokens:* 3,190
+- *Generation tokens:* 123
+- *Total tokens:* 3,313
+- *Prompt throughput (raw):* 2,805 tok/s
+- *Generation throughput (raw):* 188 tok/s
+- *Peak memory:* 9.0
 - *Active memory:* 2.8
-- *Cache memory:* 0.16
+- *Cache memory:* 0.41
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.0056
+- *Post-cleanup active memory:* 0.00562
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 2909
+- *Rendered prompt characters:* 3569
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -527,354 +506,14 @@ kittens, tabby, pink cushion, remote controls, relaxed posture, indoor setting, 
 
 <pre class="model-output-readable">
 Title:
-Two Sleeping Tabby Kittens on Pink Couch
+War Memorial Column at Felixstowe Seafront
 
 Description:
-Two young tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft lighting casts gentle shadows across their fur.
+A tall, classical column stands prominently at the seafront of Felixstowe, England, dedicated to honoring fallen soldiers. It features inscriptions, a sculpted eagle atop, and is surrounded by coastal rocks under clear blue skies with decorative string lights strung nearby.
 
 Keywords:
-pink sofa, remote controls, young tabbies, indoor setting, cozy scene, pet photoshoot, domestic ambiance, soft lighting, pet accessories, resting cats
+war memorial, Felixstowe, seafront, Suffolk, UK, coastal column, commemorative plaque, eagle sculpture, maritime setting, string lights, historic monument, East Anglian coast, UK GBR, coastal defense, memorial inscriptions, coastal lighting.
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### mlx-community/Molmo-7B-D-0924-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo-7B-D-0924-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.18s
-- *Generation time:* 2.10s
-- *Total time:* 3.29s
-- *Input validation time:* 7.91e-05
-- *Prompt preparation time:* 0.00164
-- *First-token latency:* 0.42
-- *Cleanup time:* 0.0813
-- *Prompt tokens:* 843
-- *Generation tokens:* 89
-- *Total tokens:* 932
-- *Prompt throughput (raw):* 2,007 tok/s
-- *Generation throughput (raw):* 53.6 tok/s
-- *Peak memory:* 11
-- *Active memory:* 9.0
-- *Cache memory:* 0.08
-- *Model-load active memory:* 9.04
-- *Post-cleanup active memory:* 0.00592
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 468
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.molmo.processing_molmo.MolmoProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 90a14ed7a230088904c7556fbe6d67b295c33f5f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo-7B-D-0924-8bit/snapshots/90a14ed7a230088904c7556fbe6d67b295c33f5f
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Two feline friends on a cozy sofa.
-
-Description: Two cats, one larger and one smaller, rest on a pink blanket-covered sofa. One wears a green collar. Two remote controls lie between them. The scene is bathed in warm, artificial light.
-
-Keywords: Pink, sofa, cats, remote controls, green collar, artificial light, cozy, rest, different sizes, close-up, domestic, feline, companionship
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmopoint-8b-fp16"></a>
-
-### mlx-community/MolmoPoint-8B-fp16
-
-<details>
-<summary>Complete evidence: mlx-community/MolmoPoint-8B-fp16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.33s
-- *Generation time:* 13.90s
-- *Total time:* 16.24s
-- *Input validation time:* 7.81e-05
-- *Prompt preparation time:* 0.00511
-- *First-token latency:* 0.853
-- *Cleanup time:* 0.108
-- *Prompt tokens:* 860
-- *Generation tokens:* 78
-- *Total tokens:* 938
-- *Prompt throughput (raw):* 1,008 tok/s
-- *Generation throughput (raw):* 6.04 tok/s
-- *Peak memory:* 23
-- *Active memory:* 19
-- *Cache memory:* 4.3
-- *Model-load active memory:* 17.4
-- *Post-cleanup active memory:* 0.00654
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 510
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a60033b4e4813fb53df4c7523857d2ec972c7d9
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-fp16/snapshots/0a60033b4e4813fb53df4c7523857d2ec972c7d9
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats Resting on Pink Blanket with Remote Controls
-
-Description: Two cats are sleeping on a pink blanket. A pink couch is visible in the background. Two remote controls are placed on the blanket. The cats appear to be in a relaxed state.
-
-Keywords: cats, pink blanket, remote controls, couch, sleeping, relaxed, feline, domestic, comfortable, rest
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.93s
-- *Generation time:* 1.45s
-- *Total time:* 2.39s
-- *Input validation time:* 0.000108
-- *Prompt preparation time:* 0.00114
-- *First-token latency:* 0.203
-- *Cleanup time:* 0.083
-- *Prompt tokens:* 883
-- *Generation tokens:* 68
-- *Total tokens:* 951
-- *Prompt throughput (raw):* 4,349 tok/s
-- *Generation throughput (raw):* 57.7 tok/s
-- *Peak memory:* 9.3
-- *Active memory:* 8.3
-- *Cache memory:* 0.42
-- *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00711
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 493
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats Sleeping on Sofa
-
-Description: Two cats are sleeping on a pink sofa with remote controls beside them.
-
-Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
-
-### mlx-community/Qwen3-VL-2B-Instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.89s
-- *Generation time:* 0.73s
-- *Total time:* 1.62s
-- *Input validation time:* 7.5e-05
-- *Prompt preparation time:* 0.000314
-- *First-token latency:* 0.0843
-- *Cleanup time:* 0.0855
-- *Prompt tokens:* 409
-- *Generation tokens:* 82
-- *Total tokens:* 491
-- *Prompt throughput (raw):* 4,855 tok/s
-- *Generation throughput (raw):* 135 tok/s
-- *Peak memory:* 5.3
-- *Active memory:* 4.3
-- *Cache memory:* 0.07
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00773
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 544
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Instruct-bf16/snapshots/c8a67a84327484ba87f5ec4f8fb927cdafd791aa
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two cats on a pink couch
-
-Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.
-
-Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, comfort, pet, blanket, lounging
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 6.76s
-- *Total time:* 7.54s
-- *Input validation time:* 7.12e-05
-- *Prompt preparation time:* 0.0115
-- *First-token latency:* 0.0865
-- *Cleanup time:* 0.0831
-- *Prompt tokens:* 411
-- *Generation tokens:* 872
-- *Total tokens:* 1,283
-- *Prompt throughput (raw):* 4,754 tok/s
-- *Generation throughput (raw):* 131 tok/s
-- *Peak memory:* 5.3
-- *Active memory:* 4.3
-- *Cache memory:* 0.19
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00805
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 552
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
-
-Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
-
-Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
-
-Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
-
-Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
-
-Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
-&lt;/think&gt;
-
-Title:
-Two tabby cats resting on pink couch with remotes
-
-Description:
-Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
-
-Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote controls" but need to check. Wait, the problem says "British-English catalogue metadata", so maybe "Two tabby cats resting on pink couch with remote controls" but let's count: Two tabby cats resting on pink couch with remote controls is 10 words. That's good.
-
-Next, the description. Need 1-2 sentences. Main subject: two cats. Setting: pink couch. Action: resting. Lighting: bright (since it's a photo, probably natural light). Distinctive details: tabby patterns, remotes. So "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby."
-
-Wait, but the problem says "omit uncertain details and unsupported identity, location, event, brand, species, period, or intent." So species is cat, which is known, so okay. The remotes are visible, so "two remote controls" is okay. Lighting: the image is bright, so "bright lighting" or "natural light". Let's make it concise.
-
-Description: "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby under the couch."
-
-Wait, but the problem says "1-2 sentences". Let's check: "Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby." That's two sentences. Wait, no, it's one sentence. Wait, the example in the problem says "1-2 sentences". So maybe "Two tabby cats rest on a pink couch, one with a green collar, while two remote controls lie nearby." That's one sentence. Wait, but the problem says "1-2 sentences", so that's okay.
-
-Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's see: cats, tabby, pink couch, remote controls, resting, two, couch, bright, collar, green, natural light. Wait, but need to be unique. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light. Wait, but need 10-18. Let's check the image: two cats, pink couch, remotes, tabby pattern, resting, collar (green), bright lighting. So keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but need to be unique. Let's make sure they are distinct. Let's list: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two. Wait, but "two" is a number, but maybe "two" is okay. Wait, the problem says "unique, comma-separated keywords". So "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but that's 11. Wait, maybe "cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two" but let's check if they are unique. Yes, all are unique. Wait, but maybe "two" is redundant. Wait, the problem says "unique", so "two" is a count, but maybe it's okay. Wait, but let's see. Let's check the image: two cats, so "two" is a keyword. Let's make sure. Let's list: cats, tabby, pink
-</think>
-
-Title:
-Two tabby cats resting on pink couch with remotes
-
-Description:
-Two tabby cats rest on a bright pink couch, one with a green collar, while two remote controls lie nearby under the couch.
-
-Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, light, two
-```
-
-</details>
 
 </details>
 
@@ -892,27 +531,27 @@ Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, lig
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.45s
-- *Generation time:* 1.08s
-- *Total time:* 3.55s
-- *Input validation time:* 7.14e-05
-- *Prompt preparation time:* 0.0142
-- *First-token latency:* 0.25
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 421
-- *Generation tokens:* 89
-- *Total tokens:* 510
-- *Prompt throughput (raw):* 1,686 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory:* 21
+- *Model load time:* 2.53s
+- *Generation time:* 66.16s
+- *Total time:* 68.72s
+- *Input validation time:* 9.43e-05
+- *Prompt preparation time:* 0.0149
+- *First-token latency:* 64.5
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 95
+- *Total tokens:* 16,577
+- *Prompt throughput (raw):* 256 tok/s
+- *Generation throughput (raw):* 109 tok/s
+- *Peak memory:* 24
 - *Active memory:* 21
-- *Cache memory:* 0.10
+- *Cache memory:* 0.88
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00855
+- *Post-cleanup active memory:* 0.00857
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -928,11 +567,11 @@ Keywords: cats, tabby, pink, couch, remote, resting, collar, green, natural, lig
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Sleeping on Pink Sofa
+Title: War Memorial Column on Felixstowe Seafront
 
-Description: Two tabby cats lie asleep on a bright pink sofa, each positioned near a white remote control. The scene is lit by even indoor lighting, highlighting the cats’ striped fur and relaxed postures.
+Description: A tall stone column topped with a bronze eagle stands on a plinth inscribed with names, situated on a paved promenade overlooking the sea under a clear blue sky.
 
-Keywords: tabby cats, pink sofa, sleeping cats, remote controls, domestic interior, feline relaxation, striped fur, pet photography, cozy setting, animal stillness
+Keywords: Felixstowe, seafront, war memorial, column, eagle, monument, England, UK, Suffolk, East Suffolk, promenade, ocean, blue sky, stone, sculpture, commemoration, coastal, architecture
 </pre>
 
 </details>
@@ -951,27 +590,27 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, domestic interi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.47s
-- *Generation time:* 1.15s
-- *Total time:* 2.63s
-- *Input validation time:* 9.3e-05
-- *Prompt preparation time:* 0.00066
-- *First-token latency:* 0.288
-- *Cleanup time:* 0.085
-- *Prompt tokens:* 421
-- *Generation tokens:* 86
-- *Total tokens:* 507
-- *Prompt throughput (raw):* 1,464 tok/s
-- *Generation throughput (raw):* 101 tok/s
-- *Peak memory:* 7.1
+- *Model load time:* 1.38s
+- *Generation time:* 75.11s
+- *Total time:* 76.50s
+- *Input validation time:* 7.71e-05
+- *Prompt preparation time:* 0.000523
+- *First-token latency:* 73
+- *Cleanup time:* 0.0975
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 113
+- *Total tokens:* 16,595
+- *Prompt throughput (raw):* 226 tok/s
+- *Generation throughput (raw):* 91.2 tok/s
+- *Peak memory:* 10.0
 - *Active memory:* 6.6
-- *Cache memory:* 0.11
+- *Cache memory:* 1.2
 - *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00906
+- *Post-cleanup active memory:* 0.00909
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -987,58 +626,58 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, domestic interi
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Sleeping on a Pink Couch
+Title: Felixstowe Seafront Memorial Column with Eagle
 
-Description: Two tabby cats are lying on a pink couch, each with a remote control nearby. The scene is well-lit, highlighting the texture of the couch and the fur of the cats.
+Description: A tall stone column topped with an eagle statue stands on a seafront promenade in Felixstowe, England, under clear blue skies, with the sea and festive string lights visible in the background.
 
-Keywords: cats, tabby, pink couch, remote control, sleeping, fur, texture, lighting, comfort, relaxation, domestic, pet, rest, cozy, home
+Keywords: Felixstowe, seafront, memorial column, eagle statue, stone pillar, coastal view, blue sky, string lights, rock breakwater, public space, East Suffolk, England, UK, GBR, Europe, 2026-08-13
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+<a id="model-mlx-community-qwen38-27b-4bit"></a>
 
-### mlx-community/Qwen3.6-27B-mxfp8
+### mlx-community/Qwen3.8-27B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
+<summary>Complete evidence: mlx-community/Qwen3.8-27B-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.20s
-- *Generation time:* 6.68s
-- *Total time:* 9.90s
-- *Input validation time:* 7.1e-05
-- *Prompt preparation time:* 0.0145
-- *First-token latency:* 0.841
-- *Cleanup time:* 0.156
-- *Prompt tokens:* 421
-- *Generation tokens:* 107
-- *Total tokens:* 528
-- *Prompt throughput (raw):* 501 tok/s
-- *Generation throughput (raw):* 18.4 tok/s
-- *Peak memory:* 30
-- *Active memory:* 29
-- *Cache memory:* 0.23
-- *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.00957
+- *Model load time:* 2.06s
+- *Generation time:* 99.55s
+- *Total time:* 101.65s
+- *Input validation time:* 9.83e-05
+- *Prompt preparation time:* 0.0151
+- *First-token latency:* 93.8
+- *Cleanup time:* 0.145
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 127
+- *Total tokens:* 16,609
+- *Prompt throughput (raw):* 176 tok/s
+- *Generation throughput (raw):* 25.9 tok/s
+- *Peak memory:* 22
+- *Active memory:* 18
+- *Cache memory:* 1.8
+- *Model-load active memory:* 16.1
+- *Post-cleanup active memory:* 0.0101
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved model revision:* 3e6447f082e89cc7f0bc6e5441afd38dfce760ff
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-4bit/snapshots/3e6447f082e89cc7f0bc6e5441afd38dfce760ff
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1046,11 +685,74 @@ Keywords: cats, tabby, pink couch, remote control, sleeping, fur, texture, light
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Resting on Pink Sofa
+Title:
+War Memorial Column on the Felixstowe Seafront
 
-Description: Two tabby cats are lying on a pink sofa, one near a white remote control and the other beside a blue remote. The scene is brightly lit, highlighting the cats' striped fur and relaxed postures.
+Description:
+A tall, fluted stone column topped with a bronze eagle stands on a stepped plinth inscribed with names, set against a calm blue sea and clear sky. The monument is situated on a paved promenade with a blue lamp post and string lights nearby, while pedestrians walk along the rocky shoreline in the background.
 
-Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, bright lighting, relaxed posture, domestic setting, comfortable, feline, lounging, indoor, soft fabric, casual, pet, home environment, serene, cozy
+Keywords:
+Felixstowe, seafront, war memorial, column, eagle, bronze, stone, Suffolk, England, UK, promenade, ocean, sky, monument, street lamp, pedestrians, coastal, architecture
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.64s
+- *Generation time:* 1.77s
+- *Total time:* 2.42s
+- *Input validation time:* 7.39e-05
+- *Prompt preparation time:* 0.00215
+- *First-token latency:* 0.437
+- *Cleanup time:* 0.09
+- *Prompt tokens:* 1,400
+- *Generation tokens:* 89
+- *Total tokens:* 1,489
+- *Prompt throughput (raw):* 3,203 tok/s
+- *Generation throughput (raw):* 126 tok/s
+- *Peak memory:* 5.5
+- *Active memory:* 4.5
+- *Cache memory:* 0.35
+- *Model-load active memory:* 4.5
+- *Post-cleanup active memory:* 0.0102
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1164
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title:
+Seafront, Felixstowe, England, UK, GBR, Europe
+Description:
+A tall, white column stands on a rocky beach, overlooking the ocean. The column is topped with a statue of an eagle, and there are several plaques on the column.
+Keywords:
+Felixstowe, England, UK, GBR, Europe, Column, Eagle, Plaques, Beach, Ocean
 </pre>
 
 </details>
@@ -1069,27 +771,27 @@ Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, bright l
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 8.24s
-- *Generation time:* 7.39s
-- *Total time:* 15.65s
-- *Input validation time:* 9.62e-05
-- *Prompt preparation time:* 0.0166
-- *First-token latency:* 4.91
-- *Cleanup time:* 0.214
-- *Prompt tokens:* 286
-- *Generation tokens:* 105
-- *Total tokens:* 391
-- *Prompt throughput (raw):* 58.2 tok/s
-- *Generation throughput (raw):* 43.4 tok/s
-- *Peak memory:* 65
+- *Model load time:* 6.13s
+- *Generation time:* 18.72s
+- *Total time:* 24.87s
+- *Input validation time:* 7.87e-05
+- *Prompt preparation time:* 0.014
+- *First-token latency:* 15.5
+- *Cleanup time:* 0.211
+- *Prompt tokens:* 3,468
+- *Generation tokens:* 114
+- *Total tokens:* 3,582
+- *Prompt throughput (raw):* 224 tok/s
+- *Generation throughput (raw):* 44.0 tok/s
+- *Peak memory:* 70
 - *Active memory:* 63
-- *Cache memory:* 0.11
+- *Cache memory:* 0.39
 - *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.00995
+- *Post-cleanup active memory:* 0.0105
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 550
+- *Rendered prompt characters:* 1210
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1106,131 +808,13 @@ Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, bright l
 
 <pre class="model-output-readable">
 Title:
-Two cats sleeping on a pink blanket
+Column monument on Felixstowe seafront
 
 Description:
-Two cats are lying on a pink blanket on a couch, with remote controls placed nearby. One cat is smaller with a green collar, while the other is larger with a striped coat. Both appear relaxed and asleep under indoor lighting.
+A tall column monument topped with a bird statue stands on a paved seafront area in Felixstowe, Suffolk, England, overlooking the ocean under a clear blue sky, with two men walking nearby and decorative streetlights and a WiFi sign present.
 
 Keywords:
-cats, pink blanket, couch, remote controls, sleeping, striped coat, green collar, indoor, pets, relaxation, two animals, soft fabric, remote control, lying down, home setting, feline, nap, cozy
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.14s
-- *Generation time:* 1.95s
-- *Total time:* 3.09s
-- *Input validation time:* 0.000104
-- *Prompt preparation time:* 0.000601
-- *First-token latency:* 0.261
-- *Cleanup time:* 0.0973
-- *Prompt tokens:* 511
-- *Generation tokens:* 106
-- *Total tokens:* 617
-- *Prompt throughput (raw):* 1,959 tok/s
-- *Generation throughput (raw):* 65.9 tok/s
-- *Peak memory:* 10
-- *Active memory:* 9.5
-- *Cache memory:* 0.06
-- *Model-load active memory:* 9.46
-- *Post-cleanup active memory:* 0.0103
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 602
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Cats Sleeping on Pink Couch with Remotes
-
-Description: Two tabby cats lie on a pink couch, one curled up, the other stretched out, with a remote control between them. The setting is indoors, with soft lighting highlighting their relaxed postures. The couch's vibrant pink fabric contrasts with the cats' striped fur.
-
-Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxed, striped fur, soft lighting, domestic, feline, comfort, companionship, home setting.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.25s
-- *Generation time:* 3.78s
-- *Total time:* 6.04s
-- *Input validation time:* 0.000105
-- *Prompt preparation time:* 0.00288
-- *First-token latency:* 0.789
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 379
-- *Generation tokens:* 90
-- *Total tokens:* 469
-- *Prompt throughput (raw):* 480 tok/s
-- *Generation throughput (raw):* 30.3 tok/s
-- *Peak memory:* 18
-- *Active memory:* 16
-- *Cache memory:* 0.33
-- *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.0108
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 527
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Tabby Cats Resting on Pink Fabric
-
-Description: Two tabby cats lie prone on a pink fabric surface, each with a remote control nearby. Both cats are asleep with paws extended, exhibiting striped fur patterns.
-
-Keywords: cats, tabby, pink, fabric, remote control, sleeping, lying down, indoors, domestic animals, striped, paws, feline, resting, horizontal, two animals, close-up, daylight, cushions.
+Felixstowe, Suffolk, England, UK, seafront, column monument, bird statue, ocean view, blue sky, streetlights, WiFi sign, coastal promenade, war memorial, public monument, East Suffolk, Europe
 </pre>
 
 </details>
@@ -1249,27 +833,27 @@ Keywords: cats, tabby, pink, fabric, remote control, sleeping, lying down, indoo
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.41s
-- *Generation time:* 0.97s
-- *Total time:* 3.41s
-- *Input validation time:* 8.72e-05
-- *Prompt preparation time:* 0.0214
-- *First-token latency:* 0.374
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 390
-- *Generation tokens:* 73
-- *Total tokens:* 463
-- *Prompt throughput (raw):* 1,043 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Model load time:* 2.39s
+- *Generation time:* 1.69s
+- *Total time:* 4.11s
+- *Input validation time:* 6.92e-05
+- *Prompt preparation time:* 0.0216
+- *First-token latency:* 0.445
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 580
+- *Generation tokens:* 98
+- *Total tokens:* 678
+- *Prompt throughput (raw):* 1,304 tok/s
+- *Generation throughput (raw):* 130 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
-- *Cache memory:* 0.16
+- *Cache memory:* 0.20
 - *Model-load active memory:* 15.4
-- *Post-cleanup active memory:* 0.0119
+- *Post-cleanup active memory:* 0.0124
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 526
+- *Rendered prompt characters:* 1186
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1285,11 +869,9 @@ Keywords: cats, tabby, pink, fabric, remote control, sleeping, lying down, indoo
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats lying on a pink surface
-
-Description: Two tabby cats lie on a bright pink fabric surface next to two remote controls. The cats are positioned with their heads facing in opposite directions.
-
-Keywords: tabby, cats, pink, fabric, remote control, lying, indoor, domestic, striped, fur, two, pets, bright, daylight
+Title: War Memorial Column on Felixstowe Seafront
+Description: A tall stone war memorial column topped with a bird sculpture stands against a clear blue sky on the Felixstowe seafront. The monument features inscribed plaques and is set against a backdrop of the sea and rocky coastline.
+Keywords: Felixstowe, Suffolk, England, UK, war memorial, column, monument, seafront, coast, sea, blue sky, stone, sculpture, memorial, East Suffolk, maritime, daylight
 </pre>
 
 </details>
@@ -1308,27 +890,27 @@ Keywords: tabby, cats, pink, fabric, remote control, lying, indoor, domestic, st
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.64s
-- *Generation time:* 3.84s
-- *Total time:* 6.49s
-- *Input validation time:* 0.000105
-- *Prompt preparation time:* 0.000353
-- *First-token latency:* 0.854
-- *Cleanup time:* 0.135
-- *Prompt tokens:* 390
-- *Generation tokens:* 80
-- *Total tokens:* 470
-- *Prompt throughput (raw):* 457 tok/s
-- *Generation throughput (raw):* 27.0 tok/s
-- *Peak memory:* 19
+- *Model load time:* 2.67s
+- *Generation time:* 5.53s
+- *Total time:* 8.21s
+- *Input validation time:* 7.44e-05
+- *Prompt preparation time:* 0.000368
+- *First-token latency:* 1.03
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 580
+- *Generation tokens:* 111
+- *Total tokens:* 691
+- *Prompt throughput (raw):* 564 tok/s
+- *Generation throughput (raw):* 27.7 tok/s
+- *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.59
+- *Cache memory:* 0.76
 - *Model-load active memory:* 18.4
-- *Post-cleanup active memory:* 0.0124
+- *Post-cleanup active memory:* 0.0129
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 526
+- *Rendered prompt characters:* 1186
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1344,9 +926,9 @@ Keywords: tabby, cats, pink, fabric, remote control, lying, indoor, domestic, st
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two tabby cats lying on a pink blanket
-Description: Two tabby cats lie on a pink blanket atop a red sofa next to two remote controls. The scene is captured under bright, direct lighting.
-Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets, indoor, fabric, stripes, animals, furniture, home, resting, soft, textile
+Title: War Memorial on the Seafront in Felixstowe, Suffolk
+Description: A tall, fluted Corinthian column topped with an eagle sculpture stands on the seafront in Felixstowe, England, under a clear blue sky. The monument features inscribed plaques at its base, overlooking the coast and sea.
+Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, war memorial, monument, Corinthian column, eagle sculpture, coast, seaside, public art, commemorative, blue sky, outdoor, Europe, gbr
 </pre>
 
 </details>
@@ -1365,27 +947,27 @@ Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.70s
-- *Generation time:* 3.18s
-- *Total time:* 4.90s
-- *Input validation time:* 9.17e-05
-- *Prompt preparation time:* 0.00824
-- *First-token latency:* 0.963
-- *Cleanup time:* 0.096
-- *Prompt tokens:* 1,335
-- *Generation tokens:* 89
-- *Total tokens:* 1,424
-- *Prompt throughput (raw):* 1,386 tok/s
-- *Generation throughput (raw):* 40.4 tok/s
-- *Peak memory:* 15
+- *Model load time:* 1.67s
+- *Generation time:* 5.23s
+- *Total time:* 6.91s
+- *Input validation time:* 7.51e-05
+- *Prompt preparation time:* 0.00253
+- *First-token latency:* 2.31
+- *Cleanup time:* 0.0961
+- *Prompt tokens:* 3,429
+- *Generation tokens:* 99
+- *Total tokens:* 3,528
+- *Prompt throughput (raw):* 1,484 tok/s
+- *Generation throughput (raw):* 39.7 tok/s
+- *Peak memory:* 16
 - *Active memory:* 13
-- *Cache memory:* 0.27
+- *Cache memory:* 0.64
 - *Model-load active memory:* 13.5
-- *Post-cleanup active memory:* 0.0144
+- *Post-cleanup active memory:* 0.0149
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 472
+- *Rendered prompt characters:* 1132
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1401,304 +983,15 @@ Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets
 *Readable output:*
 
 <pre class="model-output-readable">
-### Title:
-Two Cats Lounging on Red Couch
-
-### Description:
-Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.
-
-### Keywords:
-cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic, paws, stretch, lounge, resting, home, soft, purring, peaceful
-</pre>
-
-</details>
-
----
-
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
-
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
-
-<details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 7 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.45s
-- *Generation time:* 0.17s
-- *Total time:* 0.62s
-- *Input validation time:* 0.0018
-- *Prompt preparation time:* 0.00611
-- *First-token latency:* 0.0363
-- *Cleanup time:* 0.0584
-- *Prompt tokens:* 350
-- *Generation tokens:* 63
-- *Total tokens:* 413
-- *Prompt throughput (raw):* 9,637 tok/s
-- *Generation throughput (raw):* 516 tok/s
-- *Peak memory:* 1.4
-- *Active memory:* 0.90
-- *Cache memory:* 0.02
-- *Model-load active memory:* 0.897
-- *Post-cleanup active memory:* 0.000132
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 523
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
 Title:
-Cats on a Pink Sofa
+Seafront Monument in Felixstowe, England
 
 Description:
-Two cats are lying on a pink sofa, one is stretched out with its paws extended, while the other is curled up with its head resting on the sofa.
+A tall column monument with an eagle statue at the top stands prominently by the seaside in Felixstowe, England, with a clear blue sky and calm sea in the background.
 
 Keywords:
-cats, sofa, pink, relaxation, fur, stripes, sleeping
+Felixstowe, England, UK, seafront, monument, column, eagle statue, seaside, blue sky, calm sea, coastal, memorial, stone, plaque, commemorative, seascape, East Suffolk
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-<details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 19 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.10s
-- *Generation time:* 4.01s
-- *Total time:* 6.12s
-- *Input validation time:* 8.42e-05
-- *Prompt preparation time:* 0.00663
-- *First-token latency:* 0.744
-- *Cleanup time:* 0.0917
-- *Prompt tokens:* 537
-- *Generation tokens:* 100
-- *Total tokens:* 637
-- *Prompt throughput (raw):* 721 tok/s
-- *Generation throughput (raw):* 30.9 tok/s
-- *Peak memory:* 20
-- *Active memory:* 18
-- *Cache memory:* 0.14
-- *Model-load active memory:* 18
-- *Post-cleanup active memory:* 0.000968
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 472
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Two cats resting on a pink sofa
-
-Description:
-Two tabby cats are lying on a pink sofa, one on its back and the other on its side, with a remote control nearby. The lighting is natural, and the cats have distinctive striped fur patterns.
-
-Keywords: cats, tabby, sofa, pink, remote control, resting, lying, natural lighting, striped fur, indoor, furniture, pets, relaxation, home, domestic, fur, pattern, remote, control
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 33 terms (requested 10-18); Duplicate
-  keywords: couch, pet, sofa, remote, television, television remote, blurry,
-  indoor, home, furniture, domestic cat, animal sleeping
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 4.85s
-- *Generation time:* 18.62s
-- *Total time:* 23.49s
-- *Input validation time:* 8.9e-05
-- *Prompt preparation time:* 0.00769
-- *First-token latency:* 1.21
-- *Cleanup time:* 0.179
-- *Prompt tokens:* 545
-- *Generation tokens:* 944
-- *Total tokens:* 1,489
-- *Prompt throughput (raw):* 450 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
-- *Peak memory:* 60
-- *Active memory:* 59
-- *Cache memory:* 0.10
-- *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00118
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 662
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
-
-Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
-
-Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
-
-Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
-
-Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all unique and relevant. I'll remove "couch" and "sofa" since they are the same thing. I'll also remove "television" and "television remote" because the remote is the only thing that is related to a television. I'll also remove "blurry" because it is not a fact. I'll also remove "pet" and "domestic cat" because they are too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove "television" because it is too general. I'll also remove "television remote" because it is too general. I'll also remove "blurry" because it is not a fact. I'll also remove "indoor" because it is too general. I'll also remove "pet" because it is too general. I'll also remove "domestic cat" because it is too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove
-&lt;/think&gt;
-
-Title: Two cats sleeping on a red couch with a remote
-
-Description: A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors.
-
-Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet, domestic cat, animal sleeping
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
-
-Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
-
-Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
-
-Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
-
-Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all unique and relevant. I'll remove "couch" and "sofa" since they are the same thing. I'll also remove "television" and "television remote" because the remote is the only thing that is related to a television. I'll also remove "blurry" because it is not a fact. I'll also remove "pet" and "domestic cat" because they are too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove "television" because it is too general. I'll also remove "television remote" because it is too general. I'll also remove "blurry" because it is not a fact. I'll also remove "indoor" because it is too general. I'll also remove "pet" because it is too general. I'll also remove "domestic cat" because it is too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove
-</think>
-
-Title: Two cats sleeping on a red couch with a remote
-
-Description: A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors.
-
-Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet, domestic cat, animal sleeping
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.41s
-- *Generation time:* 1.01s
-- *Total time:* 2.44s
-- *Input validation time:* 0.000104
-- *Prompt preparation time:* 0.00807
-- *First-token latency:* 0.319
-- *Cleanup time:* 0.0939
-- *Prompt tokens:* 499
-- *Generation tokens:* 61
-- *Total tokens:* 560
-- *Prompt throughput (raw):* 1,563 tok/s
-- *Generation throughput (raw):* 89.8 tok/s
-- *Peak memory:* 7.8
-- *Active memory:* 6.8
-- *Cache memory:* 0.05
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00211
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Cats on Pink Sofa
-Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.
-Keywords: two tabby cats, pink fabric sofa, remote control, head down
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title: Two Cats on Pink Sofa
-Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down. 
-Keywords: two tabby cats, pink fabric sofa, remote control, head down
-```
-
-</details>
 
 </details>
 
@@ -1714,29 +1007,30 @@ Keywords: two tabby cats, pink fabric sofa, remote control, head down
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Title has
+  4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 7.65s
-- *Generation time:* 6.51s
-- *Total time:* 14.17s
-- *Input validation time:* 0.0001
-- *Prompt preparation time:* 0.00735
-- *First-token latency:* 4.72
-- *Cleanup time:* 0.228
-- *Prompt tokens:* 499
-- *Generation tokens:* 89
-- *Total tokens:* 588
-- *Prompt throughput (raw):* 106 tok/s
-- *Generation throughput (raw):* 49.9 tok/s
-- *Peak memory:* 63
+- *Model load time:* 5.65s
+- *Generation time:* 17.66s
+- *Total time:* 23.32s
+- *Input validation time:* 7.14e-05
+- *Prompt preparation time:* 0.0072
+- *First-token latency:* 14.8
+- *Cleanup time:* 0.209
+- *Prompt tokens:* 6,311
+- *Generation tokens:* 96
+- *Total tokens:* 6,407
+- *Prompt throughput (raw):* 425 tok/s
+- *Generation throughput (raw):* 40.9 tok/s
+- *Peak memory:* 78
 - *Active memory:* 62
-- *Cache memory:* 0.16
+- *Cache memory:* 1.4
 - *Model-load active memory:* 61.9
 - *Post-cleanup active memory:* 0.00243
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 553
+- *Rendered prompt characters:* 1213
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1752,21 +1046,146 @@ Keywords: two tabby cats, pink fabric sofa, remote control, head down
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: Seafront monument, Felixstowe, England
+Description: A tall stone column with an eagle statue atop stands on a paved plaza by the sea, with rocky shores, the ocean, and two men walking in the background under a clear blue sky.
+Keywords: seafront, Felixstowe, England, UK, GBR, Europe, monument, column, eagle statue, stone, plaza, ocean, rocky shores, clear sky, East Suffolk, Suffolk&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+<|begin_of_box|>Title: Seafront monument, Felixstowe, England
+Description: A tall stone column with an eagle statue atop stands on a paved plaza by the sea, with rocky shores, the ocean, and two men walking in the background under a clear blue sky.
+Keywords: seafront, Felixstowe, England, UK, GBR, Europe, monument, column, eagle statue, stone, plaza, ocean, rocky shores, clear sky, East Suffolk, Suffolk<|end_of_box|>
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 1.89s
+- *Generation time:* 6.59s
+- *Total time:* 8.49s
+- *Input validation time:* 7.88e-05
+- *Prompt preparation time:* 0.00149
+- *First-token latency:* 1.08
+- *Cleanup time:* 0.0986
+- *Prompt tokens:* 2,587
+- *Generation tokens:* 160
+- *Total tokens:* 2,747
+- *Prompt throughput (raw):* 2,387 tok/s
+- *Generation throughput (raw):* 32.6 tok/s
+- *Peak memory:* 18
+- *Active memory:* 17
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.00269
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1169
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Felixstowe Seafront Monument with Ocean View.
+Description: The image depicts a monument situated on the seafront in Felixstowe, England, UK. The monument is a tall, white column with a Doric column style, topped with a statue of an eagle. The column is surrounded by a base with inscriptions, and there is a staircase leading up to it. In the background, the vast expanse of the ocean can be seen, with two people standing on a rocky shore. The sky is clear, and the lighting suggests it is either early morning or late afternoon.
+Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, ocean, rocky shore, clear sky, Doric column style, inscriptions, staircase.&lt;end_of_utterance&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ Title: Felixstowe Seafront Monument with Ocean View.
+Description: The image depicts a monument situated on the seafront in Felixstowe, England, UK. The monument is a tall, white column with a Doric column style, topped with a statue of an eagle. The column is surrounded by a base with inscriptions, and there is a staircase leading up to it. In the background, the vast expanse of the ocean can be seen, with two people standing on a rocky shore. The sky is clear, and the lighting suggests it is either early morning or late afternoon. 
+Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, ocean, rocky shore, clear sky, Doric column style, inscriptions, staircase.<end_of_utterance>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### mlx-community/InternVL3-8B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/InternVL3-8B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 3 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
+- *Model load time:* 1.61s
+- *Generation time:* 4.32s
+- *Total time:* 5.94s
+- *Input validation time:* 6.62e-05
+- *Prompt preparation time:* 0.00202
+- *First-token latency:* 1.27
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 3,623
+- *Generation tokens:* 85
+- *Total tokens:* 3,708
+- *Prompt throughput (raw):* 2,844 tok/s
+- *Generation throughput (raw):* 34.1 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.28
+- *Model-load active memory:* 15.9
+- *Post-cleanup active memory:* 0.003
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1137
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3-8B-bf16/snapshots/e0df3dd79263467173214b67ef6d6a0cc5a475fd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Felixstowe Seafront Monument
+Description: A tall column with an eagle statue stands on a seafront promenade in Felixstowe, England, under clear blue skies, with people walking nearby and festive lights strung overhead.
+Keywords: Felixstowe, seafront, monument, eagle statue, column, promenade, England, Suffolk, UK, Europe, clear skies, festive lights, people, walking
+</pre>
 
 </details>
 
@@ -1782,29 +1201,30 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
+- *Observations:* Conversation-role control tokens remain visible; Keyword
+  list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.27s
-- *Generation time:* 118.24s
-- *Total time:* 121.53s
-- *Input validation time:* 8.77e-05
-- *Prompt preparation time:* 0.00211
-- *First-token latency:* 0.844
-- *Cleanup time:* 0.169
-- *Prompt tokens:* 489
-- *Generation tokens:* 562
-- *Total tokens:* 1,051
-- *Prompt throughput (raw):* 579 tok/s
-- *Generation throughput (raw):* 4.8 tok/s
+- *Model load time:* 3.24s
+- *Generation time:* 177.24s
+- *Total time:* 180.49s
+- *Input validation time:* 8.66e-05
+- *Prompt preparation time:* 0.00212
+- *First-token latency:* 1.37
+- *Cleanup time:* 0.155
+- *Prompt tokens:* 1,257
+- *Generation tokens:* 817
+- *Total tokens:* 2,074
+- *Prompt throughput (raw):* 921 tok/s
+- *Generation throughput (raw):* 4.66 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
-- *Cache memory:* 5.2
+- *Cache memory:* 5.8
 - *Model-load active memory:* 32.8
 - *Post-cleanup active memory:* 0.00365
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 659
+- *Rendered prompt characters:* 1319
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1820,33 +1240,270 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room.
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top. The background has the sea, clear blue sky, some people, and a coastal setting. The context gives the location as Felixstowe, England, UK, with coordinates and date/time. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, etc.
 
-First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+First, the title: need a 5-10 word title. Maybe "Felixstowe Seafront Memorial Column by the Coast". That's concise.
 
-Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+Description: 1-2 sentences. The image shows a tall stone column with an eagle atop, situated on a seafront in Felixstowe, England. The monument stands near the coast with the sea in the background, clear blue sky, and people nearby. Lighting is bright, sunny day.
 
-Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby
-Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.
-Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment&lt;|im_assistant|&gt;
+Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, coastal, stone monument, clear blue sky, people, rocks, streetlights, date 2026-08-13, time 17:14:49 UTC+01:00, GPS 51.959333°N, 1.349050°E, Adobe Stock, Any Vision, East Suffolk.
+
+Wait, the capture date and time and GPS are authoritative but not visible, so include them as facts. The hints include East Suffolk, so that's part of the location. Let's check the hints: hints have East Suffolk, England, UK, GBR, seafront, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also, the image has the sea, the column, eagle, people, rocks, streetlights, string lights, etc.
+
+So keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision.
+
+Now, structure:
+
+Title: Felixstowe Seafront Memorial Column by the Coast
+
+Description: A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision◁/think▷Title:
+Felixstowe Seafront Memorial Column by the Coast
+
+Description:
+A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision&lt;|im_assistant|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room. 
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top. The background has the sea, clear blue sky, some people, and a coastal setting. The context gives the location as Felixstowe, England, UK, with coordinates and date/time. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, etc.
 
-First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+First, the title: need a 5-10 word title. Maybe "Felixstowe Seafront Memorial Column by the Coast". That's concise.
 
-Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+Description: 1-2 sentences. The image shows a tall stone column with an eagle atop, situated on a seafront in Felixstowe, England. The monument stands near the coast with the sea in the background, clear blue sky, and people nearby. Lighting is bright, sunny day.
 
-Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby  
-Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.  
-Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment<|im_assistant|>
+Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, coastal, stone monument, clear blue sky, people, rocks, streetlights, date 2026-08-13, time 17:14:49 UTC+01:00, GPS 51.959333°N, 1.349050°E, Adobe Stock, Any Vision, East Suffolk.
+
+Wait, the capture date and time and GPS are authoritative but not visible, so include them as facts. The hints include East Suffolk, so that's part of the location. Let's check the hints: hints have East Suffolk, England, UK, GBR, seafront, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also, the image has the sea, the column, eagle, people, rocks, streetlights, string lights, etc.
+
+So keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision.
+
+Now, structure:
+
+Title: Felixstowe Seafront Memorial Column by the Coast
+
+Description: A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision◁/think▷Title:
+Felixstowe Seafront Memorial Column by the Coast
+
+Description:
+A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision<|im_assistant|>
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 4 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.88s
+- *Generation time:* 1.12s
+- *Total time:* 2.01s
+- *Input validation time:* 8.76e-05
+- *Prompt preparation time:* 0.00851
+- *First-token latency:* 0.258
+- *Cleanup time:* 0.0904
+- *Prompt tokens:* 964
+- *Generation tokens:* 75
+- *Total tokens:* 1,039
+- *Prompt throughput (raw):* 3,731 tok/s
+- *Generation throughput (raw):* 271 tok/s
+- *Peak memory:* 3.8
+- *Active memory:* 2.3
+- *Cache memory:* 0.06
+- *Model-load active memory:* 2.32
+- *Post-cleanup active memory:* 0.00483
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1200
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+
+&lt;/think&gt;
+
+Title:
+War Memorial by Seafront
+
+Description:
+A tall war memorial stands by the sea, under clear skies, with people walking nearby.
+
+Keywords: war memorial, seafront, Felixstowe, England, UK, gbr, ocean, rocks, pedestrians, clear sky, decorative lights, stone column, memorial plaques, Europe
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+
+</think>
+
+Title:
+War Memorial by Seafront
+
+Description:
+A tall war memorial stands by the sea, under clear skies, with people walking nearby.
+
+Keywords: war memorial, seafront, Felixstowe, England, UK, gbr, ocean, rocks, pedestrians, clear sky, decorative lights, stone column, memorial plaques, Europe
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.40s
+- *Generation time:* 5.45s
+- *Total time:* 6.85s
+- *Input validation time:* 0.000145
+- *Prompt preparation time:* 0.000348
+- *First-token latency:* 2.27
+- *Cleanup time:* 0.0882
+- *Prompt tokens:* 3,191
+- *Generation tokens:* 174
+- *Total tokens:* 3,365
+- *Prompt throughput (raw):* 1,404 tok/s
+- *Generation throughput (raw):* 64.0 tok/s
+- *Peak memory:* 15
+- *Active memory:* 8.4
+- *Cache memory:* 0.65
+- *Model-load active memory:* 8.43
+- *Post-cleanup active memory:* 0.00536
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 3570
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-nvfp4/snapshots/28777b889d841a86369c736175cb77258c8134b2
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+**Title:**
+*Felixstowe War Memorial, Seafront, Suffolk, UK*
+
+**Description:**
+A classical stone column monument dedicated to WWI and WWII servicemen stands on Felixstowe’s seafront, overlooking the North Sea under clear daylight. Decorated with inscriptions, plaques, and topped with a winged figure, it sits beside a modern lamp post adorned with festive lights, surrounded by rocky breakwaters and visited by pedestrians.
+
+**Keywords:**
+Felixstowe, Suffolk, United Kingdom, seafront, war memorial, WWI, WWII, stone column, winged figure, rocky breakwaters, North Sea, classical monument, inscriptions, festive lights, daylight, pedestrians, East Anglia, commemorative site, authoritative context, 2026-08-13
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### mlx-community/Molmo-7B-D-0924-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo-7B-D-0924-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo)
+- *Model load time:* 1.20s
+- *Generation time:* 3.86s
+- *Total time:* 5.06s
+- *Input validation time:* 6.85e-05
+- *Prompt preparation time:* 0.0016
+- *First-token latency:* 0.65
+- *Cleanup time:* 0.0858
+- *Prompt tokens:* 1,495
+- *Generation tokens:* 122
+- *Total tokens:* 1,617
+- *Prompt throughput (raw):* 2,300 tok/s
+- *Generation throughput (raw):* 52.7 tok/s
+- *Peak memory:* 11
+- *Active memory:* 9.0
+- *Cache memory:* 0.14
+- *Model-load active memory:* 9.04
+- *Post-cleanup active memory:* 0.00593
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1128
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.molmo.processing_molmo.MolmoProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 90a14ed7a230088904c7556fbe6d67b295c33f5f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo-7B-D-0924-8bit/snapshots/90a14ed7a230088904c7556fbe6d67b295c33f5f
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Felixstowe Seafront, England, UK, GBR
+
+Description: A man in a blue shirt walks along a concrete path near a tall white column with a bird statue, surrounded by rocks and water, with a blue pole and string lights in the background. The scene is bathed in warm sunlight, creating a picturesque coastal atmosphere.
+
+Keywords: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront, concrete, column, bird statue, man in blue shirt, walk, water, rocks, sun, warm lighting
+</pre>
 
 </details>
 
@@ -1862,29 +1519,29 @@ Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Duplicate keywords: england
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 10.44s
-- *Generation time:* 8.40s
-- *Total time:* 18.87s
-- *Input validation time:* 9.15e-05
-- *Prompt preparation time:* 0.0138
-- *First-token latency:* 6.22
-- *Cleanup time:* 0.257
-- *Prompt tokens:* 421
-- *Generation tokens:* 133
-- *Total tokens:* 554
-- *Prompt throughput (raw):* 67.7 tok/s
-- *Generation throughput (raw):* 64.8 tok/s
-- *Peak memory:* 71
+- *Model load time:* 7.81s
+- *Generation time:* 57.11s
+- *Total time:* 64.94s
+- *Input validation time:* 7.84e-05
+- *Prompt preparation time:* 0.0137
+- *First-token latency:* 54.1
+- *Cleanup time:* 0.21
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 111
+- *Total tokens:* 16,593
+- *Prompt throughput (raw):* 305 tok/s
+- *Generation throughput (raw):* 63.9 tok/s
+- *Peak memory:* 74
 - *Active memory:* 70
-- *Cache memory:* 0.10
+- *Cache memory:* 0.88
 - *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00705
+- *Post-cleanup active memory:* 0.00706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 563
+- *Rendered prompt characters:* 1223
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1900,58 +1557,207 @@ Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes
-
-Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its head down.
-
-Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxation, striped fur, cozy setting, indoor scene, pet comfort, soft lighting, domestic life, animal companionship, resting pets, home environment, tranquil moment, feline behavior, sofa bedding, remote placement, cat napping, peaceful atmosphere
+Title: War memorial column on Felixstowe seafront
+Description: A tall fluted stone column topped with a bronze eagle stands on a stepped plinth inscribed with names, set against the blue sea and clear sky at Felixstowe seafront. Festive bunting and a modern communications mast are visible nearby.
+Keywords: Felixstowe, seafront, war memorial, column, eagle, Suffolk, England, UK, sea, promenade, bunting, blue sky, stone, monument, East Suffolk, coastal, England, Europe
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
 
-### mlx-community/Qwen2-VL-2B-Instruct-4bit
+### mlx-community/Phi-3.5-vision-instruct-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.59s
-- *Generation time:* 0.30s
-- *Total time:* 0.90s
-- *Input validation time:* 9.32e-05
-- *Prompt preparation time:* 0.00367
-- *First-token latency:* 0.149
-- *Cleanup time:* 0.0768
-- *Prompt tokens:* 511
-- *Generation tokens:* 40
-- *Total tokens:* 551
-- *Prompt throughput (raw):* 3,421 tok/s
-- *Generation throughput (raw):* 311 tok/s
-- *Peak memory:* 2.5
-- *Active memory:* 1.3
-- *Cache memory:* 0.03
-- *Model-load active memory:* 1.26
-- *Post-cleanup active memory:* 0.00742
+- *Observations:* Title has 3 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 1.00s
+- *Generation time:* 2.11s
+- *Total time:* 3.12s
+- *Input validation time:* 7.6e-05
+- *Prompt preparation time:* 0.00119
+- *First-token latency:* 0.244
+- *Cleanup time:* 0.0816
+- *Prompt tokens:* 1,094
+- *Generation tokens:* 81
+- *Total tokens:* 1,175
+- *Prompt throughput (raw):* 4,483 tok/s
+- *Generation throughput (raw):* 56.8 tok/s
+- *Peak memory:* 9.6
+- *Active memory:* 8.3
+- *Cache memory:* 0.52
+- *Model-load active memory:* 8.3
+- *Post-cleanup active memory:* 0.00713
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 602
+- *Rendered prompt characters:* 1153
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Felixstowe Seafront Monument
+
+Description: A prominent white column with a bird sculpture at the top stands at the seafront in Felixstowe, England, UK, with a clear blue sky and the sea in the background.
+
+Keywords: Felixstowe, seafront, monument, column, bird sculpture, blue sky, sea, rocks, people, coast
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 4 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.73s
+- *Generation time:* 28.79s
+- *Total time:* 29.54s
+- *Input validation time:* 7.04e-05
+- *Prompt preparation time:* 0.0113
+- *First-token latency:* 18
+- *Cleanup time:* 0.153
+- *Prompt tokens:* 16,469
+- *Generation tokens:* 903
+- *Total tokens:* 17,372
+- *Prompt throughput (raw):* 916 tok/s
+- *Generation throughput (raw):* 90.6 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.7
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00806
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1212
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The main subject is the memorial column. Let's see: "Felixstowe Seafront Memorial Column" – that's 10 words, which is good.
+
+Next, the description. Need to combine context with visible subject, setting, action, lighting, details. The image shows a seafront with a tall column monument, blue sky, people walking, rocks, a blue pole with lights. The capture date is 2026-08-13, but we don't claim that. The main subject is the memorial. So: "A tall stone memorial column with an eagle statue stands at Felixstowe seafront, overlooking the ocean under a clear blue sky, with people walking along the rocky shore and colorful string lights."
+
+Wait, check the context: "Seafront, Felixstowe, England, UK, GBR, Europe" – so the description should include that. Also, the monument has inscriptions, the blue pole with lights. Let's make sure it's factual. The lighting is sunny, clear sky. The people are walking, rocks in the background. The monument is the central feature.
+
+Now keywords. Need 10-18 unique, comma-separated. From context: Felixstowe, England, UK, GBR, Europe, Seafront, Suffolk, UK, gbr. Visible details: memorial column, eagle statue, blue sky, ocean, rocky shore, string lights, people walking, stone monument, inscriptions. Let's list: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Sunny Day.
+
+Wait, need to check if they are unique. Let's pick 10-18. Let's see: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Sunny Day. That's 15. Let's check if any are redundant. Maybe "Suffolk" is in the context, but the image doesn't show Suffolk specifically, but the context has "East Suffolk" as a keyword hint. Wait, the context says "East Suffolk, England, UK, Europe" – but the image is Felixstowe, which is in Suffolk. So "East Suffolk" might be part of the context. Wait, the descriptive hints have "East Suffolk" as a keyword hint. So include that. Let's see: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk. Wait, but the context says "East Suffolk" is a keyword hint, so include that. Let's count: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk. That's 16. Let's check if all are visible or context. The context has "East Suffolk" as a keyword hint, so include it. The image shows Felixstowe, so "Felixstowe" is key. The memorial column is the main subject. The eagle statue is on top. The ocean, rocky shore, string lights, people walking, blue sky. So the keywords should be: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument,
+&lt;/think&gt;
+
+Title: Felixstowe Seafront Memorial Column
+Description: A tall stone memorial column with an eagle statue stands at Felixstowe seafront, overlooking the ocean under a clear blue sky, with people walking along the rocky shore and colorful string lights.
+Keywords: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The main subject is the memorial column. Let's see: "Felixstowe Seafront Memorial Column" – that's 10 words, which is good.
+
+Next, the description. Need to combine context with visible subject, setting, action, lighting, details. The image shows a seafront with a tall column monument, blue sky, people walking, rocks, a blue pole with lights. The capture date is 2026-08-13, but we don't claim that. The main subject is the memorial. So: "A tall stone memorial column with an eagle statue stands at Felixstowe seafront, overlooking the ocean under a clear blue sky, with people walking along the rocky shore and colorful string lights."
+
+Wait, check the context: "Seafront, Felixstowe, England, UK, GBR, Europe" – so the description should include that. Also, the monument has inscriptions, the blue pole with lights. Let's make sure it's factual. The lighting is sunny, clear sky. The people are walking, rocks in the background. The monument is the central feature.
+
+Now keywords. Need 10-18 unique, comma-separated. From context: Felixstowe, England, UK, GBR, Europe, Seafront, Suffolk, UK, gbr. Visible details: memorial column, eagle statue, blue sky, ocean, rocky shore, string lights, people walking, stone monument, inscriptions. Let's list: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Sunny Day.
+
+Wait, need to check if they are unique. Let's pick 10-18. Let's see: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Sunny Day. That's 15. Let's check if any are redundant. Maybe "Suffolk" is in the context, but the image doesn't show Suffolk specifically, but the context has "East Suffolk" as a keyword hint. Wait, the context says "East Suffolk, England, UK, Europe" – but the image is Felixstowe, which is in Suffolk. So "East Suffolk" might be part of the context. Wait, the descriptive hints have "East Suffolk" as a keyword hint. So include that. Let's see: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk. Wait, but the context says "East Suffolk" is a keyword hint, so include that. Let's count: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk. That's 16. Let's check if all are visible or context. The context has "East Suffolk" as a keyword hint, so include it. The image shows Felixstowe, so "Felixstowe" is key. The memorial column is the main subject. The eagle statue is on top. The ocean, rocky shore, string lights, people walking, blue sky. So the keywords should be: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument,
+</think>
+
+Title: Felixstowe Seafront Memorial Column
+Description: A tall stone memorial column with an eagle statue stands at Felixstowe seafront, overlooking the ocean under a clear blue sky, with people walking along the rocky shore and colorful string lights.
+Keywords: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle Statue, Ocean, Rocky Shore, String Lights, People Walking, Stone Monument, Inscriptions, Blue Sky, Suffolk, East Suffolk
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### mlx-community/Qwen3.6-27B-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 3.13s
+- *Generation time:* 100.25s
+- *Total time:* 103.41s
+- *Input validation time:* 6.61e-05
+- *Prompt preparation time:* 0.0155
+- *First-token latency:* 91.8
+- *Cleanup time:* 0.173
+- *Prompt tokens:* 16,482
+- *Generation tokens:* 117
+- *Total tokens:* 16,599
+- *Prompt throughput (raw):* 180 tok/s
+- *Generation throughput (raw):* 15.4 tok/s
+- *Peak memory:* 35
+- *Active memory:* 29
+- *Cache memory:* 1.8
+- *Model-load active memory:* 28.7
+- *Post-cleanup active memory:* 0.0096
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1223
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1959,67 +1765,93 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxati
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Cats Sleeping on a Pink Couch
-Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.
-Keywords: cats, sleeping, pink couch, remote controls
+Title:
+Felixstowe War Memorial Column by the Seafront
+
+Description:
+A tall stone column topped with a bronze bird statue stands on a paved promenade overlooking the sea. The monument features inscribed plaques and is situated near a blue lamppost with festive lights, under a clear blue sky.
+
+Keywords:
+Felixstowe, Suffolk, England, UK, Europe, seafront, war memorial, monument, column, statue, bird, ocean, coast, promenade, lamppost, blue sky, stone, plaques, East Suffolk
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
 
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+### mlx-community/X-Reasoner-7B-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 4 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 0.72s
-- *Total time:* 1.36s
-- *Input validation time:* 0.000103
-- *Prompt preparation time:* 0.00264
-- *First-token latency:* 0.381
-- *Cleanup time:* 0.0796
-- *Prompt tokens:* 1,204
-- *Generation tokens:* 31
-- *Total tokens:* 1,235
-- *Prompt throughput (raw):* 3,161 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.30
-- *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00968
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 37
+  terms (requested 10-18); Duplicate keywords: felixstowe, east suffolk, uk,
+  europe
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.16s
+- *Generation time:* 25.17s
+- *Total time:* 26.34s
+- *Input validation time:* 8.35e-05
+- *Prompt preparation time:* 0.00044
+- *First-token latency:* 19.7
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 16,478
+- *Generation tokens:* 241
+- *Total tokens:* 16,719
+- *Prompt throughput (raw):* 835 tok/s
+- *Generation throughput (raw):* 51.8 tok/s
+- *Peak memory:* 13
+- *Active memory:* 9.5
+- *Cache memory:* 1.4
+- *Model-load active memory:* 9.46
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 504
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1262
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Two Cats on a Couch
-Description: Two cats are sleeping on a pink couch.
-Keywords: cats, couch, sleeping, pink
+Title:
+Felixstowe War Memorial, Seafront
+
+Description:
+A tall, ornate war memorial stands on the seafront at Felixstowe, East Suffolk, UK, with a bronze eagle perched atop, set against a clear blue sky and the calm sea. The structure bears inscriptions and plaques, marking its historical significance.
+
+Keywords: Felixstowe, East Suffolk, England, UK, Europe, war memorial, seafront, bronze eagle, clear sky, calm sea, plaques, historical monument, East Suffolk, Felixstowe, Suffolk, UK, GBR, Europe, sea, blue sky, public space, memorial, 1939-1945, 1939-1945 plaques, publicWiFi, streetlight, decorative lights, stone steps, concrete base, sunny day, blue sea, clear horizon, publicWiFi sign, GPS coordinates, 2026-08-13 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E.
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title:
+Felixstowe War Memorial, Seafront
+
+Description:
+A tall, ornate war memorial stands on the seafront at Felixstowe, East Suffolk, UK, with a bronze eagle perched atop, set against a clear blue sky and the calm sea. The structure bears inscriptions and plaques, marking its historical significance. 
+
+Keywords: Felixstowe, East Suffolk, England, UK, Europe, war memorial, seafront, bronze eagle, clear sky, calm sea, plaques, historical monument, East Suffolk, Felixstowe, Suffolk, UK, GBR, Europe, sea, blue sky, public space, memorial, 1939-1945, 1939-1945 plaques, publicWiFi, streetlight, decorative lights, stone steps, concrete base, sunny day, blue sea, clear horizon, publicWiFi sign, GPS coordinates, 2026-08-13 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E.
+```
+
+</details>
 
 </details>
 
@@ -2035,29 +1867,30 @@ Keywords: cats, couch, sleeping, pink
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Duplicate
+  keywords: memorial
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.22s
-- *Generation time:* 2.00s
-- *Total time:* 5.25s
-- *Input validation time:* 7.74e-05
-- *Prompt preparation time:* 0.0207
-- *First-token latency:* 0.307
+- *Model load time:* 3.26s
+- *Generation time:* 2.45s
+- *Total time:* 5.74s
+- *Input validation time:* 6.75e-05
+- *Prompt preparation time:* 0.0206
+- *First-token latency:* 0.335
 - *Cleanup time:* 0.124
-- *Prompt tokens:* 386
-- *Generation tokens:* 75
-- *Total tokens:* 461
-- *Prompt throughput (raw):* 1,256 tok/s
-- *Generation throughput (raw):* 49.0 tok/s
+- *Prompt tokens:* 576
+- *Generation tokens:* 83
+- *Total tokens:* 659
+- *Prompt throughput (raw):* 1,719 tok/s
+- *Generation throughput (raw):* 55.5 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
 - *Model-load active memory:* 28
-- *Post-cleanup active memory:* 0.0103
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
+- *Rendered prompt characters:* 1158
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2074,9 +1907,9 @@ Keywords: cats, couch, sleeping, pink
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
+&lt;channel|&gt;Title: War Memorial on the Felixstowe Seafront, Suffolk
+Description: A tall fluted stone column topped with a bronze eagle stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, monument, coast, ocean, stone, memorial, memorial, travel, Europe
 </pre>
 
 <details>
@@ -2084,9 +1917,9 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 
 ```text
 <|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
+<channel|>Title: War Memorial on the Felixstowe Seafront, Suffolk
+Description: A tall fluted stone column topped with a bronze eagle stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, monument, coast, ocean, stone, memorial, memorial, travel, Europe
 ```
 
 </details>
@@ -2107,27 +1940,27 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.34s
-- *Generation time:* 2.12s
-- *Total time:* 5.47s
-- *Input validation time:* 9.36e-05
-- *Prompt preparation time:* 0.000367
-- *First-token latency:* 0.315
-- *Cleanup time:* 0.123
-- *Prompt tokens:* 386
-- *Generation tokens:* 68
-- *Total tokens:* 454
-- *Prompt throughput (raw):* 1,225 tok/s
-- *Generation throughput (raw):* 41.7 tok/s
+- *Model load time:* 3.17s
+- *Generation time:* 2.38s
+- *Total time:* 5.56s
+- *Input validation time:* 7.49e-05
+- *Prompt preparation time:* 0.000338
+- *First-token latency:* 0.33
+- *Cleanup time:* 0.145
+- *Prompt tokens:* 576
+- *Generation tokens:* 82
+- *Total tokens:* 658
+- *Prompt throughput (raw):* 1,746 tok/s
+- *Generation throughput (raw):* 58.1 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
 - *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0103
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 498
+- *Rendered prompt characters:* 1158
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2144,9 +1977,9 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
+&lt;channel|&gt;Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone war memorial topped with a bronze eagle stands on the coast overlooking the North Sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, coastal, ocean, monument, stone, eagle, sculpture, East Suffolk, Europe
 </pre>
 
 <details>
@@ -2154,9 +1987,9 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 
 ```text
 <|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone war memorial topped with a bronze eagle stands on the coast overlooking the North Sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, coastal, ocean, monument, stone, eagle, sculpture, East Suffolk, Europe
 ```
 
 </details>
@@ -2165,47 +1998,47 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 
 ---
 
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
-### mlx-community/gemma-3n-E4B-it-bf16
+### mlx-community/gemma-3-27b-it-qat-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 2 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.37s
-- *Generation time:* 1.73s
-- *Total time:* 4.11s
-- *Input validation time:* 9.76e-05
-- *Prompt preparation time:* 0.00301
-- *First-token latency:* 0.338
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 378
-- *Generation tokens:* 63
-- *Total tokens:* 441
-- *Prompt throughput (raw):* 1,118 tok/s
-- *Generation throughput (raw):* 45.8 tok/s
-- *Peak memory:* 17
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.33s
+- *Generation time:* 5.71s
+- *Total time:* 8.04s
+- *Input validation time:* 7.97e-05
+- *Prompt preparation time:* 0.00282
+- *First-token latency:* 0.973
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 569
+- *Generation tokens:* 132
+- *Total tokens:* 701
+- *Prompt throughput (raw):* 585 tok/s
+- *Generation throughput (raw):* 31.0 tok/s
+- *Peak memory:* 18
 - *Active memory:* 16
-- *Cache memory:* 0.04
-- *Model-load active memory:* 15.7
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.1
 - *Post-cleanup active memory:* 0.0113
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 529
+- *Rendered prompt characters:* 1187
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
@@ -2213,11 +2046,76 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 *Readable output:*
 
 <pre class="model-output-readable">
-**Title:** Cozy Naptime
+Title: Felixstowe War Memorial, Seafront, Suffolk
 
-**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.
+Description: Captured on 13th August 2026, this image shows the War Memorial on the seafront at Felixstowe, Suffolk, bathed in bright sunlight. The memorial stands prominently on a stone plinth overlooking the North Sea, with a distinctive eagle atop a fluted column.
 
-**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, domestic, comfort, home, furry, striped, peaceful, indoors.
+Keywords: Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, War Memorial, North Sea, coastal defence, stone plinth, eagle statue, commemorative plaque, promenade, blue sky, summer, 2026, East Suffolk, memorial garden.
+</pre>
+
+</details>
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### Qwen/Qwen3-VL-2B-Instruct
+
+<details>
+<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 3 words (requested 5-10); Keyword list has 330
+  terms (requested 10-18); Duplicate keywords: seafront, memorial, sea,
+  england, uk, europe, 1939 1945, war, commemoration, plaques, lamppost, blue,
+  sky, stone, column, bronze, eagle
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.66s
+- *Generation time:* 25.28s
+- *Total time:* 25.95s
+- *Input validation time:* 5.72e-05
+- *Prompt preparation time:* 0.00912
+- *First-token latency:* 13.8
+- *Cleanup time:* 0.0791
+- *Prompt tokens:* 16,467
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,467
+- *Prompt throughput (raw):* 1,189 tok/s
+- *Generation throughput (raw):* 93.4 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.4
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.000443
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1204
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Felixstowe Seafront Memorial
+
+Description:
+A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.
+
+Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, war, England, UK, Europe, sea, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue
 </pre>
 
 </details>
@@ -2234,32 +2132,33 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description; Response
-  repeats the task instructions instead of only returning the requested
-  fields; Extra text appears before the Title field; Response appears cut off
-  at the token limit
+- *Observations:* Response repeats the task instructions instead of only
+  returning the requested fields; Extra text appears before the Title field;
+  Response appears cut off at the token limit; Title has 4 words (requested
+  5-10); Keyword list has 40 terms (requested 10-18); Duplicate keywords: east
+  suffolk
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.56s
-- *Generation time:* 23.82s
-- *Total time:* 25.39s
-- *Input validation time:* 7.72e-05
-- *Prompt preparation time:* 0.00657
-- *First-token latency:* 0.94
-- *Cleanup time:* 0.0845
-- *Prompt tokens:* 1,426
+- *Model load time:* 1.58s
+- *Generation time:* 26.76s
+- *Total time:* 28.36s
+- *Input validation time:* 6.81e-05
+- *Prompt preparation time:* 0.00692
+- *First-token latency:* 2.19
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 3,520
 - *Generation tokens:* 1,000
-- *Total tokens:* 2,426
-- *Prompt throughput (raw):* 1,518 tok/s
-- *Generation throughput (raw):* 43.7 tok/s
-- *Peak memory:* 14
+- *Total tokens:* 4,520
+- *Prompt throughput (raw):* 1,605 tok/s
+- *Generation throughput (raw):* 41.4 tok/s
+- *Peak memory:* 15
 - *Active memory:* 13
-- *Cache memory:* 0.51
+- *Cache memory:* 0.92
 - *Model-load active memory:* 12.6
 - *Post-cleanup active memory:* 0.000706
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 846
+- *Rendered prompt characters:* 1506
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2276,38 +2175,127 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+The user wants British-English catalogue metadata from the image and supplied context. They want:
 
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
+- Title: a concrete 5-10-word title.
+- Description: 1-2 sentences factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+- Keywords: 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:"
+We have the image: a tall column (a war memorial?) with a statue of an eagle at the top, on a seafront. There's a blue pole with decorative lights (string lights) overhead. The sea is visible, clear blue sky. There's a rocky breakwater. Two men are walking on a path near the column. The column is on a stone base with plaques. The column is a classical column with Corinthian capitals? Actually it's a tall column with a statue of an eagle on top, reminiscent of a war memorial. The base has inscriptions (likely names). The column is white, maybe marble. The location is Felixstowe, East Suffolk, England. The capture date/time is 2026-08-13 17:14:49 UTC+01:00. GPS: 51.959333°N, 1.349050°E.
 
-We need to produce a title (5-10 words), a description (1-2 sentences), and a list of 10-18 unique keywords, separated by commas.
+We need to produce metadata in British English. Title: 5-10 words. Something like "Felixstowe Seafront War Memorial at Sunset". That's 6 words: Felixstowe (1) Seafront (2) War (3) Memorial (4) at (5) Sunset (6). Or "Felixstowe Seafront Column with Eagle". That's 5 words: Felixstowe (1) Seafront (2) Column (3) with (4) Eagle (5). But maybe include "Sunset" to capture lighting. The lighting appears to be late afternoon, maybe golden hour. The sky is clear blue, not deep orange. The sun is low? The shadows are long? The column casts a shadow on the ground. The lighting is bright, clear. So "Felixstowe Seafront Column at Dusk" (5 words). Or "Felixstowe Seafront War Memorial, Eagle Top". That's 6 words. Let's think.
 
-We must use only clearly visible facts from the image. The image shows two cats lying on a pink couch, sleeping. There's a remote control on the couch near them. The cats are tabby, with brown, black, and tan stripes. They appear to be sleeping, curled up. The couch is pink. The remote is a typical TV remote with buttons. The lighting appears to be natural or indoor, but we can say "soft indoor lighting" maybe. The cats are lying on their sides, one is curled up with its head on the couch, the other is lying on its side with its head near the remote. The remote is a standard TV remote, but we cannot assume brand. The couch is a pink fabric. The cats are domestic short-haired tabby. The image is presumably taken from above, showing the cats from a top-down perspective.
+The description: 1-2 sentences. Must combine relevant context (Felixstowe, East Suffolk, England, UK) with main visible subject (the column, the eagle statue, the seafront, the sea, the sky, the string lights, the two men). Setting: seafront, rocky breakwater, clear sky. Action: two men walking, maybe a tourist. Lighting: bright, clear, late afternoon. Distinctive details: column with Corinthian capital, eagle statue, plaques, string lights overhead, blue pole, rocky shoreline.
 
-We need to avoid uncertain details: we cannot assume location (like "living room") unless it's clearly visible. The couch is pink, but we cannot be sure it's a living room. We can say "couch" or "sofa". The remote is present, but we cannot assume it's a TV remote? It looks like a remote control, but we can say "remote control". The cats are sleeping. The lighting is soft, maybe "ambient indoor lighting". The cats are tabby. The couch is pink. The remote is white with colored buttons. The cats are curled up. The cats are domestic. The cats are lying on a pink surface. The remote is placed near them.
+We need to be factual, not speculation. So we can say: "The image shows the Felixstowe seafront war memorial, a tall white column topped by a bronze eagle, standing on a stone plinth with inscribed plaques, with the sea and a clear blue sky in the background. Two men walk along the promenade beside a blue streetlamp adorned with decorative lights." That's two sentences. That's fine.
 
-We need to produce British English catalogue metadata. So we need to use British spelling, e.g., "colour" vs "color". But we can just use British English.
-
-We need to produce a title of 5-10 words. Something like "Two Tabby Cats Napping on Pink Couch". That's 7 words: "Two Tabby Cats Napping on Pink Couch". That's 7 words. That works.
-
-Description: 1-2 sentences. Something like: "Two domestic tabby cats are sleeping side‑by‑side on a bright pink sofa, one curled with its head on the fabric, the other stretched with its head near a white remote control. Soft indoor lighting highlights the cats' striped fur and the pink upholstery." That's two sentences. That includes main subject (two tabby cats), setting (bright pink sofa), action (sleeping side‑by‑side), lighting (soft indoor lighting), distinctive details (striped fur, remote control). That's fine.
-
-Keywords: 10-18 unique, comma-separated. Something like: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination". That's 10 keywords. We can add a few more: "fabric upholstery, relaxed posture, top‑down view". That would bring to 13. Let's count: "tabby cats, sleeping, pink sofa, remote control, indoor lighting, striped fur, domestic cats, curled posture, side‑by‑side, soft illumination, fabric upholstery, relaxed posture, top‑down view". That's 13 keywords. Good.
-
-We need to ensure we have exactly three sections: Title:, Description:, Keywords:. No extra text. The title must be 5-10 words. "Two Tabby Cats Napping on Pink Couch" is 7 words. Good.
-
-Check for British English: "couch" is fine, but "sofa" might be more British. The title uses "couch". Could use "sofa". "Two Tabby Cats Napping on Pink Sofa". That's 7 words. "Two Tabby Cats Napping on Pink Sofa". That is British. Let's use "sofa". So title: "Two Tabby Cats Napping on Pink Sofa". That's 7 words.
-
-Description: "Two domestic tabby cats are sleeping side‑by‑side on a
+Keywords: 10-18 unique, comma-separated. Must cover relevant context and visible details. So we can include: Felixstowe, Seafront, War memorial, Column, Eagle statue, Stone plinth, Inscriptions, Sea, Sky, Blue pole, Decorative lights, Rocky breakwater, Promenade, East Suffolk, England, United Kingdom, Europe, Adobe Stock, Any Vision. That's 18? Let's count: Felixstowe (1), Seafront (2), War memorial (3), Column (4), Eagle statue (5), Stone plinth (6), Inscriptions (7), Sea (8), Sky (9), Blue pole (10), Decorative lights (11), Rocky breakwater (12), Promenade (13), East Suffolk (14), England (15), United Kingdom (16), Europe (17), Adobe Stock (18), Any Vision (19). That's 19, too many. We need 10-18. So we need to limit to 10-18. Let's pick 14 maybe. Let's list: Felixstowe, Seafront, War memorial, Column, Eagle statue, Stone plinth, Inscriptions, Sea, Sky, Decorative lights, Rocky breakwater, Promenade, East Suffolk, United Kingdom. That's 14. That
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* none
+- *Observations:* Response appears cut off at the token limit; Keyword list
+  has 52 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 4.95s
+- *Generation time:* 19.53s
+- *Total time:* 24.49s
+- *Input validation time:* 7.63e-05
+- *Prompt preparation time:* 0.00826
+- *First-token latency:* 1.77
+- *Cleanup time:* 0.186
+- *Prompt tokens:* 1,584
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,584
+- *Prompt throughput (raw):* 893 tok/s
+- *Generation throughput (raw):* 59.2 tok/s
+- *Peak memory:* 60
+- *Active memory:* 59
+- *Cache memory:* 0.17
+- *Model-load active memory:* 58.8
+- *Post-cleanup active memory:* 0.00118
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1322
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get to work. I've got an image of a seaside scene, and I need to generate some metadata for it. First things first, I need to break down the request. The core task is to create a title, description, and keywords for this image, all in British English. The image itself is a seaside view, and I have some hints to work with, but I need to be careful. The hints are a bit jumbled, so I'll have to sift through them.
+
+The hints mention "Albion," "St. Mary's," and "Suffolk," which is a good starting point. The GPS coordinates are crucial, and the date/time are important too. I'll use the GPS to pinpoint the location. The hints are a bit of a mess, but I can see the key elements: a seaside view, a statue, and some people.
+
+Now, let's analyze the image itself. It's a seaside view, and the main subject is a statue. It's a tall, white, classical-style monument, and it has a statue on top. The base is made of stone, and there's a plaque. The setting is a beach or promenade, with the sea in the background. The lighting is bright, so it's probably daytime. There are a couple of people in the foreground.
+
+Okay, time to synthesize. The location is definitely Felixstowe, Suffolk, England. The statue is the focal point. The description needs to be concise and factual. I'll start with the location and the main subject. I'll mention the sea, the statue, and the people. I'll also include the date and time.
+
+The title needs to be short and descriptive. I'll go with "Felixstowe Seafront with Altar of Peace Monument."
+
+The description will be a bit longer. I'll start with the location and date, then describe the scene. I'll mention the statue, the sea, and the people.
+
+Finally, the keywords. I need to cover the location, the subject, the setting, and the details. I'll include "Felixstowe," "Suffolk," "England," "UK," "GBR," "seafront," "beach," "monument," "statue," "altar," "peace," "memorial," "people," "walkers," "sunny day," "bright," "blue sky," "sea," "ocean," "coast," "cliff," "rock," "stone," "plaque," "bronze," "golden," "sunlight," "shadow," "summer," "August," "2026," "pavilion," "pier," "harbour," "harbor," "promenade," "walkway," "path," "grass," "rocky," "sandy," "blue," "clear," "calm," "peaceful," "serene," "scenic," "landscape," "view," "outdoor," "recreation," "leisure," "tourism," "history," "commemorative," "memorial," "war," "remembrance," "remembrance day," "memorial day," "Albion," "St. Mary's," "East Suffolk," "Europe," "GBR," "UK," "England," "Suffolk," "Felixstowe," "Suffolk," "UK," "GBR," "Europe," "seafront," "beach," "monument," "statue," "altar," "peace," "memorial," "people," "walkers," "sunny day," "bright,"
+&lt;/think&gt;
+
+Title: Felixstowe Seafront with Altar of Peace Monument
+
+Description: A sunny day in August 2026 at the Felixstowe seafront in Suffolk, England, UK. A tall white classical monument with a golden eagle statue stands on a rocky shore, with a few people walking nearby.
+
+Keywords: Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, beach, monument, statue, altar, peace, memorial, people, walkers, sunny day, bright, blue sky, sea, ocean, coast, cliff, rock, stone, plaque, bronze, golden, sunlight, shadow, summer, August, 2026, pavilion, pier, harbour, harbor, promenade, walkway, path, grass, rocky, sandy, blue, clear, calm, peaceful, serene, scenic, landscape, view, outdoor, recreation,
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. I've got an image of a seaside scene, and I need to generate some metadata for it. First things first, I need to break down the request. The core task is to create a title, description, and keywords for this image, all in British English. The image itself is a seaside view, and I have some hints to work with, but I need to be careful. The hints are a bit jumbled, so I'll have to sift through them.
+
+The hints mention "Albion," "St. Mary's," and "Suffolk," which is a good starting point. The GPS coordinates are crucial, and the date/time are important too. I'll use the GPS to pinpoint the location. The hints are a bit of a mess, but I can see the key elements: a seaside view, a statue, and some people.
+
+Now, let's analyze the image itself. It's a seaside view, and the main subject is a statue. It's a tall, white, classical-style monument, and it has a statue on top. The base is made of stone, and there's a plaque. The setting is a beach or promenade, with the sea in the background. The lighting is bright, so it's probably daytime. There are a couple of people in the foreground.
+
+Okay, time to synthesize. The location is definitely Felixstowe, Suffolk, England. The statue is the focal point. The description needs to be concise and factual. I'll start with the location and the main subject. I'll mention the sea, the statue, and the people. I'll also include the date and time.
+
+The title needs to be short and descriptive. I'll go with "Felixstowe Seafront with Altar of Peace Monument."
+
+The description will be a bit longer. I'll start with the location and date, then describe the scene. I'll mention the statue, the sea, and the people.
+
+Finally, the keywords. I need to cover the location, the subject, the setting, and the details. I'll include "Felixstowe," "Suffolk," "England," "UK," "GBR," "seafront," "beach," "monument," "statue," "altar," "peace," "memorial," "people," "walkers," "sunny day," "bright," "blue sky," "sea," "ocean," "coast," "cliff," "rock," "stone," "plaque," "bronze," "golden," "sunlight," "shadow," "summer," "August," "2026," "pavilion," "pier," "harbour," "harbor," "promenade," "walkway," "path," "grass," "rocky," "sandy," "blue," "clear," "calm," "peaceful," "serene," "scenic," "landscape," "view," "outdoor," "recreation," "leisure," "tourism," "history," "commemorative," "memorial," "war," "remembrance," "remembrance day," "memorial day," "Albion," "St. Mary's," "East Suffolk," "Europe," "GBR," "UK," "England," "Suffolk," "Felixstowe," "Suffolk," "UK," "GBR," "Europe," "seafront," "beach," "monument," "statue," "altar," "peace," "memorial," "people," "walkers," "sunny day," "bright,"
+</think>
+
+Title: Felixstowe Seafront with Altar of Peace Monument
+
+Description: A sunny day in August 2026 at the Felixstowe seafront in Suffolk, England, UK. A tall white classical monument with a golden eagle statue stands on a rocky shore, with a few people walking nearby.
+
+Keywords: Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, beach, monument, statue, altar, peace, memorial, people, walkers, sunny day, bright, blue sky, sea, ocean, coast, cliff, rock, stone, plaque, bronze, golden, sunlight, shadow, summer, August, 2026, pavilion, pier, harbour, harbor, promenade, walkway, path, grass, rocky, sandy, blue, clear, calm, peaceful, serene, scenic, landscape, view, outdoor, recreation,
+```
+
+</details>
 
 </details>
 
@@ -2323,22 +2311,24 @@ Description: "Two domestic tabby cats are sleeping side‑by‑side on a
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Observations:* Missing or empty fields: Title, Keywords; Response repeats
+  the task instructions instead of only returning the requested fields; Extra
+  text appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.59s
-- *Generation time:* 0.21s
-- *Total time:* 0.81s
-- *Input validation time:* 9.61e-05
-- *Prompt preparation time:* 0.00183
-- *First-token latency:* 0.0796
-- *Cleanup time:* 0.0746
-- *Prompt tokens:* 120
-- *Generation tokens:* 32
-- *Total tokens:* 152
-- *Prompt throughput (raw):* 1,508 tok/s
-- *Generation throughput (raw):* 341 tok/s
-- *Peak memory:* 2.1
+- *Model load time:* 0.62s
+- *Generation time:* 1.41s
+- *Total time:* 2.03s
+- *Input validation time:* 7.15e-05
+- *Prompt preparation time:* 0.00169
+- *First-token latency:* 0.0957
+- *Cleanup time:* 0.0736
+- *Prompt tokens:* 308
+- *Generation tokens:* 147
+- *Total tokens:* 455
+- *Prompt throughput (raw):* 3,218 tok/s
+- *Generation throughput (raw):* 353 tok/s
+- *Peak memory:* 2.2
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -2346,7 +2336,7 @@ Description: "Two domestic tabby cats are sleeping side‑by‑side on a
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 567
+- *Rendered prompt characters:* 1227
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2362,7 +2352,8 @@ Description: "Two domestic tabby cats are sleeping side‑by‑side on a
 *Readable output:*
 
 <pre class="model-output-readable">
-A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.
+A concrete 5-10-word title: "Felixstowe, UK, Seafront, GBR, East Suffolk, England, Europe, GBR, Seafront"
+Description: The image features a prominent 5-10-word title describing a concrete 5-10-word description of a seafront in Felixstowe, UK, with a GBR (Great Britain) location, East Suffolk, England, and a GBR (Great Britain) context. The setting is a seafront with a 5-10-word title, a 1-2-sentence description of the main subject, and a 10-18 unique, comma-separated keywords covering relevant context and visible details.
 </pre>
 
 </details>
@@ -2378,32 +2369,31 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Extra text appears before the Title field; Response appears
-  cut off at the token limit; Internal reasoning block appears incomplete;
-  Title has 21 words (requested 5-10)
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title; Extra text appears before
+  the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
 - *Model load time:* 1.67s
-- *Generation time:* 21.34s
-- *Total time:* 23.02s
-- *Input validation time:* 6.31e-05
-- *Prompt preparation time:* 0.00192
-- *First-token latency:* 0.364
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 495
-- *Generation tokens:* 1,000
-- *Total tokens:* 1,495
-- *Prompt throughput (raw):* 1,360 tok/s
-- *Generation throughput (raw):* 47.7 tok/s
+- *Generation time:* 29.86s
+- *Total time:* 31.53s
+- *Input validation time:* 6.53e-05
+- *Prompt preparation time:* 0.00189
+- *First-token latency:* 7.14
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 6,307
+- *Generation tokens:* 994
+- *Total tokens:* 7,301
+- *Prompt throughput (raw):* 883 tok/s
+- *Generation throughput (raw):* 44.6 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
-- *Cache memory:* 0.08
+- *Cache memory:* 0.48
 - *Model-load active memory:* 11.8
 - *Post-cleanup active memory:* 0.0018
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 529
+- *Rendered prompt characters:* 1189
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2419,86 +2409,70 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats), setting (pink blanket, red couch), action (lying down), lighting (bright), distinctive details (remotes, cat positions). Then keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's make sure to omit uncertain details.
+&lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words. The image shows a monument by the sea, so maybe "Felixstowe Seafront Monument". Then the description should combine context (date, location) with the main subject (monument), setting (seafront), action (people walking), lighting (sunny), distinctive details (column, eagle statue, sea). Let's make sure it's factual. Then keywords need to cover context and visible details, like location, monument type, etc.
 
-Title: "Cats Resting on Pink Blanket with Remotes" – wait, 5-10 words. Let's check. "Two Cats on Pink Blanket with Remotes" is good.
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal walkway, sunny day, people walking, coastal rocks, memorial plaque
 
-Description: Two tabby cats lie on a pink blanket atop a red couch, with remote controls nearby, in bright lighting. – need to make it 1-2 sentences. So: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting."
+Wait, need to check the hints. The title hint was Seafront, Felixstowe... so maybe "Felixstowe Seafront Memorial" or similar. Let's make sure the description includes the capture date/time? Wait, the context says capture date/time is 2026-08-13 17:14:49 UTC+01:00, but maybe include that? Wait, the description should combine context with main subject, setting, action, lighting, distinctive details. So maybe: "A monument with a column and eagle statue is located on Felixstowe's seafront, with people walking nearby under clear, sunny lighting, overlooking the sea, captured on 2026-08-13."
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's check unique ones, comma-separated.
+Wait, let's structure:
 
-Now, let's structure each part:
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
+Wait, need to make sure keywords are unique, comma-separated, 10-18. Let's check the hints: keyword hints include Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also visible details: column, eagle statue, sea, rocks, people, lighting.
 
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
+Finalizing:
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home (10 words, unique)
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue is situated on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 
-Wait, need to make sure all are clearly visible. The image has two cats, pink blanket, red couch, remotes. So description should mention those. Let's adjust description: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." That's factual, no unsupported details.
+Wait, check the length. Title is 5 words (Felixstowe Seafront Monument) – 5 words, good. Description is 2 sentences? Wait, the user said 1-2 sentence. Let's make it one sentence. "A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13." That's one sentence. Then keywords need 10-18. Let's count: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking – that's 16, which is good.
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Are these unique? Let's see. Maybe add "pet" or "cats" is there. Wait, need 10-18. Let's check: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, couch, red (but red is part of couch, maybe not). Wait, the couch is red, but maybe include "red couch" as a keyword? But need unique. Let's do: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, pet, indoor, resting, tabby, two. That's 12, which is between 10-18.
+Wait, the context says "capture date/time" is authoritative, so include that in description. So description: "A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13 UTC+01:00."
 
-Wait, let's check the image again. Two tabby cats, so "tabby" can be a keyword. "resting" is action. "indoor" setting. "pink" blanket. "remotes" are there. "couch" is red. So keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, lying, domestic. That's 11, which is good.
-
-Now, final check:
-
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
-
-Description: Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
-
-Keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home (or add more, but need unique). Wait, the image has two cats, so "two" could be a keyword. Let's do: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, two. That's 11.
-
-Wait, the user said "unique, comma-separated keywords" – so no duplicates. So "cats" once, "tabby" once, "blanket" once, "couch" once, "remotes" once, "pink" once, "resting" once, "indoor" once, "relaxed" once, "home" once, "two" once. That's 10. Wait, 10-18, so maybe add "feline" (same as cat), "lying" (same as resting). Hmm. Let's make sure each keyword is unique. Let's go with:
-
-Title: "Cats on Pink Blanket with Remotes"
-
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting.
-
-Keywords: cats, tabby, blanket,
+Yes, that's better. Then keywords include all the hints and visible details.&lt;/think&gt;&lt;answer&gt;Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13 UTC+01:00.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats), setting (pink blanket, red couch), action (lying down), lighting (bright), distinctive details (remotes, cat positions). Then keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's make sure to omit uncertain details. 
+<think>Got it, let's tackle this. First, the title needs to be 5-10 words. The image shows a monument by the sea, so maybe "Felixstowe Seafront Monument". Then the description should combine context (date, location) with the main subject (monument), setting (seafront), action (people walking), lighting (sunny), distinctive details (column, eagle statue, sea). Let's make sure it's factual. Then keywords need to cover context and visible details, like location, monument type, etc.
 
-Title: "Cats Resting on Pink Blanket with Remotes" – wait, 5-10 words. Let's check. "Two Cats on Pink Blanket with Remotes" is good. 
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal walkway, sunny day, people walking, coastal rocks, memorial plaque
 
-Description: Two tabby cats lie on a pink blanket atop a red couch, with remote controls nearby, in bright lighting. – need to make it 1-2 sentences. So: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." 
+Wait, need to check the hints. The title hint was Seafront, Felixstowe... so maybe "Felixstowe Seafront Memorial" or similar. Let's make sure the description includes the capture date/time? Wait, the context says capture date/time is 2026-08-13 17:14:49 UTC+01:00, but maybe include that? Wait, the description should combine context with main subject, setting, action, lighting, distinctive details. So maybe: "A monument with a column and eagle statue is located on Felixstowe's seafront, with people walking nearby under clear, sunny lighting, overlooking the sea, captured on 2026-08-13."
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's check unique ones, comma-separated. 
+Wait, let's structure:
 
-Now, let's structure each part:
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
+Wait, need to make sure keywords are unique, comma-separated, 10-18. Let's check the hints: keyword hints include Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also visible details: column, eagle statue, sea, rocks, people, lighting.
 
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
+Finalizing:
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home (10 words, unique)
+Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue is situated on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 
-Wait, need to make sure all are clearly visible. The image has two cats, pink blanket, red couch, remotes. So description should mention those. Let's adjust description: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." That's factual, no unsupported details. 
+Wait, check the length. Title is 5 words (Felixstowe Seafront Monument) – 5 words, good. Description is 2 sentences? Wait, the user said 1-2 sentence. Let's make it one sentence. "A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13." That's one sentence. Then keywords need 10-18. Let's count: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking – that's 16, which is good.
 
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Are these unique? Let's see. Maybe add "pet" or "cats" is there. Wait, need 10-18. Let's check: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, couch, red (but red is part of couch, maybe not). Wait, the couch is red, but maybe include "red couch" as a keyword? But need unique. Let's do: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, pet, indoor, resting, tabby, two. That's 12, which is between 10-18. 
+Wait, the context says "capture date/time" is authoritative, so include that in description. So description: "A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13 UTC+01:00."
 
-Wait, let's check the image again. Two tabby cats, so "tabby" can be a keyword. "resting" is action. "indoor" setting. "pink" blanket. "remotes" are there. "couch" is red. So keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, lying, domestic. That's 11, which is good. 
-
-Now, final check:
-
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
-
-Description: Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
-
-Keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home (or add more, but need unique). Wait, the image has two cats, so "two" could be a keyword. Let's do: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, two. That's 11. 
-
-Wait, the user said "unique, comma-separated keywords" – so no duplicates. So "cats" once, "tabby" once, "blanket" once, "couch" once, "remotes" once, "pink" once, "resting" once, "indoor" once, "relaxed" once, "home" once, "two" once. That's 10. Wait, 10-18, so maybe add "feline" (same as cat), "lying" (same as resting). Hmm. Let's make sure each keyword is unique. Let's go with:
-
-Title: "Cats on Pink Blanket with Remotes"
-
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting.
-
-Keywords: cats, tabby, blanket,
+Yes, that's better. Then keywords include all the hints and visible details.</think><answer>Title: Felixstowe Seafront Monument
+Description: A monument with a column and eagle statue stands on Felixstowe's seafront, with people walking nearby under sunny lighting, overlooking the sea, captured on 2026-08-13 UTC+01:00.
+Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, England, UK, GBR, Europe, sea, coastal, memorial, stone structure, coastal rocks, sunny day, people walking, memorial plaque, coastal promenade
 ```
 
 </details>
@@ -2507,63 +2481,70 @@ Keywords: cats, tabby, blanket,
 
 ---
 
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
-### mlx-community/Idefics3-8B-Llama3-bf16
+### mlx-community/GLM-4.6V-Flash-mxfp4
 
 <details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
-  Conversation-role control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.88s
-- *Generation time:* 1.48s
-- *Total time:* 3.37s
-- *Input validation time:* 9.45e-05
-- *Prompt preparation time:* 0.00147
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.0984
-- *Prompt tokens:* 2,418
-- *Generation tokens:* 13
-- *Total tokens:* 2,431
-- *Prompt throughput (raw):* 2,312 tok/s
-- *Generation throughput (raw):* 34.6 tok/s
-- *Peak memory:* 18
-- *Active memory:* 17
-- *Cache memory:* 0.39
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00269
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 3 words (requested 5-10); Keyword list has 382
+  terms (requested 10-18); Duplicate keywords: seafront, uk, gbr, europe, war
+  memorial, stone column, eagle statue, sea, coastal, memorial, remembrance,
+  war, suffolk county
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.32s
+- *Generation time:* 21.01s
+- *Total time:* 22.35s
+- *Input validation time:* 7.45e-05
+- *Prompt preparation time:* 0.00694
+- *First-token latency:* 7.12
+- *Cleanup time:* 0.116
+- *Prompt tokens:* 6,311
+- *Generation tokens:* 1,000
+- *Total tokens:* 7,311
+- *Prompt throughput (raw):* 887 tok/s
+- *Generation throughput (raw):* 74.2 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 6.8
+- *Cache memory:* 0.44
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00211
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 509
+- *Rendered prompt characters:* 1213
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
- Two cats laying on a pink blanket with remotes.&lt;end_of_utterance&gt;
+Title: Felixstowe War Memorial
+Description: The Felixstowe War Memorial, a tall stone column topped with an eagle, stands by the seafront in Felixstowe, England.
+Keywords: Felixstowe War Memorial, seafront, Felixstowe, Suffolk, England, UK, gbr, Europe, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK,
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
- Two cats laying on a pink blanket with remotes.<end_of_utterance>
+Title: Felixstowe War Memorial
+Description: The Felixstowe War Memorial, a tall stone column topped with an eagle, stands by the seafront in Felixstowe, England. 
+Keywords: Felixstowe War Memorial, seafront, Felixstowe, Suffolk, England, UK, gbr, Europe, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK,
 ```
 
 </details>
@@ -2582,22 +2563,23 @@ Keywords: cats, tabby, blanket,
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Extra text appears before
-  the Title field; Response appears cut off at the token limit; Keyword list
-  has 313 terms (requested 10-18); Duplicate keywords: household frames
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 4 words (requested 5-10); Keyword list has 306
+  terms (requested 10-18); Duplicate keywords: historical landmark, historical
+  significance, cultural icon, historical icon
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.57s
-- *Generation time:* 64.60s
-- *Total time:* 66.18s
-- *Input validation time:* 8.3e-05
-- *Prompt preparation time:* 0.00157
-- *First-token latency:* 1.61
-- *Cleanup time:* 0.0933
-- *Prompt tokens:* 107
+- *Model load time:* 1.51s
+- *Generation time:* 50.06s
+- *Total time:* 51.57s
+- *Input validation time:* 6.24e-05
+- *Prompt preparation time:* 0.00154
+- *First-token latency:* 1.43
+- *Cleanup time:* 0.0954
+- *Prompt tokens:* 275
 - *Generation tokens:* 1,000
-- *Total tokens:* 1,107
-- *Prompt throughput (raw):* 66.6 tok/s
-- *Generation throughput (raw):* 15.9 tok/s
+- *Total tokens:* 1,275
+- *Prompt throughput (raw):* 192 tok/s
+- *Generation throughput (raw):* 20.8 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.76
@@ -2606,7 +2588,7 @@ Keywords: cats, tabby, blanket,
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 576
+- *Rendered prompt characters:* 1236
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2622,61 +2604,77 @@ Keywords: cats, tabby, blanket,
 *Readable output:*
 
 <pre class="model-output-readable">
-Here is the information in the format you requested:
+Title:
+Felixstowe Seafront Memorial Column
 
-**Title:** Two Cats on a Pink Blanket
+Description:
+The image features a prominent memorial column situated on the seafront in Felixstowe, England, with a columnar structure and a bird statue at the top, set against a clear blue sky and the calm sea in the background.
 
-**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed.
-
-**Keywords:** Tabby cats, pink blanket, remote controls, sleeping, feline, domestic, household, comfort, relaxation, domesticated, household pets, household items, household appliances, household furniture, household decor, household textiles, household linens, household blankets, household comforters, household pillows, household throws, household rugs, household mats, household carpets, household flooring, household walls, household ceilings, household windows, household doors, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames,
+Keywords:
+Felixstowe, England, UK, Seafront, Memorial, Column, Bird Statue, Blue Sky, Calm Sea, Coastal, Seaside, Public Monument, Historical Landmark, Stone Structure, Ornate Details, Seafront Promenade, Coastal Town, British Architecture, Coastal Scenery, Seaside Atmosphere, Peaceful Scene, Memorial Day, Remembrance, Commemoration, Historical Significance, Cultural Heritage, Architectural Landmark, Iconic Structure, Seafront Landmark, Coastal Icon, British History, Historical Monument, Cultural Significance, Architectural Style, Historical Landmark, Cultural Icon, British Culture, Historical Significance, Architectural Icon, Cultural Landmark, Historical Icon, Cultural Monument, Architectural Heritage, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon,
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title: 
+Felixstowe Seafront Memorial Column
+
+Description:
+The image features a prominent memorial column situated on the seafront in Felixstowe, England, with a columnar structure and a bird statue at the top, set against a clear blue sky and the calm sea in the background.
+
+Keywords:
+Felixstowe, England, UK, Seafront, Memorial, Column, Bird Statue, Blue Sky, Calm Sea, Coastal, Seaside, Public Monument, Historical Landmark, Stone Structure, Ornate Details, Seafront Promenade, Coastal Town, British Architecture, Coastal Scenery, Seaside Atmosphere, Peaceful Scene, Memorial Day, Remembrance, Commemoration, Historical Significance, Cultural Heritage, Architectural Landmark, Iconic Structure, Seafront Landmark, Coastal Icon, British History, Historical Monument, Cultural Significance, Architectural Style, Historical Landmark, Cultural Icon, British Culture, Historical Significance, Architectural Icon, Cultural Landmark, Historical Icon, Cultural Monument, Architectural Heritage, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon,
+```
+
+</details>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+<a id="model-mlx-community-molmopoint-8b-fp16"></a>
 
-### mlx-community/MiniCPM-V-4.6-8bit
+### mlx-community/MolmoPoint-8B-fp16
 
 <details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
+<summary>Complete evidence: mlx-community/MolmoPoint-8B-fp16</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title; Extra text appears before
-  the Title field
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.87s
-- *Generation time:* 0.34s
-- *Total time:* 1.23s
-- *Input validation time:* 8.11e-05
-- *Prompt preparation time:* 0.00842
-- *First-token latency:* 0.103
-- *Cleanup time:* 0.0843
-- *Prompt tokens:* 330
-- *Generation tokens:* 58
-- *Total tokens:* 388
-- *Prompt throughput (raw):* 3,216 tok/s
-- *Generation throughput (raw):* 278 tok/s
-- *Peak memory:* 3.0
-- *Active memory:* 2.3
-- *Cache memory:* 0.05
-- *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00482
+- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
+- *Model load time:* 2.31s
+- *Generation time:* 26.90s
+- *Total time:* 29.22s
+- *Input validation time:* 7.05e-05
+- *Prompt preparation time:* 0.00534
+- *First-token latency:* 2.61
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 3,119
+- *Generation tokens:* 142
+- *Total tokens:* 3,261
+- *Prompt throughput (raw):* 1,195 tok/s
+- *Generation throughput (raw):* 6.04 tok/s
+- *Peak memory:* 24
+- *Active memory:* 19
+- *Cache memory:* 5.0
+- *Model-load active memory:* 17.4
+- *Post-cleanup active memory:* 0.00655
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 540
+- *Rendered prompt characters:* 1170
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.molmo_point.processing_molmo_point.MolmoPointProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Resolved model revision:* 0a60033b4e4813fb53df4c7523857d2ec972c7d9
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MolmoPoint-8B-fp16/snapshots/0a60033b4e4813fb53df4c7523857d2ec972c7d9
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2684,12 +2682,214 @@ Here is the information in the format you requested:
 *Readable output:*
 
 <pre class="model-output-readable">
-Two cats sleeping on pink blanket with remote controls
+Felixstowe War Memorial, East Suffolk Coast
 
-Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.
+The image shows a war memorial monument on a rocky seafront in Felixstowe, England. A tall white column with an eagle statue stands prominently, surrounded by a stone base with plaques. The memorial overlooks the ocean, with a clear blue sky and a few people visible in the distance. The scene captures a peaceful seaside setting with the memorial as the focal point.
 
-Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting
+Felixstowe, England, UK, GBR, East Suffolk, seafront, war memorial, white column, eagle statue, stone base, plaques, rocky coast, ocean, clear sky, people, memorial, monument, seaside, Suffolk, UK, gbr
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Keyword list has 259 terms (requested 10-18); Duplicate
+  keywords: stone column, bird statue, people walking, clear sky, calm sea,
+  stone pathway, landmark, scenic beauty, seaside town
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.50s
+- *Generation time:* 69.96s
+- *Total time:* 70.47s
+- *Input validation time:* 6.77e-05
+- *Prompt preparation time:* 0.00365
+- *First-token latency:* 64.7
+- *Cleanup time:* 0.0808
+- *Prompt tokens:* 16,478
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,478
+- *Prompt throughput (raw):* 255 tok/s
+- *Generation throughput (raw):* 223 tok/s
+- *Peak memory:* 5.1
+- *Active memory:* 1.3
+- *Cache memory:* 0.83
+- *Model-load active memory:* 1.26
+- *Post-cleanup active memory:* 0.00744
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1262
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-2B-Instruct-4bit/snapshots/01af461cdb9574acc09084a0ef94e216e142b085
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Seafront, Felixstowe, England, UK, GBR, Europe
+
+Description:
+The Seafront of Felixstowe, England, UK, GBR, Europe, features a prominent seafront monument with a stone column and a bird statue on top. The monument is situated near the sea, with a clear blue sky and a calm sea in the background. The monument is surrounded by a stone pathway and a few people walking nearby. The monument is a notable landmark in the area, and its presence adds to the scenic beauty of the seaside town.
+
+Keywords:
+Seafront, Felixstowe, England, UK, GBR, Europe, Monument, Stone Column, Bird Statue, People Walking, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
+
+### mlx-community/Qwen3-VL-2B-Instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 3 words (requested 5-10); Keyword list has 330
+  terms (requested 10-18); Duplicate keywords: seafront, memorial, sea,
+  england, uk, europe, 1939 1945, war, commemoration, plaques, lamppost, blue,
+  sky, stone, column, bronze, eagle
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.74s
+- *Generation time:* 28.23s
+- *Total time:* 28.98s
+- *Input validation time:* 6.75e-05
+- *Prompt preparation time:* 0.000334
+- *First-token latency:* 16.4
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 16,467
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,467
+- *Prompt throughput (raw):* 1,003 tok/s
+- *Generation throughput (raw):* 91.2 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.4
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00775
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1204
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Instruct-bf16/snapshots/c8a67a84327484ba87f5ec4f8fb927cdafd791aa
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Felixstowe Seafront Memorial
+
+Description:
+A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.
+
+Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, war, England, UK, Europe, sea, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+
+### mlx-community/gemma-3n-E4B-it-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
+- *Model load time:* 2.30s
+- *Generation time:* 4.14s
+- *Total time:* 6.45s
+- *Input validation time:* 7.65e-05
+- *Prompt preparation time:* 0.00312
+- *First-token latency:* 0.368
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 568
+- *Generation tokens:* 162
+- *Total tokens:* 730
+- *Prompt throughput (raw):* 1,543 tok/s
+- *Generation throughput (raw):* 48.8 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.05
+- *Model-load active memory:* 15.7
+- *Post-cleanup active memory:* 0.0119
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1189
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+A tall, light-colored stone monument stands prominently on a rocky coastline under a clear blue sky. The monument features a fluted column topped with a bronze eagle with outstretched wings. The base of the monument is multi-tiered and adorned with several dark plaques bearing inscriptions.
+
+The monument is situated near a paved walkway and a rocky shoreline. In the background, the calm, light blue sea stretches out to the horizon. A few people are visible walking along the walkway to the left of the monument. Overhead, strings of colorful lights are strung between poles, adding a festive touch to the scene. A blue lamppost with decorative metalwork stands to the right of the monument.
+
+The overall impression is one of a historical landmark in a coastal setting, captured on a bright, sunny day.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+A tall, light-colored stone monument stands prominently on a rocky coastline under a clear blue sky. The monument features a fluted column topped with a bronze eagle with outstretched wings. The base of the monument is multi-tiered and adorned with several dark plaques bearing inscriptions. 
+
+The monument is situated near a paved walkway and a rocky shoreline. In the background, the calm, light blue sea stretches out to the horizon. A few people are visible walking along the walkway to the left of the monument. Overhead, strings of colorful lights are strung between poles, adding a festive touch to the scene. A blue lamppost with decorative metalwork stands to the right of the monument. 
+
+The overall impression is one of a historical landmark in a coastal setting, captured on a bright, sunny day.
+```
+
+</details>
 
 </details>
 
@@ -2704,31 +2904,30 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Missing or empty fields:
-  Title, Description, Keywords; Response appears cut off at the token limit
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 0.96s
-- *Generation time:* 22.41s
-- *Total time:* 23.37s
-- *Input validation time:* 0.000109
-- *Prompt preparation time:* 0.002
-- *First-token latency:* 2.78
-- *Cleanup time:* 0.117
-- *Prompt tokens:* 2,469
-- *Generation tokens:* 1,000
-- *Total tokens:* 3,469
-- *Prompt throughput (raw):* 889 tok/s
-- *Generation throughput (raw):* 51.0 tok/s
+- *Model load time:* 0.93s
+- *Generation time:* 3.61s
+- *Total time:* 4.54s
+- *Input validation time:* 6.39e-05
+- *Prompt preparation time:* 0.00186
+- *First-token latency:* 2.68
+- *Cleanup time:* 0.0881
+- *Prompt tokens:* 2,692
+- *Generation tokens:* 18
+- *Total tokens:* 2,710
+- *Prompt throughput (raw):* 1,005 tok/s
+- *Generation throughput (raw):* 64.3 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
-- *Cache memory:* 0.92
+- *Cache memory:* 0.87
 - *Model-load active memory:* 8.05
-- *Post-cleanup active memory:* 0.0125
+- *Post-cleanup active memory:* 0.013
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 474
+- *Rendered prompt characters:* 1134
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2744,8 +2943,17 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 *Readable output:*
 
 <pre class="model-output-readable">
-cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline
+Seafront, Felixstowe, England, UK, GBR, Europe,
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Seafront, Felixstowe, England, UK, GBR, Europe, 
+```
+
+</details>
 
 </details>
 
@@ -2761,30 +2969,31 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Keywords
+- *Observations:* Missing or empty fields: Keywords; Response repeats the task
+  instructions instead of only returning the requested fields
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.51s
-- *Generation time:* 0.37s
-- *Total time:* 0.88s
-- *Input validation time:* 9.69e-05
-- *Prompt preparation time:* 0.00186
-- *First-token latency:* 0.0711
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 116
-- *Generation tokens:* 97
-- *Total tokens:* 213
-- *Prompt throughput (raw):* 1,632 tok/s
-- *Generation throughput (raw):* 349 tok/s
-- *Peak memory:* 2.0
+- *Model load time:* 0.48s
+- *Generation time:* 0.98s
+- *Total time:* 1.46s
+- *Input validation time:* 6.13e-05
+- *Prompt preparation time:* 0.00164
+- *First-token latency:* 0.075
+- *Cleanup time:* 0.0899
+- *Prompt tokens:* 304
+- *Generation tokens:* 151
+- *Total tokens:* 455
+- *Prompt throughput (raw):* 4,054 tok/s
+- *Generation throughput (raw):* 374 tok/s
+- *Peak memory:* 2.4
 - *Active memory:* 0.61
-- *Cache memory:* 0.25
-- *Model-load active memory:* 0.611
-- *Post-cleanup active memory:* 0.0131
+- *Cache memory:* 0.30
+- *Model-load active memory:* 0.612
+- *Post-cleanup active memory:* 0.0136
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 558
+- *Rendered prompt characters:* 1218
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2800,8 +3009,8 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "A Study in Stripes"
-Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
+Title: Seafront, Felixstowe, England, UK, GBR, Europe
+Description: A concrete 5-10-word title, followed by a 1-2-sentence factual description that combines relevant context with the main visible subject, setting, action, lighting, and distinctive details. The description includes the title, the geographic location, the GBR code, and the name of the location. The keywords are provided in a comma-separated format, with the GBR code included in the second line. The context is provided in the third line, with the location being Felixstowe, England, UK, GBR, and the context being a photograph of the seafront in Felixstowe, England, UK, GBR.
 </pre>
 
 </details>
@@ -2819,31 +3028,31 @@ Description: A close-up of a person wearing a striped shirt, with a focus on the
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Missing or empty fields:
-  Title; Response repeats the task instructions instead of only returning the
-  requested fields; Extra text appears before the Title field; Response
-  appears cut off at the token limit
+  Title, Description, Keywords; Response repeats the task instructions instead
+  of only returning the requested fields; Response appears cut off at the
+  token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.28s
-- *Generation time:* 23.61s
-- *Total time:* 24.91s
-- *Input validation time:* 8.13e-05
-- *Prompt preparation time:* 0.000227
-- *First-token latency:* 1.19
-- *Cleanup time:* 0.154
-- *Prompt tokens:* 4,207
+- *Model load time:* 1.15s
+- *Generation time:* 22.64s
+- *Total time:* 23.81s
+- *Input validation time:* 0.000101
+- *Prompt preparation time:* 0.000209
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 4,397
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,207
-- *Prompt throughput (raw):* 3,526 tok/s
-- *Generation throughput (raw):* 45.1 tok/s
-- *Peak memory:* 4.2
+- *Total tokens:* 5,397
+- *Prompt throughput (raw):* 4,035 tok/s
+- *Generation throughput (raw):* 48.0 tok/s
+- *Peak memory:* 4.4
 - *Active memory:* 1.7
-- *Cache memory:* 2.0
+- *Cache memory:* 2.1
 - *Model-load active memory:* 1.73
-- *Post-cleanup active memory:* 0.0141
+- *Post-cleanup active memory:* 0.0146
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 458
+- *Rendered prompt characters:* 1118
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2859,88 +3068,61 @@ Description: A close-up of a person wearing a striped shirt, with a focus on the
 *Readable output:*
 
 <pre class="model-output-readable">
-Action:
-Lighting:
-Brand:
-Species:
-Period:
-Event:
-Date:
-Name:
-Intent:
-Brand:
-Date:
-Name:
-Description:
-Action:
-Lighting:
-Keywords:
-Return exactly these three sections and nothing else:
-Title:
-Description:
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-1
+- Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR,
+- Description hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, England, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR
+- Title hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felix
 </pre>
 
 </details>

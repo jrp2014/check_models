@@ -8,9 +8,9 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 41    |
-| Conclusive outcomes | 41    |
-| Completed           | 41    |
+| Attempted           | 42    |
+| Conclusive outcomes | 42    |
+| Completed           | 42    |
 | Crashed             | 0     |
 | Indeterminate       | 0     |
 
@@ -18,44 +18,45 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 32    |
-| observation needs reproduction | 9     |
+| none                           | 31    |
+| observation needs reproduction | 11    |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
-| unusable            | 9     |
-| usable              | 20    |
-| usable with caveats | 12    |
+| unusable            | 14    |
+| usable              | 13    |
+| usable with caveats | 15    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| Response repeats the same text                                                        | 3     |
+| Response repeats the same text                                                        | 6     |
 | Unrecognised model control tokens remain visible                                      | 3     |
 | Required fields are missing or empty                                                  | 7     |
-| Response repeats the task instructions instead of only returning the requested fields | 2     |
-| Extra text appears before the Title field                                             | 5     |
-| Response appears cut off at the token limit                                           | 5     |
-| Internal reasoning block appears incomplete                                           | 1     |
+| Response repeats the task instructions instead of only returning the requested fields | 4     |
+| Extra text appears before the Title field                                             | 3     |
+| Response appears cut off at the token limit                                           | 8     |
 | Conversation-role control tokens remain visible                                       | 2     |
-| Title or keywords do not meet requested constraints                                   | 10    |
+| Title or keywords do not meet requested constraints                                   | 20    |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                                                 |
-|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
-| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                               |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | unusable            | observation_needs_reproduction | missing required fields; role tokens visible                                                                 |
-| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                   | completed | unusable            | observation_needs_reproduction | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                          |
+| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                        |
+|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-------------------------------------------------------------------------------------|
+| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                             | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; cut off at token limit |
+| [mlx-community/Qwen2-VL-2B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-2b-instruct-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
+| [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)                  | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
+| [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                              | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                              |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                 |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible; title/keyword constraints failed                               |
 
 ## Crashes requiring action
 
@@ -63,10 +64,58 @@ None.
 
 ## Completed Runs with Observations
 
+<a id="diagnostic-mlx-community-glm-46v-flash-mxfp4"></a>
+
+<details>
+<summary>mlx-community/GLM-4.6V-Flash-mxfp4 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+
+### mlx-community/GLM-4.6V-Flash-mxfp4
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, token_cap_truncation,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Repeated fragment:* keyword: "coastal"
+- *Title word count:* 3
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 382
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["seafront", "uk", "gbr", "europe", "war memorial",
+  "stone column", "eagle statue", "sea", "coastal", "memorial", "remembrance",
+  "war", "suffolk county"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.002114608
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 6311
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151329
+- *Configured EOS token:* &lt;|endoftext|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+Title: Felixstowe War Memorial
+Description: The Felixstowe War Memorial, a tall stone column topped with an eagle, stands by the seafront in Felixstowe, England. 
+Keywords: Felixstowe War Memorial, seafront, Felixstowe, Suffolk, England, UK, gbr, Europe, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK, gbr, Europe, seafront, coastal, war memorial, stone column, eagle statue, sea, coastal, memorial, remembrance, war, Suffolk County, UK,
+```
+
+</details>
+
 <a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 <details>
-<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed</summary>
+<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
 
 ### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
@@ -76,24 +125,23 @@ None.
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, token_cap_truncation,
-  unexpected_catalog_preamble, catalog_constraint_violation
+  catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Repeated fragment:* keyword: "household frames"
-- *Unexpected text before Title:* Here is the information in the format you
-  requested:
-- *Title word count:* 6
+- *Repeated fragment:* keyword: "cultural icon"
+- *Title word count:* 4
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 313
+- *Keyword count:* 306
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["household frames"]
+- *Duplicate keywords:* ["historical landmark", "historical significance",
+  "cultural icon", "historical icon"]
 - *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
 - *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.00431012
+- *Post-cleanup active memory (GB):* 0.004310124
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 107
+- *Prompt tokens:* 275
 - *Generation tokens:* 1000
 - *Configured EOS token ID:* 128009
 - *Configured EOS token:* &lt;|eot_id|&gt;
@@ -104,54 +152,14 @@ None.
 #### Complete output
 
 ```text
-Here is the information in the format you requested:
+Title: 
+Felixstowe Seafront Memorial Column
 
-**Title:** Two Cats on a Pink Blanket
+Description:
+The image features a prominent memorial column situated on the seafront in Felixstowe, England, with a columnar structure and a bird statue at the top, set against a clear blue sky and the calm sea in the background.
 
-**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed.
-
-**Keywords:** Tabby cats, pink blanket, remote controls, sleeping, feline, domestic, household, comfort, relaxation, domesticated, household pets, household items, household appliances, household furniture, household decor, household textiles, household linens, household blankets, household comforters, household pillows, household throws, household rugs, household mats, household carpets, household flooring, household walls, household ceilings, household windows, household doors, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-<details>
-<summary>mlx-community/llava-v1.6-mistral-7b-8bit — unusable — repeated text; missing required fields; cut off at token limit</summary>
-
-### mlx-community/llava-v1.6-mistral-7b-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation
-- *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Missing sections:* ["title", "description", "keywords"]
-- *Repeated fragment:* feline,
-- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
-  "abrupt_tail"]
-- *Resolved model revision:* b8df5f329d95a7abe6429ed46093f9b84e8e6396
-- *Processor class:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.012453096
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2469
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline
+Keywords:
+Felixstowe, England, UK, Seafront, Memorial, Column, Bird Statue, Blue Sky, Calm Sea, Coastal, Seaside, Public Monument, Historical Landmark, Stone Structure, Ornate Details, Seafront Promenade, Coastal Town, British Architecture, Coastal Scenery, Seaside Atmosphere, Peaceful Scene, Memorial Day, Remembrance, Commemoration, Historical Significance, Cultural Heritage, Architectural Landmark, Iconic Structure, Seafront Landmark, Coastal Icon, British History, Historical Monument, Cultural Significance, Architectural Style, Historical Landmark, Cultural Icon, British Culture, Historical Significance, Architectural Icon, Cultural Landmark, Historical Icon, Cultural Monument, Architectural Heritage, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon, Historical Icon, Cultural Icon,
 ```
 
 </details>
@@ -159,7 +167,7 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 <a id="diagnostic-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 <details>
-<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit</summary>
+<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; echoes instructions; cut off at token limit</summary>
 
 ### mlx-community/paligemma2-3b-pt-896-4bit
 
@@ -169,23 +177,21 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation, prompt_instruction_echo, unexpected_catalog_preamble
+  token_cap_truncation, prompt_instruction_echo
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Missing sections:* ["title"]
-- *Repeated fragment:* phrase: "- 10-18 unique, comma-separate..."
-- *Echoed instruction fragments:* ["return exactly these three sections",
-  "return exactly these three sections and nothing else"]
-- *Unexpected text before Title:* Action: Lighting: Brand: Species: Period:
-  Event: Date: Name: Intent: Brand: Date: Name:
+- *Missing sections:* ["title", "description", "keywords"]
+- *Repeated fragment:* phrase: "- description hint: seafront,..."
+- *Echoed instruction fragments:* ["title hint:", "description hint:",
+  "keyword hints:"]
 - *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
   "abrupt_tail"]
 - *Resolved model revision:* a26bac48c7a661dfdafe1799c90177f818e79925
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.0141079
+- *Post-cleanup active memory (GB):* 0.014648584
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4207
+- *Prompt tokens:* 4397
 - *Generation tokens:* 1000
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
@@ -196,88 +202,218 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 #### Complete output
 
 ```text
-Action:
-Lighting:
-Brand:
-Species:
-Period:
-Event:
-Date:
-Name:
-Intent:
-Brand:
-Date:
-Name:
-Description:
-Action:
-Lighting:
-Keywords:
-Return exactly these three sections and nothing else:
+- Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR,
+- Description hint: Seafront, Felixstowe, England, UK, GBR,
+- Description hint: Seafront, Felixstowe, England, UK, GBR,
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, GBR
+- Title hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Description hint: Seafront, Felix
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+<details>
+<summary>mlx-community/Qwen2-VL-2B-Instruct-4bit — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+
+### mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, token_cap_truncation,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Repeated fragment:* keyword: "stone column"
+- *Title word count:* 6
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 259
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["stone column", "bird statue", "people walking",
+  "clear sky", "calm sea", "stone pathway", "landmark", "scenic beauty",
+  "seaside town"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Resolved model revision:* 01af461cdb9574acc09084a0ef94e216e142b085
+- *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.007439494
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 16478
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
 Title:
+Seafront, Felixstowe, England, UK, GBR, Europe
+
 Description:
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-18 unique, comma-separated keywords.
-- 10-1
+The Seafront of Felixstowe, England, UK, GBR, Europe, features a prominent seafront monument with a stone column and a bird statue on top. The monument is situated near the sea, with a clear blue sky and a calm sea in the background. The monument is surrounded by a stone pathway and a few people walking nearby. The monument is a notable landmark in the area, and its presence adds to the scenic beauty of the seaside town.
+
+Keywords:
+Seafront, Felixstowe, England, UK, GBR, Europe, Monument, Stone Column, Bird Statue, People Walking, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town, People Walking, Stone Column, Bird Statue, Clear Sky, Calm Sea, Stone Pathway, Landmark, Scenic Beauty, Seaside Town
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
+
+<details>
+<summary>mlx-community/Qwen3-VL-2B-Instruct-bf16 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+
+### mlx-community/Qwen3-VL-2B-Instruct-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, token_cap_truncation,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Repeated fragment:* keyword: "seafront"
+- *Title word count:* 3
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 330
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["seafront", "memorial", "sea", "england", "uk",
+  "europe", "1939 1945", "war", "commemoration", "plaques", "lamppost",
+  "blue", "sky", "stone", "column", "bronze", "eagle"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
+- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.00775079
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 16467
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+Title:
+Felixstowe Seafront Memorial
+
+Description:
+A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.
+
+Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, war, England, UK, Europe, sea, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue
+```
+
+</details>
+
+<a id="diagnostic-qwen-qwen3-vl-2b-instruct"></a>
+
+<details>
+<summary>Qwen/Qwen3-VL-2B-Instruct — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+
+### Qwen/Qwen3-VL-2B-Instruct
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, token_cap_truncation,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Repeated fragment:* keyword: "seafront"
+- *Title word count:* 3
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 330
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["seafront", "memorial", "sea", "england", "uk",
+  "europe", "1939 1945", "war", "commemoration", "plaques", "lamppost",
+  "blue", "sky", "stone", "column", "bronze", "eagle"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
+- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.000443432
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 16467
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+Title:
+Felixstowe Seafront Memorial
+
+Description:
+A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.
+
+Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, war, England, UK, Europe, sea, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue, sky, seafront, memorial, stone, column, bronze, eagle, sea, England, UK, Europe, 1939-1945, war, commemoration, plaques, lamppost, blue
 ```
 
 </details>
@@ -285,7 +421,7 @@ Description:
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-8bit
 
@@ -294,18 +430,23 @@ Description:
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token
+- *Observations:* unexpected_special_token, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Title word count:* 7
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 16
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["memorial"]
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010257588
+- *Post-cleanup active memory (GB):* 0.010798272
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 386
-- *Generation tokens:* 75
+- *Prompt tokens:* 576
+- *Generation tokens:* 83
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -316,9 +457,9 @@ Description:
 
 ```text
 <|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats rest on a pink blanket draped over a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, pets, remote control, lounging
+<channel|>Title: War Memorial on the Felixstowe Seafront, Suffolk
+Description: A tall fluted stone column topped with a bronze eagle stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, monument, coast, ocean, stone, memorial, memorial, travel, Europe
 ```
 
 </details>
@@ -343,10 +484,10 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010257588
+- *Post-cleanup active memory (GB):* 0.010798272
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 386
-- *Generation tokens:* 68
+- *Prompt tokens:* 576
+- *Generation tokens:* 82
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -357,9 +498,9 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 
 ```text
 <|channel>thought
-<channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats lie curled up on a pink blanket next to remote controls on a sofa.
-Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, feline, resting, fur, striped, domestic, lounging
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone war memorial topped with a bronze eagle stands on the coast overlooking the North Sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, coastal, ocean, monument, stone, eagle, sculpture, East Suffolk, Europe
 ```
 
 </details>
@@ -367,7 +508,7 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 <a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
 
 <details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible</summary>
+<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/GLM-4.6V-nvfp4
 
@@ -376,18 +517,22 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token
+- *Observations:* unexpected_special_token, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
 - *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
   "&lt;|end_of_box|&gt;"]
+- *Title word count:* 4
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 16
+- *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002425912
+- *Post-cleanup active memory (GB):* 0.002425916
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 499
-- *Generation tokens:* 89
+- *Prompt tokens:* 6311
+- *Generation tokens:* 96
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -397,9 +542,9 @@ Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, 
 #### Complete output
 
 ```text
-<|begin_of_box|>Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+<|begin_of_box|>Title: Seafront monument, Felixstowe, England
+Description: A tall stone column with an eagle statue atop stands on a paved plaza by the sea, with rocky shores, the ocean, and two men walking in the background under a clear blue sky.
+Keywords: seafront, Felixstowe, England, UK, GBR, Europe, monument, column, eagle statue, stone, plaza, ocean, rocky shores, clear sky, East Suffolk, Suffolk<|end_of_box|>
 ```
 
 </details>
@@ -407,27 +552,26 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 <a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 <details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — missing required fields; role tokens visible</summary>
+<summary>mlx-community/Idefics3-8B-Llama3-bf16 — usable_with_caveats — role tokens visible</summary>
 
 ### mlx-community/Idefics3-8B-Llama3-bf16
 
 #### Execution and provenance
 
 - *Execution:* completed
-- *Usability:* unusable
+- *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, role_boundary_token_present
+- *Observations:* role_boundary_token_present
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Missing sections:* ["title", "description", "keywords"]
 - *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
 - *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
 - *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002688056
+- *Post-cleanup active memory (GB):* 0.00268806
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2418
-- *Generation tokens:* 13
+- *Prompt tokens:* 2587
+- *Generation tokens:* 160
 - *Configured EOS token ID:* 128001
 - *Configured EOS token:* &lt;|end_of_text|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -437,95 +581,9 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 #### Complete output
 
 ```text
- Two cats laying on a pink blanket with remotes.<end_of_utterance>
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
-
-<details>
-<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed</summary>
-
-### mlx-community/GLM-4.1V-9B-Thinking-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* token_cap_truncation, unexpected_catalog_preamble,
-  thinking_trace_incomplete, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this.
-  First, the title needs to be 5-10 words, concrete. Looking at the image: two
-  cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with
-  Remotes" or something similar. Then description: need to mention the main
-  subject (two cats), setting (pink blanket, red couch), action (lying down),
-  lighting (bright), distinctive details (remotes, cat positions). Then
-  keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline,
-  relaxed, home. Let's make sure to omit uncertain details.
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 21
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 13
-- *Requested keyword count range:* [10, 18]
-- *Token-cap degradation evidence:* ["incomplete_thinking_trace",
-  "unfinished_list"]
-- *Resolved model revision:* 9677807f106500eb7690391c27645d59f6855cfb
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001803312
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 495
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats), setting (pink blanket, red couch), action (lying down), lighting (bright), distinctive details (remotes, cat positions). Then keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's make sure to omit uncertain details. 
-
-Title: "Cats Resting on Pink Blanket with Remotes" – wait, 5-10 words. Let's check. "Two Cats on Pink Blanket with Remotes" is good. 
-
-Description: Two tabby cats lie on a pink blanket atop a red couch, with remote controls nearby, in bright lighting. – need to make it 1-2 sentences. So: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." 
-
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's check unique ones, comma-separated. 
-
-Now, let's structure each part:
-
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
-
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
-
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home (10 words, unique)
-
-Wait, need to make sure all are clearly visible. The image has two cats, pink blanket, red couch, remotes. So description should mention those. Let's adjust description: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." That's factual, no unsupported details. 
-
-Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Are these unique? Let's see. Maybe add "pet" or "cats" is there. Wait, need 10-18. Let's check: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, couch, red (but red is part of couch, maybe not). Wait, the couch is red, but maybe include "red couch" as a keyword? But need unique. Let's do: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, pet, indoor, resting, tabby, two. That's 12, which is between 10-18. 
-
-Wait, let's check the image again. Two tabby cats, so "tabby" can be a keyword. "resting" is action. "indoor" setting. "pink" blanket. "remotes" are there. "couch" is red. So keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, lying, domestic. That's 11, which is good. 
-
-Now, final check:
-
-Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
-
-Description: Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
-
-Keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home (or add more, but need unique). Wait, the image has two cats, so "two" could be a keyword. Let's do: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, two. That's 11. 
-
-Wait, the user said "unique, comma-separated keywords" – so no duplicates. So "cats" once, "tabby" once, "blanket" once, "couch" once, "remotes" once, "pink" once, "resting" once, "indoor" once, "relaxed" once, "home" once, "two" once. That's 10. Wait, 10-18, so maybe add "feline" (same as cat), "lying" (same as resting). Hmm. Let's make sure each keyword is unique. Let's go with:
-
-Title: "Cats on Pink Blanket with Remotes"
-
-Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting.
-
-Keywords: cats, tabby, blanket,
+ Title: Felixstowe Seafront Monument with Ocean View.
+Description: The image depicts a monument situated on the seafront in Felixstowe, England, UK. The monument is a tall, white column with a Doric column style, topped with a statue of an eagle. The column is surrounded by a base with inscriptions, and there is a staircase leading up to it. In the background, the vast expanse of the ocean can be seen, with two people standing on a rocky shore. The sky is clear, and the lighting suggests it is either early morning or late afternoon. 
+Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, ocean, rocky shore, clear sky, Doric column style, inscriptions, staircase.<end_of_utterance>
 ```
 
 </details>
@@ -533,7 +591,7 @@ Keywords: cats, tabby, blanket,
 <a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 <details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — usable_with_caveats — role tokens visible</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — usable_with_caveats — role tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
@@ -542,18 +600,22 @@ Keywords: cats, tabby, blanket,
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* role_boundary_token_present
+- *Observations:* role_boundary_token_present, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
 - *Thinking trace markers:* ["\u25c1think\u25b7", "\u25c1/think\u25b7"]
 - *Role-boundary tokens in output:* ["&lt;|im_assistant|&gt;"]
+- *Title word count:* 7
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 21
+- *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003654748
+- *Post-cleanup active memory (GB):* 0.003654752
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 489
-- *Generation tokens:* 562
+- *Prompt tokens:* 1257
+- *Generation tokens:* 817
 - *Configured EOS token ID:* 163594
 - *Configured EOS token:* [EOS]
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -563,15 +625,31 @@ Keywords: cats, tabby, blanket,
 #### Complete output
 
 ```text
-◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room. 
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top. The background has the sea, clear blue sky, some people, and a coastal setting. The context gives the location as Felixstowe, England, UK, with coordinates and date/time. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, etc.
 
-First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+First, the title: need a 5-10 word title. Maybe "Felixstowe Seafront Memorial Column by the Coast". That's concise.
 
-Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+Description: 1-2 sentences. The image shows a tall stone column with an eagle atop, situated on a seafront in Felixstowe, England. The monument stands near the coast with the sea in the background, clear blue sky, and people nearby. Lighting is bright, sunny day.
 
-Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby  
-Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.  
-Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment<|im_assistant|>
+Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, coastal, stone monument, clear blue sky, people, rocks, streetlights, date 2026-08-13, time 17:14:49 UTC+01:00, GPS 51.959333°N, 1.349050°E, Adobe Stock, Any Vision, East Suffolk.
+
+Wait, the capture date and time and GPS are authoritative but not visible, so include them as facts. The hints include East Suffolk, so that's part of the location. Let's check the hints: hints have East Suffolk, England, UK, GBR, seafront, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also, the image has the sea, the column, eagle, people, rocks, streetlights, string lights, etc.
+
+So keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision.
+
+Now, structure:
+
+Title: Felixstowe Seafront Memorial Column by the Coast
+
+Description: A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision◁/think▷Title:
+Felixstowe Seafront Memorial Column by the Coast
+
+Description:
+A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+
+Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision<|im_assistant|>
 ```
 
 </details>
@@ -586,48 +664,47 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                                 | Usability           | Observations                                                                                  |
-|-------------------------------------------------------|---------------------|-----------------------------------------------------------------------------------------------|
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; extra text before Title; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                                                       |
-| mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                                              |
-| mlx-community/nanoLLaVA-1.5-4bit                      | unusable            | missing required fields                                                                       |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16      | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/gemma-3n-E4B-it-bf16                    | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/GLM-4.6V-Flash-mxfp4                    | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/Ornith-1.0-35B-bf16                     | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit               | usable_with_caveats | title/keyword constraints failed                                                              |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | usable_with_caveats | title/keyword constraints failed                                                              |
+| Model                                             | Usability           | Observations                                                                                           |
+|---------------------------------------------------|---------------------|--------------------------------------------------------------------------------------------------------|
+| mlx-community/FastVLM-0.5B-bf16                   | unusable            | missing required fields; echoes instructions; extra text before Title                                  |
+| mlx-community/gemma-3n-E4B-it-bf16                | unusable            | missing required fields                                                                                |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit           | unusable            | missing required fields; extra text before Title                                                       |
+| mlx-community/llava-v1.6-mistral-7b-8bit          | unusable            | missing required fields                                                                                |
+| mlx-community/MolmoPoint-8B-fp16                  | unusable            | missing required fields                                                                                |
+| mlx-community/nanoLLaVA-1.5-4bit                  | unusable            | missing required fields; echoes instructions                                                           |
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX     | unusable            | echoes instructions; extra text before Title; cut off at token limit; title/keyword constraints failed |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16  | unusable            | cut off at token limit; title/keyword constraints failed                                               |
+| mlx-community/gemma-3-27b-it-qat-4bit             | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/InternVL3-8B-bf16                   | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/MiniCPM-V-4.6-8bit                  | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Molmo-7B-D-0924-8bit                | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Ornith-1.0-35B-bf16                 | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16           | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/Qwen3.6-27B-mxfp8                   | usable_with_caveats | title/keyword constraints failed                                                                       |
+| mlx-community/X-Reasoner-7B-8bit                  | usable_with_caveats | title/keyword constraints failed                                                                       |
 
 ## Clean Completion Context
 
 <details>
 <summary>Clean completions</summary>
 
-| Model                                             | Runtime identity                                        | Performance                                                                              |
-|---------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------|
-| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 30.3 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 125 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache     |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 27.0 tok/s; 19 GB peak; cleanup 0.0124/0.0 GB active/cache    |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 60 generated; 35.8 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
-| mlx-community/LFM2.5-VL-1.6B-bf16                 | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 350 prompt / 100 generated; 184 tok/s; 4.1 GB peak; cleanup 0.00379/0.0 GB active/cache  |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.7 tok/s; 9.8 GB peak; cleanup 0.00508/0.0 GB active/cache |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 64.9 tok/s; 10 GB peak; cleanup 0.00534/0.0 GB active/cache |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 194 tok/s; 4.5 GB peak; cleanup 0.0056/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 843 prompt / 89 generated; 53.6 tok/s; 11 GB peak; cleanup 0.00592/0.0 GB active/cache   |
-| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 6.04 tok/s; 23 GB peak; cleanup 0.00654/0.0 GB active/cache   |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 57.7 tok/s; 9.3 GB peak; cleanup 0.00711/0.0 GB active/cache  |
-| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.4 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache   |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16           | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 135 tok/s; 5.3 GB peak; cleanup 0.00773/0.0 GB active/cache   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 411 prompt / 872 generated; 131 tok/s; 5.3 GB peak; cleanup 0.00805/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 124 tok/s; 21 GB peak; cleanup 0.00855/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 101 tok/s; 7.1 GB peak; cleanup 0.00906/0.0 GB active/cache   |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 18.4 tok/s; 30 GB peak; cleanup 0.00957/0.0 GB active/cache  |
-| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 105 generated; 43.4 tok/s; 65 GB peak; cleanup 0.00995/0.0 GB active/cache  |
-| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 65.9 tok/s; 10 GB peak; cleanup 0.0103/0.0 GB active/cache   |
-| Qwen/Qwen3-VL-2B-Instruct                         | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 138 tok/s; 5.2 GB peak; cleanup 0.000443/0.0 GB active/cache  |
+| Model                                                 | Runtime identity                                    | Performance                                                                                 |
+|-------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed   | 2072 prompt / 132 generated; 479 tok/s; 1.9 GB peak; cleanup 0.000132/0.0 GB active/cache   |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2658 prompt / 131 generated; 29.9 tok/s; 24 GB peak; cleanup 0.000968/0.0 GB active/cache   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed   | 580 prompt / 98 generated; 130 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache        |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 580 prompt / 111 generated; 27.7 tok/s; 20 GB peak; cleanup 0.0129/0.0 GB active/cache      |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed   | 2072 prompt / 140 generated; 186 tok/s; 4.2 GB peak; cleanup 0.00379/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 3191 prompt / 162 generated; 66.3 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache     |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 3190 prompt / 123 generated; 188 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache    |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3429 prompt / 99 generated; 39.7 tok/s; 16 GB peak; cleanup 0.0149/0.0 GB active/cache      |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16482 prompt / 95 generated; 109 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16482 prompt / 113 generated; 91.2 tok/s; 10.0 GB peak; cleanup 0.00909/0.0 GB active/cache |
+| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed  | 16482 prompt / 127 generated; 25.9 tok/s; 22 GB peak; cleanup 0.0101/0.0 GB active/cache    |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed  | 1400 prompt / 89 generated; 126 tok/s; 5.5 GB peak; cleanup 0.0102/0.0 GB active/cache      |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3468 prompt / 114 generated; 44.0 tok/s; 70 GB peak; cleanup 0.0105/0.0 GB active/cache     |
 
 </details>
 
@@ -636,20 +713,31 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 640 x 480 pixels
-- *Image size:* 173,131 bytes
-- *Image SHA-256:* dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
+- *Image dimensions:* 6,656 x 8,880 pixels
+- *Image size:* 31,372,387 bytes
+- *Image SHA-256:* 4d57e07687c4c8ec3ba359b4615fee07f708aec2d9d88b409187cfe54fd6bdd3
 
 <details>
 <summary>Exact prompt</summary>
 
 ```text
-Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-13 17:14:49 UTC+01:00
+- GPS: 51.959333°N, 1.349050°E
+
+Descriptive hints:
+- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe
+- Description hint: Seafront, Felixstowe, England, UK, GBR
+- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront
 
 Write:
 - a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
 Return exactly these three sections and nothing else:
 Title:
@@ -667,14 +755,16 @@ original image before filing.
 
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
+| mlx-community/GLM-4.6V-Flash-mxfp4               | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
 | mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
-| mlx-community/llava-v1.6-mistral-7b-8bit         | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
 | mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit          | 01af461cdb9574acc09084a0ef94e216e142b085 |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16          | c8a67a84327484ba87f5ec4f8fb927cdafd791aa |
+| Qwen/Qwen3-VL-2B-Instruct                        | 89644892e4d85e24eaac8bacfd4f463576704203 |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
 | mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit          | 9677807f106500eb7690391c27645d59f6855cfb |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
 
 ### Components and system
@@ -712,6 +802,6 @@ original image before filing.
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,684,784 bytes, sha256=b90da7f5c9401aa9b05d09c0b0d796a6a3a2517ab081152db7b419e00c7f1815) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,982,032 bytes, sha256=ff4a2f5da3749505bffa7164284c23fb9fcbb4979178cb4367bf4a16dc700e30)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,982,032 bytes, sha256=a58a571eaf73eea64aa0ac22fd16a995de2e17acc7c5d75f3b2b5a7f25d0bdc1)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
