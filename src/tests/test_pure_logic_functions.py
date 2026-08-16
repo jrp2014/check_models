@@ -1339,3 +1339,109 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         assert "snapshot missing config.json" not in caplog.text
         assert "loaded processor has no image_processor" not in caplog.text
         assert not any(record.levelno >= logging.WARNING for record in caplog.records)
+
+
+class TestSnapshotNotes:
+    """Legacy file-layout facts are recorded as neutral per-model evidence."""
+
+    def test_layout_validator_returns_missing_artifact_notes(
+        self, mod: types.ModuleType, tmp_path: Path
+    ) -> None:
+        """A snapshot lacking processor config yields a note (and no exception)."""
+        snapshot = tmp_path / "snapshot"
+        snapshot.mkdir()
+        (snapshot / "config.json").write_text("{}")
+        (snapshot / "tokenizer_config.json").write_text("{}")
+
+        notes = mod._validate_model_artifact_layout(
+            model_identifier="org/legacy",
+            snapshot_path=snapshot,
+            tokenizer=object(),  # any non-None tokenizer enables the tokenizer check
+        )
+
+        expected = (
+            "processor config missing from snapshot "
+            "(preprocessor_config.json, processor_config.json)"
+        )
+        assert notes == (expected,)
+
+    def test_layout_validator_reports_tokenizer_and_processor_gaps(
+        self, mod: types.ModuleType, tmp_path: Path
+    ) -> None:
+        """Both artifact families are reported when both are absent."""
+        snapshot = tmp_path / "snapshot"
+        snapshot.mkdir()
+
+        notes = mod._validate_model_artifact_layout(
+            model_identifier="org/bare",
+            snapshot_path=snapshot,
+            tokenizer=object(),
+        )
+
+        assert len(notes) == 2
+        assert notes[0].startswith("tokenizer artifacts missing from snapshot")
+        assert notes[1].startswith("processor config missing from snapshot")
+
+    def test_layout_validator_is_silent_for_complete_snapshot(
+        self, mod: types.ModuleType, tmp_path: Path
+    ) -> None:
+        """A snapshot with a processor config and tokenizer yields no notes."""
+        snapshot = tmp_path / "snapshot"
+        snapshot.mkdir()
+        (snapshot / "tokenizer.json").write_text("{}")
+        (snapshot / "preprocessor_config.json").write_text("{}")
+
+        assert (
+            mod._validate_model_artifact_layout(
+                model_identifier="org/modern",
+                snapshot_path=snapshot,
+                tokenizer=object(),
+            )
+            == ()
+        )
+
+    def test_layout_validator_returns_empty_without_snapshot(self, mod: types.ModuleType) -> None:
+        """No snapshot on disk means nothing to note."""
+        assert (
+            mod._validate_model_artifact_layout(
+                model_identifier="org/uncached",
+                snapshot_path=None,
+                tokenizer=None,
+            )
+            == ()
+        )
+
+    def test_snapshot_notes_round_trip_prompt_diagnostics_json(self, mod: types.ModuleType) -> None:
+        """Notes are serialised into the per-model JSONL prompt diagnostics."""
+        diagnostics = mod.PromptDiagnostics(
+            snapshot_notes=("processor config missing from snapshot (x.json)",),
+        )
+
+        payload = mod._prompt_diagnostics_to_json(diagnostics)
+
+        assert payload["snapshot_notes"] == ["processor config missing from snapshot (x.json)"]
+        assert "snapshot_notes" not in mod._prompt_diagnostics_to_json(mod.PromptDiagnostics())
+
+    def test_snapshot_notes_never_become_observations(self, mod: types.ModuleType) -> None:
+        """Notes are evidence only: a clean answer with notes stays usable."""
+        diagnostics = mod.PromptDiagnostics(
+            snapshot_notes=("processor config missing from snapshot (x.json)",),
+        )
+
+        class _Gen:
+            text = "A cat sits on a wall under a clear sky."
+            generation_tokens = 40
+            prompt_tokens = 300
+
+        result = mod.PerformanceResult(
+            model_name="org/legacy",
+            generation=_Gen(),
+            success=True,
+            prompt_diagnostics=diagnostics,
+        )
+        result = mod._populate_result_quality_analysis(result, prompt=None)
+
+        assessment = mod._assess_result(result)
+
+        assert assessment.observations == ()
+        assert assessment.usability == "usable"

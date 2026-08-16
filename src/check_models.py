@@ -1784,6 +1784,11 @@ class PromptDiagnostics:
     # harness applied it because the template opened a thinking block,
     # "explicit" when the user passed thinking flags, None when no budget.
     thinking_budget_source: Literal["auto", "explicit"] | None = None
+    # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
+    # processor config). Evidence only: never an observation, never affects
+    # usability; retained so a later failure can be traced to a snapshot that
+    # always lacked the artifact.
+    snapshot_notes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -9016,6 +9021,8 @@ def _diagnostics_result_facts(
     )
     if assessment.execution == "indeterminate":
         rows.append(("Indeterminate root cause", _indeterminate_reason(result)))
+    if prompt_diagnostics is not None and prompt_diagnostics.snapshot_notes:
+        rows.append(("Snapshot notes (neutral)", "; ".join(prompt_diagnostics.snapshot_notes)))
     telemetry = result.system_telemetry
     if telemetry is not None:
         label = (
@@ -11149,6 +11156,7 @@ def _build_prompt_diagnostics(
     generate_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
     thinking_budget_source: Literal["auto", "explicit"] | None = None,
+    snapshot_notes: tuple[str, ...] = (),
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -11176,6 +11184,7 @@ def _build_prompt_diagnostics(
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
+        snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
             processor_passthrough_kwargs=processor_passthrough_kwargs,
@@ -11217,6 +11226,10 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         ]
     if diagnostics.generate_kwargs:
         payload["generate_kwargs"] = dict(diagnostics.generate_kwargs)
+    if diagnostics.snapshot_notes:
+        payload["snapshot_notes"] = [
+            _prompt_diag_json_value(note) for note in diagnostics.snapshot_notes
+        ]
     return payload
 
 
@@ -12151,19 +12164,24 @@ def _validate_model_artifact_layout(
     model_identifier: str,
     snapshot_path: Path | None,
     tokenizer: PreTrainedTokenizerBase | SupportsTextDecoder | None,
-) -> None:
-    """Validate local model artifact structure and emit actionable warnings.
+) -> tuple[str, ...]:
+    """Validate local model artifact structure and return neutral snapshot notes.
 
     These checks are intentionally non-fatal because many older/community repos
-    rely on legacy file layouts that still run correctly with mlx-vlm.
+    rely on legacy file layouts that still run correctly with mlx-vlm. The
+    notes are recorded as evidence on the per-model result (never as an
+    observation and never affecting usability) so that a later failure on a
+    newer mlx-vlm can be traced back to a snapshot that always lacked the
+    artifact, without grepping run logs.
     """
     if snapshot_path is None or not snapshot_path.exists():
         logger.debug(
             "Skipping file-layout preflight for %s (snapshot unavailable).",
             model_identifier,
         )
-        return
+        return ()
 
+    notes: list[str] = []
     if tokenizer is not None:
         tokenizer_candidates = (
             "tokenizer_config.json",
@@ -12172,19 +12190,17 @@ def _validate_model_artifact_layout(
             "vocab.json",
         )
         if not any((snapshot_path / name).exists() for name in tokenizer_candidates):
-            logger.debug(
-                "Legacy snapshot note for %s: tokenizer artifacts missing from snapshot (%s).",
-                model_identifier,
-                ", ".join(tokenizer_candidates),
+            notes.append(
+                f"tokenizer artifacts missing from snapshot ({', '.join(tokenizer_candidates)})"
             )
 
     processor_candidates = ("preprocessor_config.json", "processor_config.json")
     if not any((snapshot_path / name).exists() for name in processor_candidates):
-        logger.debug(
-            "Legacy snapshot note for %s: processor config missing from snapshot (%s).",
-            model_identifier,
-            ", ".join(processor_candidates),
-        )
+        notes.append(f"processor config missing from snapshot ({', '.join(processor_candidates)})")
+
+    for note in notes:
+        logger.debug("Legacy snapshot note for %s: %s.", model_identifier, note)
+    return tuple(notes)
 
 
 def _run_model_preflight_validators(
@@ -12193,8 +12209,11 @@ def _run_model_preflight_validators(
     processor: ProcessorMixin,
     config: PreTrainedConfig | Mapping[str, object] | None,
     phase_callback: Callable[[str], None] | None = None,
-) -> None:
-    """Run preflight validators before invoking generation."""
+) -> tuple[str, ...]:
+    """Run preflight validators before invoking generation.
+
+    Returns neutral snapshot notes (legacy file-layout facts) for the result.
+    """
     _set_failure_phase(phase_callback, "tokenizer_load")
     tokenizer = _extract_processor_tokenizer(processor)
     if tokenizer is None:
@@ -12219,7 +12238,7 @@ def _run_model_preflight_validators(
         )
 
     snapshot_path = _resolve_model_snapshot_path(model_identifier)
-    _validate_model_artifact_layout(
+    return _validate_model_artifact_layout(
         model_identifier=model_identifier,
         snapshot_path=snapshot_path,
         tokenizer=tokenizer,
@@ -12281,6 +12300,13 @@ def _build_runtime_diagnostics(
     )
 
 
+class _PreparedPrompt(NamedTuple):
+    """Rendered prompt payload plus neutral snapshot notes from preflight."""
+
+    prompt: str | list[object]
+    snapshot_notes: tuple[str, ...]
+
+
 def _prepare_generation_prompt(
     *,
     params: ProcessImageParams,
@@ -12288,20 +12314,20 @@ def _prepare_generation_prompt(
     config: PreTrainedConfig | Mapping[str, object] | None,
     phase_callback: Callable[[str], None] | None,
     phase_timer: PhaseTimer | None,
-) -> str | list[object]:
+) -> _PreparedPrompt:
     """Run preflight checks and build the prompt payload for generation."""
     try:
         chat_template_kwargs = _build_chat_template_kwargs(params)
         timer_scope = phase_timer.track("prompt_prep") if phase_timer is not None else nullcontext()
         with timer_scope:
-            _run_model_preflight_validators(
+            snapshot_notes = _run_model_preflight_validators(
                 model_identifier=params.model_identifier,
                 processor=processor,
                 config=config,
                 phase_callback=phase_callback,
             )
             _set_failure_phase(phase_callback, "prefill")
-            return cast(
+            rendered = cast(
                 "str | list[object]",
                 apply_chat_template(
                     processor=processor,
@@ -12311,6 +12337,7 @@ def _prepare_generation_prompt(
                     **chat_template_kwargs,
                 ),
             )
+            return _PreparedPrompt(prompt=rendered, snapshot_notes=snapshot_notes)
     except ValueError as preflight_err:
         message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
         logger.exception("Model preflight validation failed for %s", params.model_identifier)
@@ -12533,13 +12560,14 @@ def _prepare_generation(
             raise _tag_exception_failure_phase(TypeError(msg), "processor_load")
         generation_processor = tokenizer
 
-    formatted = _prepare_generation_prompt(
+    prepared_prompt = _prepare_generation_prompt(
         params=params,
         processor=processor,
         config=config,
         phase_callback=phase_callback,
         phase_timer=phase_timer,
     )
+    formatted = prepared_prompt.prompt
     # Handle list return from apply_chat_template
     formatted_prompt = (
         "\n".join(str(m) for m in formatted) if isinstance(formatted, list) else formatted
@@ -12563,6 +12591,7 @@ def _prepare_generation(
         generate_kwargs=generate_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
         thinking_budget_source=thinking_budget_source,
+        snapshot_notes=prepared_prompt.snapshot_notes,
     )
     return _PreparedGeneration(
         model=model,

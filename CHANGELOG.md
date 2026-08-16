@@ -2,12 +2,25 @@
 
 Notable changes to this project will be documented in this file.
 
-
 ## [Unreleased]
 
-## [0.11.0] - 2026-08-16
+## [0.12.0] - 2026-08-16
 
 ### Added
+
+- Legacy snapshot notes are now recorded as structured, neutral per-model
+  evidence instead of a debug log line. The preflight file-layout check
+  (missing tokenizer artifacts, missing `preprocessor_config.json` /
+  `processor_config.json`) returns its findings, which are stored on
+  `PromptDiagnostics.snapshot_notes`, serialised into `results.jsonl` under
+  `prompt_diagnostics.snapshot_notes`, and shown as a "Snapshot notes
+  (neutral)" row in each model's diagnostics facts. They are evidence only:
+  never an observation and never affecting usability (many community repos
+  rely on legacy layouts that run correctly). Previously the note reached
+  `results.jsonl` only incidentally, as log text embedded verbatim in
+  `captured_upstream_output`, and was absent from every other artefact —
+  so tracing a later failure on a newer mlx-vlm back to a snapshot that
+  always lacked the artifact required grepping run logs.
 
 - Human-facing reports now surface each editable/git-installed component's
   exact source revision beside its version — `run_summary.md` "Run context"
@@ -20,6 +33,33 @@ Notable changes to this project will be documented in this file.
   correction in mlx-vlm #1927), so the revision is what pins a run's model
   behaviour and explains cross-run deltas that are not due to the image,
   prompt, or harness. Installed (non-git) packages gain no row.
+
+### Changed
+
+- Tighten the ruff quality ceilings to measured maxima so they guard against
+  regression instead of sitting far above real usage: `max-complexity`
+  75 → 15 (the previous ceiling was ~4× the most complex function) and
+  `max-statements` 60 → 50. The one production function over both new
+  limits, the report orchestrator `_generate_reports_and_log_outputs`, is
+  split along its two natural seams (`_run_diagnostics_artifact` and
+  `_log_report_generation_outcomes`) and now sits exactly at the ceiling.
+  Long scenario tests are exempt from the statement count (they read better
+  whole than fragmented). Argument ceilings are unchanged: they reflect the
+  keyword-only, typed report-builder signatures, and folding those into
+  parameter objects would add code without removing complexity.
+- Evaluated enabling the preview rule `RUF069` (float-equality-comparison)
+  and deliberately did not: individual preview rules require global
+  `preview = true`, which silently changes the behaviour of *stable* rules
+  (S603/S106 stop firing on this codebase, breaking the suppression audit).
+  The monolith already has zero exact float comparisons — the 47 hits are
+  all correct round-trip assertions in tests — so the rule would guard
+  against nothing today at the cost of altering the whole ruleset. The
+  decision and its reason are recorded in `pyproject.toml`; revisit when
+  the rule stabilises.
+
+## [0.11.0] - 2026-08-16
+
+### Added
 
 
 - mlx-vlm coverage matrix (upstream alignment design §6): an authoritative
@@ -234,27 +274,6 @@ Notable changes to this project will be documented in this file.
   (repo threshold 24). Report output is unchanged.
 
 ### Changed
-
-- Tighten the ruff quality ceilings to measured maxima so they guard against
-  regression instead of sitting far above real usage: `max-complexity`
-  75 → 15 (the previous ceiling was ~4× the most complex function) and
-  `max-statements` 60 → 50. The one production function over both new
-  limits, the report orchestrator `_generate_reports_and_log_outputs`, is
-  split along its two natural seams (`_run_diagnostics_artifact` and
-  `_log_report_generation_outcomes`) and now sits exactly at the ceiling.
-  Long scenario tests are exempt from the statement count (they read better
-  whole than fragmented). Argument ceilings are unchanged: they reflect the
-  keyword-only, typed report-builder signatures, and folding those into
-  parameter objects would add code without removing complexity.
-- Evaluated enabling the preview rule `RUF069` (float-equality-comparison)
-  and deliberately did not: individual preview rules require global
-  `preview = true`, which silently changes the behaviour of *stable* rules
-  (S603/S106 stop firing on this codebase, breaking the suppression audit).
-  The monolith already has zero exact float comparisons — the 47 hits are
-  all correct round-trip assertions in tests — so the rule would guard
-  against nothing today at the cost of altering the whole ruleset. The
-  decision and its reason are recorded in `pyproject.toml`; revisit when
-  the rule stabilises.
 
 
 - `_run_model_generation` is split at one seam: `_prepare_generation`
@@ -976,7 +995,6 @@ Notable changes to this project will be documented in this file.
 - Restore the prompt-preparation phase in detailed runtime timing logs so
   verbose metrics output and regression coverage stay aligned.
 
-
 ## [0.7.3] - 2026-05-29
 
 ### Changed
@@ -1435,7 +1453,6 @@ Notable changes to this project will be documented in this file.
 - Updated workspace file associations so generated `PKG-INFO` package-metadata
   files open as properties instead of Markdown, avoiding editor-only
   markdownlint noise on `.egg-info` metadata.
-
 
 ## [0.3.3] - 2026-04-12
 
