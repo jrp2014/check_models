@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-14 18:24:56 BST
+FULL ENVIRONMENT DUMP - 2026-08-16 17:42:02 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -24,9 +24,9 @@ CacheControl==0.14.4
 certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
-charset-normalizer==3.5.0
-check_models==0.9.1
-check_models==0.9.1
+charset-normalizer==3.5.1
+check_models==0.10.0
+check_models==0.10.0
 click==8.4.2
 cmake==4.4.2
 coverage==7.15.4
@@ -84,8 +84,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.1.dev20260814+3d23f7d87
-mlx==0.32.1.dev20260814+3d23f7d87
+mlx==0.32.1.dev20260816+c2bcf47ee
+mlx==0.32.1.dev20260816+c2bcf47ee
 mlx-audio==0.4.8
 mlx-lm==0.31.3
 mlx-vlm==0.6.14
@@ -94,7 +94,7 @@ mpmath==1.3.0
 msgpack==1.2.1
 multidict==6.7.1
 multiprocess==0.70.19
-mypy==2.3.0
+mypy==2.3.1
 mypy_extensions==1.1.0
 namex==0.1.0
 nanobind==2.14.0
@@ -187,11 +187,11 @@ tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
 truststore==0.10.4
-ty==0.0.71
+ty==0.0.72
 typer==0.27.1
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260518
-types-PyYAML==6.0.12.20260724
+types-PyYAML==6.0.12.20260815
 types-requests==2.33.0.20260712
 types-simplejson==4.1.0.20260724
 types-tabulate==0.10.0.20260508
@@ -216,5 +216,5 @@ yarl==1.24.5
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-14 18:24:56 BST
+Environment dump completed at 2026-08-16 17:42:02 BST
 ================================================================================

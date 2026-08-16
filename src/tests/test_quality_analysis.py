@@ -1144,3 +1144,59 @@ class TestFinalAnswerView:
 
         assert analysis.likely_capped is True
         assert "unfinished_list" in analysis.token_cap_reasons
+
+
+def test_configured_thinking_markers_are_not_prestripped_from_analysis() -> None:
+    """Regression: with a thinking budget configured, the </think> closure must survive.
+
+    ``_configured_output_wrappers`` used to include the configured thinking
+    start/end tokens, so ``_normalize_output_for_analysis`` stripped ``</think>``
+    before ``_final_answer_view`` ran; the seeded trace could then never be
+    recognised as complete and the reasoning was flagged as preamble.
+    """
+    diagnostics = check_models.PromptDiagnostics(
+        rendered_prompt="<|im_start|>assistant\n<think>\n",
+        generate_kwargs={
+            "enable_thinking": True,
+            "thinking_budget": 800,
+            "thinking_start_token": "<think>",
+            "thinking_end_token": "</think>",
+        },
+    )
+
+    wrappers = check_models._configured_output_wrappers(diagnostics)
+    assert "<think>" not in wrappers
+    assert "</think>" not in wrappers
+    # ...but they are still reported as configured generation wrappers.
+    assert "</think>" in check_models._configured_generation_wrappers(diagnostics)
+
+    class _Gen:
+        text = (
+            "Let me think about the title first, it should be 5-10 words.\n"
+            "</think>\n\n"
+            "Title: Two Tabby Cats Resting on a Pink Couch\n\n"
+            "Description: Two tabby cats rest on a pink couch with remotes nearby.\n\n"
+            "Keywords: cats, tabby, couch, pink, remote, resting, indoor, pets, fur, "
+            "sofa, cushion, home"
+        )
+        generation_tokens = 300
+        prompt_tokens = 900
+
+    result = check_models.PerformanceResult(
+        model_name="org/thinker",
+        generation=_Gen(),
+        success=True,
+        requested_max_tokens=1000,
+        prompt_diagnostics=diagnostics,
+    )
+
+    populated = check_models._populate_result_quality_analysis(
+        result, prompt=CATALOG_PROMPT, requested_max_tokens=1000
+    )
+
+    analysis = populated.quality_analysis
+    assert analysis is not None
+    assert analysis.has_thinking_trace is True
+    assert analysis.unexpected_catalog_preamble is None
+    assert analysis.instruction_echo is False
+    assert check_models._assess_result(populated).usability == "usable"

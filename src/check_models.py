@@ -15327,12 +15327,37 @@ def _collapse_preview_line_whitespace(text: str) -> str:
     return "\n".join(" ".join(line.split()) for line in normalized.split("\n"))
 
 
+def _configured_thinking_markers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
+    """Return the thinking start/end markers configured for this generation."""
+    if diagnostics is None:
+        return ()
+    markers = [
+        value
+        for key in ("thinking_start_token", "thinking_end_token")
+        if isinstance(value := diagnostics.generate_kwargs.get(key), str) and value
+    ]
+    return tuple(_dedupe_preserve_order(markers))
+
+
 def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
-    """Return wrappers declared by tokenizer metadata or mlx-vlm generation kwargs."""
+    """Return wrappers to strip from the analysis copy before structural checks.
+
+    Thinking start/end markers are deliberately excluded: they are structural
+    delimiters that ``_final_answer_view`` must still see to recognise a
+    complete trace. Stripping them here (as happened whenever a thinking
+    budget was configured) destroyed the closure marker, so a model that
+    reasoned and then answered was judged on its reasoning as preamble.
+    They remain in ``_configured_generation_wrappers`` as reported evidence.
+    """
     if diagnostics is None:
         return ()
 
-    wrappers = [*diagnostics.special_tokens, *_configured_generation_wrappers(diagnostics)]
+    thinking_markers = set(_configured_thinking_markers(diagnostics))
+    wrappers = [
+        wrapper
+        for wrapper in (*diagnostics.special_tokens, *_configured_generation_wrappers(diagnostics))
+        if wrapper not in thinking_markers
+    ]
     return tuple(_dedupe_preserve_order(wrappers))
 
 

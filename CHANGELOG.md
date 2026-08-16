@@ -91,6 +91,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Configured thinking start/end markers are no longer pre-stripped from the
+  analysis copy as generic control-token wrappers. Whenever a thinking budget
+  was configured (auto or explicit), `_configured_output_wrappers` fed
+  `</think>` into `_normalize_output_for_analysis`, which removed the closure
+  before `_final_answer_view` ran; a seeded trace could then never be
+  recognised as complete, so a model that reasoned and then answered was
+  judged on its reasoning as "extra text before Title" (and quoted phrases
+  inside the reasoning read as instruction echo). The markers stay reported
+  as configured generation wrappers. Regression-tested on the exact
+  `_populate_result_quality_analysis` path; on the 2026-08-16 run's real
+  outputs Qwen3-VL-2B-Thinking regrades unusable → usable and
+  ERNIE-4.5-VL-Thinking unusable → usable with caveats.
+
 - Completed thinking traces no longer make a good answer "unusable". A new
   final-answer view (`_final_answer_view`) removes every *complete* recognised
   thinking trace — emitted `<start>…<end>` blocks and prompt-seeded blocks the

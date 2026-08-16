@@ -10,346 +10,141 @@ Outcome counts
 |---------------------|-------|
 | Attempted           | 41    |
 | Conclusive outcomes | 41    |
-| Completed           | 40    |
-| Crashed             | 1     |
+| Completed           | 41    |
+| Crashed             | 0     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 1     |
-| none                           | 29    |
-| observation needs reproduction | 11    |
+| none                           | 31    |
+| observation needs reproduction | 10    |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
-| not evaluated       | 1     |
-| unusable            | 16    |
-| usable              | 10    |
-| usable with caveats | 14    |
+| unusable            | 11    |
+| usable              | 19    |
+| usable with caveats | 11    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| Response repeats the same text                                                        | 7     |
+| Response repeats the same text                                                        | 4     |
 | Unrecognised model control tokens remain visible                                      | 3     |
-| Required fields are missing or empty                                                  | 10    |
-| Response repeats the task instructions instead of only returning the requested fields | 2     |
-| Extra text appears before the Title field                                             | 5     |
-| Response appears cut off at the token limit                                           | 4     |
+| Required fields are missing or empty                                                  | 7     |
+| Response repeats the task instructions instead of only returning the requested fields | 3     |
+| Extra text appears before the Title field                                             | 7     |
+| Response appears cut off at the token limit                                           | 5     |
 | Internal reasoning block appears incomplete                                           | 1     |
 | Conversation-role control tokens remain visible                                       | 2     |
-| Title or keywords do not meet requested constraints                                   | 18    |
-| Title, Description and Keywords copy all supplied hints unchanged                     | 1     |
+| Title or keywords do not meet requested constraints                                   | 11    |
 
 ## Triage
 
-| Model                                                                                                      | Execution | Usability           | Maintainer status              | Observations                                                                                                       |
-|------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)            | crashed   | not_evaluated       | actionable_failure             | none                                                                                                               |
-| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)              | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)   | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; extra text before Title; role tokens visible                               |
-| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                           | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                            |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)             | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions                                                        |
-| [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)             | completed | unusable            | observation_needs_reproduction | repeated text; title/keyword constraints failed                                                                    |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                           | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                            |
-| [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                         | completed | unusable            | observation_needs_reproduction | repeated text; title/keyword constraints failed                                                                    |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)   | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                             |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                             |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                    | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                           |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                 | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible; title/keyword constraints failed                                                              |
+| Model                                                                                                           | Execution | Usability           | Maintainer status              | Observations                                                                                                 |
+|-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------|
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; title/keyword constraints failed                                     |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed             |
+| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                               |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                     |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                       |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | unusable            | observation_needs_reproduction | missing required fields; role tokens visible                                                                 |
+| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                   | completed | unusable            | observation_needs_reproduction | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                          |
 
 ## Crashes requiring action
 
-<a id="diagnostic-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-#### Root exception and chain
-
-```text
-builtins.ValueError: Image features and image tokens do not match: tokens: 81, features 1053
-builtins.ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do not match: tokens: 81, features 1053
-```
-
-#### Execution and provenance
-
-- *Execution:* crashed
-- *Usability:* not_evaluated
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Missing sections:* ["title", "description"]
-- *Echoed instruction fragments:* ["return exactly these three sections",
-  "title hint:", "description hint:", "keyword hints:"]
-- *Unexpected text before Title:* ========== Files: ['/', 'U', 's', 'e', 'r',
-  's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/',
-  'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0',
-  '8', '1', '5', '-', '1', '5', '5', '9', '4', '6', '_', 'D', 'S', 'C', '0',
-  '1', '5', '6', '8', '.', 'j', 'p', 'g']   Prompt:  User:&lt;image&gt;Create
-  British-English catalogue metadata from the image and supplied context.
-  Treat any capture date/time and GPS as authoritative facts, but do not claim
-  they are visible. Descriptive hints may be incomplete or wrong: retain
-  details supported by the image, correct conflicts, and add important visible
-  details. Prefer image evidence when a hint conflicts, and omit uncertain
-  details.  Context: Authoritative context: - Capture date/time: 2026-08-15
-  15:59:46 UTC+01:00 - GPS: 51.128800°N, 1.319100°E  Descriptive hints: -
-  Title hint: Dover Castle, Dover, England, UK, GBR, Europe - Description
-  hint: An exterior view of a historic medieval stone castle, featuring round
-  towers, an arched entranceway, and a small bridge, built on a steep grassy
-  hill under a partly cloudy sky. - Keyword hints: Adobe Stock, Any Vision,
-  Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent,
-  Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-  Write: - a concrete 5-10-word title; - a 1-2-sentence factual description
-  combining relevant context with the main visible subject, setting, action,
-  lighting, and distinctive details; - 10-18 unique, comma-separated keywords
-  covering relevant context and visible details.  Return exactly these three
-  sections and nothing else:
-- *Unexpected special tokens:* ["&lt;|im_start|&gt;"]
-- *Phase:* decode
-- *Stage:* Model Error
-- *Package:* mlx-vlm
-- *Error type:* ValueError
-- *Error message:* Model generation failed for
-  mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do
-  not match: tokens: 81, features 1053
-- *Root error type:* ValueError
-- *Root error message:* Image features and image tokens do not match: tokens:
-  81, features 1053
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.009602184
-- *Post-cleanup cache memory (GB):* 0.0
-- *Configured EOS token ID:* 49279
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-<details>
-<summary>Complete traceback</summary>
-
-```text
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11966, in _run_generation_guarded
-    return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12315, in _generate_once
-    return strict_generate(
-        model=model,
-    ...<3 lines>...
-        **generate_kwargs,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1159, in generate
-    for response in stream_generate(
-                    ~~~~~~~~~~~~~~~^
-        model, processor, prompt, image, audio, video, verbose=verbose, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 978, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 393, in generate_step
-    embedding_output = model.get_input_embeddings(
-        input_ids, pixel_values, mask=mask, **kwargs
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/idefics3/idefics3.py", line 160, in get_input_embeddings
-    final_inputs_embeds = self._prepare_inputs_for_multimodal(
-        image_features, inputs_embeds, input_ids
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/idefics3/idefics3.py", line 174, in _prepare_inputs_for_multimodal
-    raise ValueError(
-        f"Image features and image tokens do not match: tokens: {n_image_tokens}, features {n_image_features}"
-    )
-ValueError: Image features and image tokens do not match: tokens: 81, features 1053
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12893, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12328, in _run_model_generation
-    output = _run_generation_guarded(
-        params=params,
-        generate_once=_generate_once,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11973, in _run_generation_guarded
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-ValueError: Model generation failed for mlx-community/SmolVLM2-2.2B-Instruct-mlx: Image features and image tokens do not match: tokens: 81, features 1053
-
-```
-
-</details>
-
-#### Captured stdout/stderr
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '8', '1', '5', '-', '1', '5', '5', '9', '4', '6', '_', 'D', 'S', 'C', '0', '1', '5', '6', '8', '.', 'j', 'p', 'g'] 
-
-Prompt: <|im_start|>User:<image>Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-08-15 15:59:46 UTC+01:00
-- GPS: 51.128800°N, 1.319100°E
-
-Descriptive hints:
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:<end_of_utterance>
-Assistant:
-
-=== STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 3113.43it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[00:45:18] ERROR    Generation error for mlx-community/SmolVLM2-2.2B-Instruct-mlx
-                    ValueError: Image features and image tokens do not match: tokens: 81, features 1053
-```
+None.
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
+<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — repeated text; missing required fields; extra text before Title; cut off at token limit; incomplete thinking block</summary>
+<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — repeated text; extra text before Title; title/keyword constraints failed</summary>
 
-### mlx-community/GLM-4.1V-9B-Thinking-8bit
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 #### Execution and provenance
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  token_cap_truncation, unexpected_catalog_preamble, thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Missing sections:* ["title"]
-- *Repeated fragment:* keyword: "england"
-- *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this task
-  step by step. First, the title needs to be 5-10 words, concrete. The image
-  is of Dover Castle, so maybe "Dover Castle Exterior View". Then the
-  description should combine context (date/time, location) with the main
-  subject, setting, etc. The image shows a historic medieval stone castle with
-  round towers, arched entrance, steep grassy hill, partly cloudy sky. So the
-  description should mention the castle, its features, the setting, and the
-  time. Then keywords need to be 10-18 unique ones, covering context and
-  visible details.  First, title: Let's make it "Dover Castle Exterior with
-  Round Towers". Wait, need 5-10 words. Maybe "Dover Castle Medieval
-  Exterior". Wait, let's check the hints. The title hint is Dover Castle,
-  Dover, England... so maybe "Dover Castle Exterior View". That's 3 words,
-  maybe add more. "Dover Castle Historic Exterior with Round Towers" – that's
-  6 words. Okay.
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
-  "incomplete_thinking_trace", "abrupt_tail"]
-- *Resolved model revision:* 9677807f106500eb7690391c27645d59f6855cfb
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001803312
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6344
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image is of Dover Castle, so maybe "Dover Castle Exterior View". Then the description should combine context (date/time, location) with the main subject, setting, etc. The image shows a historic medieval stone castle with round towers, arched entrance, steep grassy hill, partly cloudy sky. So the description should mention the castle, its features, the setting, and the time. Then keywords need to be 10-18 unique ones, covering context and visible details.
-
-First, title: Let's make it "Dover Castle Exterior with Round Towers". Wait, need 5-10 words. Maybe "Dover Castle Medieval Exterior". Wait, let's check the hints. The title hint is Dover Castle, Dover, England... so maybe "Dover Castle Exterior View". That's 3 words, maybe add more. "Dover Castle Historic Exterior with Round Towers" – that's 6 words. Okay.
-
-Description: Combine context (capture date/time, location) with main subject (historic medieval stone castle), setting (steep grassy hill), lighting (partly cloudy sky), distinctive details (round towers, arched entrance). So: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00 in Dover, England." Wait, need 1-2 sentences. Let's make it concise. "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15." That's two sentences? Wait, no, 1-2 sentences. Let's try: "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That's one sentence. Wait, need to include the context (capture date/time, location) and the main visible subject, setting, etc. So maybe: "A historic medieval stone castle with round towers and an arched entrance, built on a steep grassy hill under a partly cloudy sky, photographed in Dover, England on 2026-08-15 15:59:46 UTC+01:00." That's a bit long, but maybe shorten. "A historic medieval stone castle with round towers and an arched entrance, situated on a steep grassy hill under a partly cloudy sky, captured in Dover, England on 2026-08-15." That works.
-
-Keywords: Need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not, since the image might not be from those, but the hints include them? Wait, the hints say "Adobe Stock, Any Vision" as keyword hints? Wait, the context says "Descriptive hints" include those, but maybe the keywords should include the ones from hints plus others. Let's list: Dover Castle, England, Europe, Kent, Castle, Fortress, Hill, Sky, Stone, Tower, Wall, ancient, architecture, blue, Britain, UK, United Kingdom, Arch, Bridge. Wait, the image has a small bridge, so Bridge. Let's check the hints: keyword hints are Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. So combine these, remove duplicates. Let's list unique ones: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue. Wait, need 10-18. Let's count: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue – that's 18, but maybe some can be combined. Wait, "United Kingdom" and "UK" are similar, but keep both? Or pick one. Let's do: Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue. That's 17. Add Bridge if visible. The image has a small bridge, so Bridge. So Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, Wall, ancient, architecture, blue, Bridge. That's
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
-
-<details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — unusable — repeated text; missing required fields; extra text before Title; role tokens visible</summary>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, missing_requested_sections,
-  unexpected_catalog_preamble, role_boundary_token_present
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Missing sections:* ["title"]
-- *Repeated fragment:* keyword: "kent"
-- *Unexpected text before Title:* ◁think▷Okay, let's tackle this. First, I
-  need to create a British-English catalogue metadata based on the image and
-  the provided context. The user wants a 5-10 word title, a 1-2 sentence
-  description, and 10-18 keywords.  Starting with the title: The image shows
-  Dover Castle, which is in the context given. The castle is a historic
-  medieval stone structure with round towers, an arched entrance, and a
-  bridge. The setting is a grassy hill under a partly cloudy sky. So the title
-  should be concise. Maybe "Dover Castle, Kent, UK: Medieval stone fortress on
-  grassy hill with arched entrance and towers." That's 10 words.  Next, the
-  description: It needs to combine context and visible details. The capture
-  date and GPS are authoritative but not visible, so focus on the image. The
-  castle is on a grassy hill, has stone walls, round towers, an arched
-  entrance, and a bridge. The sky is partly cloudy. So the description could
-  be: "Exterior view of Dover Castle, a medieval stone fortress on a grassy
-  hill, featuring round towers, an arched entranceway, and a bridge, under a
-  partly cloudy sky." That's 25 words, which is a bit long but fits the
-  requirement.
-- *Thinking trace markers:* ["\u25c1think\u25b7", "\u25c1/think\u25b7"]
-- *Role-boundary tokens in output:* ["&lt;|im_assistant|&gt;"]
-- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Observations:* repeated_output, unexpected_catalog_preamble,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Repeated fragment:* phrase: "too general. i'll also..."
+- *Unexpected text before Title:* Alright, let's get to work. I need to
+  generate some metadata for this image, and the instructions are very
+  specific. First, I need a title, a description, and a list of keywords. The
+  title has to be between five and ten words, and the description needs to be
+  a short, factual paragraph. The keywords are crucial; they have to be unique
+  and relevant, and I can only use what's *clearly* visible. No guessing, no
+  assumptions.  Okay, let's break down the image. I see two cats, definitely.
+  One is a calico, and the other is a tabby. They're on a red couch, and
+  there's a remote control nearby. The lighting seems to be indoor, probably
+  from a lamp or the sun. The cats are sleeping, and the image is a bit
+  blurry.  Now, the title. I need something short and descriptive. "Two cats
+  sleeping on a red couch" is a good start, but I can do better. "Calico and
+  tabby cats resting on a red couch" is more specific, but maybe too long.
+  "Two cats sleeping on a red couch with a remote" is also good. I'll go with
+  "Two cats sleeping on a red couch with a remote." It's concise and accurate.
+  Next, the description. I need to cover the main subject, setting, action,
+  lighting, and any distinctive details. The main subjects are the two cats.
+  The setting is a red couch. They're sleeping. The lighting is soft, and the
+  image is a bit blurry. The distinctive details are the calico and tabby
+  patterns, the red couch, and the remote. I'll write: "A calico cat and a
+  tabby cat are sleeping side-by-side on a red couch. A remote control lies
+  nearby. The image is slightly blurry, capturing a quiet moment indoors."
+  That's two sentences, factual, and covers everything.  Finally, the
+  keywords. I need to be very careful here. I'll list the obvious things: cat,
+  cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting,
+  couch, sofa, remote, television, television remote, blurry, indoor, home,
+  furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure
+  they are all unique and relevant. I'll remove "couch" and "sofa" since they
+  are the same thing. I'll also remove "television" and "television remote"
+  because the remote is the only thing that is related to a television. I'll
+  also remove "blurry" because it is not a fact. I'll also remove "pet" and
+  "domestic cat" because they are too general. I'll also remove "animal"
+  because it is too general. I'll also remove "animal sleeping" because it is
+  too general. I'll also remove "home" because it is too general. I'll also
+  remove "furniture" because it is too general. I'll also remove "television"
+  because it is too general. I'll also remove "television remote" because it
+  is too general. I'll also remove "blurry" because it is not a fact. I'll
+  also remove "indoor" because it is too general. I'll also remove "pet"
+  because it is too general. I'll also remove "domestic cat" because it is too
+  general. I'll also remove "animal" because it is too general. I'll also
+  remove "animal sleeping" because it is too general. I'll also remove "home"
+  because it is too general. I'll also remove "furniture" because it is too
+  general. I'll also remove
+- *Declared generation wrappers in output:* ["&lt;/think&gt;"]
+- *Thinking trace markers:* ["&lt;think&gt;", "&lt;/think&gt;"]
+- *Title word count:* 10
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 33
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["couch", "pet", "sofa", "remote", "television",
+  "television remote", "blurry", "indoor", "home", "furniture", "domestic
+  cat", "animal sleeping"]
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003654752
+- *Post-cleanup active memory (GB):* 0.001180718
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1296
-- *Generation tokens:* 834
-- *Configured EOS token ID:* 163594
-- *Configured EOS token:* [EOS]
+- *Prompt tokens:* 545
+- *Generation tokens:* 944
+- *Configured EOS token ID:* 2
+- *Configured EOS token:* &lt;/s&gt;
+- *Configured thinking start token:* &lt;think&gt;
+- *Configured thinking end token:* &lt;/think&gt;
+- *Configured thinking budget:* 800
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); mode snapshot
@@ -357,25 +152,32 @@ Keywords: Need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Visio
 #### Complete output
 
 ```text
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. 
+Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
 
-Starting with the title: The image shows Dover Castle, which is in the context given. The castle is a historic medieval stone structure with round towers, an arched entrance, and a bridge. The setting is a grassy hill under a partly cloudy sky. So the title should be concise. Maybe "Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers." That's 10 words.
+Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
 
-Next, the description: It needs to combine context and visible details. The capture date and GPS are authoritative but not visible, so focus on the image. The castle is on a grassy hill, has stone walls, round towers, an arched entrance, and a bridge. The sky is partly cloudy. So the description could be: "Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky." That's 25 words, which is a bit long but fits the requirement.
+Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
 
-Keywords: Need 10-18 unique terms. From the context and image: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue (sky), United Kingdom, Britain, fortification, wall. Let me count: Dover Castle, Kent, UK, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, blue, United Kingdom, Britain, fortification, wall. That's 17 keywords. Need to check if they are unique and relevant. Maybe "UK" and "United Kingdom" are redundant, so replace one. Let's remove "United Kingdom" and keep UK. Also, "Britain" is similar to UK. So revised: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, Kent, England. Wait, Kent is already in the title. Maybe include "Dover Castle" as a keyword. Let me check again. The context mentions Dover Castle, so that's essential. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue sky, UK. That's 16 keywords. Maybe add "sky" instead of "blue sky" but "blue" is in the hints. Hmm, the hints have "blue" as a keyword. So include that. So final keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, blue, UK. That's 16. Maybe add "sky" instead of "blue" if needed, but the hint says to prefer image evidence. The sky is partly cloudy, so "partly cloudy sky" is better. So keep "partly cloudy sky". Alright, that should work.◁/think▷Title: Dover Castle, Kent, UK: Medieval stone fortress on grassy hill with arched entrance and towers  
-Description: Exterior view of Dover Castle, a medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a bridge, under a partly cloudy sky.  
-Keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round towers, arched entrance, bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortification, wall, UK<|im_assistant|>
+Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
+
+Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all unique and relevant. I'll remove "couch" and "sofa" since they are the same thing. I'll also remove "television" and "television remote" because the remote is the only thing that is related to a television. I'll also remove "blurry" because it is not a fact. I'll also remove "pet" and "domestic cat" because they are too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove "television" because it is too general. I'll also remove "television remote" because it is too general. I'll also remove "blurry" because it is not a fact. I'll also remove "indoor" because it is too general. I'll also remove "pet" because it is too general. I'll also remove "domestic cat" because it is too general. I'll also remove "animal" because it is too general. I'll also remove "animal sleeping" because it is too general. I'll also remove "home" because it is too general. I'll also remove "furniture" because it is too general. I'll also remove
+</think>
+
+Title: Two cats sleeping on a red couch with a remote
+
+Description: A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors.
+
+Keywords: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet, domestic cat, animal sleeping
 ```
 
 </details>
 
-<a id="diagnostic-mlx-community-lfm25-vl-16b-bf16"></a>
+<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 <details>
-<summary>mlx-community/LFM2.5-VL-1.6B-bf16 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — repeated text; extra text before Title; cut off at token limit; title/keyword constraints failed</summary>
 
-### mlx-community/LFM2.5-VL-1.6B-bf16
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 #### Execution and provenance
 
@@ -383,25 +185,27 @@ Keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round t
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Repeated fragment:* keyword: "blue"
-- *Title word count:* 13
+  unexpected_catalog_preamble, catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Repeated fragment:* keyword: "household frames"
+- *Unexpected text before Title:* Here is the information in the format you
+  requested:
+- *Title word count:* 6
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 454
+- *Keyword count:* 313
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["uk", "architecture", "blue", "castle"]
-- *Token-cap degradation evidence:* ["repetitive_tail"]
-- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Duplicate keywords:* ["household frames"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.003785824
+- *Post-cleanup active memory (GB):* 0.00431012
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 603
+- *Prompt tokens:* 107
 - *Generation tokens:* 1000
-- *Configured EOS token ID:* 7
-- *Configured EOS token:* &lt;|im_end|&gt;
+- *Configured EOS token ID:* 128009
+- *Configured EOS token:* &lt;|eot_id|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); mode snapshot
@@ -409,11 +213,54 @@ Keywords: Dover Castle, Kent, England, Europe, stone fortress, medieval, round t
 #### Complete output
 
 ```text
-Title: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, Hill, Sky, Architecture, Blue
+Here is the information in the format you requested:
 
-Description: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's imposing structure and intricate design reflect its rich history and architectural significance.
+**Title:** Two Cats on a Pink Blanket
 
-Keywords: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, Hill, Sky, Architecture, Blue, Castle, Kent, UK, Ancient, Blue, Architecture, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle, Blue, Castle,
+**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed.
+
+**Keywords:** Tabby cats, pink blanket, remote controls, sleeping, feline, domestic, household, comfort, relaxation, domesticated, household pets, household items, household appliances, household furniture, household decor, household textiles, household linens, household blankets, household comforters, household pillows, household throws, household rugs, household mats, household carpets, household flooring, household walls, household ceilings, household windows, household doors, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames, household frames,
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+<details>
+<summary>mlx-community/llava-v1.6-mistral-7b-8bit — unusable — repeated text; missing required fields; cut off at token limit</summary>
+
+### mlx-community/llava-v1.6-mistral-7b-8bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, missing_requested_sections,
+  token_cap_truncation
+- *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
+- *Missing sections:* ["title", "description", "keywords"]
+- *Repeated fragment:* feline,
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
+  "abrupt_tail"]
+- *Resolved model revision:* b8df5f329d95a7abe6429ed46093f9b84e8e6396
+- *Processor class:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.012453096
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 2469
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 2
+- *Configured EOS token:* &lt;/s&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline
 ```
 
 </details>
@@ -421,7 +268,7 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, H
 <a id="diagnostic-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 <details>
-<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; echoes instructions</summary>
+<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated text; missing required fields; echoes instructions; extra text before Title; cut off at token limit</summary>
 
 ### mlx-community/paligemma2-3b-pt-896-4bit
 
@@ -431,20 +278,24 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, H
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, missing_requested_sections,
-  prompt_instruction_echo
+  token_cap_truncation, prompt_instruction_echo, unexpected_catalog_preamble
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Missing sections:* ["title", "description", "keywords"]
-- *Repeated fragment:* phrase: "europe, fortress, hill, kent,..."
-- *Echoed instruction fragments:* ["title hint:", "description hint:",
-  "keyword hints:"]
+- *Missing sections:* ["title"]
+- *Repeated fragment:* phrase: "- 10-18 unique, comma-separate..."
+- *Echoed instruction fragments:* ["return exactly these three sections",
+  "return exactly these three sections and nothing else"]
+- *Unexpected text before Title:* Action: Lighting: Brand: Species: Period:
+  Event: Date: Name: Intent: Brand: Date: Name:
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
+  "abrupt_tail"]
 - *Resolved model revision:* a26bac48c7a661dfdafe1799c90177f818e79925
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014025992
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.0141079
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4435
-- *Generation tokens:* 726
+- *Prompt tokens:* 4207
+- *Generation tokens:* 1000
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -454,175 +305,88 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Medieval, Stone, Tower, H
 #### Complete output
 
 ```text
-- Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe, Fortress, Hill, Kent, Sky, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
-
-<details>
-<summary>mlx-community/Qwen3-VL-2B-Instruct-bf16 — unusable — repeated text; title/keyword constraints failed</summary>
-
-### mlx-community/Qwen3-VL-2B-Instruct-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Repeated fragment:* keyword: "stone"
-- *Title word count:* 3
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 33
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["england", "uk", "europe", "fortress", "castle",
-  "stone", "tower", "wall", "hill", "sky", "ancient", "architecture", "united
-  kingdom"]
-- *Resolved model revision:* c8a67a84327484ba87f5ec4f8fb927cdafd791aa
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00775079
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16506
-- *Generation tokens:* 118
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title:
-Dover Castle Exterior
-
+Action:
+Lighting:
+Brand:
+Species:
+Period:
+Event:
+Date:
+Name:
+Intent:
+Brand:
+Date:
+Name:
 Description:
-An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.
-
-Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wall, Hill, Sky, Arch, Ancient, Architecture, Britain, Kent, United Kingdom, Stone, Wall, Castle, England, Europe, Fortress, Hill, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
-
-<details>
-<summary>mlx-community/X-Reasoner-7B-8bit — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Repeated fragment:* keyword: "kent"
-- *Title word count:* 4
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 357
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["kent", "england", "uk", "europe", "medieval",
-  "stone", "round towers", "small bridge", "grassy hill", "partly cloudy sky",
-  "architecture", "ancient", "arched entranceway", "historic", "fortress"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.01017566
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16517
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
+Action:
+Lighting:
+Keywords:
+Return exactly these three sections and nothing else:
 Title:
-Dover Castle, Kent, England
-
 Description:
-A historic medieval stone castle with round towers, an arched entranceway, and a small bridge, situated on a steep grassy hill under a partly cloudy sky, captured on 2026-08-15 at 15:59:46 UTC+01:00.
-
-Keywords: Dover Castle, Kent, England, UK, Europe, medieval, stone, round towers, arched entrance, small bridge, grassy hill, partly cloudy sky, historic architecture, ancient fortress, stone walls, medieval castle, United Kingdom, Europe, architecture, blue sky, greenery, stone bridge, medieval structure, stone towers, historical landmark, Kent, England, UK, Europe, ancient, architecture, blue, grass, sky, stone, tower, wall, entrance, bridge, castle, Dover, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent, England, UK, Europe, medieval, stone, round towers, arched entranceway, small bridge, grassy hill, partly cloudy sky, historic, architecture, ancient, fortress, Kent
-```
-
-</details>
-
-<a id="diagnostic-qwen-qwen3-vl-2b-instruct"></a>
-
-<details>
-<summary>Qwen/Qwen3-VL-2B-Instruct — unusable — repeated text; title/keyword constraints failed</summary>
-
-### Qwen/Qwen3-VL-2B-Instruct
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Repeated fragment:* keyword: "stone"
-- *Title word count:* 3
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 33
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["england", "uk", "europe", "fortress", "castle",
-  "stone", "tower", "wall", "hill", "sky", "ancient", "architecture", "united
-  kingdom"]
-- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.000443432
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16506
-- *Generation tokens:* 118
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title:
-Dover Castle Exterior
-
-Description:
-An exterior view of Dover Castle, a historic medieval stone fortress on a grassy hill, featuring round towers, an arched entranceway, and a small bridge under a partly cloudy sky.
-
-Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wall, Hill, Sky, Arch, Ancient, Architecture, Britain, Kent, United Kingdom, Stone, Wall, Castle, England, Europe, Fortress, Hill, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-18 unique, comma-separated keywords.
+- 10-1
 ```
 
 </details>
@@ -630,7 +394,7 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wal
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-8bit
 
@@ -639,18 +403,23 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wal
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token
+- *Observations:* unexpected_special_token, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Title word count:* 8
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 14
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["domestic"]
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01017568
+- *Post-cleanup active memory (GB):* 0.010257588
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 615
-- *Generation tokens:* 85
+- *Prompt tokens:* 386
+- *Generation tokens:* 72
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -661,9 +430,9 @@ Keywords: Dover Castle, England, UK, Europe, Fortress, Castle, Stone, Tower, Wal
 
 ```text
 <|channel>thought
-<channel|>Title: Exterior view of Dover Castle in Kent, England
-Description: An exterior view of the medieval stone fortifications of Dover Castle, featuring round towers and an arched entranceway atop a steep grassy hill under a partly cloudy sky.
-Keywords: Dover Castle, England, Kent, UK, castle, fortress, stone, tower, architecture, medieval, ancient, arch, hill, history, Britain, Europe
+<channel|>Title: Two tabby cats sleeping on a pink blanket
+Description: Two striped tabby cats rest on a bright pink blanket atop a red sofa. Two remote controls lie near the sleeping animals.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, remote, indoor, pets, striped, resting, feline, domestic, domestic
 ```
 
 </details>
@@ -688,10 +457,10 @@ Keywords: Dover Castle, England, Kent, UK, castle, fortress, stone, tower, archi
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01017568
+- *Post-cleanup active memory (GB):* 0.010257588
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 615
-- *Generation tokens:* 82
+- *Prompt tokens:* 386
+- *Generation tokens:* 74
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -702,9 +471,9 @@ Keywords: Dover Castle, England, Kent, UK, castle, fortress, stone, tower, archi
 
 ```text
 <|channel>thought
-<channel|>Title: Medieval Stone Towers of Dover Castle in Kent England
-Description: An exterior view of the historic medieval stone castle featuring round towers and an arched entranceway situated on a steep grassy hill under a cloudy sky.
-Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tower, Wall, ancient, architecture, Arch, Medieval, Kent, Europe
+<channel|>Title: Two tabby cats sleeping on a pink blanket
+Description: Two tabby cats are lying down on a pink blanket on a red sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, red, indoor, remote, controls, feline, resting, domestic, fur, soft
 ```
 
 </details>
@@ -712,7 +481,7 @@ Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tow
 <a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
 
 <details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
+<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible</summary>
 
 ### mlx-community/GLM-4.6V-nvfp4
 
@@ -721,22 +490,18 @@ Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tow
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token, catalog_constraint_violation
+- *Observations:* unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
 - *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
   "&lt;|end_of_box|&gt;"]
-- *Title word count:* 4
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 16
-- *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002425916
+- *Post-cleanup active memory (GB):* 0.002425912
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6348
-- *Generation tokens:* 83
+- *Prompt tokens:* 499
+- *Generation tokens:* 89
 - *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -746,9 +511,9 @@ Keywords: Dover Castle, England, UK, Britain, Castle, Fortress, Hill, Stone, Tow
 #### Complete output
 
 ```text
-<|begin_of_box|>Title: Dover Castle, Kent, England
-Description: An exterior view of Dover Castle, a historic medieval stone fortress with round towers and an arched entrance, perched on a steep grassy hill under a partly cloudy sky.
-Keywords: Dover Castle, England, UK, Kent, Castle, Fortress, Stone, Tower, Arch, Hill, Sky, Architecture, Ancient, Britain, Europe, Wall<|end_of_box|>
+<|begin_of_box|>Title: Two cats on a pink couch
+Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
+Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
 ```
 
 </details>
@@ -756,31 +521,27 @@ Keywords: Dover Castle, England, UK, Kent, Castle, Fortress, Stone, Tower, Arch,
 <a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 <details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — usable_with_caveats — role tokens visible; title/keyword constraints failed</summary>
+<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — missing required fields; role tokens visible</summary>
 
 ### mlx-community/Idefics3-8B-Llama3-bf16
 
 #### Execution and provenance
 
 - *Execution:* completed
-- *Usability:* usable_with_caveats
+- *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* role_boundary_token_present, catalog_constraint_violation
+- *Observations:* missing_requested_sections, role_boundary_token_present
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Missing sections:* ["title", "description", "keywords"]
 - *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
-- *Title word count:* 10
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 24
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["europe", "sky"]
 - *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
 - *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00268806
+- *Post-cleanup active memory (GB):* 0.002688056
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2626
-- *Generation tokens:* 141
+- *Prompt tokens:* 2418
+- *Generation tokens:* 13
 - *Configured EOS token ID:* 128001
 - *Configured EOS token:* &lt;|end_of_text|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -790,9 +551,141 @@ Keywords: Dover Castle, England, UK, Kent, Castle, Fortress, Stone, Tower, Arch,
 #### Complete output
 
 ```text
- Title: Dover Castle, England, UK, Medieval Stone Castle on a Hill.
-Description: Dover Castle, a historic medieval stone castle, features round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky. The castle's architecture is characterized by its stone walls and towers, and it is a prominent landmark in Dover, England, UK.
-Keywords: castle, dover, england, uk, europe, stone, tower, hill, sky, arch, bridge, grass, cloudy, sky, blue, ancient, architecture, fortification, kent, adobe stock, any vision, united kingdom, europe, gbr.<end_of_utterance>
+ Two cats laying on a pink blanket with remotes.<end_of_utterance>
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
+
+<details>
+<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed</summary>
+
+### mlx-community/GLM-4.1V-9B-Thinking-8bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* token_cap_truncation, unexpected_catalog_preamble,
+  thinking_trace_incomplete, catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this.
+  First, the title needs to be 5-10 words, concrete. Looking at the image: two
+  cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with
+  Remotes" or something similar. Then description: need to mention the main
+  subject (two cats), setting (pink blanket, red couch), action (lying down),
+  lighting (bright), distinctive details (remotes, cat positions). Then
+  keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline,
+  relaxed, home. Let's make sure to omit uncertain details.
+- *Thinking trace markers:* ["&lt;think&gt;"]
+- *Title word count:* 21
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 13
+- *Requested keyword count range:* [10, 18]
+- *Token-cap degradation evidence:* ["incomplete_thinking_trace",
+  "unfinished_list"]
+- *Resolved model revision:* 9677807f106500eb7690391c27645d59f6855cfb
+- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.001803312
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 495
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151329
+- *Configured EOS token:* &lt;|endoftext|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+<think>Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats), setting (pink blanket, red couch), action (lying down), lighting (bright), distinctive details (remotes, cat positions). Then keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's make sure to omit uncertain details. 
+
+Title: "Cats Resting on Pink Blanket with Remotes" – wait, 5-10 words. Let's check. "Two Cats on Pink Blanket with Remotes" is good. 
+
+Description: Two tabby cats lie on a pink blanket atop a red couch, with remote controls nearby, in bright lighting. – need to make it 1-2 sentences. So: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." 
+
+Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Let's check unique ones, comma-separated. 
+
+Now, let's structure each part:
+
+Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
+
+Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
+
+Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home (10 words, unique)
+
+Wait, need to make sure all are clearly visible. The image has two cats, pink blanket, red couch, remotes. So description should mention those. Let's adjust description: "Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, under bright lighting." That's factual, no unsupported details. 
+
+Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home. Are these unique? Let's see. Maybe add "pet" or "cats" is there. Wait, need 10-18. Let's check: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, couch, red (but red is part of couch, maybe not). Wait, the couch is red, but maybe include "red couch" as a keyword? But need unique. Let's do: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed, home, pet, indoor, resting, tabby, two. That's 12, which is between 10-18. 
+
+Wait, let's check the image again. Two tabby cats, so "tabby" can be a keyword. "resting" is action. "indoor" setting. "pink" blanket. "remotes" are there. "couch" is red. So keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, lying, domestic. That's 11, which is good. 
+
+Now, final check:
+
+Title: "Cats on Pink Blanket with Remotes" (5 words, concrete)
+
+Description: Two tabby cats rest on a pink blanket on a red couch, with remote controls nearby, in bright lighting. (1 sentence, factual)
+
+Keywords: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home (or add more, but need unique). Wait, the image has two cats, so "two" could be a keyword. Let's do: cats, tabby, blanket, couch, remotes, pink, resting, indoor, relaxed, home, two. That's 11. 
+
+Wait, the user said "unique, comma-separated keywords" – so no duplicates. So "cats" once, "tabby" once, "blanket" once, "couch" once, "remotes" once, "pink" once, "resting" once, "indoor" once, "relaxed" once, "home" once, "two" once. That's 10. Wait, 10-18, so maybe add "feline" (same as cat), "lying" (same as resting). Hmm. Let's make sure each keyword is unique. Let's go with:
+
+Title: "Cats on Pink Blanket with Remotes"
+
+Description: Two tabby cats lie on a pink blanket on a red couch, with remote controls nearby, in bright lighting.
+
+Keywords: cats, tabby, blanket,
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+
+<details>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — usable_with_caveats — role tokens visible</summary>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* role_boundary_token_present
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Thinking trace markers:* ["\u25c1think\u25b7", "\u25c1/think\u25b7"]
+- *Role-boundary tokens in output:* ["&lt;|im_assistant|&gt;"]
+- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.003654748
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 489
+- *Generation tokens:* 562
+- *Configured EOS token ID:* 163594
+- *Configured EOS token:* [EOS]
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, likely a living room. 
+
+First, the title: need a 5-10 word title. Maybe "Two tabby cats resting on pink fabric with remotes." Wait, check word count. "Two tabby cats rest on pink fabric with remotes." That's 8 words. Good.
+
+Description: 1-2 sentences. Describe main subject (two tabby cats), setting (pink fabric, likely couch), action (resting), lighting (bright, vivid colors), distinctive details (remotes, their positions). So: "Two tabby cats lie on a pink fabric surface, with two remote controls nearby, under bright lighting that enhances vivid colors." Wait, maybe shorter. "Two tabby cats rest on pink fabric; two remotes nearby, bright lighting highlights their fur patterns." Hmm, need to be concise. Let's refine: "Two tabby cats lie on pink fabric with two remote controls, under bright lighting emphasizing their striped fur." That's 2 sentences. Wait, the instruction says 1-2 sentences. Let's make it better: "Two tabby cats rest on a pink fabric surface, with two remote controls nearby, under bright lighting that highlights their striped patterns." That's 2 sentences.
+
+Keywords: 10-18 unique, comma-separated. Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment, relaxed cats. Let's count: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Maybe add "two cats" but that's redundant. Wait, "two tabby cats" is already mentioned. So keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment. That's 10. Check if all are unique and visible. Yes.◁/think▷Title: Two tabby cats rest on pink fabric with remotes nearby  
+Description: Two tabby cats lie on a pink fabric surface, with two remote controls positioned near them, under bright lighting that highlights their striped fur patterns.  
+Keywords: tabby cats, pink fabric, remote controls, bright lighting, striped fur, resting, indoor setting, domestic scene, relaxed posture, feline, domestic environment<|im_assistant|>
 ```
 
 </details>
@@ -807,45 +700,47 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                                 | Usability           | Observations                                                         |
-|-------------------------------------------------------|---------------------|----------------------------------------------------------------------|
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                              |
-| mlx-community/gemma-3n-E4B-it-bf16                    | unusable            | missing required fields                                              |
-| mlx-community/llava-v1.6-mistral-7b-8bit              | unusable            | missing required fields                                              |
-| mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                     |
-| mlx-community/MolmoPoint-8B-fp16                      | unusable            | missing required fields                                              |
-| mlx-community/nanoLLaVA-1.5-4bit                      | unusable            | missing required fields                                              |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16      | unusable            | extra text before Title; title/keyword constraints failed            |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | unusable            | extra text before Title; title/keyword constraints failed            |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/GLM-4.6V-Flash-mxfp4                    | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/InternVL3-8B-bf16                       | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Molmo-7B-D-0924-8bit                    | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/pixtral-12b-8bit                        | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit               | usable_with_caveats | title/keyword constraints failed; draft hints copied unchanged       |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Step-3.7-Flash-oQ2e                     | usable_with_caveats | title/keyword constraints failed                                     |
+| Model                                                 | Usability           | Observations                                                                                  |
+|-------------------------------------------------------|---------------------|-----------------------------------------------------------------------------------------------|
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                                                       |
+| mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                                              |
+| mlx-community/nanoLLaVA-1.5-4bit                      | unusable            | missing required fields                                                                       |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | unusable            | echoes instructions; extra text before Title                                                  |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/gemma-3n-E4B-it-bf16                    | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/GLM-4.6V-Flash-mxfp4                    | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Ornith-1.0-35B-bf16                     | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit               | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | usable_with_caveats | title/keyword constraints failed                                                              |
 
 ## Clean Completion Context
 
 <details>
 <summary>Clean completions</summary>
 
-| Model                                             | Runtime identity                                    | Performance                                                                               |
-|---------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                  | rev ed71acdae079; Lfm2VlProcessor; stop completed   | 400 prompt / 98 generated; 503 tok/s; 1.1 GB peak; cleanup 0.000132/0.0 GB active/cache   |
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed   | 619 prompt / 98 generated; 91.3 tok/s; 16 GB peak; cleanup 0.0118/0.0 GB active/cache     |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed   | 619 prompt / 73 generated; 16.3 tok/s; 20 GB peak; cleanup 0.0123/0.0 GB active/cache     |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit  | rev 8451adc50203; MllamaProcessor; stop completed   | 314 prompt / 106 generated; 15.0 tok/s; 15 GB peak; cleanup 0.00431/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed | 3228 prompt / 143 generated; 58.3 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed | 3227 prompt / 104 generated; 172 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache  |
-| mlx-community/Ornith-1.0-35B-bf16                 | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed  | 16522 prompt / 105 generated; 48.9 tok/s; 74 GB peak; cleanup 0.00706/0.0 GB active/cache |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed    | 1137 prompt / 110 generated; 50.9 tok/s; 9.4 GB peak; cleanup 0.00713/0.0 GB active/cache |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16522 prompt / 116 generated; 90.4 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed  | 16522 prompt / 114 generated; 13.0 tok/s; 35 GB peak; cleanup 0.0096/0.0 GB active/cache  |
+| Model                                             | Runtime identity                                        | Performance                                                                              |
+|---------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------|
+| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 31.6 tok/s; 18 GB peak; cleanup 0.0108/0.0 GB active/cache    |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 130 tok/s; 16 GB peak; cleanup 0.0119/0.0 GB active/cache     |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 28.1 tok/s; 19 GB peak; cleanup 0.0124/0.0 GB active/cache    |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 60 generated; 34.4 tok/s; 17 GB peak; cleanup 0.003/0.0 GB active/cache    |
+| mlx-community/LFM2.5-VL-1.6B-bf16                 | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 350 prompt / 100 generated; 185 tok/s; 4.1 GB peak; cleanup 0.00379/0.0 GB active/cache  |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.5 tok/s; 9.8 GB peak; cleanup 0.00508/0.0 GB active/cache |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 64.6 tok/s; 10 GB peak; cleanup 0.00534/0.0 GB active/cache |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 193 tok/s; 4.5 GB peak; cleanup 0.0056/0.0 GB active/cache   |
+| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 843 prompt / 89 generated; 53.7 tok/s; 11 GB peak; cleanup 0.00592/0.0 GB active/cache   |
+| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 6.21 tok/s; 23 GB peak; cleanup 0.00654/0.0 GB active/cache   |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 59.6 tok/s; 9.3 GB peak; cleanup 0.00711/0.0 GB active/cache  |
+| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.5 tok/s; 15 GB peak; cleanup 0.0144/0.0 GB active/cache   |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16           | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 129 tok/s; 5.3 GB peak; cleanup 0.00773/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 121 tok/s; 21 GB peak; cleanup 0.00855/0.0 GB active/cache    |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 101 tok/s; 7.1 GB peak; cleanup 0.00906/0.0 GB active/cache   |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 19.2 tok/s; 30 GB peak; cleanup 0.00957/0.0 GB active/cache  |
+| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 105 generated; 44.2 tok/s; 65 GB peak; cleanup 0.00995/0.0 GB active/cache  |
+| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 66.1 tok/s; 10 GB peak; cleanup 0.0103/0.0 GB active/cache   |
+| Qwen/Qwen3-VL-2B-Instruct                         | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 138 tok/s; 5.2 GB peak; cleanup 0.000443/0.0 GB active/cache  |
 
 </details>
 
@@ -854,31 +749,20 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 6,656 x 8,880 pixels
-- *Image size:* 79,069,278 bytes
-- *Image SHA-256:* 771ab1bcadbb99020fb1a6270d6f36e8dd613cc3132c390bed714290bda2dd05
+- *Image dimensions:* 640 x 480 pixels
+- *Image size:* 173,131 bytes
+- *Image SHA-256:* dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
 
 <details>
 <summary>Exact prompt</summary>
 
 ```text
-Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-08-15 15:59:46 UTC+01:00
-- GPS: 51.128800°N, 1.319100°E
-
-Descriptive hints:
-- Title hint: Dover Castle, Dover, England, UK, GBR, Europe
-- Description hint: An exterior view of a historic medieval stone castle, featuring round towers, an arched entranceway, and a small bridge, built on a steep grassy hill under a partly cloudy sky.
-- Keyword hints: Adobe Stock, Any Vision, Arch, Britain, Castle, Dover Castle, England, Europe, Fortress, Hill, Kent, Sky, Stone, Tower, UK, United Kingdom, Wall, ancient, architecture, blue
+Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
 
 Write:
 - a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
 
 Return exactly these three sections and nothing else:
 Title:
@@ -892,29 +776,32 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
+The shared command omits per-model automatic thinking flags. When substituting
+these models, append the flags recorded in their diagnostics blocks:
+`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (--enable-thinking
+--thinking-budget 800).
+
 ### Highlighted model revisions
 
-| Model                                         | Resolved revision                        |
-|-----------------------------------------------|------------------------------------------|
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx      | 844516024a1c4400d34489b89ee067d794e432ed |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit       | 9677807f106500eb7690391c27645d59f6855cfb |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16  | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
-| mlx-community/LFM2.5-VL-1.6B-bf16             | 16a710cf8afca206ff16a95a4ad6fe657f876ce1 |
-| mlx-community/paligemma2-3b-pt-896-4bit       | a26bac48c7a661dfdafe1799c90177f818e79925 |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16       | c8a67a84327484ba87f5ec4f8fb927cdafd791aa |
-| mlx-community/X-Reasoner-7B-8bit              | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
-| Qwen/Qwen3-VL-2B-Instruct                     | 89644892e4d85e24eaac8bacfd4f463576704203 |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit  | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | ded389e478f86d498ad9e7f47666e83b166a28f1 |
-| mlx-community/GLM-4.6V-nvfp4                  | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
-| mlx-community/Idefics3-8B-Llama3-bf16         | 8c2a30c48864f3251701b7bde40f601d25535098 |
+| Model                                            | Resolved revision                        |
+|--------------------------------------------------|------------------------------------------|
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
+| mlx-community/llava-v1.6-mistral-7b-8bit         | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
+| mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
+| mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
+| mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit          | 9677807f106500eb7690391c27645d59f6855cfb |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
 
 ### Components and system
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.14                                                                                                                                          |
-| mlx                        | 0.32.1.dev20260815+9ab977b56                                                                                                                    |
+| mlx                        | 0.32.1.dev20260816+c2bcf47ee                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.8                                                                                                                                           |
 | transformers               | 5.15.0                                                                                                                                          |
@@ -943,7 +830,7 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,684,032 bytes, sha256=58668b2e31837a33652e00f30dc03cf27d6342065e1b1f0e4d6a98e5cb3c6efe) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,981,840 bytes, sha256=e403248438590fc1042a115709e9964b09d5bb23bb16c262e88fd314bce11ad5)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,684,784 bytes, sha256=b90da7f5c9401aa9b05d09c0b0d796a6a3a2517ab081152db7b419e00c7f1815) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,982,032 bytes, sha256=ff4a2f5da3749505bffa7164284c23fb9fcbb4979178cb4367bf4a16dc700e30)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
