@@ -7,6 +7,16 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- mlx-vlm coverage matrix (upstream alignment design §6): an authoritative
+  table in `src/README.md` recording which upstream surfaces this project
+  exercises (direct load / image / chat-template / generate APIs, sampling,
+  thinking, KV-cache controls, harness-side measurement), deliberately leaves
+  unexercised (multi-image/audio/video, speculative decoding, prompt/vision
+  cache reuse, image generation), treats as server-only (protocol routes,
+  batching, APC, embeddings/reranking, structured outputs), or regards as
+  separate workflows (conversion, fine-tuning, distributed). It records why
+  mlx-vlm PR #1713's APC prefix-reuse fix cannot affect direct, isolated,
+  cold-start benchmark runs. `docs/IMPLEMENTATION_GUIDE.md` points at it.
 - Capability-aware default discovery (upstream alignment design §1–3). Cache
   discovery now has two independent layers: the existing mlx-vlm server-style
   cache-layout filter, plus a tri-state image-capability classification

@@ -78,6 +78,13 @@ A single medium-sized, well-commented function is often clearer than a web of on
       `hf-cache-mlx-vlm-models` under `.agents/skills/` (pip/conda adaptations of
       mlx-vlm support workflows). Prefer retained diagnostics and
       `src/output/issues/` over inventing new repro tooling.
+    - Before extending upstream coverage, consult the **mlx-vlm coverage
+      matrix** in `src/README.md` (Configuration & Parameters → Server-Shared
+      Request Controls). It is the authoritative record of which upstream
+      surfaces this project exercises, deliberately leaves unexercised (e.g.
+      speculative decoding, cache reuse), treats as server-only, or regards as
+      separate workflows — and explains why server-cache fixes such as
+      mlx-vlm PR #1713 do not affect direct, isolated benchmark runs.
 3. **Environment Discipline**:
     - **ALWAYS** run python commands in the `mlx-vlm` conda environment.
     - Use `conda run -n mlx-vlm python ...` for single commands.

@@ -454,12 +454,50 @@ FastAPI server. Where those controls map directly to `mlx_vlm.generate()`,
 - `--logit-bias '{"token_id": bias}'`: Forward an OpenAI-style token-id bias
   object to generation, with JSON object keys normalized to integer token IDs.
 
-The MLX-VLM server also provides HTTP/API surfaces that are not direct
-per-model benchmark kwargs: `/models`, `/v1/chat/completions`, `/v1/responses`,
-`/health`, `/metrics`, `/v1/cache/*`, `/unload`, continuous batching, APC,
-structured outputs, tool calls, top-logprobs envelopes, and image
-generation/editing endpoints. Use `mlx_vlm.server` directly for those server
-surfaces; `check_models` uses direct generation for benchmark isolation.
+#### mlx-vlm coverage matrix
+
+`check_models` is a focused single-image benchmark that calls the direct
+`mlx_vlm` load, chat-template, image-loading, and generation APIs, one model at
+a time, in an isolated process state. As mlx-vlm has grown into a serving
+runtime, this table is the authoritative statement of which upstream surfaces
+this project exercises and which it deliberately leaves to native mlx-vlm
+tools. (The upstream contract this project validates against is
+`_RUNTIME_API_CALL_CONTRACTS` in `check_models.py`; the direct calls are
+`mlx_vlm.utils.load`, `mlx_vlm.utils.load_image`,
+`mlx_vlm.prompt_utils.apply_chat_template`, and `mlx_vlm.generate.generate`.)
+
+| Surface | Status | Notes |
+| ------- | ------ | ----- |
+| Model loading (`load`), `--revision`, `--adapter-path`, `--trust-remote-code`, `--lazy-load`, `--force-download` | **Exercised** | Direct API; load failures are phase-tagged and classified. |
+| Still-image input (`load_image`), one image per run | **Exercised** | Always exactly one image; the chat template is applied with `num_images=1`. |
+| Chat templates (`apply_chat_template`), `--processor-kwargs` passthrough | **Exercised** | Template kwargs are recorded in prompt diagnostics. |
+| Text generation (`generate`), sampling and penalty controls, `--seed`, `--logit-bias` | **Exercised** | Everything sent is listed in `_SENT_GENERATE_KEYWORDS` and drift-checked against the installed `GenerateKwargs`. |
+| Thinking controls (`--enable-thinking`, `--thinking-budget`, start/end tokens, `--thinking-mode`, automatic budget) | **Exercised** | See the `--enable-thinking`, `--thinking-budget`, and `--auto-thinking-budget` entries in the Command Line Reference. |
+| KV-cache controls (`--max-kv-size`, uniform and per-tensor `--kv-*-bits`/`--kv-*-scheme`, `--quantized-kv-start`) | **Exercised** | Per-tensor fields are sent only when set, so PyPI releases predating them are unaffected. |
+| Timing, throughput, MLX peak/active/cache memory, allocator evidence, system-pressure telemetry | **Exercised** | Harness-side measurement around the direct call, not an upstream surface. |
+| Multi-image, audio, and video inputs | Deliberately unexercised | Out of scope for a single-image description benchmark; use `python -m mlx_vlm.generate` / `mlx_vlm.video_generate` natively. |
+| Speculative decoding (draft models, DFlash) | Deliberately unexercised | A drafter is a second model and changes timing, memory, provenance, and failure attribution; it belongs in a future explicit benchmark lane, never the baseline. |
+| Prompt cache / vision-feature cache reuse across calls | Deliberately unexercised | Each model runs cold in an isolated process state; no `prompt_cache`, `vision_cache`, or `prompt_cache_state` is constructed or reused. |
+| Image/video generation and image editing pipelines | Deliberately unexercised | Different model kind; cached generation pipelines classify as non-image and are skipped by default discovery with an explicit reason. |
+| OpenAI / Anthropic / Responses / realtime protocols, streaming envelopes, top-logprobs | Server-only | `python -m mlx_vlm.server`; not a per-model benchmark kwarg. |
+| Continuous batching, request queues, `/v1/cache/*`, `/unload`, `/health`, `/metrics` | Server-only | Serving-runtime concerns with no direct-API equivalent. |
+| Automatic prefix caching (APC), including PR #1713 | Server-only | See the note below. |
+| Embeddings and reranking endpoints/model kinds | Server-only | Their cached model repos classify as non-image and are skipped by default discovery. |
+| Structured outputs, tool calling, MCP | Server-only | Protocol features layered on the server, not on `generate()`. |
+| Model conversion / quantisation, fine-tuning (LoRA), evaluation suites, distributed inference | Separate workflows | Native mlx-vlm CLIs; this project only consumes already-converted cached repos. |
+
+**Why mlx-vlm PR #1713 does not affect normal `check_models` runs.** That PR
+fixes automatic-prefix-cache reuse for growing prepared prompts. APC prefix
+reuse only engages when a caller supplies an `apc_manager` and reuses server
+prompt caches across requests. `check_models` never constructs an APC manager,
+never passes `prompt_cache`/`prompt_cache_state`, and runs each model exactly
+once from a cold state, so there is no prefix to reuse and the changed code
+path is never entered. The same reasoning applies to any future server-cache
+fix: it can only matter here if this project starts reusing caches, which the
+baseline deliberately does not.
+
+Use `mlx_vlm.server` directly for the server-only surfaces; `check_models`
+uses direct generation for benchmark isolation.
 
 When filing or debugging upstream server-only behavior, start the server with
 `python -m mlx_vlm.server` under the conda `mlx-vlm` environment, prefer `curl`
