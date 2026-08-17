@@ -7,8 +7,12 @@ once fully resolved.
 ## Active Documents
 
 - **[GPS_DATA_FORMAT_EXPLANATION.md](GPS_DATA_FORMAT_EXPLANATION.md)** — GPS/EXIF data format reference
-- **[DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md](DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md)** — Product recommendations for issue-ready diagnostics (mlx-vlm maintainers) and model-selection galleries (image description)
-- **[CHECK_MODELS_MONOLITH_COMPRESSION_REVIEW.md](CHECK_MODELS_MONOLITH_COMPRESSION_REVIEW.md)** — Human review of `src/check_models.py` for compression, robustness, and analyzer-friendly structure (no monolith split)
+- **[UPSTREAM_THINKING_BUDGET_EMITTED_START_ISSUE.md](UPSTREAM_THINKING_BUDGET_EMITTED_START_ISSUE.md)** — Evidence file behind the posted upstream issue [Blaizzy/mlx-vlm#1819](https://github.com/Blaizzy/mlx-vlm/issues/1819) (thinking budget vs. model-emitted `<think>`); kept current with each re-verification against upstream `main` while fix PR #1882 is open
+- **[UPSTREAM_WORKFLOW_HARDENING_PR.md](UPSTREAM_WORKFLOW_HARDENING_PR.md)** — Paste-ready PR material for hardening mlx-vlm's GitHub Actions workflows (status not tracked here; retire once filed or superseded)
+
+Upstream issue drafts are created under this directory only while a finding is
+being prepared or actively tracked; once posted and closed upstream, or
+superseded by a newer draft, they move to `archive/`.
 
 ## Archive
 

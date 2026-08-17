@@ -1,8 +1,10 @@
 # Draft upstream issue: thinking_budget cannot bound models that emit their own thinking start token
 
-Status: draft, not filed. Paste-ready body below the line. Native-run evidence
-captured 2026-08-15 on the pinned revisions shown; sweep evidence from the
-2026-08-14 41-model run (`src/output/results.jsonl`).
+Status: **posted as [Blaizzy/mlx-vlm#1819](https://github.com/Blaizzy/mlx-vlm/issues/1819)**;
+fix PR [#1882](https://github.com/Blaizzy/mlx-vlm/pull/1882) open, unmerged. This
+file tracks the evidence behind the issue and its follow-up comments. Native-run
+evidence below was captured 2026-08-15 (`8683ec19`) and re-verified 2026-08-17
+(`625f71fa`, see the update at the end); sweep evidence from the 2026-08-14 run.
 
 ---
 
@@ -151,3 +153,52 @@ with no behaviour change for models that never emit the token.
 - mlx-vlm: `main` @ `8683ec19` (editable install); also inspected `v0.6.13`
 - mlx: `0.32.1.dev20260814+3d23f7d87`
 - macOS 26.6.1, Apple M5 Max (128 GB), Python 3.13.14
+
+---
+
+## Update 2026-08-17 at `625f71fa`: the budget now fires, but the model resumes reasoning past it
+
+Re-ran the GLM-4.1V-9B-Thinking case on current `main` (`625f71fa`, mlx
+`0.32.1.dev20260817`, M5 Max), single image, `temperature=0.0`,
+`max_tokens=300`, `enable_thinking=True`, `thinking_budget=20`. The rendered
+prompt ends `…<|assistant|>\n` — the template does not open a thinking block;
+the model emits `<think>` itself (the case #1882 targets).
+
+Observed (229 tokens generated, `finish_reason=stop`):
+
+1. The model opens `<think>` itself and the budget **does** engage: `</think>`
+   is forced after **23 tokens**. This differs from the original report at
+   0.6.11, where the block ran unclosed to the cap.
+2. The model then **continues reasoning immediately without re-opening
+   `<think>`** — `</think>Got it, let's look at the image. …` — for a further
+   **204 tokens** of unmarked chain-of-thought.
+3. It finally emits its *own* `</think>` (a second one — the model's protocol)
+   followed by `<answer>A monument with a bird statue atop stands by the sea…</answer>`.
+
+So the forced closure is treated as noise: the model neither stops thinking
+nor transitions to answer mode. Net effect: the budget saved 0 tokens versus
+no budget on this prompt; on the catalogue prompt in the sweeps the same
+model still spends the full 1000-token cap.
+
+Implications for #1882:
+
+- The `input_ids` gate at `generate/dispatch.py:918` is unchanged; the budget
+  engaged here only because `enable_thinking=True` was passed explicitly and
+  the criteria armed on the emitted opener. A caller relying on auto-detection
+  still gets nothing.
+- Closing the block is **necessary but not sufficient**. For a self-opening
+  model the forced `</think>` must be followed by something that moves the
+  model into answer mode — e.g. forcing the model's answer-start token where
+  one exists (`<answer>` for GLM-4.1V/4.6V), or at minimum resetting
+  `in_thinking` and re-forcing closure if reasoning continues. Otherwise the
+  model treats `\n</think>` as a stray token and carries on.
+
+Retest command once #1882 is rebased: the same call with `thinking_budget=20`
+should yield an `<answer>` within ~30–40 tokens if the fix achieves its goal.
+
+Related, resolved: the Idefics3 `<end_of_utterance>` leak (same
+turn-terminator class) was fixed upstream in `625f71fa` (#1936; see also the
+earlier PR #1774), verified live. Kimi-VL's `<|im_assistant|>` leak has a
+different cause — `generation_config.json` (`[163585]`) overriding a correct
+`config.json` `eos_token_id` (`[163584, 163586]`) at load — and is tracked as
+a follow-up comment on #1936.

@@ -4,6 +4,21 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation housekeeping: archived the two superseded 2026-08-09 thinking
+  issue drafts (both replaced by the posted upstream issue #1819 and the
+  current evidence file), and the completed pip-metadata-quarantine plan/spec
+  and the fully implemented mlx-vlm upstream alignment design spec (now under
+  `docs/notes/archive/superpowers/`; the empty `docs/superpowers/` tree is
+  removed, matching the notes README's stated convention). The notes README
+  index no longer lists archived files as active and now describes the
+  lifecycle of upstream issue drafts. The emitted-start thinking-budget
+  evidence file is updated with the 2026-08-17 `625f71fa` re-verification
+  (budget now fires but the model resumes reasoning past the forced close;
+  Idefics3 leak fixed upstream in #1936; Kimi-VL leak traced to
+  `generation_config.json` overriding `config.json` EOS ids).
+
 ## [0.12.0] - 2026-08-16
 
 ### Added
