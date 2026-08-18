@@ -12366,6 +12366,12 @@ def _mlx_shutdown_cleanup() -> None:
     ``mx.clear_streams()`` at the end of every thread that used MLX,
     including the main thread. Running it from ``atexit`` places it after
     normal shutdown work but before module teardown, which is early enough.
+
+    mlx-vlm registers the same ``atexit`` cleanup itself from 0.6.15
+    (Blaizzy/mlx-vlm#1949, unreleased at the time of writing); this hook stays
+    so that released 0.6.14 wheels — and direct ``mlx.core`` use before
+    ``mlx_vlm`` is imported — are covered too. A second ``clear_streams()``
+    on an already-empty thread is a no-op.
     """
     synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
     clear_streams_fn = cast("Callable[[], object] | None", getattr(mx, "clear_streams", None))

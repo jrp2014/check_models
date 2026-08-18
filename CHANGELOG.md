@@ -24,7 +24,8 @@ Notable changes to this project will be documented in this file.
   `update.sh` local-MLX smoke runs the upstream `mlx_vlm generate` CLI through
   a bootstrap that registers the same hook, since the upstream CLI does no
   teardown of its own. The local mlx checkout is no longer pinned to
-  `d9e2b0d40`.
+  `d9e2b0d40`. (Upstream mlx-vlm registers the same cleanup from 0.6.15,
+  Blaizzy/mlx-vlm#1949; ours stays for released 0.6.14 wheels.)
 
 ### Removed
 
