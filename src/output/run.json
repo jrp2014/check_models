@@ -613,7 +613,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "b33477e58a63a7ed895c646f171dfca6a25c4850",
+      "source_revision": "3b02a3211b112e563ab7f9b72e648d17f2b307f4",
       "vcs_revision": null,
       "version": "0.12.0"
     },
@@ -623,15 +623,15 @@
       "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "source_revision": null,
       "vcs_revision": null,
-      "version": "1.27.0"
+      "version": "1.28.0"
     },
     "mlx": {
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "d5841be95f68eba13bce5ab6abd673260bf12f74",
+      "source_revision": "7f062ddcb81bedb537f3f95d11a7343ba6b5f909",
       "vcs_revision": null,
-      "version": "0.32.2.dev20260818+d5841be95"
+      "version": "0.32.2.dev20260818+7f062ddcb"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -661,7 +661,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "625f71fae24f0d5c5ee7f1ec747094e815393405",
+      "source_revision": "e2b4ea1af18eff4cb4d1dd2cdfa2a588bbcfc0fd",
       "vcs_revision": null,
       "version": "0.6.14"
     },
@@ -698,7 +698,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-18 13:00:51 BST",
+  "generated_at": "2026-08-18 19:44:23 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -715,8 +715,8 @@
   },
   "library_versions": {
     "Pillow": "12.3.0",
-    "huggingface-hub": "1.27.0",
-    "mlx": "0.32.2.dev20260818+d5841be95",
+    "huggingface-hub": "1.28.0",
+    "mlx": "0.32.2.dev20260818+7f062ddcb",
     "mlx-audio": "0.5.0",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -981,8 +981,8 @@
     }
   },
   "producer": {
-    "dirty": true,
-    "git_revision": "b33477e58a63a7ed895c646f171dfca6a25c4850",
+    "dirty": false,
+    "git_revision": "3b02a3211b112e563ab7f9b72e648d17f2b307f4",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.12.0"
@@ -1328,6 +1328,6 @@
   },
   "prompt_sha256": "ae934c0aa806dbad3ab44aa77c6aea920b9e2ea0f377d63a1862c0065ef290ba",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1082.808,
+  "total_runtime_seconds": 1062.673,
   "trust_remote_code": true
 }

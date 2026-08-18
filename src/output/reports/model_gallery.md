@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-18 13:00:51 BST
+Generated on: 2026-08-18 19:44:23 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -18,53 +18,53 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                           |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.84s   | 479 tok/s  | 0.37            | 1.9     | 2,072      | 132     | none                                                                                                   |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 11.13s  | 29.6 tok/s | 3.76            | 24      | 2,658      | 131     | none                                                                                                   |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 9.98s   | 32.7 tok/s | 1.09            | 18      | 2,587      | 202     | none                                                                                                   |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 2.36s   | 186 tok/s  | 0.37            | 4.0     | 2,072      | 140     | none                                                                                                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.89s   | 66.5 tok/s | 2.52            | 14      | 3,191      | 162     | none                                                                                                   |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.40s   | 185 tok/s  | 1.17            | 9.0     | 3,190      | 123     | none                                                                                                   |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 63.61s  | 111 tok/s  | 59.04           | 24      | 16,482     | 95      | none                                                                                                   |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 64.00s  | 93.5 tok/s | 60.40           | 10.0    | 16,482     | 113     | none                                                                                                   |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 83.24s  | 30.4 tok/s | 75.99           | 22      | 16,482     | 127     | none                                                                                                   |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.72s   | 125 tok/s  | 0.38            | 5.5     | 1,400      | 89      | none                                                                                                   |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 23.96s  | 46.2 tok/s | 15.16           | 70      | 3,468      | 114     | none                                                                                                   |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.25s   | 126 tok/s  | 0.44            | 16      | 580        | 98      | none                                                                                                   |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.56s   | 26.0 tok/s | 1.18            | 20      | 580        | 111     | none                                                                                                   |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 7.15s   | 39.0 tok/s | 2.28            | 16      | 3,429      | 99      | none                                                                                                   |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 24.71s  | 42.6 tok/s | 15.34           | 78      | 6,311      | 96      | control tokens visible; title/keyword constraints failed                                               |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 6.66s   | 34.3 tok/s | 1.88            | 17      | 3,623      | 85      | title/keyword constraints failed                                                                       |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 135.52s | 4.7 tok/s  | 1.65            | 40      | 1,257      | 610     | role tokens visible                                                                                    |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | 2.22s   | 273 tok/s  | 0.26            | 3.8     | 964        | 73      | title/keyword constraints failed                                                                       |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 7.09s   | 64.1 tok/s | 2.32            | 15      | 3,191      | 174     | title/keyword constraints failed                                                                       |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.36s   | 53.1 tok/s | 0.88            | 11      | 1,495      | 122     | title/keyword constraints failed                                                                       |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 73.65s  | 63.4 tok/s | 62.33           | 74      | 16,482     | 111     | title/keyword constraints failed                                                                       |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | 3.39s   | 56.7 tok/s | 0.39            | 9.6     | 1,094      | 81      | title/keyword constraints failed                                                                       |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | 27.72s  | 90.7 tok/s | 16.01           | 8.4     | 16,469     | 903     | title/keyword constraints failed                                                                       |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 89.73s  | 17.9 tok/s | 78.90           | 35      | 16,482     | 117     | title/keyword constraints failed                                                                       |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | 24.30s  | 57.5 tok/s | 17.99           | 13      | 16,478     | 241     | title/keyword constraints failed                                                                       |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 6.26s   | 53.3 tok/s | 0.63            | 29      | 576        | 81      | control tokens visible; title/keyword constraints failed                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 6.02s   | 47.8 tok/s | 0.33            | 28      | 576        | 82      | control tokens visible; title/keyword constraints failed                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.57s   | 30.6 tok/s | 0.99            | 17      | 569        | 139     | title/keyword constraints failed                                                                       |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.97s  | 93.8 tok/s | 13.85           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.99s  | 41.2 tok/s | 2.29            | 15      | 3,520      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; title/keyword constraints failed |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 25.09s  | 59.4 tok/s | 1.88            | 60      | 1,584      | 1,000   | cut off at token limit; title/keyword constraints failed                                               |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.35s   | 354 tok/s  | 0.23            | 2.1     | 308        | 147     | missing required fields; echoes instructions; extra text before Title                                  |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 28.39s  | 47.4 tok/s | 5.24            | 13      | 6,307      | 994     | missing required fields; extra text before Title                                                       |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 21.01s  | 76.8 tok/s | 6.09            | 8.4     | 6,311      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 54.33s  | 19.7 tok/s | 1.44            | 15      | 275        | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 29.99s  | 5.96 tok/s | 2.94            | 24      | 3,119      | 142     | missing required fields                                                                                |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 76.04s  | 221 tok/s  | 70.13           | 5.1     | 16,478     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | 30.10s  | 90.7 tok/s | 17.29           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 7.28s   | 48.5 tok/s | 0.89            | 17      | 568        | 162     | missing required fields                                                                                |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 4.37s   | 64.3 tok/s | 2.35            | 9.7     | 2,692      | 18      | missing required fields                                                                                |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.58s   | 368 tok/s  | 0.07            | 2.4     | 304        | 151     | missing required fields; echoes instructions                                                           |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 24.75s  | 46.9 tok/s | 1.34            | 4.4     | 4,397      | 1,000   | repeated text; missing required fields; echoes instructions; cut off at token limit                    |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.56s   | 483 tok/s  | 0.11            | 1.9     | 2,072      | 132     | none                                                                                                   |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 11.08s  | 29.3 tok/s | 3.72            | 24      | 2,658      | 131     | none                                                                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 10.06s  | 32.3 tok/s | 1.12            | 18      | 2,587      | 202     | none                                                                                                   |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 2.33s   | 187 tok/s  | 0.37            | 4.0     | 2,072      | 140     | none                                                                                                   |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.83s   | 67.0 tok/s | 2.34            | 14      | 3,191      | 162     | none                                                                                                   |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.33s   | 189 tok/s  | 1.13            | 9.0     | 3,190      | 123     | none                                                                                                   |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 63.24s  | 110 tok/s  | 58.86           | 24      | 16,482     | 95      | none                                                                                                   |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 64.36s  | 93.5 tok/s | 60.77           | 10.0    | 16,482     | 113     | none                                                                                                   |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 87.78s  | 29.5 tok/s | 80.34           | 22      | 16,482     | 127     | none                                                                                                   |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.77s   | 126 tok/s  | 0.38            | 5.5     | 1,400      | 89      | none                                                                                                   |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 24.64s  | 44.8 tok/s | 15.46           | 70      | 3,468      | 114     | none                                                                                                   |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.15s   | 129 tok/s  | 0.40            | 16      | 580        | 98      | none                                                                                                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.76s   | 25.1 tok/s | 1.21            | 20      | 580        | 111     | none                                                                                                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 6.60s   | 39.5 tok/s | 1.81            | 16      | 3,429      | 99      | none                                                                                                   |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | 23.70s  | 43.3 tok/s | 14.61           | 78      | 6,311      | 96      | control tokens visible; title/keyword constraints failed                                               |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | 6.20s   | 34.3 tok/s | 1.38            | 17      | 3,623      | 85      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 135.74s | 4.68 tok/s | 1.31            | 40      | 1,257      | 610     | role tokens visible                                                                                    |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable_with_caveats` | 2.16s   | 272 tok/s  | 0.26            | 3.8     | 964        | 73      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | 6.94s   | 64.5 tok/s | 2.25            | 15      | 3,191      | 174     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable_with_caveats` | 5.13s   | 52.9 tok/s | 0.65            | 11      | 1,495      | 122     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 64.19s  | 63.1 tok/s | 53.00           | 74      | 16,482     | 111     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | 3.23s   | 56.7 tok/s | 0.23            | 9.6     | 1,094      | 81      | title/keyword constraints failed                                                                       |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | 29.24s  | 90.6 tok/s | 17.53           | 8.4     | 16,469     | 903     | title/keyword constraints failed                                                                       |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | 89.55s  | 17.5 tok/s | 78.70           | 35      | 16,482     | 117     | title/keyword constraints failed                                                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | 25.10s  | 54.8 tok/s | 18.63           | 13      | 16,478     | 241     | title/keyword constraints failed                                                                       |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.99s   | 54.6 tok/s | 0.39            | 29      | 576        | 82      | control tokens visible; title/keyword constraints failed                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 5.69s   | 56.6 tok/s | 0.33            | 28      | 576        | 79      | control tokens visible                                                                                 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | 8.90s   | 28.3 tok/s | 1.11            | 17      | 569        | 139     | title/keyword constraints failed                                                                       |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.93s  | 93.1 tok/s | 13.73           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 29.52s  | 41.4 tok/s | 2.19            | 15      | 3,520      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; title/keyword constraints failed |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.43s  | 59.1 tok/s | 1.60            | 60      | 1,584      | 1,000   | cut off at token limit; title/keyword constraints failed                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.27s   | 347 tok/s  | 0.12            | 2.0     | 308        | 147     | missing required fields; echoes instructions; extra text before Title                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 28.47s  | 47.8 tok/s | 5.50            | 13      | 6,307      | 994     | missing required fields; extra text before Title                                                       |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 19.95s  | 78.2 tok/s | 5.24            | 8.4     | 6,311      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 51.71s  | 20.7 tok/s | 1.43            | 15      | 275        | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `unusable`            | 29.27s  | 6.01 tok/s | 2.43            | 24      | 3,119      | 142     | missing required fields                                                                                |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `unusable`            | 68.07s  | 223 tok/s  | 62.16           | 5.1     | 16,478     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `unusable`            | 28.94s  | 91.0 tok/s | 16.19           | 8.4     | 16,467     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 6.64s   | 48.5 tok/s | 0.38            | 17      | 568        | 162     | missing required fields                                                                                |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 4.32s   | 64.4 tok/s | 2.32            | 9.7     | 2,692      | 18      | missing required fields                                                                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 1.67s   | 369 tok/s  | 0.07            | 2.4     | 304        | 151     | missing required fields; echoes instructions                                                           |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 23.95s  | 48.0 tok/s | 1.13            | 4.4     | 4,397      | 1,000   | repeated text; missing required fields; echoes instructions; cut off at token limit                    |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 479 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 483 tok/s
 
 Average clean-completion throughput: 113 tok/s (indicative only: tokenizers and architectures differ across models)
 
@@ -125,8 +125,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | Got it, let's tackle this step by step. First, the title. The context says Felixstowe, England, UK, so we need a concise title. The main subject is the memorial column. Let's see: "Felixstowe Seafront Memorial Column" – that's 10 words, which is good.<br><br>Next, the description. N...                                     |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | Title:<br>Felixstowe War Memorial Column by the Seafront<br><br>Description:<br>A tall stone column topped with a bronze bird statue stands on a paved promenade overlooking the sea. The monument features inscribed plaques and is situated near a blue lamppost with festive lights, under a c...                               |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | Title:<br>Felixstowe War Memorial, Seafront<br><br>Description:<br>A tall, ornate war memorial stands on the seafront at Felixstowe, East Suffolk, UK, with a bronze eagle perched atop, set against a clear blue sky and the calm sea. The structure bears inscriptions and plaques, marking its...                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial Column on the Felixstowe Seafront<br>Description: A tall fluted stone column topped with a bronze eagle stands on the coastal seafront overlooking the North Sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK, sea...                                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial Column on the Felixstowe Seafront England<br>Description: A tall fluted column topped with a bronze eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK,...                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial Column on the Felixstowe Seafront<br>Description: A tall, fluted stone column topped with an eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, England, UK, coasta...                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: War Memorial Column on the Felixstowe Seafront<br>Description: A tall fluted stone column topped with a bronze eagle statue stands along the English coast under a clear blue sky.<br>Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, war memo...                                |
 | [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Felixstowe Seafront War Memorial, Suffolk<br><br>Description: Captured on 13th August 2026, this photograph shows the War Memorial on Felixstowe seafront, Suffolk, bathed in bright sunlight with the North Sea visible beyond. The memorial stands prominently on a stone plinth,...                                      |
 | [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | Title:<br>Felixstowe Seafront Memorial<br><br>Description:<br>A stone memorial column stands at the seafront in Felixstowe, England, topped with a bronze eagle, commemorating the 1939-1945 war, with plaques listing names and a blue lamppost nearby under a clear blue sky.<br><br>Keywords: Felixs...                         |
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user wants British-English catalogue metadata from the image and supplied context. They want:<br><br>- Title: a concrete 5-10-word title.<br>- Description: 1-2 sentences factual description combining relevant context with main visible subject, setting,...                                |
@@ -147,11 +147,11 @@ The first 280 characters of each model's actual output (or failure evidence for 
 ## Run Stamps
 
 - `mlx-vlm`: `0.6.14`
-- `mlx`: `0.32.2.dev20260818+d5841be95`
+- `mlx`: `0.32.2.dev20260818+7f062ddcb`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.15.0`
 - `tokenizers`: `0.22.2`
-- `huggingface-hub`: `1.27.0`
+- `huggingface-hub`: `1.28.0`
 - *Python Version:* 3.13.14
 - *OS:* Darwin 25.6.0
 - *macOS Version:* 26.6.1
@@ -225,17 +225,17 @@ Complete generated or crash evidence for every attempted model.
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
 - *Model load time:* 0.54s
-- *Generation time:* 1.04s
-- *Total time:* 1.84s
-- *Input validation time:* 0.253
-- *Prompt preparation time:* 0.00628
-- *First-token latency:* 0.373
-- *Cleanup time:* 0.0634
+- *Generation time:* 0.76s
+- *Total time:* 1.56s
+- *Input validation time:* 0.247
+- *Prompt preparation time:* 0.00604
+- *First-token latency:* 0.107
+- *Cleanup time:* 0.0586
 - *Prompt tokens:* 2,072
 - *Generation tokens:* 132
 - *Total tokens:* 2,204
-- *Prompt throughput (raw):* 5,553 tok/s
-- *Generation throughput (raw):* 479 tok/s
+- *Prompt throughput (raw):* 19,434 tok/s
+- *Generation throughput (raw):* 483 tok/s
 - *Peak memory:* 1.9
 - *Active memory:* 0.90
 - *Cache memory:* 0.08
@@ -286,18 +286,18 @@ Seafront, Felixstowe, England, UK, GBR, Europe, statue, eagle, coastal promenade
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.42s
-- *Generation time:* 8.70s
-- *Total time:* 11.13s
-- *Input validation time:* 9.6e-05
-- *Prompt preparation time:* 0.00718
-- *First-token latency:* 3.76
+- *Model load time:* 2.39s
+- *Generation time:* 8.67s
+- *Total time:* 11.08s
+- *Input validation time:* 9.78e-05
+- *Prompt preparation time:* 0.0071
+- *First-token latency:* 3.72
 - *Cleanup time:* 0.103
 - *Prompt tokens:* 2,658
 - *Generation tokens:* 131
 - *Total tokens:* 2,789
-- *Prompt throughput (raw):* 707 tok/s
-- *Generation throughput (raw):* 29.6 tok/s
+- *Prompt throughput (raw):* 715 tok/s
+- *Generation throughput (raw):* 29.3 tok/s
 - *Peak memory:* 24
 - *Active memory:* 18
 - *Cache memory:* 0.52
@@ -348,18 +348,18 @@ war memorial, seafront, Felixstowe, England, UK, North Sea, stone column, winged
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.10s
-- *Generation time:* 7.87s
-- *Total time:* 9.98s
-- *Input validation time:* 8.71e-05
-- *Prompt preparation time:* 0.00147
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.0997
+- *Model load time:* 2.08s
+- *Generation time:* 7.97s
+- *Total time:* 10.06s
+- *Input validation time:* 7.23e-05
+- *Prompt preparation time:* 0.00151
+- *First-token latency:* 1.12
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 2,587
 - *Generation tokens:* 202
 - *Total tokens:* 2,789
-- *Prompt throughput (raw):* 2,364 tok/s
-- *Generation throughput (raw):* 32.7 tok/s
+- *Prompt throughput (raw):* 2,310 tok/s
+- *Generation throughput (raw):* 32.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
@@ -405,18 +405,18 @@ Keywords: Felixstowe, seafront, England, UK, monument, Doric column, eagle statu
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.79s
-- *Generation time:* 1.56s
-- *Total time:* 2.36s
-- *Input validation time:* 7.53e-05
-- *Prompt preparation time:* 0.00387
-- *First-token latency:* 0.373
-- *Cleanup time:* 0.0741
+- *Model load time:* 0.77s
+- *Generation time:* 1.55s
+- *Total time:* 2.33s
+- *Input validation time:* 9.2e-05
+- *Prompt preparation time:* 0.00371
+- *First-token latency:* 0.37
+- *Cleanup time:* 0.0734
 - *Prompt tokens:* 2,072
 - *Generation tokens:* 140
 - *Total tokens:* 2,212
-- *Prompt throughput (raw):* 5,558 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Prompt throughput (raw):* 5,596 tok/s
+- *Generation throughput (raw):* 187 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 3.2
 - *Cache memory:* 0.06
@@ -464,18 +464,18 @@ Keywords: Seafront, Felixstowe, England, UK, GBR, War Memorial, Eagle Statue, Li
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.46s
-- *Generation time:* 5.42s
-- *Total time:* 6.89s
-- *Input validation time:* 5.95e-05
-- *Prompt preparation time:* 0.00715
-- *First-token latency:* 2.52
-- *Cleanup time:* 0.0892
+- *Model load time:* 1.61s
+- *Generation time:* 5.21s
+- *Total time:* 6.83s
+- *Input validation time:* 7.2e-05
+- *Prompt preparation time:* 0.00677
+- *First-token latency:* 2.34
+- *Cleanup time:* 0.09
 - *Prompt tokens:* 3,191
 - *Generation tokens:* 162
 - *Total tokens:* 3,353
-- *Prompt throughput (raw):* 1,268 tok/s
-- *Generation throughput (raw):* 66.5 tok/s
+- *Prompt throughput (raw):* 1,364 tok/s
+- *Generation throughput (raw):* 67.0 tok/s
 - *Peak memory:* 14
 - *Active memory:* 8.0
 - *Cache memory:* 0.65
@@ -527,17 +527,17 @@ Felixstowe, Suffolk, UK, GBR, Europe, seafront, war memorial, ocean view, classi
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
 - *Model load time:* 1.09s
-- *Generation time:* 2.29s
-- *Total time:* 3.40s
-- *Input validation time:* 6.13e-05
-- *Prompt preparation time:* 0.00662
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.0772
+- *Generation time:* 2.24s
+- *Total time:* 3.33s
+- *Input validation time:* 5.72e-05
+- *Prompt preparation time:* 0.00695
+- *First-token latency:* 1.13
+- *Cleanup time:* 0.0765
 - *Prompt tokens:* 3,190
 - *Generation tokens:* 123
 - *Total tokens:* 3,313
-- *Prompt throughput (raw):* 2,737 tok/s
-- *Generation throughput (raw):* 185 tok/s
+- *Prompt throughput (raw):* 2,816 tok/s
+- *Generation throughput (raw):* 189 tok/s
 - *Peak memory:* 9.0
 - *Active memory:* 2.8
 - *Cache memory:* 0.41
@@ -588,18 +588,18 @@ war memorial, Felixstowe, seafront, Suffolk, UK, coastal column, commemorative p
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.83s
-- *Generation time:* 60.76s
-- *Total time:* 63.61s
-- *Input validation time:* 8.7e-05
-- *Prompt preparation time:* 0.0143
-- *First-token latency:* 59
-- *Cleanup time:* 0.12
+- *Model load time:* 2.65s
+- *Generation time:* 60.57s
+- *Total time:* 63.24s
+- *Input validation time:* 8.49e-05
+- *Prompt preparation time:* 0.0147
+- *First-token latency:* 58.9
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 16,482
 - *Generation tokens:* 95
 - *Total tokens:* 16,577
-- *Prompt throughput (raw):* 279 tok/s
-- *Generation throughput (raw):* 111 tok/s
+- *Prompt throughput (raw):* 280 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory:* 24
 - *Active memory:* 21
 - *Cache memory:* 0.88
@@ -647,17 +647,17 @@ Keywords: Felixstowe, seafront, war memorial, column, eagle, monument, England, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.54s
-- *Generation time:* 62.45s
-- *Total time:* 64.00s
-- *Input validation time:* 6.59e-05
-- *Prompt preparation time:* 0.000527
-- *First-token latency:* 60.4
-- *Cleanup time:* 0.09
+- *Model load time:* 1.53s
+- *Generation time:* 62.82s
+- *Total time:* 64.36s
+- *Input validation time:* 8.1e-05
+- *Prompt preparation time:* 0.0006
+- *First-token latency:* 60.8
+- *Cleanup time:* 0.0882
 - *Prompt tokens:* 16,482
 - *Generation tokens:* 113
 - *Total tokens:* 16,595
-- *Prompt throughput (raw):* 273 tok/s
+- *Prompt throughput (raw):* 271 tok/s
 - *Generation throughput (raw):* 93.5 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.6
@@ -706,18 +706,18 @@ Keywords: Felixstowe, seafront, memorial column, eagle statue, stone pillar, coa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.21s
-- *Generation time:* 81.01s
-- *Total time:* 83.24s
-- *Input validation time:* 7.55e-05
-- *Prompt preparation time:* 0.0152
-- *First-token latency:* 76
-- *Cleanup time:* 0.124
+- *Model load time:* 2.25s
+- *Generation time:* 85.50s
+- *Total time:* 87.78s
+- *Input validation time:* 9.6e-05
+- *Prompt preparation time:* 0.0155
+- *First-token latency:* 80.3
+- *Cleanup time:* 0.139
 - *Prompt tokens:* 16,482
 - *Generation tokens:* 127
 - *Total tokens:* 16,609
-- *Prompt throughput (raw):* 217 tok/s
-- *Generation throughput (raw):* 30.4 tok/s
+- *Prompt throughput (raw):* 205 tok/s
+- *Generation throughput (raw):* 29.5 tok/s
 - *Peak memory:* 22
 - *Active memory:* 18
 - *Cache memory:* 1.8
@@ -768,18 +768,18 @@ Felixstowe, seafront, war memorial, column, eagle, bronze, stone, Suffolk, Engla
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 1.01s
+- *Model load time:* 1.05s
 - *Generation time:* 1.71s
-- *Total time:* 2.72s
-- *Input validation time:* 7.65e-05
-- *Prompt preparation time:* 0.00211
-- *First-token latency:* 0.377
-- *Cleanup time:* 0.0806
+- *Total time:* 2.77s
+- *Input validation time:* 9.22e-05
+- *Prompt preparation time:* 0.0022
+- *First-token latency:* 0.378
+- *Cleanup time:* 0.0809
 - *Prompt tokens:* 1,400
 - *Generation tokens:* 89
 - *Total tokens:* 1,489
-- *Prompt throughput (raw):* 3,712 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 3,704 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
@@ -828,18 +828,18 @@ Felixstowe, England, UK, GBR, Europe, Column, Eagle, Plaques, Beach, Ocean
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 5.62s
-- *Generation time:* 18.32s
-- *Total time:* 23.96s
-- *Input validation time:* 5.92e-05
-- *Prompt preparation time:* 0.0135
-- *First-token latency:* 15.2
-- *Cleanup time:* 0.223
+- *Model load time:* 5.98s
+- *Generation time:* 18.64s
+- *Total time:* 24.64s
+- *Input validation time:* 8.18e-05
+- *Prompt preparation time:* 0.0165
+- *First-token latency:* 15.5
+- *Cleanup time:* 0.208
 - *Prompt tokens:* 3,468
 - *Generation tokens:* 114
 - *Total tokens:* 3,582
-- *Prompt throughput (raw):* 229 tok/s
-- *Generation throughput (raw):* 46.2 tok/s
+- *Prompt throughput (raw):* 224 tok/s
+- *Generation throughput (raw):* 44.8 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.39
@@ -890,18 +890,18 @@ Felixstowe, Suffolk, England, UK, seafront, column monument, bird statue, ocean 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.52s
-- *Generation time:* 1.70s
-- *Total time:* 4.25s
-- *Input validation time:* 6.2e-05
-- *Prompt preparation time:* 0.0207
-- *First-token latency:* 0.436
-- *Cleanup time:* 0.12
+- *Model load time:* 2.48s
+- *Generation time:* 1.65s
+- *Total time:* 4.15s
+- *Input validation time:* 8.15e-05
+- *Prompt preparation time:* 0.0205
+- *First-token latency:* 0.4
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 580
 - *Generation tokens:* 98
 - *Total tokens:* 678
-- *Prompt throughput (raw):* 1,329 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 1,449 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.20
@@ -947,18 +947,18 @@ Keywords: Felixstowe, Suffolk, England, UK, war memorial, column, monument, seaf
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.61s
-- *Generation time:* 5.94s
-- *Total time:* 8.56s
-- *Input validation time:* 7.45e-05
-- *Prompt preparation time:* 0.000355
-- *First-token latency:* 1.18
-- *Cleanup time:* 0.125
+- *Model load time:* 2.64s
+- *Generation time:* 6.11s
+- *Total time:* 8.76s
+- *Input validation time:* 7.57e-05
+- *Prompt preparation time:* 0.00037
+- *First-token latency:* 1.21
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 580
 - *Generation tokens:* 111
 - *Total tokens:* 691
-- *Prompt throughput (raw):* 491 tok/s
-- *Generation throughput (raw):* 26.0 tok/s
+- *Prompt throughput (raw):* 480 tok/s
+- *Generation throughput (raw):* 25.1 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.76
@@ -1004,18 +1004,18 @@ Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, seafront, war memorial
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.89s
-- *Generation time:* 5.25s
-- *Total time:* 7.15s
-- *Input validation time:* 7.22e-05
-- *Prompt preparation time:* 0.00266
-- *First-token latency:* 2.28
-- *Cleanup time:* 0.0999
+- *Model load time:* 1.85s
+- *Generation time:* 4.75s
+- *Total time:* 6.60s
+- *Input validation time:* 5.97e-05
+- *Prompt preparation time:* 0.00264
+- *First-token latency:* 1.81
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 3,429
 - *Generation tokens:* 99
 - *Total tokens:* 3,528
-- *Prompt throughput (raw):* 1,504 tok/s
-- *Generation throughput (raw):* 39.0 tok/s
+- *Prompt throughput (raw):* 1,893 tok/s
+- *Generation throughput (raw):* 39.5 tok/s
 - *Peak memory:* 16
 - *Active memory:* 13
 - *Cache memory:* 0.64
@@ -1067,18 +1067,18 @@ Felixstowe, England, UK, seafront, monument, column, eagle statue, seaside, blue
 - *Observations:* Unrecognised model control tokens remain visible; Title has
   4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.66s
-- *Generation time:* 18.04s
-- *Total time:* 24.71s
-- *Input validation time:* 8.09e-05
-- *Prompt preparation time:* 0.00751
-- *First-token latency:* 15.3
-- *Cleanup time:* 0.25
+- *Model load time:* 6.42s
+- *Generation time:* 17.27s
+- *Total time:* 23.70s
+- *Input validation time:* 8.53e-05
+- *Prompt preparation time:* 0.0073
+- *First-token latency:* 14.6
+- *Cleanup time:* 0.211
 - *Prompt tokens:* 6,311
 - *Generation tokens:* 96
 - *Total tokens:* 6,407
-- *Prompt throughput (raw):* 412 tok/s
-- *Generation throughput (raw):* 42.6 tok/s
+- *Prompt throughput (raw):* 432 tok/s
+- *Generation throughput (raw):* 43.3 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1135,17 +1135,17 @@ Keywords: seafront, Felixstowe, England, UK, GBR, Europe, monument, column, eagl
 - *Maintainer status:* none
 - *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.75s
-- *Generation time:* 4.91s
-- *Total time:* 6.66s
-- *Input validation time:* 9.73e-05
+- *Model load time:* 1.79s
+- *Generation time:* 4.40s
+- *Total time:* 6.20s
+- *Input validation time:* 8.5e-05
 - *Prompt preparation time:* 0.00202
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.105
+- *First-token latency:* 1.38
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 3,623
 - *Generation tokens:* 85
 - *Total tokens:* 3,708
-- *Prompt throughput (raw):* 1,927 tok/s
+- *Prompt throughput (raw):* 2,634 tok/s
 - *Generation throughput (raw):* 34.3 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
@@ -1192,18 +1192,18 @@ Keywords: Felixstowe, seafront, monument, eagle statue, column, promenade, Engla
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.42s
-- *Generation time:* 132.09s
-- *Total time:* 135.52s
-- *Input validation time:* 6.18e-05
-- *Prompt preparation time:* 0.00201
-- *First-token latency:* 1.65
-- *Cleanup time:* 0.173
+- *Model load time:* 3.40s
+- *Generation time:* 132.32s
+- *Total time:* 135.74s
+- *Input validation time:* 7.13e-05
+- *Prompt preparation time:* 0.00211
+- *First-token latency:* 1.31
+- *Cleanup time:* 0.159
 - *Prompt tokens:* 1,257
 - *Generation tokens:* 610
 - *Total tokens:* 1,867
-- *Prompt throughput (raw):* 762 tok/s
-- *Generation throughput (raw):* 4.7 tok/s
+- *Prompt throughput (raw):* 961 tok/s
+- *Generation throughput (raw):* 4.68 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.6
@@ -1292,18 +1292,18 @@ Keywords: Felixstowe, England, UK, seafront, memorial column, eagle statue, coas
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.09s
-- *Generation time:* 1.11s
-- *Total time:* 2.22s
-- *Input validation time:* 5.96e-05
-- *Prompt preparation time:* 0.00939
-- *First-token latency:* 0.262
-- *Cleanup time:* 0.0855
+- *Model load time:* 1.05s
+- *Generation time:* 1.10s
+- *Total time:* 2.16s
+- *Input validation time:* 5.83e-05
+- *Prompt preparation time:* 0.00857
+- *First-token latency:* 0.256
+- *Cleanup time:* 0.084
 - *Prompt tokens:* 964
 - *Generation tokens:* 73
 - *Total tokens:* 1,037
-- *Prompt throughput (raw):* 3,684 tok/s
-- *Generation throughput (raw):* 273 tok/s
+- *Prompt throughput (raw):* 3,763 tok/s
+- *Generation throughput (raw):* 272 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.06
@@ -1376,18 +1376,18 @@ Keywords: war memorial, seafront, Felixstowe, England, UK, gbr, ocean, rocks, pe
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.58s
-- *Generation time:* 5.50s
-- *Total time:* 7.09s
-- *Input validation time:* 6.31e-05
-- *Prompt preparation time:* 0.000383
-- *First-token latency:* 2.32
-- *Cleanup time:* 0.0901
+- *Model load time:* 1.53s
+- *Generation time:* 5.40s
+- *Total time:* 6.94s
+- *Input validation time:* 6.91e-05
+- *Prompt preparation time:* 0.000349
+- *First-token latency:* 2.25
+- *Cleanup time:* 0.0905
 - *Prompt tokens:* 3,191
 - *Generation tokens:* 174
 - *Total tokens:* 3,365
-- *Prompt throughput (raw):* 1,373 tok/s
-- *Generation throughput (raw):* 64.1 tok/s
+- *Prompt throughput (raw):* 1,420 tok/s
+- *Generation throughput (raw):* 64.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 8.4
 - *Cache memory:* 0.65
@@ -1438,18 +1438,18 @@ Felixstowe, Suffolk, United Kingdom, seafront, war memorial, WWI, WWII, stone co
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo)
-- *Model load time:* 1.31s
-- *Generation time:* 4.04s
-- *Total time:* 5.36s
-- *Input validation time:* 5.86e-05
-- *Prompt preparation time:* 0.00156
-- *First-token latency:* 0.882
-- *Cleanup time:* 0.0834
+- *Model load time:* 1.28s
+- *Generation time:* 3.83s
+- *Total time:* 5.13s
+- *Input validation time:* 7.1e-05
+- *Prompt preparation time:* 0.00159
+- *First-token latency:* 0.652
+- *Cleanup time:* 0.0821
 - *Prompt tokens:* 1,495
 - *Generation tokens:* 122
 - *Total tokens:* 1,617
-- *Prompt throughput (raw):* 1,696 tok/s
-- *Generation throughput (raw):* 53.1 tok/s
+- *Prompt throughput (raw):* 2,293 tok/s
+- *Generation throughput (raw):* 52.9 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.14
@@ -1497,18 +1497,18 @@ Keywords: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Su
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: england
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 8.36s
-- *Generation time:* 65.26s
-- *Total time:* 73.65s
-- *Input validation time:* 7.87e-05
-- *Prompt preparation time:* 0.0138
-- *First-token latency:* 62.3
-- *Cleanup time:* 0.26
+- *Model load time:* 8.16s
+- *Generation time:* 56.00s
+- *Total time:* 64.19s
+- *Input validation time:* 7.15e-05
+- *Prompt preparation time:* 0.0142
+- *First-token latency:* 53
+- *Cleanup time:* 0.223
 - *Prompt tokens:* 16,482
 - *Generation tokens:* 111
 - *Total tokens:* 16,593
-- *Prompt throughput (raw):* 264 tok/s
-- *Generation throughput (raw):* 63.4 tok/s
+- *Prompt throughput (raw):* 311 tok/s
+- *Generation throughput (raw):* 63.1 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
 - *Cache memory:* 0.88
@@ -1554,17 +1554,17 @@ Keywords: Felixstowe, seafront, war memorial, column, eagle, Suffolk, England, U
 - *Maintainer status:* none
 - *Observations:* Title has 3 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.15s
-- *Generation time:* 2.23s
-- *Total time:* 3.39s
-- *Input validation time:* 7.22e-05
-- *Prompt preparation time:* 0.00116
-- *First-token latency:* 0.393
-- *Cleanup time:* 0.0835
+- *Model load time:* 1.10s
+- *Generation time:* 2.12s
+- *Total time:* 3.23s
+- *Input validation time:* 9.57e-05
+- *Prompt preparation time:* 0.00113
+- *First-token latency:* 0.231
+- *Cleanup time:* 0.083
 - *Prompt tokens:* 1,094
 - *Generation tokens:* 81
 - *Total tokens:* 1,175
-- *Prompt throughput (raw):* 2,784 tok/s
+- *Prompt throughput (raw):* 4,735 tok/s
 - *Generation throughput (raw):* 56.7 tok/s
 - *Peak memory:* 9.6
 - *Active memory:* 8.3
@@ -1613,18 +1613,18 @@ Keywords: Felixstowe, seafront, monument, column, bird sculpture, blue sky, sea,
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.90s
-- *Generation time:* 26.80s
-- *Total time:* 27.72s
-- *Input validation time:* 6.33e-05
-- *Prompt preparation time:* 0.0113
-- *First-token latency:* 16
-- *Cleanup time:* 0.112
+- *Model load time:* 0.88s
+- *Generation time:* 28.34s
+- *Total time:* 29.24s
+- *Input validation time:* 6.26e-05
+- *Prompt preparation time:* 0.0114
+- *First-token latency:* 17.5
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 16,469
 - *Generation tokens:* 903
 - *Total tokens:* 17,372
-- *Prompt throughput (raw):* 1,029 tok/s
-- *Generation throughput (raw):* 90.7 tok/s
+- *Prompt throughput (raw):* 940 tok/s
+- *Generation throughput (raw):* 90.6 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.7
@@ -1705,18 +1705,18 @@ Keywords: Felixstowe, Seafront, England, UK, GBR, Europe, Memorial Column, Eagle
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.42s
-- *Generation time:* 86.29s
-- *Total time:* 89.73s
-- *Input validation time:* 6.66e-05
-- *Prompt preparation time:* 0.0149
-- *First-token latency:* 78.9
+- *Model load time:* 3.29s
+- *Generation time:* 86.24s
+- *Total time:* 89.55s
+- *Input validation time:* 6.7e-05
+- *Prompt preparation time:* 0.015
+- *First-token latency:* 78.7
 - *Cleanup time:* 0.137
 - *Prompt tokens:* 16,482
 - *Generation tokens:* 117
 - *Total tokens:* 16,599
 - *Prompt throughput (raw):* 209 tok/s
-- *Generation throughput (raw):* 17.9 tok/s
+- *Generation throughput (raw):* 17.5 tok/s
 - *Peak memory:* 35
 - *Active memory:* 29
 - *Cache memory:* 1.8
@@ -1769,18 +1769,18 @@ Felixstowe, Suffolk, England, UK, Europe, seafront, war memorial, monument, colu
   terms (requested 10-18); Duplicate keywords: felixstowe, east suffolk, uk,
   europe
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.32s
-- *Generation time:* 22.98s
-- *Total time:* 24.30s
-- *Input validation time:* 8.07e-05
-- *Prompt preparation time:* 0.000442
-- *First-token latency:* 18
-- *Cleanup time:* 0.0992
+- *Model load time:* 1.28s
+- *Generation time:* 23.81s
+- *Total time:* 25.10s
+- *Input validation time:* 8.68e-05
+- *Prompt preparation time:* 0.000466
+- *First-token latency:* 18.6
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 16,478
 - *Generation tokens:* 241
 - *Total tokens:* 16,719
-- *Prompt throughput (raw):* 916 tok/s
-- *Generation throughput (raw):* 57.5 tok/s
+- *Prompt throughput (raw):* 885 tok/s
+- *Generation throughput (raw):* 54.8 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.4
@@ -1844,20 +1844,20 @@ Keywords: Felixstowe, East Suffolk, England, UK, Europe, war memorial, seafront,
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Duplicate
-  keywords: memorial
+  keywords: tourism
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.44s
-- *Generation time:* 2.79s
-- *Total time:* 6.26s
-- *Input validation time:* 7.14e-05
-- *Prompt preparation time:* 0.0213
-- *First-token latency:* 0.633
-- *Cleanup time:* 0.114
+- *Model load time:* 3.45s
+- *Generation time:* 2.52s
+- *Total time:* 5.99s
+- *Input validation time:* 6.65e-05
+- *Prompt preparation time:* 0.0208
+- *First-token latency:* 0.389
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 576
-- *Generation tokens:* 81
-- *Total tokens:* 657
-- *Prompt throughput (raw):* 910 tok/s
-- *Generation throughput (raw):* 53.3 tok/s
+- *Generation tokens:* 82
+- *Total tokens:* 658
+- *Prompt throughput (raw):* 1,482 tok/s
+- *Generation throughput (raw):* 54.6 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1884,8 +1884,8 @@ Keywords: Felixstowe, East Suffolk, England, UK, Europe, war memorial, seafront,
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
 &lt;channel|&gt;Title: War Memorial Column on the Felixstowe Seafront
-Description: A tall fluted stone column topped with a bronze eagle stands on the coastal seafront overlooking the North Sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, coastal, ocean, stone, monument, sculpture, memorial, memorial
+Description: A tall, fluted stone column topped with an eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, coastal, seafront, memorial, column, eagle, ocean, horizon, monument, stone, sculpture, tourism, tourism
 </pre>
 
 <details>
@@ -1894,8 +1894,8 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 ```text
 <|channel>thought
 <channel|>Title: War Memorial Column on the Felixstowe Seafront
-Description: A tall fluted stone column topped with a bronze eagle stands on the coastal seafront overlooking the North Sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, coastal, ocean, stone, monument, sculpture, memorial, memorial
+Description: A tall, fluted stone column topped with an eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, coastal, seafront, memorial, column, eagle, ocean, horizon, monument, stone, sculpture, tourism, tourism
 ```
 
 </details>
@@ -1914,21 +1914,20 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Duplicate
-  keywords: monument
+- *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.33s
-- *Generation time:* 2.69s
-- *Total time:* 6.02s
-- *Input validation time:* 0.000112
+- *Model load time:* 3.31s
+- *Generation time:* 2.37s
+- *Total time:* 5.69s
+- *Input validation time:* 7.35e-05
 - *Prompt preparation time:* 0.00035
 - *First-token latency:* 0.329
-- *Cleanup time:* 0.131
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 576
-- *Generation tokens:* 82
-- *Total tokens:* 658
-- *Prompt throughput (raw):* 1,750 tok/s
-- *Generation throughput (raw):* 47.8 tok/s
+- *Generation tokens:* 79
+- *Total tokens:* 655
+- *Prompt throughput (raw):* 1,749 tok/s
+- *Generation throughput (raw):* 56.6 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -1954,9 +1953,9 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: War Memorial Column on the Felixstowe Seafront England
-Description: A tall fluted column topped with a bronze eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column, eagle, statue, ocean, coastal, stone, sculpture, monument, monument
+&lt;channel|&gt;Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone column topped with a bronze eagle statue stands along the English coast under a clear blue sky.
+Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, war memorial, column, eagle, seafront, ocean, stone, monument, memorial, coastal, sculpture
 </pre>
 
 <details>
@@ -1964,9 +1963,9 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column
 
 ```text
 <|channel>thought
-<channel|>Title: War Memorial Column on the Felixstowe Seafront England
-Description: A tall fluted column topped with a bronze eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column, eagle, statue, ocean, coastal, stone, sculpture, monument, monument
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone column topped with a bronze eagle statue stands along the English coast under a clear blue sky.
+Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, war memorial, column, eagle, seafront, ocean, stone, monument, memorial, coastal, sculpture
 ```
 
 </details>
@@ -1987,18 +1986,18 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.54s
-- *Generation time:* 6.01s
-- *Total time:* 8.57s
-- *Input validation time:* 8.54e-05
-- *Prompt preparation time:* 0.00328
-- *First-token latency:* 0.994
-- *Cleanup time:* 0.126
+- *Model load time:* 2.40s
+- *Generation time:* 6.49s
+- *Total time:* 8.90s
+- *Input validation time:* 8.26e-05
+- *Prompt preparation time:* 0.0027
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 569
 - *Generation tokens:* 139
 - *Total tokens:* 708
-- *Prompt throughput (raw):* 572 tok/s
-- *Generation throughput (raw):* 30.6 tok/s
+- *Prompt throughput (raw):* 514 tok/s
+- *Generation throughput (raw):* 28.3 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.43
@@ -2050,18 +2049,18 @@ Keywords: Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, war memorial,
   england, uk, europe, 1939 1945, war, commemoration, plaques, lamppost, blue,
   sky, stone, column, bronze, eagle
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.71s
-- *Generation time:* 25.24s
-- *Total time:* 25.97s
-- *Input validation time:* 6.68e-05
-- *Prompt preparation time:* 0.00934
-- *First-token latency:* 13.8
-- *Cleanup time:* 0.0784
+- *Model load time:* 0.72s
+- *Generation time:* 25.20s
+- *Total time:* 25.93s
+- *Input validation time:* 5.8e-05
+- *Prompt preparation time:* 0.0091
+- *First-token latency:* 13.7
+- *Cleanup time:* 0.09
 - *Prompt tokens:* 16,467
 - *Generation tokens:* 1,000
 - *Total tokens:* 17,467
-- *Prompt throughput (raw):* 1,189 tok/s
-- *Generation throughput (raw):* 93.8 tok/s
+- *Prompt throughput (raw):* 1,199 tok/s
+- *Generation throughput (raw):* 93.1 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
@@ -2115,18 +2114,18 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
   5-10); Keyword list has 40 terms (requested 10-18); Duplicate keywords: east
   suffolk
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.98s
-- *Generation time:* 27.00s
-- *Total time:* 28.99s
-- *Input validation time:* 7.05e-05
-- *Prompt preparation time:* 0.00699
-- *First-token latency:* 2.29
-- *Cleanup time:* 0.0988
+- *Model load time:* 2.72s
+- *Generation time:* 26.80s
+- *Total time:* 29.52s
+- *Input validation time:* 0.000112
+- *Prompt preparation time:* 0.00684
+- *First-token latency:* 2.19
+- *Cleanup time:* 0.097
 - *Prompt tokens:* 3,520
 - *Generation tokens:* 1,000
 - *Total tokens:* 4,520
-- *Prompt throughput (raw):* 1,538 tok/s
-- *Generation throughput (raw):* 41.2 tok/s
+- *Prompt throughput (raw):* 1,604 tok/s
+- *Generation throughput (raw):* 41.4 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.92
@@ -2186,18 +2185,18 @@ Keywords: 10-18 unique, comma-separated. Must cover relevant context and visible
 - *Observations:* Response appears cut off at the token limit; Keyword list
   has 52 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 5.49s
-- *Generation time:* 19.58s
-- *Total time:* 25.09s
-- *Input validation time:* 6.79e-05
-- *Prompt preparation time:* 0.00784
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.203
+- *Model load time:* 5.15s
+- *Generation time:* 19.27s
+- *Total time:* 24.43s
+- *Input validation time:* 7.68e-05
+- *Prompt preparation time:* 0.00849
+- *First-token latency:* 1.6
+- *Cleanup time:* 0.191
 - *Prompt tokens:* 1,584
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,584
-- *Prompt throughput (raw):* 842 tok/s
-- *Generation throughput (raw):* 59.4 tok/s
+- *Prompt throughput (raw):* 991 tok/s
+- *Generation throughput (raw):* 59.1 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.17
@@ -2293,19 +2292,19 @@ Keywords: Felixstowe, Suffolk, England, UK, GBR, Europe, seafront, beach, monume
   text appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.79s
-- *Generation time:* 1.55s
-- *Total time:* 2.35s
-- *Input validation time:* 8.22e-05
-- *Prompt preparation time:* 0.00169
-- *First-token latency:* 0.228
-- *Cleanup time:* 0.076
+- *Model load time:* 0.82s
+- *Generation time:* 1.44s
+- *Total time:* 2.27s
+- *Input validation time:* 8.45e-05
+- *Prompt preparation time:* 0.00173
+- *First-token latency:* 0.117
+- *Cleanup time:* 0.0779
 - *Prompt tokens:* 308
 - *Generation tokens:* 147
 - *Total tokens:* 455
-- *Prompt throughput (raw):* 1,350 tok/s
-- *Generation throughput (raw):* 354 tok/s
-- *Peak memory:* 2.1
+- *Prompt throughput (raw):* 2,631 tok/s
+- *Generation throughput (raw):* 347 tok/s
+- *Peak memory:* 2.0
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -2350,18 +2349,18 @@ Description: The image features a prominent 5-10-word title describing a concret
 - *Observations:* Missing or empty fields: Title; Extra text appears before
   the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.76s
-- *Generation time:* 26.63s
-- *Total time:* 28.39s
-- *Input validation time:* 6.15e-05
-- *Prompt preparation time:* 0.00196
-- *First-token latency:* 5.24
+- *Model load time:* 1.74s
+- *Generation time:* 26.72s
+- *Total time:* 28.47s
+- *Input validation time:* 7.42e-05
+- *Prompt preparation time:* 0.00188
+- *First-token latency:* 5.5
 - *Cleanup time:* 0.095
 - *Prompt tokens:* 6,307
 - *Generation tokens:* 994
 - *Total tokens:* 7,301
-- *Prompt throughput (raw):* 1,203 tok/s
-- *Generation throughput (raw):* 47.4 tok/s
+- *Prompt throughput (raw):* 1,146 tok/s
+- *Generation throughput (raw):* 47.8 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.48
@@ -2474,18 +2473,18 @@ Keywords: Felixstowe, seafront, monument, column, eagle statue, East Suffolk, En
   memorial, stone column, eagle statue, sea, coastal, memorial, remembrance,
   war, suffolk county
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.45s
-- *Generation time:* 19.54s
-- *Total time:* 21.01s
-- *Input validation time:* 6.8e-05
-- *Prompt preparation time:* 0.00779
-- *First-token latency:* 6.09
-- *Cleanup time:* 0.0844
+- *Model load time:* 1.49s
+- *Generation time:* 18.44s
+- *Total time:* 19.95s
+- *Input validation time:* 6.89e-05
+- *Prompt preparation time:* 0.00696
+- *First-token latency:* 5.24
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 6,311
 - *Generation tokens:* 1,000
 - *Total tokens:* 7,311
-- *Prompt throughput (raw):* 1,036 tok/s
-- *Generation throughput (raw):* 76.8 tok/s
+- *Prompt throughput (raw):* 1,204 tok/s
+- *Generation throughput (raw):* 78.2 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
 - *Cache memory:* 0.44
@@ -2545,18 +2544,18 @@ Keywords: Felixstowe War Memorial, seafront, Felixstowe, Suffolk, England, UK, g
   terms (requested 10-18); Duplicate keywords: historical landmark, historical
   significance, cultural icon, historical icon
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.59s
-- *Generation time:* 52.74s
-- *Total time:* 54.33s
-- *Input validation time:* 6.02e-05
-- *Prompt preparation time:* 0.00152
-- *First-token latency:* 1.44
-- *Cleanup time:* 0.096
+- *Model load time:* 1.62s
+- *Generation time:* 50.09s
+- *Total time:* 51.71s
+- *Input validation time:* 5.9e-05
+- *Prompt preparation time:* 0.00155
+- *First-token latency:* 1.43
+- *Cleanup time:* 0.0952
 - *Prompt tokens:* 275
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,275
-- *Prompt throughput (raw):* 191 tok/s
-- *Generation throughput (raw):* 19.7 tok/s
+- *Prompt throughput (raw):* 192 tok/s
+- *Generation throughput (raw):* 20.7 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.76
@@ -2623,18 +2622,18 @@ Felixstowe, England, UK, Seafront, Memorial, Column, Bird Statue, Blue Sky, Calm
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo_point)
-- *Model load time:* 2.44s
-- *Generation time:* 27.54s
-- *Total time:* 29.99s
-- *Input validation time:* 8.2e-05
-- *Prompt preparation time:* 0.00508
-- *First-token latency:* 2.94
-- *Cleanup time:* 0.107
+- *Model load time:* 2.45s
+- *Generation time:* 26.81s
+- *Total time:* 29.27s
+- *Input validation time:* 7e-05
+- *Prompt preparation time:* 0.00594
+- *First-token latency:* 2.43
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 3,119
 - *Generation tokens:* 142
 - *Total tokens:* 3,261
-- *Prompt throughput (raw):* 1,060 tok/s
-- *Generation throughput (raw):* 5.96 tok/s
+- *Prompt throughput (raw):* 1,285 tok/s
+- *Generation throughput (raw):* 6.01 tok/s
 - *Peak memory:* 24
 - *Active memory:* 19
 - *Cache memory:* 5.0
@@ -2685,18 +2684,18 @@ Felixstowe, England, UK, GBR, East Suffolk, seafront, war memorial, white column
   keywords: stone column, bird statue, people walking, clear sky, calm sea,
   stone pathway, landmark, scenic beauty, seaside town
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.58s
-- *Generation time:* 75.44s
-- *Total time:* 76.04s
-- *Input validation time:* 6.23e-05
-- *Prompt preparation time:* 0.00395
-- *First-token latency:* 70.1
-- *Cleanup time:* 0.0865
+- *Model load time:* 0.61s
+- *Generation time:* 67.45s
+- *Total time:* 68.07s
+- *Input validation time:* 6.79e-05
+- *Prompt preparation time:* 0.00356
+- *First-token latency:* 62.2
+- *Cleanup time:* 0.085
 - *Prompt tokens:* 16,478
 - *Generation tokens:* 1,000
 - *Total tokens:* 17,478
-- *Prompt throughput (raw):* 235 tok/s
-- *Generation throughput (raw):* 221 tok/s
+- *Prompt throughput (raw):* 265 tok/s
+- *Generation throughput (raw):* 223 tok/s
 - *Peak memory:* 5.1
 - *Active memory:* 1.3
 - *Cache memory:* 0.83
@@ -2751,18 +2750,18 @@ Seafront, Felixstowe, England, UK, GBR, Europe, Monument, Stone Column, Bird Sta
   england, uk, europe, 1939 1945, war, commemoration, plaques, lamppost, blue,
   sky, stone, column, bronze, eagle
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.93s
-- *Generation time:* 29.16s
-- *Total time:* 30.10s
-- *Input validation time:* 6.63e-05
-- *Prompt preparation time:* 0.000331
-- *First-token latency:* 17.3
-- *Cleanup time:* 0.088
+- *Model load time:* 0.92s
+- *Generation time:* 28.01s
+- *Total time:* 28.94s
+- *Input validation time:* 5.97e-05
+- *Prompt preparation time:* 0.000316
+- *First-token latency:* 16.2
+- *Cleanup time:* 0.0926
 - *Prompt tokens:* 16,467
 - *Generation tokens:* 1,000
 - *Total tokens:* 17,467
-- *Prompt throughput (raw):* 952 tok/s
-- *Generation throughput (raw):* 90.7 tok/s
+- *Prompt throughput (raw):* 1,017 tok/s
+- *Generation throughput (raw):* 91.0 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
@@ -2812,17 +2811,17 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.58s
-- *Generation time:* 4.69s
-- *Total time:* 7.28s
-- *Input validation time:* 8.12e-05
-- *Prompt preparation time:* 0.00349
-- *First-token latency:* 0.894
-- *Cleanup time:* 0.119
+- *Model load time:* 2.47s
+- *Generation time:* 4.16s
+- *Total time:* 6.64s
+- *Input validation time:* 8.03e-05
+- *Prompt preparation time:* 0.00348
+- *First-token latency:* 0.378
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 568
 - *Generation tokens:* 162
 - *Total tokens:* 730
-- *Prompt throughput (raw):* 635 tok/s
+- *Prompt throughput (raw):* 1,502 tok/s
 - *Generation throughput (raw):* 48.5 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
@@ -2884,18 +2883,18 @@ The overall impression is one of a historical landmark in a coastal setting, cap
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_next)
-- *Model load time:* 1.08s
-- *Generation time:* 3.28s
-- *Total time:* 4.37s
-- *Input validation time:* 7.47e-05
-- *Prompt preparation time:* 0.00197
-- *First-token latency:* 2.35
-- *Cleanup time:* 0.089
+- *Model load time:* 1.07s
+- *Generation time:* 3.25s
+- *Total time:* 4.32s
+- *Input validation time:* 6.93e-05
+- *Prompt preparation time:* 0.00186
+- *First-token latency:* 2.32
+- *Cleanup time:* 0.0906
 - *Prompt tokens:* 2,692
 - *Generation tokens:* 18
 - *Total tokens:* 2,710
-- *Prompt throughput (raw):* 1,146 tok/s
-- *Generation throughput (raw):* 64.3 tok/s
+- *Prompt throughput (raw):* 1,161 tok/s
+- *Generation throughput (raw):* 64.4 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.87
@@ -2950,18 +2949,18 @@ Seafront, Felixstowe, England, UK, GBR, Europe,
   instructions instead of only returning the requested fields
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.59s
+- *Model load time:* 0.68s
 - *Generation time:* 0.98s
-- *Total time:* 1.58s
-- *Input validation time:* 9.91e-05
-- *Prompt preparation time:* 0.00164
+- *Total time:* 1.67s
+- *Input validation time:* 5.95e-05
+- *Prompt preparation time:* 0.00169
 - *First-token latency:* 0.0735
-- *Cleanup time:* 0.0839
+- *Cleanup time:* 0.0923
 - *Prompt tokens:* 304
 - *Generation tokens:* 151
 - *Total tokens:* 455
-- *Prompt throughput (raw):* 4,138 tok/s
-- *Generation throughput (raw):* 368 tok/s
+- *Prompt throughput (raw):* 4,137 tok/s
+- *Generation throughput (raw):* 369 tok/s
 - *Peak memory:* 2.4
 - *Active memory:* 0.61
 - *Cache memory:* 0.30
@@ -3009,18 +3008,18 @@ Description: A concrete 5-10-word title, followed by a 1-2-sentence factual desc
   of only returning the requested fields; Response appears cut off at the
   token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.37s
-- *Generation time:* 23.37s
-- *Total time:* 24.75s
-- *Input validation time:* 6.05e-05
-- *Prompt preparation time:* 0.000198
-- *First-token latency:* 1.34
-- *Cleanup time:* 0.118
+- *Model load time:* 1.25s
+- *Generation time:* 22.69s
+- *Total time:* 23.95s
+- *Input validation time:* 5.79e-05
+- *Prompt preparation time:* 0.0002
+- *First-token latency:* 1.13
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 4,397
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,397
-- *Prompt throughput (raw):* 3,271 tok/s
-- *Generation throughput (raw):* 46.9 tok/s
+- *Prompt throughput (raw):* 3,878 tok/s
+- *Generation throughput (raw):* 48.0 tok/s
 - *Peak memory:* 4.4
 - *Active memory:* 1.7
 - *Cache memory:* 2.1

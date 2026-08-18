@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-18 12:42:47 BST
+FULL ENVIRONMENT DUMP - 2026-08-18 19:26:39 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 208
+Total packages: 207
 
 absl-py==2.5.0
 accelerate==1.14.0
@@ -51,11 +51,11 @@ h11==0.16.0
 h5py==3.14.0
 hf-xet==1.6.0
 httpcore==1.0.9
-httpcore2==2.10.0
+httpcore2==2.12.0
 httpx==0.28.1
 httpx-sse==0.4.3
-httpx2==2.10.0
-huggingface_hub==1.27.0
+httpx2==2.12.0
+huggingface_hub==1.28.0
 identify==2.6.19
 idna==3.19
 iniconfig==2.3.0
@@ -84,8 +84,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.2.dev20260818+d5841be95
-mlx==0.32.2.dev20260818+d5841be95
+mlx==0.32.2.dev20260818+7f062ddcb
+mlx==0.32.2.dev20260818+7f062ddcb
 mlx-audio==0.5.0
 mlx-lm==0.31.3
 mlx-vlm==0.6.14
@@ -97,7 +97,6 @@ multiprocess==0.70.19
 mypy==2.3.1
 mypy_extensions==1.1.0
 namex==0.1.0
-nanobind==2.14.0
 networkx==3.6.1
 nodeenv==1.10.0
 num2words==0.5.14
@@ -216,5 +215,5 @@ yarl==1.24.5
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-18 12:42:47 BST
+Environment dump completed at 2026-08-18 19:26:39 BST
 ================================================================================

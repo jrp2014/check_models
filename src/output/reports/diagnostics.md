@@ -40,7 +40,7 @@ Observation counts
 | Extra text appears before the Title field                                             | 3     |
 | Response appears cut off at the token limit                                           | 8     |
 | Conversation-role control tokens remain visible                                       | 1     |
-| Title or keywords do not meet requested constraints                                   | 20    |
+| Title or keywords do not meet requested constraints                                   | 19    |
 
 ## Triage
 
@@ -53,7 +53,7 @@ Observation counts
 | [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)                  | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
 | [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                              | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
 | [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                              |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
 | [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                 |
 
@@ -435,56 +435,10 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Title word count:* 7
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 15
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["memorial"]
-- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010798272
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 576
-- *Generation tokens:* 81
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<|channel>thought
-<channel|>Title: War Memorial Column on the Felixstowe Seafront
-Description: A tall fluted stone column topped with a bronze eagle stands on the coastal seafront overlooking the North Sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, coastal, ocean, stone, monument, sculpture, memorial, memorial
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-<details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
-- *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
-- *Title word count:* 8
-- *Requested title word range:* [5, 10]
 - *Keyword count:* 16
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["monument"]
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Duplicate keywords:* ["tourism"]
+- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
@@ -502,9 +456,50 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 
 ```text
 <|channel>thought
-<channel|>Title: War Memorial Column on the Felixstowe Seafront England
-Description: A tall fluted column topped with a bronze eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column, eagle, statue, ocean, coastal, stone, sculpture, monument, monument
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall, fluted stone column topped with an eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, coastal, seafront, memorial, column, eagle, ocean, horizon, monument, stone, sculpture, tourism, tourism
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+<details>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible</summary>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* unexpected_special_token
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.010798272
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 576
+- *Generation tokens:* 79
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+<|channel>thought
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone column topped with a bronze eagle statue stands along the English coast under a clear blue sky.
+Keywords: Felixstowe, Suffolk, East Suffolk, England, UK, war memorial, column, eagle, seafront, ocean, stone, monument, memorial, coastal, sculpture
 ```
 
 </details>
@@ -647,20 +642,20 @@ is in the model gallery.
 
 | Model                                                 | Runtime identity                                    | Performance                                                                                 |
 |-------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed   | 2072 prompt / 132 generated; 479 tok/s; 1.9 GB peak; cleanup 0.000132/0.0 GB active/cache   |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2658 prompt / 131 generated; 29.6 tok/s; 24 GB peak; cleanup 0.000968/0.0 GB active/cache   |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed   | 580 prompt / 98 generated; 126 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache        |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 580 prompt / 111 generated; 26.0 tok/s; 20 GB peak; cleanup 0.0129/0.0 GB active/cache      |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed | 2587 prompt / 202 generated; 32.7 tok/s; 18 GB peak; cleanup 0.00269/0.0 GB active/cache    |
-| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed   | 2072 prompt / 140 generated; 186 tok/s; 4.0 GB peak; cleanup 0.00379/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 3191 prompt / 162 generated; 66.5 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache     |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 3190 prompt / 123 generated; 185 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache    |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3429 prompt / 99 generated; 39.0 tok/s; 16 GB peak; cleanup 0.0149/0.0 GB active/cache      |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16482 prompt / 95 generated; 111 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache     |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed   | 2072 prompt / 132 generated; 483 tok/s; 1.9 GB peak; cleanup 0.000132/0.0 GB active/cache   |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2658 prompt / 131 generated; 29.3 tok/s; 24 GB peak; cleanup 0.000968/0.0 GB active/cache   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed   | 580 prompt / 98 generated; 129 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache        |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 580 prompt / 111 generated; 25.1 tok/s; 20 GB peak; cleanup 0.0129/0.0 GB active/cache      |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed | 2587 prompt / 202 generated; 32.3 tok/s; 18 GB peak; cleanup 0.00269/0.0 GB active/cache    |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed   | 2072 prompt / 140 generated; 187 tok/s; 4.0 GB peak; cleanup 0.00379/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 3191 prompt / 162 generated; 67.0 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache     |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 3190 prompt / 123 generated; 189 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache    |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3429 prompt / 99 generated; 39.5 tok/s; 16 GB peak; cleanup 0.0149/0.0 GB active/cache      |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16482 prompt / 95 generated; 110 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache     |
 | mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16482 prompt / 113 generated; 93.5 tok/s; 10.0 GB peak; cleanup 0.00909/0.0 GB active/cache |
-| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed  | 16482 prompt / 127 generated; 30.4 tok/s; 22 GB peak; cleanup 0.0101/0.0 GB active/cache    |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed  | 1400 prompt / 89 generated; 125 tok/s; 5.5 GB peak; cleanup 0.0102/0.0 GB active/cache      |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3468 prompt / 114 generated; 46.2 tok/s; 70 GB peak; cleanup 0.0105/0.0 GB active/cache     |
+| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed  | 16482 prompt / 127 generated; 29.5 tok/s; 22 GB peak; cleanup 0.0101/0.0 GB active/cache    |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed  | 1400 prompt / 89 generated; 126 tok/s; 5.5 GB peak; cleanup 0.0102/0.0 GB active/cache      |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3468 prompt / 114 generated; 44.8 tok/s; 70 GB peak; cleanup 0.0105/0.0 GB active/cache     |
 
 </details>
 
@@ -727,15 +722,15 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.14                                                                                                                                          |
-| mlx-vlm source revision    | 625f71fae24f0d5c5ee7f1ec747094e815393405                                                                                                        |
-| mlx                        | 0.32.2.dev20260818+d5841be95                                                                                                                    |
-| mlx source revision        | d5841be95f68eba13bce5ab6abd673260bf12f74                                                                                                        |
+| mlx-vlm source revision    | e2b4ea1af18eff4cb4d1dd2cdfa2a588bbcfc0fd                                                                                                        |
+| mlx                        | 0.32.2.dev20260818+7f062ddcb                                                                                                                    |
+| mlx source revision        | 7f062ddcb81bedb537f3f95d11a7343ba6b5f909                                                                                                        |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-lm source revision     | 13425df69fdf066ed84d8f1bbdc8182a7576740d                                                                                                        |
 | mlx-audio                  | 0.5.0                                                                                                                                           |
 | transformers               | 5.15.0                                                                                                                                          |
 | tokenizers                 | 0.22.2                                                                                                                                          |
-| huggingface-hub            | 1.27.0                                                                                                                                          |
+| huggingface-hub            | 1.28.0                                                                                                                                          |
 | Python Version             | 3.13.14                                                                                                                                         |
 | OS                         | Darwin 25.6.0                                                                                                                                   |
 | macOS Version              | 26.6.1                                                                                                                                          |
@@ -759,7 +754,7 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,789,712 bytes, sha256=76c3d558d3f616ecf8b28e4fed0e5b2aeeacb766067eba1b8350a5e57207f478) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,887,872 bytes, sha256=01051184aa90b241725c63aba68daee128f42b066094dd458ef2536b1e1c5362)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (175,109,328 bytes, sha256=6b2f8a023931977180ef83487ad379d89a7ce32469a46f1fa2bffa0991277cd1) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,887,904 bytes, sha256=bc46a2463d54d380b567b793182c080b025697038c3a041a12fffbc32582433c)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->
