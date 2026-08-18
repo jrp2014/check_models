@@ -38,6 +38,7 @@ from __future__ import annotations
 # =============================================================================
 import argparse
 import ast
+import atexit
 import base64
 import codecs
 import functools
@@ -12351,6 +12352,45 @@ def _prepare_generation_prompt(
         raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
 
 
+_MLX_SHUTDOWN_CLEANUP_REGISTERED = False
+
+
+def _mlx_shutdown_cleanup() -> None:
+    """Destroy MLX streams before interpreter finalization.
+
+    Since mlx ``8e00a2d9d`` (#4248) the runtime no longer registers its own
+    ``atexit`` cleanup, and stream/compile-cache teardown that happens during
+    static destruction — after Python has finalized — aborts the process
+    (``PyThreadState_Get`` fatal error, exit 134). The mlx maintainers'
+    guidance (ml-explore/mlx#4327) is that the embedding application must call
+    ``mx.clear_streams()`` at the end of every thread that used MLX,
+    including the main thread. Running it from ``atexit`` places it after
+    normal shutdown work but before module teardown, which is early enough.
+    """
+    synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
+    clear_streams_fn = cast("Callable[[], object] | None", getattr(mx, "clear_streams", None))
+    for step_name, func in (
+        ("mx.synchronize", synchronize_fn),
+        ("mx.clear_streams", clear_streams_fn),
+    ):
+        if func is None:
+            continue
+        try:
+            func()
+        except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
+            logger.debug("Ignoring shutdown cleanup failure in %s", step_name, exc_info=True)
+
+
+def _register_mlx_shutdown_cleanup() -> bool:
+    """Register :func:`_mlx_shutdown_cleanup` once; return whether it was registered now."""
+    global _MLX_SHUTDOWN_CLEANUP_REGISTERED  # noqa: PLW0603 - process-wide idempotency latch for atexit
+    if _MLX_SHUTDOWN_CLEANUP_REGISTERED or mx is None:
+        return False
+    atexit.register(_mlx_shutdown_cleanup)
+    _MLX_SHUTDOWN_CLEANUP_REGISTERED = True
+    return True
+
+
 def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
     """Clear runtime resources after each model run.
 
@@ -19543,6 +19583,7 @@ def main_cli() -> None:
     # Load quality configuration
     load_quality_config(getattr(args, "quality_config", None))
 
+    _register_mlx_shutdown_cleanup()
     main(args)
 
 

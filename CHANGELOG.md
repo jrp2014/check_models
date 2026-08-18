@@ -4,6 +4,21 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Clean process exit on current mlx `main`: since mlx `8e00a2d9d` (#4248) the
+  runtime no longer tears down its streams/compile cache at exit, and the
+  maintainers' position (ml-explore/mlx#4327) is that the embedding process
+  must call `mx.clear_streams()` on every thread that used MLX. `main_cli()`
+  now registers an idempotent `atexit` hook (`_mlx_shutdown_cleanup`:
+  `mx.synchronize()` then `mx.clear_streams()`, best-effort) so a run that
+  generated with any model exits 0 instead of aborting with
+  `PyThreadState_Get` (exit 134) after all reports were written. The
+  `update.sh` local-MLX smoke runs the upstream `mlx_vlm generate` CLI through
+  a bootstrap that registers the same hook, since the upstream CLI does no
+  teardown of its own. The local mlx checkout is no longer pinned to
+  `d9e2b0d40`.
+
 ### Changed
 
 - Documentation housekeeping: archived the two superseded 2026-08-09 thinking

@@ -613,9 +613,9 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "e4e0cef29909bb7dab471999fc7238567cfada10",
+      "source_revision": "b33477e58a63a7ed895c646f171dfca6a25c4850",
       "vcs_revision": null,
-      "version": "0.11.0"
+      "version": "0.12.0"
     },
     "huggingface-hub": {
       "direct_url": null,
@@ -629,9 +629,9 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "c2bcf47ee312a26cdb6d1dee76aec43e03121303",
+      "source_revision": "d5841be95f68eba13bce5ab6abd673260bf12f74",
       "vcs_revision": null,
-      "version": "0.32.1.dev20260816+c2bcf47ee"
+      "version": "0.32.2.dev20260818+d5841be95"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -639,13 +639,13 @@
       "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "source_revision": null,
       "vcs_revision": null,
-      "version": "0.4.8"
+      "version": "0.5.0"
     },
     "mlx-lm": {
       "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-lm",
-      "source_revision": "254d153fdeb6f150edd4fc5a54f9828638481fa8",
+      "source_revision": "13425df69fdf066ed84d8f1bbdc8182a7576740d",
       "vcs_revision": null,
       "version": "0.31.3"
     },
@@ -661,7 +661,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "edf7b77f7e3e2277a50e5e47ebd29aac2a064483",
+      "source_revision": "625f71fae24f0d5c5ee7f1ec747094e815393405",
       "vcs_revision": null,
       "version": "0.6.14"
     },
@@ -698,7 +698,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-16 22:30:27 BST",
+  "generated_at": "2026-08-18 13:00:51 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -716,8 +716,8 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.27.0",
-    "mlx": "0.32.1.dev20260816+c2bcf47ee",
-    "mlx-audio": "0.4.8",
+    "mlx": "0.32.2.dev20260818+d5841be95",
+    "mlx-audio": "0.5.0",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
     "mlx-vlm": "0.6.14",
@@ -981,11 +981,11 @@
     }
   },
   "producer": {
-    "dirty": false,
-    "git_revision": "e4e0cef29909bb7dab471999fc7238567cfada10",
+    "dirty": true,
+    "git_revision": "b33477e58a63a7ed895c646f171dfca6a25c4850",
     "install_type": "source-tree",
     "name": "check_models",
-    "version": "0.11.0"
+    "version": "0.12.0"
   },
   "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-13 17:14:49 UTC+01:00\n- GPS: 51.959333\u00b0N, 1.349050\u00b0E\n\nDescriptive hints:\n- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe\n- Description hint: Seafront, Felixstowe, England, UK, GBR\n- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
   "prompt_burden": {
@@ -1328,6 +1328,6 @@
   },
   "prompt_sha256": "ae934c0aa806dbad3ab44aa77c6aea920b9e2ea0f377d63a1862c0065ef290ba",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1156.733,
+  "total_runtime_seconds": 1082.808,
   "trust_remote_code": true
 }

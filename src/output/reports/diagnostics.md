@@ -18,16 +18,16 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 31    |
-| observation needs reproduction | 11    |
+| none                           | 32    |
+| observation needs reproduction | 10    |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
 | unusable            | 14    |
-| usable              | 13    |
-| usable with caveats | 15    |
+| usable              | 14    |
+| usable with caveats | 14    |
 
 Observation counts
 
@@ -39,7 +39,7 @@ Observation counts
 | Response repeats the task instructions instead of only returning the requested fields | 4     |
 | Extra text appears before the Title field                                             | 3     |
 | Response appears cut off at the token limit                                           | 8     |
-| Conversation-role control tokens remain visible                                       | 2     |
+| Conversation-role control tokens remain visible                                       | 1     |
 | Title or keywords do not meet requested constraints                                   | 20    |
 
 ## Triage
@@ -53,10 +53,9 @@ Observation counts
 | [mlx-community/Qwen3-VL-2B-Instruct-bf16](#diagnostic-mlx-community-qwen3-vl-2b-instruct-bf16)                  | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
 | [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                              | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed             |
 | [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                              |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                            |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                 |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible; title/keyword constraints failed                               |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                 |
 
 ## Crashes requiring action
 
@@ -436,7 +435,7 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Title word count:* 7
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 16
+- *Keyword count:* 15
 - *Requested keyword count range:* [10, 18]
 - *Duplicate keywords:* ["memorial"]
 - *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
@@ -446,7 +445,7 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
 - *Post-cleanup active memory (GB):* 0.010798272
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 576
-- *Generation tokens:* 83
+- *Generation tokens:* 81
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -457,9 +456,9 @@ Keywords: Felixstowe, seafront, memorial, war memorial, stone column, bronze eag
 
 ```text
 <|channel>thought
-<channel|>Title: War Memorial on the Felixstowe Seafront, Suffolk
-Description: A tall fluted stone column topped with a bronze eagle stands on the coastal promenade overlooking the sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, monument, coast, ocean, stone, memorial, memorial, travel, Europe
+<channel|>Title: War Memorial Column on the Felixstowe Seafront
+Description: A tall fluted stone column topped with a bronze eagle stands on the coastal seafront overlooking the North Sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagle, coastal, ocean, stone, monument, sculpture, memorial, memorial
 ```
 
 </details>
@@ -467,7 +466,7 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
@@ -476,10 +475,15 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token
+- *Observations:* unexpected_special_token, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
+- *Title word count:* 8
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 16
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["monument"]
 - *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -498,9 +502,9 @@ Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, eagl
 
 ```text
 <|channel>thought
-<channel|>Title: War Memorial Column on the Felixstowe Seafront
-Description: A tall fluted stone war memorial topped with a bronze eagle stands on the coast overlooking the North Sea under a clear blue sky.
-Keywords: Felixstowe, Suffolk, England, UK, seafront, war memorial, column, coastal, ocean, monument, stone, eagle, sculpture, East Suffolk, Europe
+<channel|>Title: War Memorial Column on the Felixstowe Seafront England
+Description: A tall fluted column topped with a bronze eagle statue stands on the coastal promenade overlooking the sea under a clear blue sky.
+Keywords: Felixstowe, Suffolk, England, UK, seafront, memorial, monument, column, eagle, statue, ocean, coastal, stone, sculpture, monument, monument
 ```
 
 </details>
@@ -549,49 +553,10 @@ Keywords: seafront, Felixstowe, England, UK, GBR, Europe, monument, column, eagl
 
 </details>
 
-<a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-<details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — usable_with_caveats — role tokens visible</summary>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* role_boundary_token_present
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00268806
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2587
-- *Generation tokens:* 160
-- *Configured EOS token ID:* 128001
-- *Configured EOS token:* &lt;|end_of_text|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
- Title: Felixstowe Seafront Monument with Ocean View.
-Description: The image depicts a monument situated on the seafront in Felixstowe, England, UK. The monument is a tall, white column with a Doric column style, topped with a statue of an eagle. The column is surrounded by a base with inscriptions, and there is a staircase leading up to it. In the background, the vast expanse of the ocean can be seen, with two people standing on a rocky shore. The sky is clear, and the lighting suggests it is either early morning or late afternoon. 
-Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, ocean, rocky shore, clear sky, Doric column style, inscriptions, staircase.<end_of_utterance>
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 <details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — usable_with_caveats — role tokens visible; title/keyword constraints failed</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — usable_with_caveats — role tokens visible</summary>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
@@ -600,14 +565,10 @@ Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, oce
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* role_boundary_token_present, catalog_constraint_violation
+- *Observations:* role_boundary_token_present
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
 - *Thinking trace markers:* ["\u25c1think\u25b7", "\u25c1/think\u25b7"]
 - *Role-boundary tokens in output:* ["&lt;|im_assistant|&gt;"]
-- *Title word count:* 7
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 21
-- *Requested keyword count range:* [10, 18]
 - *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -615,7 +576,7 @@ Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, oce
 - *Post-cleanup active memory (GB):* 0.003654752
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1257
-- *Generation tokens:* 817
+- *Generation tokens:* 610
 - *Configured EOS token ID:* 163594
 - *Configured EOS token:* [EOS]
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -625,31 +586,25 @@ Keywords: Felixstowe, seafront, England, UK, monument, column, eagle statue, oce
 #### Complete output
 
 ```text
-◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top. The background has the sea, clear blue sky, some people, and a coastal setting. The context gives the location as Felixstowe, England, UK, with coordinates and date/time. The hints mention seafront, Felixstowe, England, UK, GBR, Europe, etc.
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. Let's start by analyzing the image. The image shows a tall column monument by the sea, likely a war memorial, with an eagle statue on top. The background has the sea, rocks, a clear blue sky, and some people walking. The location is Felixstowe, England, UK, as per the context. 
 
-First, the title: need a 5-10 word title. Maybe "Felixstowe Seafront Memorial Column by the Coast". That's concise.
+First, the title: needs to be a 5-10 word concrete title. Maybe " Felixstowe Seafront Memorial Column by the Coast". That's 7 words.
 
-Description: 1-2 sentences. The image shows a tall stone column with an eagle atop, situated on a seafront in Felixstowe, England. The monument stands near the coast with the sea in the background, clear blue sky, and people nearby. Lighting is bright, sunny day.
+Description: 1-2 sentences. It should combine context (Felixstowe, England, UK), main subject (memorial column), setting (seafront, sea, rocks), action (people walking), lighting (bright sunny day), distinctive details (column with eagle, plaques, string lights). So: "A tall stone memorial column with an eagle statue stands on the seafront of Felixstowe, England, UK, near the coast with people walking nearby under a clear blue sky."
 
-Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, coastal, stone monument, clear blue sky, people, rocks, streetlights, date 2026-08-13, time 17:14:49 UTC+01:00, GPS 51.959333°N, 1.349050°E, Adobe Stock, Any Vision, East Suffolk.
+Keywords: Need 10-18 unique keywords. Let's list: Felixstowe, England, UK, seafront, memorial column, eagle statue, coastal rocks, clear sky, people walking, plaques, string lights, blue sky. That's 10 keywords.
 
-Wait, the capture date and time and GPS are authoritative but not visible, so include them as facts. The hints include East Suffolk, so that's part of the location. Let's check the hints: hints have East Suffolk, England, UK, GBR, seafront, Felixstowe, Suffolk, UK, gbr, seafront. So include those. Also, the image has the sea, the column, eagle, people, rocks, streetlights, string lights, etc.
-
-So keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision.
-
-Now, structure:
+Wait, check if all context and visible details are covered. The context mentions East Suffolk, UK, Europe, but the image doesn't show East Suffolk specifically, but Felixstowe is in Suffolk. The keywords should include Felixstowe, England, UK, Europe. Also, the eagle statue, the column, the sea, rocks, people, string lights, plaques, clear sky. Let's adjust: Felixstowe, England, UK, seafront, memorial column, eagle statue, coastal rocks, clear blue sky, people walking, plaques, string lights. That's 10. Maybe add "war memorial" but the hint says to omit uncertain details. The plaques might be part of the memorial, so include plaques. Let's finalize:
 
 Title: Felixstowe Seafront Memorial Column by the Coast
 
-Description: A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+Description: A tall stone memorial column topped with an eagle statue stands on the seafront of Felixstowe, England, UK, near coastal rocks with people walking nearby under a clear blue sky.
 
-Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision◁/think▷Title:
-Felixstowe Seafront Memorial Column by the Coast
+Keywords: Felixstowe, England, UK, seafront, memorial column, eagle statue, coastal rocks, clear blue sky, people walking, plaques, string lights◁/think▷Title: Felixstowe Seafront Memorial Column by the Coast
 
-Description:
-A tall stone memorial column with an eagle statue stands on a seafront in Felixstowe, England, UK, featuring a clear blue sky, the sea in the background, and people nearby. The monument is situated on a paved area with rocks and streetlights visible.
+Description: A tall stone memorial column topped with an eagle statue stands on the seafront of Felixstowe, England, UK, near coastal rocks with people walking nearby under a clear blue sky.
 
-Keywords: Felixstowe, England, UK, GBR, seafront, sea, memorial column, eagle statue, stone monument, clear blue sky, people, rocks, streetlights, string lights, East Suffolk, 2026-08-13, 17:14:49 UTC+01:00, 51.959333°N, 1.349050°E, Adobe Stock, Any Vision<|im_assistant|>
+Keywords: Felixstowe, England, UK, seafront, memorial column, eagle statue, coastal rocks, clear blue sky, people walking, plaques, string lights<|im_assistant|>
 ```
 
 </details>
@@ -693,18 +648,19 @@ is in the model gallery.
 | Model                                                 | Runtime identity                                    | Performance                                                                                 |
 |-------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
 | LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed   | 2072 prompt / 132 generated; 479 tok/s; 1.9 GB peak; cleanup 0.000132/0.0 GB active/cache   |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2658 prompt / 131 generated; 29.9 tok/s; 24 GB peak; cleanup 0.000968/0.0 GB active/cache   |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed   | 580 prompt / 98 generated; 130 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache        |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 580 prompt / 111 generated; 27.7 tok/s; 20 GB peak; cleanup 0.0129/0.0 GB active/cache      |
-| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed   | 2072 prompt / 140 generated; 186 tok/s; 4.2 GB peak; cleanup 0.00379/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 3191 prompt / 162 generated; 66.3 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache     |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 3190 prompt / 123 generated; 188 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache    |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3429 prompt / 99 generated; 39.7 tok/s; 16 GB peak; cleanup 0.0149/0.0 GB active/cache      |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16482 prompt / 95 generated; 109 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16482 prompt / 113 generated; 91.2 tok/s; 10.0 GB peak; cleanup 0.00909/0.0 GB active/cache |
-| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed  | 16482 prompt / 127 generated; 25.9 tok/s; 22 GB peak; cleanup 0.0101/0.0 GB active/cache    |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed  | 1400 prompt / 89 generated; 126 tok/s; 5.5 GB peak; cleanup 0.0102/0.0 GB active/cache      |
-| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3468 prompt / 114 generated; 44.0 tok/s; 70 GB peak; cleanup 0.0105/0.0 GB active/cache     |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed | 2658 prompt / 131 generated; 29.6 tok/s; 24 GB peak; cleanup 0.000968/0.0 GB active/cache   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed   | 580 prompt / 98 generated; 126 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache        |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed   | 580 prompt / 111 generated; 26.0 tok/s; 20 GB peak; cleanup 0.0129/0.0 GB active/cache      |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed | 2587 prompt / 202 generated; 32.7 tok/s; 18 GB peak; cleanup 0.00269/0.0 GB active/cache    |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed   | 2072 prompt / 140 generated; 186 tok/s; 4.0 GB peak; cleanup 0.00379/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed | 3191 prompt / 162 generated; 66.5 tok/s; 14 GB peak; cleanup 0.0051/0.0 GB active/cache     |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed | 3190 prompt / 123 generated; 185 tok/s; 9.0 GB peak; cleanup 0.00562/0.0 GB active/cache    |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed  | 3429 prompt / 99 generated; 39.0 tok/s; 16 GB peak; cleanup 0.0149/0.0 GB active/cache      |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16482 prompt / 95 generated; 111 tok/s; 24 GB peak; cleanup 0.00857/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16482 prompt / 113 generated; 93.5 tok/s; 10.0 GB peak; cleanup 0.00909/0.0 GB active/cache |
+| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed  | 16482 prompt / 127 generated; 30.4 tok/s; 22 GB peak; cleanup 0.0101/0.0 GB active/cache    |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed  | 1400 prompt / 89 generated; 125 tok/s; 5.5 GB peak; cleanup 0.0102/0.0 GB active/cache      |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed  | 3468 prompt / 114 generated; 46.2 tok/s; 70 GB peak; cleanup 0.0105/0.0 GB active/cache     |
 
 </details>
 
@@ -764,7 +720,6 @@ original image before filing.
 | mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
 | mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
-| mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
 
 ### Components and system
@@ -772,9 +727,12 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.14                                                                                                                                          |
-| mlx                        | 0.32.1.dev20260816+c2bcf47ee                                                                                                                    |
+| mlx-vlm source revision    | 625f71fae24f0d5c5ee7f1ec747094e815393405                                                                                                        |
+| mlx                        | 0.32.2.dev20260818+d5841be95                                                                                                                    |
+| mlx source revision        | d5841be95f68eba13bce5ab6abd673260bf12f74                                                                                                        |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
-| mlx-audio                  | 0.4.8                                                                                                                                           |
+| mlx-lm source revision     | 13425df69fdf066ed84d8f1bbdc8182a7576740d                                                                                                        |
+| mlx-audio                  | 0.5.0                                                                                                                                           |
 | transformers               | 5.15.0                                                                                                                                          |
 | tokenizers                 | 0.22.2                                                                                                                                          |
 | huggingface-hub            | 1.27.0                                                                                                                                          |
@@ -801,7 +759,7 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,684,784 bytes, sha256=b90da7f5c9401aa9b05d09c0b0d796a6a3a2517ab081152db7b419e00c7f1815) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,982,032 bytes, sha256=a58a571eaf73eea64aa0ac22fd16a995de2e17acc7c5d75f3b2b5a7f25d0bdc1)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (174,789,712 bytes, sha256=76c3d558d3f616ecf8b28e4fed0e5b2aeeacb766067eba1b8350a5e57207f478) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,887,872 bytes, sha256=01051184aa90b241725c63aba68daee128f42b066094dd458ef2536b1e1c5362)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

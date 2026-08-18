@@ -1445,3 +1445,68 @@ class TestSnapshotNotes:
 
         assert assessment.observations == ()
         assert assessment.usability == "usable"
+
+
+# ── MLX shutdown cleanup (ml-explore/mlx#4327) ────────────────────────────
+
+
+class TestMlxShutdownCleanup:
+    """The process must clear MLX streams itself before interpreter teardown."""
+
+    def test_register_is_idempotent_and_uses_atexit(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """First registration installs the atexit hook; later calls are no-ops."""
+        registered: list[object] = []
+        monkeypatch.setattr(mod.atexit, "register", registered.append)
+        monkeypatch.setattr(mod, "_MLX_SHUTDOWN_CLEANUP_REGISTERED", False)
+        monkeypatch.setattr(mod, "mx", object())
+
+        assert mod._register_mlx_shutdown_cleanup() is True
+        assert mod._register_mlx_shutdown_cleanup() is False
+        assert registered == [mod._mlx_shutdown_cleanup]
+
+    def test_register_skips_when_mlx_unavailable(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without an MLX runtime there is nothing to tear down."""
+        registered: list[object] = []
+        monkeypatch.setattr(mod.atexit, "register", registered.append)
+        monkeypatch.setattr(mod, "_MLX_SHUTDOWN_CLEANUP_REGISTERED", False)
+        monkeypatch.setattr(mod, "mx", None)
+
+        assert mod._register_mlx_shutdown_cleanup() is False
+        assert registered == []
+
+    def test_cleanup_synchronizes_then_clears_streams(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Order matters: drain in-flight work before destroying the streams."""
+        calls: list[str] = []
+
+        class _FakeMx:
+            @staticmethod
+            def synchronize() -> None:
+                calls.append("synchronize")
+
+            @staticmethod
+            def clear_streams() -> None:
+                calls.append("clear_streams")
+
+        monkeypatch.setattr(mod, "mx", _FakeMx())
+        mod._mlx_shutdown_cleanup()
+        assert calls == ["synchronize", "clear_streams"]
+
+    def test_cleanup_tolerates_runtime_errors(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A failing teardown step must never turn a clean run into a crash."""
+
+        class _FakeMx:
+            @staticmethod
+            def synchronize() -> None:
+                msg = "device gone"
+                raise RuntimeError(msg)
+
+        monkeypatch.setattr(mod, "mx", _FakeMx())
+        mod._mlx_shutdown_cleanup()  # no exception; clear_streams absent is fine
