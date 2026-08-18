@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/generate_stubs.py` now treats packages whose distribution is not
+  installed as optional: they are skipped up front (logged), and generation
+  still patches, syntax-validates and records the manifest for the installed
+  subset instead of returning early. This unblocks CI on PyPI mlx-vlm 0.6.14,
+  which no longer depends on mlx-lm — the previous early return left
+  transformers' known-broken `glue.pyi`/`squad.pyi`/`processing_utils.pyi`
+  unpatched and the stub contract check failed.
 - Clean process exit on current mlx `main`: since mlx `8e00a2d9d` (#4248) the
   runtime no longer tears down its streams/compile cache at exit, and the
   maintainers' position (ml-explore/mlx#4327) is that the embedding process

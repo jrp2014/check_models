@@ -754,6 +754,21 @@ def _current_stub_manifest_entry(package: str) -> dict[str, str] | None:
     return {"distribution": distribution, "version": version}
 
 
+def _partition_installed_packages(packages: Iterable[str]) -> tuple[list[str], list[str]]:
+    """Split packages into (installed, absent) by their backing distribution.
+
+    Optional runtime components (mlx-lm since mlx-vlm 0.6.14 no longer depends
+    on it) may legitimately be absent; stub generation and checking proceed for
+    the installed subset instead of aborting or skipping the post-patch steps.
+    """
+    installed: list[str] = []
+    absent: list[str] = []
+    for package in packages:
+        target = installed if _current_stub_manifest_entry(package) is not None else absent
+        target.append(package)
+    return installed, absent
+
+
 def _stub_target_exists(typings_dir: Path, package: str) -> bool:
     package_path = typings_dir / package.replace(".", "/")
     return package_path.exists() or package_path.with_suffix(".pyi").exists()
@@ -1207,6 +1222,57 @@ def run_stubgen(packages: Iterable[str]) -> int:
     return overall_return_code
 
 
+def _finalize_generated_stubs(packages: list[str]) -> int:
+    """Patch, syntax-check, and record freshly generated stubs for ``packages``."""
+    patch_audit_issues: list[str] = []
+    if any(pkg.split(".")[0] == "mlx_vlm" for pkg in packages):
+        patch_audit_issues.extend(_patch_mlx_vlm_stubs(TYPINGS_DIR, audit=True))
+    if any(pkg.split(".")[0] == "transformers" for pkg in packages):
+        patch_audit_issues.extend(_patch_transformers_stubs(TYPINGS_DIR, audit=True))
+    if patch_audit_issues:
+        for issue in patch_audit_issues:
+            logger.error("[stubs] Stub patch audit failed: %s", issue)
+        return 1
+
+    _validate_stub_syntax(TYPINGS_DIR, packages)
+    _write_stub_manifest(packages)
+    integrity_issues = get_stub_integrity_issues(packages)
+    if integrity_issues:
+        for issue in integrity_issues:
+            logger.error("[stubs] %s", issue)
+        return 1
+
+    stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))
+    logger.info("[stubs] Generated %d stub files (.pyi)", stub_count)
+    logger.info("[stubs] Done")
+    return 0
+
+
+def _run_stub_generation(packages: list[str]) -> int:
+    """Run stubgen for ``packages`` and finalize whatever it produced."""
+    logger.info("[stubs] Generating stubs into: %s", TYPINGS_DIR)
+    logger.info("[stubs] Packages: %s", ", ".join(packages))
+    code = run_stubgen(packages)
+    if code != 0:
+        return code
+
+    missing = [pkg for pkg in packages if not (TYPINGS_DIR / pkg.replace(".", "/")).exists()]
+    if missing:
+        logger.warning(
+            "[stubs] Some packages did not produce stubs (possibly not importable): %s",
+            ", ".join(missing),
+        )
+        logger.warning(
+            "[stubs] This is expected on non-macOS platforms (MLX requires Apple Silicon)",
+        )
+        # Don't fail - mypy has ignore_missing_imports=true and will work without
+        # stubs - but still patch/validate/record whatever was produced.
+        packages = [pkg for pkg in packages if pkg not in missing]
+        if not packages:
+            return 0
+    return _finalize_generated_stubs(packages)
+
+
 def main() -> int:
     """CLI entry point: parse args, optionally clear, and generate stubs."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -1241,7 +1307,15 @@ def main() -> int:
         ),
     )
     ns = parser.parse_args()
-    packages = _validate_packages(ns.packages)
+    packages, absent = _partition_installed_packages(_validate_packages(ns.packages))
+    if absent:
+        logger.info(
+            "[stubs] Skipping packages whose distribution is not installed (optional): %s",
+            ", ".join(absent),
+        )
+    if not packages:
+        logger.warning("[stubs] No requested package is installed; nothing to do")
+        return 0
 
     if ns.check:
         return _run_stub_integrity_check(
@@ -1260,50 +1334,7 @@ def main() -> int:
             return 0
         logger.info("[stubs] Regenerating stubs because %s", refresh_reason)
 
-    logger.info("[stubs] Generating stubs into: %s", TYPINGS_DIR)
-    logger.info("[stubs] Packages: %s", ", ".join(packages))
-    code = run_stubgen(packages)
-    # Verify expected outputs exist when return code was 0
-    if code == 0:
-        missing: list[str] = []
-        for pkg in packages:
-            pkg_dir = TYPINGS_DIR / pkg.replace(".", "/")
-            if not pkg_dir.exists():
-                missing.append(pkg)
-        if missing:
-            logger.warning(
-                "[stubs] Some packages did not produce stubs (possibly not importable): %s",
-                ", ".join(missing),
-            )
-            logger.warning(
-                "[stubs] This is expected on non-macOS platforms (MLX requires Apple Silicon)",
-            )
-            # Don't fail - mypy has ignore_missing_imports=true and will work without stubs
-            return 0
-        # Apply post-processing patches for mlx_vlm stubs
-        patch_audit_issues: list[str] = []
-        if any(pkg.split(".")[0] == "mlx_vlm" for pkg in packages):
-            patch_audit_issues.extend(_patch_mlx_vlm_stubs(TYPINGS_DIR, audit=True))
-        if any(pkg.split(".")[0] == "transformers" for pkg in packages):
-            patch_audit_issues.extend(_patch_transformers_stubs(TYPINGS_DIR, audit=True))
-        if patch_audit_issues:
-            for issue in patch_audit_issues:
-                logger.error("[stubs] Stub patch audit failed: %s", issue)
-            return 1
-
-        _validate_stub_syntax(TYPINGS_DIR, packages)
-        _write_stub_manifest(packages)
-        integrity_issues = get_stub_integrity_issues(packages)
-        if integrity_issues:
-            for issue in integrity_issues:
-                logger.error("[stubs] %s", issue)
-            return 1
-
-        # Count and report generated stub files
-        stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))
-        logger.info("[stubs] Generated %d stub files (.pyi)", stub_count)
-        logger.info("[stubs] Done")
-    return code
+    return _run_stub_generation(packages)
 
 
 if __name__ == "__main__":

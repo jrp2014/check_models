@@ -1186,6 +1186,26 @@ def test_stub_refresh_reason_is_none_for_fresh_manifest(
     assert generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir) is None
 
 
+def test_partition_installed_packages_skips_absent_optional_distributions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """mlx-lm is optional since mlx-vlm 0.6.14; its absence must not stall stub work.
+
+    Regression: CI on the first PyPI mlx-vlm 0.6.14 resolution had no mlx-lm, and
+    stub generation returned early before patching transformers' known-broken
+    stubs, so the contract check failed on glue.pyi/squad.pyi.
+    """
+    versions = {"mlx-vlm": "0.6.14", "transformers": "5.15.0", "tokenizers": "0.22.2"}
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", versions.get)
+
+    installed, absent = generate_stubs._partition_installed_packages(
+        ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
+    )
+
+    assert installed == ["mlx_vlm", "transformers", "tokenizers"]
+    assert absent == ["mlx_lm"]
+
+
 def test_stub_refresh_reason_detects_version_change(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
