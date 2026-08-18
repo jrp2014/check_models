@@ -155,7 +155,7 @@ The file is organized in this order — search for these exact landmark headers 
 ### 7. CI and hooks
 
 - **Skylos danger scan**: full-mode quality runs (`make quality`, the `static-quality` CI job) execute `bash src/tools/run_skylos_danger_advisory.sh --full --gate`, so danger findings in this repository's own files are **blocking**. Findings under third-party `.worktrees/` checkouts are filtered out of the report with a visible drop notice. The separate GitHub Actions `skylos-advisory` job on `ubuntu-latest` additionally runs the scan in advisory mode for annotation-style surfacing.
-- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA and `-a` audit checks.
+- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA and `-a` audit checks.
 - **Runtime CI job**: separate `runtime-smoke` job runs `bash src/tools/run_runtime_smoke.sh` so Metal/runtime failures do not mask static quality results.
 - **Dependency sync CI job**: `.github/workflows/dependency-sync.yml` runs on `ubuntu-latest` with path filters and verifies `python -m tools.update_readme_deps --check`.
 - **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:

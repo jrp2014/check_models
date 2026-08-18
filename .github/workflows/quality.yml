@@ -75,35 +75,6 @@ jobs:
           pip install -e "src/.[dev]"
           npm install --ignore-scripts --prefix src
 
-      - name: Generate MLX stubs for mypy
-        run: |
-          mkdir -p typings
-          STUB_ROOT="$(mktemp -d)"
-          GENERATED_STUB=""
-
-          # Generate recursive stubs into an output directory.
-          # nanobind output layout for dotted modules varies by version.
-          if python -m nanobind.stubgen -m mlx.core -r -O "$STUB_ROOT"; then
-            if [ -f "$STUB_ROOT/mlx/core.pyi" ]; then
-              GENERATED_STUB="$STUB_ROOT/mlx/core.pyi"
-            elif [ -f "$STUB_ROOT/core.pyi" ]; then
-              GENERATED_STUB="$STUB_ROOT/core.pyi"
-            fi
-
-            if [ -n "$GENERATED_STUB" ] && [ -f "$GENERATED_STUB" ]; then
-              # Keep stubs in repo-local typings/ so mypy/pyrefly consume one source of truth.
-              mkdir -p typings/mlx/core
-              cp "$GENERATED_STUB" typings/mlx/core.pyi
-              cp "$GENERATED_STUB" typings/mlx/core/__init__.pyi
-            else
-              echo "⚠️ MLX stub file missing after stubgen; type checking may be less accurate"
-            fi
-          else
-            echo "⚠️ MLX stubgen failed; type checking may be less accurate"
-          fi
-
-          rm -rf "$STUB_ROOT"
-
       - name: Run static quality checks
         env:
           CI: true

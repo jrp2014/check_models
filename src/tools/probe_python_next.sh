@@ -137,9 +137,10 @@ if [[ "$PROBE_SOURCE_BUILD" != "1" ]]; then
 elif [[ ! -d "$MLX_REPO/.git" ]]; then
     echo "   skipped: no local mlx checkout at $MLX_REPO"
 else
-    "$PY" -m pip install -q "setuptools>=80,<82" cmake typing_extensions nanobind
+    # Mirrors mlx's [build-system] requires; nanobind is fetched by mlx's CMake.
+    "$PY" -m pip install -q "setuptools>=80,<82" cmake typing_extensions
     # MLX's setup.py spawns `cmake` from PATH; make the probe env's own
-    # pip-installed cmake (and nanobind's stubgen) win over any active env.
+    # pip-installed cmake win over any active env.
     probe_bin="$(dirname "$PY")"
     if (cd "$MLX_REPO" && PATH="$probe_bin:$PATH" "$PY" -m pip install -q --no-build-isolation -e . 2>&1 | tail -15); then
         echo "✓ mlx source build succeeded for Python $PROBE_PYTHON"

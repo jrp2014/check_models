@@ -2594,18 +2594,27 @@ def test_section_banners_match_copilot_instructions() -> None:
     )
 
 
-def test_ci_only_mlx_core_stub_step_is_declared() -> None:
-    """CI generates mlx.core stubs locally absent from the stub tooling; keep that visible."""
+def test_no_ci_only_mlx_core_stub_generation() -> None:
+    """mlx.core stubs come from the mlx distribution itself; nothing must regenerate them.
+
+    Both the PyPI wheel and an editable build ship ``mlx/core/*.pyi`` generated at
+    build time by mlx's own ``nanobind_add_stub``. A recursive
+    ``python -m nanobind.stubgen -m mlx.core -r`` run emits submodule stubs without
+    imports (hundreds of mypy name-defined errors), so the retired CI step and the
+    nanobind dev dependency must not come back.
+    """
     quality_workflow = (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(
         encoding="utf-8"
     )
+    pyproject_text = (REPO_ROOT / "src" / "pyproject.toml").read_text(encoding="utf-8")
     copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
 
-    assert "nanobind" in quality_workflow
-    assert "nanobind" in copilot_text, (
-        "CI-only mlx.core stub generation must stay documented until it is unified "
-        "with tools/generate_stubs.py"
-    )
+    for label, text in (
+        ("quality.yml", quality_workflow),
+        ("pyproject.toml", pyproject_text),
+        ("copilot-instructions.md", copilot_text),
+    ):
+        assert "nanobind" not in text, f"{label} reintroduces nanobind stub generation"
 
 
 def test_make_format_covers_every_gate_formatted_directory() -> None:
