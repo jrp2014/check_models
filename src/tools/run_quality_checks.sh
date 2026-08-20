@@ -65,14 +65,14 @@ if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Type Stub Refresh (Best Effort) ==="
     stub_refresh_failed=0
     if ! "$QUALITY_PYTHON" -m tools.generate_stubs --skip-if-fresh \
-        mlx_lm mlx_vlm; then
+        mlx_vlm; then
         echo "⚠️  Stub refresh warning: could not regenerate local third-party stubs; continuing"
         stub_refresh_failed=1
     fi
 
     echo "=== Type Stub Contract Check ==="
     if ! "$QUALITY_PYTHON" -m tools.generate_stubs --check --refresh-manifest-on-check \
-        mlx_lm mlx_vlm; then
+        mlx_vlm; then
         if [ "$stub_refresh_failed" -eq 1 ]; then
             echo "❌ Stub refresh and integrity checks failed"
         fi

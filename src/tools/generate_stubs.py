@@ -9,7 +9,7 @@ Usage examples
 --------------
     python -m tools.generate_stubs
     python -m tools.generate_stubs --clear && \
-        python -m tools.generate_stubs mlx_lm mlx_vlm
+        python -m tools.generate_stubs mlx_vlm
 
 Notes:
 -----
@@ -543,10 +543,9 @@ TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
 STUB_TOOL_VERSION = "10"
 
-DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm"]
+DEFAULT_PACKAGES = ["mlx_vlm"]
 
 PACKAGE_DISTRIBUTIONS = {
-    "mlx_lm": "mlx-lm",
     "mlx_vlm": "mlx-vlm",
 }
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -1006,7 +1005,7 @@ def _package_source_dir(package: str) -> Path | None:
     discovery: modules that raise SystemExit at import time (for example
     ``mlx_vlm.chat_ui`` without gradio, upstream 63c41804) and package trees
     whose cumulative import time exceeds mypy's fixed 30s inspection budget
-    (``mlx_vlm`` and ``mlx_lm`` today). C-extension packages return ``None``
+    (``mlx_vlm`` today). C-extension packages return ``None``
     and keep import-based discovery, which they genuinely require.
     """
     if "." in package:

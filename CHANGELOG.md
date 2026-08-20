@@ -4,6 +4,14 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+
+- `mlx_lm` from local type-stub generation (now `mlx_vlm` only). The monolith
+  never imports `mlx_lm` — its sole reference is a failure-attribution string
+  needle — mlx-lm ships `py.typed`, and CI never had the stubs anyway (PyPI
+  mlx-vlm 0.6.14 does not install mlx-lm, so its stub generation was always
+  skipped there). mypy, pyrefly, and ty verified clean without them.
+
 ## [0.13.0] - 2026-08-20
 
 ### Removed

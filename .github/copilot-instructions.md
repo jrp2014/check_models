@@ -99,7 +99,7 @@ The file is organized in this order — search for these exact landmark headers 
 | `make -C src lint-fix` | Apply safe Ruff lint fixes (`ruff check --fix`) before running the full quality gate |
 | `make lint` | Run Ruff lint early so lint errors are cleared before the full quality gate |
 | `make ci` | Full strict CI pipeline |
-| `make stubs` | Auto-generate `typings/` stubs for `mlx-lm` and `mlx-vlm` (transformers and tokenizers ship their own inline types / `.pyi`) |
+| `make stubs` | Auto-generate `typings/` stubs for `mlx-vlm` (mlx-lm, transformers, and tokenizers ship their own inline types / `.pyi`; the monolith never imports mlx_lm) |
 | `make deps-sync` | Sync README dependency blocks with pyproject.toml |
 | `make update` | Full updater via `src/tools/update.sh`: conda/brew refresh, local MLX repo builds, stubs, runtime smoke |
 | `make update-quick` | Quick in-env refresh: pip upgrade + editable reinstall with `[dev,extras,torch]` |
