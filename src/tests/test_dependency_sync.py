@@ -1192,17 +1192,14 @@ def test_partition_installed_packages_skips_absent_optional_distributions(
     """mlx-lm is optional since mlx-vlm 0.6.14; its absence must not stall stub work.
 
     Regression: CI on the first PyPI mlx-vlm 0.6.14 resolution had no mlx-lm, and
-    stub generation returned early before patching transformers' known-broken
-    stubs, so the contract check failed on glue.pyi/squad.pyi.
+    stub generation returned early instead of finalizing the installed subset.
     """
-    versions = {"mlx-vlm": "0.6.14", "transformers": "5.15.0", "tokenizers": "0.22.2"}
+    versions = {"mlx-vlm": "0.6.14"}
     monkeypatch.setattr(generate_stubs, "_installed_distribution_version", versions.get)
 
-    installed, absent = generate_stubs._partition_installed_packages(
-        ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
-    )
+    installed, absent = generate_stubs._partition_installed_packages(["mlx_lm", "mlx_vlm"])
 
-    assert installed == ["mlx_vlm", "transformers", "tokenizers"]
+    assert installed == ["mlx_vlm"]
     assert absent == ["mlx_lm"]
 
 
@@ -1411,66 +1408,6 @@ def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
     assert generate_stubs.refresh_stub_manifest_from_existing_stubs(["tokenizers"], typings_dir)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["packages"]["tokenizers"]["version"] == "0.22.2"
-
-
-def test_patch_transformers_stubs_adds_processor_runtime_attrs(tmp_path: Path) -> None:
-    """Patched ProcessorMixin stubs should expose tokenizer/image processor attrs."""
-    typings_dir = tmp_path / "typings"
-    transformers_dir = typings_dir / "transformers"
-    transformers_dir.mkdir(parents=True)
-    processing_utils_path = transformers_dir / "processing_utils.pyi"
-    processing_utils_path.write_text(
-        "from .tokenization_utils_base import PreTrainedTokenizerBase as PreTrainedTokenizerBase\n"
-        "from _typeshed import Incomplete\n"
-        "from typing import Any\n"
-        "\n"
-        "class PushToHubMixin: ...\n"
-        "\n"
-        "class ProcessorMixin(PushToHubMixin):\n"
-        "    valid_processor_kwargs = object\n"
-        "    image_ids: Incomplete\n"
-        "    video_ids: Incomplete\n"
-        "    audio_ids: Incomplete\n",
-        encoding="utf-8",
-    )
-
-    generate_stubs._patch_transformers_stubs(typings_dir)
-
-    patched = processing_utils_path.read_text(encoding="utf-8")
-    assert "tokenizer: PreTrainedTokenizerBase | None" in patched
-    assert "image_processor: Any | None" in patched
-
-
-def test_patch_transformers_stubs_widens_existing_processor_runtime_attrs(
-    tmp_path: Path,
-) -> None:
-    """Current upstream ProcessorMixin attrs should be widened without duplication."""
-    typings_dir = tmp_path / "typings"
-    transformers_dir = typings_dir / "transformers"
-    transformers_dir.mkdir(parents=True)
-    processing_utils_path = transformers_dir / "processing_utils.pyi"
-    processing_utils_path.write_text(
-        "from .tokenization_utils_base import PreTrainedTokenizerBase as PreTrainedTokenizerBase\n"
-        "from typing import Any\n"
-        "\n"
-        "class PushToHubMixin: ...\n"
-        "\n"
-        "class ProcessorMixin(PushToHubMixin):\n"
-        "    tokenizer: Any\n"
-        "    feature_extractor: Any\n"
-        "    image_processor: Any\n"
-        "    video_processor: Any\n",
-        encoding="utf-8",
-    )
-
-    generate_stubs._patch_transformers_stubs(typings_dir)
-    generate_stubs._patch_transformers_stubs(typings_dir)
-
-    patched = processing_utils_path.read_text(encoding="utf-8")
-    assert patched.count("    tokenizer: PreTrainedTokenizerBase | None\n") == 1
-    assert patched.count("    image_processor: Any | None\n") == 1
-    assert "    tokenizer: Any\n" not in patched
-    assert "    image_processor: Any\n" not in patched
 
 
 def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> None:

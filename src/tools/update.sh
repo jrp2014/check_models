@@ -32,7 +32,7 @@
 #   4. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
 #   5. Skip PyPI MLX updates for these packages
 #   6. Reinstall check_models from pyproject.toml to reconcile shared deps
-#   7. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
+#   7. Generate stubs for this project (mlx_lm, mlx_vlm)
 #   8. Run the local MLX runtime smoke if a local mlx build was installed
 #
 # Requirements for local MLX builds:
@@ -592,14 +592,14 @@ generate_project_stubs() {
 	ORIGINAL_DIR="$(pwd)"
 	cd "$SCRIPT_DIR"
 	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
-		if run_generate_stubs_command "$SCRIPT_DIR" mlx_lm mlx_vlm transformers tokenizers; then
+		echo "[update.sh] Generating type stubs for mlx_lm and mlx_vlm..."
+		if run_generate_stubs_command "$SCRIPT_DIR" mlx_lm mlx_vlm; then
 			echo "✓ Project stubs generated successfully"
 		else
 			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
 		fi
 
-		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers; then
+		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm; then
 			echo "❌ Project stub integrity verification failed"
 			cd "$ORIGINAL_DIR"
 			return 1

@@ -9,7 +9,7 @@ Usage examples
 --------------
     python -m tools.generate_stubs
     python -m tools.generate_stubs --clear && \
-        python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers
+        python -m tools.generate_stubs mlx_lm mlx_vlm
 
 Notes:
 -----
@@ -478,82 +478,6 @@ def _patch_mlx_vlm_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]
     return audit_issues
 
 
-def _patch_transformers_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]:
-    """Patch known defects emitted in transformers stubs."""
-    root = typings_dir / "transformers"
-    if not root.exists():
-        return []
-
-    # stubgen can emit "<ERROR>.join(...)" in dataclass field metadata for some
-    # datasets modules. Replace with a stable placeholder join string.
-    audit_issues: list[str] = []
-    join_placeholder_fix = _stub_patch(
-        "dataset metadata join placeholder",
-        re.compile(r"<ERROR>\.join\("),
-        "', '.join(",
-    )
-    audit_issues.extend(
-        _patch_stub_file_in_typings(
-            typings_dir,
-            root / "data/datasets/glue.pyi",
-            [join_placeholder_fix],
-            audit=audit,
-        )
-    )
-    audit_issues.extend(
-        _patch_stub_file_in_typings(
-            typings_dir,
-            root / "data/datasets/squad.pyi",
-            [join_placeholder_fix],
-            audit=audit,
-        )
-    )
-    audit_issues.extend(
-        _patch_stub_file_in_typings(
-            typings_dir,
-            root / "processing_utils.pyi",
-            [
-                _stub_patch_group(
-                    "ProcessorMixin runtime attrs",
-                    [
-                        # Current stubgen output preserves ProcessorMixin's broad runtime
-                        # declarations. Narrow tokenizer and retain the real None cases.
-                        (
-                            re.compile(
-                                r"(^class ProcessorMixin\(PushToHubMixin\):\n"
-                                r"(?:    [^\n]*\n)*?    tokenizer:) Any$",
-                                re.MULTILINE,
-                            ),
-                            r"\1 PreTrainedTokenizerBase | None",
-                        ),
-                        (
-                            re.compile(
-                                r"(^class ProcessorMixin\(PushToHubMixin\):\n"
-                                r"(?:    [^\n]*\n)*?    image_processor:) Any$",
-                                re.MULTILINE,
-                            ),
-                            r"\1 Any | None",
-                        ),
-                        # Older stubgen output omitted both runtime attributes.
-                        (
-                            re.compile(
-                                r"(    audio_ids: Incomplete\n)(?!    tokenizer: PreTrainedTokenizerBase \| None\n)",
-                            ),
-                            (
-                                r"\1"
-                                "    tokenizer: PreTrainedTokenizerBase | None\n"
-                                "    image_processor: Any | None\n"
-                            ),
-                        ),
-                    ],
-                ),
-            ],
-            audit=audit,
-        )
-    )
-    return audit_issues
-
-
 def _find_invalid_stub_files(
     typings_dir: Path,
     package_roots: Iterable[str],
@@ -619,22 +543,13 @@ TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
 STUB_TOOL_VERSION = "10"
 
-DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
+DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm"]
 
 PACKAGE_DISTRIBUTIONS = {
     "mlx_lm": "mlx-lm",
     "mlx_vlm": "mlx-vlm",
 }
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
-_TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
-    "Something went wrong trying to find the model name in the path:",
-    (
-        "Config not found for model. You can manually add it to"
-        " HARDCODED_CONFIG_FOR_MODELS in utils/auto_docstring.py"
-    ),
-    "No checkpoint found for ",
-    " but not documented. Make sure to add it to the docstring of the function in ",
-)
 _VERSION_METADATA_CHANGED_SUFFIX = "version metadata changed"
 
 
@@ -864,30 +779,6 @@ def _read_stub_file(path: Path, typings_dir: Path) -> tuple[str | None, list[str
         return None, [f"could not read {path.relative_to(typings_dir)}: {err}"]
 
 
-def _verify_transformers_stub_contracts(typings_dir: Path) -> list[str]:
-    """Verify that patched transformers stubs expose runtime ProcessorMixin attrs."""
-    processing_utils_path = typings_dir / "transformers" / "processing_utils.pyi"
-    text, issues = _read_stub_file(processing_utils_path, typings_dir)
-    if text is None:
-        return issues
-
-    missing_tokens = [
-        token
-        for token in (
-            "tokenizer: PreTrainedTokenizerBase | None",
-            "image_processor: Any | None",
-        )
-        if token not in text
-    ]
-    if not missing_tokens:
-        return []
-
-    return [
-        "transformers processing_utils stub is missing patched ProcessorMixin runtime attributes: "
-        + ", ".join(missing_tokens)
-    ]
-
-
 def _verify_mlx_vlm_stub_contracts(typings_dir: Path) -> list[str]:
     """Verify that patched mlx_vlm stubs expose the generate contract we rely on."""
     upstream_generate_types_path = typings_dir / "mlx_vlm" / "generate" / "types.pyi"
@@ -945,8 +836,6 @@ def get_stub_integrity_issues(
         issues.append(f"{package} stub syntax error in {location} ({message})")
 
     top_level_packages = {package.split(".", maxsplit=1)[0] for package in pkg_list}
-    if "transformers" in top_level_packages:
-        issues.extend(_verify_transformers_stub_contracts(typings_dir))
     if "mlx_vlm" in top_level_packages:
         issues.extend(_verify_mlx_vlm_stub_contracts(typings_dir))
 
@@ -1049,13 +938,6 @@ def _split_stubgen_output(stdout_text: str, stderr_text: str) -> list[str]:
     return [line.strip() for line in normalized.splitlines() if line.strip()]
 
 
-def _is_transformers_stubgen_noise(line: str) -> bool:
-    """Return True for known non-actionable transformers stubgen noise lines."""
-    return line.startswith("[ERROR]") and any(
-        token in line for token in _TRANSFORMERS_STUBGEN_NOISE_TOKENS
-    )
-
-
 def _default_stubgen_command() -> list[str]:
     """Resolve the preferred stubgen command for the active Python environment."""
     stubgen_path = shutil.which("stubgen")
@@ -1094,27 +976,8 @@ def _ensure_mypy_stubgen_command(stubgen_command: list[str]) -> list[str]:
     return [sys.executable, "-m", "mypy.stubgen"]
 
 
-def _log_stubgen_output(
-    *,
-    output_lines: list[str],
-    return_code: int,
-    transformers_requested: bool,
-) -> None:
-    """Log stubgen output with transformers-specific noise suppression."""
-    if return_code == 0 and transformers_requested:
-        suppressed_count = 0
-        for line in output_lines:
-            if _is_transformers_stubgen_noise(line):
-                suppressed_count += 1
-                continue
-            logger.info("[stubgen] %s", line)
-        if suppressed_count:
-            logger.info(
-                "[stubs] Suppressed %d non-actionable transformers stubgen message(s)",
-                suppressed_count,
-            )
-        return
-
+def _log_stubgen_output(*, output_lines: list[str], return_code: int) -> None:
+    """Log stubgen output at a severity matching its exit status."""
     log_fn = logger.error if return_code else logger.info
     for line in output_lines:
         log_fn("[stubgen] %s", line)
@@ -1195,7 +1058,6 @@ def _run_stubgen_once(stubgen_command: Sequence[str], package: str) -> int:
     _log_stubgen_output(
         output_lines=output_lines,
         return_code=return_code,
-        transformers_requested=package.split(".", maxsplit=1)[0] == "transformers",
     )
     return return_code
 
@@ -1227,8 +1089,6 @@ def _finalize_generated_stubs(packages: list[str]) -> int:
     patch_audit_issues: list[str] = []
     if any(pkg.split(".")[0] == "mlx_vlm" for pkg in packages):
         patch_audit_issues.extend(_patch_mlx_vlm_stubs(TYPINGS_DIR, audit=True))
-    if any(pkg.split(".")[0] == "transformers" for pkg in packages):
-        patch_audit_issues.extend(_patch_transformers_stubs(TYPINGS_DIR, audit=True))
     if patch_audit_issues:
         for issue in patch_audit_issues:
             logger.error("[stubs] Stub patch audit failed: %s", issue)
