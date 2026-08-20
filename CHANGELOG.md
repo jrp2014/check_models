@@ -4,6 +4,16 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Raised the `mlx` floor to `>=0.32.1`: the 0.32.0 wheels shipped `py.typed`
+  without the `mlx/core/*.pyi` stubs (ml-explore/mlx#3916), so 0.32.1 is the
+  first release whose wheel guarantees the upstream-shipped typing the gate
+  now relies on. The transformers (>=5.14.0), tokenizers (>=0.22.0), and
+  mlx-lm (>=0.31.3) floors already sit far above the versions that introduced
+  their shipped types; the typing guarantees are now documented alongside the
+  floors in `dependency_policy.py`.
+
 ### Removed
 
 - `mlx_lm` from local type-stub generation (now `mlx_vlm` only). The monolith

@@ -732,7 +732,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.0" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.1" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -933,7 +933,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.0" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.32.1" "mlx-vlm>=0.6.13" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "transformers>=5.14.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 

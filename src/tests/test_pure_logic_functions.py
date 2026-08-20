@@ -1118,7 +1118,9 @@ class TestPreflightDependencyDiagnostics:
                 "huggingface-hub": "1.10.1",
             },
         )
-        assert requirements["mlx"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx"]
+        # The project floor (0.32.1, first wheel with mlx/core/*.pyi) is now
+        # stricter than upstream mlx-vlm's own mlx minimum.
+        assert requirements["mlx"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx"]
         assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
         assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
         # mlx-lm is no longer a project runtime floor; the fixture's mlx-vlm
@@ -1135,7 +1137,7 @@ class TestPreflightDependencyDiagnostics:
         mod: types.ModuleType,
     ) -> None:
         """mlx-lm is required by mlx-vlm < 0.6.14 only; newer installs never warn."""
-        base = {"mlx": "0.32.0", "transformers": "5.15.0", "huggingface-hub": "1.10.1"}
+        base = {"mlx": "0.32.1", "transformers": "5.15.0", "huggingface-hub": "1.10.1"}
 
         legacy = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.13"})
         assert any("mlx-lm is missing" in issue for issue in legacy)
@@ -1157,7 +1159,10 @@ class TestPreflightDependencyDiagnostics:
                 "huggingface-hub": "1.9.9",
             },
         )
-        assert any("mlx==0.29.9" in issue and "0.32.0" in issue for issue in issues)
+        assert any(
+            "mlx==0.29.9" in issue and mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx"] in issue
+            for issue in issues
+        )
         assert any(
             "mlx-vlm==0.4.1" in issue and mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"] in issue
             for issue in issues
@@ -1175,7 +1180,7 @@ class TestPreflightDependencyDiagnostics:
             {
                 "mlx-vlm": "0.6.13",
                 "mlx-lm": "0.31.3",
-                "mlx": "0.32.0",
+                "mlx": "0.32.1",
                 "mlx-audio": "0.4.3",
                 "transformers": "5.15.0",
                 "huggingface-hub": "1.10.1",
