@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-08-23
+
 ### Removed
 
 - The `atexit` `mx.clear_streams()` exit hook in `main_cli()` and the
