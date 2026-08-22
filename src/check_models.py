@@ -12367,11 +12367,12 @@ def _mlx_shutdown_cleanup() -> None:
     including the main thread. Running it from ``atexit`` places it after
     normal shutdown work but before module teardown, which is early enough.
 
-    mlx-vlm registers the same ``atexit`` cleanup itself from 0.6.15
-    (Blaizzy/mlx-vlm#1949, unreleased at the time of writing); this hook stays
-    so that released 0.6.14 wheels — and direct ``mlx.core`` use before
-    ``mlx_vlm`` is imported — are covered too. A second ``clear_streams()``
-    on an already-empty thread is a no-op.
+    Upstream has since closed the gap from both sides: mlx ``1038679aa``
+    (ml-explore/mlx#4373) re-registers an ``atexit`` hook that clears the
+    main-thread compile cache, and mlx-vlm registers ``clear_streams`` itself
+    from 0.6.15 (Blaizzy/mlx-vlm#1949). This hook stays because it is a
+    no-op when redundant, and it still covers the dev-build window between
+    #4248 and #4373 and released mlx-vlm 0.6.14 wheels.
     """
     synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
     clear_streams_fn = cast("Callable[[], object] | None", getattr(mx, "clear_streams", None))

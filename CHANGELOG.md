@@ -4,6 +4,17 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Recorded that upstream closed the exit-crash gap from both sides: mlx
+  `1038679aa` (ml-explore/mlx#4373) re-registers an `atexit` compile-cache
+  cleanup on the main thread, and mlx-vlm 0.6.15 registers `clear_streams`
+  itself (#1949). Verified a compile-then-exit and a compiled decode-style
+  loop both exit 0 on mlx `1038679aa` with no manual cleanup. Our own
+  `atexit` hook and the `update.sh` smoke bootstrap stay — they are no-ops
+  when redundant and still cover the `#4248..#4373` dev-build window and
+  released mlx-vlm 0.6.14 wheels. Docstrings and comments updated to match.
+
 ## [0.14.0] - 2026-08-22
 
 ### Changed

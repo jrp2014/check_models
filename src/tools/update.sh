@@ -454,11 +454,12 @@ import sys
 
 model, prompt, max_tokens, expected = sys.argv[1:5]
 timeout = int(os.environ.get("MLX_LOCAL_BUILD_SMOKE_TIMEOUT", "240"))
-# mlx >= 8e00a2d9d (#4248) no longer tears its streams down at exit; the
-# embedding process must call mx.clear_streams() on every thread that used
-# MLX (ml-explore/mlx#4327). The upstream mlx_vlm CLI does not, so run it
-# through a bootstrap that registers that call, otherwise a healthy backend
-# still exits 134 (PyThreadState_Get abort) after printing the right answer.
+# mlx 8e00a2d9d..1038679aa (#4248..#4373) did not tear its compile cache down
+# at exit, and the embedding process had to call mx.clear_streams() on every
+# thread that used MLX (ml-explore/mlx#4327); mlx_vlm < 0.6.15 did not. Run
+# the CLI through a bootstrap that registers that call so a healthy backend in
+# that window does not exit 134 (PyThreadState_Get abort) after printing the
+# right answer. Harmless (a no-op) on builds where upstream cleans up itself.
 bootstrap = (
     "import atexit, runpy\n"
     "import mlx.core as mx\n"
