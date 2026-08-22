@@ -18278,6 +18278,12 @@ _NATIVE_CLI_OPTIONAL_ARGS: Final[tuple[tuple[str, str], ...]] = (
     ("--thinking-start-token", "thinking_start_token"),
 )
 _NATIVE_CLI_NONDEFAULT_ARGS: Final[tuple[tuple[str, str, object], ...]] = (
+    # Sampling flags exist on the upstream generate CLI since #1994 (post-0.6.15).
+    # Emitted only when non-default, so repro commands stay valid for releases
+    # predating them unless the run actually used the setting.
+    ("--top-p", "top_p", 1.0),
+    ("--min-p", "min_p", 0.0),
+    ("--top-k", "top_k", 0),
     ("--repetition-context-size", "repetition_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
     ("--presence-context-size", "presence_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
     ("--frequency-context-size", "frequency_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
@@ -18295,12 +18301,7 @@ _NATIVE_CLI_LOAD_BOOLEAN_FLAGS: Final[tuple[tuple[str, str, bool], ...]] = (
     ("--trust-remote-code", "trust_remote_code", True),
     ("--quantize-activations", "quantize_activations", False),
 )
-_NATIVE_GENERATION_KWARG_DEFAULTS: Final[tuple[tuple[str, object], ...]] = (
-    ("top_p", 1.0),
-    ("min_p", 0.0),
-    ("top_k", 0),
-    ("logit_bias", None),
-)
+_NATIVE_GENERATION_KWARG_DEFAULTS: Final[tuple[tuple[str, object], ...]] = (("logit_bias", None),)
 
 
 def _append_native_cli_load_args(

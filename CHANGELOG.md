@@ -6,6 +6,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Native repro commands now emit `--top-p`, `--min-p`, and `--top-k` as
+  first-class `mlx_vlm.generate` CLI flags (upstream added them in
+  Blaizzy/mlx-vlm#1994; previously they could only travel in the
+  `--gen-kwargs` JSON blob, which is now reserved for `logit_bias`). The
+  flags are emitted only when non-default, so repro commands remain valid on
+  releases predating #1994 unless the run actually used the setting — the
+  same policy as the per-tensor KV flags. Verified against the installed
+  upstream CLI (`18e9b979`), which also landed the suggested
+  `math.prod` fix for the `grid_sample` Metal launch grid (#2006), so the
+  local mlx-vlm checkout patch is retired.
+
+
 - Raised the `mlx` floor to `>=0.32.1`: the 0.32.0 wheels shipped `py.typed`
   without the `mlx/core/*.pyi` stubs (ml-explore/mlx#3916), so 0.32.1 is the
   first release whose wheel guarantees the upstream-shipped typing the gate

@@ -742,11 +742,13 @@ def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
     ):
         assert flag in tokens
     assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
+    # Sampling settings are first-class upstream CLI flags since mlx-vlm #1994;
+    # only logit_bias still needs the --gen-kwargs escape hatch.
+    assert tokens[tokens.index("--top-p") + 1] == "0.81"
+    assert tokens[tokens.index("--min-p") + 1] == "0.12"
+    assert tokens[tokens.index("--top-k") + 1] == "7"
     assert json.loads(tokens[tokens.index("--gen-kwargs") + 1]) == {
         "logit_bias": {"42": -1.5},
-        "min_p": 0.12,
-        "top_k": 7,
-        "top_p": 0.81,
     }
 
 
