@@ -4,16 +4,26 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+
+- The `atexit` `mx.clear_streams()` exit hook in `main_cli()` and the
+  `update.sh` smoke bootstrap. Both were workarounds for the mlx
+  `#4248..#4373` dev-build window in which the runtime dropped its own
+  compile-cache teardown; mlx `1038679aa` (ml-explore/mlx#4373) restores it
+  and mlx-vlm 0.6.15 registers `clear_streams` itself (#1949). Verified on
+  `1038679aa`: a real `generate()` followed by interpreter exit, with mlx-vlm's
+  own hook unregistered and no bootstrap, exits 0. No released mlx was ever
+  affected (0.32.1 predates #4248; the next release carries #4373), so no
+  supported configuration needs the workaround.
+
 ### Changed
 
 - Recorded that upstream closed the exit-crash gap from both sides: mlx
   `1038679aa` (ml-explore/mlx#4373) re-registers an `atexit` compile-cache
   cleanup on the main thread, and mlx-vlm 0.6.15 registers `clear_streams`
   itself (#1949). Verified a compile-then-exit and a compiled decode-style
-  loop both exit 0 on mlx `1038679aa` with no manual cleanup. Our own
-  `atexit` hook and the `update.sh` smoke bootstrap stay — they are no-ops
-  when redundant and still cover the `#4248..#4373` dev-build window and
-  released mlx-vlm 0.6.14 wheels. Docstrings and comments updated to match.
+  loop both exit 0 on mlx `1038679aa` with no manual cleanup (see
+  "Removed" above for the consequence).
 
 ## [0.14.0] - 2026-08-22
 
