@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-08-22
+
 ### Changed
 
 - Native repro commands now emit `--top-p`, `--min-p`, and `--top-k` as
@@ -16,7 +18,6 @@ Notable changes to this project will be documented in this file.
   upstream CLI (`18e9b979`), which also landed the suggested
   `math.prod` fix for the `grid_sample` Metal launch grid (#2006), so the
   local mlx-vlm checkout patch is retired.
-
 
 - Raised the `mlx` floor to `>=0.32.1`: the 0.32.0 wheels shipped `py.typed`
   without the `mlx/core/*.pyi` stubs (ml-explore/mlx#3916), so 0.32.1 is the
