@@ -613,9 +613,9 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "d9538f8e4dac6ccae7178907ab8deecb6cd45f26",
+      "source_revision": "5a78e984657f492733f34cbe3d7887058ef60060",
       "vcs_revision": null,
-      "version": "0.13.0"
+      "version": "0.14.0"
     },
     "huggingface-hub": {
       "direct_url": null,
@@ -629,9 +629,9 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "27fec909a3df9e572f5195607a453e273e7d80d0",
+      "source_revision": "846d176227a0ac13d2667e58d2bb68b322109ab0",
       "vcs_revision": null,
-      "version": "0.32.2.dev20260820+27fec909a"
+      "version": "0.32.2.dev20260822+846d17622"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -645,7 +645,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-lm",
-      "source_revision": "d06c5374a12e1f9384aad5fece583d7be9d2619d",
+      "source_revision": "d78bf58e217c904ec282ed8da9b947491f78c022",
       "vcs_revision": null,
       "version": "0.32.0"
     },
@@ -661,7 +661,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "1249c7db09921714b43e056b149f9d762eec07d3",
+      "source_revision": "18e9b979f9e6b9edfad20832698db1171320247c",
       "vcs_revision": null,
       "version": "0.6.15"
     },
@@ -692,13 +692,13 @@
   },
   "counts": {
     "models_attempted": 42,
-    "models_completed": 39,
-    "models_crashed": 3,
+    "models_completed": 42,
+    "models_crashed": 0,
     "models_evaluated": 42,
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-20 23:13:03 BST",
+  "generated_at": "2026-08-22 22:51:18 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -716,7 +716,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.28.0",
-    "mlx": "0.32.2.dev20260820+27fec909a",
+    "mlx": "0.32.2.dev20260822+846d17622",
     "mlx-audio": "0.5.0",
     "mlx-lm": "0.32.0",
     "mlx-metal": null,
@@ -982,10 +982,10 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "d9538f8e4dac6ccae7178907ab8deecb6cd45f26",
+    "git_revision": "5a78e984657f492733f34cbe3d7887058ef60060",
     "install_type": "source-tree",
     "name": "check_models",
-    "version": "0.13.0"
+    "version": "0.14.0"
   },
   "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-13 17:14:49 UTC+01:00\n- GPS: 51.959333\u00b0N, 1.349050\u00b0E\n\nDescriptive hints:\n- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe\n- Description hint: Seafront, Felixstowe, England, UK, GBR\n- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
   "prompt_burden": {
@@ -1039,27 +1039,27 @@
     },
     "mlx-community/GLM-4.1V-9B-Thinking-8bit": {
       "image_patch_count": null,
-      "nontext_tokens_est": null,
+      "nontext_tokens_est": 6109,
       "processed_image_height": null,
       "processed_image_width": null,
       "text_tokens_est": 198,
-      "total_tokens": null
+      "total_tokens": 6307
     },
     "mlx-community/GLM-4.6V-Flash-mxfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": null,
+      "nontext_tokens_est": 6113,
       "processed_image_height": null,
       "processed_image_width": null,
       "text_tokens_est": 198,
-      "total_tokens": null
+      "total_tokens": 6311
     },
     "mlx-community/GLM-4.6V-nvfp4": {
       "image_patch_count": null,
-      "nontext_tokens_est": null,
+      "nontext_tokens_est": 6113,
       "processed_image_height": null,
       "processed_image_width": null,
       "text_tokens_est": 198,
-      "total_tokens": null
+      "total_tokens": 6311
     },
     "mlx-community/Idefics3-8B-Llama3-bf16": {
       "image_patch_count": null,
@@ -1328,6 +1328,6 @@
   },
   "prompt_sha256": "ae934c0aa806dbad3ab44aa77c6aea920b9e2ea0f377d63a1862c0065ef290ba",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1023.007,
+  "total_runtime_seconds": 1107.33,
   "trust_remote_code": true
 }
