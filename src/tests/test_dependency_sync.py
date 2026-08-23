@@ -2491,10 +2491,19 @@ def test_python_floor_is_single_sourced() -> None:
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
     assert f"python={floor}" in setup_script
 
+    # CI runs the floor plus any newer candidate (a staged Python move is
+    # rehearsed in CI before the working env follows). Every literal version
+    # in the workflows must be >= the floor, and the floor itself must still be
+    # exercised somewhere so the supported minimum stays tested.
+    floor_parts = tuple(int(part) for part in floor.split("."))
+    ci_versions: set[str] = set()
     for workflow_path in sorted((REPO_ROOT / ".github" / "workflows").glob("*.yml")):
         workflow_text = workflow_path.read_text(encoding="utf-8")
-        for match in re.finditer(r'python-version:\s*"([^"]+)"', workflow_text):
-            assert match.group(1) == floor, workflow_path.name
+        for match in re.finditer(r'"(3\.\d{1,2})"', workflow_text):
+            ci_versions.add(match.group(1))
+    assert floor in ci_versions, f"CI no longer tests the Python floor {floor}: {ci_versions}"
+    for version in ci_versions:
+        assert tuple(int(part) for part in version.split(".")) >= floor_parts, version
 
 
 def test_update_smoke_defaults_are_documented() -> None:

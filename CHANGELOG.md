@@ -4,6 +4,20 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- CI now rehearses the next Python: the static-quality job runs a matrix of
+  the floor (3.13) and 3.14, while the runtime-smoke and Skylos jobs move to
+  3.14, and `Programming Language :: Python :: 3.14` is declared. The floor
+  (`requires-python >= 3.13`, the checker targets, `validate_env`,
+  `setup_conda_env.sh`) is unchanged — the working env stays on 3.13 until a
+  deliberate rebuild — and `test_python_floor_is_single_sourced` now requires
+  every CI Python to be >= the floor with the floor itself still exercised.
+  Motivated by `make probe-python-next` on 3.14.7 passing every check with
+  no friction: PyPI wheels (mlx 0.32.1, mlx-vlm 0.6.15, transformers 5.15.1,
+  Metal available), the local mlx source build, the full test suite, mypy,
+  pyrefly, ty, ruff, and the torch extra (2.13.0).
+
 ## [0.14.1] - 2026-08-23
 
 ### Removed
