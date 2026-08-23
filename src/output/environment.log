@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-23 14:31:03 BST
+FULL ENVIRONMENT DUMP - 2026-08-23 22:50:24 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 162
+Total packages: 163
 
 annotated-doc==0.0.5
 annotated-types==0.8.0
@@ -33,7 +33,7 @@ editor==1.8.0
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.141.1
-filelock==3.32.3
+filelock==3.32.4
 fsspec==2026.7.0
 h11==0.16.0
 hf-xet==1.6.0
@@ -65,10 +65,11 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.2.dev20260823+d9077d831
-mlx==0.32.2.dev20260823+d9077d831
+mlx==0.32.2.dev20260823+451dc8759
+mlx==0.32.2.dev20260823+451dc8759
 mlx-audio==0.5.0
 mlx-lm==0.32.0
+mlx-vlm==0.6.16
 mlx-vlm==0.6.16
 more-itertools==11.1.0
 mpmath==1.3.0
@@ -170,5 +171,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-23 14:31:03 BST
+Environment dump completed at 2026-08-23 22:50:24 BST
 ================================================================================
