@@ -4,6 +4,43 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Built-in run comparison (`--compare-with`, default `auto`): every sweep now
+  diffs itself against a baseline — by default the retained `results.jsonl` at
+  git `HEAD`, i.e. the last committed sweep — and reports a "Since the baseline
+  sweep" section in `run_summary.md`, a `comparison` block in `run.json`, and a
+  terminal summary. It records per-model execution/usability/observation-set
+  transitions, the count of byte-identical generated texts, generation tok/s
+  ratios (median/min/max) with per-model noise bands derived from
+  `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs,
+  excluding the run being judged; a fixed ±15% band when history is thin), and
+  peak-memory moves beyond 0.5 GB and 10%. Models added/removed between runs
+  are listed (collapsed to a count for targeted runs). `none` disables; a path
+  or any git ref selects another baseline. Everything is model-agnostic and
+  degrades to "no comparison" rather than failing a run.
+- Isolated execution (`--isolate`): each model runs in a fresh child
+  interpreter that hands its full `PerformanceResult` back as JSON (nested
+  dataclasses and the upstream generation metrics round-trip exactly, so
+  reports are identical to in-process runs). A child that dies natively —
+  segfault, abort, interpreter-finalization fault — becomes that model's
+  phase-tagged crash record (signal name, phase reached via a progress file,
+  stderr tail) built through the same failure path as an in-process
+  exception, instead of ending the sweep. Verified live with a forced
+  `SIGABRT` in one child of a three-model run. The in-process boundary is
+  unchanged and remains the default.
+- Exact prompt token accounting: prompt diagnostics now record
+  `rendered_prompt_token_count`, the tokenizer's count of the rendered chat
+  template (mirroring upstream's `should_add_special_tokens`, duck-typed so
+  every family takes the same path). Quality analysis and `run.json`
+  `prompt_burden` use it as the text/template share — `text_tokens_source`
+  says `tokenizer` or `heuristic` — so the non-text (image/audio expansion)
+  share is exact for every model, and a new "Prompt composition" diagnostics
+  row states it (e.g. Qwen3-VL-2B: 16,467 = 298 text + 16,169 non-text,
+  98%). With an exact split, `visual_input` classification no longer depends
+  on the placeholder regex recognising a family's image token. The word-ratio
+  heuristic remains the fallback when a tokenizer cannot count.
+
 ### Fixed
 
 - The CLI parser now pins `prog` to `basename(sys.argv[0])` (the Python 3.13

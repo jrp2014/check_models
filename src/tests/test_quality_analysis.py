@@ -1337,3 +1337,66 @@ class TestDownloadTimeoutClassification:
             check_models._run_issue_failure_observed_result(failure, "")
             == "Model Error during model loading"
         )
+
+
+# ── Exact prompt token accounting ────────────────────────────────────────────
+
+
+class TestExactPromptTokenAccounting:
+    """A tokenizer count of the rendered prompt replaces the word-ratio heuristic."""
+
+    def test_analysis_prefers_exact_text_tokens(self) -> None:
+        """An exact count wins and is labelled as tokenizer-sourced."""
+        analysis = check_models.analyze_generation_text(
+            "Title: A\nDescription: B\nKeywords: c, d",
+            generated_tokens=20,
+            prompt_tokens=16467,
+            prompt="some prompt words here",
+            prompt_text_tokens=298,
+        )
+        assert analysis.prompt_tokens_text_est == 298
+        assert analysis.prompt_tokens_nontext_est == 16169
+        assert analysis.prompt_tokens_text_source == "tokenizer"
+
+    def test_analysis_falls_back_to_heuristic(self) -> None:
+        """Without an exact count the word-ratio heuristic is used and labelled."""
+        analysis = check_models.analyze_generation_text(
+            "Title: A", generated_tokens=3, prompt_tokens=100, prompt="four words of prompt"
+        )
+        assert analysis.prompt_tokens_text_source == "heuristic"
+        assert analysis.prompt_tokens_text_est == check_models._estimate_prompt_tokens_from_text(
+            "four words of prompt"
+        )
+
+    def test_count_rendered_prompt_tokens_uses_encode_and_tolerates_signatures(self) -> None:
+        """Counting duck-types encode and copes with older encode signatures."""
+
+        class _Tok:
+            def encode(self, text: str, add_special_tokens: bool = True) -> list[int]:
+                return [1] * (len(text.split()) + (1 if add_special_tokens else 0))
+
+        class _OldTok:
+            def encode(self, text: str) -> list[int]:  # no add_special_tokens kwarg
+                return [1] * len(text.split())
+
+        prompt = "a b c"
+        # Without upstream's helper resolvable for a None model_type, markers are off.
+        assert check_models._count_rendered_prompt_tokens(_Tok(), prompt, None, object()) == 3
+        assert check_models._count_rendered_prompt_tokens(_OldTok(), prompt, None, object()) == 3
+        assert check_models._count_rendered_prompt_tokens(object(), prompt, None, object()) is None
+
+    def test_exact_split_classifies_visual_burden_without_placeholder_regex(self) -> None:
+        """With exact text tokens the ratio alone classifies visual burden."""
+        kind, _ = check_models._classify_prompt_burden(
+            total=16467, text_est=298, nontext_est=16169, ratio=0.98, placeholders=0
+        )
+        assert kind == "mixed"
+        kind, _ = check_models._classify_prompt_burden(
+            total=16467,
+            text_est=298,
+            nontext_est=16169,
+            ratio=0.98,
+            placeholders=0,
+            exact_text_tokens=True,
+        )
+        assert kind == "visual_input"

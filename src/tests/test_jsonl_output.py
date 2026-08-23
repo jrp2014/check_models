@@ -382,6 +382,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         "trust_remote_code",
         "model_provenance",
         "prompt_burden",
+        "comparison",
     }
     assert payload["schema_version"] == "2.0"
     assert payload["eval_mode"] == "triage"
@@ -431,6 +432,9 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         "total_tokens": 80,
         "text_tokens_est": 12,
         "nontext_tokens_est": 68,
+        "text_tokens_source": "heuristic",
+        "nontext_ratio": 0.85,
+        "kind": "normal",
         "processed_image_width": 640,
         "processed_image_height": 480,
         "image_patch_count": 120,

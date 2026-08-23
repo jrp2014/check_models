@@ -5471,3 +5471,201 @@ def test_component_source_revision_prefers_source_then_vcs() -> None:
     assert check_models._component_source_revision({"x": {"source_revision": None}}, "x") is None
     assert check_models._component_source_revision(None, "x") is None
     assert check_models._component_source_revision({}, "missing") is None
+
+
+# ── Run comparison (current sweep vs retained baseline) ─────────────────────
+
+
+def _comparison_record(
+    model: str,
+    *,
+    usability: str = "usable",
+    observations: list[str] | None = None,
+    text: str = "same text",
+    tps: float | None = 100.0,
+    peak_gb: float | None = 10.0,
+    execution: str = "completed",
+) -> dict[str, object]:
+    record = _issue_summary_result(
+        model, execution=execution, usability=usability, observations=observations
+    )
+    record["generated_text"] = text
+    record["metrics"] = {
+        **({"generation_tps": tps} if tps is not None else {}),
+        **({"peak_memory_gb": peak_gb} if peak_gb is not None else {}),
+    }
+    return record
+
+
+def _comparison_baseline(records: list[dict[str, object]]) -> check_models.ComparisonBaseline:
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {
+            "_type": "metadata",
+            "format_version": "2.0",
+            "prompt": "p",
+            "system": {"Python Version": "3.13.14"},
+            "timestamp": "2026-08-01 10:00:00 BST",
+            "library_versions": {"mlx": "0.32.1", "mlx-vlm": "0.6.15"},
+            "component_provenance": {
+                "mlx": {"version": "0.32.1", "source_revision": "abcdef1234567890"},
+            },
+        },
+    )
+    return check_models.ComparisonBaseline(
+        label="HEAD:src/output/results.jsonl",
+        metadata=metadata,
+        results=tuple(cast("check_models.JsonlResultRecord", r) for r in records),
+    )
+
+
+def test_compare_run_results_reports_transitions_text_tps_and_memory() -> None:
+    """The diff must surface exactly the mechanical changes and nothing else."""
+    baseline = _comparison_baseline(
+        [
+            _comparison_record("org/steady"),
+            _comparison_record("org/flipped", usability="usable", observations=[]),
+            _comparison_record("org/faster", tps=100.0),
+            _comparison_record("org/bigger", peak_gb=10.0),
+            _comparison_record("org/gone"),
+        ]
+    )
+    current = [
+        _comparison_record("org/steady"),
+        _comparison_record(
+            "org/flipped",
+            usability="usable_with_caveats",
+            observations=["catalog_constraint_violation"],
+            text="different",
+        ),
+        _comparison_record("org/faster", tps=130.0),  # +30% with no history -> fallback flag
+        _comparison_record("org/bigger", peak_gb=12.0),  # +2 GB, +20%
+        _comparison_record("org/new"),
+    ]
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", r) for r in current], baseline
+    )
+
+    assert comparison.compared_models == 4
+    assert comparison.models_added == ("org/new",)
+    assert comparison.models_removed == ("org/gone",)
+    assert [c.model for c in comparison.changes] == ["org/flipped"]
+    change = comparison.changes[0]
+    assert (change.baseline_usability, change.current_usability) == (
+        "usable",
+        "usable_with_caveats",
+    )
+    assert change.observations_added == ("catalog_constraint_violation",)
+    assert comparison.identical_text_models == 3
+    assert comparison.text_compared_models == 4
+    assert comparison.tps_ratio_median == 1.0
+    assert comparison.tps_ratio_max == 1.3
+    assert [f.model for f in comparison.throughput_flags] == ["org/faster"]
+    assert comparison.throughput_flags[0].band_source == "fallback"
+    assert [m.model for m in comparison.memory_changes] == ["org/bigger"]
+    assert comparison.baseline_components == (
+        ("mlx", "0.32.1 @ abcdef123"),
+        ("mlx-vlm", "0.6.15"),
+        ("python", "3.13.14"),
+    )
+    assert comparison.has_changes
+
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    assert payload["identical_text_models"] == 3
+    changes = payload["changes"]
+    assert isinstance(changes, list)
+    first_change = changes[0]
+    assert isinstance(first_change, dict)
+    assert first_change["usability"] == ["usable", "usable_with_caveats"]
+
+
+def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_path: Path) -> None:
+    """A per-model Tukey band from history wins over the fixed fallback band."""
+    history = tmp_path / "results.history.jsonl"
+    runs = [
+        json.dumps(
+            {
+                "_type": "run",
+                "prompt_hash": "h",
+                "model_results": {"org/m": {"generation_tps": tps}},
+            }
+        )
+        for tps in (100.0, 102.0, 98.0, 101.0, 99.0)
+    ]
+    # The record appended for the current run must not vouch for itself.
+    runs.append(
+        json.dumps(
+            {
+                "_type": "run",
+                "prompt_hash": "h",
+                "model_results": {"org/m": {"generation_tps": 130.0}},
+            }
+        )
+    )
+    history.write_text("\n".join(runs) + "\n", encoding="utf-8")
+
+    baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
+    current = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=108.0))]
+    comparison = check_models.compare_run_results(
+        current, baseline, history_path=history, prompt_hash="h", history_excludes_current=True
+    )
+    assert comparison.history_runs_used == 5
+    assert [f.model for f in comparison.throughput_flags] == ["org/m"]
+    flag = comparison.throughput_flags[0]
+    assert flag.band_source == "history"
+    assert flag.band_samples == 5
+    assert flag.band_high < 108.0
+
+    steady = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=101.0))]
+    assert not check_models.compare_run_results(
+        steady, baseline, history_path=history, prompt_hash="h"
+    ).throughput_flags
+
+
+def test_resolve_comparison_baseline_handles_none_path_and_missing(tmp_path: Path) -> None:
+    """'none' disables, a file is read directly, garbage degrades to no comparison."""
+    jsonl = tmp_path / "results.jsonl"
+    assert check_models._resolve_comparison_baseline("none", jsonl) is None
+    baseline_file = tmp_path / "baseline.jsonl"
+    baseline_file.write_text(
+        json.dumps(
+            {
+                "_type": "metadata",
+                "format_version": "2.0",
+                "prompt": "p",
+                "system": {},
+                "timestamp": "t",
+            }
+        )
+        + "\n"
+        + json.dumps(_comparison_record("org/m"))
+        + "\n",
+        encoding="utf-8",
+    )
+    loaded = check_models._resolve_comparison_baseline(str(baseline_file), jsonl)
+    assert loaded is not None
+    assert loaded.label == str(baseline_file)
+    assert [r["model"] for r in loaded.results] == ["org/m"]
+    # An untracked temp path under 'auto' yields no baseline rather than an error.
+    assert check_models._resolve_comparison_baseline("auto", jsonl) is None
+
+
+def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_lists() -> None:
+    """The section names the baseline, shows transitions, and keeps targeted runs tidy."""
+    baseline = _comparison_baseline([_comparison_record(f"org/m{i}") for i in range(12)])
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record("org/m0", usability="unusable", observations=["repeated_output"]),
+        )
+    ]
+    comparison = check_models.compare_run_results(current, baseline)
+    section = check_models._run_issue_summary_comparison_section(comparison)
+    rendered = "\n".join(check_models.render_report_markdown((section,)))
+    assert "Since the baseline sweep" in rendered
+    assert "HEAD:src/output/results.jsonl" in rendered
+    assert "usable → unusable" in rendered
+    assert "+repeated_output" in rendered
+    assert "In baseline, not run this time: 11 models (targeted run" in rendered
+    assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"

@@ -57,13 +57,15 @@ import signal
 import stat
 import subprocess
 import sys
+import tempfile
 import textwrap
 import threading
 import time
 import traceback
+import types
 import webbrowser
 from collections import Counter
-from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence, Sized
 from contextlib import (
     ContextDecorator,
     ExitStack,
@@ -104,9 +106,12 @@ from typing import (
     TextIO,
     TypedDict,
     TypeGuard,
+    Union,
     Unpack,
     cast,
     get_args,
+    get_origin,
+    get_type_hints,
     runtime_checkable,
 )
 from urllib.error import URLError
@@ -160,8 +165,6 @@ else:
     wcwidth_wcswidth = cast("Callable[[str], int]", _wcwidth_wcswidth)
 
 if TYPE_CHECKING:
-    import types
-
     from mlx import nn
     from mlx_vlm.generate import GenerationResult
     from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
@@ -1152,6 +1155,9 @@ class RunPromptBurdenRecord(TypedDict):
     total_tokens: int | None
     text_tokens_est: int | None
     nontext_tokens_est: int | None
+    text_tokens_source: str | None
+    nontext_ratio: float | None
+    kind: str
     processed_image_width: int | None
     processed_image_height: int | None
     image_patch_count: int | None
@@ -1192,6 +1198,7 @@ class RunJsonReportRecord(TypedDict):
     trust_remote_code: bool
     model_provenance: dict[str, ModelProvenanceRecord]
     prompt_burden: dict[str, RunPromptBurdenRecord]
+    comparison: dict[str, JsonLike] | None
     cache_discovery: NotRequired[list[CacheDiscoveryEntryRecord]]
 
 
@@ -1369,6 +1376,7 @@ class ReportGenerationInputs:
     model_revision: str | None = None
     trust_remote_code: bool = True
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
+    comparison: RunComparison | None = None
 
 
 @dataclass(frozen=True)
@@ -1772,6 +1780,7 @@ class PromptDiagnostics:
     rendered_prompt: str | None = None
     rendered_prompt_chars: int | None = None
     image_placeholder_count: int | None = None
+    rendered_prompt_token_count: int | None = None
     processed_image_width: int | None = None
     processed_image_height: int | None = None
     image_patch_count: int | None = None
@@ -1928,6 +1937,7 @@ class PromptBurden:
     visual_tokens_est: int | None = None
     template_tokens_est: int | None = None
     nontext_ratio: float | None = None
+    text_tokens_source: str | None = None
     source: str = "unavailable"
     reason: str | None = None
     original_width: int | None = None
@@ -1944,8 +1954,16 @@ def _classify_prompt_burden(
     nontext_est: int | None,
     ratio: float | None,
     placeholders: int | None,
+    exact_text_tokens: bool = False,
 ) -> tuple[PromptBurdenKind, str | None]:
-    """Classify prompt burden from token components; returns (kind, reason)."""
+    """Classify prompt burden from token components; returns (kind, reason).
+
+    With a heuristic text estimate, a heavy non-text share only counts as
+    visual input when a recognised image placeholder confirms it. With an
+    exact tokenizer count the ratio is authoritative on its own, so families
+    whose placeholder the regex does not know (e.g. ``<|image_pad|>``) are
+    classified the same way as the rest.
+    """
     if total is None:
         return "unknown", "prompt_token_total_unavailable"
     if text_est is None or nontext_est is None:
@@ -1953,7 +1971,7 @@ def _classify_prompt_burden(
     substantial = total >= QUALITY.long_prompt_tokens_threshold
     if not substantial or ratio is None:
         return "normal", None
-    if placeholders and ratio >= QUALITY.heavy_nontext_prompt_ratio:
+    if (placeholders or exact_text_tokens) and ratio >= QUALITY.heavy_nontext_prompt_ratio:
         return "visual_input", None
     if text_est >= QUALITY.long_prompt_tokens_threshold:
         return ("text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"), None
@@ -1974,6 +1992,28 @@ def _merged_processed_dimensions(
     return width, height
 
 
+def _prompt_composition_fact(result: PerformanceResult) -> str | None:
+    """Describe the prompt's text/non-text token split when both parts are known."""
+    analysis = _quality_analysis_for_result(result)
+    if analysis is None:
+        return None
+    total = analysis.prompt_tokens_total
+    text = analysis.prompt_tokens_text_est
+    nontext = analysis.prompt_tokens_nontext_est
+    if total is None or text is None or nontext is None or total <= 0:
+        return None
+    source = (
+        "tokenizer-exact"
+        if analysis.prompt_tokens_text_source == "tokenizer"
+        else "word-ratio estimate"
+    )
+    share = 100.0 * nontext / total
+    return (
+        f"{total:,} = {text:,} text/template ({source}) + {nontext:,} non-text "
+        f"({share:.0f}%, image/audio expansion)"
+    )
+
+
 def _prompt_burden_for_result(
     result: PerformanceResult,
     image_profile: ImageInputProfile | None,
@@ -1988,12 +2028,14 @@ def _prompt_burden_for_result(
     placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
     processed_width, processed_height = _merged_processed_dimensions(diagnostics, image_profile)
 
+    text_source = analysis.prompt_tokens_text_source if analysis is not None else None
     kind, reason = _classify_prompt_burden(
         total=total,
         text_est=text_est,
         nontext_est=nontext_est,
         ratio=ratio,
         placeholders=placeholders,
+        exact_text_tokens=text_source == "tokenizer",
     )
 
     return PromptBurden(
@@ -2002,7 +2044,12 @@ def _prompt_burden_for_result(
         text_tokens_est=text_est,
         nontext_tokens_est=nontext_est,
         nontext_ratio=ratio,
-        source="estimated_nontext" if nontext_est is not None else "unavailable",
+        text_tokens_source=text_source,
+        source=(
+            ("exact_text_tokens" if text_source == "tokenizer" else "estimated_nontext")
+            if nontext_est is not None
+            else "unavailable"
+        ),
         reason=reason,
         original_width=image_profile.width if image_profile is not None else None,
         original_height=image_profile.height if image_profile is not None else None,
@@ -4288,6 +4335,7 @@ class GenerationQualityAnalysis:
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
+    prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
     configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
@@ -4454,8 +4502,13 @@ def analyze_generation_text(
     configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
     seeded_thinking_text: str = "",
+    prompt_text_tokens: int | None = None,
 ) -> GenerationQualityAnalysis:
-    """Collect mechanical output observations and recorded runtime facts."""
+    """Collect mechanical output observations and recorded runtime facts.
+
+    ``prompt_text_tokens`` is the exact tokenizer count of the rendered prompt
+    when the caller has one; otherwise a word-ratio heuristic estimates it.
+    """
     # Thinking delimiters — every recognised pair plus any custom configured
     # pair — are structural markers that ``_final_answer_view`` must still see
     # to recognise a complete trace. Never let the generic special-token strip
@@ -4492,7 +4545,13 @@ def analyze_generation_text(
         thinking_trace_delimiters=thinking_trace_delimiters,
         seeded_thinking_text=seeded_thinking_text,
     )
-    prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
+    prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None
+    if prompt_text_tokens is not None:
+        prompt_tokens_text_est: int | None = prompt_text_tokens
+        prompt_tokens_text_source = "tokenizer"
+    else:
+        prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
+        prompt_tokens_text_source = "heuristic" if prompt_tokens_text_est is not None else None
     prompt_tokens_nontext_est = (
         max(prompt_tokens - prompt_tokens_text_est, 0)
         if (prompt_tokens is not None and prompt_tokens_text_est is not None)
@@ -4559,6 +4618,7 @@ def analyze_generation_text(
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
+        prompt_tokens_text_source=prompt_tokens_text_source,
         special_token_wrappers=list(normalized.removed_wrappers),
         configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
@@ -4585,6 +4645,7 @@ def _analyze_text_quality(
     configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
     seeded_thinking_text: str = "",
+    prompt_text_tokens: int | None = None,
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return mechanical quality analysis plus a compact log-only label string."""
     analysis = analyze_generation_text(
@@ -4598,6 +4659,7 @@ def _analyze_text_quality(
         configured_generation_wrappers=configured_generation_wrappers,
         thinking_trace_delimiters=thinking_trace_delimiters,
         seeded_thinking_text=seeded_thinking_text,
+        prompt_text_tokens=prompt_text_tokens,
     )
     return analysis, _build_quality_issues_string(analysis)
 
@@ -9005,6 +9067,7 @@ def _diagnostics_result_facts(
             runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
         ),
         ("Prompt tokens", _generation_int_metric(result.generation, "prompt_tokens")),
+        ("Prompt composition", _prompt_composition_fact(result)),
         ("Generation tokens", _generation_int_metric(result.generation, "generation_tokens")),
         (
             "Configured EOS token ID",
@@ -11147,6 +11210,59 @@ def _generation_kwargs_for_prompt_diagnostics(
     return {key: _prompt_diag_json_value(value) for key, value in sorted(kwargs.items())}
 
 
+def _count_rendered_prompt_tokens(
+    tokenizer: object,
+    formatted_prompt: str,
+    model_type: str | None,
+    processor: object,
+) -> int | None:
+    """Return the exact token count of the rendered prompt, or None if unavailable.
+
+    Mirrors upstream's ``should_add_special_tokens`` so the count matches what
+    ``mlx_vlm.generate`` tokenizes (the rendered chat template plus any
+    tokenizer-added markers), using duck-typed ``encode`` so every model family
+    goes through the same path. Image placeholders count as rendered — their
+    expansion is what ``prompt_tokens - this`` isolates. Best effort: never
+    raises.
+    """
+    encode = getattr(tokenizer, "encode", None)
+    if not callable(encode):
+        return None
+    add_special_tokens = False
+    should_add = cast(
+        "Callable[[str, object], object] | None",
+        _optional_mlx_vlm_utils_attribute("should_add_special_tokens"),
+    )
+    if callable(should_add) and model_type is not None:
+        try:
+            add_special_tokens = bool(should_add(model_type, processor))
+        except (AttributeError, TypeError, ValueError):
+            add_special_tokens = False
+    try:
+        encoded = encode(formatted_prompt, add_special_tokens=add_special_tokens)
+    except TypeError:
+        try:
+            encoded = encode(formatted_prompt)
+        except (AttributeError, TypeError, ValueError, RuntimeError, OSError):
+            return None
+    except (AttributeError, ValueError, RuntimeError, OSError):
+        return None
+    ids: object = getattr(encoded, "ids", encoded)
+    if not isinstance(ids, Sized):
+        return None
+    count = len(ids)
+    return count if count >= 0 else None
+
+
+def _optional_mlx_vlm_utils_attribute(name: str) -> object | None:
+    """Return an attribute from ``mlx_vlm.utils`` when importable, else None."""
+    try:
+        utils_module = import_module("mlx_vlm.utils")
+    except (ImportError, OSError, RuntimeError, ValueError):
+        return None
+    return getattr(utils_module, name, None)
+
+
 def _build_prompt_diagnostics(
     *,
     params: ProcessImageParams,
@@ -11177,6 +11293,9 @@ def _build_prompt_diagnostics(
         rendered_prompt=formatted_prompt,
         rendered_prompt_chars=len(formatted_prompt),
         image_placeholder_count=_count_image_placeholders(formatted_prompt),
+        rendered_prompt_token_count=_count_rendered_prompt_tokens(
+            tokenizer, formatted_prompt, model_type, processor
+        ),
         processed_image_width=processed_width,
         processed_image_height=processed_height,
         eos_token_id=_prompt_diag_json_value(getattr(tokenizer, "eos_token_id", None)),
@@ -11206,6 +11325,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "rendered_prompt",
         "rendered_prompt_chars",
         "image_placeholder_count",
+        "rendered_prompt_token_count",
         "processed_image_width",
         "processed_image_height",
         "image_patch_count",
@@ -13260,6 +13380,331 @@ def _attach_system_telemetry(
     return replace(result, system_telemetry=telemetry)
 
 
+# =============================================================================
+# SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)
+# =============================================================================
+
+ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
+ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
+_ISOLATED_STDERR_TAIL_CHARS: Final[int] = 6000
+_ISOLATION_PHASE_SINK: Callable[[str], None] | None = None
+_SHELL_SIGNAL_EXIT_BASE: Final[int] = 128
+_VARIADIC_TUPLE_ARGS: Final[int] = 2
+
+
+class IsolatedWorkerCrashError(RuntimeError):
+    """The child interpreter running one model died without reporting a result."""
+
+    def __init__(self, model_identifier: str, returncode: int, detail: str) -> None:
+        self.returncode = returncode
+        signal_name = _signal_name_for_returncode(returncode)
+        how = f"killed by {signal_name}" if signal_name else f"exited with status {returncode}"
+        super().__init__(
+            f"Isolated worker for {model_identifier} {how} before writing a result; {detail}"
+        )
+
+
+def _signal_name_for_returncode(returncode: int) -> str | None:
+    """Map a negative subprocess return code (or 128+N) to a signal name."""
+    number = (
+        -returncode
+        if returncode < 0
+        else (returncode - _SHELL_SIGNAL_EXIT_BASE if returncode > _SHELL_SIGNAL_EXIT_BASE else 0)
+    )
+    if number <= 0:
+        return None
+    try:
+        return signal.Signals(number).name
+    except ValueError:
+        return f"signal {number}"
+
+
+@dataclass(frozen=True)
+class IsolatedGenerationResult:
+    """Duck-typed stand-in for an upstream GenerationResult rebuilt from JSON.
+
+    Reports only read generation metrics through ``getattr`` (``text``,
+    ``prompt_tokens``, ``generation_tps``, ...), so a frozen holder whose
+    unknown attributes resolve from the recorded mapping round-trips exactly
+    what the child measured without importing or reconstructing upstream types.
+    """
+
+    text: str = ""
+    extra: dict[str, JsonLike] = dataclass_field(default_factory=dict)
+
+    def __getattr__(self, name: str) -> JsonLike:
+        extra = cast("dict[str, JsonLike]", object.__getattribute__(self, "extra"))
+        if name in extra:
+            return extra[name]
+        raise AttributeError(name)
+
+
+def _json_safe(value: object) -> JsonLike:
+    """Convert dataclasses, paths, tuples and sets into JSON-compatible values."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    if is_dataclass(value) and not isinstance(value, type):
+        return {field.name: _json_safe(getattr(value, field.name)) for field in fields(value)}
+    if isinstance(value, Mapping):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_json_safe(item) for item in value]
+    return str(value)
+
+
+def _namespace_to_json(args: argparse.Namespace) -> dict[str, JsonLike]:
+    """Serialise parsed CLI arguments, tagging Path values so the child restores them."""
+    payload: dict[str, JsonLike] = {}
+    for key, value in vars(args).items():
+        if isinstance(value, Path):
+            payload[key] = {"__path__": str(value)}
+        else:
+            payload[key] = _json_safe(value)
+    return payload
+
+
+def _namespace_from_json(payload: Mapping[str, JsonLike]) -> argparse.Namespace:
+    """Rebuild an argparse Namespace from ``_namespace_to_json`` output."""
+    restored: dict[str, object] = {}
+    for key, value in payload.items():
+        if isinstance(value, dict) and set(value) == {"__path__"}:
+            restored[key] = Path(str(value["__path__"]))
+        else:
+            restored[key] = value
+    return argparse.Namespace(**restored)
+
+
+def _dataclass_from_json[T](cls: type[T], data: object) -> T:
+    """Rebuild a dataclass (recursively) from JSON produced by ``_json_safe``."""
+    if not isinstance(data, Mapping):
+        message = f"Expected a mapping for {cls.__name__}, got {type(data).__name__}"
+        raise TypeError(message)
+    hints = get_type_hints(cls)
+    kwargs: dict[str, object] = {}
+    for field in fields(cast("type[Any]", cls)):
+        if field.name not in data:
+            continue
+        kwargs[field.name] = _coerce_json_value(hints.get(field.name), data[field.name])
+    return cls(**kwargs)
+
+
+def _coerce_union_json_value(annotation: object, value: object) -> object:
+    """Try each non-None member of a union until one coerces cleanly."""
+    for candidate in get_args(annotation):
+        if candidate is type(None):
+            continue
+        try:
+            return _coerce_json_value(candidate, value)
+        except (TypeError, ValueError):
+            continue
+    return value
+
+
+def _coerce_tuple_json_value(annotation: object, value: list[object]) -> tuple[object, ...]:
+    """Rebuild ``tuple[T, ...]`` or fixed-arity tuples from a JSON list."""
+    args = get_args(annotation)
+    if len(args) == _VARIADIC_TUPLE_ARGS and args[1] is Ellipsis:
+        return tuple(_coerce_json_value(args[0], item) for item in value)
+    return tuple(
+        _coerce_json_value(args[index] if index < len(args) else None, item)
+        for index, item in enumerate(value)
+    )
+
+
+def _coerce_json_value(annotation: object, value: object) -> object:
+    """Coerce one JSON value toward ``annotation`` (dataclasses, tuples, unions)."""
+    if value is None or annotation is None:
+        return value
+    origin = get_origin(annotation)
+    if origin in (types.UnionType, Union):
+        return _coerce_union_json_value(annotation, value)
+    if isinstance(annotation, type) and is_dataclass(annotation):
+        return _dataclass_from_json(annotation, value)
+    if origin is tuple and isinstance(value, list):
+        return _coerce_tuple_json_value(annotation, value)
+    if origin is list and isinstance(value, list):
+        (item_type,) = get_args(annotation) or (None,)
+        return [_coerce_json_value(item_type, item) for item in value]
+    return value
+
+
+def _performance_result_to_json(result: PerformanceResult) -> dict[str, JsonLike]:
+    """Serialise a PerformanceResult for the parent, flattening upstream generation."""
+    payload = cast("dict[str, JsonLike]", _json_safe(result))
+    generation = result.generation
+    if generation is not None:
+        if is_dataclass(generation) and not isinstance(generation, type):
+            generation_payload = {
+                field.name: _json_safe(getattr(generation, field.name))
+                for field in fields(generation)
+            }
+        else:
+            generation_payload = {
+                name: _json_safe(getattr(generation, name))
+                for name in dir(generation)
+                if not name.startswith("_") and not callable(getattr(generation, name, None))
+            }
+        payload["generation"] = generation_payload
+    return payload
+
+
+def _performance_result_from_json(payload: Mapping[str, JsonLike]) -> PerformanceResult:
+    """Rebuild a PerformanceResult from a child's JSON, with a duck-typed generation."""
+    data = dict(payload)
+    generation_payload = data.pop("generation", None)
+    result = _dataclass_from_json(PerformanceResult, {**data, "generation": None})
+    if isinstance(generation_payload, dict):
+        text = generation_payload.get("text", "")
+        extra = {key: value for key, value in generation_payload.items() if key != "text"}
+        result = replace(
+            result,
+            generation=cast(
+                "StoredGenerationResult",
+                IsolatedGenerationResult(text=str(text or ""), extra=extra),
+            ),
+        )
+    return result
+
+
+def _run_model_isolated(
+    args: argparse.Namespace,
+    *,
+    model_identifier: str,
+    image_path: Path,
+    prompt: str,
+) -> PerformanceResult:
+    """Run one model in a fresh child interpreter and return its PerformanceResult.
+
+    A child that dies natively (segfault, abort, ``PyThreadState_Get``) becomes a
+    phase-tagged crash record for that model — built through the same failure
+    path as an in-process exception — instead of ending the sweep. The child
+    reports the phase it reached through a progress file so the crash is
+    attributed to ``model_load`` / ``decode`` / ... rather than "unknown".
+    """
+    params = _process_image_params_from_args(
+        args, model_identifier=model_identifier, image_path=image_path, prompt=prompt
+    )
+    with tempfile.TemporaryDirectory(prefix="check_models_worker_") as tmp:
+        tmp_dir = Path(tmp)
+        spec_path = tmp_dir / "spec.json"
+        result_path = tmp_dir / "result.json"
+        phase_path = tmp_dir / "phase.txt"
+        stderr_path = tmp_dir / "stderr.txt"
+        spec = {
+            "args": _namespace_to_json(args),
+            "model_identifier": model_identifier,
+            "image_path": str(image_path),
+            "prompt": prompt,
+        }
+        _write_text_file(spec_path, json.dumps(spec))
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            ISOLATED_WORKER_FLAG,
+            str(spec_path),
+        ]
+        logger.debug("Isolated worker: %s", shlex_join(command))
+        start = time.perf_counter()
+        _write_text_file(stderr_path, "")
+        with stderr_path.open("a", encoding="utf-8") as stderr_file:
+            completed = subprocess.run(  # noqa: S603 - this interpreter, this script, a temp spec
+                command,
+                check=False,
+                stdout=None,
+                stderr=stderr_file,
+            )
+        stderr_text = _read_text_tail(stderr_path, _ISOLATED_STDERR_TAIL_CHARS)
+        if stderr_text.strip():
+            logger.debug("[isolated worker stderr] %s\n%s", model_identifier, stderr_text)
+        if completed.returncode == 0 and result_path.is_file():
+            try:
+                payload = json.loads(_read_text_file(result_path))
+                if isinstance(payload, dict):
+                    return _performance_result_from_json(payload)
+                detail = "result payload was not a JSON object"
+            except (OSError, ValueError, TypeError) as error:
+                detail = f"result payload unreadable: {error}"
+        else:
+            detail = (
+                "see the worker stderr tail in the run log"
+                if stderr_text.strip()
+                else "no stderr was captured"
+            )
+        current_phase = _read_text_tail(phase_path, 200).strip() or "unknown"
+        phase_timer = PhaseTimer()
+        boundary: UpstreamBoundary = _advance_upstream_boundary("not_started", current_phase)
+        result_payload, stop_reason = _build_exception_process_result(
+            params=params,
+            error=IsolatedWorkerCrashError(model_identifier, completed.returncode, detail),
+            stdout_text="",
+            stderr_text=stderr_text,
+            current_phase=current_phase,
+            phase_timer=phase_timer,
+            total_start_time=start,
+            upstream_boundary=boundary,
+        )
+        return _finalize_process_result(
+            result_payload=result_payload,
+            params=params,
+            phase_timer=phase_timer,
+            stop_reason=stop_reason,
+            current_phase=current_phase,
+            total_start_time=start,
+            upstream_boundary=boundary,
+        )
+
+
+def _read_text_tail(path: Path, max_chars: int) -> str:
+    """Return up to the last ``max_chars`` of a regular text file, or '' when absent."""
+    try:
+        text = _read_text_file(path)
+    except (OSError, ValueError):
+        return ""
+    return text[-max_chars:]
+
+
+def _run_isolated_worker(spec_path: Path) -> int:
+    """Child entry point: run one model from a spec file and write its result JSON."""
+    global _ISOLATION_PHASE_SINK  # noqa: PLW0603 - process-local hook for this worker only
+    # The parent created the spec's directory; the child only ever touches
+    # sibling files there, never paths named inside the spec.
+    worker_dir = spec_path.resolve().parent
+    spec = json.loads(_read_text_file(spec_path))
+    args = _namespace_from_json(spec["args"])
+    phase_path = worker_dir / "phase.txt"
+    result_path = worker_dir / "result.json"
+    logging.basicConfig(
+        level=logging.DEBUG if getattr(args, "verbose", False) else logging.INFO,
+        stream=sys.stderr,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+
+    def _record_phase(phase: str) -> None:
+        try:
+            _write_text_file(phase_path, phase)
+        except OSError:
+            logger.debug("Unable to record worker phase %s", phase, exc_info=True)
+
+    _ISOLATION_PHASE_SINK = _record_phase
+    crash_model = os.environ.get(ISOLATION_CRASH_TEST_ENV)
+    if crash_model and crash_model == str(spec["model_identifier"]):
+        # Test seam: prove a native abort in a child becomes a per-model record.
+        _record_phase("decode")
+        os.abort()
+    load_quality_config(getattr(args, "quality_config", None))
+    params = _process_image_params_from_args(
+        args,
+        model_identifier=str(spec["model_identifier"]),
+        image_path=Path(str(spec["image_path"])),
+        prompt=str(spec["prompt"]),
+    )
+    result = process_image_with_model(params)
+    _write_text_file(result_path, json.dumps(_performance_result_to_json(result)))
+    return 0
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     arch, gpu_info = get_system_info()
@@ -13282,6 +13727,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         nonlocal current_phase, upstream_boundary
         current_phase = _normalise_failure_phase(phase) or phase
         upstream_boundary = _advance_upstream_boundary(upstream_boundary, current_phase)
+        if _ISOLATION_PHASE_SINK is not None:
+            _ISOLATION_PHASE_SINK(current_phase)
 
     try:
         _update_phase("input_validation")
@@ -15363,6 +15810,27 @@ def _process_image_params_from_args(
     )
 
 
+def _run_one_model(
+    args: argparse.Namespace,
+    *,
+    model_identifier: str,
+    image_path: Path,
+    prompt: str,
+) -> PerformanceResult:
+    """Run one model in-process, or in a child interpreter under ``--isolate``."""
+    if getattr(args, "isolate", False):
+        return _run_model_isolated(
+            args, model_identifier=model_identifier, image_path=image_path, prompt=prompt
+        )
+    params = _process_image_params_from_args(
+        args,
+        model_identifier=model_identifier,
+        image_path=image_path,
+        prompt=prompt,
+    )
+    return process_image_with_model(params)
+
+
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
@@ -15448,13 +15916,9 @@ def process_models(
         # Compact logging for model header
         log_model_name(model_label, label=f"Processing Model {run_label}:")
 
-        params = _process_image_params_from_args(
-            args,
-            model_identifier=model_id,
-            image_path=image_path,
-            prompt=prompt,
+        result: PerformanceResult = _run_one_model(
+            args, model_identifier=model_id, image_path=image_path, prompt=prompt
         )
-        result: PerformanceResult = process_image_with_model(params)
 
         # Calculate and log mechanical observations for successful generations.
         if result.success and result.generation:
@@ -15693,6 +16157,9 @@ def _populate_result_quality_analysis(
             diagnostics.rendered_prompt or diagnostics.rendered_prompt_preview or ""
             if diagnostics is not None
             else ""
+        ),
+        prompt_text_tokens=(
+            diagnostics.rendered_prompt_token_count if diagnostics is not None else None
         ),
     )
     return replace(
@@ -16702,6 +17169,11 @@ def _run_prompt_burden_records(
             "total_tokens": burden.total_tokens,
             "text_tokens_est": burden.text_tokens_est,
             "nontext_tokens_est": burden.nontext_tokens_est,
+            "text_tokens_source": burden.text_tokens_source,
+            "nontext_ratio": (
+                round(burden.nontext_ratio, 4) if burden.nontext_ratio is not None else None
+            ),
+            "kind": burden.kind,
             "processed_image_width": burden.processed_width,
             "processed_image_height": burden.processed_height,
             "image_patch_count": burden.patch_count,
@@ -16723,6 +17195,7 @@ def save_run_json_report(
     producer: CheckModelsProvenanceRecord | None = None,
     trust_remote_code: bool = True,
     requested_revision: str | None = None,
+    comparison: RunComparison | None = None,
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
@@ -16765,6 +17238,7 @@ def save_run_json_report(
             for result in results
         },
         "prompt_burden": _run_prompt_burden_records(results, report_context.image_profile),
+        "comparison": _run_comparison_to_json(comparison),
     }
     discovery = _cache_discovery_records()
     if discovery:
@@ -16788,21 +17262,685 @@ _RUN_ISSUE_MAINTAINER_VALUES: Final[frozenset[str]] = _MAINTAINER_STATUS_VALUES
 _RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = _OBSERVATION_CODE_VALUES
 
 
-def _parse_run_issue_jsonl_rows(jsonl_path: Path) -> list[JsonLike]:
-    """Read retained JSONL safely and return decoded rows with line-aware errors."""
-    lines = [line for line in _read_text_file(jsonl_path).splitlines() if line]
-    if not lines:
-        message = f"Missing JSONL metadata in {jsonl_path}"
-        raise ValueError(message)
+# =============================================================================
+# SECTION: RUN COMPARISON (current sweep vs a retained baseline)
+# =============================================================================
 
-    parsed_rows: list[JsonLike] = []
+DEFAULT_COMPARE_WITH: Final[str] = "auto"
+_COMPARISON_HISTORY_WINDOW: Final[int] = 10
+_COMPARISON_MIN_BAND_SAMPLES: Final[int] = 4
+_COMPARISON_TPS_RATIO_FALLBACK_BAND: Final[tuple[float, float]] = (0.85, 1.15)
+_COMPARISON_PEAK_MEMORY_MIN_DELTA_GB: Final[float] = 0.5
+_COMPARISON_PEAK_MEMORY_MIN_DELTA_RATIO: Final[float] = 0.10
+_COMPARISON_GIT_TIMEOUT_SECONDS: Final[float] = 20.0
+
+
+@dataclass(frozen=True)
+class RunComparisonModelChange:
+    """One model whose execution, usability, or observation set moved."""
+
+    model: str
+    baseline_execution: str
+    current_execution: str
+    baseline_usability: str
+    current_usability: str
+    observations_added: tuple[str, ...]
+    observations_removed: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class RunComparisonThroughputFlag:
+    """One model whose generation throughput left its usual band."""
+
+    model: str
+    baseline_tps: float
+    current_tps: float
+    ratio: float
+    band_low: float
+    band_high: float
+    band_source: Literal["history", "fallback"]
+    band_samples: int
+
+
+@dataclass(frozen=True)
+class RunComparisonMemoryChange:
+    """One model whose peak memory moved by more than noise."""
+
+    model: str
+    baseline_peak_gb: float
+    current_peak_gb: float
+    delta_gb: float
+
+
+@dataclass(frozen=True)
+class RunComparison:
+    """Mechanical diff of the current sweep against a retained baseline sweep."""
+
+    baseline_label: str
+    baseline_timestamp: str | None
+    baseline_components: tuple[tuple[str, str], ...]
+    compared_models: int
+    models_added: tuple[str, ...]
+    models_removed: tuple[str, ...]
+    changes: tuple[RunComparisonModelChange, ...]
+    identical_text_models: int
+    text_compared_models: int
+    tps_ratio_median: float | None
+    tps_ratio_min: float | None
+    tps_ratio_max: float | None
+    tps_compared_models: int
+    throughput_flags: tuple[RunComparisonThroughputFlag, ...]
+    memory_changes: tuple[RunComparisonMemoryChange, ...]
+    history_runs_used: int
+
+    @property
+    def has_changes(self) -> bool:
+        """Return whether anything beyond noise moved."""
+        return bool(
+            self.models_added
+            or self.models_removed
+            or self.changes
+            or self.throughput_flags
+            or self.memory_changes
+        )
+
+
+@dataclass(frozen=True)
+class ComparisonBaseline:
+    """A loaded baseline: where it came from plus its validated JSONL rows."""
+
+    label: str
+    metadata: JsonlMetadataRecord
+    results: tuple[JsonlResultRecord, ...]
+
+
+def _run_git_capture(args: Sequence[str], cwd: Path) -> str | None:
+    """Run a read-only git command and return stdout, or None on any failure."""
+    git = shutil.which("git")
+    if git is None:
+        return None
+    try:
+        completed = subprocess.run(  # noqa: S603 - fixed git binary, read-only subcommands
+            [git, *args],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=_COMPARISON_GIT_TIMEOUT_SECONDS,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if completed.returncode != 0:
+        return None
+    return completed.stdout
+
+
+def _git_tracked_relpath(path: Path) -> tuple[Path, str] | None:
+    """Return (repo_root, repo-relative POSIX path) when ``path`` is tracked in git."""
+    parent = path.parent if path.parent.exists() else Path.cwd()
+    top = _run_git_capture(["rev-parse", "--show-toplevel"], parent)
+    if not top:
+        return None
+    repo_root = Path(top.strip())
+    try:
+        relpath = path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        return None
+    tracked = _run_git_capture(["ls-files", "--error-unmatch", "--", relpath], repo_root)
+    if tracked is None:
+        return None
+    return repo_root, relpath
+
+
+def _parse_jsonl_text_rows(text: str, label: str) -> list[JsonLike]:
+    """Decode JSONL text into rows with label-aware errors."""
+    lines = [line for line in text.splitlines() if line]
+    if not lines:
+        message = f"Missing JSONL metadata in {label}"
+        raise ValueError(message)
+    rows: list[JsonLike] = []
     for line_number, line in enumerate(lines, start=1):
         try:
-            parsed_rows.append(json.loads(line))
+            rows.append(json.loads(line))
         except json.JSONDecodeError as error:
-            message = f"Invalid JSONL row {line_number} in {jsonl_path}: {error.msg}"
+            message = f"Invalid JSONL row {line_number} in {label}: {error.msg}"
             raise ValueError(message) from error
-    return parsed_rows
+    return rows
+
+
+def _baseline_from_jsonl_text(text: str, label: str) -> ComparisonBaseline:
+    """Validate baseline JSONL text into a ComparisonBaseline."""
+    rows = _parse_jsonl_text_rows(text, label)
+    metadata = _validate_run_issue_metadata(rows[0], Path(label))
+    results = tuple(
+        _validate_run_issue_result(value, line_number)
+        for line_number, value in enumerate(rows[1:], start=2)
+    )
+    return ComparisonBaseline(label=label, metadata=metadata, results=results)
+
+
+def _resolve_comparison_baseline(spec: str | None, jsonl_path: Path) -> ComparisonBaseline | None:
+    """Resolve ``--compare-with`` into a loaded baseline, or None when unavailable.
+
+    ``auto`` compares against the retained sweep at ``HEAD`` when the JSONL path
+    is tracked in git; ``none`` disables; an existing file is read directly;
+    anything else is treated as a git ref for the same repo-relative path.
+    Every failure mode degrades to "no comparison" — this is evidence, not a
+    gate — and is logged once.
+    """
+    if spec is None:
+        spec = DEFAULT_COMPARE_WITH
+    choice = spec.strip()
+    if choice.lower() == "none":
+        return None
+    try:
+        if choice.lower() != "auto":
+            candidate = Path(choice).expanduser()
+            if candidate.is_file():
+                return _baseline_from_jsonl_text(_read_text_file(candidate), str(candidate))
+        tracked = _git_tracked_relpath(jsonl_path)
+        if tracked is None:
+            if choice.lower() != "auto":
+                logger.warning(
+                    "--compare-with %s: %s is not a file and %s is not tracked in git; "
+                    "skipping comparison.",
+                    choice,
+                    choice,
+                    jsonl_path,
+                )
+            return None
+        repo_root, relpath = tracked
+        ref = "HEAD" if choice.lower() == "auto" else choice
+        text = _run_git_capture(["show", f"{ref}:{relpath}"], repo_root)
+        if text is None:
+            logger.warning(
+                "--compare-with %s: could not read %s:%s from git; skipping comparison.",
+                choice,
+                ref,
+                relpath,
+            )
+            return None
+        label = f"{ref}:{relpath}"
+        if ref == "HEAD":
+            sha = _run_git_capture(["rev-parse", "--short", "HEAD"], repo_root)
+            if sha:
+                label = f"{sha.strip()}:{relpath}"
+        return _baseline_from_jsonl_text(text, label)
+    except (OSError, ValueError, TypeError) as error:
+        logger.warning(
+            "--compare-with %s: baseline unusable (%s); skipping comparison.", choice, error
+        )
+        return None
+
+
+def _history_tps_bands(
+    history_path: Path,
+    *,
+    prompt_hash: str | None,
+    exclude_last: bool,
+) -> tuple[dict[str, tuple[float, float, int]], int]:
+    """Return per-model (low, high, samples) throughput bands from retained history.
+
+    Uses the last ``_COMPARISON_HISTORY_WINDOW`` runs with the same prompt hash
+    (when available, so like is compared with like) and a Tukey fence
+    (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model. ``exclude_last`` drops the record
+    just appended for the current run so it cannot vouch for itself.
+    """
+    if not history_path.is_file():
+        return {}, 0
+    try:
+        rows = [line for line in _read_text_file(history_path).splitlines() if line]
+    except OSError:
+        return {}, 0
+    if exclude_last and rows:
+        rows = rows[:-1]
+    runs: list[dict[str, JsonLike]] = []
+    for line in rows:
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(record, dict) or record.get("_type") != "run":
+            continue
+        if prompt_hash and record.get("prompt_hash") not in (None, prompt_hash):
+            continue
+        runs.append(record)
+    runs = runs[-_COMPARISON_HISTORY_WINDOW:]
+    samples: dict[str, list[float]] = {}
+    for record in runs:
+        model_results = record.get("model_results")
+        if not isinstance(model_results, dict):
+            continue
+        for model, facts in model_results.items():
+            if not isinstance(facts, dict):
+                continue
+            tps = facts.get("generation_tps")
+            if isinstance(tps, (int, float)) and tps > 0:
+                samples.setdefault(model, []).append(float(tps))
+    bands: dict[str, tuple[float, float, int]] = {}
+    for model, values in samples.items():
+        if len(values) < _COMPARISON_MIN_BAND_SAMPLES:
+            continue
+        ordered = sorted(values)
+        q1, q3 = _quantile(ordered, 0.25), _quantile(ordered, 0.75)
+        iqr = q3 - q1
+        bands[model] = (max(q1 - 1.5 * iqr, 0.0), q3 + 1.5 * iqr, len(values))
+    return bands, len(runs)
+
+
+def _quantile(ordered: Sequence[float], q: float) -> float:
+    """Linear-interpolated quantile of an already-sorted sequence."""
+    if not ordered:
+        return 0.0
+    position = (len(ordered) - 1) * q
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    weight = position - lower
+    return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def _comparison_component_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str, str], ...]:
+    """Summarise a baseline's stack identity (version plus short source revision)."""
+    rows: list[tuple[str, str]] = []
+    provenance = metadata.get("component_provenance") or {}
+    versions = metadata.get("library_versions") or {}
+    for name in ("check_models", "mlx", "mlx-vlm", "transformers"):
+        entry = provenance.get(name) if isinstance(provenance, dict) else None
+        version = None
+        revision = None
+        if isinstance(entry, dict):
+            version = entry.get("version")
+            revision = entry.get("source_revision") or entry.get("vcs_revision")
+        if version is None:
+            version = versions.get(name) if isinstance(versions, dict) else None
+        if version is None and revision is None:
+            continue
+        text = f"{version}" if version is not None else ""
+        if isinstance(revision, str) and revision:
+            text = f"{text} @ {revision[:9]}".strip()
+        rows.append((name, text))
+    system_info = metadata.get("system")
+    python_version = system_info.get("Python Version") if isinstance(system_info, dict) else None
+
+    if python_version:
+        rows.append(("python", f"{python_version}"))
+    return tuple(rows)
+
+
+def _result_generation_tps(record: JsonlResultRecord) -> float | None:
+    metrics = record.get("metrics") or {}
+    value = metrics.get("generation_tps") if isinstance(metrics, dict) else None
+    return float(value) if isinstance(value, (int, float)) and value > 0 else None
+
+
+def _result_peak_memory_gb(record: JsonlResultRecord) -> float | None:
+    metrics = record.get("metrics") or {}
+    value = metrics.get("peak_memory_gb") if isinstance(metrics, dict) else None
+    return float(value) if isinstance(value, (int, float)) and value > 0 else None
+
+
+def compare_run_results(
+    current: Sequence[JsonlResultRecord],
+    baseline: ComparisonBaseline,
+    *,
+    history_path: Path | None = None,
+    prompt_hash: str | None = None,
+    history_excludes_current: bool = True,
+) -> RunComparison:
+    """Diff current JSONL result rows against a baseline sweep, mechanically.
+
+    Everything is model-agnostic: execution/usability/observation transitions,
+    byte-identical generated text, throughput ratios against per-model history
+    bands (or a fixed ±15% fallback when history is thin), and peak-memory
+    moves beyond 0.5 GB and 10%.
+    """
+    current_by = {record["model"]: record for record in current}
+    baseline_by = {record["model"]: record for record in baseline.results}
+    shared = [model for model in current_by if model in baseline_by]
+    bands, history_runs = (
+        _history_tps_bands(
+            history_path, prompt_hash=prompt_hash, exclude_last=history_excludes_current
+        )
+        if history_path is not None
+        else ({}, 0)
+    )
+
+    changes: list[RunComparisonModelChange] = []
+    identical_text = 0
+    text_compared = 0
+    ratios: list[float] = []
+    flags: list[RunComparisonThroughputFlag] = []
+    memory: list[RunComparisonMemoryChange] = []
+    for model in shared:
+        now, before = current_by[model], baseline_by[model]
+        now_a, before_a = now["assessment"], before["assessment"]
+        now_obs, before_obs = set(now_a["observations"]), set(before_a["observations"])
+        if (
+            now_a["execution"] != before_a["execution"]
+            or now_a["usability"] != before_a["usability"]
+            or now_obs != before_obs
+        ):
+            changes.append(
+                RunComparisonModelChange(
+                    model=model,
+                    baseline_execution=before_a["execution"],
+                    current_execution=now_a["execution"],
+                    baseline_usability=before_a["usability"],
+                    current_usability=now_a["usability"],
+                    observations_added=tuple(sorted(now_obs - before_obs)),
+                    observations_removed=tuple(sorted(before_obs - now_obs)),
+                )
+            )
+        if now_a["execution"] == "completed" and before_a["execution"] == "completed":
+            text_compared += 1
+            if now.get("generated_text", "") == before.get("generated_text", ""):
+                identical_text += 1
+        now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
+        if now_tps is not None and before_tps is not None:
+            ratio = now_tps / before_tps
+            ratios.append(ratio)
+            band = bands.get(model)
+            if band is not None:
+                low, high, samples = band
+                if not low <= now_tps <= high:
+                    flags.append(
+                        RunComparisonThroughputFlag(
+                            model, before_tps, now_tps, ratio, low, high, "history", samples
+                        )
+                    )
+            else:
+                low_ratio, high_ratio = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+                if not low_ratio <= ratio <= high_ratio:
+                    flags.append(
+                        RunComparisonThroughputFlag(
+                            model,
+                            before_tps,
+                            now_tps,
+                            ratio,
+                            before_tps * low_ratio,
+                            before_tps * high_ratio,
+                            "fallback",
+                            0,
+                        )
+                    )
+        now_peak, before_peak = _result_peak_memory_gb(now), _result_peak_memory_gb(before)
+        if now_peak is not None and before_peak is not None:
+            delta = now_peak - before_peak
+            if (
+                abs(delta) >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_GB
+                and abs(delta) / before_peak >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_RATIO
+            ):
+                memory.append(RunComparisonMemoryChange(model, before_peak, now_peak, delta))
+
+    ratios_sorted = sorted(ratios)
+    return RunComparison(
+        baseline_label=baseline.label,
+        baseline_timestamp=baseline.metadata.get("timestamp"),
+        baseline_components=_comparison_component_rows(baseline.metadata),
+        compared_models=len(shared),
+        models_added=tuple(sorted(set(current_by) - set(baseline_by))),
+        models_removed=tuple(sorted(set(baseline_by) - set(current_by))),
+        changes=tuple(changes),
+        identical_text_models=identical_text,
+        text_compared_models=text_compared,
+        tps_ratio_median=_quantile(ratios_sorted, 0.5) if ratios_sorted else None,
+        tps_ratio_min=ratios_sorted[0] if ratios_sorted else None,
+        tps_ratio_max=ratios_sorted[-1] if ratios_sorted else None,
+        tps_compared_models=len(ratios_sorted),
+        throughput_flags=tuple(flags),
+        memory_changes=tuple(memory),
+        history_runs_used=history_runs,
+    )
+
+
+def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonLike] | None:
+    """Serialise a RunComparison for run.json."""
+    if comparison is None:
+        return None
+
+    def _r(value: float | None) -> float | None:
+        return round(value, 4) if value is not None else None
+
+    return {
+        "baseline": comparison.baseline_label,
+        "baseline_timestamp": comparison.baseline_timestamp,
+        "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
+        "compared_models": comparison.compared_models,
+        "models_added": cast("JsonLike", list(comparison.models_added)),
+        "models_removed": cast("JsonLike", list(comparison.models_removed)),
+        "changes": [
+            {
+                "model": change.model,
+                "execution": [change.baseline_execution, change.current_execution],
+                "usability": [change.baseline_usability, change.current_usability],
+                "observations_added": list(change.observations_added),
+                "observations_removed": list(change.observations_removed),
+            }
+            for change in comparison.changes
+        ],
+        "identical_text_models": comparison.identical_text_models,
+        "text_compared_models": comparison.text_compared_models,
+        "generation_tps_ratio": {
+            "median": _r(comparison.tps_ratio_median),
+            "min": _r(comparison.tps_ratio_min),
+            "max": _r(comparison.tps_ratio_max),
+            "compared_models": comparison.tps_compared_models,
+        },
+        "throughput_flags": [
+            {
+                "model": flag.model,
+                "baseline_tps": _r(flag.baseline_tps),
+                "current_tps": _r(flag.current_tps),
+                "ratio": _r(flag.ratio),
+                "band": [_r(flag.band_low), _r(flag.band_high)],
+                "band_source": flag.band_source,
+                "band_samples": flag.band_samples,
+            }
+            for flag in comparison.throughput_flags
+        ],
+        "memory_changes": [
+            {
+                "model": change.model,
+                "baseline_peak_gb": _r(change.baseline_peak_gb),
+                "current_peak_gb": _r(change.current_peak_gb),
+                "delta_gb": _r(change.delta_gb),
+            }
+            for change in comparison.memory_changes
+        ],
+        "history_runs_used": comparison.history_runs_used,
+    }
+
+
+_COMPARISON_MODEL_LIST_LIMIT: Final[int] = 8
+
+
+def _comparison_model_list(models: Sequence[str]) -> str:
+    """List models inline, collapsing long lists (targeted runs) to a count."""
+    if len(models) > _COMPARISON_MODEL_LIST_LIMIT:
+        return f"{len(models)} models (targeted run against a full-sweep baseline)"
+    return ", ".join(f"`{model}`" for model in models)
+
+
+def _format_usability_transition(before: str, after: str) -> str:
+    return before if before == after else f"{before} → {after}"
+
+
+def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
+    """Render the mechanical diff against the baseline sweep for run_summary.md."""
+    ratio_text = (
+        f"{comparison.tps_ratio_median:.3f} (range {comparison.tps_ratio_min:.2f}-"
+        f"{comparison.tps_ratio_max:.2f}, {comparison.tps_compared_models} models)"
+        if comparison.tps_ratio_median is not None
+        and comparison.tps_ratio_min is not None
+        and comparison.tps_ratio_max is not None
+        else "n/a"
+    )
+    band_text = (
+        f"history (last {comparison.history_runs_used} same-prompt runs, Tukey fence)"
+        if comparison.history_runs_used >= _COMPARISON_MIN_BAND_SAMPLES
+        else "fixed ±15% fallback (insufficient history)"
+    )
+    key_rows: list[tuple[str, str]] = [
+        ("Baseline", comparison.baseline_label),
+    ]
+    if comparison.baseline_timestamp:
+        key_rows.append(("Baseline run timestamp", comparison.baseline_timestamp))
+    key_rows.extend((f"Baseline {name}", value) for name, value in comparison.baseline_components)
+    key_rows.extend(
+        (
+            ("Models compared", str(comparison.compared_models)),
+            (
+                "Identical generated text",
+                (
+                    f"{comparison.identical_text_models} of "
+                    f"{comparison.text_compared_models} completed in both"
+                ),
+            ),
+            ("Generation tok/s ratio (now/baseline)", ratio_text),
+            ("Throughput noise band", band_text),
+        )
+    )
+    blocks: list[ReportBlock] = [ReportKeyValues(tuple(key_rows))]
+    if comparison.models_added or comparison.models_removed:
+        items: list[str] = []
+        if comparison.models_added:
+            items.append(
+                "New this run (no baseline): " + _comparison_model_list(comparison.models_added)
+            )
+        if comparison.models_removed:
+            items.append(
+                "In baseline, not run this time: "
+                + _comparison_model_list(comparison.models_removed)
+            )
+        blocks.append(ReportBulletList(tuple(items)))
+    if comparison.changes:
+        rows = tuple(
+            (
+                change.model,
+                _format_usability_transition(change.baseline_execution, change.current_execution),
+                _format_usability_transition(change.baseline_usability, change.current_usability),
+                "; ".join(
+                    [f"+{code}" for code in change.observations_added]
+                    + [f"-{code}" for code in change.observations_removed]
+                )
+                or "—",
+            )
+            for change in comparison.changes
+        )
+        blocks.append(
+            ReportTable(
+                ("Model", "Execution", "Usability", "Observation delta"), rows, compact=True
+            )
+        )
+    else:
+        blocks.append(
+            ReportParagraph(
+                "No execution, usability, or observation-set changes against the baseline."
+            )
+        )
+    if comparison.throughput_flags:
+        flag_rows = tuple(
+            (
+                flag.model,
+                f"{flag.baseline_tps:.1f}",
+                f"{flag.current_tps:.1f}",
+                f"{flag.ratio:.2f}",
+                f"{flag.band_low:.1f}-{flag.band_high:.1f} ({flag.band_source}"
+                + (f", n={flag.band_samples}" if flag.band_samples else "")
+                + ")",
+            )
+            for flag in comparison.throughput_flags
+        )
+        blocks.append(
+            ReportTable(
+                ("Model", "Baseline tok/s", "Now tok/s", "Ratio", "Expected band"),
+                flag_rows,
+                compact=True,
+            )
+        )
+    if comparison.memory_changes:
+        memory_rows = tuple(
+            (
+                memory_change.model,
+                f"{memory_change.baseline_peak_gb:.1f}",
+                f"{memory_change.current_peak_gb:.1f}",
+                f"{memory_change.delta_gb:+.1f}",
+            )
+            for memory_change in comparison.memory_changes
+        )
+        blocks.append(
+            ReportTable(
+                ("Model", "Baseline peak GB", "Now peak GB", "Delta"), memory_rows, compact=True
+            )
+        )
+    blocks.append(
+        ReportParagraph(
+            "Mechanical diff only: one image, temperature as configured; single-observation "
+            "flips on one model are usually run-to-run variance, broad shifts are not."
+        )
+    )
+    return ReportSection("Since the baseline sweep", tuple(blocks))
+
+
+def _log_run_comparison(comparison: RunComparison | None) -> None:
+    """Log the comparison headline so terminal users see drift without opening reports."""
+    if comparison is None:
+        return
+    print_cli_section("Comparison with baseline sweep")
+    logger.info("Baseline: %s", comparison.baseline_label)
+    logger.info(
+        "Models compared: %d; identical generated text: %d/%d; gen tok/s ratio median %s",
+        comparison.compared_models,
+        comparison.identical_text_models,
+        comparison.text_compared_models,
+        f"{comparison.tps_ratio_median:.3f}" if comparison.tps_ratio_median is not None else "n/a",
+    )
+    for change in comparison.changes:
+        logger.info(
+            "  %s: %s -> %s%s",
+            change.model,
+            change.baseline_usability,
+            change.current_usability,
+            (
+                " ("
+                + ", ".join(
+                    [f"+{c}" for c in change.observations_added]
+                    + [f"-{c}" for c in change.observations_removed]
+                )
+                + ")"
+                if change.observations_added or change.observations_removed
+                else ""
+            ),
+        )
+    for flag in comparison.throughput_flags:
+        logger.info(
+            "  %s: %.1f -> %.1f tok/s (x%.2f) outside %s band %.1f-%.1f",
+            flag.model,
+            flag.baseline_tps,
+            flag.current_tps,
+            flag.ratio,
+            flag.band_source,
+            flag.band_low,
+            flag.band_high,
+        )
+    for memory_change in comparison.memory_changes:
+        logger.info(
+            "  %s: peak %.1f -> %.1f GB (%+.1f)",
+            memory_change.model,
+            memory_change.baseline_peak_gb,
+            memory_change.current_peak_gb,
+            memory_change.delta_gb,
+        )
+
+    if not comparison.has_changes:
+        logger.info("No changes beyond noise against the baseline sweep.")
+
+
+def _parse_run_issue_jsonl_rows(jsonl_path: Path) -> list[JsonLike]:
+    """Read retained JSONL safely and return decoded rows with line-aware errors."""
+    return _parse_jsonl_text_rows(_read_text_file(jsonl_path), str(jsonl_path))
 
 
 def _validate_run_issue_metadata(
@@ -17928,6 +19066,7 @@ def generate_run_issue_summary_report(
     issue_reports: Mapping[str, Path] | None = None,
     include_gallery_markdown: bool = True,
     include_run_json: bool = True,
+    comparison: RunComparison | None = None,
 ) -> Path | None:
     """Generate a paste-ready whole-run issue from retained schema-2.0 artifacts."""
     source = _load_run_issue_summary_source(
@@ -17975,8 +19114,10 @@ def generate_run_issue_summary_report(
                 ),
             ),
         ),
-        _run_issue_summary_quality_section(source.results),
     ]
+    if comparison is not None:
+        blocks.append(_run_issue_summary_comparison_section(comparison))
+    blocks.append(_run_issue_summary_quality_section(source.results))
 
     if actionable:
         blocks.append(
@@ -18755,6 +19896,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
             trust_remote_code=inputs.trust_remote_code,
             requested_revision=inputs.model_revision,
+            comparison=inputs.comparison,
         ),
     }
     return tuple(
@@ -18822,6 +19964,7 @@ def _generate_run_issue_summary_output(
             issue_reports=issue_reports,
             include_gallery_markdown=gallery_succeeded,
             include_run_json=run_json_succeeded,
+            comparison=inputs.comparison,
         )
     except (OSError, TypeError, ValueError, RuntimeError) as error:
         cleanup_error = _remove_run_issue_summary(inputs.output_paths)
@@ -18909,6 +20052,26 @@ def _log_report_generation_outcomes(
         log_file_path(inputs.output_paths.environment, label="   Environment:")
 
 
+def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | None:
+    """Diff the just-written JSONL against the configured baseline (best effort)."""
+    spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
+    baseline = _resolve_comparison_baseline(spec, inputs.output_paths.jsonl)
+    if baseline is None:
+        return None
+    try:
+        source = _load_run_issue_summary_source(inputs.output_paths, include_run_json=False)
+    except (OSError, ValueError, TypeError) as error:
+        logger.warning("Comparison skipped: current results.jsonl unreadable (%s)", error)
+        return None
+    return compare_run_results(
+        source.results,
+        baseline,
+        history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
+        prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
+        history_excludes_current=True,
+    )
+
+
 def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> tuple[ReportArtifactOutcome, ...]:
@@ -18951,6 +20114,14 @@ def _generate_reports_and_log_outputs(
             return True
 
     jsonl_succeeded = run_artifact(by_key["jsonl"])
+
+    if jsonl_succeeded and inputs.comparison is None:
+        comparison = _compute_run_comparison(inputs)
+        if comparison is not None:
+            inputs = replace(inputs, comparison=comparison)
+            artifacts = _build_report_artifacts(inputs)
+            by_key = {artifact.key: artifact for artifact in artifacts}
+            _log_run_comparison(comparison)
 
     diagnostics_artifacts, diagnostics_succeeded = _run_diagnostics_artifact(inputs, outcomes)
     _log_maintainer_summary(
@@ -19512,6 +20683,8 @@ def _handle_dry_run(
 
 def main_cli() -> None:
     """CLI entry point for the MLX VLM checker script."""
+    if len(sys.argv) >= 3 and sys.argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0], flag, spec
+        raise SystemExit(_run_isolated_worker(Path(sys.argv[2])))
     parser = _build_cli_parser()
 
     # Parse arguments
@@ -19616,6 +20789,18 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
             default=spec.default,
             help=spec.help_text,
         )
+    parser.add_argument(
+        "--compare-with",
+        type=str,
+        default=DEFAULT_COMPARE_WITH,
+        metavar="auto|none|PATH|GITREF",
+        help=(
+            "Baseline sweep to diff this run against in run_summary.md and run.json. "
+            "'auto' uses the retained results.jsonl at git HEAD when the output path is "
+            "tracked (the last committed sweep); 'none' disables; a path reads that "
+            "results.jsonl; any other value is a git ref for the same repo-relative path."
+        ),
+    )
 
 
 def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
@@ -20054,6 +21239,17 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         type=str,
         default="Context:",
         help="Marker used to identify context section in prompt.",
+    )
+    quality_group.add_argument(
+        "--isolate",
+        action="store_true",
+        default=False,
+        help=(
+            "Run each model in a fresh child interpreter. A native crash (segfault, abort, "
+            "interpreter-finalization fault) in one model is then recorded as that model's "
+            "phase-tagged failure instead of ending the sweep; costs a few seconds of "
+            "import time per model and frees GPU memory between models."
+        ),
     )
     quality_group.add_argument(
         "--rerun-triage",

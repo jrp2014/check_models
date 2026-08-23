@@ -1132,6 +1132,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures, harness issues, text-sanity issues, or preflight warnings). |
+| `--compare-with` | str | `auto` | Baseline sweep to diff this run against, as a "Since the baseline sweep" section in `run_summary.md` and a `comparison` block in `run.json`: per-model execution/usability/observation transitions, byte-identical generated text count, generation tok/s ratios with per-model noise bands from `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs; fixed ±15% when history is thin), and peak-memory moves beyond 0.5 GB and 10%. `auto` uses the retained `results.jsonl` at git `HEAD` when the output path is tracked (the last committed sweep) and silently does nothing otherwise; `none` disables; a path reads that `results.jsonl`; any other value is a git ref for the same repo-relative path. |
 | `--link-style` | str | `github` | Link format for local-navigation Markdown artifacts: `github` uses canonical repository URLs; `relative` uses offline-friendly local paths. Issue-ready cross-file links remain canonical GitHub URLs in either mode so pasted issue text keeps working. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. May be repeated; model lists accumulate across occurrences. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). May be repeated; exclusions accumulate across occurrences. |
@@ -1180,6 +1181,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
+| `--isolate` | flag | `False` | Run each model in a fresh child interpreter. A native crash (segfault, abort, interpreter-finalization fault) in one model is then recorded as that model's phase-tagged failure — with the signal name and the phase the child reached — instead of ending the sweep. Costs a few seconds of import time per model and frees GPU memory between models; results round-trip through JSON so reports are identical to in-process runs. |
 | `--rerun-triage` | flag | `False` | Rerun crashed models and completed models with recorded mechanical observations using a simple prompt. First-pass results are never overwritten. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 

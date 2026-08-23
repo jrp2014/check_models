@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import logging
+import subprocess
 import sys
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -12,8 +15,8 @@ import pytest
 from transformers.processing_utils import ProcessorMixin
 
 if TYPE_CHECKING:
+    import argparse
     from collections.abc import Callable, Sequence
-    from pathlib import Path
 
 import check_models
 
@@ -1294,3 +1297,120 @@ class TestPerModelIsolationBoundary:
             pytest.raises(SystemExit),
         ):
             check_models.process_image_with_model(params)
+
+
+# ── Isolated execution (one child interpreter per model) ─────────────────────
+
+
+class TestIsolatedExecution:
+    """The parent must survive a native child crash and round-trip full results."""
+
+    @staticmethod
+    def _args(test_image: Path) -> argparse.Namespace:
+        parser = check_models._build_cli_parser()
+        return parser.parse_args(["--image", str(test_image), "--isolate", "--max-tokens", "5"])
+
+    def test_namespace_json_round_trip_preserves_paths(self, test_image: Path) -> None:
+        """Path-valued CLI args survive the JSON hand-off to the child."""
+        args = self._args(test_image)
+        restored = check_models._namespace_from_json(check_models._namespace_to_json(args))
+        assert restored.image == test_image
+        assert isinstance(restored.output_jsonl, Path)
+        assert restored.max_tokens == 5
+        assert restored.isolate is True
+
+    def test_performance_result_json_round_trip(self) -> None:
+        """Nested dataclasses and a duck-typed generation survive the round trip."""
+        diagnostics = check_models.PromptDiagnostics(
+            model_type="fake",
+            rendered_prompt="p",
+            rendered_prompt_token_count=7,
+            special_token_ids=(1, 2),
+            snapshot_notes=("note",),
+            generate_kwargs={"max_tokens": 5},
+        )
+        result = check_models.PerformanceResult(
+            model_name="org/m",
+            success=True,
+            generation=_FakeGenerationResult(text="hello", prompt_tokens=50, generation_tps=42.0),
+            generation_time=1.5,
+            prompt_diagnostics=diagnostics,
+            exception_chain=(
+                check_models.FailureException(
+                    exception_type="ValueError", module="builtins", message="x"
+                ),
+            ),
+            runtime_diagnostics=check_models.RuntimeDiagnostics(stop_reason="completed"),
+            completed_at="2026-08-23 12:00:00 BST",
+        )
+        payload = json.loads(json.dumps(check_models._performance_result_to_json(result)))
+        restored = check_models._performance_result_from_json(payload)
+
+        assert restored.model_name == "org/m"
+        assert restored.success is True
+        assert restored.generation is not None
+        assert restored.generation.text == "hello"
+        assert getattr(restored.generation, "prompt_tokens", None) == 50
+        assert getattr(restored.generation, "generation_tps", None) == 42.0
+        assert getattr(restored.generation, "missing_field", None) is None
+        assert check_models._generation_int_metric(restored.generation, "prompt_tokens") == 50
+        assert restored.prompt_diagnostics == diagnostics
+        assert restored.exception_chain == result.exception_chain
+        assert restored.runtime_diagnostics == result.runtime_diagnostics
+        assert restored.generation_time == 1.5
+
+    def test_signal_names(self) -> None:
+        """Negative and 128+N return codes map to signal names."""
+        assert check_models._signal_name_for_returncode(-6) == "SIGABRT"
+        assert check_models._signal_name_for_returncode(134) == "SIGABRT"
+        assert check_models._signal_name_for_returncode(-11) == "SIGSEGV"
+        assert check_models._signal_name_for_returncode(1) is None
+        assert check_models._signal_name_for_returncode(0) is None
+
+    def test_crashed_child_becomes_phase_tagged_failure(self, test_image: Path) -> None:
+        """A child dying natively is recorded with the phase it reached, not fatal."""
+        args = self._args(test_image)
+
+        def _fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            worker_dir = Path(command[-1]).parent
+            check_models._write_text_file(worker_dir / "phase.txt", "decode")
+            return subprocess.CompletedProcess(command, -11)
+
+        with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
+            result = check_models._run_model_isolated(
+                args, model_identifier="org/crasher", image_path=test_image, prompt="p"
+            )
+
+        assert result.success is False
+        assert result.failure_phase == "decode"
+        assert result.error_type == "IsolatedWorkerCrashError"
+        assert result.error_message is not None
+        assert "SIGSEGV" in result.error_message
+        assert result.upstream_boundary != "not_started"
+
+    def test_successful_child_result_is_returned(self, test_image: Path) -> None:
+        """A child that writes a result has it returned verbatim."""
+        args = self._args(test_image)
+        child_result = check_models.PerformanceResult(
+            model_name="org/ok",
+            success=True,
+            generation=_FakeGenerationResult(text="child says hi"),
+            generation_time=0.2,
+        )
+
+        def _fake_run(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            worker_dir = Path(command[-1]).parent
+            check_models._write_text_file(
+                worker_dir / "result.json",
+                json.dumps(check_models._performance_result_to_json(child_result)),
+            )
+            return subprocess.CompletedProcess(command, 0)
+
+        with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
+            result = check_models._run_model_isolated(
+                args, model_identifier="org/ok", image_path=test_image, prompt="p"
+            )
+        assert result.success is True
+        assert result.generation is not None
+        assert result.generation.text == "child says hi"
+        assert result.generation_time == 0.2

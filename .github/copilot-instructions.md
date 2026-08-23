@@ -30,7 +30,7 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~19,800 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~21,300 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
@@ -54,8 +54,10 @@ The file is organized in this order — search for these exact landmark headers 
 | Diagnostics/report context builders | `DiagnosticsConfig`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
 | Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_gallery_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
 | Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
+| Isolated model execution | `--isolate` child-interpreter worker: `_run_model_isolated`, `_run_isolated_worker`, JSON round-trip of `PerformanceResult` | `SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)` |
 | CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
 | Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
+| Run comparison | `--compare-with` baseline resolution, `compare_run_results`, history noise bands, summary section | `SECTION: RUN COMPARISON (current sweep vs a retained baseline)` |
 | Main orchestration & argparse | `main()`, `main_cli()`, `_build_cli_parser()` | `SECTION: MAIN ORCHESTRATION & ARGPARSE` |
 
 ### 4. Architecture & patterns
