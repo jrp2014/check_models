@@ -173,6 +173,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The baseline-comparison Markdown section and the terminal summary now render
+  from one shared `_ComparisonView` derived once per comparison (identity and
+  summary rows, banners, revision note, membership items, and the
+  change/throughput/memory cells), so wording and withholding rules cannot
+  drift between surfaces; a test asserts both surfaces show the same cells.
+  `run.json` keeps its own raw-number serialization.
+
 - Native repro commands now emit `--top-p`, `--min-p`, and `--top-k` as
   first-class `mlx_vlm.generate` CLI flags (upstream added them in
   Blaizzy/mlx-vlm#1994; previously they could only travel in the

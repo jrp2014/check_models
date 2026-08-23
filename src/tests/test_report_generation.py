@@ -5851,3 +5851,42 @@ def test_unknown_comparability_withholds_performance_but_keeps_transitions() -> 
         )
     )
     assert "Comparability unknown" in rendered
+
+
+def test_comparison_surfaces_render_from_one_view(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Markdown tables and terminal lines must show the same derived cells."""
+    baseline = _comparison_baseline(
+        [_comparison_record("org/m", tps=100.0), _comparison_record("org/n", tps=50.0)]
+    )
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record(
+                "org/m", usability="unusable", observations=["repeated_output"], tps=130.0
+            ),
+        ),
+        cast("check_models.JsonlResultRecord", _comparison_record("org/n", tps=50.0)),
+    ]
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    )
+    view = check_models._comparison_view(comparison)
+    assert view.change_rows == (("org/m", "completed", "usable → unusable", "+repeated_output"),)
+    assert [row[0] for row in view.flag_rows] == ["org/m"]
+
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        check_models._log_run_comparison(comparison)
+    logged = "\n".join(record.getMessage() for record in caplog.records)
+    for cell in ("usable → unusable", "+repeated_output"):
+        assert cell in rendered
+        assert cell in logged
+    ratio_cell = view.flag_rows[0][3]
+    assert ratio_cell in rendered
+    assert ratio_cell in logged

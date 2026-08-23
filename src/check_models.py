@@ -18110,8 +18110,35 @@ def _format_usability_transition(before: str, after: str) -> str:
     return before if before == after else f"{before} → {after}"
 
 
-def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
-    """Render the mechanical diff against the baseline sweep for run_summary.md."""
+def _format_observation_delta(change: RunComparisonModelChange) -> str:
+    """Compact +added/-removed observation-code delta shared by every renderer."""
+    parts = [f"+{code}" for code in change.observations_added] + [
+        f"-{code}" for code in change.observations_removed
+    ]
+    return "; ".join(parts) or "—"
+
+
+@dataclass(frozen=True)
+class _ComparisonView:
+    """Formatted comparison rows derived once and shared by Markdown and terminal.
+
+    ``run.json`` keeps its own raw-number serialization; everything human-facing
+    renders from this view so wording and withholding rules cannot drift
+    between surfaces.
+    """
+
+    identity_rows: tuple[tuple[str, str], ...]
+    summary_rows: tuple[tuple[str, str], ...]
+    banner: str | None
+    revision_note: str | None
+    membership_items: tuple[str, ...]
+    change_rows: tuple[tuple[str, str, str, str], ...]
+    flag_rows: tuple[tuple[str, str, str, str, str], ...]
+    memory_rows: tuple[tuple[str, str, str, str], ...]
+
+
+def _comparison_view(comparison: RunComparison) -> _ComparisonView:
+    """Derive every formatted row of the baseline diff exactly once."""
     if not comparison.throughput_comparable:
         ratio_text = "withheld (execution mode or inputs not established as like-for-like)"
     elif (
@@ -18131,94 +18158,135 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         if comparison.history_runs_used >= _COMPARISON_MIN_BAND_SAMPLES
         else "fixed ±15% fallback (insufficient history)"
     )
-    key_rows: list[tuple[str, str]] = [
-        ("Baseline", comparison.baseline_label),
-    ]
+
+    identity_rows: list[tuple[str, str]] = [("Baseline", comparison.baseline_label)]
     if comparison.baseline_timestamp:
-        key_rows.append(("Baseline run timestamp", comparison.baseline_timestamp))
-    key_rows.extend((f"Baseline {name}", value) for name, value in comparison.baseline_components)
-    key_rows.extend(
-        (
-            ("Models compared", str(comparison.compared_models)),
-            (
-                "Identical generated text",
-                (
-                    f"{comparison.identical_text_models} of "
-                    f"{comparison.text_compared_models} completed in both"
-                ),
-            ),
-            ("Generation tok/s ratio (now/baseline)", ratio_text),
-            ("Throughput noise band", band_text),
-        )
+        identity_rows.append(("Baseline run timestamp", comparison.baseline_timestamp))
+    identity_rows.extend(
+        (f"Baseline {name}", value) for name, value in comparison.baseline_components
     )
+
+    summary_rows: list[tuple[str, str]] = [
+        ("Models compared", str(comparison.compared_models)),
+        (
+            "Identical generated text",
+            (
+                f"{comparison.identical_text_models} of "
+                f"{comparison.text_compared_models} completed in both"
+            ),
+        ),
+        ("Generation tok/s ratio (now/baseline)", ratio_text),
+        ("Throughput noise band", band_text),
+    ]
     if comparison.current_execution_mode != comparison.baseline_execution_mode:
         mode_note = (
             f"{comparison.current_execution_mode} now vs "
             f"{comparison.baseline_execution_mode} in the baseline — per-process "
             "start-up differs, so throughput is not directly comparable"
         )
-        key_rows.append(("Execution mode", mode_note))
+        summary_rows.append(("Execution mode", mode_note))
+
+    banner: str | None = None
+    if comparison.comparability == "incomparable":
+        banner = (
+            "**Not directly comparable** — the per-model diff is withheld because the "
+            "runs differ in: " + "; ".join(comparison.incomparable_reasons) + ". "
+            "Treat any difference against this baseline as a change of inputs, not a "
+            "change of model or runtime behaviour."
+        )
+    elif comparison.comparability == "unknown":
+        banner = (
+            "**Comparability unknown** — could not verify: "
+            + ", ".join(comparison.unverified_facts)
+            + " (the baseline's run.json was unavailable or incomplete). Quality "
+            "transitions are shown; throughput and memory comparisons are withheld."
+        )
+
+    revision_note = (
+        "Model revisions changed since the baseline (their rows below reflect a "
+        "different snapshot, not only a different run): "
+        + ", ".join(
+            f"`{model}` {before[:9]} → {after[:9]}"
+            for model, before, after in comparison.revision_changes
+        )
+        if comparison.revision_changes
+        else None
+    )
+
+    membership_items: list[str] = []
+    if comparison.models_added:
+        membership_items.append(
+            "New this run (no baseline): " + _comparison_model_list(comparison.models_added)
+        )
+    if comparison.models_removed:
+        membership_items.append(
+            "In baseline, not run this time: " + _comparison_model_list(comparison.models_removed)
+        )
+
+    change_rows = tuple(
+        (
+            change.model,
+            _format_usability_transition(change.baseline_execution, change.current_execution),
+            _format_usability_transition(change.baseline_usability, change.current_usability),
+            _format_observation_delta(change),
+        )
+        for change in comparison.changes
+    )
+    flag_rows = tuple(
+        (
+            flag.model,
+            f"{flag.baseline_tps:.1f}",
+            f"{flag.current_tps:.1f}",
+            f"{flag.ratio:.2f}",
+            f"{flag.band_low:.1f}-{flag.band_high:.1f} ({flag.band_source}"
+            + (f", n={flag.band_samples}" if flag.band_samples else "")
+            + ")",
+        )
+        for flag in comparison.throughput_flags
+    )
+    memory_rows = tuple(
+        (
+            memory_change.model,
+            f"{memory_change.baseline_peak_gb:.1f}",
+            f"{memory_change.current_peak_gb:.1f}",
+            f"{memory_change.delta_gb:+.1f}",
+        )
+        for memory_change in comparison.memory_changes
+    )
+    return _ComparisonView(
+        identity_rows=tuple(identity_rows),
+        summary_rows=tuple(summary_rows),
+        banner=banner,
+        revision_note=revision_note,
+        membership_items=tuple(membership_items),
+        change_rows=change_rows,
+        flag_rows=flag_rows,
+        memory_rows=memory_rows,
+    )
+
+
+def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
+    """Render the mechanical diff against the baseline sweep for run_summary.md."""
+    view = _comparison_view(comparison)
     if not comparison.comparable:
-        blocks_incomparable: list[ReportBlock] = [
-            ReportParagraph(
-                "**Not directly comparable** — the per-model diff is withheld because the "
-                "runs differ in: " + "; ".join(comparison.incomparable_reasons) + ". "
-                "Treat any difference against this baseline as a change of inputs, not a "
-                "change of model or runtime behaviour."
-            ),
-            ReportKeyValues(tuple(key_rows[: 2 + len(comparison.baseline_components)])),
-        ]
-        return ReportSection("Since the baseline sweep", tuple(blocks_incomparable))
-    blocks: list[ReportBlock] = [ReportKeyValues(tuple(key_rows))]
-    if comparison.comparability == "unknown":
-        blocks.append(
-            ReportParagraph(
-                "**Comparability unknown** — could not verify: "
-                + ", ".join(comparison.unverified_facts)
-                + " (the baseline's run.json was unavailable or incomplete). Quality "
-                "transitions are shown; throughput and memory comparisons are withheld."
-            )
+        assert view.banner is not None  # noqa: S101 - incomparable always carries a banner
+        return ReportSection(
+            "Since the baseline sweep",
+            (ReportParagraph(view.banner), ReportKeyValues(view.identity_rows)),
         )
-    if comparison.revision_changes:
-        blocks.append(
-            ReportParagraph(
-                "Model revisions changed since the baseline (their rows below reflect a "
-                "different snapshot, not only a different run): "
-                + ", ".join(
-                    f"`{model}` {before[:9]} → {after[:9]}"
-                    for model, before, after in comparison.revision_changes
-                )
-            )
-        )
-    if comparison.models_added or comparison.models_removed:
-        items: list[str] = []
-        if comparison.models_added:
-            items.append(
-                "New this run (no baseline): " + _comparison_model_list(comparison.models_added)
-            )
-        if comparison.models_removed:
-            items.append(
-                "In baseline, not run this time: "
-                + _comparison_model_list(comparison.models_removed)
-            )
-        blocks.append(ReportBulletList(tuple(items)))
-    if comparison.changes:
-        rows = tuple(
-            (
-                change.model,
-                _format_usability_transition(change.baseline_execution, change.current_execution),
-                _format_usability_transition(change.baseline_usability, change.current_usability),
-                "; ".join(
-                    [f"+{code}" for code in change.observations_added]
-                    + [f"-{code}" for code in change.observations_removed]
-                )
-                or "—",
-            )
-            for change in comparison.changes
-        )
+    blocks: list[ReportBlock] = [ReportKeyValues(view.identity_rows + view.summary_rows)]
+    if view.banner is not None:
+        blocks.append(ReportParagraph(view.banner))
+    if view.revision_note is not None:
+        blocks.append(ReportParagraph(view.revision_note))
+    if view.membership_items:
+        blocks.append(ReportBulletList(view.membership_items))
+    if view.change_rows:
         blocks.append(
             ReportTable(
-                ("Model", "Execution", "Usability", "Observation delta"), rows, compact=True
+                ("Model", "Execution", "Usability", "Observation delta"),
+                view.change_rows,
+                compact=True,
             )
         )
     else:
@@ -18227,39 +18295,20 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 "No execution, usability, or observation-set changes against the baseline."
             )
         )
-    if comparison.throughput_flags:
-        flag_rows = tuple(
-            (
-                flag.model,
-                f"{flag.baseline_tps:.1f}",
-                f"{flag.current_tps:.1f}",
-                f"{flag.ratio:.2f}",
-                f"{flag.band_low:.1f}-{flag.band_high:.1f} ({flag.band_source}"
-                + (f", n={flag.band_samples}" if flag.band_samples else "")
-                + ")",
-            )
-            for flag in comparison.throughput_flags
-        )
+    if view.flag_rows:
         blocks.append(
             ReportTable(
                 ("Model", "Baseline tok/s", "Now tok/s", "Ratio", "Expected band"),
-                flag_rows,
+                view.flag_rows,
                 compact=True,
             )
         )
-    if comparison.memory_changes:
-        memory_rows = tuple(
-            (
-                memory_change.model,
-                f"{memory_change.baseline_peak_gb:.1f}",
-                f"{memory_change.current_peak_gb:.1f}",
-                f"{memory_change.delta_gb:+.1f}",
-            )
-            for memory_change in comparison.memory_changes
-        )
+    if view.memory_rows:
         blocks.append(
             ReportTable(
-                ("Model", "Baseline peak GB", "Now peak GB", "Delta"), memory_rows, compact=True
+                ("Model", "Baseline peak GB", "Now peak GB", "Delta"),
+                view.memory_rows,
+                compact=True,
             )
         )
     blocks.append(
@@ -18271,75 +18320,36 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
     return ReportSection("Since the baseline sweep", tuple(blocks))
 
 
+def _plain_log_text(text: str) -> str:
+    """Strip the view's Markdown emphasis/backticks for terminal logging."""
+    return text.replace("**", "").replace("`", "")
+
+
 def _log_run_comparison(comparison: RunComparison | None) -> None:
-    """Log the comparison headline so terminal users see drift without opening reports."""
+    """Log the same comparison rows the summary renders, via the shared view."""
     if comparison is None:
         return
+    view = _comparison_view(comparison)
     print_cli_section("Comparison with baseline sweep")
     logger.info("Baseline: %s", comparison.baseline_label)
-    if not comparison.comparable:
-        logger.warning(
-            "Not directly comparable (%s); per-model diff withheld.",
-            "; ".join(comparison.incomparable_reasons),
-        )
-        return
-    if comparison.comparability == "unknown":
-        logger.warning(
-            "Comparability unknown (could not verify: %s); throughput/memory withheld.",
-            ", ".join(comparison.unverified_facts),
-        )
-    elif not comparison.throughput_comparable:
-        logger.warning(
-            "Throughput comparison withheld: execution mode %s now vs %s in the baseline.",
-            comparison.current_execution_mode,
-            comparison.baseline_execution_mode,
-        )
-    for model, before, after in comparison.revision_changes:
-        logger.info("  %s: revision %s -> %s", model, before[:9], after[:9])
-    logger.info(
-        "Models compared: %d; identical generated text: %d/%d; gen tok/s ratio median %s",
-        comparison.compared_models,
-        comparison.identical_text_models,
-        comparison.text_compared_models,
-        f"{comparison.tps_ratio_median:.3f}" if comparison.tps_ratio_median is not None else "n/a",
-    )
-    for change in comparison.changes:
+    if view.banner is not None:
+        logger.warning("%s", _plain_log_text(view.banner))
+        if not comparison.comparable:
+            return
+    for label, value in view.summary_rows:
+        logger.info("%s: %s", label, value)
+    if view.revision_note is not None:
+        logger.info("%s", _plain_log_text(view.revision_note))
+    for item in view.membership_items:
+        logger.info("%s", _plain_log_text(item))
+    for model, execution, usability, observations in view.change_rows:
+        logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
+    for model, baseline_tps, now_tps, ratio, band in view.flag_rows:
         logger.info(
-            "  %s: %s -> %s%s",
-            change.model,
-            change.baseline_usability,
-            change.current_usability,
-            (
-                " ("
-                + ", ".join(
-                    [f"+{c}" for c in change.observations_added]
-                    + [f"-{c}" for c in change.observations_removed]
-                )
-                + ")"
-                if change.observations_added or change.observations_removed
-                else ""
-            ),
+            "  %s: %s -> %s tok/s (x%s) outside band %s", model, baseline_tps, now_tps, ratio, band
         )
-    for flag in comparison.throughput_flags:
-        logger.info(
-            "  %s: %.1f -> %.1f tok/s (x%.2f) outside %s band %.1f-%.1f",
-            flag.model,
-            flag.baseline_tps,
-            flag.current_tps,
-            flag.ratio,
-            flag.band_source,
-            flag.band_low,
-            flag.band_high,
-        )
-    for memory_change in comparison.memory_changes:
-        logger.info(
-            "  %s: peak %.1f -> %.1f GB (%+.1f)",
-            memory_change.model,
-            memory_change.baseline_peak_gb,
-            memory_change.current_peak_gb,
-            memory_change.delta_gb,
-        )
-
+    for model, baseline_peak, now_peak, delta in view.memory_rows:
+        logger.info("  %s: peak %s -> %s GB (%s)", model, baseline_peak, now_peak, delta)
     if not comparison.has_changes:
         logger.info("No changes beyond noise against the baseline sweep.")
 
