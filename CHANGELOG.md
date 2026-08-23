@@ -44,6 +44,25 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Comparability is now three-state (`comparable` / `unknown` / `incomparable`):
+  facts that cannot be verified (a baseline without `run.json`, missing image
+  sha or settings) are named as `unverified_facts` and mark the comparison
+  `unknown` instead of silently counting as comparable. Quality transitions
+  stay visible under `unknown`; throughput and memory comparisons are
+  withheld. Throughput is also withheld whenever the execution modes differ
+  (isolated vs in-process — cold per-process caches make tok/s a different
+  population); `run.json` records `comparability`, `throughput_comparable`,
+  and both execution modes on every path, and the terminal warns.
+- The heuristic fallback is bound by the same `0 <= text <= total` invariant
+  as the exact count: when both are impossible the split is reported
+  unavailable (the rejected exact count stays recorded), instead of
+  publishing e.g. `5 = 130 text + 0 non-text`.
+- Download-timeout classification recognises the `TimeoutError` family by
+  suffix (so `IsolatedWorkerTimeoutError` from a worker deadline counts) and
+  the retained `stop_reason == "timeout"`, and the HF progress needles now
+  include the per-file tqdm rate suffix (`…MB/s]`) so a cold download that
+  outlives an isolated worker's deadline stays an environmental,
+  indeterminate outcome rather than an actionable crash.
 - Comparisons are like-for-like or withheld: the baseline's `run.json` is read
   from the same source as its `results.jsonl` (sibling file, or the same git
   ref), and the prompt, image sha256, evaluation lane, and shared generation

@@ -1485,3 +1485,28 @@ class TestIsolatedExecution:
         assert getattr(restored.generation, "active_memory", None) == 0.5
         assert getattr(restored.generation, "cache_memory", None) == 0.25
         assert getattr(restored.generation, "prompt_tokens", None) == 3
+
+    def test_isolated_download_timeout_is_environmental(self, test_image: Path) -> None:
+        """A worker deadline that expired mid-download stays indeterminate, not actionable."""
+        args = self._args(test_image)
+
+        def _fake_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            worker_dir = Path(command[-1]).parent
+            check_models._write_text_file(worker_dir / "phase.txt", "model_load")
+            check_models._write_text_file(
+                worker_dir / "stderr.txt",
+                "model-00001-of-00005.safetensors:  37%|███  | 7.4G/20.1G [04:02<07:12, 29.3MB/s]",
+            )
+            deadline = kwargs.get("timeout")
+            assert isinstance(deadline, float)
+            raise subprocess.TimeoutExpired(command, deadline)
+
+        with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
+            result = check_models._run_model_isolated(
+                args, model_identifier="org/coldstart", image_path=test_image, prompt="p"
+            )
+        assert result.error_type == "IsolatedWorkerTimeoutError"
+        assert check_models._is_download_timeout_failure(result) is True
+        assessment = check_models._assess_result(result)
+        assert assessment.execution == "indeterminate"
+        assert assessment.maintainer_status != "actionable_failure"

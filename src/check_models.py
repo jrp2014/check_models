@@ -4577,6 +4577,16 @@ def analyze_generation_text(
         prompt_tokens_text_exact_rejected = prompt_text_tokens
         prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
         prompt_tokens_text_source = "heuristic" if prompt_tokens_text_est is not None else None
+    if (
+        prompt_tokens_text_est is not None
+        and prompt_tokens is not None
+        and not 0 <= prompt_tokens_text_est <= prompt_tokens
+    ):
+        # The same invariant binds the heuristic: rather than publish an
+        # impossible split, mark it unavailable (the rejected exact count, if
+        # any, stays recorded as evidence).
+        prompt_tokens_text_est = None
+        prompt_tokens_text_source = None
     prompt_tokens_nontext_est = (
         max(prompt_tokens - prompt_tokens_text_est, 0)
         if (prompt_tokens is not None and prompt_tokens_text_est is not None)
@@ -7390,6 +7400,7 @@ _HF_DOWNLOAD_PROGRESS_NEEDLES: Final[tuple[str, ...]] = (
     "downloading bytes",
     "reconstructing (incomplete total",
     "not found in hf cache",
+    "b/s]",  # per-file tqdm bar rate suffix: "... 7.4G/20.1G [04:02<07:12, 29.3MB/s]"
 )
 
 
@@ -7413,9 +7424,22 @@ def _is_download_timeout_failure(result: PerformanceResult) -> bool:
     """
     if result.success or result.failure_phase != "model_load":
         return False
-    if result.root_error_type != "TimeoutError" and result.error_type != "TimeoutError":
+
+    def _is_timeout_type(name: str | None) -> bool:
+        # Subclasses keep their own names (e.g. IsolatedWorkerTimeoutError);
+        # anything in the TimeoutError family counts.
+        return name is not None and name.endswith("TimeoutError")
+
+    stop_reason = (
+        result.runtime_diagnostics.stop_reason if result.runtime_diagnostics is not None else None
+    )
+    if (
+        not _is_timeout_type(result.root_error_type)
+        and not _is_timeout_type(result.error_type)
+        and stop_reason != "timeout"
+    ):
         chain_types = {entry.exception_type for entry in result.exception_chain}
-        if "TimeoutError" not in chain_types:
+        if not any(_is_timeout_type(name) for name in chain_types):
             return False
     captured = (result.captured_output_on_fail or "").casefold()
     return any(needle in captured for needle in _HF_DOWNLOAD_PROGRESS_NEEDLES)
@@ -17477,9 +17501,16 @@ class RunComparison:
     history_runs_used: int
     baseline_execution_mode: str = "in_process"
     current_execution_mode: str = "in_process"
-    comparable: bool = True
+    comparability: Literal["comparable", "unknown", "incomparable"] = "comparable"
     incomparable_reasons: tuple[str, ...] = ()
+    unverified_facts: tuple[str, ...] = ()
     revision_changes: tuple[tuple[str, str, str], ...] = ()
+    throughput_comparable: bool = True
+
+    @property
+    def comparable(self) -> bool:
+        """Return whether the per-model diff may be shown at all."""
+        return self.comparability != "incomparable"
 
     @property
     def has_changes(self) -> bool:
@@ -17805,11 +17836,16 @@ def compare_run_results(
     withheld and the reasons are reported instead; per-model revision changes
     are reported alongside the diff.
     """
-    incomparable_reasons = _comparison_incomparable_reasons(
+    incomparable_reasons, unverified_facts = _comparison_compatibility(
         baseline,
         current_metadata=current_metadata,
         current_image=current_image,
         current_generation_settings=current_generation_settings,
+    )
+    throughput_comparable = (
+        current_execution_mode == str(baseline.metadata.get("execution_mode", "in_process"))
+        and not unverified_facts
+        and not incomparable_reasons
     )
     current_by = {record["model"]: record for record in current}
     baseline_by = {record["model"]: record for record in baseline.results}
@@ -17858,7 +17894,7 @@ def compare_run_results(
             if now.get("generated_text", "") == before.get("generated_text", ""):
                 identical_text += 1
         now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
-        if now_tps is not None and before_tps is not None:
+        if throughput_comparable and now_tps is not None and before_tps is not None:
             ratio = now_tps / before_tps
             ratios.append(ratio)
             band = bands.get(model)
@@ -17886,7 +17922,7 @@ def compare_run_results(
                         )
                     )
         now_peak, before_peak = _result_peak_memory_gb(now), _result_peak_memory_gb(before)
-        if now_peak is not None and before_peak is not None:
+        if throughput_comparable and now_peak is not None and before_peak is not None:
             delta = now_peak - before_peak
             if (
                 abs(delta) >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_GB
@@ -17914,25 +17950,35 @@ def compare_run_results(
         history_runs_used=history_runs,
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
-        comparable=not incomparable_reasons,
+        comparability=(
+            "incomparable"
+            if incomparable_reasons
+            else ("unknown" if unverified_facts else "comparable")
+        ),
         incomparable_reasons=incomparable_reasons,
+        unverified_facts=unverified_facts,
         revision_changes=tuple(revision_changes),
+        throughput_comparable=throughput_comparable,
     )
 
 
-def _comparison_incomparable_reasons(
+def _comparison_compatibility(
     baseline: ComparisonBaseline,
     *,
     current_metadata: JsonlMetadataRecord | None,
     current_image: RunImageRecord | None,
     current_generation_settings: tuple[tuple[str, str], ...],
-) -> tuple[str, ...]:
-    """Name every way the two runs are not like-for-like (empty when comparable).
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return (mismatch reasons, facts that could not be verified).
 
-    Facts missing on either side are treated as unknown, not as a mismatch.
+    A fact missing on either side is *unknown*, not a mismatch — but it is
+    named, so absent evidence is never silently promoted to "comparable".
     """
     reasons: list[str] = []
-    if current_metadata is not None:
+    unverified: list[str] = []
+    if current_metadata is None:
+        unverified.append("current run metadata")
+    else:
         if current_metadata.get("prompt") != baseline.metadata.get("prompt"):
             reasons.append("prompt differs")
         now_mode, before_mode = (
@@ -17941,10 +17987,15 @@ def _comparison_incomparable_reasons(
         )
         if now_mode and before_mode and now_mode != before_mode:
             reasons.append(f"evaluation lane differs ({before_mode} → {now_mode})")
+        elif not (now_mode and before_mode):
+            unverified.append("evaluation lane")
     now_sha = current_image.get("sha256") if current_image else None
     before_sha = baseline.image.get("sha256") if baseline.image else None
-    if now_sha and before_sha and now_sha != before_sha:
-        reasons.append(f"image differs (sha256 {before_sha[:12]}… → {now_sha[:12]}…)")
+    if now_sha and before_sha:
+        if now_sha != before_sha:
+            reasons.append(f"image differs (sha256 {before_sha[:12]}… → {now_sha[:12]}…)")
+    else:
+        unverified.append("image identity")
     if current_generation_settings and baseline.generation_settings:
         now_settings = dict(current_generation_settings)
         before_settings = dict(baseline.generation_settings)
@@ -17955,7 +18006,9 @@ def _comparison_incomparable_reasons(
         )
         if diffs:
             reasons.append("generation settings differ: " + ", ".join(diffs))
-    return tuple(reasons)
+    else:
+        unverified.append("generation settings")
+    return tuple(reasons), tuple(unverified)
 
 
 def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonLike] | None:
@@ -17966,19 +18019,26 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
     def _r(value: float | None) -> float | None:
         return round(value, 4) if value is not None else None
 
+    execution_mode: JsonLike = {
+        "baseline": comparison.baseline_execution_mode,
+        "current": comparison.current_execution_mode,
+    }
     if not comparison.comparable:
         return {
             "baseline": comparison.baseline_label,
             "baseline_timestamp": comparison.baseline_timestamp,
             "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
-            "comparable": False,
+            "comparability": comparison.comparability,
             "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
+            "execution_mode": execution_mode,
         }
     return {
         "baseline": comparison.baseline_label,
         "baseline_timestamp": comparison.baseline_timestamp,
         "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
-        "comparable": True,
+        "comparability": comparison.comparability,
+        "unverified_facts": cast("JsonLike", list(comparison.unverified_facts)),
+        "throughput_comparable": comparison.throughput_comparable,
         "revision_changes": [
             {"model": model, "baseline": before, "current": after}
             for model, before, after in comparison.revision_changes
@@ -18026,10 +18086,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             for change in comparison.memory_changes
         ],
         "history_runs_used": comparison.history_runs_used,
-        "execution_mode": {
-            "baseline": comparison.baseline_execution_mode,
-            "current": comparison.current_execution_mode,
-        },
+        "execution_mode": execution_mode,
     }
 
 
@@ -18049,14 +18106,19 @@ def _format_usability_transition(before: str, after: str) -> str:
 
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
-    ratio_text = (
-        f"{comparison.tps_ratio_median:.3f} (range {comparison.tps_ratio_min:.2f}-"
-        f"{comparison.tps_ratio_max:.2f}, {comparison.tps_compared_models} models)"
-        if comparison.tps_ratio_median is not None
+    if not comparison.throughput_comparable:
+        ratio_text = "withheld (execution mode or inputs not established as like-for-like)"
+    elif (
+        comparison.tps_ratio_median is not None
         and comparison.tps_ratio_min is not None
         and comparison.tps_ratio_max is not None
-        else "n/a"
-    )
+    ):
+        ratio_text = (
+            f"{comparison.tps_ratio_median:.3f} (range {comparison.tps_ratio_min:.2f}-"
+            f"{comparison.tps_ratio_max:.2f}, {comparison.tps_compared_models} models)"
+        )
+    else:
+        ratio_text = "n/a"
     band_text = (
         f"history (last {comparison.history_runs_used} same-prompt runs, Tukey fence, "
         "at least ±10% of the median)"
@@ -18102,6 +18164,15 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         ]
         return ReportSection("Since the baseline sweep", tuple(blocks_incomparable))
     blocks: list[ReportBlock] = [ReportKeyValues(tuple(key_rows))]
+    if comparison.comparability == "unknown":
+        blocks.append(
+            ReportParagraph(
+                "**Comparability unknown** — could not verify: "
+                + ", ".join(comparison.unverified_facts)
+                + " (the baseline's run.json was unavailable or incomplete). Quality "
+                "transitions are shown; throughput and memory comparisons are withheld."
+            )
+        )
     if comparison.revision_changes:
         blocks.append(
             ReportParagraph(
@@ -18206,6 +18277,17 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
             "; ".join(comparison.incomparable_reasons),
         )
         return
+    if comparison.comparability == "unknown":
+        logger.warning(
+            "Comparability unknown (could not verify: %s); throughput/memory withheld.",
+            ", ".join(comparison.unverified_facts),
+        )
+    elif not comparison.throughput_comparable:
+        logger.warning(
+            "Throughput comparison withheld: execution mode %s now vs %s in the baseline.",
+            comparison.current_execution_mode,
+            comparison.baseline_execution_mode,
+        )
     for model, before, after in comparison.revision_changes:
         logger.info("  %s: revision %s -> %s", model, before[:9], after[:9])
     logger.info(

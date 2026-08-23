@@ -1404,9 +1404,29 @@ class TestExactPromptTokenAccounting:
     def test_inconsistent_exact_count_is_rejected_and_recorded(self) -> None:
         """An exact count above the total is kept as evidence, not used for the split."""
         analysis = check_models.analyze_generation_text(
-            "Title: A", generated_tokens=3, prompt_tokens=5, prompt="one two", prompt_text_tokens=7
+            "Title: A",
+            generated_tokens=3,
+            prompt_tokens=5,
+            prompt="one two three four five six seven",  # heuristic ~10 > total 5
+            prompt_text_tokens=7,
         )
-        assert analysis.prompt_tokens_text_source == "heuristic"
         assert analysis.prompt_tokens_text_exact_rejected == 7
+        # The heuristic is bound by the same invariant; here it also exceeds the
+        # 5-token total, so the split is unavailable rather than impossible.
+        assert analysis.prompt_tokens_text_source is None
+        assert analysis.prompt_tokens_text_est is None
+        assert analysis.prompt_tokens_nontext_est is None
+
+    def test_heuristic_fallback_within_total_is_used(self) -> None:
+        """A rejected exact count falls back to the heuristic when it fits the total."""
+        analysis = check_models.analyze_generation_text(
+            "Title: A",
+            generated_tokens=3,
+            prompt_tokens=100,
+            prompt="four words of prompt",
+            prompt_text_tokens=250,
+        )
+        assert analysis.prompt_tokens_text_exact_rejected == 250
+        assert analysis.prompt_tokens_text_source == "heuristic"
         assert analysis.prompt_tokens_text_est is not None
-        assert analysis.prompt_tokens_text_est <= 5 or analysis.prompt_tokens_nontext_est == 0
+        assert 0 <= analysis.prompt_tokens_text_est <= 100

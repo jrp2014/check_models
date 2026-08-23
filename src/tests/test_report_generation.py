@@ -11,7 +11,7 @@ import re
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast, get_args
+from typing import TYPE_CHECKING, Any, Literal, cast, get_args
 from unittest.mock import patch
 
 import pytest
@@ -5497,6 +5497,17 @@ def _comparison_record(
     return record
 
 
+def _verified_comparison_kwargs(
+    baseline: check_models.ComparisonBaseline,
+) -> dict[str, object]:
+    """Current-run facts that make the fixture baseline fully verified."""
+    return {
+        "current_metadata": baseline.metadata,
+        "current_image": cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        "current_generation_settings": (("max_tokens", "1000"),),
+    }
+
+
 def _comparison_baseline(records: list[dict[str, object]]) -> check_models.ComparisonBaseline:
     metadata = cast(
         "check_models.JsonlMetadataRecord",
@@ -5517,6 +5528,8 @@ def _comparison_baseline(records: list[dict[str, object]]) -> check_models.Compa
         label="HEAD:src/output/results.jsonl",
         metadata=metadata,
         results=tuple(cast("check_models.JsonlResultRecord", r) for r in records),
+        image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        generation_settings=(("max_tokens", "1000"),),
     )
 
 
@@ -5544,9 +5557,13 @@ def test_compare_run_results_reports_transitions_text_tps_and_memory() -> None:
         _comparison_record("org/new"),
     ]
     comparison = check_models.compare_run_results(
-        [cast("check_models.JsonlResultRecord", r) for r in current], baseline
+        [cast("check_models.JsonlResultRecord", r) for r in current],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
 
+    assert comparison.comparability == "comparable"
+    assert comparison.throughput_comparable is True
     assert comparison.compared_models == 4
     assert comparison.models_added == ("org/new",)
     assert comparison.models_removed == ("org/gone",)
@@ -5573,6 +5590,9 @@ def test_compare_run_results_reports_transitions_text_tps_and_memory() -> None:
 
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
+    assert payload["comparability"] == "comparable"
+    assert payload["throughput_comparable"] is True
+    assert payload["execution_mode"] == {"baseline": "in_process", "current": "in_process"}
     assert payload["identical_text_models"] == 3
     changes = payload["changes"]
     assert isinstance(changes, list)
@@ -5611,7 +5631,12 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
     # floor and the Tukey fence, 101 sits inside both.
     current = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=115.0))]
     comparison = check_models.compare_run_results(
-        current, baseline, history_path=history, prompt_hash="h", history_excludes_current=True
+        current,
+        baseline,
+        history_path=history,
+        prompt_hash="h",
+        history_excludes_current=True,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
     assert comparison.history_runs_used == 5
     assert [f.model for f in comparison.throughput_flags] == ["org/m"]
@@ -5623,7 +5648,11 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
 
     steady = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=101.0))]
     assert not check_models.compare_run_results(
-        steady, baseline, history_path=history, prompt_hash="h"
+        steady,
+        baseline,
+        history_path=history,
+        prompt_hash="h",
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     ).throughput_flags
 
 
@@ -5664,7 +5693,9 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
             _comparison_record("org/m0", usability="unusable", observations=["repeated_output"]),
         )
     ]
-    comparison = check_models.compare_run_results(current, baseline)
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    )
     section = check_models._run_issue_summary_comparison_section(comparison)
     rendered = "\n".join(check_models.render_report_markdown((section,)))
     assert "Since the baseline sweep" in rendered
@@ -5697,7 +5728,7 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
         current_image=cast("check_models.RunImageRecord", {"sha256": "b" * 64}),
         current_generation_settings=(("max_tokens", "500"),),
     )
-    assert comparison.comparable is False
+    assert comparison.comparability == "incomparable"
     assert "prompt differs" in comparison.incomparable_reasons
     assert any(r.startswith("image differs") for r in comparison.incomparable_reasons)
     assert any(
@@ -5708,7 +5739,8 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
 
     payload = check_models._run_comparison_to_json(comparison)
     assert payload is not None
-    assert payload["comparable"] is False
+    assert payload["comparability"] == "incomparable"
+    assert payload["execution_mode"] == {"baseline": "in_process", "current": "in_process"}
     assert "changes" not in payload
     rendered = "\n".join(
         check_models.render_report_markdown(
@@ -5731,7 +5763,7 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
         current_image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
         current_generation_settings=(("max_tokens", "1000"),),
     )
-    assert comparison.comparable is True
+    assert comparison.comparability == "comparable"
     assert comparison.revision_changes == (("org/m", "revision-m", "newrev123456"),)
 
 
@@ -5753,3 +5785,69 @@ def test_history_bands_ignore_hashless_rows_and_respect_confirmed_append(tmp_pat
     # exclude_last only when the caller confirmed the append.
     _, runs_excl = check_models._history_tps_bands(history, prompt_hash=None, exclude_last=True)
     assert runs_excl == 3
+
+
+def test_throughput_withheld_when_execution_modes_differ() -> None:
+    """Isolated vs in-process runs keep quality transitions but not tok/s ratios."""
+    baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record("org/m", usability="unusable", tps=50.0),
+        )
+    ]
+    comparison = check_models.compare_run_results(
+        current,
+        baseline,
+        current_execution_mode="isolated",
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison.comparability == "comparable"
+    assert comparison.throughput_comparable is False
+    assert comparison.tps_ratio_median is None
+    assert comparison.throughput_flags == ()
+    assert comparison.memory_changes == ()
+    assert [c.model for c in comparison.changes] == ["org/m"]
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    assert payload["throughput_comparable"] is False
+    assert payload["execution_mode"] == {"baseline": "in_process", "current": "isolated"}
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "withheld" in rendered
+
+
+def test_unknown_comparability_withholds_performance_but_keeps_transitions() -> None:
+    """A baseline without run.json facts is 'unknown', never silently comparable."""
+    baseline = replace(
+        _comparison_baseline([_comparison_record("org/m", tps=100.0)]),
+        image=None,
+        generation_settings=(),
+    )
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record("org/m", usability="unusable", tps=50.0),
+        )
+    ]
+    comparison = check_models.compare_run_results(
+        current, baseline, current_metadata=baseline.metadata
+    )
+    assert comparison.comparability == "unknown"
+    assert "image identity" in comparison.unverified_facts
+    assert "generation settings" in comparison.unverified_facts
+    assert comparison.throughput_comparable is False
+    assert comparison.throughput_flags == ()
+    assert [c.model for c in comparison.changes] == ["org/m"]
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    assert payload["comparability"] == "unknown"
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Comparability unknown" in rendered
