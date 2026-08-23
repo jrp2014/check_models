@@ -106,6 +106,7 @@ from typing import (
     TextIO,
     TypedDict,
     TypeGuard,
+    TypeIs,
     Union,
     Unpack,
     cast,
@@ -11092,8 +11093,14 @@ def _build_generate_kwargs(
 
 def _is_generation_processor(
     processor: object,
-) -> TypeGuard[ProcessorLike | PreTrainedTokenizer]:
-    """Return whether a processor matches either upstream generation branch."""
+) -> TypeIs[ProcessorLike | PreTrainedTokenizer]:
+    """Return whether a processor matches either upstream generation branch.
+
+    ``TypeIs`` (PEP 742) rather than ``TypeGuard``: the positive branch is an
+    intersection with the declared type, so a ``ProcessorMixin`` checked here
+    is still a ``ProcessorMixin`` after the ``if``/``else`` rejoin instead of
+    widening to the union (which pyright reports at the later call sites).
+    """
     return hasattr(processor, "detokenizer") and (
         hasattr(processor, "tokenizer") or _has_text_decoder_api(processor)
     )

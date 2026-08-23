@@ -43,6 +43,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `_is_generation_processor` is a `TypeIs` (PEP 742) rather than a
+  `TypeGuard`: with `TypeGuard` the positive branch replaced the declared
+  `ProcessorMixin` with the guarded union, so after the `if`/`else` rejoin
+  pyright widened `processor` to `ProcessorLike | PreTrainedTokenizer |
+  ProcessorMixin` and reported the later `_prepare_generation_prompt` /
+  `_build_prompt_diagnostics` calls as argument-type errors (visible in
+  Pylance; mypy, pyrefly and ty accepted it). `TypeIs` intersects, so the
+  variable is a `ProcessorMixin` again after the rejoin. Pyright: 0 errors.
+
 - The CLI parser now pins `prog` to `basename(sys.argv[0])` (the Python 3.13
   default) instead of relying on argparse's heuristic. Python 3.14 derives
   `prog` from the `-m` invocation, and the exact rule differs between point
