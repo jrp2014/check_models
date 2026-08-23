@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import tomllib
+import types
 import typing
 import zipfile
 from pathlib import Path
@@ -212,7 +213,7 @@ def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
     )
     safe_io.write_text_no_follow(
         generate_dir / "types.pyi",
-        "from typing import Protocol, TypedDict\n"
+        "from typing import ClassVar, Protocol, TypedDict\n"
         "from typing_extensions import Unpack as Unpack\n"
         "\n"
         "class ProcessorLike(Protocol): ...\n"
@@ -2677,3 +2678,36 @@ def test_check_if_needed_rejects_suppressions_without_justification(tmp_path: Pa
     )
     assert check_suppressions._suppression_rationale(justified_noqa)
     assert check_suppressions._suppression_rationale(justified_ignore)
+
+
+def test_provider_typed_packages_skip_stub_generation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A package shipping py.typed gets no stubs, and stale stubs are purged.
+
+    mlx-vlm ships a PEP 561 marker since Blaizzy/mlx-vlm#1985; generated stubs
+    would shadow its inline annotations, so the tooling must remove them and
+    stand down. On installs predating the marker (PyPI 0.6.15) generation
+    continues unchanged — the subsystem retires itself per environment.
+    """
+    package_dir = tmp_path / "site" / "typed_pkg"
+    package_dir.mkdir(parents=True)
+    (package_dir / "__init__.py").write_text("", encoding="utf-8")
+
+    spec = types.SimpleNamespace(submodule_search_locations=[str(package_dir)])
+    monkeypatch.setattr(
+        generate_stubs.importlib.util,
+        "find_spec",
+        lambda name: spec if name == "typed_pkg" else None,
+    )
+    assert generate_stubs._package_ships_types("typed_pkg") is False
+    (package_dir / "py.typed").write_text("", encoding="utf-8")
+    assert generate_stubs._package_ships_types("typed_pkg") is True
+
+    typings_dir = tmp_path / "typings"
+    stale = typings_dir / "typed_pkg"
+    stale.mkdir(parents=True)
+    (stale / "__init__.pyi").write_text("x: int\n", encoding="utf-8")
+    generate_stubs._purge_shadowing_stubs("typed_pkg", typings_dir)
+    assert not stale.exists()

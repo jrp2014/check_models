@@ -918,7 +918,12 @@ update_local_mlx_repos() {
 			echo "[update.sh] Using upstream MLX editable dev install with verbose pip output (-v)"
 			INSTALL_CMD=(pip_install_verbose -e ".[dev]")
 		else
-			INSTALL_CMD=(pip_install -e .)
+			# Compat-mode editable installs expose the checkout as a plain sys.path
+			# entry (a real .pth) instead of an __editable__ finder hook, which
+			# static type checkers cannot traverse. With mlx-vlm shipping py.typed,
+			# this is what lets mypy/pyrefly/ty read its inline annotations without
+			# locally generated stubs.
+			INSTALL_CMD=(pip_install -e . --config-settings editable_mode=compat)
 		fi
 
 		if "${INSTALL_CMD[@]}"; then

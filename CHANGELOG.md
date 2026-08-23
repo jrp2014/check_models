@@ -4,6 +4,22 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- mlx-vlm stub generation now retires itself: upstream ships a PEP 561
+  `py.typed` marker since Blaizzy/mlx-vlm#1985 (the packaging half included),
+  so `tools/generate_stubs.py` skips any package whose *installed* copy
+  carries the marker and purges previously generated stubs, which would
+  otherwise shadow the inline annotations. `update.sh` installs the mlx-lm
+  and mlx-vlm editables in setuptools compat mode (a plain `.pth` path) so
+  static checkers can traverse them — the `__editable__` finder hooks were
+  the real blocker, not missing types. Verified: with no `typings/mlx_vlm`,
+  mypy, pyrefly, and ty all pass and resolve `load`/`generate`/
+  `GenerateKwargs` at full fidelity from upstream's own annotations. CI on
+  PyPI mlx-vlm 0.6.15 (which predates the marker) keeps generating stubs
+  unchanged and stands down automatically at the next release; the remaining
+  stub machinery can be deleted outright once that happens.
+
 ### Added
 
 - Built-in run comparison (`--compare-with`, default `auto`): every sweep now
@@ -132,7 +148,6 @@ Notable changes to this project will be documented in this file.
   matrix caught on its first run (3.14.6 on the runner vs 3.14.7 in the local
   probe env). The usage line is now interpreter-independent.
 
-### Changed
 
 - CI now rehearses the next Python: the static-quality job runs a matrix of
   the floor (3.13) and 3.14, while the runtime-smoke and Skylos jobs move to

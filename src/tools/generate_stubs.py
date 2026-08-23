@@ -668,6 +668,39 @@ def _current_stub_manifest_entry(package: str) -> dict[str, str] | None:
     return {"distribution": distribution, "version": version}
 
 
+def _package_ships_types(package: str) -> bool:
+    """Return whether the installed package carries a PEP 561 ``py.typed`` marker.
+
+    Runtime import machinery resolves editable installs that static checkers
+    cannot, so this is checked against the actual installed location. A
+    provider-typed package needs no generated stubs — and stale stubs would
+    *shadow* its inline annotations, so callers also purge them.
+    """
+    try:
+        spec = importlib.util.find_spec(package)
+    except (ImportError, ValueError):
+        return False
+    if spec is None or not spec.submodule_search_locations:
+        return False
+    package_dir = Path(next(iter(spec.submodule_search_locations)))
+    return (package_dir / "py.typed").is_file()
+
+
+def _purge_shadowing_stubs(package: str, typings_dir: Path = TYPINGS_DIR) -> None:
+    """Remove generated stubs for a provider-typed package so they cannot shadow it."""
+    root = typings_dir.resolve()
+    target = (typings_dir / package.replace(".", "/")).resolve()
+    # Containment check: package names pass _PKG_RE, but a hostile ".." would
+    # still resolve outside typings/; only ever delete strictly inside it.
+    if target == root or root not in target.parents:
+        return
+    if target.exists():
+        shutil.rmtree(target)  # skylos: ignore[SKY-D215] resolved and contained in typings/ above.
+        logger.info(
+            "[stubs] Removed stale generated stubs for %s (package ships py.typed)", package
+        )
+
+
 def _partition_installed_packages(packages: Iterable[str]) -> tuple[list[str], list[str]]:
     """Split packages into (installed, absent) by their backing distribution.
 
@@ -1172,8 +1205,17 @@ def main() -> int:
             "[stubs] Skipping packages whose distribution is not installed (optional): %s",
             ", ".join(absent),
         )
+    provider_typed = [package for package in packages if _package_ships_types(package)]
+    if provider_typed:
+        logger.info(
+            "[stubs] %s ship py.typed; using their inline annotations, no stubs generated",
+            ", ".join(provider_typed),
+        )
+        for package in provider_typed:
+            _purge_shadowing_stubs(package)
+        packages = [package for package in packages if package not in provider_typed]
     if not packages:
-        logger.warning("[stubs] No requested package is installed; nothing to do")
+        logger.info("[stubs] Every requested package provides its own types; nothing to do")
         return 0
 
     if ns.check:
