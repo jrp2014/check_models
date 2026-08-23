@@ -20,6 +20,25 @@ Notable changes to this project will be documented in this file.
   unchanged and stands down automatically at the next release; the remaining
   stub machinery can be deleted outright once that happens.
 
+- The baseline-comparison Markdown section and the terminal summary now render
+  from one shared `_ComparisonView` derived once per comparison (identity and
+  summary rows, banners, revision note, membership items, and the
+  change/throughput/memory cells), so wording and withholding rules cannot
+  drift between surfaces; a test asserts both surfaces show the same cells.
+  `run.json` keeps its own raw-number serialization.
+
+- CI now rehearses the next Python: the static-quality job runs a matrix of
+  the floor (3.13) and 3.14, while the runtime-smoke and Skylos jobs move to
+  3.14, and `Programming Language :: Python :: 3.14` is declared. The floor
+  (`requires-python >= 3.13`, the checker targets, `validate_env`,
+  `setup_conda_env.sh`) is unchanged — the working env stays on 3.13 until a
+  deliberate rebuild — and `test_python_floor_is_single_sourced` now requires
+  every CI Python to be >= the floor with the floor itself still exercised.
+  Motivated by `make probe-python-next` on 3.14.7 passing every check with
+  no friction: PyPI wheels (mlx 0.32.1, mlx-vlm 0.6.15, transformers 5.15.1,
+  Metal available), the local mlx source build, the full test suite, mypy,
+  pyrefly, ty, ruff, and the torch extra (2.13.0).
+
 ### Added
 
 - Built-in run comparison (`--compare-with`, default `auto`): every sweep now
@@ -148,19 +167,6 @@ Notable changes to this project will be documented in this file.
   matrix caught on its first run (3.14.6 on the runner vs 3.14.7 in the local
   probe env). The usage line is now interpreter-independent.
 
-
-- CI now rehearses the next Python: the static-quality job runs a matrix of
-  the floor (3.13) and 3.14, while the runtime-smoke and Skylos jobs move to
-  3.14, and `Programming Language :: Python :: 3.14` is declared. The floor
-  (`requires-python >= 3.13`, the checker targets, `validate_env`,
-  `setup_conda_env.sh`) is unchanged — the working env stays on 3.13 until a
-  deliberate rebuild — and `test_python_floor_is_single_sourced` now requires
-  every CI Python to be >= the floor with the floor itself still exercised.
-  Motivated by `make probe-python-next` on 3.14.7 passing every check with
-  no friction: PyPI wheels (mlx 0.32.1, mlx-vlm 0.6.15, transformers 5.15.1,
-  Metal available), the local mlx source build, the full test suite, mypy,
-  pyrefly, ty, ruff, and the torch extra (2.13.0).
-
 ## [0.14.1] - 2026-08-23
 
 ### Removed
@@ -187,13 +193,6 @@ Notable changes to this project will be documented in this file.
 ## [0.14.0] - 2026-08-22
 
 ### Changed
-
-- The baseline-comparison Markdown section and the terminal summary now render
-  from one shared `_ComparisonView` derived once per comparison (identity and
-  summary rows, banners, revision note, membership items, and the
-  change/throughput/memory cells), so wording and withholding rules cannot
-  drift between surfaces; a test asserts both surfaces show the same cells.
-  `run.json` keeps its own raw-number serialization.
 
 - Native repro commands now emit `--top-p`, `--min-p`, and `--top-k` as
   first-class `mlx_vlm.generate` CLI flags (upstream added them in
