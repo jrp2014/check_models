@@ -1389,6 +1389,7 @@ class ReportGenerationInputs:
     trust_remote_code: bool = True
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
     comparison: RunComparison | None = None
+    history_appended: bool = False
 
 
 @dataclass(frozen=True)
@@ -2019,6 +2020,9 @@ def _prompt_composition_fact(result: PerformanceResult) -> str | None:
         if analysis.prompt_tokens_text_source == "tokenizer"
         else "word-ratio estimate"
     )
+    rejected = analysis.prompt_tokens_text_exact_rejected
+    if rejected is not None:
+        source += f"; tokenizer count {rejected:,} rejected as inconsistent with total {total:,}"
     share = 100.0 * nontext / total
     return (
         f"{total:,} = {text:,} text/template ({source}) + {nontext:,} non-text "
@@ -4348,6 +4352,7 @@ class GenerationQualityAnalysis:
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None = None
+    prompt_tokens_text_exact_rejected: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
     configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
@@ -4558,10 +4563,18 @@ def analyze_generation_text(
         seeded_thinking_text=seeded_thinking_text,
     )
     prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None
-    if prompt_text_tokens is not None:
+    prompt_tokens_text_exact_rejected: int | None = None
+    exact_is_consistent = prompt_text_tokens is not None and (
+        prompt_tokens is None or 0 <= prompt_text_tokens <= prompt_tokens
+    )
+    if prompt_text_tokens is not None and exact_is_consistent:
         prompt_tokens_text_est: int | None = prompt_text_tokens
         prompt_tokens_text_source = "tokenizer"
     else:
+        # An exact count outside [0, total] would publish impossible evidence
+        # (e.g. "5 = 7 text + 0 non-text"); keep the raw number as diagnostic
+        # evidence and fall back to the heuristic for the split.
+        prompt_tokens_text_exact_rejected = prompt_text_tokens
         prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
         prompt_tokens_text_source = "heuristic" if prompt_tokens_text_est is not None else None
     prompt_tokens_nontext_est = (
@@ -4631,6 +4644,7 @@ def analyze_generation_text(
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         prompt_tokens_text_source=prompt_tokens_text_source,
+        prompt_tokens_text_exact_rejected=prompt_tokens_text_exact_rejected,
         special_token_wrappers=list(normalized.removed_wrappers),
         configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
@@ -11247,15 +11261,16 @@ def _count_rendered_prompt_tokens(
     if not callable(encode):
         return None
     add_special_tokens = False
-    should_add = cast(
-        "Callable[[str, object], object] | None",
-        _optional_mlx_vlm_utils_attribute("should_add_special_tokens"),
-    )
-    if callable(should_add) and model_type is not None:
-        try:
-            add_special_tokens = bool(should_add(model_type, processor))
-        except (AttributeError, TypeError, ValueError):
-            add_special_tokens = False
+    if model_type is not None:
+        should_add = cast(
+            "Callable[[str, object], object] | None",
+            _optional_mlx_vlm_utils_attribute("should_add_special_tokens"),
+        )
+        if callable(should_add):
+            try:
+                add_special_tokens = bool(should_add(model_type, processor))
+            except (AttributeError, TypeError, ValueError):
+                add_special_tokens = False
     try:
         encoded = encode(formatted_prompt, add_special_tokens=add_special_tokens)
     except TypeError:
@@ -13403,6 +13418,7 @@ def _attach_system_telemetry(
 # =============================================================================
 
 _ISOLATED_STDERR_TAIL_CHARS: Final[int] = 6000
+_ISOLATION_TIMEOUT_GRACE_SECONDS: Final[float] = 120.0
 _ISOLATION_PHASE_SINK: Callable[[str], None] | None = None
 _SHELL_SIGNAL_EXIT_BASE: Final[int] = 128
 _VARIADIC_TUPLE_ARGS: Final[int] = 2
@@ -13417,6 +13433,17 @@ class IsolatedWorkerCrashError(RuntimeError):
         how = f"killed by {signal_name}" if signal_name else f"exited with status {returncode}"
         super().__init__(
             f"Isolated worker for {model_identifier} {how} before writing a result; {detail}"
+        )
+
+
+class IsolatedWorkerTimeoutError(TimeoutError):
+    """The child interpreter running one model exceeded the parent's deadline."""
+
+    def __init__(self, model_identifier: str, deadline_s: float, phase: str) -> None:
+        super().__init__(
+            f"Isolated worker for {model_identifier} exceeded {deadline_s:.0f}s "
+            f"(model timeout plus {_ISOLATION_TIMEOUT_GRACE_SECONDS:.0f}s start-up/cleanup "
+            f"grace) while in phase {phase}; the child was terminated"
         )
 
 
@@ -13551,12 +13578,21 @@ def _performance_result_to_json(result: PerformanceResult) -> dict[str, JsonLike
     payload = cast("dict[str, JsonLike]", _json_safe(result))
     generation = result.generation
     if generation is not None:
+        generation_payload: dict[str, JsonLike] = {}
         if is_dataclass(generation) and not isinstance(generation, type):
             generation_payload = {
                 field.name: _json_safe(getattr(generation, field.name))
                 for field in fields(generation)
             }
-        else:
+        # check_models attaches runtime metrics (active_memory, cache_memory,
+        # model_load_active_memory) to the upstream object dynamically; the
+        # instance dict carries those, declared fields alone would drop them.
+        instance_dict = getattr(generation, "__dict__", None)
+        if isinstance(instance_dict, dict):
+            for name, value in instance_dict.items():
+                if not name.startswith("_") and name not in generation_payload:
+                    generation_payload[name] = _json_safe(value)
+        if not generation_payload:
             generation_payload = {
                 name: _json_safe(getattr(generation, name))
                 for name in dir(generation)
@@ -13590,6 +13626,10 @@ def _run_model_isolated(
     model_identifier: str,
     image_path: Path,
     prompt: str,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    timeout: float | None = None,
+    verbose: bool | None = None,
 ) -> PerformanceResult:
     """Run one model in a fresh child interpreter and return its PerformanceResult.
 
@@ -13600,8 +13640,16 @@ def _run_model_isolated(
     attributed to ``model_load`` / ``decode`` / ... rather than "unknown".
     """
     params = _process_image_params_from_args(
-        args, model_identifier=model_identifier, image_path=image_path, prompt=prompt
+        args,
+        model_identifier=model_identifier,
+        image_path=image_path,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        timeout=timeout,
+        verbose=verbose,
     )
+    deadline_s = params.timeout + _ISOLATION_TIMEOUT_GRACE_SECONDS
     with tempfile.TemporaryDirectory(prefix="check_models_worker_") as tmp:
         tmp_dir = Path(tmp)
         spec_path = tmp_dir / "spec.json"
@@ -13613,6 +13661,12 @@ def _run_model_isolated(
             "model_identifier": model_identifier,
             "image_path": str(image_path),
             "prompt": prompt,
+            "overrides": {
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "timeout": timeout,
+                "verbose": verbose,
+            },
         }
         _write_text_file(spec_path, json.dumps(spec))
         command = [
@@ -13624,17 +13678,35 @@ def _run_model_isolated(
         logger.debug("Isolated worker: %s", shlex_join(command))
         start = time.perf_counter()
         _write_text_file(stderr_path, "")
+        timed_out = False
+        returncode = 0
         with stderr_path.open("a", encoding="utf-8") as stderr_file:
-            completed = subprocess.run(  # noqa: S603 - this interpreter, this script, a temp spec
-                command,
-                check=False,
-                stdout=None,
-                stderr=stderr_file,
-            )
+            try:
+                completed = subprocess.run(  # noqa: S603 - this interpreter, this script, a temp spec
+                    command,
+                    check=False,
+                    stdout=None,
+                    stderr=stderr_file,
+                    timeout=deadline_s,
+                )
+            except subprocess.TimeoutExpired:
+                # subprocess.run has already killed the child; classify below.
+                timed_out = True
+            else:
+                returncode = completed.returncode
         stderr_text = _read_text_tail(stderr_path, _ISOLATED_STDERR_TAIL_CHARS)
         if stderr_text.strip():
             logger.debug("[isolated worker stderr] %s\n%s", model_identifier, stderr_text)
-        if completed.returncode == 0 and result_path.is_file():
+        current_phase = _read_text_tail(phase_path, 200).strip() or "unknown"
+        if timed_out:
+            return _isolated_failure_result(
+                params,
+                IsolatedWorkerTimeoutError(model_identifier, deadline_s, current_phase),
+                stderr_text=stderr_text,
+                current_phase=current_phase,
+                start=start,
+            )
+        if returncode == 0 and result_path.is_file():
             try:
                 payload = json.loads(_read_text_file(result_path))
                 if isinstance(payload, dict):
@@ -13648,28 +13720,45 @@ def _run_model_isolated(
                 if stderr_text.strip()
                 else "no stderr was captured"
             )
-        current_phase = _read_text_tail(phase_path, 200).strip() or "unknown"
-        phase_timer = PhaseTimer()
-        boundary: UpstreamBoundary = _advance_upstream_boundary("not_started", current_phase)
-        result_payload, stop_reason = _build_exception_process_result(
-            params=params,
-            error=IsolatedWorkerCrashError(model_identifier, completed.returncode, detail),
-            stdout_text="",
+        return _isolated_failure_result(
+            params,
+            IsolatedWorkerCrashError(model_identifier, returncode, detail),
             stderr_text=stderr_text,
             current_phase=current_phase,
-            phase_timer=phase_timer,
-            total_start_time=start,
-            upstream_boundary=boundary,
+            start=start,
         )
-        return _finalize_process_result(
-            result_payload=result_payload,
-            params=params,
-            phase_timer=phase_timer,
-            stop_reason=stop_reason,
-            current_phase=current_phase,
-            total_start_time=start,
-            upstream_boundary=boundary,
-        )
+
+
+def _isolated_failure_result(
+    params: ProcessImageParams,
+    error: Exception,
+    *,
+    stderr_text: str,
+    current_phase: str,
+    start: float,
+) -> PerformanceResult:
+    """Build a phase-tagged failure for a child that crashed or timed out."""
+    phase_timer = PhaseTimer()
+    boundary: UpstreamBoundary = _advance_upstream_boundary("not_started", current_phase)
+    result_payload, stop_reason = _build_exception_process_result(
+        params=params,
+        error=error,
+        stdout_text="",
+        stderr_text=stderr_text,
+        current_phase=current_phase,
+        phase_timer=phase_timer,
+        total_start_time=start,
+        upstream_boundary=boundary,
+    )
+    return _finalize_process_result(
+        result_payload=result_payload,
+        params=params,
+        phase_timer=phase_timer,
+        stop_reason=stop_reason,
+        current_phase=current_phase,
+        total_start_time=start,
+        upstream_boundary=boundary,
+    )
 
 
 def _read_text_tail(path: Path, max_chars: int) -> str:
@@ -13710,11 +13799,20 @@ def _run_isolated_worker(spec_path: Path) -> int:
         _record_phase("decode")
         os.abort()
     load_quality_config(getattr(args, "quality_config", None))
+    overrides = spec.get("overrides") or {}
+    max_tokens = overrides.get("max_tokens")
+    temperature = overrides.get("temperature")
+    timeout = overrides.get("timeout")
+    verbose = overrides.get("verbose")
     params = _process_image_params_from_args(
         args,
         model_identifier=str(spec["model_identifier"]),
         image_path=Path(str(spec["image_path"])),
         prompt=str(spec["prompt"]),
+        max_tokens=max_tokens if isinstance(max_tokens, int) else None,
+        temperature=float(temperature) if isinstance(temperature, (int, float)) else None,
+        timeout=float(timeout) if isinstance(timeout, (int, float)) else None,
+        verbose=verbose if isinstance(verbose, bool) else None,
     )
     result = process_image_with_model(params)
     _write_text_file(result_path, json.dumps(_performance_result_to_json(result)))
@@ -15832,17 +15930,36 @@ def _run_one_model(
     model_identifier: str,
     image_path: Path,
     prompt: str,
+    max_tokens: int | None = None,
+    temperature: float | None = None,
+    timeout: float | None = None,
+    verbose: bool | None = None,
 ) -> PerformanceResult:
-    """Run one model in-process, or in a child interpreter under ``--isolate``."""
+    """Run one model in-process, or in a child interpreter under ``--isolate``.
+
+    Every model execution — first pass and differential reruns alike — goes
+    through here so the selected crash boundary applies uniformly.
+    """
     if getattr(args, "isolate", False):
         return _run_model_isolated(
-            args, model_identifier=model_identifier, image_path=image_path, prompt=prompt
+            args,
+            model_identifier=model_identifier,
+            image_path=image_path,
+            prompt=prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            timeout=timeout,
+            verbose=verbose,
         )
     params = _process_image_params_from_args(
         args,
         model_identifier=model_identifier,
         image_path=image_path,
         prompt=prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        timeout=timeout,
+        verbose=verbose,
     )
     return process_image_with_model(params)
 
@@ -16831,8 +16948,12 @@ def append_history_record(
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: EvaluationLane,
-) -> HistoryRunRecord:
-    """Append raw factual run data for optional out-of-band history analysis."""
+) -> HistoryRunRecord | None:
+    """Append raw factual run data for optional out-of-band history analysis.
+
+    Returns the record on a confirmed append and ``None`` when the write failed,
+    so callers never assume the current run is the last history row.
+    """
     record = _build_history_run_record(
         results=results,
         prompt=prompt,
@@ -16847,6 +16968,7 @@ def append_history_record(
         _write_text_file(history_path, json.dumps(record) + "\n", append=True)
     except OSError:
         logger.exception("Failed to append history record to %s", history_path)
+        return None
 
     return record
 
@@ -17355,6 +17477,9 @@ class RunComparison:
     history_runs_used: int
     baseline_execution_mode: str = "in_process"
     current_execution_mode: str = "in_process"
+    comparable: bool = True
+    incomparable_reasons: tuple[str, ...] = ()
+    revision_changes: tuple[tuple[str, str, str], ...] = ()
 
     @property
     def has_changes(self) -> bool:
@@ -17370,11 +17495,19 @@ class RunComparison:
 
 @dataclass(frozen=True)
 class ComparisonBaseline:
-    """A loaded baseline: where it came from plus its validated JSONL rows."""
+    """A loaded baseline: where it came from plus its validated JSONL rows.
+
+    ``image`` and ``generation_settings`` come from the baseline's ``run.json``
+    when it can be read from the same source; they drive the like-for-like
+    check so a prompt, image, or settings change is never reported as a model
+    regression.
+    """
 
     label: str
     metadata: JsonlMetadataRecord
     results: tuple[JsonlResultRecord, ...]
+    image: RunImageRecord | None = None
+    generation_settings: tuple[tuple[str, str], ...] = ()
 
 
 def _run_git_capture(args: Sequence[str], cwd: Path) -> str | None:
@@ -17431,18 +17564,41 @@ def _parse_jsonl_text_rows(text: str, label: str) -> list[JsonLike]:
     return rows
 
 
-def _baseline_from_jsonl_text(text: str, label: str) -> ComparisonBaseline:
-    """Validate baseline JSONL text into a ComparisonBaseline."""
+def _baseline_from_jsonl_text(
+    text: str,
+    label: str,
+    *,
+    run_json_text: str | None = None,
+) -> ComparisonBaseline:
+    """Validate baseline JSONL text (plus optional run.json text) into a ComparisonBaseline."""
     rows = _parse_jsonl_text_rows(text, label)
     metadata = _validate_run_issue_metadata(rows[0], Path(label))
     results = tuple(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(rows[1:], start=2)
     )
-    return ComparisonBaseline(label=label, metadata=metadata, results=results)
+    image: RunImageRecord | None = None
+    generation_settings: tuple[tuple[str, str], ...] = ()
+    if run_json_text:
+        try:
+            run_value: JsonLike = json.loads(run_json_text)
+        except json.JSONDecodeError:
+            run_value = None
+        image, generation_settings, _, _, _ = _narrow_run_issue_enrichment(run_value)
+    return ComparisonBaseline(
+        label=label,
+        metadata=metadata,
+        results=results,
+        image=image,
+        generation_settings=generation_settings,
+    )
 
 
-def _resolve_comparison_baseline(spec: str | None, jsonl_path: Path) -> ComparisonBaseline | None:
+def _resolve_comparison_baseline(
+    spec: str | None,
+    jsonl_path: Path,
+    run_json_path: Path | None = None,
+) -> ComparisonBaseline | None:
     """Resolve ``--compare-with`` into a loaded baseline, or None when unavailable.
 
     ``auto`` compares against the retained sweep at ``HEAD`` when the JSONL path
@@ -17460,7 +17616,13 @@ def _resolve_comparison_baseline(spec: str | None, jsonl_path: Path) -> Comparis
         if choice.lower() != "auto":
             candidate = Path(choice).expanduser()
             if candidate.is_file():
-                return _baseline_from_jsonl_text(_read_text_file(candidate), str(candidate))
+                sibling = candidate.with_name(
+                    run_json_path.name if run_json_path is not None else "run.json"
+                )
+                sibling_text = _read_text_file(sibling) if sibling.is_file() else None
+                return _baseline_from_jsonl_text(
+                    _read_text_file(candidate), str(candidate), run_json_text=sibling_text
+                )
         tracked = _git_tracked_relpath(jsonl_path)
         if tracked is None:
             if choice.lower() != "auto":
@@ -17488,7 +17650,14 @@ def _resolve_comparison_baseline(spec: str | None, jsonl_path: Path) -> Comparis
             sha = _run_git_capture(["rev-parse", "--short", "HEAD"], repo_root)
             if sha:
                 label = f"{sha.strip()}:{relpath}"
-        return _baseline_from_jsonl_text(text, label)
+        run_json_text: str | None = None
+        if run_json_path is not None:
+            tracked_run_json = _git_tracked_relpath(run_json_path)
+            if tracked_run_json is not None:
+                run_json_text = _run_git_capture(
+                    ["show", f"{ref}:{tracked_run_json[1]}"], repo_root
+                )
+        return _baseline_from_jsonl_text(text, label, run_json_text=run_json_text)
     except (OSError, ValueError, TypeError) as error:
         logger.warning(
             "--compare-with %s: baseline unusable (%s); skipping comparison.", choice, error
@@ -17505,9 +17674,11 @@ def _history_tps_bands(
     """Return per-model (low, high, samples) throughput bands from retained history.
 
     Uses the last ``_COMPARISON_HISTORY_WINDOW`` runs with the same prompt hash
-    (when available, so like is compared with like) and a Tukey fence
-    (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model. ``exclude_last`` drops the record
-    just appended for the current run so it cannot vouch for itself.
+    (rows without a recorded hash are excluded — they cannot be shown to match)
+    and a Tukey fence (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model, never narrower
+    than ±10% of the median. ``exclude_last`` drops the record just appended for
+    the current run so it cannot vouch for itself; callers pass it only after a
+    confirmed append.
     """
     if not history_path.is_file():
         return {}, 0
@@ -17525,7 +17696,9 @@ def _history_tps_bands(
             continue
         if not isinstance(record, dict) or record.get("_type") != "run":
             continue
-        if prompt_hash and record.get("prompt_hash") not in (None, prompt_hash):
+        if prompt_hash and record.get("prompt_hash") != prompt_hash:
+            # Legacy rows without a hash cannot be shown to be the same prompt;
+            # a band must only be built from runs known to match.
             continue
         runs.append(record)
     runs = runs[-_COMPARISON_HISTORY_WINDOW:]
@@ -17618,14 +17791,26 @@ def compare_run_results(
     prompt_hash: str | None = None,
     history_excludes_current: bool = True,
     current_execution_mode: str = "in_process",
+    current_metadata: JsonlMetadataRecord | None = None,
+    current_image: RunImageRecord | None = None,
+    current_generation_settings: tuple[tuple[str, str], ...] = (),
 ) -> RunComparison:
     """Diff current JSONL result rows against a baseline sweep, mechanically.
 
     Everything is model-agnostic: execution/usability/observation transitions,
     byte-identical generated text, throughput ratios against per-model history
     bands (or a fixed ±15% fallback when history is thin), and peak-memory
-    moves beyond 0.5 GB and 10%.
+    moves beyond 0.5 GB and 10%. The runs must be like-for-like — same prompt,
+    image, evaluation lane, and generation settings — or the per-model diff is
+    withheld and the reasons are reported instead; per-model revision changes
+    are reported alongside the diff.
     """
+    incomparable_reasons = _comparison_incomparable_reasons(
+        baseline,
+        current_metadata=current_metadata,
+        current_image=current_image,
+        current_generation_settings=current_generation_settings,
+    )
     current_by = {record["model"]: record for record in current}
     baseline_by = {record["model"]: record for record in baseline.results}
     shared = [model for model in current_by if model in baseline_by]
@@ -17643,8 +17828,13 @@ def compare_run_results(
     ratios: list[float] = []
     flags: list[RunComparisonThroughputFlag] = []
     memory: list[RunComparisonMemoryChange] = []
+    revision_changes: list[tuple[str, str, str]] = []
     for model in shared:
         now, before = current_by[model], baseline_by[model]
+        now_rev = (now.get("model_provenance") or {}).get("resolved_revision")
+        before_rev = (before.get("model_provenance") or {}).get("resolved_revision")
+        if now_rev and before_rev and now_rev != before_rev:
+            revision_changes.append((model, before_rev, now_rev))
         now_a, before_a = now["assessment"], before["assessment"]
         now_obs, before_obs = set(now_a["observations"]), set(before_a["observations"])
         if (
@@ -17724,7 +17914,48 @@ def compare_run_results(
         history_runs_used=history_runs,
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
+        comparable=not incomparable_reasons,
+        incomparable_reasons=incomparable_reasons,
+        revision_changes=tuple(revision_changes),
     )
+
+
+def _comparison_incomparable_reasons(
+    baseline: ComparisonBaseline,
+    *,
+    current_metadata: JsonlMetadataRecord | None,
+    current_image: RunImageRecord | None,
+    current_generation_settings: tuple[tuple[str, str], ...],
+) -> tuple[str, ...]:
+    """Name every way the two runs are not like-for-like (empty when comparable).
+
+    Facts missing on either side are treated as unknown, not as a mismatch.
+    """
+    reasons: list[str] = []
+    if current_metadata is not None:
+        if current_metadata.get("prompt") != baseline.metadata.get("prompt"):
+            reasons.append("prompt differs")
+        now_mode, before_mode = (
+            current_metadata.get("eval_mode"),
+            baseline.metadata.get("eval_mode"),
+        )
+        if now_mode and before_mode and now_mode != before_mode:
+            reasons.append(f"evaluation lane differs ({before_mode} → {now_mode})")
+    now_sha = current_image.get("sha256") if current_image else None
+    before_sha = baseline.image.get("sha256") if baseline.image else None
+    if now_sha and before_sha and now_sha != before_sha:
+        reasons.append(f"image differs (sha256 {before_sha[:12]}… → {now_sha[:12]}…)")
+    if current_generation_settings and baseline.generation_settings:
+        now_settings = dict(current_generation_settings)
+        before_settings = dict(baseline.generation_settings)
+        diffs = sorted(
+            f"{key} {before_settings.get(key)} → {now_settings.get(key)}"
+            for key in set(now_settings) | set(before_settings)
+            if now_settings.get(key) != before_settings.get(key)
+        )
+        if diffs:
+            reasons.append("generation settings differ: " + ", ".join(diffs))
+    return tuple(reasons)
 
 
 def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonLike] | None:
@@ -17735,10 +17966,23 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
     def _r(value: float | None) -> float | None:
         return round(value, 4) if value is not None else None
 
+    if not comparison.comparable:
+        return {
+            "baseline": comparison.baseline_label,
+            "baseline_timestamp": comparison.baseline_timestamp,
+            "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
+            "comparable": False,
+            "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
+        }
     return {
         "baseline": comparison.baseline_label,
         "baseline_timestamp": comparison.baseline_timestamp,
         "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
+        "comparable": True,
+        "revision_changes": [
+            {"model": model, "baseline": before, "current": after}
+            for model, before, after in comparison.revision_changes
+        ],
         "compared_models": comparison.compared_models,
         "models_added": cast("JsonLike", list(comparison.models_added)),
         "models_removed": cast("JsonLike", list(comparison.models_removed)),
@@ -17846,7 +18090,29 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
             "start-up differs, so throughput is not directly comparable"
         )
         key_rows.append(("Execution mode", mode_note))
+    if not comparison.comparable:
+        blocks_incomparable: list[ReportBlock] = [
+            ReportParagraph(
+                "**Not directly comparable** — the per-model diff is withheld because the "
+                "runs differ in: " + "; ".join(comparison.incomparable_reasons) + ". "
+                "Treat any difference against this baseline as a change of inputs, not a "
+                "change of model or runtime behaviour."
+            ),
+            ReportKeyValues(tuple(key_rows[: 2 + len(comparison.baseline_components)])),
+        ]
+        return ReportSection("Since the baseline sweep", tuple(blocks_incomparable))
     blocks: list[ReportBlock] = [ReportKeyValues(tuple(key_rows))]
+    if comparison.revision_changes:
+        blocks.append(
+            ReportParagraph(
+                "Model revisions changed since the baseline (their rows below reflect a "
+                "different snapshot, not only a different run): "
+                + ", ".join(
+                    f"`{model}` {before[:9]} → {after[:9]}"
+                    for model, before, after in comparison.revision_changes
+                )
+            )
+        )
     if comparison.models_added or comparison.models_removed:
         items: list[str] = []
         if comparison.models_added:
@@ -17934,6 +18200,14 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         return
     print_cli_section("Comparison with baseline sweep")
     logger.info("Baseline: %s", comparison.baseline_label)
+    if not comparison.comparable:
+        logger.warning(
+            "Not directly comparable (%s); per-model diff withheld.",
+            "; ".join(comparison.incomparable_reasons),
+        )
+        return
+    for model, before, after in comparison.revision_changes:
+        logger.info("  %s: revision %s -> %s", model, before[:9], after[:9])
     logger.info(
         "Models compared: %d; identical generated text: %d/%d; gen tok/s ratio median %s",
         comparison.compared_models,
@@ -18196,8 +18470,8 @@ def _narrow_run_issue_producer(value: JsonLike) -> CheckModelsProvenanceRecord |
     return record
 
 
-def _load_run_issue_enrichment(
-    run_json_path: Path,
+def _narrow_run_issue_enrichment(
+    run_value: JsonLike,
 ) -> tuple[
     RunImageRecord | None,
     tuple[tuple[str, str], ...],
@@ -18205,16 +18479,12 @@ def _load_run_issue_enrichment(
     CheckModelsProvenanceRecord | None,
     tuple[datetime, datetime] | None,
 ]:
-    """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
+    """Narrow optional image/settings enrichment from a parsed run JSON value."""
     image_record: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
     trust_remote_code: bool | None = None
     producer: CheckModelsProvenanceRecord | None = None
     run_window: tuple[datetime, datetime] | None = None
-    try:
-        run_value: JsonLike = json.loads(_read_text_file(run_json_path))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-        run_value = None
     if isinstance(run_value, dict):
         image_record = _narrow_run_issue_image(run_value.get("image"))
         producer = _narrow_run_issue_producer(run_value.get("producer"))
@@ -18237,6 +18507,23 @@ def _load_run_issue_enrichment(
         ):
             run_window = run_end - timedelta(seconds=runtime), run_end
     return image_record, generation_settings, trust_remote_code, producer, run_window
+
+
+def _load_run_issue_enrichment(
+    run_json_path: Path,
+) -> tuple[
+    RunImageRecord | None,
+    tuple[tuple[str, str], ...],
+    bool | None,
+    CheckModelsProvenanceRecord | None,
+    tuple[datetime, datetime] | None,
+]:
+    """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
+    try:
+        run_value: JsonLike = json.loads(_read_text_file(run_json_path))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None, (), None, None, None
+    return _narrow_run_issue_enrichment(run_value)
 
 
 def _load_run_issue_summary_source(
@@ -20102,7 +20389,9 @@ def _log_report_generation_outcomes(
 def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | None:
     """Diff the just-written JSONL against the configured baseline (best effort)."""
     spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
-    baseline = _resolve_comparison_baseline(spec, inputs.output_paths.jsonl)
+    baseline = _resolve_comparison_baseline(
+        spec, inputs.output_paths.jsonl, inputs.output_paths.run_json
+    )
     if baseline is None:
         return None
     try:
@@ -20110,13 +20399,24 @@ def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | N
     except (OSError, ValueError, TypeError) as error:
         logger.warning("Comparison skipped: current results.jsonl unreadable (%s)", error)
         return None
+    current_image = (
+        _run_image_record(inputs.image_path, inputs.report_context.image_profile)
+        if inputs.image_path is not None
+        else None
+    )
     return compare_run_results(
         source.results,
         baseline,
         history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
         prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
-        history_excludes_current=True,
+        history_excludes_current=inputs.history_appended,
         current_execution_mode=str(source.metadata.get("execution_mode", "in_process")),
+        current_metadata=source.metadata,
+        current_image=current_image,
+        current_generation_settings=tuple(
+            (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
+            for key, value in sorted(_common_generation_settings(inputs.results).items())
+        ),
     )
 
 
@@ -20314,7 +20614,7 @@ def _run_differential_reruns(
             len(candidates),
             result.model_name,
         )
-        params = _process_image_params_from_args(
+        rerun_result = _run_one_model(
             args,
             model_identifier=result.model_name,
             image_path=image_path,
@@ -20324,7 +20624,6 @@ def _run_differential_reruns(
             timeout=RERUN_TRIAGE_TIMEOUT,
             verbose=False,
         )
-        rerun_result = process_image_with_model(params)
         evidence = _build_rerun_evidence(rerun_result, rerun_prompt=TRIAGE_PROMPT)
         updated_result = replace(result, rerun_evidence=evidence)
         logger.info(
@@ -20470,7 +20769,7 @@ def finalize_execution(
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Preserve raw append-only history without reading it into current reports.
-        append_history_record(
+        history_record = append_history_record(
             history_path=history_path,
             results=results,
             prompt=prompt,
@@ -20495,6 +20794,7 @@ def finalize_execution(
                 report_context=report_context,
                 output_paths=output_paths,
                 run_args=args,
+                history_appended=history_record is not None,
                 model_revision=requested_revision,
                 trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
                 runtime_fingerprint=runtime_fingerprint,

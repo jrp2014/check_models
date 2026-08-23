@@ -1414,3 +1414,74 @@ class TestIsolatedExecution:
         assert result.generation is not None
         assert result.generation.text == "child says hi"
         assert result.generation_time == 0.2
+
+    def test_timed_out_child_is_terminated_and_classified(self, test_image: Path) -> None:
+        """A child that exceeds the model timeout plus grace is a phase-tagged timeout."""
+        args = self._args(test_image)
+
+        def _fake_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            worker_dir = Path(command[-1]).parent
+            check_models._write_text_file(worker_dir / "phase.txt", "model_load")
+            deadline = kwargs.get("timeout")
+            assert isinstance(deadline, float)
+            raise subprocess.TimeoutExpired(command, deadline)
+
+        with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
+            result = check_models._run_model_isolated(
+                args, model_identifier="org/hang", image_path=test_image, prompt="p"
+            )
+        assert result.success is False
+        assert result.failure_phase == "model_load"
+        assert result.error_type == "IsolatedWorkerTimeoutError"
+        assert result.error_message is not None
+        assert "exceeded" in result.error_message
+
+    def test_reruns_use_the_selected_execution_boundary(self, test_image: Path) -> None:
+        """--rerun-triage must not bypass --isolate."""
+        args = self._args(test_image)
+        args.rerun_triage = True
+        first = check_models.PerformanceResult(model_name="org/m", success=False, generation=None)
+        seen: list[dict[str, object]] = []
+
+        def _fake_isolated(_args: object, **kwargs: object) -> check_models.PerformanceResult:
+            seen.append(kwargs)
+            return check_models.PerformanceResult(
+                model_name="org/m", success=True, generation=_FakeGenerationResult(text="rerun ok")
+            )
+
+        with (
+            patch.object(check_models, "_run_model_isolated", side_effect=_fake_isolated),
+            patch.object(
+                check_models,
+                "process_image_with_model",
+                side_effect=AssertionError("bypassed isolation"),
+            ),
+        ):
+            updated = check_models._run_differential_reruns([first], args, test_image)
+        assert seen
+        assert seen[0]["prompt"] == check_models.TRIAGE_PROMPT
+        assert seen[0]["max_tokens"] == check_models.RERUN_TRIAGE_MAX_TOKENS
+        assert updated[0].rerun_evidence is not None
+        assert updated[0].rerun_evidence.rerun_success is True
+
+    def test_dynamic_generation_attributes_survive_isolation(self) -> None:
+        """Metrics check_models attaches to the upstream object are not declared fields."""
+
+        @dataclass
+        class _UpstreamLike:
+            text: str = "hi"
+            prompt_tokens: int = 3
+
+        generation = _UpstreamLike()
+        # Attached the way check_models attaches runtime metrics: dynamically.
+        setattr(generation, "active_memory", 0.5)  # noqa: B010 - deliberately dynamic
+        setattr(generation, "cache_memory", 0.25)  # noqa: B010 - deliberately dynamic
+        result = check_models.PerformanceResult(
+            model_name="org/m", success=True, generation=generation
+        )
+        restored = check_models._performance_result_from_json(
+            json.loads(json.dumps(check_models._performance_result_to_json(result)))
+        )
+        assert getattr(restored.generation, "active_memory", None) == 0.5
+        assert getattr(restored.generation, "cache_memory", None) == 0.25
+        assert getattr(restored.generation, "prompt_tokens", None) == 3

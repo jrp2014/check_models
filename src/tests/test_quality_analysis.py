@@ -1400,3 +1400,13 @@ class TestExactPromptTokenAccounting:
             exact_text_tokens=True,
         )
         assert kind == "visual_input"
+
+    def test_inconsistent_exact_count_is_rejected_and_recorded(self) -> None:
+        """An exact count above the total is kept as evidence, not used for the split."""
+        analysis = check_models.analyze_generation_text(
+            "Title: A", generated_tokens=3, prompt_tokens=5, prompt="one two", prompt_text_tokens=7
+        )
+        assert analysis.prompt_tokens_text_source == "heuristic"
+        assert analysis.prompt_tokens_text_exact_rejected == 7
+        assert analysis.prompt_tokens_text_est is not None
+        assert analysis.prompt_tokens_text_est <= 5 or analysis.prompt_tokens_nontext_est == 0

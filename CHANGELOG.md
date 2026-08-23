@@ -8,9 +8,10 @@ Notable changes to this project will be documented in this file.
 
 - Built-in run comparison (`--compare-with`, default `auto`): every sweep now
   diffs itself against a baseline — by default the retained `results.jsonl` at
-  git `HEAD`, i.e. the last committed sweep — and reports a "Since the baseline
-  sweep" section in `run_summary.md`, a `comparison` block in `run.json`, and a
-  terminal summary. It records per-model execution/usability/observation-set
+  git `HEAD`, i.e. the last committed sweep — and reports a `comparison` block
+  in `run.json`, a terminal summary, and a "Since the baseline sweep" section in
+  `run_summary.md` whenever that summary is produced (it remains conditional on
+  there being something to report, as before). It records per-model execution/usability/observation-set
   transitions, the count of byte-identical generated texts, generation tok/s
   ratios (median/min/max) with per-model noise bands derived from
   `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs,
@@ -43,6 +44,45 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Comparisons are like-for-like or withheld: the baseline's `run.json` is read
+  from the same source as its `results.jsonl` (sibling file, or the same git
+  ref), and the prompt, image sha256, evaluation lane, and shared generation
+  settings are checked before any per-model diff. A mismatch marks the
+  comparison "not directly comparable", lists the reasons, and suppresses the
+  transition/text/throughput/memory tables in `run_summary.md` and `run.json`
+  (`comparable: false`), so a prompt or image change can never read as a
+  model regression. Per-model resolved-revision changes are reported alongside
+  the diff. Facts missing on either side count as unknown, not as a mismatch.
+- `--isolate` children are now bounded by the parent: `subprocess.run` gets a
+  deadline of the model timeout plus 120 s start-up/cleanup grace; on expiry
+  the child is terminated and the model is recorded as an
+  `IsolatedWorkerTimeoutError` (a `TimeoutError`) tagged with the phase the
+  child had reached. Previously a child stuck in import, setup, a deadlock, or
+  finalization could stall the sweep indefinitely.
+- `--rerun-triage` now runs its differential reruns through the same
+  execution boundary as the first pass (`_run_one_model`), so `--isolate
+  --rerun-triage` no longer loses the sweep when reproducing a crash
+  in-process; the worker accepts the rerun's prompt/max_tokens/temperature/
+  timeout overrides.
+- History throughput bands only use rows whose recorded `prompt_hash` matches
+  the current prompt (legacy hashless rows are excluded rather than treated as
+  matching everything), and the current run's row is excluded only after a
+  confirmed append — `append_history_record` returns `None` when the write
+  failed and the comparison no longer blindly drops the last retained row.
+- Exact prompt token counts must satisfy `0 <= text <= total`; a count outside
+  that range is kept as diagnostic evidence (`prompt_tokens_text_exact_rejected`,
+  and named in the "Prompt composition" row) while the split and burden
+  classification fall back to the heuristic, so impossible evidence such as
+  `5 = 7 text + 0 non-text` is never published.
+- The isolation serializer now captures attributes check_models attaches to
+  the upstream generation object dynamically (`active_memory`,
+  `cache_memory`, `model_load_active_memory`), not only declared dataclass
+  fields, so the terminal memory tree after an isolated run matches an
+  in-process one. The round-trip test uses an upstream-like dataclass without
+  those fields declared.
+- `_count_rendered_prompt_tokens` only consults `mlx_vlm.utils` when a model
+  type is known, which also keeps its unit test free of any Metal/mlx
+  initialisation.
 - `--isolate` workers no longer run the module-level subprocess import probes
   (the 8 s `import mlx_vlm` guard that protects the long-lived parent); a
   child is already the crash boundary, and the probe timing out once under

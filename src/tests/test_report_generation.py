@@ -5506,6 +5506,7 @@ def _comparison_baseline(records: list[dict[str, object]]) -> check_models.Compa
             "prompt": "p",
             "system": {"Python Version": "3.13.14"},
             "timestamp": "2026-08-01 10:00:00 BST",
+            "eval_mode": "assisted",
             "library_versions": {"mlx": "0.32.1", "mlx-vlm": "0.6.15"},
             "component_provenance": {
                 "mlx": {"version": "0.32.1", "source_revision": "abcdef1234567890"},
@@ -5672,3 +5673,83 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
     assert "+repeated_output" in rendered
     assert "In baseline, not run this time: 11 models (targeted run" in rendered
     assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"
+
+
+def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
+    """A prompt/image/settings change is reported as such, never as a model regression."""
+    baseline = _comparison_baseline([_comparison_record("org/m", usability="usable")])
+    baseline = replace(
+        baseline,
+        image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        generation_settings=(("max_tokens", "1000"),),
+    )
+    current = [
+        cast("check_models.JsonlResultRecord", _comparison_record("org/m", usability="unusable"))
+    ]
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "prompt": "a different prompt", "eval_mode": "blind"},
+    )
+    comparison = check_models.compare_run_results(
+        current,
+        baseline,
+        current_metadata=metadata,
+        current_image=cast("check_models.RunImageRecord", {"sha256": "b" * 64}),
+        current_generation_settings=(("max_tokens", "500"),),
+    )
+    assert comparison.comparable is False
+    assert "prompt differs" in comparison.incomparable_reasons
+    assert any(r.startswith("image differs") for r in comparison.incomparable_reasons)
+    assert any(
+        r.startswith("generation settings differ: max_tokens")
+        for r in comparison.incomparable_reasons
+    )
+    assert any("evaluation lane differs" in r for r in comparison.incomparable_reasons)
+
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    assert payload["comparable"] is False
+    assert "changes" not in payload
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Not directly comparable" in rendered
+    assert "usable → unusable" not in rendered
+
+    # Same inputs -> comparable, and a revision change is reported alongside the diff.
+    same_metadata = cast("check_models.JsonlMetadataRecord", dict(baseline.metadata))
+    moved = _comparison_record("org/m", usability="unusable")
+    provenance = moved["model_provenance"]
+    assert isinstance(provenance, dict)
+    provenance["resolved_revision"] = "newrev123456"
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", moved)],
+        baseline,
+        current_metadata=same_metadata,
+        current_image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        current_generation_settings=(("max_tokens", "1000"),),
+    )
+    assert comparison.comparable is True
+    assert comparison.revision_changes == (("org/m", "revision-m", "newrev123456"),)
+
+
+def test_history_bands_ignore_hashless_rows_and_respect_confirmed_append(tmp_path: Path) -> None:
+    """Legacy rows without a prompt hash cannot vouch for the current prompt."""
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        json.dumps({"_type": "run", "model_results": {"org/m": {"generation_tps": t}}})
+        for t in (100.0, 101.0, 99.0, 100.5)
+    ]
+    history.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    bands, runs = check_models._history_tps_bands(history, prompt_hash="h", exclude_last=False)
+    assert bands == {}
+    assert runs == 0
+    # Without a current hash, legacy rows are usable.
+    bands, runs = check_models._history_tps_bands(history, prompt_hash=None, exclude_last=False)
+    assert "org/m" in bands
+    assert runs == 4
+    # exclude_last only when the caller confirmed the append.
+    _, runs_excl = check_models._history_tps_bands(history, prompt_hash=None, exclude_last=True)
+    assert runs_excl == 3

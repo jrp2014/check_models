@@ -253,6 +253,7 @@ def test_jsonl_system_provenance_is_public_safe_while_history_stays_raw(
         image_path=check_models.Path("/private/tmp/source.jpg"),
         eval_mode="blind",
     )
+    assert history is not None
 
     assert header["system"] == {
         "Home tool": "~/projects/mlx/bin/tool",
@@ -808,6 +809,7 @@ def test_working_set_percentage_stays_in_current_run_jsonl(tmp_path: Path) -> No
         library_versions={},
         eval_mode="blind",
     )
+    assert history is not None
     assert "peak_memory_working_set_pct" not in history["model_results"]["test-model"]
 
 
@@ -1531,6 +1533,7 @@ def test_append_history_record_contains_only_raw_execution_and_resource_facts(
         image_path=None,
         eval_mode="blind",
     )
+    assert record is not None
 
     model_results = _require_present(record.get("model_results"), field_name="model_results")
     model_record = model_results["test-model"]
@@ -1699,6 +1702,7 @@ class TestRuntimeFingerprint:
             runtime_fingerprint=fingerprint,
             eval_mode="blind",
         )
+        assert record is not None
         assert record.get("runtime_fingerprint") == fingerprint
         # Verify it's persisted to disk
         lines = history_path.read_text().strip().splitlines()
