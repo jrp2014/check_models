@@ -604,7 +604,7 @@
     "Pillow": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "12.3.0"
@@ -613,14 +613,14 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "5a78e984657f492733f34cbe3d7887058ef60060",
+      "source_revision": "d717f91bfd18f367a808c62c9ba03e2661ab11bc",
       "vcs_revision": null,
-      "version": "0.14.0"
+      "version": "0.14.1"
     },
     "huggingface-hub": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "1.28.0"
@@ -629,14 +629,14 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "846d176227a0ac13d2667e58d2bb68b322109ab0",
+      "source_revision": "d9077d8316ad7305497a3ecf2296bd0e0e99a627",
       "vcs_revision": null,
-      "version": "0.32.2.dev20260822+846d17622"
+      "version": "0.32.2.dev20260823+d9077d831"
     },
     "mlx-audio": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "0.5.0"
@@ -661,14 +661,14 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "18e9b979f9e6b9edfad20832698db1171320247c",
+      "source_revision": "332873ff2925d73a84b9e1094419b88247256c22",
       "vcs_revision": null,
       "version": "0.6.15"
     },
     "numpy": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "2.5.2"
@@ -676,7 +676,7 @@
     "tokenizers": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "0.22.2"
@@ -684,7 +684,7 @@
     "transformers": {
       "direct_url": null,
       "install_type": "wheel",
-      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages",
       "source_revision": null,
       "vcs_revision": null,
       "version": "5.15.1"
@@ -698,7 +698,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-22 22:51:18 BST",
+  "generated_at": "2026-08-23 12:44:16 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -716,7 +716,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.28.0",
-    "mlx": "0.32.2.dev20260822+846d17622",
+    "mlx": "0.32.2.dev20260823+d9077d831",
     "mlx-audio": "0.5.0",
     "mlx-lm": "0.32.0",
     "mlx-metal": null,
@@ -982,10 +982,10 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "5a78e984657f492733f34cbe3d7887058ef60060",
+    "git_revision": "d717f91bfd18f367a808c62c9ba03e2661ab11bc",
     "install_type": "source-tree",
     "name": "check_models",
-    "version": "0.14.0"
+    "version": "0.14.1"
   },
   "prompt": "Create British-English catalogue metadata from the image and supplied context.\n\nTreat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.\n\nContext: Authoritative context:\n- Capture date/time: 2026-08-13 17:14:49 UTC+01:00\n- GPS: 51.959333\u00b0N, 1.349050\u00b0E\n\nDescriptive hints:\n- Title hint: Seafront, Felixstowe, England, UK, GBR, Europe\n- Description hint: Seafront, Felixstowe, England, UK, GBR\n- Keyword hints: Adobe Stock, Any Vision, East Suffolk, England, Europe, Felixstowe, Suffolk, UK, gbr, seafront\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords covering relevant context and visible details.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:",
   "prompt_burden": {
@@ -1328,6 +1328,6 @@
   },
   "prompt_sha256": "ae934c0aa806dbad3ab44aa77c6aea920b9e2ea0f377d63a1862c0065ef290ba",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1107.33,
+  "total_runtime_seconds": 1128.924,
   "trust_remote_code": true
 }
