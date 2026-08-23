@@ -4,6 +4,16 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- The CLI parser now pins `prog` to `basename(sys.argv[0])` (the Python 3.13
+  default) instead of relying on argparse's heuristic. Python 3.14 derives
+  `prog` from the `-m` invocation, and the exact rule differs between point
+  releases — under a patched `sys.argv` 3.14.6 renders
+  `usage: python3 -m pytest …` while 3.14.7 does not — which the new CI
+  matrix caught on its first run (3.14.6 on the runner vs 3.14.7 in the local
+  probe env). The usage line is now interpreter-independent.
+
 ### Changed
 
 - CI now rehearses the next Python: the static-quality job runs a matrix of

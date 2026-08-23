@@ -20124,6 +20124,12 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
 def _build_cli_parser() -> argparse.ArgumentParser:
     """Build and return the command-line parser for the CLI entry point."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        # Pin prog to the 3.13 default (basename of argv[0]) rather than relying on
+        # argparse's heuristic: Python 3.14 derives it from the `-m` invocation
+        # instead, and the exact rule differs between 3.14 point releases
+        # (3.14.6 rendered "python3 -m pytest" under a patched argv; 3.14.7 does
+        # not), which made the usage line depend on the interpreter patch level.
+        prog=Path(sys.argv[0]).name or "check_models.py",
         description="MLX VLM Model Checker",
         usage="%(prog)s [-h] [-f FOLDER | -i IMAGE] [options]",
         formatter_class=_ConditionalDefaultsHelpFormatter,
