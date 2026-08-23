@@ -2013,14 +2013,20 @@ def _prompt_composition_fact(result: PerformanceResult) -> str | None:
     total = analysis.prompt_tokens_total
     text = analysis.prompt_tokens_text_est
     nontext = analysis.prompt_tokens_nontext_est
+    rejected = analysis.prompt_tokens_text_exact_rejected
     if total is None or text is None or nontext is None or total <= 0:
+        # The rejected exact count is evidence even when no split survived it.
+        if rejected is not None and total is not None:
+            return (
+                f"unavailable; tokenizer count {rejected:,} rejected as inconsistent "
+                f"with total {total:,} and the word-ratio estimate also exceeded it"
+            )
         return None
     source = (
         "tokenizer-exact"
         if analysis.prompt_tokens_text_source == "tokenizer"
         else "word-ratio estimate"
     )
-    rejected = analysis.prompt_tokens_text_exact_rejected
     if rejected is not None:
         source += f"; tokenizer count {rejected:,} rejected as inconsistent with total {total:,}"
     share = 100.0 * nontext / total

@@ -1430,3 +1430,20 @@ class TestExactPromptTokenAccounting:
         assert analysis.prompt_tokens_text_source == "heuristic"
         assert analysis.prompt_tokens_text_est is not None
         assert 0 <= analysis.prompt_tokens_text_est <= 100
+
+    def test_composition_row_surfaces_rejected_count_when_split_unavailable(self) -> None:
+        """The rejected exact count is reported even when no split survived."""
+        analysis = check_models.analyze_generation_text(
+            "Title: A",
+            generated_tokens=3,
+            prompt_tokens=5,
+            prompt="one two three four five six seven",
+            prompt_text_tokens=7,
+        )
+        result = check_models.PerformanceResult(
+            model_name="org/m", success=True, generation=None, quality_analysis=analysis
+        )
+        fact = check_models._prompt_composition_fact(result)
+        assert fact is not None
+        assert fact.startswith("unavailable")
+        assert "tokenizer count 7 rejected as inconsistent with total 5" in fact

@@ -56,7 +56,9 @@ Notable changes to this project will be documented in this file.
 - The heuristic fallback is bound by the same `0 <= text <= total` invariant
   as the exact count: when both are impossible the split is reported
   unavailable (the rejected exact count stays recorded), instead of
-  publishing e.g. `5 = 130 text + 0 non-text`.
+  publishing e.g. `5 = 130 text + 0 non-text`. The "Prompt composition"
+  diagnostics row still surfaces the rejected count in that case
+  ("unavailable; tokenizer count 7 rejected as inconsistent with total 5…").
 - Download-timeout classification recognises the `TimeoutError` family by
   suffix (so `IsolatedWorkerTimeoutError` from a worker deadline counts) and
   the retained `stop_reason == "timeout"`, and the HF progress needles now
