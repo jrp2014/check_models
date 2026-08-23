@@ -43,6 +43,17 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `--isolate` workers no longer run the module-level subprocess import probes
+  (the 8 s `import mlx_vlm` guard that protects the long-lived parent); a
+  child is already the crash boundary, and the probe timing out once under
+  transient load had marked one model's mlx-vlm as "unavailable" in a 42-model
+  isolated sweep.
+- Comparison throughput bands now have a floor of ±10% of the history median:
+  a handful of near-identical samples produced Tukey fences a couple of percent
+  wide, which flagged ordinary run-to-run variance (27 of 41 models in one
+  sweep). The JSONL metadata now records `execution_mode` (`in_process` /
+  `isolated`) and the comparison caveats throughput when the current and
+  baseline modes differ.
 - `_is_generation_processor` is a `TypeIs` (PEP 742) rather than a
   `TypeGuard`: with `TypeGuard` the positive branch replaced the declared
   `ProcessorMixin` with the guarded union, so after the `if`/`else` rejoin

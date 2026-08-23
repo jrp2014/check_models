@@ -259,6 +259,8 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
+ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
+ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
 IMPORT_PROBE_MIN_TAIL_CHARS: Final[int] = 10
@@ -635,7 +637,15 @@ def _probe_import_runtime(
     error_prefix: str,
     detect_metal_nsrange: bool = False,
 ) -> str | None:
-    """Run a subprocess import probe and return an actionable error message when it fails."""
+    """Run a subprocess import probe and return an actionable error message when it fails.
+
+    Skipped inside an ``--isolate`` worker: the probe exists to keep a hard-crashing
+    import out of the long-lived parent, and a worker is already the crash
+    boundary. Running it per child also made it a false failure source — an
+    8 s timeout under transient load marked mlx-vlm "unavailable" for one model.
+    """
+    if len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
+        return None
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
             [sys.executable, "-c", f"import {import_target}"],
@@ -1117,6 +1127,7 @@ class JsonlMetadataRecord(TypedDict, total=False):
     eval_mode: EvaluationLane
     metadata_exposed_to_prompt: bool
     component_provenance: dict[str, ComponentProvenanceRecord]
+    execution_mode: Literal["in_process", "isolated"]
 
 
 class ModelProvenanceRecord(TypedDict):
@@ -13391,8 +13402,6 @@ def _attach_system_telemetry(
 # SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)
 # =============================================================================
 
-ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
-ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
 _ISOLATED_STDERR_TAIL_CHARS: Final[int] = 6000
 _ISOLATION_PHASE_SINK: Callable[[str], None] | None = None
 _SHELL_SIGNAL_EXIT_BASE: Final[int] = 128
@@ -16849,6 +16858,7 @@ def _build_jsonl_metadata_record(
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     mode_policy: ReportModePolicy,
+    execution_mode: Literal["in_process", "isolated"] = "in_process",
 ) -> JsonlMetadataRecord:
     """Build shared metadata header row for JSONL results."""
     record: JsonlMetadataRecord = {
@@ -16859,6 +16869,7 @@ def _build_jsonl_metadata_record(
         "timestamp": local_now_str(),
         "eval_mode": mode_policy.eval_mode,
         "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
+        "execution_mode": execution_mode,
     }
     if library_versions is not None:
         record["library_versions"] = library_versions
@@ -17031,6 +17042,7 @@ def save_jsonl_report(
     mode_policy: ReportModePolicy | None = None,
     requested_revision: str | None = None,
     report_context: ReportRenderContext | None = None,
+    execution_mode: Literal["in_process", "isolated"] = "in_process",
 ) -> None:
     """Save the narrow JSONL machine contract with complete captured evidence."""
     resolved_policy = (
@@ -17059,6 +17071,7 @@ def save_jsonl_report(
         library_versions=library_versions,
         runtime_fingerprint=runtime_fingerprint,
         mode_policy=resolved_policy,
+        execution_mode=execution_mode,
     )
     lines = [json.dumps(header)]
 
@@ -17277,6 +17290,7 @@ DEFAULT_COMPARE_WITH: Final[str] = "auto"
 _COMPARISON_HISTORY_WINDOW: Final[int] = 10
 _COMPARISON_MIN_BAND_SAMPLES: Final[int] = 4
 _COMPARISON_TPS_RATIO_FALLBACK_BAND: Final[tuple[float, float]] = (0.85, 1.15)
+_COMPARISON_TPS_BAND_MIN_HALF_WIDTH: Final[float] = 0.10
 _COMPARISON_PEAK_MEMORY_MIN_DELTA_GB: Final[float] = 0.5
 _COMPARISON_PEAK_MEMORY_MIN_DELTA_RATIO: Final[float] = 0.10
 _COMPARISON_GIT_TIMEOUT_SECONDS: Final[float] = 20.0
@@ -17339,6 +17353,8 @@ class RunComparison:
     throughput_flags: tuple[RunComparisonThroughputFlag, ...]
     memory_changes: tuple[RunComparisonMemoryChange, ...]
     history_runs_used: int
+    baseline_execution_mode: str = "in_process"
+    current_execution_mode: str = "in_process"
 
     @property
     def has_changes(self) -> bool:
@@ -17530,8 +17546,14 @@ def _history_tps_bands(
             continue
         ordered = sorted(values)
         q1, q3 = _quantile(ordered, 0.25), _quantile(ordered, 0.75)
+        median = _quantile(ordered, 0.5)
         iqr = q3 - q1
-        bands[model] = (max(q1 - 1.5 * iqr, 0.0), q3 + 1.5 * iqr, len(values))
+        # A handful of near-identical samples yields a fence a couple of percent
+        # wide, which flags ordinary run-to-run variance; never narrower than
+        # ±10% of the history median.
+        low = min(q1 - 1.5 * iqr, median * (1.0 - _COMPARISON_TPS_BAND_MIN_HALF_WIDTH))
+        high = max(q3 + 1.5 * iqr, median * (1.0 + _COMPARISON_TPS_BAND_MIN_HALF_WIDTH))
+        bands[model] = (max(low, 0.0), high, len(values))
     return bands, len(runs)
 
 
@@ -17595,6 +17617,7 @@ def compare_run_results(
     history_path: Path | None = None,
     prompt_hash: str | None = None,
     history_excludes_current: bool = True,
+    current_execution_mode: str = "in_process",
 ) -> RunComparison:
     """Diff current JSONL result rows against a baseline sweep, mechanically.
 
@@ -17699,6 +17722,8 @@ def compare_run_results(
         throughput_flags=tuple(flags),
         memory_changes=tuple(memory),
         history_runs_used=history_runs,
+        baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
+        current_execution_mode=current_execution_mode,
     )
 
 
@@ -17757,6 +17782,10 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             for change in comparison.memory_changes
         ],
         "history_runs_used": comparison.history_runs_used,
+        "execution_mode": {
+            "baseline": comparison.baseline_execution_mode,
+            "current": comparison.current_execution_mode,
+        },
     }
 
 
@@ -17785,7 +17814,8 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         else "n/a"
     )
     band_text = (
-        f"history (last {comparison.history_runs_used} same-prompt runs, Tukey fence)"
+        f"history (last {comparison.history_runs_used} same-prompt runs, Tukey fence, "
+        "at least ±10% of the median)"
         if comparison.history_runs_used >= _COMPARISON_MIN_BAND_SAMPLES
         else "fixed ±15% fallback (insufficient history)"
     )
@@ -17809,6 +17839,13 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
             ("Throughput noise band", band_text),
         )
     )
+    if comparison.current_execution_mode != comparison.baseline_execution_mode:
+        mode_note = (
+            f"{comparison.current_execution_mode} now vs "
+            f"{comparison.baseline_execution_mode} in the baseline — per-process "
+            "start-up differs, so throughput is not directly comparable"
+        )
+        key_rows.append(("Execution mode", mode_note))
     blocks: list[ReportBlock] = [ReportKeyValues(tuple(key_rows))]
     if comparison.models_added or comparison.models_removed:
         items: list[str] = []
@@ -19886,6 +19923,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             runtime_fingerprint=inputs.runtime_fingerprint,
             requested_revision=inputs.model_revision,
             report_context=inputs.report_context,
+            execution_mode=(
+                "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
+            ),
         ),
         "run_json": lambda: save_run_json_report(
             inputs.results,
@@ -20076,6 +20116,7 @@ def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | N
         history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
         prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
         history_excludes_current=True,
+        current_execution_mode=str(source.metadata.get("execution_mode", "in_process")),
     )
 
 

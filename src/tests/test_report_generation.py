@@ -5606,7 +5606,9 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
     history.write_text("\n".join(runs) + "\n", encoding="utf-8")
 
     baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
-    current = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=108.0))]
+    # ±10% of the ~100 tok/s median is the floor; 115 sits outside both the
+    # floor and the Tukey fence, 101 sits inside both.
+    current = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=115.0))]
     comparison = check_models.compare_run_results(
         current, baseline, history_path=history, prompt_hash="h", history_excludes_current=True
     )
@@ -5615,7 +5617,8 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
     flag = comparison.throughput_flags[0]
     assert flag.band_source == "history"
     assert flag.band_samples == 5
-    assert flag.band_high < 108.0
+    assert flag.band_high < 115.0
+    assert flag.band_high >= 110.0  # floor applied
 
     steady = [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=101.0))]
     assert not check_models.compare_run_results(
