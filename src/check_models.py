@@ -639,10 +639,11 @@ def _probe_import_runtime(
 ) -> str | None:
     """Run a subprocess import probe and return an actionable error message when it fails.
 
-    Skipped inside an ``--isolate`` worker: the probe exists to keep a hard-crashing
-    import out of the long-lived parent, and a worker is already the crash
-    boundary. Running it per child also made it a false failure source — an
-    8 s timeout under transient load marked mlx-vlm "unavailable" for one model.
+    Skipped inside an ``--isolate`` worker: the probe exists to shield the
+    long-lived parent from a hard-crashing dependency, and a worker is already
+    the crash boundary. Running it per child also made it a false failure
+    source — an 8 s timeout under transient load marked mlx-vlm "unavailable"
+    for one model.
     """
     if len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
         return None
@@ -4514,6 +4515,43 @@ def _collect_prompt_quality_signals(
     )
 
 
+def _split_prompt_tokens(
+    *,
+    prompt_tokens: int | None,
+    prompt: str | None,
+    prompt_text_tokens: int | None,
+) -> tuple[int | None, int | None, Literal["tokenizer", "heuristic"] | None, int | None]:
+    """Split total prompt tokens into (text, non-text, source, rejected exact).
+
+    Prefers an exact tokenizer count; either count must satisfy
+    ``0 <= text <= total`` or the split is unavailable. An exact count that
+    fails the invariant is retained as the rejected evidence value — it would
+    otherwise publish an impossible split (e.g. "5 = 7 text + 0 non-text").
+    """
+    source: Literal["tokenizer", "heuristic"] | None
+    rejected: int | None = None
+    exact_is_consistent = prompt_text_tokens is not None and (
+        prompt_tokens is None or 0 <= prompt_text_tokens <= prompt_tokens
+    )
+    if prompt_text_tokens is not None and exact_is_consistent:
+        text_est: int | None = prompt_text_tokens
+        source = "tokenizer"
+    else:
+        rejected = prompt_text_tokens
+        text_est = _estimate_prompt_tokens_from_text(prompt)
+        source = "heuristic" if text_est is not None else None
+    if text_est is not None and prompt_tokens is not None and not 0 <= text_est <= prompt_tokens:
+        # The same invariant binds the heuristic.
+        text_est = None
+        source = None
+    nontext_est = (
+        max(prompt_tokens - text_est, 0)
+        if (prompt_tokens is not None and text_est is not None)
+        else None
+    )
+    return text_est, nontext_est, source, rejected
+
+
 def analyze_generation_text(
     text: str,
     generated_tokens: int | None,
@@ -4568,35 +4606,13 @@ def analyze_generation_text(
         thinking_trace_delimiters=thinking_trace_delimiters,
         seeded_thinking_text=seeded_thinking_text,
     )
-    prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None
-    prompt_tokens_text_exact_rejected: int | None = None
-    exact_is_consistent = prompt_text_tokens is not None and (
-        prompt_tokens is None or 0 <= prompt_text_tokens <= prompt_tokens
-    )
-    if prompt_text_tokens is not None and exact_is_consistent:
-        prompt_tokens_text_est: int | None = prompt_text_tokens
-        prompt_tokens_text_source = "tokenizer"
-    else:
-        # An exact count outside [0, total] would publish impossible evidence
-        # (e.g. "5 = 7 text + 0 non-text"); keep the raw number as diagnostic
-        # evidence and fall back to the heuristic for the split.
-        prompt_tokens_text_exact_rejected = prompt_text_tokens
-        prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
-        prompt_tokens_text_source = "heuristic" if prompt_tokens_text_est is not None else None
-    if (
-        prompt_tokens_text_est is not None
-        and prompt_tokens is not None
-        and not 0 <= prompt_tokens_text_est <= prompt_tokens
-    ):
-        # The same invariant binds the heuristic: rather than publish an
-        # impossible split, mark it unavailable (the rejected exact count, if
-        # any, stays recorded as evidence).
-        prompt_tokens_text_est = None
-        prompt_tokens_text_source = None
-    prompt_tokens_nontext_est = (
-        max(prompt_tokens - prompt_tokens_text_est, 0)
-        if (prompt_tokens is not None and prompt_tokens_text_est is not None)
-        else None
+    (
+        prompt_tokens_text_est,
+        prompt_tokens_nontext_est,
+        prompt_tokens_text_source,
+        prompt_tokens_text_exact_rejected,
+    ) = _split_prompt_tokens(
+        prompt_tokens=prompt_tokens, prompt=prompt, prompt_text_tokens=prompt_text_tokens
     )
     likely_capped, cutoff_reasons = _detect_likely_cutoff(
         analysis_text,
@@ -17820,6 +17836,87 @@ def _result_peak_memory_gb(record: JsonlResultRecord) -> float | None:
     return float(value) if isinstance(value, (int, float)) and value > 0 else None
 
 
+def _model_revision_change(
+    model: str, now: JsonlResultRecord, before: JsonlResultRecord
+) -> tuple[str, str, str] | None:
+    """Return (model, baseline revision, current revision) when the snapshot moved."""
+    now_rev = (now.get("model_provenance") or {}).get("resolved_revision")
+    before_rev = (before.get("model_provenance") or {}).get("resolved_revision")
+    if now_rev and before_rev and now_rev != before_rev:
+        return (model, before_rev, now_rev)
+    return None
+
+
+def _model_assessment_change(
+    model: str, now: JsonlResultRecord, before: JsonlResultRecord
+) -> RunComparisonModelChange | None:
+    """Return the execution/usability/observation transition for one model, if any."""
+    now_a, before_a = now["assessment"], before["assessment"]
+    now_obs, before_obs = set(now_a["observations"]), set(before_a["observations"])
+    if (
+        now_a["execution"] == before_a["execution"]
+        and now_a["usability"] == before_a["usability"]
+        and now_obs == before_obs
+    ):
+        return None
+    return RunComparisonModelChange(
+        model=model,
+        baseline_execution=before_a["execution"],
+        current_execution=now_a["execution"],
+        baseline_usability=before_a["usability"],
+        current_usability=now_a["usability"],
+        observations_added=tuple(sorted(now_obs - before_obs)),
+        observations_removed=tuple(sorted(before_obs - now_obs)),
+    )
+
+
+def _model_throughput_flag(
+    model: str,
+    *,
+    now_tps: float,
+    before_tps: float,
+    band: tuple[float, float, int] | None,
+) -> RunComparisonThroughputFlag | None:
+    """Flag a model whose throughput left its history band (or the fallback band)."""
+    ratio = now_tps / before_tps
+    if band is not None:
+        low, high, samples = band
+        if not low <= now_tps <= high:
+            return RunComparisonThroughputFlag(
+                model, before_tps, now_tps, ratio, low, high, "history", samples
+            )
+        return None
+    low_ratio, high_ratio = _COMPARISON_TPS_RATIO_FALLBACK_BAND
+    if not low_ratio <= ratio <= high_ratio:
+        return RunComparisonThroughputFlag(
+            model,
+            before_tps,
+            now_tps,
+            ratio,
+            before_tps * low_ratio,
+            before_tps * high_ratio,
+            "fallback",
+            0,
+        )
+    return None
+
+
+def _model_memory_change(
+    model: str, now: JsonlResultRecord, before: JsonlResultRecord
+) -> RunComparisonMemoryChange | None:
+    """Return a peak-memory move beyond both the absolute and relative floors."""
+    now_peak, before_peak = _result_peak_memory_gb(now), _result_peak_memory_gb(before)
+    if now_peak is None or before_peak is None:
+        return None
+    delta = now_peak - before_peak
+    if (
+        abs(delta) >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_GB
+        and abs(delta) / before_peak >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_RATIO
+    ):
+        return RunComparisonMemoryChange(model, before_peak, now_peak, delta)
+    return None
+
+
 def compare_run_results(
     current: Sequence[JsonlResultRecord],
     baseline: ComparisonBaseline,
@@ -17873,68 +17970,28 @@ def compare_run_results(
     revision_changes: list[tuple[str, str, str]] = []
     for model in shared:
         now, before = current_by[model], baseline_by[model]
-        now_rev = (now.get("model_provenance") or {}).get("resolved_revision")
-        before_rev = (before.get("model_provenance") or {}).get("resolved_revision")
-        if now_rev and before_rev and now_rev != before_rev:
-            revision_changes.append((model, before_rev, now_rev))
-        now_a, before_a = now["assessment"], before["assessment"]
-        now_obs, before_obs = set(now_a["observations"]), set(before_a["observations"])
-        if (
-            now_a["execution"] != before_a["execution"]
-            or now_a["usability"] != before_a["usability"]
-            or now_obs != before_obs
+        if (revision := _model_revision_change(model, now, before)) is not None:
+            revision_changes.append(revision)
+        if (change := _model_assessment_change(model, now, before)) is not None:
+            changes.append(change)
+        if now["assessment"]["execution"] == "completed" and (
+            before["assessment"]["execution"] == "completed"
         ):
-            changes.append(
-                RunComparisonModelChange(
-                    model=model,
-                    baseline_execution=before_a["execution"],
-                    current_execution=now_a["execution"],
-                    baseline_usability=before_a["usability"],
-                    current_usability=now_a["usability"],
-                    observations_added=tuple(sorted(now_obs - before_obs)),
-                    observations_removed=tuple(sorted(before_obs - now_obs)),
-                )
-            )
-        if now_a["execution"] == "completed" and before_a["execution"] == "completed":
             text_compared += 1
             if now.get("generated_text", "") == before.get("generated_text", ""):
                 identical_text += 1
+        if not throughput_comparable:
+            continue
         now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
-        if throughput_comparable and now_tps is not None and before_tps is not None:
-            ratio = now_tps / before_tps
-            ratios.append(ratio)
-            band = bands.get(model)
-            if band is not None:
-                low, high, samples = band
-                if not low <= now_tps <= high:
-                    flags.append(
-                        RunComparisonThroughputFlag(
-                            model, before_tps, now_tps, ratio, low, high, "history", samples
-                        )
-                    )
-            else:
-                low_ratio, high_ratio = _COMPARISON_TPS_RATIO_FALLBACK_BAND
-                if not low_ratio <= ratio <= high_ratio:
-                    flags.append(
-                        RunComparisonThroughputFlag(
-                            model,
-                            before_tps,
-                            now_tps,
-                            ratio,
-                            before_tps * low_ratio,
-                            before_tps * high_ratio,
-                            "fallback",
-                            0,
-                        )
-                    )
-        now_peak, before_peak = _result_peak_memory_gb(now), _result_peak_memory_gb(before)
-        if throughput_comparable and now_peak is not None and before_peak is not None:
-            delta = now_peak - before_peak
-            if (
-                abs(delta) >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_GB
-                and abs(delta) / before_peak >= _COMPARISON_PEAK_MEMORY_MIN_DELTA_RATIO
-            ):
-                memory.append(RunComparisonMemoryChange(model, before_peak, now_peak, delta))
+        if now_tps is not None and before_tps is not None:
+            ratios.append(now_tps / before_tps)
+            flag = _model_throughput_flag(
+                model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)
+            )
+            if flag is not None:
+                flags.append(flag)
+        if (memory_change := _model_memory_change(model, now, before)) is not None:
+            memory.append(memory_change)
 
     ratios_sorted = sorted(ratios)
     return RunComparison(
