@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-23 22:50:24 BST
+FULL ENVIRONMENT DUMP - 2026-08-24 23:40:33 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 163
+Total packages: 164
 
 annotated-doc==0.0.5
 annotated-types==0.8.0
@@ -56,18 +56,19 @@ keyring==25.7.0
 libcst==1.9.0
 librt==0.15.0
 license-expression==30.4.4
-linkify-it-py==2.1.0
+linkify-it-py==2.1.1
 llguidance==1.8.0
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
-mcp==1.29.0
+mcp==1.29.1
 mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.2.dev20260823+451dc8759
-mlx==0.32.2.dev20260823+451dc8759
+mlx==0.32.2.dev20260824+43d2f06cb
+mlx==0.32.2.dev20260824+43d2f06cb
 mlx-audio==0.5.0
+mlx-lm==0.32.0
 mlx-lm==0.32.0
 mlx-vlm==0.6.16
 mlx-vlm==0.6.16
@@ -89,7 +90,7 @@ pip==26.2.1
 pip-api==0.0.34
 pip-requirements-parser==32.0.1
 pip_audit==2.10.1
-platformdirs==4.11.3
+platformdirs==4.11.4
 pluggy==1.6.0
 pre_commit==4.6.2
 protobuf==7.36.0
@@ -108,7 +109,7 @@ pyrefly==1.2.0
 pytest==9.1.1
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
-python-discovery==1.5.2
+python-discovery==1.5.3
 python-dotenv==1.2.3
 python-multipart==0.0.32
 PyYAML==6.0.3
@@ -171,5 +172,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-23 22:50:24 BST
+Environment dump completed at 2026-08-24 23:40:33 BST
 ================================================================================

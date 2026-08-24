@@ -601,15 +601,15 @@
     }
   ],
   "comparison": {
-    "baseline": "6f54a4fe:src/output/results.jsonl",
+    "baseline": "93a90d91:src/output/results.jsonl",
     "baseline_components": {
-      "check_models": "0.14.1 @ d717f91bf",
-      "mlx": "0.32.2.dev20260823+d9077d831 @ d9077d831",
-      "mlx-vlm": "0.6.15 @ 332873ff2",
+      "check_models": "0.14.1 @ 6f54a4fe2",
+      "mlx": "0.32.2.dev20260823+451dc8759 @ 451dc8759",
+      "mlx-vlm": "0.6.16 @ 5fa03cfcc",
       "python": "3.14.7",
       "transformers": "5.15.1"
     },
-    "baseline_timestamp": "2026-08-23 12:44:16 BST",
+    "baseline_timestamp": "2026-08-23 23:10:25 BST",
     "changes": [
       {
         "execution": [
@@ -617,6 +617,21 @@
           "completed"
         ],
         "model": "mlx-community/diffusiongemma-26B-A4B-it-mxfp8",
+        "observations_added": [
+          "catalog_constraint_violation"
+        ],
+        "observations_removed": [],
+        "usability": [
+          "usable_with_caveats",
+          "usable_with_caveats"
+        ]
+      },
+      {
+        "execution": [
+          "completed",
+          "completed"
+        ],
+        "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit",
         "observations_added": [],
         "observations_removed": [
           "catalog_constraint_violation"
@@ -635,11 +650,11 @@
     },
     "generation_tps_ratio": {
       "compared_models": 42,
-      "max": 1.7075,
-      "median": 1.0227,
-      "min": 0.8533
+      "max": 1.3311,
+      "median": 1.0118,
+      "min": 0.8909
     },
-    "history_runs_used": 8,
+    "history_runs_used": 9,
     "identical_text_models": 40,
     "memory_changes": [],
     "models_added": [],
@@ -650,39 +665,15 @@
     "throughput_flags": [
       {
         "band": [
-          27.9124,
-          34.1152
+          27.8887,
+          34.0862
         ],
-        "band_samples": 8,
+        "band_samples": 9,
         "band_source": "history",
-        "baseline_tps": 30.0031,
-        "current_tps": 26.3511,
+        "baseline_tps": 26.3511,
+        "current_tps": 27.6698,
         "model": "mlx-community/gemma-3-27b-it-qat-4bit",
-        "ratio": 0.8783
-      },
-      {
-        "band": [
-          67.4032,
-          82.3817
-        ],
-        "band_samples": 6,
-        "band_source": "history",
-        "baseline_tps": 72.6332,
-        "current_tps": 65.1891,
-        "model": "mlx-community/GLM-4.6V-Flash-mxfp4",
-        "ratio": 0.8975
-      },
-      {
-        "band": [
-          16.8158,
-          21.8143
-        ],
-        "band_samples": 8,
-        "band_source": "history",
-        "baseline_tps": 19.4024,
-        "current_tps": 16.5565,
-        "model": "mlx-community/Llama-3.2-11B-Vision-Instruct-8bit",
-        "ratio": 0.8533
+        "ratio": 1.05
       }
     ],
     "unverified_facts": []
@@ -700,7 +691,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "6f54a4fe2c64bf189ce319a8f8aa8ade9e97dafe",
+      "source_revision": "93a90d917d3ef80a0f0298d364a316b737266f92",
       "vcs_revision": null,
       "version": "0.14.1"
     },
@@ -716,9 +707,9 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx",
-      "source_revision": "451dc8759703b8e3f3cde34251292edaff63a50f",
+      "source_revision": "43d2f06cb87e76895bf9a152bade4fee83408643",
       "vcs_revision": null,
-      "version": "0.32.2.dev20260823+451dc8759"
+      "version": "0.32.2.dev20260824+43d2f06cb"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -732,7 +723,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-lm",
-      "source_revision": "d78bf58e217c904ec282ed8da9b947491f78c022",
+      "source_revision": "cc8521569694a3240b52c98acffd100d59b4c755",
       "vcs_revision": null,
       "version": "0.32.0"
     },
@@ -748,7 +739,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "5fa03cfcc670163754afc2c419d15f2ebf6a5abc",
+      "source_revision": "2b31570bdee86e2cdeea049761885aeed524a98c",
       "vcs_revision": null,
       "version": "0.6.16"
     },
@@ -785,7 +776,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-23 23:10:25 BST",
+  "generated_at": "2026-08-24 23:59:43 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -803,7 +794,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.28.0",
-    "mlx": "0.32.2.dev20260823+451dc8759",
+    "mlx": "0.32.2.dev20260824+43d2f06cb",
     "mlx-audio": "0.5.0",
     "mlx-lm": "0.32.0",
     "mlx-metal": null,
@@ -1069,7 +1060,7 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "6f54a4fe2c64bf189ce319a8f8aa8ade9e97dafe",
+    "git_revision": "93a90d917d3ef80a0f0298d364a316b737266f92",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.14.1"
@@ -1541,6 +1532,6 @@
   },
   "prompt_sha256": "ae934c0aa806dbad3ab44aa77c6aea920b9e2ea0f377d63a1862c0065ef290ba",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1200.143,
+  "total_runtime_seconds": 1148.861,
   "trust_remote_code": true
 }
