@@ -928,6 +928,20 @@ update_local_mlx_repos() {
 
 		if "${INSTALL_CMD[@]}"; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
+			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+				# Pin the just-built local mlx for every later pip install in this
+				# run. Eager upgrades otherwise replace the editable build with a
+				# PyPI wheel the moment a release version overtakes the local dev
+				# version (PEP 440 ranks 0.32.2 above 0.32.2.devN) - which is
+				# exactly what a new upstream release does.
+				LOCAL_MLX_PIN_VERSION="$(get_installed_distribution_version mlx)"
+				if [[ -n "$LOCAL_MLX_PIN_VERSION" ]]; then
+					LOCAL_MLX_CONSTRAINT_FILE="$(mktemp -t mlx-local-pin)"
+					printf 'mlx==%s\n' "$LOCAL_MLX_PIN_VERSION" > "$LOCAL_MLX_CONSTRAINT_FILE"
+					export PIP_CONSTRAINT="$LOCAL_MLX_CONSTRAINT_FILE"
+					echo "[update.sh] Pinned local mlx $LOCAL_MLX_PIN_VERSION via PIP_CONSTRAINT for the rest of this run"
+				fi
+			fi
 		else
 			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
 			REPO_SKIP[idx]=1
@@ -974,8 +988,11 @@ update_local_mlx_repos() {
 			mlx|mlx-lm|mlx-vlm)
 				if ! verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"; then
 					echo "❌ Local build verification failed for ${REPO_NAMES[idx]}"
-					cd "$ORIGINAL_DIR"
-					return 1
+					echo "   The environment is in a mixed state (a later install replaced the"
+					echo "   local build - typically a new PyPI release overtaking the local"
+					echo "   dev version). Stopping rather than continuing half-local."
+					echo "   Fix: cd ${REPO_PATHS[idx]} && pip install -v -e '.[dev]' then re-run update.sh"
+					exit 1
 				fi
 				log_editable_install_provenance "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
 				;;
@@ -1036,8 +1053,17 @@ if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
 	elif [[ $SKIP_MLX_PYPI -eq 1 ]]; then
 		echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
 		# Remove stale mlx-metal from PyPI when using local builds
-		# (local builds compile their own Metal backend)
-		if pip show mlx-metal >/dev/null 2>&1; then
+		# (local builds compile their own Metal backend). Guarded on mlx itself
+		# being editable/dev: if mlx is a PyPI wheel, mlx-metal is its backend
+		# and removing it would break the runtime.
+		MLX_IS_LOCAL_BUILD=0
+		MLX_INSTALLED_VERSION="$(get_installed_distribution_version mlx)"
+		if [[ -n "$(get_editable_project_location mlx)" ]] ||
+			[[ "$MLX_INSTALLED_VERSION" == *".dev"* ]] ||
+			[[ "$MLX_INSTALLED_VERSION" == *"+"* ]]; then
+		MLX_IS_LOCAL_BUILD=1
+		fi
+		if [[ $MLX_IS_LOCAL_BUILD -eq 1 ]] && pip show mlx-metal >/dev/null 2>&1; then
 			echo "[update.sh] Removing stale mlx-metal PyPI package (not needed with local builds)..."
 			pip uninstall -y mlx-metal || true
 		fi

@@ -79,6 +79,20 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `update.sh` can no longer lose the local mlx build to a PyPI release: the
+  moment upstream published mlx 0.32.2, the eager-upgrade installs of
+  mlx-lm/mlx-vlm replaced the editable `0.32.2.dev…` build with the wheel
+  (PEP 440 ranks a final release above any `.devN` of the same version), the
+  Stage 4b verification failure was non-fatal, and the script then removed
+  `mlx-metal` on the false premise that mlx was still local. Now: after a
+  successful local mlx build its exact version is pinned via a
+  `PIP_CONSTRAINT` file for every later pip install in the run (verified: an
+  eager `-U` leaves the pinned build untouched); a failed editable
+  verification is fatal with the remedy printed instead of degrading into a
+  mixed state; and the `mlx-metal` removal is guarded on mlx actually being
+  an editable/dev install.
+
+
 - Comparability is now three-state (`comparable` / `unknown` / `incomparable`):
   facts that cannot be verified (a baseline without `run.json`, missing image
   sha or settings) are named as `unverified_facts` and mark the comparison
