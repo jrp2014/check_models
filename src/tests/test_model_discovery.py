@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
+from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING
 
@@ -17,7 +18,6 @@ from tools import safe_io
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -731,3 +731,221 @@ class TestCapabilityAwareSelection:
         ]
         assert by_id["org/vlm"]["selected"] is True
         assert by_id["org/new-arch"]["capability_verdict"] == "unknown"
+
+
+# --- Nativ-informed discovery hardening ---------------------------------------
+
+
+def _revision(
+    commit_hash: str,
+    snapshot_path: str,
+    *,
+    refs: tuple[str, ...] = (),
+    last_modified: float = 0.0,
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        commit_hash=commit_hash,
+        snapshot_path=snapshot_path,
+        refs=refs,
+        last_modified=last_modified,
+    )
+
+
+class TestSnapshotRevisionResolution:
+    """Snapshot resolution mirrors the loader: ref/hash, then main, then labelled fallback."""
+
+    @staticmethod
+    def _install_cache(monkeypatch: pytest.MonkeyPatch, revisions: list[SimpleNamespace]) -> None:
+        repo = SimpleNamespace(repo_id="org/m", revisions=revisions)
+        monkeypatch.setattr(
+            check_models,
+            "_get_hf_cache_info_cached",
+            lambda **_: SimpleNamespace(repos=(repo,)),
+        )
+
+    def test_requested_hash_prefix_wins_over_newer_snapshots(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An explicit --revision resolves to its own snapshot, not the newest one."""
+        self._install_cache(
+            monkeypatch,
+            [
+                _revision("aaaa1111bbbb", "/snap/old", last_modified=1.0),
+                _revision("cccc2222dddd", "/snap/new", refs=("main",), last_modified=9.0),
+            ],
+        )
+        resolved = check_models._resolve_model_snapshot("org/m", "aaaa1111")
+        assert resolved is not None
+        assert resolved.path == Path("/snap/old")
+        assert resolved.source == "requested-revision"
+
+    def test_ref_name_resolves_and_unresolvable_request_returns_none(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A cached ref name matches; a revision absent from the cache never misreports."""
+        self._install_cache(
+            monkeypatch,
+            [_revision("aaaa1111bbbb", "/snap/tagged", refs=("v1.0", "main"))],
+        )
+        resolved = check_models._resolve_model_snapshot("org/m", "v1.0")
+        assert resolved is not None
+        assert resolved.source == "requested-revision"
+        assert check_models._resolve_model_snapshot("org/m", "not-cached") is None
+
+    def test_main_ref_beats_newest_snapshot(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Without a request, the cached main ref wins even when another snapshot is newer."""
+        self._install_cache(
+            monkeypatch,
+            [
+                _revision("aaaa1111bbbb", "/snap/main", refs=("main",), last_modified=1.0),
+                _revision("cccc2222dddd", "/snap/detached", last_modified=9.0),
+            ],
+        )
+        resolved = check_models._resolve_model_snapshot("org/m")
+        assert resolved is not None
+        assert resolved.path == Path("/snap/main")
+        assert resolved.source == "refs/main"
+
+    def test_newest_fallback_is_labelled(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """With no main ref, the recency fallback is used and says so."""
+        self._install_cache(
+            monkeypatch,
+            [
+                _revision("aaaa1111bbbb", "/snap/older", last_modified=1.0),
+                _revision("cccc2222dddd", "/snap/newer", last_modified=9.0),
+            ],
+        )
+        resolved = check_models._resolve_model_snapshot("org/m")
+        assert resolved is not None
+        assert resolved.path == Path("/snap/newer")
+        assert resolved.source == "newest-snapshot"
+
+    def test_provenance_records_resolution_source(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """model_provenance carries revision_source so reports can show the basis."""
+        self._install_cache(
+            monkeypatch,
+            [_revision("aaaa1111bbbb", "/cache/snapshots/aaaa1111bbbb", refs=("main",))],
+        )
+        record = check_models._collect_model_provenance("org/m")
+        assert record["resolved_revision"] == "aaaa1111bbbb"
+        assert record.get("revision_source") == "refs/main"
+
+
+class TestWeightShardValidation:
+    """A safetensors index only counts when every referenced shard is present."""
+
+    @staticmethod
+    def _snapshot_with_shards(tmp_path: Path, *, missing: int) -> Path:
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        names = [f"model-{i:05d}-of-00003.safetensors" for i in range(1, 4)]
+        index = {"weight_map": {f"layer{i}": name for i, name in enumerate(names)}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        for name in names[: len(names) - missing]:
+            safe_io.write_text_no_follow(snapshot / name, "weights")
+        return snapshot
+
+    def test_complete_and_incomplete_snapshots(self, tmp_path: Path) -> None:
+        """Missing shards are counted with a bounded sample; complete is clean."""
+        complete = self._snapshot_with_shards(tmp_path / "ok", missing=0)
+        status = check_models._weight_shard_status(complete)
+        assert status is not None
+        assert (status.missing, status.total) == (0, 3)
+
+        partial = self._snapshot_with_shards(tmp_path / "partial", missing=2)
+        status = check_models._weight_shard_status(partial)
+        assert status is not None
+        assert (status.missing, status.total) == (2, 3)
+        assert len(status.missing_sample) == 2
+        assert all(name.endswith(".safetensors") for name in status.missing_sample)
+
+    def test_empty_shard_counts_as_missing(self, tmp_path: Path) -> None:
+        """A zero-byte shard is an interrupted download, not a weight file."""
+        snapshot = self._snapshot_with_shards(tmp_path, missing=0)
+        (snapshot / "model-00001-of-00003.safetensors").write_bytes(b"")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_layout_validator_notes_missing_shards(self, tmp_path: Path) -> None:
+        """Explicit runs retain the attempt but record the incomplete download."""
+        snapshot = self._snapshot_with_shards(tmp_path, missing=1)
+        (snapshot / "config.json").write_text("{}")
+        (snapshot / "tokenizer_config.json").write_text("{}")
+        (snapshot / "preprocessor_config.json").write_text("{}")
+        notes = check_models._validate_model_artifact_layout(
+            model_identifier="org/m", snapshot_path=snapshot, tokenizer=None
+        )
+        assert any("1 of 3 weight shards missing" in note for note in notes)
+
+    def test_incomplete_cache_load_failure_is_indeterminate(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A model_load failure on a half-downloaded snapshot is environmental."""
+        snapshot = self._snapshot_with_shards(tmp_path, missing=2)
+        monkeypatch.setattr(
+            check_models, "_resolve_model_snapshot_path", lambda *_a, **_k: snapshot
+        )
+        result = check_models.PerformanceResult(
+            model_name="org/m",
+            success=False,
+            generation=None,
+            failure_phase="model_load",
+            error_type="FileNotFoundError",
+        )
+        assert check_models._is_incomplete_cache_failure(result) is True
+        assert check_models._execution_status(result) == "indeterminate"
+        assert "incomplete cached snapshot" in check_models._indeterminate_reason(result)
+
+
+class TestTemplateThinkingMarkers:
+    """Discovery-time detection of thinking-capable chat templates."""
+
+    def test_jinja_template_with_markers(self, tmp_path: Path) -> None:
+        """A chat_template.jinja containing <think> declares thinking."""
+        (tmp_path / "chat_template.jinja").write_text("{% if x %}<think>{% endif %}")
+        assert check_models._template_declares_thinking(tmp_path) is True
+
+    def test_tokenizer_config_template_without_markers(self, tmp_path: Path) -> None:
+        """A plain template is a definite False, not unknown."""
+        (tmp_path / "tokenizer_config.json").write_text(
+            json.dumps({"chat_template": "{{ messages }}"})
+        )
+        assert check_models._template_declares_thinking(tmp_path) is False
+
+    def test_kimi_style_marker_in_config_template(self, tmp_path: Path) -> None:
+        """Non-ASCII markers (Kimi's ◁think▷) are recognised in JSON templates."""
+        (tmp_path / "tokenizer_config.json").write_text(
+            json.dumps({"chat_template": "... ◁think▷ ..."})
+        )
+        assert check_models._template_declares_thinking(tmp_path) is True
+
+    def test_no_template_is_none(self, tmp_path: Path) -> None:
+        """No template found anywhere means unknown, never False."""
+        assert check_models._template_declares_thinking(tmp_path) is None
+        assert check_models._template_declares_thinking(None) is None
+
+
+class TestEmbeddingLayoutSignal:
+    """Sentence-transformers layouts are embeddings regardless of config wording."""
+
+    def test_layout_files_classify_as_embedding(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """modules.json / pooling configs are an unambiguous embedding signal."""
+        (tmp_path / "modules.json").write_text("[]")
+        (tmp_path / "1_Pooling").mkdir()
+        (tmp_path / "1_Pooling" / "config.json").write_text("{}")
+        monkeypatch.setattr(check_models, "_hf_cache_main_snapshot_path", lambda _repo: tmp_path)
+        signal = check_models._embedding_layout_signal(object())
+        assert signal is not None
+        assert (signal.verdict, signal.purpose) == ("no", "embedding")
+        assert any("modules.json" in item for item in signal.evidence)
+
+    def test_absent_layout_is_no_signal(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without layout files the classifier falls through to config evidence."""
+        monkeypatch.setattr(check_models, "_hf_cache_main_snapshot_path", lambda _repo: tmp_path)
+        assert check_models._embedding_layout_signal(object()) is None

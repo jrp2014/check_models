@@ -638,7 +638,13 @@ def test_model_provenance_distinguishes_requested_and_resolved_revision(
     snapshot = check_models.Path(
         f"/Users/example/.cache/huggingface/hub/models--org--model/snapshots/{snapshot_sha}"
     )
-    monkeypatch.setattr(check_models, "_resolve_model_snapshot_path", lambda _model: snapshot)
+    monkeypatch.setattr(
+        check_models,
+        "_resolve_model_snapshot",
+        lambda _model, _revision=None: check_models.ResolvedSnapshot(
+            snapshot, "requested-revision"
+        ),
+    )
     monkeypatch.setattr(
         check_models.Path, "home", classmethod(lambda _cls: check_models.Path("/Users/example"))
     )
@@ -653,6 +659,7 @@ def test_model_provenance_distinguishes_requested_and_resolved_revision(
         "requested_revision": "main",
         "resolved_revision": snapshot_sha,
         "snapshot_path": ("~/.cache/huggingface/hub/models--org--model/snapshots/" + snapshot_sha),
+        "revision_source": "requested-revision",
     }
 
 

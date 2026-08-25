@@ -1138,6 +1138,7 @@ class ModelProvenanceRecord(TypedDict):
     requested_revision: str | None
     resolved_revision: str | None
     snapshot_path: str | None
+    revision_source: NotRequired[str]
 
 
 class RunOutcomeCounts(TypedDict):
@@ -1187,6 +1188,7 @@ class CacheDiscoveryEntryRecord(TypedDict):
     model_purpose: ModelPurposeClass
     capability_evidence: list[str]
     skip_reasons: list[str]
+    thinking_template: NotRequired[bool | None]
     model_type: str | None
     arch_supported: bool | None
 
@@ -1807,6 +1809,7 @@ class PromptDiagnostics:
     # harness applied it because the template opened a thinking block,
     # "explicit" when the user passed thinking flags, None when no budget.
     thinking_budget_source: Literal["auto", "explicit"] | None = None
+    template_thinking_markers: bool | None = None
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
     # usability; retained so a later failure can be traced to a snapshot that
@@ -7426,6 +7429,132 @@ _HF_DOWNLOAD_PROGRESS_NEEDLES: Final[tuple[str, ...]] = (
 )
 
 
+_THINKING_TEMPLATE_MARKERS: Final[tuple[str, ...]] = (
+    "enable_thinking",
+    "thinking_config",
+    "reasoning_content",
+    "<think>",
+    "</think>",
+    "<thinking>",
+    "◁think▷",
+)
+
+
+def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
+    """Scan a snapshot's chat template(s) for thinking markers (Nativ-style).
+
+    Discovery-time complement to the render-time auto-budget check: a model
+    whose template *declares* thinking but does not pre-open a block is the
+    self-opening case a rendered-prompt check cannot see. Returns None when no
+    chat template is found at all.
+    """
+    if snapshot_path is None or not snapshot_path.is_dir():
+        return None
+    found_template = False
+    jinja_path = snapshot_path / "chat_template.jinja"
+    if jinja_path.is_file():
+        found_template = True
+        try:
+            template_text = _read_text_file(jinja_path).casefold()
+        except (OSError, ValueError):
+            template_text = ""
+        if any(marker in template_text for marker in _THINKING_TEMPLATE_MARKERS):
+            return True
+    for file_name in ("tokenizer_config.json", "processor_config.json", "chat_template.json"):
+        config_path = snapshot_path / file_name
+        if not config_path.is_file():
+            continue
+        try:
+            payload = json.loads(_read_text_file(config_path))
+        except (OSError, ValueError):
+            continue
+        template_value = payload.get("chat_template") if isinstance(payload, dict) else None
+        if template_value is None:
+            continue
+        found_template = True
+        template_text = json.dumps(template_value, ensure_ascii=False).casefold()
+        if any(marker in template_text for marker in _THINKING_TEMPLATE_MARKERS):
+            return True
+    return False if found_template else None
+
+
+class WeightShardStatus(NamedTuple):
+    """Completeness of a sharded checkpoint per its safetensors index."""
+
+    missing: int
+    total: int
+    missing_sample: tuple[str, ...]
+
+
+_WEIGHT_SHARD_SAMPLE_LIMIT: Final[int] = 5
+
+INCOMPLETE_CACHE_REMEDY: Final[str] = (
+    "The snapshot's safetensors index references weight shards that are absent "
+    "or empty — typically an interrupted download. Re-run to resume it, or "
+    "re-fetch with `hf download <model>`."
+)
+
+
+def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
+    """Check every shard the safetensors index references, Nativ-style.
+
+    The index file downloads before its shards, so its mere presence does not
+    make a model runnable. Each referenced shard must exist, resolve inside
+    this repo's cache directory, and be a non-empty regular file. Returns None
+    when there is no index (single-file checkpoints are validated by the
+    plain safetensors presence check).
+    """
+    index_path = snapshot_path / "model.safetensors.index.json"
+    if not index_path.is_file():
+        return None
+    try:
+        payload = json.loads(_read_text_file(index_path))
+    except (OSError, ValueError):
+        return None
+    weight_map = payload.get("weight_map") if isinstance(payload, dict) else None
+    if not isinstance(weight_map, dict):
+        return None
+    shard_names = sorted({str(name) for name in weight_map.values() if name})
+    if not shard_names:
+        return None
+    try:
+        repo_root = snapshot_path.parent.parent.resolve(strict=True)
+    except OSError:
+        return None
+    missing: list[str] = []
+    for name in shard_names:
+        shard = snapshot_path / name
+        try:
+            resolved = shard.resolve(strict=True)
+            complete = resolved.is_relative_to(repo_root) and (
+                resolved.is_file() and resolved.stat().st_size > 0
+            )
+        except OSError:
+            complete = False
+        if not complete:
+            missing.append(name)
+    return WeightShardStatus(
+        missing=len(missing),
+        total=len(shard_names),
+        missing_sample=tuple(missing[:_WEIGHT_SHARD_SAMPLE_LIMIT]),
+    )
+
+
+def _is_incomplete_cache_failure(result: PerformanceResult) -> bool:
+    """Return whether a load failure sits on an incompletely downloaded snapshot.
+
+    Environmental, like a download timeout: the model never had its weights,
+    so the failure is evidence about the cache, not the model or runtime.
+    """
+    if result.success or result.failure_phase != "model_load":
+        return False
+    snapshot_path = _resolve_model_snapshot_path(result.model_name)
+    if snapshot_path is None:
+        return False
+    status = _weight_shard_status(snapshot_path)
+    return status is not None and status.missing > 0
+
+
 DOWNLOAD_TIMEOUT_REMEDY: Final[str] = (
     "the per-model timeout expired while the checkpoint was still downloading, so the "
     "model was never loaded or tested. This is a local environment condition, not an "
@@ -8194,7 +8323,11 @@ def _execution_status(result: PerformanceResult) -> ExecutionStatus:
     the environment prevented a conclusive attempt, so they are neither a
     completion nor a crash attributable to the model or mlx-vlm.
     """
-    if _is_indeterminate_connectivity_failure(result) or _is_download_timeout_failure(result):
+    if (
+        _is_indeterminate_connectivity_failure(result)
+        or _is_download_timeout_failure(result)
+        or _is_incomplete_cache_failure(result)
+    ):
         return "indeterminate"
     return "completed" if result.success else "crashed"
 
@@ -9364,6 +9497,10 @@ def _diagnostics_partition_blocks(
                 detail = _gallery_observation_labels(assessment.observations)
             elif _is_download_timeout_failure(result):
                 detail = "indeterminate: download timeout (re-run, pre-fetch, or raise --timeout)"
+            elif _is_incomplete_cache_failure(result):
+                detail = (
+                    "indeterminate: incomplete cached snapshot (resume or re-fetch the download)"
+                )
             else:
                 detail = "indeterminate: connectivity failure"
             entry = ReportDetails(
@@ -11382,6 +11519,9 @@ def _build_prompt_diagnostics(
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
+        template_thinking_markers=_template_declares_thinking(
+            _resolve_model_snapshot_path(params.model_identifier, params.revision)
+        ),
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
@@ -11411,6 +11551,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "eos_token_id",
         "eos_token",
         "thinking_budget_source",
+        "template_thinking_markers",
     ):
         value = getattr(diagnostics, key)
         if value is not None:
@@ -11593,6 +11734,10 @@ class CachedModelEligibility:
             evidence=("capability not classified",),
         )
     )
+    # Whether the chat template declares thinking markers (None: no template
+    # found). A neutral discovery fact — self-opening thinkers declare markers
+    # without pre-opening a block, which render-time checks cannot see.
+    thinking_template: bool | None = None
 
     @property
     def selected(self) -> bool:
@@ -12229,7 +12374,7 @@ def _load_model(
             f"{type(error).__name__}: {error}" for error in _exception_chain(load_error)
         )
         snapshot_path = (
-            _resolve_model_snapshot_path(params.model_identifier)
+            _resolve_model_snapshot_path(params.model_identifier, params.revision)
             if not params.force_download and _has_external_connectivity_signal(chain_text)
             else None
         )
@@ -12294,11 +12439,33 @@ def _extract_processor_tokenizer(
     return None
 
 
-def _resolve_model_snapshot_path(model_identifier: str) -> Path | None:
-    """Resolve local snapshot path for a model identifier when available."""
+_MIN_REVISION_HASH_PREFIX: Final[int] = 7
+
+
+class ResolvedSnapshot(NamedTuple):
+    """A locally resolved snapshot plus how its revision was chosen."""
+
+    path: Path
+    source: Literal["local-path", "requested-revision", "refs/main", "newest-snapshot"]
+
+
+def _resolve_model_snapshot(
+    model_identifier: str,
+    requested_revision: str | None = None,
+) -> ResolvedSnapshot | None:
+    """Resolve the cached snapshot the way the loader will, not by recency.
+
+    Resolution order mirrors huggingface_hub (and Nativ's discovery): an
+    explicit requested revision (commit hash, hash prefix, or a cached ref
+    name) wins; otherwise the cached ``main`` ref; only when neither exists is
+    the newest snapshot by modification time used, and that fallback is
+    labelled so provenance never silently passes it off as ``main``. A
+    requested revision that cannot be resolved locally returns None rather
+    than misreporting some other snapshot as the requested one.
+    """
     if model_identifier.startswith(("/", "./", "../")):
         path = Path(model_identifier)
-        return path.resolve() if path.is_dir() else None
+        return ResolvedSnapshot(path.resolve(), "local-path") if path.is_dir() else None
 
     try:
         cache_info = _get_hf_cache_info_cached()
@@ -12306,19 +12473,59 @@ def _resolve_model_snapshot_path(model_identifier: str) -> Path | None:
         return None
 
     for repo in cache_info.repos:
-        if repo.repo_id != model_identifier:
-            continue
-        revisions = list(repo.revisions)
-        if not revisions:
-            repo_path = getattr(repo, "repo_path", None)
-            return Path(repo_path) if repo_path else None
-        revisions.sort(
-            key=lambda revision: float(getattr(revision, "last_modified", 0.0) or 0.0),
-            reverse=True,
-        )
-        snapshot_path = getattr(revisions[0], "snapshot_path", None)
-        return Path(snapshot_path) if snapshot_path else None
+        if repo.repo_id == model_identifier:
+            return _resolve_repo_snapshot(list(repo.revisions), requested_revision)
     return None
+
+
+def _revision_matches_request(revision: object, requested_revision: str) -> bool:
+    """Return whether a cached revision satisfies an explicit hash/prefix/ref."""
+    commit_hash = str(getattr(revision, "commit_hash", "") or "")
+    refs = {str(ref) for ref in getattr(revision, "refs", ()) or ()}
+    return (
+        commit_hash == requested_revision
+        or (
+            len(requested_revision) >= _MIN_REVISION_HASH_PREFIX
+            and commit_hash.startswith(requested_revision)
+        )
+        or requested_revision in refs
+    )
+
+
+def _resolve_repo_snapshot(
+    revisions: list[object],
+    requested_revision: str | None,
+) -> ResolvedSnapshot | None:
+    """Pick the snapshot for one cached repo per the documented resolution order."""
+    if not revisions:
+        return None
+    if requested_revision:
+        for revision in revisions:
+            if _revision_matches_request(revision, requested_revision):
+                snapshot = getattr(revision, "snapshot_path", None)
+                if snapshot:
+                    return ResolvedSnapshot(Path(str(snapshot)), "requested-revision")
+        return None
+    for revision in revisions:
+        if "main" in (getattr(revision, "refs", ()) or ()):
+            snapshot = getattr(revision, "snapshot_path", None)
+            if snapshot:
+                return ResolvedSnapshot(Path(str(snapshot)), "refs/main")
+    revisions.sort(
+        key=lambda revision: float(getattr(revision, "last_modified", 0.0) or 0.0),
+        reverse=True,
+    )
+    snapshot = getattr(revisions[0], "snapshot_path", None)
+    return ResolvedSnapshot(Path(str(snapshot)), "newest-snapshot") if snapshot else None
+
+
+def _resolve_model_snapshot_path(
+    model_identifier: str,
+    requested_revision: str | None = None,
+) -> Path | None:
+    """Path-only convenience over :func:`_resolve_model_snapshot`."""
+    resolved = _resolve_model_snapshot(model_identifier, requested_revision)
+    return resolved.path if resolved is not None else None
 
 
 def _collect_model_provenance(
@@ -12327,13 +12534,14 @@ def _collect_model_provenance(
     requested_revision: str | None = None,
 ) -> ModelProvenanceRecord:
     """Return requested and locally selected model snapshot identity."""
-    snapshot_path = _resolve_model_snapshot_path(model_identifier)
+    resolved = _resolve_model_snapshot(model_identifier, requested_revision)
+    snapshot_path = resolved.path if resolved is not None else None
     resolved_revision = (
         snapshot_path.name
         if snapshot_path is not None and snapshot_path.parent.name == "snapshots"
         else None
     )
-    return {
+    record: ModelProvenanceRecord = {
         "model": model_identifier,
         "requested_revision": requested_revision,
         "resolved_revision": resolved_revision,
@@ -12341,6 +12549,9 @@ def _collect_model_provenance(
             _home_relative_report_text(str(snapshot_path)) if snapshot_path is not None else None
         ),
     }
+    if resolved is not None:
+        record["revision_source"] = resolved.source
+    return record
 
 
 def _get_config_value(config: object | None, key: str) -> object | None:
@@ -12397,6 +12608,14 @@ def _validate_model_artifact_layout(
     if not any((snapshot_path / name).exists() for name in processor_candidates):
         notes.append(f"processor config missing from snapshot ({', '.join(processor_candidates)})")
 
+    shard_status = _weight_shard_status(snapshot_path)
+    if shard_status is not None and shard_status.missing:
+        sample = ", ".join(shard_status.missing_sample)
+        notes.append(
+            f"{shard_status.missing} of {shard_status.total} weight shards missing "
+            f"from snapshot (e.g. {sample}) — incomplete download"
+        )
+
     for note in notes:
         logger.debug("Legacy snapshot note for %s: %s.", model_identifier, note)
     return tuple(notes)
@@ -12408,6 +12627,7 @@ def _run_model_preflight_validators(
     processor: ProcessorMixin,
     config: PreTrainedConfig | Mapping[str, object] | None,
     phase_callback: Callable[[str], None] | None = None,
+    requested_revision: str | None = None,
 ) -> tuple[str, ...]:
     """Run preflight validators before invoking generation.
 
@@ -12436,7 +12656,7 @@ def _run_model_preflight_validators(
             model_identifier,
         )
 
-    snapshot_path = _resolve_model_snapshot_path(model_identifier)
+    snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
     return _validate_model_artifact_layout(
         model_identifier=model_identifier,
         snapshot_path=snapshot_path,
@@ -12524,6 +12744,7 @@ def _prepare_generation_prompt(
                 processor=processor,
                 config=config,
                 phase_callback=phase_callback,
+                requested_revision=params.revision,
             )
             _set_failure_phase(phase_callback, "prefill")
             rendered = cast(
@@ -15533,6 +15754,35 @@ def _capability_from_image_evidence(
     )
 
 
+_SENTENCE_TRANSFORMER_LAYOUT_FILES: Final[tuple[str, ...]] = (
+    "modules.json",
+    "1_Pooling/config.json",
+    "sentence_bert_config.json",
+)
+
+
+def _embedding_layout_signal(repo: object) -> ImageCapability | None:
+    """Classify sentence-transformers layouts as embeddings (Nativ heuristic).
+
+    These repos carry a plain text-encoder config that the generative-arch
+    rules would leave ``unknown`` (and therefore run); the layout files are
+    an unambiguous embedding signal that needs no ``mlx_embeddings`` stamp.
+    """
+    snapshot = _hf_cache_main_snapshot_path(repo)
+    if snapshot is None:
+        return None
+    present = tuple(
+        name for name in _SENTENCE_TRANSFORMER_LAYOUT_FILES if (snapshot / name).is_file()
+    )
+    if not present:
+        return None
+    return ImageCapability(
+        "no",
+        "embedding",
+        tuple(f"sentence-transformers layout file: {name}" for name in present),
+    )
+
+
 def _classify_image_capability(repo: object) -> ImageCapability:
     """Classify a cached repo's fit for the single-image description benchmark.
 
@@ -15554,6 +15804,10 @@ def _classify_image_capability(repo: object) -> ImageCapability:
     config = _read_cached_repo_json(repo, "config.json")
     if config is None:
         return ImageCapability("unknown", "unknown", ("no readable config.json",))
+
+    layout_signal = _embedding_layout_signal(repo)
+    if layout_signal is not None:
+        return layout_signal
 
     model_type = str(config.get("model_type") or "").lower().replace("-", "_")
     raw_architectures = config.get("architectures")
@@ -15647,6 +15901,17 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         )
         if not has_safetensors:
             reasons.append("missing safetensors weights")
+        elif "model.safetensors.index.json" in main_files:
+            # An index downloads before its shards; require every referenced
+            # shard to actually be present and non-empty (Nativ does the same).
+            snapshot = _hf_cache_main_snapshot_path(repo)
+            shard_status = _weight_shard_status(snapshot) if snapshot is not None else None
+            if shard_status is not None and shard_status.missing:
+                sample = ", ".join(shard_status.missing_sample)
+                reasons.append(
+                    f"cache layout: {shard_status.missing} of {shard_status.total} "
+                    f"weight shards missing (e.g. {sample})"
+                )
 
     model_type, resolved_model_type, arch_supported = _model_arch_precheck(repo)
     return CachedModelEligibility(
@@ -15657,6 +15922,7 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
         resolved_model_type=resolved_model_type,
         arch_supported=arch_supported,
         capability=_classify_image_capability(repo),
+        thinking_template=_template_declares_thinking(_hf_cache_main_snapshot_path(repo)),
     )
 
 
@@ -15710,6 +15976,7 @@ def _cache_discovery_records() -> list[CacheDiscoveryEntryRecord]:
             "skip_reasons": list(entry.skip_reasons),
             "model_type": entry.model_type,
             "arch_supported": entry.arch_supported,
+            "thinking_template": entry.thinking_template,
         }
         for entry in get_cached_model_eligibility()
     ]
@@ -16781,6 +17048,8 @@ def _indeterminate_reason(result: PerformanceResult) -> str:
     """Return the root cause and remedy for an indeterminate attempt."""
     if _is_download_timeout_failure(result):
         return f"download timeout: {DOWNLOAD_TIMEOUT_REMEDY}"
+    if _is_incomplete_cache_failure(result):
+        return f"incomplete cached snapshot: {INCOMPLETE_CACHE_REMEDY}"
     return result.error_message or "external connectivity failure"
 
 

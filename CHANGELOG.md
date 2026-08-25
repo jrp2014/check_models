@@ -4,6 +4,73 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Nativ-informed discovery hardening (with review):
+  - Snapshot resolution now mirrors the loader instead of picking the newest
+    snapshot by mtime: an explicit `--revision` (commit hash, >=7-char prefix,
+    or cached ref name) resolves to its own snapshot, otherwise the cached
+    `main` ref wins, and only then does a recency fallback apply — labelled,
+    and recorded as `revision_source` in `model_provenance`. A requested
+    revision absent from the cache resolves to nothing rather than
+    misreporting another snapshot, fixing baseline comparisons attributing
+    changes to the wrong revision.
+  - Sharded checkpoints are validated against their safetensors index: every
+    referenced shard must exist inside the repo's cache directory as a
+    non-empty regular file. Default discovery skips incomplete snapshots with
+    `cache layout: N of M weight shards missing (e.g. …)`; explicit selection
+    retains the attempt and records the fact as a snapshot note; a
+    `model_load` failure on such a snapshot is classified indeterminate
+    (environmental, like a download timeout) with a resume/re-fetch remedy.
+  - Discovery and prompt diagnostics record whether a model's chat template
+    declares thinking markers (`thinking_template` in `cache_discovery`,
+    `template_thinking_markers` in prompt diagnostics; tri-state, `null` when
+    no template exists) — the self-opening thinkers declare markers without
+    pre-opening a block, which render-time checks cannot see.
+  - Sentence-transformers layouts (`modules.json`, `1_Pooling/config.json`,
+    `sentence_bert_config.json`) classify as embeddings during discovery even
+    without an `mlx_embeddings` stamp.
+  Deliberately not adopted from Nativ: its fixed memory-headroom fit verdict
+  (this harness measures actual MLX memory); raw model-burden facts remain a
+  candidate follow-up.
+
+
+- Built-in run comparison (`--compare-with`, default `auto`): every sweep now
+  diffs itself against a baseline — by default the retained `results.jsonl` at
+  git `HEAD`, i.e. the last committed sweep — and reports a `comparison` block
+  in `run.json`, a terminal summary, and a "Since the baseline sweep" section in
+  `run_summary.md` whenever that summary is produced (it remains conditional on
+  there being something to report, as before). It records per-model execution/usability/observation-set
+  transitions, the count of byte-identical generated texts, generation tok/s
+  ratios (median/min/max) with per-model noise bands derived from
+  `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs,
+  excluding the run being judged; a fixed ±15% band when history is thin), and
+  peak-memory moves beyond 0.5 GB and 10%. Models added/removed between runs
+  are listed (collapsed to a count for targeted runs). `none` disables; a path
+  or any git ref selects another baseline. Everything is model-agnostic and
+  degrades to "no comparison" rather than failing a run.
+- Isolated execution (`--isolate`): each model runs in a fresh child
+  interpreter that hands its full `PerformanceResult` back as JSON (nested
+  dataclasses and the upstream generation metrics round-trip exactly, so
+  reports are identical to in-process runs). A child that dies natively —
+  segfault, abort, interpreter-finalization fault — becomes that model's
+  phase-tagged crash record (signal name, phase reached via a progress file,
+  stderr tail) built through the same failure path as an in-process
+  exception, instead of ending the sweep. Verified live with a forced
+  `SIGABRT` in one child of a three-model run. The in-process boundary is
+  unchanged and remains the default.
+- Exact prompt token accounting: prompt diagnostics now record
+  `rendered_prompt_token_count`, the tokenizer's count of the rendered chat
+  template (mirroring upstream's `should_add_special_tokens`, duck-typed so
+  every family takes the same path). Quality analysis and `run.json`
+  `prompt_burden` use it as the text/template share — `text_tokens_source`
+  says `tokenizer` or `heuristic` — so the non-text (image/audio expansion)
+  share is exact for every model, and a new "Prompt composition" diagnostics
+  row states it (e.g. Qwen3-VL-2B: 16,467 = 298 text + 16,169 non-text,
+  98%). With an exact split, `visual_input` classification no longer depends
+  on the placeholder regex recognising a family's image token. The word-ratio
+  heuristic remains the fallback when a tokenizer cannot count.
+
 ### Changed
 
 - `check_outdated.py` annotates local dev/editable builds in its outdated
@@ -43,44 +110,6 @@ Notable changes to this project will be documented in this file.
   no friction: PyPI wheels (mlx 0.32.1, mlx-vlm 0.6.15, transformers 5.15.1,
   Metal available), the local mlx source build, the full test suite, mypy,
   pyrefly, ty, ruff, and the torch extra (2.13.0).
-
-### Added
-
-- Built-in run comparison (`--compare-with`, default `auto`): every sweep now
-  diffs itself against a baseline — by default the retained `results.jsonl` at
-  git `HEAD`, i.e. the last committed sweep — and reports a `comparison` block
-  in `run.json`, a terminal summary, and a "Since the baseline sweep" section in
-  `run_summary.md` whenever that summary is produced (it remains conditional on
-  there being something to report, as before). It records per-model execution/usability/observation-set
-  transitions, the count of byte-identical generated texts, generation tok/s
-  ratios (median/min/max) with per-model noise bands derived from
-  `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs,
-  excluding the run being judged; a fixed ±15% band when history is thin), and
-  peak-memory moves beyond 0.5 GB and 10%. Models added/removed between runs
-  are listed (collapsed to a count for targeted runs). `none` disables; a path
-  or any git ref selects another baseline. Everything is model-agnostic and
-  degrades to "no comparison" rather than failing a run.
-- Isolated execution (`--isolate`): each model runs in a fresh child
-  interpreter that hands its full `PerformanceResult` back as JSON (nested
-  dataclasses and the upstream generation metrics round-trip exactly, so
-  reports are identical to in-process runs). A child that dies natively —
-  segfault, abort, interpreter-finalization fault — becomes that model's
-  phase-tagged crash record (signal name, phase reached via a progress file,
-  stderr tail) built through the same failure path as an in-process
-  exception, instead of ending the sweep. Verified live with a forced
-  `SIGABRT` in one child of a three-model run. The in-process boundary is
-  unchanged and remains the default.
-- Exact prompt token accounting: prompt diagnostics now record
-  `rendered_prompt_token_count`, the tokenizer's count of the rendered chat
-  template (mirroring upstream's `should_add_special_tokens`, duck-typed so
-  every family takes the same path). Quality analysis and `run.json`
-  `prompt_burden` use it as the text/template share — `text_tokens_source`
-  says `tokenizer` or `heuristic` — so the non-text (image/audio expansion)
-  share is exact for every model, and a new "Prompt composition" diagnostics
-  row states it (e.g. Qwen3-VL-2B: 16,467 = 298 text + 16,169 non-text,
-  98%). With an exact split, `visual_input` classification no longer depends
-  on the placeholder regex recognising a family's image token. The word-ratio
-  heuristic remains the fallback when a tokenizer cannot count.
 
 ### Fixed
 
