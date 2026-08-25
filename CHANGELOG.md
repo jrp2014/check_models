@@ -84,13 +84,19 @@ Notable changes to this project will be documented in this file.
   mlx-lm/mlx-vlm replaced the editable `0.32.2.dev…` build with the wheel
   (PEP 440 ranks a final release above any `.devN` of the same version), the
   Stage 4b verification failure was non-fatal, and the script then removed
-  `mlx-metal` on the false premise that mlx was still local. Now: after a
-  successful local mlx build its exact version is pinned via a
-  `PIP_CONSTRAINT` file for every later pip install in the run (verified: an
-  eager `-U` leaves the pinned build untouched); a failed editable
-  verification is fatal with the remedy printed instead of degrading into a
-  mixed state; and the `mlx-metal` removal is guarded on mlx actually being
-  an editable/dev install.
+  `mlx-metal` on the false premise that mlx was still local. After a
+  successful local mlx build its exact version is now pinned as a *private*
+  `--constraint` argument injected by the pip wrappers — caller-supplied
+  `PIP_CONSTRAINT` passes through untouched, and the temp file is removed by
+  an `EXIT` trap. Local-source preservation outranks `FORCE_REINSTALL`: once
+  the pin is active the flag is suppressed (and logged) instead of producing
+  `ResolutionImpossible` against a dev version PyPI cannot supply. Repo
+  detection is separated from the mutating updater, which now runs as an
+  ordinary command so `set -e` makes any failure — including editable
+  verification — abort the run instead of degrading into a half-local
+  environment; `mlx-metal` removal is guarded on mlx actually being an
+  editable/dev install. Fake-pip regression tests cover the normal, forced,
+  pinned, forced+pinned, caller-constraint, and cleanup cases.
 
 
 - Comparability is now three-state (`comparable` / `unknown` / `incomparable`):

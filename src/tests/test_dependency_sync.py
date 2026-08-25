@@ -2115,10 +2115,16 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
 
     assert "UPDATE_PIP_CONSTRAINT" not in update_script
     assert "UPDATE_PIP_CONSTRAINT_SPECS" not in policy_source
-    assert 'pip install "${args[@]}" "$@"' in update_script
+    # Wrappers inject the private local-mlx pin (empty-safe on bash 3.2).
+    assert (
+        'pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"'
+        in update_script
+    )
+    # Detection is a separate, non-mutating gate so set -e reaches the updater.
+    assert "if local_mlx_repos_present; then" in update_script
     assert 'pip_install_tool "setuptools>=80,<82"' in update_script
 
-    local_update_pos = main_flow.index("if update_local_mlx_repos; then")
+    local_update_pos = main_flow.index("update_local_mlx_repos")
     pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-lm mlx-vlm")
     reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
     stubs_pos = main_flow.index("generate_project_stubs")
@@ -2711,3 +2717,97 @@ def test_provider_typed_packages_skip_stub_generation(
     (stale / "__init__.pyi").write_text("x: int\n", encoding="utf-8")
     generate_stubs._purge_shadowing_stubs("typed_pkg", typings_dir)
     assert not stale.exists()
+
+
+def _run_update_pip_wrapper_harness(driver: str, tmp_path: Path) -> str:
+    """Run update.sh's pin/wrapper helpers against a fake pip; return its arg log.
+
+    The helpers are extracted verbatim from the script (the contiguous block
+    from the pin state through ``pip_install_verbose``) so the test exercises
+    the shipped code, not a copy.
+    """
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    start = script.index('LOCAL_MLX_CONSTRAINT_FILE=""')
+    end = script.index("# Helper function: pip install for build/infrastructure tools only.")
+    helpers = script[start:end]
+
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir(exist_ok=True)
+    pip_log = tmp_path / "pip-args.log"
+    fake_pip = fake_bin / "pip"
+    safe_io.write_text_no_follow(
+        fake_pip,
+        "#!/bin/bash\n"
+        f'echo "ARGS: $*" >> "{pip_log}"\n'
+        f'echo "CALLER_PIP_CONSTRAINT: ${{PIP_CONSTRAINT:-unset}}" >> "{pip_log}"\n',
+        mode=0o755,
+    )
+
+    completed = subprocess.run(  # noqa: S603 - test harness, fixed bash, temp files
+        ["/bin/bash", "-c", helpers + "\n" + driver],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"},
+        cwd=tmp_path,
+    )
+    assert completed.returncode == 0, completed.stderr + completed.stdout
+    log_text = safe_io.read_text_no_follow(pip_log) if pip_log.exists() else ""
+    return log_text + completed.stdout
+
+
+def test_update_pip_wrappers_normal_and_forced_without_pin(tmp_path: Path) -> None:
+    """Without a pin, wrappers pass eager upgrades and honour FORCE_REINSTALL."""
+    log = _run_update_pip_wrapper_harness("pip_install somepkg", tmp_path)
+    assert "--constraint" not in log
+    assert "--force-reinstall" not in log
+
+    log = _run_update_pip_wrapper_harness("FORCE_REINSTALL=1\npip_install somepkg", tmp_path)
+    assert "--force-reinstall" in log
+    assert "--constraint" not in log
+
+
+def test_update_pip_wrappers_pin_constrains_and_suppresses_force(tmp_path: Path) -> None:
+    """The mlx pin adds a private --constraint and outranks FORCE_REINSTALL.
+
+    Regression: FORCE_REINSTALL plus the pin previously produced
+    ResolutionImpossible (the exact local dev version cannot come from PyPI);
+    local-source preservation must win, with the suppression logged.
+    """
+    driver = """
+get_installed_distribution_version() { echo "0.32.2.dev20260825+abc123"; }
+pin_local_mlx_build
+pip_install somepkg
+FORCE_REINSTALL=1
+pip_install otherpkg
+"""
+    log = _run_update_pip_wrapper_harness(driver, tmp_path)
+    assert "--constraint" in log
+    assert "--force-reinstall" not in log
+    assert "FORCE_REINSTALL suppressed" in log
+    assert "Pinned local mlx 0.32.2.dev20260825+abc123" in log
+
+
+def test_update_pip_wrappers_preserve_caller_constraint_and_clean_up(tmp_path: Path) -> None:
+    """Caller PIP_CONSTRAINT passes through untouched; the pin file is removed on exit."""
+    caller_file = tmp_path / "caller-constraints.txt"
+    caller_file.write_text("requests==2.0.0\n", encoding="utf-8")
+    driver = f"""
+export PIP_CONSTRAINT="{caller_file}"
+get_installed_distribution_version() {{ echo "0.32.2.dev20260825+abc123"; }}
+pin_local_mlx_build
+pip_install somepkg
+echo "PINFILE: $LOCAL_MLX_CONSTRAINT_FILE"
+"""
+    log = _run_update_pip_wrapper_harness(driver, tmp_path)
+    assert f"CALLER_PIP_CONSTRAINT: {caller_file}" in log
+    pin_file = next(
+        line.split("PINFILE: ", 1)[1].strip()
+        for line in log.splitlines()
+        if line.startswith("PINFILE: ")
+    )
+    assert pin_file
+    assert not Path(pin_file).exists(), "EXIT trap must remove the pin file"
+    # And the script must never export global pip state for the pin.
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    assert "export PIP_CONSTRAINT" not in script

@@ -12,7 +12,9 @@
 # Usage examples:
 #   ./update.sh                       # Install project + dev + extras + torch (MLX_METAL_JIT=OFF by default)
 #   SKIP_TORCH=1 ./update.sh          # Skip torch group installation
-#   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
+#   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall (suppressed
+#                                     # after the local mlx build is pinned: preserving the
+#                                     # local source build takes precedence)
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
 #   UPDATE_SYSTEM_PACKAGES=0 ./update.sh # Skip conda base/env and Homebrew updates
@@ -219,18 +221,60 @@ else
 	echo "   (Install Node.js/npm for markdown linting: brew install node)"
 fi
 
-# Helper function: pip install with optional force reinstall (eager upgrades)
+# Once the local mlx build is installed, later pip runs must not replace it:
+# a PyPI release overtakes the local dev version in PEP 440 ordering (0.32.2
+# ranks above 0.32.2.devN), so eager upgrades would silently swap the editable
+# build for the wheel. The pin is a private --constraint argument injected by
+# the wrappers below — never an exported PIP_CONSTRAINT, so caller-supplied
+# pip configuration is untouched — and the temp file is removed on exit.
+LOCAL_MLX_CONSTRAINT_FILE=""
+LOCAL_MLX_PIN_ARGS=()
+cleanup_local_mlx_constraint() {
+	[[ -n "${LOCAL_MLX_CONSTRAINT_FILE:-}" ]] && rm -f "$LOCAL_MLX_CONSTRAINT_FILE"
+}
+trap cleanup_local_mlx_constraint EXIT
+
+pin_local_mlx_build() {
+	local pinned_version
+	pinned_version="$(get_installed_distribution_version mlx)"
+	if [[ -z "$pinned_version" ]]; then
+		echo "⚠️  Could not read the installed mlx version; local build is unpinned"
+		return 0
+	fi
+	LOCAL_MLX_CONSTRAINT_FILE="$(mktemp -t mlx-local-pin)"
+	printf 'mlx==%s\n' "$pinned_version" > "$LOCAL_MLX_CONSTRAINT_FILE"
+	LOCAL_MLX_PIN_ARGS=(--constraint "$LOCAL_MLX_CONSTRAINT_FILE")
+	echo "[update.sh] Pinned local mlx $pinned_version for the rest of this run"
+}
+
+# Helper function: pip install with optional force reinstall (eager upgrades).
+# Local-source preservation takes precedence over FORCE_REINSTALL: once the
+# local mlx build is pinned, forcing a reinstall would demand the pinned dev
+# version from PyPI (where it cannot exist) and fail resolution, so the flag
+# is suppressed for the remaining installs and the suppression is logged.
 pip_install() {
 	local args=("-U" "--upgrade-strategy" "eager")
-	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
-	pip install "${args[@]}" "$@"
+	if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+		if [[ -n "$LOCAL_MLX_CONSTRAINT_FILE" ]]; then
+			echo "[update.sh] FORCE_REINSTALL suppressed: preserving the pinned local mlx build"
+		else
+			args+=("--force-reinstall")
+		fi
+	fi
+	pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"
 }
 
 # Helper function: pip install with verbose output for build-heavy operations.
 pip_install_verbose() {
 	local args=("-v" "-U" "--upgrade-strategy" "eager")
-	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
-	pip install "${args[@]}" "$@"
+	if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+		if [[ -n "$LOCAL_MLX_CONSTRAINT_FILE" ]]; then
+			echo "[update.sh] FORCE_REINSTALL suppressed: preserving the pinned local mlx build"
+		else
+			args+=("--force-reinstall")
+		fi
+	fi
+	pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"
 }
 
 # Helper function: pip install for build/infrastructure tools only.
@@ -782,7 +826,7 @@ update_local_mlx_repos() {
 		echo "[update.sh] No local MLX development repositories found"
 		echo "[update.sh] (Looked for mlx-lm, mlx-vlm, mlx directories with .git at $PARENT_DIR)"
 		cd "$ORIGINAL_DIR"
-		return 1
+		return 0
 	fi
 	
 	echo ""
@@ -929,18 +973,7 @@ update_local_mlx_repos() {
 		if "${INSTALL_CMD[@]}"; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
 			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-				# Pin the just-built local mlx for every later pip install in this
-				# run. Eager upgrades otherwise replace the editable build with a
-				# PyPI wheel the moment a release version overtakes the local dev
-				# version (PEP 440 ranks 0.32.2 above 0.32.2.devN) - which is
-				# exactly what a new upstream release does.
-				LOCAL_MLX_PIN_VERSION="$(get_installed_distribution_version mlx)"
-				if [[ -n "$LOCAL_MLX_PIN_VERSION" ]]; then
-					LOCAL_MLX_CONSTRAINT_FILE="$(mktemp -t mlx-local-pin)"
-					printf 'mlx==%s\n' "$LOCAL_MLX_PIN_VERSION" > "$LOCAL_MLX_CONSTRAINT_FILE"
-					export PIP_CONSTRAINT="$LOCAL_MLX_CONSTRAINT_FILE"
-					echo "[update.sh] Pinned local mlx $LOCAL_MLX_PIN_VERSION via PIP_CONSTRAINT for the rest of this run"
-				fi
+				pin_local_mlx_build
 			fi
 		else
 			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
@@ -992,7 +1025,8 @@ update_local_mlx_repos() {
 					echo "   local build - typically a new PyPI release overtaking the local"
 					echo "   dev version). Stopping rather than continuing half-local."
 					echo "   Fix: cd ${REPO_PATHS[idx]} && pip install -v -e '.[dev]' then re-run update.sh"
-					exit 1
+					cd "$ORIGINAL_DIR"
+					return 1
 				fi
 				log_editable_install_provenance "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
 				;;
@@ -1019,15 +1053,30 @@ if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
 	clean_local_mlx_builds
 fi
 
+# Detection is separate from mutation so the updater runs as an ordinary
+# command: under `set -e` any failure inside it (build, install, or editable
+# verification) aborts the script instead of silently degrading into the
+# PyPI branch with a half-local environment.
+local_mlx_repos_present() {
+	local parent_dir
+	parent_dir="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local repo
+	for repo in mlx mlx-lm mlx-vlm; do
+		[[ -d "$parent_dir/$repo/.git" ]] && return 0
+	done
+	return 1
+}
+
 # Determine if we should skip PyPI MLX updates
 SKIP_MLX_PYPI=0
 LOCAL_MLX_READY=0
 
-# Check for local MLX repos
-if update_local_mlx_repos; then
+if local_mlx_repos_present; then
+	update_local_mlx_repos
 	SKIP_MLX_PYPI=1
 	echo "[update.sh] Local MLX builds updated - skipping PyPI updates"
 else
+	echo "[update.sh] No local MLX development repositories found"
 	# Check if MLX is a dev build (contains .dev or +commit)
 	MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
 	if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
