@@ -949,3 +949,67 @@ class TestEmbeddingLayoutSignal:
         """Without layout files the classifier falls through to config evidence."""
         monkeypatch.setattr(check_models, "_hf_cache_main_snapshot_path", lambda _repo: tmp_path)
         assert check_models._embedding_layout_signal(object()) is None
+
+
+class TestShardIndexFailsClosed:
+    """An index that exists but cannot be validated is evidence, not a pass."""
+
+    def test_unreadable_index_fails_closed(self, tmp_path: Path) -> None:
+        """Corrupt JSON in the index marks the snapshot invalid, not runnable."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", "{not json")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.index_error is not None
+        assert "unreadable safetensors index" in status.index_error
+
+    def test_index_without_weight_map_fails_closed(self, tmp_path: Path) -> None:
+        """A parseable index missing weight_map is equally invalid."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", "{}")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.index_error == "safetensors index has no weight_map object"
+
+    def test_invalid_index_load_failure_is_indeterminate(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """model_load failure on a corrupt-index snapshot is environmental too."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", "{not json")
+        captured: list[tuple[str, str | None]] = []
+
+        def _resolve(model: str, revision: str | None = None) -> Path:
+            captured.append((model, revision))
+            return snapshot
+
+        monkeypatch.setattr(check_models, "_resolve_model_snapshot_path", _resolve)
+        result = check_models.PerformanceResult(
+            model_name="org/m",
+            success=False,
+            generation=None,
+            failure_phase="model_load",
+            requested_revision="my-branch",
+        )
+        assert check_models._is_incomplete_cache_failure(result) is True
+        # The classifier inspects the snapshot the run actually requested.
+        assert captured == [("org/m", "my-branch")]
+
+
+def test_shard_skip_reason_carries_single_cache_layout_prefix(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """skip_reasons prefixes layout reasons once; the shard reason must not re-prefix."""
+    entry = check_models.CachedModelEligibility(
+        repo_id="org/m",
+        supported=False,
+        reasons=("2 of 3 weight shards missing (e.g. model-00001-of-00003.safetensors)",),
+    )
+    assert entry.skip_reasons[0].startswith("cache layout: 2 of 3")
+    assert "cache layout: cache layout" not in entry.skip_reasons[0]

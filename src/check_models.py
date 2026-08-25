@@ -1884,6 +1884,7 @@ class PerformanceResult:
     error_traceback: str | None = None
     runtime_diagnostics: RuntimeDiagnostics | None = None
     requested_max_tokens: int | None = None
+    requested_revision: str | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
     # Thermal/memory-pressure facts sampled while this model ran (darwin only).
@@ -7479,11 +7480,19 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
 
 
 class WeightShardStatus(NamedTuple):
-    """Completeness of a sharded checkpoint per its safetensors index."""
+    """Completeness of a sharded checkpoint per its safetensors index.
+
+    ``index_error`` is set when an index file exists but cannot be read or
+    validated — that fails closed (an unreadable index on a sharded
+    checkpoint is itself evidence of an incomplete or corrupt download),
+    unlike the absence of an index, which simply means a single-file
+    checkpoint.
+    """
 
     missing: int
     total: int
     missing_sample: tuple[str, ...]
+    index_error: str | None = None
 
 
 _WEIGHT_SHARD_SAMPLE_LIMIT: Final[int] = 5
@@ -7507,20 +7516,24 @@ def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
     index_path = snapshot_path / "model.safetensors.index.json"
     if not index_path.is_file():
         return None
+
+    def _invalid(reason: str) -> WeightShardStatus:
+        return WeightShardStatus(0, 0, (), index_error=reason)
+
     try:
         payload = json.loads(_read_text_file(index_path))
-    except (OSError, ValueError):
-        return None
+    except (OSError, ValueError) as error:
+        return _invalid(f"unreadable safetensors index ({error})")
     weight_map = payload.get("weight_map") if isinstance(payload, dict) else None
     if not isinstance(weight_map, dict):
-        return None
+        return _invalid("safetensors index has no weight_map object")
     shard_names = sorted({str(name) for name in weight_map.values() if name})
     if not shard_names:
-        return None
+        return _invalid("safetensors index names no shards")
     try:
         repo_root = snapshot_path.parent.parent.resolve(strict=True)
-    except OSError:
-        return None
+    except OSError as error:
+        return _invalid(f"cache repo root unresolvable ({error})")
     missing: list[str] = []
     for name in shard_names:
         shard = snapshot_path / name
@@ -7548,11 +7561,11 @@ def _is_incomplete_cache_failure(result: PerformanceResult) -> bool:
     """
     if result.success or result.failure_phase != "model_load":
         return False
-    snapshot_path = _resolve_model_snapshot_path(result.model_name)
+    snapshot_path = _resolve_model_snapshot_path(result.model_name, result.requested_revision)
     if snapshot_path is None:
         return False
     status = _weight_shard_status(snapshot_path)
-    return status is not None and status.missing > 0
+    return status is not None and (status.missing > 0 or status.index_error is not None)
 
 
 DOWNLOAD_TIMEOUT_REMEDY: Final[str] = (
@@ -12373,13 +12386,18 @@ def _load_model(
         chain_text = " ".join(
             f"{type(error).__name__}: {error}" for error in _exception_chain(load_error)
         )
-        snapshot_path = (
-            _resolve_model_snapshot_path(params.model_identifier, params.revision)
+        resolved_snapshot = (
+            _resolve_model_snapshot(params.model_identifier, params.revision)
             if not params.force_download and _has_external_connectivity_signal(chain_text)
             else None
         )
+        snapshot_path = resolved_snapshot.path if resolved_snapshot is not None else None
+        # The resolver only returns a snapshot for an explicit revision when it
+        # matched a cached hash/prefix/ref, so its source — not a directory-name
+        # equality that a branch or tag name can never satisfy — is the check.
         revision_matches = params.revision is None or (
-            snapshot_path is not None and snapshot_path.name == params.revision
+            resolved_snapshot is not None
+            and resolved_snapshot.source in ("requested-revision", "local-path")
         )
         if (
             snapshot_path is None
@@ -12609,12 +12627,15 @@ def _validate_model_artifact_layout(
         notes.append(f"processor config missing from snapshot ({', '.join(processor_candidates)})")
 
     shard_status = _weight_shard_status(snapshot_path)
-    if shard_status is not None and shard_status.missing:
-        sample = ", ".join(shard_status.missing_sample)
-        notes.append(
-            f"{shard_status.missing} of {shard_status.total} weight shards missing "
-            f"from snapshot (e.g. {sample}) — incomplete download"
-        )
+    if shard_status is not None:
+        if shard_status.index_error is not None:
+            notes.append(f"{shard_status.index_error} — incomplete or corrupt download")
+        elif shard_status.missing:
+            sample = ", ".join(shard_status.missing_sample)
+            notes.append(
+                f"{shard_status.missing} of {shard_status.total} weight shards missing "
+                f"from snapshot (e.g. {sample}) — incomplete download"
+            )
 
     for note in notes:
         logger.debug("Legacy snapshot note for %s: %s.", model_identifier, note)
@@ -12939,7 +12960,11 @@ def _finalize_process_result(
             requested_max_tokens=params.max_tokens,
             upstream_boundary=upstream_boundary,
         )
-    return replace(result_payload, runtime_diagnostics=runtime_diagnostics)
+    return replace(
+        result_payload,
+        runtime_diagnostics=runtime_diagnostics,
+        requested_revision=params.revision,
+    )
 
 
 class _PreparedGeneration(NamedTuple):
@@ -15906,12 +15931,15 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
             # shard to actually be present and non-empty (Nativ does the same).
             snapshot = _hf_cache_main_snapshot_path(repo)
             shard_status = _weight_shard_status(snapshot) if snapshot is not None else None
-            if shard_status is not None and shard_status.missing:
-                sample = ", ".join(shard_status.missing_sample)
-                reasons.append(
-                    f"cache layout: {shard_status.missing} of {shard_status.total} "
-                    f"weight shards missing (e.g. {sample})"
-                )
+            if shard_status is not None:
+                if shard_status.index_error is not None:
+                    reasons.append(shard_status.index_error)
+                elif shard_status.missing:
+                    sample = ", ".join(shard_status.missing_sample)
+                    reasons.append(
+                        f"{shard_status.missing} of {shard_status.total} "
+                        f"weight shards missing (e.g. {sample})"
+                    )
 
     model_type, resolved_model_type, arch_supported = _model_arch_precheck(repo)
     return CachedModelEligibility(

@@ -344,8 +344,8 @@ class TestProcessImageWithModelMock:
             ) as mock_load,
             patch.object(
                 check_models,
-                "_resolve_model_snapshot_path",
-                return_value=snapshot,
+                "_resolve_model_snapshot",
+                return_value=check_models.ResolvedSnapshot(snapshot, "refs/main"),
             ),
         ):
             model, processor, config = check_models._load_model(params)

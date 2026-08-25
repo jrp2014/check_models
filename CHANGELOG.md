@@ -113,6 +113,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Review fixes on the discovery hardening: the offline-retry path accepts a
+  resolver-verified requested revision (branch/tag names could never equal
+  the snapshot's hash-named directory, so the legacy equality check rejected
+  every resolved ref); the incomplete-cache classifier inspects the snapshot
+  the run actually requested; an existing-but-invalid safetensors index
+  fails closed (`index_error`) across discovery, snapshot notes, and the
+  indeterminate classification; and the shard skip reason no longer
+  duplicates the `cache layout:` prefix.
+
 - `update.sh` can no longer lose the local mlx build to a PyPI release: the
   moment upstream published mlx 0.32.2, the eager-upgrade installs of
   mlx-lm/mlx-vlm replaced the editable `0.32.2.dev…` build with the wheel
