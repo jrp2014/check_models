@@ -860,6 +860,73 @@ class TestWeightShardValidation:
         assert len(status.missing_sample) == 2
         assert all(name.endswith(".safetensors") for name in status.missing_sample)
 
+    def test_symlinked_real_cache_layout_validates_clean(self, tmp_path: Path) -> None:
+        """Index and shards symlinked into blobs/ — every ordinary HF cache — pass.
+
+        Regression: the no-follow reader treated the symlinked index as
+        unreadable, so shard validation failed closed and discovery skipped
+        every sharded model in a real cache.
+        """
+        repo_root = tmp_path / "models--org--m"
+        blobs = repo_root / "blobs"
+        snapshot = repo_root / "snapshots" / "abc"
+        blobs.mkdir(parents=True)
+        snapshot.mkdir(parents=True)
+        names = [f"model-{i:05d}-of-00002.safetensors" for i in (1, 2)]
+        index = {"weight_map": {f"layer{i}": name for i, name in enumerate(names)}}
+        safe_io.write_text_no_follow(blobs / "indexblob", json.dumps(index))
+        (snapshot / "model.safetensors.index.json").symlink_to(blobs / "indexblob")
+        for i, name in enumerate(names):
+            safe_io.write_text_no_follow(blobs / f"shard{i}", "weights")
+            (snapshot / name).symlink_to(blobs / f"shard{i}")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.index_error is None
+        assert (status.missing, status.total) == (0, 2)
+
+    def test_shard_symlink_escaping_the_repo_counts_as_missing(self, tmp_path: Path) -> None:
+        """Containment still holds: a shard resolving outside the repo is missing."""
+        snapshot = self._snapshot_with_shards(tmp_path, missing=1)
+        outside = tmp_path / "outside-blob"
+        safe_io.write_text_no_follow(outside, "weights")
+        (snapshot / "model-00003-of-00003.safetensors").symlink_to(outside)
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_stale_index_beside_complete_family_is_runnable(self, tmp_path: Path) -> None:
+        """A re-sharded checkpoint with a stale index passes (loader ignores the index).
+
+        Real-cache case: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX ships a
+        7-shard index beside a complete 3-shard family; mlx-vlm globs the
+        shards and loads it fine.
+        """
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        stale_names = [f"model-{i:05d}-of-00007.safetensors" for i in range(1, 8)]
+        index = {"weight_map": {f"layer{i}": name for i, name in enumerate(stale_names)}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        for i in (1, 2, 3):
+            safe_io.write_text_no_follow(
+                snapshot / f"model-{i:05d}-of-00003.safetensors", "weights"
+            )
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 0
+
+    def test_incomplete_family_does_not_override_the_index(self, tmp_path: Path) -> None:
+        """A partial alternative family is still an interrupted download."""
+        snapshot = self._snapshot_with_shards(tmp_path, missing=1)
+        # One stray shard of a different, incomplete family must not rescue it.
+        safe_io.write_text_no_follow(snapshot / "model-00001-of-00009.safetensors", "weights")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
     def test_empty_shard_counts_as_missing(self, tmp_path: Path) -> None:
         """A zero-byte shard is an interrupted download, not a weight file."""
         snapshot = self._snapshot_with_shards(tmp_path, missing=0)
@@ -1075,10 +1142,15 @@ class TestModelBurdenFacts:
         assert burden.weight_bytes is None
 
     def test_million_scale_and_fractional_size_tokens(self) -> None:
-        """M-scale and fractional size tokens parse; the last token wins."""
+        """M-scale and fractional size tokens parse; the largest token wins."""
         assert check_models._parameter_count_from_name("org/nano-350M") == 350_000_000
         assert check_models._parameter_count_from_name("org/big-2.7b-chat") == 2_700_000_000
         assert check_models._parameter_count_from_name("org/no-size-here") is None
+
+    def test_moe_names_report_total_not_activated_parameters(self) -> None:
+        """MoE names carry total and activated sizes; the total (largest) wins."""
+        moe = check_models._parameter_count_from_name("mlx-community/Qwen3-30B-A3B-Instruct-4bit")
+        assert moe == 30_000_000_000
 
     def test_weight_bytes_ignores_shards_escaping_the_repo_root(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
@@ -1098,4 +1170,67 @@ class TestModelBurdenFacts:
     def test_unresolvable_snapshot_returns_none(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """No cached snapshot means no burden facts, not a partial record."""
         self._install_snapshot(monkeypatch, None)
+        refreshes: list[bool] = []
+        monkeypatch.setattr(
+            check_models,
+            "_get_hf_cache_info_cached",
+            lambda *, refresh=False: refreshes.append(refresh) or SimpleNamespace(repos=()),
+        )
         assert check_models._collect_model_burden("org/uncached") is None
+        # The miss triggered exactly one refreshed rescan before giving up.
+        assert refreshes == [True]
+
+    def test_cold_download_retries_with_refreshed_cache_scan(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """A snapshot downloaded during this run is found after one cache refresh."""
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(
+            snapshot / "config.json", json.dumps({"max_position_embeddings": 4096})
+        )
+        state = {"refreshed": False}
+
+        def fake_cache_info(*, refresh: bool = False) -> SimpleNamespace:
+            if refresh:
+                state["refreshed"] = True
+            return SimpleNamespace(repos=())
+
+        monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", fake_cache_info)
+        monkeypatch.setattr(
+            check_models,
+            "_resolve_model_snapshot_path",
+            lambda *_a, **_k: snapshot if state["refreshed"] else None,
+        )
+
+        burden = check_models._collect_model_burden("org/just-downloaded")
+        assert burden is not None
+        assert burden.context_length == 4096
+
+    def test_real_hf_cache_symlink_layout_is_readable(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Snapshot files symlinked into blobs/ (the real HF layout) must be read.
+
+        Regression: the cached Qwen/Qwen3-VL-2B-Instruct config declares
+        text_config.max_position_embeddings, but the no-follow reader rejected
+        the config symlink and dropped the context length entirely.
+        """
+        repo_root = tmp_path / "models--Qwen--Qwen3-VL-2B-Instruct"
+        blobs = repo_root / "blobs"
+        snapshot = repo_root / "snapshots" / "abc123"
+        blobs.mkdir(parents=True)
+        snapshot.mkdir(parents=True)
+        config = {"text_config": {"max_position_embeddings": 262_144}}
+        safe_io.write_text_no_follow(blobs / "cfgblob", json.dumps(config))
+        safe_io.write_text_no_follow(blobs / "weightblob", "12345678")
+        (snapshot / "config.json").symlink_to(blobs / "cfgblob")
+        (snapshot / "model.safetensors").symlink_to(blobs / "weightblob")
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("Qwen/Qwen3-VL-2B-Instruct")
+        assert burden is not None
+        assert burden.context_length == 262_144
+        assert burden.context_length_source == "text_config.max_position_embeddings"
+        assert burden.parameter_count == 2_000_000_000
+        assert burden.parameter_count_source == "name-estimate"
+        assert burden.weight_bytes == 8

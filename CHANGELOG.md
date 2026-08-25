@@ -123,6 +123,27 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Snapshot metadata readers now handle the real HF cache layout, where every
+  snapshot file is a symlink into the repo's `blobs/` store: a shared
+  containment-checked reader (`_resolve_snapshot_file` and its text/JSON
+  wrappers, extracted from the capability classifier's existing pattern)
+  follows the link but requires the target to stay inside the repo's cache
+  directory. This fixes two real-cache failures the synthetic fixtures
+  missed — shard validation failed closed on every ordinary sharded cache
+  entry (the no-follow reader could not open the symlinked index, so
+  discovery would have skipped all of them), and the burden collector
+  dropped config-sourced facts (the cached Qwen/Qwen3-VL-2B-Instruct
+  config declares `text_config.max_position_embeddings = 262144`, which
+  now reports with its source key). The thinking-template scan and
+  weight-byte sum read through the same helper. Also fixed alongside:
+  shard validation accepts a complete, self-consistent shard family on
+  disk beside a stale index (mlx-vlm globs shards and never consults the
+  index — a re-sharded upload such as the cached Apriel-1.5-15b-Thinker
+  is loader-runnable); the name-based parameter estimate takes the
+  largest size token so MoE names ("30B-A3B") report total rather than
+  activated parameters; and the burden collector retries once with a
+  refreshed cache scan so models cold-downloaded during the run are not
+  invisible to the run's earlier cache snapshot.
 - Review fixes on the discovery hardening: the offline-retry path accepts a
   resolver-verified requested revision (branch/tag names could never equal
   the snapshot's hash-named directory, so the legacy equality check rejected

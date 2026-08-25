@@ -7489,6 +7489,55 @@ _THINKING_TEMPLATE_MARKERS: Final[tuple[str, ...]] = (
 )
 
 
+def _resolve_snapshot_file(snapshot_path: Path, file_name: str) -> Path | None:
+    """Resolve one snapshot file to a contained regular file, following links.
+
+    Real HF cache snapshots link every file into the repo's ``blobs/`` store
+    by design, so the no-follow artifact readers reject them outright. This
+    follows the link but requires the target to remain inside the repo's
+    cache directory (``models--*``, when the snapshot sits in the standard
+    ``snapshots/`` layout) or inside the snapshot directory itself (a plain
+    local model directory). Returns None when absent, escaping, or not a
+    regular file.
+    """
+    candidate = snapshot_path / file_name
+    try:
+        root = (
+            snapshot_path.parent.parent
+            if snapshot_path.parent.name == "snapshots"
+            else snapshot_path
+        ).resolve(strict=True)
+        resolved = candidate.resolve(strict=True)
+        if not resolved.is_file() or not resolved.is_relative_to(root):
+            return None
+    except OSError:
+        return None
+    return resolved
+
+
+def _read_snapshot_text(snapshot_path: Path, file_name: str) -> str | None:
+    """Read one snapshot text file through :func:`_resolve_snapshot_file`."""
+    resolved = _resolve_snapshot_file(snapshot_path, file_name)
+    if resolved is None:
+        return None
+    try:
+        return _read_text_file(resolved)
+    except OSError:
+        return None
+
+
+def _read_snapshot_json(snapshot_path: Path, file_name: str) -> dict[str, JsonLike] | None:
+    """Read one snapshot JSON object file; None when absent, unreadable, or not an object."""
+    text = _read_snapshot_text(snapshot_path, file_name)
+    if text is None:
+        return None
+    try:
+        payload = json.loads(text)
+    except ValueError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
 def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     """Scan a snapshot's chat template(s) for thinking markers (Nativ-style).
 
@@ -7500,24 +7549,16 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     if snapshot_path is None or not snapshot_path.is_dir():
         return None
     found_template = False
-    jinja_path = snapshot_path / "chat_template.jinja"
-    if jinja_path.is_file():
+    if (snapshot_path / "chat_template.jinja").is_file():
         found_template = True
-        try:
-            template_text = _read_text_file(jinja_path).casefold()
-        except (OSError, ValueError):
-            template_text = ""
+        template_text = (_read_snapshot_text(snapshot_path, "chat_template.jinja") or "").casefold()
         if any(marker in template_text for marker in _THINKING_TEMPLATE_MARKERS):
             return True
     for file_name in ("tokenizer_config.json", "processor_config.json", "chat_template.json"):
-        config_path = snapshot_path / file_name
-        if not config_path.is_file():
+        payload = _read_snapshot_json(snapshot_path, file_name)
+        if payload is None:
             continue
-        try:
-            payload = json.loads(_read_text_file(config_path))
-        except (OSError, ValueError):
-            continue
-        template_value = payload.get("chat_template") if isinstance(payload, dict) else None
+        template_value = payload.get("chat_template")
         if template_value is None:
             continue
         found_template = True
@@ -7559,32 +7600,36 @@ class ModelBurdenFacts:
 def _snapshot_weight_bytes(snapshot_path: Path) -> int | None:
     """Sum the resolved sizes of the snapshot's safetensors weight files."""
     try:
-        repo_root = snapshot_path.parent.parent.resolve(strict=True)
-        shard_paths = sorted(snapshot_path.glob("*.safetensors"))
+        shard_names = sorted(path.name for path in snapshot_path.glob("*.safetensors"))
     except OSError:
         return None
     total = 0
     counted = 0
-    for shard in shard_paths:
+    for name in shard_names:
+        resolved = _resolve_snapshot_file(snapshot_path, name)
+        if resolved is None:
+            continue
         try:
-            resolved = shard.resolve(strict=True)
-            if not resolved.is_relative_to(repo_root) or not resolved.is_file():
-                continue
             total += resolved.stat().st_size
-            counted += 1
         except OSError:
             continue
+        counted += 1
     return total if counted else None
 
 
 def _parameter_count_from_name(model_identifier: str) -> int | None:
-    """Estimate parameters from the size token in the model name (last match wins)."""
+    """Estimate parameters from the size tokens in the model name (largest wins).
+
+    MoE names carry both total and activated sizes ("30B-A3B"); the largest
+    token is the total parameter count this estimate stands in for.
+    """
     matches = _PARAM_COUNT_NAME_RE.findall(model_identifier)
     if not matches:
         return None
-    value_text, unit = matches[-1]
-    scale = 1_000_000_000 if unit.lower() == "b" else 1_000_000
-    return int(float(value_text) * scale)
+    return max(
+        int(float(value_text) * (1_000_000_000 if unit.lower() == "b" else 1_000_000))
+        for value_text, unit in matches
+    )
 
 
 def _collect_model_burden(
@@ -7594,16 +7639,16 @@ def _collect_model_burden(
     """Collect burden facts from the resolved snapshot; None when unavailable."""
     snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
     if snapshot_path is None or not snapshot_path.is_dir():
-        return None
-    config: dict[str, JsonLike] = {}
-    config_path = snapshot_path / "config.json"
-    if config_path.is_file():
+        # A cold in-process download during this run postdates the cached
+        # cache scan; refresh once so the run's own downloads are visible.
         try:
-            loaded = json.loads(_read_text_file(config_path))
-            if isinstance(loaded, dict):
-                config = loaded
-        except (OSError, ValueError):
-            config = {}
+            _get_hf_cache_info_cached(refresh=True)
+        except (OSError, ValueError, FileNotFoundError, HFValidationError):
+            return None
+        snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
+    if snapshot_path is None or not snapshot_path.is_dir():
+        return None
+    config: dict[str, JsonLike] = _read_snapshot_json(snapshot_path, "config.json") or {}
 
     parameter_count: int | None = None
     parameter_count_source: Literal["config", "name-estimate"] | None = None
@@ -7683,6 +7728,38 @@ INCOMPLETE_CACHE_REMEDY: Final[str] = (
 )
 
 
+_SHARD_FAMILY_RE = re.compile(r"^(?P<stem>.+)-(?P<part>\d+)-of-(?P<total>\d+)\.safetensors$")
+
+
+def _complete_shard_family_present(snapshot_path: Path) -> bool:
+    """Return whether a complete, self-consistent shard family is on disk.
+
+    The mlx-vlm loader globs ``model*.safetensors`` and never consults the
+    index, so a re-sharded upload can leave a stale index (e.g. naming seven
+    shards) beside a complete alternative family (e.g. three) that loads
+    fine. A full non-empty family is loader-runnable regardless of what the
+    index claims.
+    """
+    families: dict[tuple[str, int], set[int]] = {}
+    try:
+        names = [path.name for path in snapshot_path.glob("*.safetensors")]
+    except OSError:
+        return False
+    for name in names:
+        match = _SHARD_FAMILY_RE.match(name)
+        if match is None:
+            continue
+        resolved = _resolve_snapshot_file(snapshot_path, name)
+        try:
+            if resolved is None or resolved.stat().st_size == 0:
+                continue
+        except OSError:
+            continue
+        key = (match.group("stem"), int(match.group("total")))
+        families.setdefault(key, set()).add(int(match.group("part")))
+    return any(len(present) == total for (_stem, total), present in families.items())
+
+
 def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
     """Check every shard the safetensors index references, Nativ-style.
 
@@ -7693,15 +7770,18 @@ def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
     plain safetensors presence check).
     """
     index_path = snapshot_path / "model.safetensors.index.json"
-    if not index_path.is_file():
+    if not index_path.exists() and not index_path.is_symlink():
         return None
 
     def _invalid(reason: str) -> WeightShardStatus:
         return WeightShardStatus(0, 0, (), index_error=reason)
 
+    index_text = _read_snapshot_text(snapshot_path, "model.safetensors.index.json")
+    if index_text is None:
+        return _invalid("unreadable safetensors index (absent target or escaping link)")
     try:
-        payload = json.loads(_read_text_file(index_path))
-    except (OSError, ValueError) as error:
+        payload = json.loads(index_text)
+    except ValueError as error:
         return _invalid(f"unreadable safetensors index ({error})")
     weight_map = payload.get("weight_map") if isinstance(payload, dict) else None
     if not isinstance(weight_map, dict):
@@ -7709,22 +7789,18 @@ def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
     shard_names = sorted({str(name) for name in weight_map.values() if name})
     if not shard_names:
         return _invalid("safetensors index names no shards")
-    try:
-        repo_root = snapshot_path.parent.parent.resolve(strict=True)
-    except OSError as error:
-        return _invalid(f"cache repo root unresolvable ({error})")
     missing: list[str] = []
     for name in shard_names:
-        shard = snapshot_path / name
+        resolved = _resolve_snapshot_file(snapshot_path, name)
         try:
-            resolved = shard.resolve(strict=True)
-            complete = resolved.is_relative_to(repo_root) and (
-                resolved.is_file() and resolved.stat().st_size > 0
-            )
+            complete = resolved is not None and resolved.stat().st_size > 0
         except OSError:
             complete = False
         if not complete:
             missing.append(name)
+    if missing and _complete_shard_family_present(snapshot_path):
+        # Stale index beside a complete re-sharded checkpoint: loader-runnable.
+        missing = []
     return WeightShardStatus(
         missing=len(missing),
         total=len(shard_names),
@@ -15806,16 +15882,7 @@ def _read_cached_repo_json(repo: object, file_name: str) -> dict[str, JsonLike] 
     snapshot = _hf_cache_main_snapshot_path(repo)
     if snapshot is None:
         return None
-    path = snapshot / file_name
-    try:
-        cache_repo_root = snapshot.parent.parent.resolve(strict=True)
-        resolved = path.resolve(strict=True)
-        if not resolved.is_relative_to(cache_repo_root):
-            return None
-        payload = json.loads(_read_text_file(resolved))
-    except (OSError, ValueError):
-        return None
-    return payload if isinstance(payload, dict) else None
+    return _read_snapshot_json(snapshot, file_name)
 
 
 # Positive image-input evidence: keys mlx-vlm VLM configs carry (surveyed across
