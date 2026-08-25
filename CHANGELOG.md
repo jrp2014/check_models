@@ -95,8 +95,11 @@ Notable changes to this project will be documented in this file.
   ordinary command so `set -e` makes any failure — including editable
   verification — abort the run instead of degrading into a half-local
   environment; `mlx-metal` removal is guarded on mlx actually being an
-  editable/dev install. Fake-pip regression tests cover the normal, forced,
-  pinned, forced+pinned, caller-constraint, and cleanup cases.
+  editable/dev install. A local build whose version cannot be read is fatal
+  rather than continuing unpinned (the unprotected state was the original
+  bug), and the two eager wrappers share one argument-construction helper.
+  Fake-pip regression tests cover the normal, forced, pinned, forced+pinned,
+  caller-constraint, cleanup, and unpinnable-fatal cases.
 
 
 - Comparability is now three-state (`comparable` / `unknown` / `incomparable`):

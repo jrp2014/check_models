@@ -238,8 +238,10 @@ pin_local_mlx_build() {
 	local pinned_version
 	pinned_version="$(get_installed_distribution_version mlx)"
 	if [[ -z "$pinned_version" ]]; then
-		echo "⚠️  Could not read the installed mlx version; local build is unpinned"
-		return 0
+		echo "❌ Could not read the installed mlx version; refusing to continue"
+		echo "   unpinned - later eager upgrades could replace the local build with"
+		echo "   the PyPI wheel. Inspect: pip show mlx"
+		return 1
 	fi
 	LOCAL_MLX_CONSTRAINT_FILE="$(mktemp -t mlx-local-pin)"
 	printf 'mlx==%s\n' "$pinned_version" > "$LOCAL_MLX_CONSTRAINT_FILE"
@@ -247,34 +249,31 @@ pin_local_mlx_build() {
 	echo "[update.sh] Pinned local mlx $pinned_version for the rest of this run"
 }
 
-# Helper function: pip install with optional force reinstall (eager upgrades).
-# Local-source preservation takes precedence over FORCE_REINSTALL: once the
-# local mlx build is pinned, forcing a reinstall would demand the pinned dev
-# version from PyPI (where it cannot exist) and fail resolution, so the flag
-# is suppressed for the remaining installs and the suppression is logged.
-pip_install() {
-	local args=("-U" "--upgrade-strategy" "eager")
+# Shared eager-install invocation. Local-source preservation takes precedence
+# over FORCE_REINSTALL: once the local mlx build is pinned, forcing a
+# reinstall would demand the pinned dev version from PyPI (where it cannot
+# exist) and fail resolution, so the flag is suppressed for the remaining
+# installs and the suppression is logged.
+run_eager_pip_install() {
+	local args=("$@")
 	if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 		if [[ -n "$LOCAL_MLX_CONSTRAINT_FILE" ]]; then
 			echo "[update.sh] FORCE_REINSTALL suppressed: preserving the pinned local mlx build"
 		else
-			args+=("--force-reinstall")
+			args=("--force-reinstall" "${args[@]}")
 		fi
 	fi
-	pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"
+	pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"}
+}
+
+# Helper function: pip install with optional force reinstall (eager upgrades).
+pip_install() {
+	run_eager_pip_install "-U" "--upgrade-strategy" "eager" "$@"
 }
 
 # Helper function: pip install with verbose output for build-heavy operations.
 pip_install_verbose() {
-	local args=("-v" "-U" "--upgrade-strategy" "eager")
-	if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-		if [[ -n "$LOCAL_MLX_CONSTRAINT_FILE" ]]; then
-			echo "[update.sh] FORCE_REINSTALL suppressed: preserving the pinned local mlx build"
-		else
-			args+=("--force-reinstall")
-		fi
-	fi
-	pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"
+	run_eager_pip_install "-v" "-U" "--upgrade-strategy" "eager" "$@"
 }
 
 # Helper function: pip install for build/infrastructure tools only.

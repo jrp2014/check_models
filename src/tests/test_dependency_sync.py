@@ -2115,11 +2115,13 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
 
     assert "UPDATE_PIP_CONSTRAINT" not in update_script
     assert "UPDATE_PIP_CONSTRAINT_SPECS" not in policy_source
-    # Wrappers inject the private local-mlx pin (empty-safe on bash 3.2).
+    # One shared invocation injects the private local-mlx pin (empty-safe on
+    # bash 3.2); both public wrappers delegate to it.
     assert (
-        'pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"} "$@"'
+        'pip install "${args[@]}" ${LOCAL_MLX_PIN_ARGS[@]+"${LOCAL_MLX_PIN_ARGS[@]}"}'
         in update_script
     )
+    assert update_script.count("run_eager_pip_install") >= 3  # def + two wrappers
     # Detection is a separate, non-mutating gate so set -e reaches the updater.
     assert "if local_mlx_repos_present; then" in update_script
     assert 'pip_install_tool "setuptools>=80,<82"' in update_script
@@ -2786,6 +2788,21 @@ pip_install otherpkg
     assert "--force-reinstall" not in log
     assert "FORCE_REINSTALL suppressed" in log
     assert "Pinned local mlx 0.32.2.dev20260825+abc123" in log
+
+
+def test_update_pin_failure_is_fatal_when_version_unreadable(tmp_path: Path) -> None:
+    """An unpinnable local build must stop the run, not continue unprotected."""
+    driver = """
+get_installed_distribution_version() { echo ""; }
+if pin_local_mlx_build; then
+    echo "PIN_RC: 0"
+else
+    echo "PIN_RC: 1"
+fi
+"""
+    log = _run_update_pip_wrapper_harness(driver, tmp_path)
+    assert "PIN_RC: 1" in log
+    assert "refusing to continue" in log
 
 
 def test_update_pip_wrappers_preserve_caller_constraint_and_clean_up(tmp_path: Path) -> None:
