@@ -125,7 +125,7 @@ dropped_worktree_count="$(
     cd "$SCRIPT_DIR/.." && "$QUALITY_PYTHON" -m tools.filter_danger_report "$report_abs_path"
 )"
 if [ "$dropped_worktree_count" -gt 0 ]; then
-    echo "ℹ️  Dropped $dropped_worktree_count finding(s) from third-party .worktrees/ checkouts (not this repository's files to gate)."
+    echo "ℹ️  Dropped $dropped_worktree_count finding(s): third-party .worktrees/ checkouts or shell lines carrying an inline 'skylos: ignore[RULE]' justification (Skylos 4.33.x does not parse inline ignores in .sh files)."
 fi
 
 quality_run_python_tool skylos cicd annotate --input "$report_path" --severity medium </dev/null

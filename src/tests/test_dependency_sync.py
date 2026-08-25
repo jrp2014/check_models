@@ -2828,3 +2828,94 @@ echo "PINFILE: $LOCAL_MLX_CONSTRAINT_FILE"
     # And the script must never export global pip state for the pin.
     script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert "export PIP_CONSTRAINT" not in script
+
+
+def test_pip_show_helpers_survive_set_e_pipefail_with_chatty_pip(tmp_path: Path) -> None:
+    """The helpers must not die under `set -euo pipefail` however chatty pip is.
+
+    Regression: `pip show | awk '{...; exit}'` raced SIGPIPE — awk quit at the
+    matched line, pip took EPIPE, and once the updater ran under live `set -e`
+    the failing command substitution in `pin_local_mlx_build` killed the whole
+    script with no output, right after "mlx installed successfully".
+    """
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    helper_names = (
+        "pip_show_field",
+        "get_editable_project_location",
+        "get_installed_distribution_version",
+    )
+    helper_parts: list[str] = []
+    for name in helper_names:
+        match = re.search(rf"^{name}\(\) \{{\n.*?^\}}\n", script, re.MULTILINE | re.DOTALL)
+        assert match is not None, f"helper {name} missing from update.sh"
+        helper_parts.append(match.group(0))
+    helper_block = "".join(helper_parts)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_python = fake_bin / "python"
+    lines = "\n".join(f"Filler-{i}: value" for i in range(4000))
+    safe_io.write_text_no_follow(
+        fake_python,
+        "#!/bin/bash\n"
+        'echo "Name: mlx"\n'
+        'echo "Version: 0.32.2.dev1+abc"\n'
+        f'cat <<"BULK"\n{lines}\nBULK\n'
+        'echo "Editable project location: /tmp/mlx"\n',
+        mode=0o755,
+    )
+    driver = (
+        "set -euo pipefail\n"
+        + helper_block
+        + '\nversion="$(get_installed_distribution_version mlx)"\n'
+        + 'location="$(get_editable_project_location mlx)"\n'
+        + 'echo "VERSION: $version"\n'
+        + 'echo "LOCATION: $location"\n'
+    )
+    completed = subprocess.run(  # noqa: S603 - test harness, fixed bash, temp files
+        ["/bin/bash", "-c", driver],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "PATH": f"{fake_bin}:{os.environ['PATH']}"},
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "VERSION: 0.32.2.dev1+abc" in completed.stdout
+    assert "LOCATION: /tmp/mlx" in completed.stdout
+
+
+def test_danger_filter_honours_shell_inline_ignores(tmp_path: Path) -> None:
+    """Inline `skylos: ignore[RULE]` on a flagged .sh line is a counted waiver.
+
+    Skylos 4.33.x's shell analyzer ignores the inline convention it honours
+    for Python, so the danger-report post-filter applies it — justification
+    stays at the code site and drops are never silent.
+    """
+    sh = tmp_path / "thing.sh"
+    safe_io.write_text_no_follow(
+        sh,
+        "#!/bin/bash\n"
+        'do_risky "$1" # skylos: ignore[SKY-D215] fixed literal input\n'
+        'do_other "$1"\n',
+    )
+    report: dict[str, object] = {
+        "danger": [
+            {"rule_id": "SKY-D215", "file": str(sh), "line": 2},  # waived
+            {"rule_id": "SKY-D999", "file": str(sh), "line": 2},  # wrong rule -> kept
+            {"rule_id": "SKY-D215", "file": str(sh), "line": 3},  # no ignore -> kept
+            {"rule_id": "SKY-D215", "file": str(tmp_path / "x.py"), "line": 1},  # not .sh -> kept
+        ]
+    }
+    dropped = filter_danger_report.drop_inline_ignored_shell_findings(report)
+    assert dropped == 1
+    remaining = report["danger"]
+    assert isinstance(remaining, list)
+    assert len(remaining) == 3
+    assert all(
+        not (
+            f.get("rule_id") == "SKY-D215"
+            and f.get("line") == 2
+            and str(f.get("file", "")).endswith(".sh")
+        )
+        for f in remaining
+        if isinstance(f, dict)
+    )

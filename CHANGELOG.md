@@ -99,7 +99,18 @@ Notable changes to this project will be documented in this file.
   rather than continuing unpinned (the unprotected state was the original
   bug), and the two eager wrappers share one argument-construction helper.
   Fake-pip regression tests cover the normal, forced, pinned, forced+pinned,
-  caller-constraint, cleanup, and unpinnable-fatal cases.
+  caller-constraint, cleanup, and unpinnable-fatal cases. The `pip show`
+  helpers now capture output before parsing and feed awk via a herestring:
+  the old `pip show | awk '{…; exit}'` pipelines raced SIGPIPE, harmless
+  while the updater body ran with `set -e` suspended, but fatal-and-silent
+  once it ran as an ordinary command — the script died with no output right
+  after "mlx installed successfully". A chatty-pip harness test pins the
+  behaviour under `set -euo pipefail`. Because Skylos 4.33.x's shell
+  analyzer does not parse the inline `skylos: ignore[RULE]` convention it
+  honours for Python, the danger-report post-filter now applies it for
+  `.sh` files: a flagged line carrying a matching inline justification is a
+  counted, visible waiver (tested), keeping justifications at the code site
+  instead of in a separate allowlist.
 
 
 - Comparability is now three-state (`comparable` / `unknown` / `incomparable`):

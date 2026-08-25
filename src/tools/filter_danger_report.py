@@ -1,4 +1,13 @@
-"""Drop third-party `.worktrees/` findings from a Skylos danger report.
+"""Drop waived findings from a Skylos danger report before the gate.
+
+Two waiver classes, both visible (drop counts are printed, never silent):
+
+1. Third-party `.worktrees/` checkouts (see below).
+2. Shell-file findings whose flagged line carries the same inline
+   ``# skylos: ignore[RULE-ID] - why`` convention Skylos itself honours for
+   Python. Skylos 4.33.x's shell analyzer does not parse inline ignores, so
+   without this the convention silently stops working the moment a finding
+   lands in a ``.sh`` file.
 
 Skylos 4.33.x intermittently ignores both `--exclude .worktrees` and the
 `.skylos/config.yaml` exclude for its workflow danger scanner, so upstream
@@ -45,6 +54,41 @@ def drop_worktree_findings(report: dict[str, object]) -> int:
     return dropped
 
 
+def drop_inline_ignored_shell_findings(report: dict[str, object]) -> int:
+    """Drop shell findings whose flagged line carries a matching inline ignore."""
+    findings = report.get("danger")
+    if not isinstance(findings, list):
+        return 0
+    kept: list[object] = []
+    dropped = 0
+    file_lines: dict[str, list[str]] = {}
+    for finding in findings:
+        if not isinstance(finding, dict) or not str(finding.get("file", "")).endswith(".sh"):
+            kept.append(finding)
+            continue
+        file_name = str(finding["file"])
+        rule_id = str(finding.get("rule_id", ""))
+        line_number = finding.get("line")
+        if file_name not in file_lines:
+            try:
+                file_lines[file_name] = read_text_no_follow(Path(file_name)).splitlines()
+            except (OSError, ValueError):
+                file_lines[file_name] = []
+        lines = file_lines[file_name]
+        flagged = (
+            lines[line_number - 1]
+            if isinstance(line_number, int) and 1 <= line_number <= len(lines)
+            else ""
+        )
+        if rule_id and f"skylos: ignore[{rule_id}]" in flagged:
+            dropped += 1
+        else:
+            kept.append(finding)
+    if dropped:
+        report["danger"] = kept
+    return dropped
+
+
 def main(argv: list[str]) -> int:
     """Filter the report file named by argv[1]; print the drop count."""
     report_path = Path(argv[1])
@@ -53,6 +97,7 @@ def main(argv: list[str]) -> int:
         print(0)
         return 0
     dropped = drop_worktree_findings(report)
+    dropped += drop_inline_ignored_shell_findings(report)
     if dropped:
         write_text_no_follow(report_path, json.dumps(report))
     print(dropped)

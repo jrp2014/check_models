@@ -230,7 +230,9 @@ fi
 LOCAL_MLX_CONSTRAINT_FILE=""
 LOCAL_MLX_PIN_ARGS=()
 cleanup_local_mlx_constraint() {
-	[[ -n "${LOCAL_MLX_CONSTRAINT_FILE:-}" ]] && rm -f "$LOCAL_MLX_CONSTRAINT_FILE"
+	if [[ -n "${LOCAL_MLX_CONSTRAINT_FILE:-}" ]]; then
+		rm -f "$LOCAL_MLX_CONSTRAINT_FILE"
+	fi
 }
 trap cleanup_local_mlx_constraint EXIT
 
@@ -285,10 +287,22 @@ pip_install_tool() {
 	pip install "${args[@]}" "$@"
 }
 
-get_editable_project_location() {
+# pip-show helpers capture the full output before parsing. Piping pip
+# straight into an early-exiting awk raced SIGPIPE under pipefail: awk quits
+# at the matched line, pip takes EPIPE, and with `set -e` live the failing
+# command substitution killed the script with no output at all.
+pip_show_field() {
 	local package_name="$1"
-	python -m pip show "$package_name" 2>/dev/null \
-		| awk -F': ' '/^Editable project location: / {print $2; exit}'
+	local field_name="$2"
+	local show_output
+	show_output="$(python -m pip show "$package_name" 2>/dev/null || true)"
+	# Herestring, not a pipe: awk's early exit on a pipe delivers SIGPIPE to
+	# the writer, and under pipefail that made the helper itself fail.
+	awk -F': ' -v field="$field_name" '$1 == field {print $2; exit}' <<<"$show_output" # skylos: ignore[SKY-D215] fixed field names; herestring carries pip metadata, not a path
+}
+
+get_editable_project_location() {
+	pip_show_field "$1" "Editable project location"
 }
 
 normalize_path_or_echo() {
@@ -329,9 +343,7 @@ verify_expected_editable_install() {
 }
 
 get_installed_distribution_version() {
-	local package_name="$1"
-	python -m pip show "$package_name" 2>/dev/null \
-		| awk -F': ' '/^Version: / {print $2; exit}'
+	pip_show_field "$1" "Version"
 }
 
 get_git_current_branch() {
