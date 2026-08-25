@@ -287,18 +287,18 @@ pip_install_tool() {
 	pip install "${args[@]}" "$@"
 }
 
-# pip-show helpers capture the full output before parsing. Piping pip
-# straight into an early-exiting awk raced SIGPIPE under pipefail: awk quits
-# at the matched line, pip takes EPIPE, and with `set -e` live the failing
-# command substitution killed the script with no output at all.
+# pip-show helpers must be safe under live `set -e`/pipefail: an
+# early-exiting awk once delivered SIGPIPE to pip and the failing command
+# substitution killed the script with no output at all.
 pip_show_field() {
 	local package_name="$1"
 	local field_name="$2"
-	local show_output
-	show_output="$(python -m pip show "$package_name" 2>/dev/null || true)"
-	# Herestring, not a pipe: awk's early exit on a pipe delivers SIGPIPE to
-	# the writer, and under pipefail that made the helper itself fail.
-	awk -F': ' -v field="$field_name" '$1 == field {print $2; exit}' <<<"$show_output" # skylos: ignore[SKY-D215] fixed field names; herestring carries pip metadata, not a path
+	# awk reads all input (no early exit), so a chatty pip can never take
+	# SIGPIPE; `|| true` absorbs pip's status for absent packages under
+	# pipefail. pip show fields are unique, so at most one line prints.
+	python -m pip show "$package_name" 2>/dev/null \
+		| awk -F': ' -v field="$field_name" '$1 == field {print $2}' \
+		|| true
 }
 
 get_editable_project_location() {
