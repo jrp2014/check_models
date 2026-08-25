@@ -79,6 +79,19 @@ def _load_managed_packages(pyproject_path: Path) -> set[str]:
     return managed
 
 
+def _local_build_note(current_version: str) -> str:
+    """Annotate local dev/editable builds whose 'outdated' status is a PEP 440 artefact.
+
+    A source build named ``X.dev…+sha`` always ranks below the final ``X`` on
+    PyPI, even when the checkout is at or past the release tag — the row is
+    informational for such builds, not an upgrade prompt (update.sh pins them
+    against exactly this).
+    """
+    if ".dev" in current_version or "+" in current_version:
+        return "  (local dev build; PEP 440 ranks the final release above it)"
+    return ""
+
+
 def _print_outdated_rows(rows: list[dict[str, str]]) -> None:
     """Print compact rows of outdated package versions."""
     if not rows:
@@ -89,7 +102,7 @@ def _print_outdated_rows(rows: list[dict[str, str]]) -> None:
         name = row.get("name", "")
         current = row.get("version", "?")
         latest = row.get("latest_version", "?")
-        print(f"  - {name:<{width}}  {current} -> {latest}")
+        print(f"  - {name:<{width}}  {current} -> {latest}{_local_build_note(current)}")
 
 
 def _looks_like_network_error(message: str) -> bool:

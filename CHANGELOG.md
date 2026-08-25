@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `check_outdated.py` annotates local dev/editable builds in its outdated
+  list — `mlx 0.32.2.dev… -> 0.32.2  (local dev build; PEP 440 ranks the
+  final release above it)` — so the permanent ordering artefact reads as
+  informational rather than as an upgrade prompt.
+
 - mlx-vlm stub generation now retires itself: upstream ships a PEP 561
   `py.typed` marker since Blaizzy/mlx-vlm#1985 (the packaging half included),
   so `tools/generate_stubs.py` skips any package whose *installed* copy
