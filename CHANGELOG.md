@@ -30,9 +30,19 @@ Notable changes to this project will be documented in this file.
   - Sentence-transformers layouts (`modules.json`, `1_Pooling/config.json`,
     `sentence_bert_config.json`) classify as embeddings during discovery even
     without an `mlx_embeddings` stamp.
+  - Raw, source-labelled model-burden facts per result: checkpoint weight
+    bytes (containment-checked sum of the snapshot's safetensors shards),
+    parameter count with its source (`config` keys or a labelled
+    model-name estimate), quantization bits/group size/mode, and declared
+    context length with the config key it came from (including
+    `text_config` nesting). Serialized as `model_burden` in
+    `results.jsonl` (None-valued facts dropped, key omitted when the
+    snapshot is unresolvable) and rendered as diagnostics rows, including
+    a measured "Load active memory vs checkpoint" ratio built from the
+    existing MLX load-time active-memory sample.
   Deliberately not adopted from Nativ: its fixed memory-headroom fit verdict
-  (this harness measures actual MLX memory); raw model-burden facts remain a
-  candidate follow-up.
+  and 20 %/6 GB activation-reserve heuristics — this harness measures actual
+  MLX memory and reports facts, not a coarse fit estimate.
 
 
 - Built-in run comparison (`--compare-with`, default `auto`): every sweep now

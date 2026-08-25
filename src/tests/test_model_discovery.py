@@ -1013,3 +1013,89 @@ def test_shard_skip_reason_carries_single_cache_layout_prefix(
     )
     assert entry.skip_reasons[0].startswith("cache layout: 2 of 3")
     assert "cache layout: cache layout" not in entry.skip_reasons[0]
+
+
+class TestModelBurdenFacts:
+    """The burden collector reports source-labelled facts only — no fit verdicts."""
+
+    @staticmethod
+    def _snapshot(tmp_path: Path) -> Path:
+        snapshot = tmp_path / "repo" / "snapshots" / "abc123"
+        snapshot.mkdir(parents=True)
+        return snapshot
+
+    def _install_snapshot(self, monkeypatch: pytest.MonkeyPatch, snapshot: Path | None) -> None:
+        monkeypatch.setattr(
+            check_models,
+            "_resolve_model_snapshot_path",
+            lambda *_args, **_kwargs: snapshot,
+        )
+
+    def test_config_sourced_facts_win_over_name_estimate(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Config parameter count, quantization, and nested context length are labelled."""
+        snapshot = self._snapshot(tmp_path)
+        config = {
+            "num_parameters": 8_030_000_000,
+            "quantization": {"bits": 4, "group_size": 64, "mode": "affine"},
+            "text_config": {"max_position_embeddings": 131_072},
+        }
+        safe_io.write_text_no_follow(snapshot / "config.json", json.dumps(config))
+        safe_io.write_text_no_follow(snapshot / "model-00001-of-00002.safetensors", "aa")
+        safe_io.write_text_no_follow(snapshot / "model-00002-of-00002.safetensors", "bbb")
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/Some-7B-4bit")
+        assert burden is not None
+        assert burden.parameter_count == 8_030_000_000
+        assert burden.parameter_count_source == "config"
+        assert burden.quantization_bits == 4
+        assert burden.quantization_group_size == 64
+        assert burden.quantization_mode == "affine"
+        assert burden.context_length == 131_072
+        assert burden.context_length_source == "text_config.max_position_embeddings"
+        assert burden.weight_bytes == 5
+
+    def test_name_estimate_fallback_is_labelled_and_skips_bit_suffixes(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Without config params, the size token in the name is used — '4bit' is not one."""
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(snapshot / "config.json", json.dumps({}))
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("mlx-community/Qwen2-VL-7B-Instruct-4bit")
+        assert burden is not None
+        assert burden.parameter_count == 7_000_000_000
+        assert burden.parameter_count_source == "name-estimate"
+        assert burden.quantization_bits is None
+        assert burden.context_length is None
+        # No weight files in this snapshot: absence is None, never zero.
+        assert burden.weight_bytes is None
+
+    def test_million_scale_and_fractional_size_tokens(self) -> None:
+        """M-scale and fractional size tokens parse; the last token wins."""
+        assert check_models._parameter_count_from_name("org/nano-350M") == 350_000_000
+        assert check_models._parameter_count_from_name("org/big-2.7b-chat") == 2_700_000_000
+        assert check_models._parameter_count_from_name("org/no-size-here") is None
+
+    def test_weight_bytes_ignores_shards_escaping_the_repo_root(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """A symlinked shard resolving outside the repo never counts toward weight bytes."""
+        snapshot = self._snapshot(tmp_path)
+        outside = tmp_path / "outside.safetensors"
+        safe_io.write_text_no_follow(outside, "stolen-bytes")
+        (snapshot / "model.safetensors").symlink_to(outside)
+        safe_io.write_text_no_follow(snapshot / "real.safetensors", "abcd")
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/m")
+        assert burden is not None
+        assert burden.weight_bytes == 4
+
+    def test_unresolvable_snapshot_returns_none(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """No cached snapshot means no burden facts, not a partial record."""
+        self._install_snapshot(monkeypatch, None)
+        assert check_models._collect_model_burden("org/uncached") is None

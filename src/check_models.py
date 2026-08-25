@@ -1284,6 +1284,7 @@ class JsonlResultRecord(TypedDict):
     timing: JsonlTimingRecord
     model_provenance: ModelProvenanceRecord
     prompt_diagnostics: dict[str, JsonLike] | None
+    model_burden: NotRequired[dict[str, JsonLike]]
     architecture: NotRequired[JsonlArchitectureRecord]
     system_telemetry: NotRequired[SystemTelemetryRecord]
 
@@ -1885,6 +1886,7 @@ class PerformanceResult:
     runtime_diagnostics: RuntimeDiagnostics | None = None
     requested_max_tokens: int | None = None
     requested_revision: str | None = None
+    model_burden: ModelBurdenFacts | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
     # Thermal/memory-pressure facts sampled while this model ran (darwin only).
@@ -2008,6 +2010,52 @@ def _merged_processed_dimensions(
         image_profile.processed_height if image_profile is not None else None
     )
     return width, height
+
+
+def _model_burden_rows(
+    result: PerformanceResult,
+) -> tuple[tuple[str, str | float | int | None], ...]:
+    """Source-labelled model-burden facts as diagnostics rows (facts, no verdicts)."""
+    burden = result.model_burden
+    if burden is None:
+        return ()
+    rows: list[tuple[str, str | float | int | None]] = []
+    weight_gb = burden.weight_bytes / 1e9 if burden.weight_bytes else None
+    if weight_gb is not None:
+        rows.append(("Checkpoint weights (GB)", f"{weight_gb:.2f}"))
+    if burden.parameter_count is not None:
+        rows.append(
+            (
+                "Parameter count",
+                f"{burden.parameter_count / 1e9:.2f}B ({burden.parameter_count_source})",
+            )
+        )
+    if burden.quantization_bits is not None or burden.quantization_mode is not None:
+        parts = []
+        if burden.quantization_bits is not None:
+            parts.append(f"{burden.quantization_bits}-bit")
+        if burden.quantization_group_size is not None:
+            parts.append(f"group {burden.quantization_group_size}")
+        if burden.quantization_mode is not None:
+            parts.append(burden.quantization_mode)
+        rows.append(("Quantization", ", ".join(parts)))
+    if burden.context_length is not None:
+        rows.append(
+            (
+                "Declared context length",
+                f"{burden.context_length:,} ({burden.context_length_source})",
+            )
+        )
+    runtime = result.runtime_diagnostics
+    load_active = runtime.model_load_active_memory_gb if runtime is not None else None
+    if load_active is not None and weight_gb:
+        rows.append(
+            (
+                "Load active memory vs checkpoint",
+                f"{load_active / weight_gb:.2f}x ({load_active:.2f} GB vs {weight_gb:.2f} GB on disk)",
+            )
+        )
+    return tuple(rows)
 
 
 def _prompt_composition_fact(result: PerformanceResult) -> str | None:
@@ -7479,6 +7527,137 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     return False if found_template else None
 
 
+_PARAM_COUNT_NAME_RE = re.compile(r"(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE)
+_CONTEXT_LENGTH_CONFIG_KEYS: Final[tuple[str, ...]] = (
+    "max_position_embeddings",
+    "context_length",
+    "max_sequence_length",
+    "seq_length",
+)
+
+
+@dataclass(frozen=True)
+class ModelBurdenFacts:
+    """Raw, source-labelled facts about a model's on-disk and declared burden.
+
+    Facts only, per review of the Nativ adaptation: no fit verdict, no
+    headroom heuristics — the harness measures actual MLX memory, and these
+    exist to explain load time and memory behaviour (e.g. load active memory
+    far above checkpoint bytes is anomalous overhead worth a look).
+    """
+
+    weight_bytes: int | None = None
+    parameter_count: int | None = None
+    parameter_count_source: Literal["config", "name-estimate"] | None = None
+    quantization_bits: int | None = None
+    quantization_group_size: int | None = None
+    quantization_mode: str | None = None
+    context_length: int | None = None
+    context_length_source: str | None = None
+
+
+def _snapshot_weight_bytes(snapshot_path: Path) -> int | None:
+    """Sum the resolved sizes of the snapshot's safetensors weight files."""
+    try:
+        repo_root = snapshot_path.parent.parent.resolve(strict=True)
+        shard_paths = sorted(snapshot_path.glob("*.safetensors"))
+    except OSError:
+        return None
+    total = 0
+    counted = 0
+    for shard in shard_paths:
+        try:
+            resolved = shard.resolve(strict=True)
+            if not resolved.is_relative_to(repo_root) or not resolved.is_file():
+                continue
+            total += resolved.stat().st_size
+            counted += 1
+        except OSError:
+            continue
+    return total if counted else None
+
+
+def _parameter_count_from_name(model_identifier: str) -> int | None:
+    """Estimate parameters from the size token in the model name (last match wins)."""
+    matches = _PARAM_COUNT_NAME_RE.findall(model_identifier)
+    if not matches:
+        return None
+    value_text, unit = matches[-1]
+    scale = 1_000_000_000 if unit.lower() == "b" else 1_000_000
+    return int(float(value_text) * scale)
+
+
+def _collect_model_burden(
+    model_identifier: str,
+    requested_revision: str | None = None,
+) -> ModelBurdenFacts | None:
+    """Collect burden facts from the resolved snapshot; None when unavailable."""
+    snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
+    if snapshot_path is None or not snapshot_path.is_dir():
+        return None
+    config: dict[str, JsonLike] = {}
+    config_path = snapshot_path / "config.json"
+    if config_path.is_file():
+        try:
+            loaded = json.loads(_read_text_file(config_path))
+            if isinstance(loaded, dict):
+                config = loaded
+        except (OSError, ValueError):
+            config = {}
+
+    parameter_count: int | None = None
+    parameter_count_source: Literal["config", "name-estimate"] | None = None
+    for key in ("num_parameters", "total_params", "n_params"):
+        value = config.get(key)
+        if isinstance(value, int) and value > 0:
+            parameter_count = value
+            parameter_count_source = "config"
+            break
+    if parameter_count is None:
+        parameter_count = _parameter_count_from_name(model_identifier)
+        if parameter_count is not None:
+            parameter_count_source = "name-estimate"
+
+    quantization = config.get("quantization")
+    quantization_bits: int | None = None
+    quantization_group_size: int | None = None
+    quantization_mode: str | None = None
+    if isinstance(quantization, dict):
+        bits = quantization.get("bits")
+        group_size = quantization.get("group_size")
+        mode = quantization.get("mode")
+        quantization_bits = bits if isinstance(bits, int) else None
+        quantization_group_size = group_size if isinstance(group_size, int) else None
+        quantization_mode = mode if isinstance(mode, str) else None
+
+    context_length: int | None = None
+    context_length_source: str | None = None
+    search_spaces: list[tuple[str, Mapping[str, JsonLike]]] = [("", config)]
+    text_config = config.get("text_config")
+    if isinstance(text_config, dict):
+        search_spaces.append(("text_config.", text_config))
+    for prefix, space in search_spaces:
+        for key in _CONTEXT_LENGTH_CONFIG_KEYS:
+            value = space.get(key)
+            if isinstance(value, int) and value > 0:
+                context_length = value
+                context_length_source = f"{prefix}{key}"
+                break
+        if context_length is not None:
+            break
+
+    return ModelBurdenFacts(
+        weight_bytes=_snapshot_weight_bytes(snapshot_path),
+        parameter_count=parameter_count,
+        parameter_count_source=parameter_count_source,
+        quantization_bits=quantization_bits,
+        quantization_group_size=quantization_group_size,
+        quantization_mode=quantization_mode,
+        context_length=context_length,
+        context_length_source=context_length_source,
+    )
+
+
 class WeightShardStatus(NamedTuple):
     """Completeness of a sharded checkpoint per its safetensors index.
 
@@ -9286,6 +9465,7 @@ def _diagnostics_result_facts(
         ),
         ("Prompt tokens", _generation_int_metric(result.generation, "prompt_tokens")),
         ("Prompt composition", _prompt_composition_fact(result)),
+        *_model_burden_rows(result),
         ("Generation tokens", _generation_int_metric(result.generation, "generation_tokens")),
         (
             "Configured EOS token ID",
@@ -12964,6 +13144,7 @@ def _finalize_process_result(
         result_payload,
         runtime_diagnostics=runtime_diagnostics,
         requested_revision=params.revision,
+        model_burden=_collect_model_burden(params.model_identifier, params.revision),
     )
 
 
@@ -17448,6 +17629,15 @@ def _build_jsonl_result_record(
     failure = _build_jsonl_failure_record(result, assessment.execution)
 
     prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
+    burden_payload = (
+        {
+            field_info.name: value
+            for field_info in fields(result.model_burden)
+            if (value := getattr(result.model_burden, field_info.name)) is not None
+        }
+        if result.model_burden is not None
+        else None
+    )
     record: JsonlResultRecord = {
         "_type": "result",
         "model": result.model_name,
@@ -17480,6 +17670,8 @@ def _build_jsonl_result_record(
         ),
         "prompt_diagnostics": prompt_diagnostics or None,
     }
+    if burden_payload:
+        record["model_burden"] = cast("dict[str, JsonLike]", burden_payload)
     model_type, resolved_model_type, arch_supported = _arch_precheck_for_model(result.model_name)
     if model_type is not None and resolved_model_type is not None and arch_supported is not None:
         record["architecture"] = {

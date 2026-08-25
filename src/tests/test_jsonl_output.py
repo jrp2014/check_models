@@ -1997,3 +1997,58 @@ class TestRerunEvidence:
         assert params.thinking_start_token == "<think>"
         assert params.thinking_end_token == "</think>"
         assert params.context_marker == "Metadata:"
+
+
+class TestModelBurdenRecord:
+    """model_burden serialization drops None fields and is omitted when absent."""
+
+    def test_record_carries_populated_burden_fields_only(self) -> None:
+        """Present facts serialize; None-valued facts are dropped from the payload."""
+        result = PerformanceResult(
+            model_name="org/burden",
+            generation=None,
+            success=False,
+            model_burden=check_models.ModelBurdenFacts(
+                weight_bytes=5_000_000_000,
+                parameter_count=8_000_000_000,
+                parameter_count_source="config",
+                context_length=32_768,
+                context_length_source="max_position_embeddings",
+            ),
+        )
+        assessment = check_models._assess_result(result)
+        record = check_models._build_jsonl_result_record(
+            result,
+            assessment,
+            requested_revision=None,
+            model_provenance={
+                "model": "org/burden",
+                "requested_revision": None,
+                "resolved_revision": "rev",
+                "snapshot_path": None,
+            },
+        )
+        assert record["model_burden"] == {
+            "weight_bytes": 5_000_000_000,
+            "parameter_count": 8_000_000_000,
+            "parameter_count_source": "config",
+            "context_length": 32_768,
+            "context_length_source": "max_position_embeddings",
+        }
+
+    def test_record_omits_burden_key_when_facts_unavailable(self) -> None:
+        """A result with no burden facts writes no model_burden key at all."""
+        result = PerformanceResult(model_name="org/none", generation=None, success=False)
+        assessment = check_models._assess_result(result)
+        record = check_models._build_jsonl_result_record(
+            result,
+            assessment,
+            requested_revision=None,
+            model_provenance={
+                "model": "org/none",
+                "requested_revision": None,
+                "resolved_revision": "rev",
+                "snapshot_path": None,
+            },
+        )
+        assert "model_burden" not in record
