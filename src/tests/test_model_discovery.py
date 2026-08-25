@@ -927,6 +927,87 @@ class TestWeightShardValidation:
         assert status is not None
         assert status.missing == 1
 
+    def test_partial_indexed_subset_is_never_rescued(self, tmp_path: Path) -> None:
+        """When any indexed shard exists, the loader uses that (incomplete) subset.
+
+        mlx-vlm falls back to globbing only when none of the indexed shards
+        exist; a partial indexed subset is loaded as-is and cannot supply the
+        missing weights — so a complete alternative family must not rescue it.
+        """
+        snapshot = self._snapshot_with_shards(tmp_path, missing=1)
+        for i in (1, 2):
+            safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00002.safetensors", "alt")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_stale_index_beside_loose_single_file_is_runnable(self, tmp_path: Path) -> None:
+        """A re-shard to a single model.safetensors also satisfies the glob fallback."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        stale = [f"model-{i:05d}-of-00002.safetensors" for i in (1, 2)]
+        index = {"weight_map": {f"layer{i}": name for i, name in enumerate(stale)}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        safe_io.write_text_no_follow(snapshot / "model.safetensors", "weights")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 0
+
+    def test_unrelated_stem_family_does_not_rescue_a_stale_index(self, tmp_path: Path) -> None:
+        """Only a complete family with the model stem (or a loose file) rescues."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model-00001-of-00002.safetensors"}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        safe_io.write_text_no_follow(snapshot / "foreign-00001-of-00001.safetensors", "weights")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_misnumbered_family_does_not_rescue(self, tmp_path: Path) -> None:
+        """The rescuing family needs the exact 1..N part set, not just N files."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model-00001-of-00009.safetensors"}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        for i in (2, 3, 4):
+            safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00003.safetensors", "w")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_malformed_index_with_complete_weights_takes_the_glob_fallback(
+        self, tmp_path: Path
+    ) -> None:
+        """The loader swallows index errors and globs; a complete set is runnable."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", "{not json")
+        for i in (1, 2):
+            safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00002.safetensors", "w")
+
+        assert check_models._weight_shard_status(snapshot) is None
+
+    def test_consolidated_file_alone_does_not_satisfy_the_fallback(self, tmp_path: Path) -> None:
+        """The loader's glob excludes consolidated.safetensors, so it cannot rescue."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model-00001-of-00001.safetensors"}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        safe_io.write_text_no_follow(snapshot / "consolidated.safetensors", "weights")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
     def test_empty_shard_counts_as_missing(self, tmp_path: Path) -> None:
         """A zero-byte shard is an interrupted download, not a weight file."""
         snapshot = self._snapshot_with_shards(tmp_path, missing=0)
@@ -1116,7 +1197,7 @@ class TestModelBurdenFacts:
         burden = check_models._collect_model_burden("org/Some-7B-4bit")
         assert burden is not None
         assert burden.parameter_count == 8_030_000_000
-        assert burden.parameter_count_source == "config"
+        assert burden.parameter_count_source == "num_parameters"
         assert burden.quantization_bits == 4
         assert burden.quantization_group_size == 64
         assert burden.quantization_mode == "affine"
@@ -1166,6 +1247,20 @@ class TestModelBurdenFacts:
         burden = check_models._collect_model_burden("org/m")
         assert burden is not None
         assert burden.weight_bytes == 4
+
+    def test_invalid_utf8_config_degrades_to_no_config_facts(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """A corrupt (non-UTF-8) config blob must not crash the best-effort reader."""
+        snapshot = self._snapshot(tmp_path)
+        (snapshot / "config.json").write_bytes(b"\xff\xfe broken \xff")
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/corrupt-2B")
+        assert burden is not None
+        assert burden.context_length is None
+        # Name estimate still applies; only the config-sourced facts are lost.
+        assert burden.parameter_count_source == "name-estimate"
 
     def test_unresolvable_snapshot_returns_none(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """No cached snapshot means no burden facts, not a partial record."""

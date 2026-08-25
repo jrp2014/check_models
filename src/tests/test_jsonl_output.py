@@ -2011,7 +2011,7 @@ class TestModelBurdenRecord:
             model_burden=check_models.ModelBurdenFacts(
                 weight_bytes=5_000_000_000,
                 parameter_count=8_000_000_000,
-                parameter_count_source="config",
+                parameter_count_source="num_parameters",
                 context_length=32_768,
                 context_length_source="max_position_embeddings",
             ),
@@ -2031,7 +2031,7 @@ class TestModelBurdenRecord:
         assert record["model_burden"] == {
             "weight_bytes": 5_000_000_000,
             "parameter_count": 8_000_000_000,
-            "parameter_count_source": "config",
+            "parameter_count_source": "num_parameters",
             "context_length": 32_768,
             "context_length_source": "max_position_embeddings",
         }

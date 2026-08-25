@@ -7522,7 +7522,7 @@ def _read_snapshot_text(snapshot_path: Path, file_name: str) -> str | None:
         return None
     try:
         return _read_text_file(resolved)
-    except OSError:
+    except (OSError, ValueError):
         return None
 
 
@@ -7589,7 +7589,7 @@ class ModelBurdenFacts:
 
     weight_bytes: int | None = None
     parameter_count: int | None = None
-    parameter_count_source: Literal["config", "name-estimate"] | None = None
+    parameter_count_source: str | None = None
     quantization_bits: int | None = None
     quantization_group_size: int | None = None
     quantization_mode: str | None = None
@@ -7651,12 +7651,12 @@ def _collect_model_burden(
     config: dict[str, JsonLike] = _read_snapshot_json(snapshot_path, "config.json") or {}
 
     parameter_count: int | None = None
-    parameter_count_source: Literal["config", "name-estimate"] | None = None
+    parameter_count_source: str | None = None
     for key in ("num_parameters", "total_params", "n_params"):
         value = config.get(key)
         if isinstance(value, int) and value > 0:
             parameter_count = value
-            parameter_count_source = "config"
+            parameter_count_source = key
             break
     if parameter_count is None:
         parameter_count = _parameter_count_from_name(model_identifier)
@@ -7731,33 +7731,47 @@ INCOMPLETE_CACHE_REMEDY: Final[str] = (
 _SHARD_FAMILY_RE = re.compile(r"^(?P<stem>.+)-(?P<part>\d+)-of-(?P<total>\d+)\.safetensors$")
 
 
-def _complete_shard_family_present(snapshot_path: Path) -> bool:
-    """Return whether a complete, self-consistent shard family is on disk.
+def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
+    """Return whether mlx-vlm's glob fallback would find a complete weight set.
 
-    The mlx-vlm loader globs ``model*.safetensors`` and never consults the
-    index, so a re-sharded upload can leave a stale index (e.g. naming seven
-    shards) beside a complete alternative family (e.g. three) that loads
-    fine. A full non-empty family is loader-runnable regardless of what the
-    index claims.
+    The loader consults the index first, keeping the indexed shards that
+    exist; only when none exist does it fall back to globbing
+    ``*.safetensors`` (excluding ``consolidated.safetensors``) — e.g. a stale
+    index beside a re-sharded checkpoint. This predicts that fallback's
+    success: every glob member must be a contained, non-empty regular file,
+    and any ``-NNNNN-of-MMMMM`` family among them must be complete (a blind
+    glob cannot make a partial family loadable).
     """
-    families: dict[tuple[str, int], set[int]] = {}
     try:
-        names = [path.name for path in snapshot_path.glob("*.safetensors")]
+        names = sorted(path.name for path in snapshot_path.glob("*.safetensors"))
     except OSError:
         return False
+    families: dict[tuple[str, int], set[int]] = {}
+    loose_present = False
     for name in names:
-        match = _SHARD_FAMILY_RE.match(name)
-        if match is None:
+        if name.endswith("consolidated.safetensors"):
             continue
         resolved = _resolve_snapshot_file(snapshot_path, name)
         try:
             if resolved is None or resolved.stat().st_size == 0:
-                continue
+                return False
         except OSError:
+            return False
+        match = _SHARD_FAMILY_RE.match(name)
+        if match is None:
+            loose_present = True
             continue
         key = (match.group("stem"), int(match.group("total")))
         families.setdefault(key, set()).add(int(match.group("part")))
-    return any(len(present) == total for (_stem, total), present in families.items())
+    complete_model_family = False
+    for (stem, total), present in families.items():
+        if present != set(range(1, total + 1)):
+            # An incomplete or mis-numbered family would be swept up by the
+            # blind glob and cannot form a loadable weight set.
+            return False
+        if stem == "model":
+            complete_model_family = True
+    return loose_present or complete_model_family
 
 
 def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
@@ -7767,13 +7781,23 @@ def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
     make a model runnable. Each referenced shard must exist, resolve inside
     this repo's cache directory, and be a non-empty regular file. Returns None
     when there is no index (single-file checkpoints are validated by the
-    plain safetensors presence check).
+    plain safetensors presence check) — and likewise when the index is
+    broken or wholly stale but the loader's glob fallback would find a
+    complete weight set, because mlx-vlm swallows index errors and ignores
+    an index none of whose shards exist.
     """
     index_path = snapshot_path / "model.safetensors.index.json"
     if not index_path.exists() and not index_path.is_symlink():
         return None
 
-    def _invalid(reason: str) -> WeightShardStatus:
+    def _invalid(reason: str) -> WeightShardStatus | None:
+        # The loader swallows index errors and falls back to globbing
+        # *.safetensors; a broken index beside a complete weight set is
+        # therefore runnable (None: the plain presence check governs).
+        # Without one, the broken index stays evidence of a corrupt
+        # download and fails closed.
+        if _loader_fallback_weights_present(snapshot_path):
+            return None
         return WeightShardStatus(0, 0, (), index_error=reason)
 
     index_text = _read_snapshot_text(snapshot_path, "model.safetensors.index.json")
@@ -7798,9 +7822,14 @@ def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:
             complete = False
         if not complete:
             missing.append(name)
-    if missing and _complete_shard_family_present(snapshot_path):
-        # Stale index beside a complete re-sharded checkpoint: loader-runnable.
-        missing = []
+    if missing:
+        # mlx-vlm ignores the index only when none of its shards exist at
+        # all; with a partial indexed subset it loads that subset, which
+        # cannot supply the missing weights. Mirror that branch exactly
+        # before crediting the loader's glob fallback.
+        any_indexed_present = any((snapshot_path / name).exists() for name in shard_names)
+        if not any_indexed_present and _loader_fallback_weights_present(snapshot_path):
+            missing = []
     return WeightShardStatus(
         missing=len(missing),
         total=len(shard_names),

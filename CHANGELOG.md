@@ -32,8 +32,9 @@ Notable changes to this project will be documented in this file.
     without an `mlx_embeddings` stamp.
   - Raw, source-labelled model-burden facts per result: checkpoint weight
     bytes (containment-checked sum of the snapshot's safetensors shards),
-    parameter count with its source (`config` keys or a labelled
-    model-name estimate), quantization bits/group size/mode, and declared
+    parameter count with its source (the exact config key —
+    `num_parameters`/`total_params`/`n_params` — or `name-estimate`),
+    quantization bits/group size/mode, and declared
     context length with the config key it came from (including
     `text_config` nesting). Serialized as `model_burden` in
     `results.jsonl` (None-valued facts dropped, key omitted when the
@@ -135,15 +136,23 @@ Notable changes to this project will be documented in this file.
   dropped config-sourced facts (the cached Qwen/Qwen3-VL-2B-Instruct
   config declares `text_config.max_position_embeddings = 262144`, which
   now reports with its source key). The thinking-template scan and
-  weight-byte sum read through the same helper. Also fixed alongside:
-  shard validation accepts a complete, self-consistent shard family on
-  disk beside a stale index (mlx-vlm globs shards and never consults the
-  index — a re-sharded upload such as the cached Apriel-1.5-15b-Thinker
-  is loader-runnable); the name-based parameter estimate takes the
-  largest size token so MoE names ("30B-A3B") report total rather than
-  activated parameters; and the burden collector retries once with a
-  refreshed cache scan so models cold-downloaded during the run are not
-  invisible to the run's earlier cache snapshot.
+  weight-byte sum read through the same helper, and the best-effort
+  snapshot reader also absorbs invalid UTF-8 (`UnicodeDecodeError` is a
+  `ValueError`, which only the JSON layer caught) instead of aborting
+  discovery or result finalization on a corrupt cached file. Also fixed
+  alongside: shard validation mirrors the mlx-vlm loader's index handling
+  exactly — the loader keeps whichever indexed shards exist and falls
+  back to globbing `*.safetensors` (excluding `consolidated.safetensors`)
+  only when none exist or the index is malformed, so a wholly stale or
+  broken index beside a complete weight set (a loose `model.safetensors`
+  or a `model`-stem family with the exact 1..N part set, e.g. the cached
+  re-sharded Apriel-1.5-15b-Thinker) validates as runnable, while a
+  partial indexed subset or an unrelated-stem family never rescues; the
+  name-based parameter estimate takes the largest size token so MoE
+  names ("30B-A3B") report total rather than activated parameters; and
+  the burden collector retries once with a refreshed cache scan so
+  models cold-downloaded during the run are not invisible to the run's
+  earlier cache snapshot.
 - Review fixes on the discovery hardening: the offline-retry path accepts a
   resolver-verified requested revision (branch/tag names could never equal
   the snapshot's hash-named directory, so the legacy equality check rejected
