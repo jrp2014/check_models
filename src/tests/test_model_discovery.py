@@ -1291,6 +1291,16 @@ class TestModelBurdenFacts:
         assert check_models._parameter_count_from_name("org/big-2.7b-chat") == 2_700_000_000
         assert check_models._parameter_count_from_name("org/no-size-here") is None
 
+    def test_fractional_sizes_do_not_truncate(self) -> None:
+        """Decimal arithmetic: 4.1 is inexact in binary and float-int truncated.
+
+        Mirrors ml-explore/mlx-lm#1726, which fixed the same defect in
+        mlx-lm's _parse_size.
+        """
+        assert check_models._parameter_count_from_name("org/model-4.1B") == 4_100_000_000
+        assert check_models._parameter_count_from_name("org/tiny-8.2M") == 8_200_000
+        assert check_models._parameter_count_from_name("org/mid-16.9b") == 16_900_000_000
+
     def test_moe_names_report_total_not_activated_parameters(self) -> None:
         """MoE names carry total and activated sizes; the total (largest) wins."""
         moe = check_models._parameter_count_from_name("mlx-community/Qwen3-30B-A3B-Instruct-4bit")

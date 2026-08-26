@@ -4,6 +4,12 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Name-based parameter estimates use `Decimal` arithmetic: `int(float("4.1")
+  - 1e9)` truncates to 4,099,999,999 because 4.1 is inexact in binary — the
+  same defect mlx-lm fixed in its `_parse_size` (ml-explore/mlx-lm#1726).
+
 ### Changed
 
 - The `tokenizers` ceiling is widened to `<0.24.0` (from `<0.23.0`) in both

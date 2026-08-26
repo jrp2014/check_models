@@ -78,6 +78,7 @@ from contextlib import (
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from functools import lru_cache
 from importlib import import_module
 from importlib.metadata import (
@@ -7635,8 +7636,10 @@ def _parameter_count_from_name(model_identifier: str) -> int | None:
     matches = _PARAM_COUNT_NAME_RE.findall(model_identifier)
     if not matches:
         return None
+    # Decimal, not float: int(float("4.1") * 1e9) truncates to 4_099_999_999
+    # (same defect mlx-lm fixed in ml-explore/mlx-lm#1726).
     return max(
-        int(float(value_text) * (1_000_000_000 if unit.lower() == "b" else 1_000_000))
+        int(Decimal(value_text) * (10**9 if unit.lower() == "b" else 10**6))
         for value_text, unit in matches
     )
 
