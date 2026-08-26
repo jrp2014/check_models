@@ -4,6 +4,18 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- The stale-index glob-fallback rescue is aligned with Nativ's merged fix for
+  the same snapshot class (Blaizzy/nativ#370): the rescuing weight set must
+  stand on its own — exactly one loose full-checkpoint file, or exactly the
+  complete 1..N of one `model`-stem shard series. Mixed series, an adapter,
+  or a stray loose file beside the series would be merged into the blind
+  glob load and no longer rescue. One deliberate divergence remains: a
+  malformed or empty index beside a self-standing weight set still rescues
+  here, because mlx-vlm's Python loader swallows index errors and globs,
+  while Nativ's pre-flight hides that case.
+
 ## [0.15.0] - 2026-08-26
 
 ### Added

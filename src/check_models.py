@@ -7799,42 +7799,45 @@ def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
     The loader consults the index first, keeping the indexed shards that
     exist; only when none exist does it fall back to globbing
     ``*.safetensors`` (excluding ``consolidated.safetensors``) — e.g. a stale
-    index beside a re-sharded checkpoint. This predicts that fallback's
-    success: every glob member must be a contained, non-empty regular file,
-    and any ``-NNNNN-of-MMMMM`` family among them must be complete (a blind
-    glob cannot make a partial family loadable).
+    index beside a re-sharded checkpoint. Aligned with Nativ's discovery fix
+    for the same class of snapshot (Blaizzy/nativ#370), the glob'd set must
+    stand on its own: exactly one loose full-checkpoint file, or exactly the
+    complete 1..N of one ``model``-stem shard series. Anything else swept up
+    by the blind glob — a second series, an adapter, a stray loose file —
+    would be merged into the load and cannot be vouched for. One deliberate
+    divergence from Nativ remains at the call sites: a malformed or empty
+    index with a self-standing weight set still rescues here, because
+    mlx-vlm's Python loader swallows index errors and globs.
     """
     names = _glob_weight_names(snapshot_path)
     if names is None:
         return False
     families: dict[tuple[str, int], set[int]] = {}
-    loose_full_checkpoint = False
+    loose_full_checkpoint = 0
     for name in names:
         resolved = _resolve_snapshot_file(snapshot_path, name)
         try:
-            if resolved is None or resolved.stat().st_size == 0:
-                return False
+            usable = resolved is not None and resolved.stat().st_size > 0
         except OSError:
+            usable = False
+        if not usable:
             return False
         match = _SHARD_FAMILY_RE.match(name)
         if match is None:
-            # Adapter and other auxiliary safetensors are swept up by the
-            # blind glob but cannot stand in for a full checkpoint; only a
-            # full-checkpoint name vouches for one.
-            if name in _FULL_CHECKPOINT_LOOSE_NAMES:
-                loose_full_checkpoint = True
+            if name not in _FULL_CHECKPOINT_LOOSE_NAMES:
+                # Adapters and other auxiliary safetensors would be merged
+                # into the load; the set no longer stands on its own.
+                return False
+            loose_full_checkpoint += 1
             continue
         key = (match.group("stem"), int(match.group("total")))
         families.setdefault(key, set()).add(int(match.group("part")))
-    complete_model_family = False
-    for (stem, total), present in families.items():
-        if present != set(range(1, total + 1)):
-            # An incomplete or mis-numbered family would be swept up by the
-            # blind glob and cannot form a loadable weight set.
-            return False
-        if stem == "model":
-            complete_model_family = True
-    return loose_full_checkpoint or complete_model_family
+    if loose_full_checkpoint:
+        return loose_full_checkpoint == 1 and not families
+    if len(families) != 1:
+        return False
+    (stem, total), present = next(iter(families.items()))
+    return stem == "model" and present == set(range(1, total + 1))
 
 
 def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:

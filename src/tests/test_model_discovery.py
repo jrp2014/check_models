@@ -1020,6 +1020,44 @@ class TestWeightShardValidation:
         assert status is not None
         assert status.missing == 1
 
+    def test_mixed_shard_series_do_not_rescue_a_stale_index(self, tmp_path: Path) -> None:
+        """Two complete series stand for two builds; the glob would merge them.
+
+        Mirrors Blaizzy/nativ#370: the rescuing set must stand on its own —
+        mixed series (leftovers of another build) are rejected.
+        """
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model-00001-of-00009.safetensors"}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        for i in (1, 2):
+            safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00002.safetensors", "a")
+        for i in (1, 2, 3):
+            safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00003.safetensors", "b")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
+    def test_extra_files_beside_a_complete_series_do_not_rescue(self, tmp_path: Path) -> None:
+        """An adapter or loose checkpoint beside the series breaks stand-alone-ness."""
+        for extra in ("adapter_model.safetensors", "model.safetensors"):
+            repo_root = tmp_path / f"models--org--{extra.split('.')[0]}"
+            snapshot = repo_root / "snapshots" / "abc"
+            snapshot.mkdir(parents=True)
+            index = {"weight_map": {"layer0": "model-00001-of-00009.safetensors"}}
+            safe_io.write_text_no_follow(
+                snapshot / "model.safetensors.index.json", json.dumps(index)
+            )
+            for i in (1, 2):
+                safe_io.write_text_no_follow(snapshot / f"model-{i:05d}-of-00002.safetensors", "w")
+            safe_io.write_text_no_follow(snapshot / extra, "x")
+
+            status = check_models._weight_shard_status(snapshot)
+            assert status is not None
+            assert status.missing == 1, extra
+
     def test_consolidated_file_alone_does_not_satisfy_the_fallback(self, tmp_path: Path) -> None:
         """The loader's glob excludes consolidated.safetensors, so it cannot rescue."""
         repo_root = tmp_path / "models--org--m"
