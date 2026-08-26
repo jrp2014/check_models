@@ -52,7 +52,7 @@ PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS: Final[dict[str, str]] = {
     # its own mlx-lm dependency (738e4406). Recorded in reports when present.
     "mlx-lm": ">=0.31.3",
     "psutil": ">=5.9.0",
-    "tokenizers": "<0.23.0,>=0.22.0",
+    "tokenizers": "<0.24.0,>=0.22.0",
     "einops": ">=0.6.0",
     "num2words": ">=0.5.0",
     "sentencepiece": "!=0.1.92,>=0.1.91",

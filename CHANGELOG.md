@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The `tokenizers` ceiling is widened to `<0.24.0` (from `<0.23.0`) in both
+  `src/pyproject.toml` and the dependency policy: transformers 5.16.0
+  requires `tokenizers>=0.23.1,<0.24.0`, so the old ceiling would have made
+  transformers unresolvable past 5.15.1. This lifts the long-standing hold
+  on the Dependabot tokenizers bump, which proposed exactly this range.
 - The stale-index glob-fallback rescue is aligned with Nativ's merged fix for
   the same snapshot class (Blaizzy/nativ#370): the rescuing weight set must
   stand on its own — exactly one loose full-checkpoint file, or exactly the
