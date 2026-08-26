@@ -24,7 +24,6 @@ from check_models import (
     PerformanceResult,
     RuntimeDiagnostics,
     _build_report_render_context,
-    _clean_stale_toplevel_reports,
     _generate_github_issue_reports,
     generate_diagnostics_report,
     generate_html_report,
@@ -4533,7 +4532,7 @@ class TestMarkdownGalleryReport:
         assert r"answer with \| pipe" not in chooser
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" not in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser
-        assert "not_evaluated" in chooser
+        assert "not evaluated" in chooser
         assert "boom" not in chooser
         avoid = _extract_markdown_subsection(
             content,
@@ -4753,6 +4752,8 @@ class TestMarkdownGalleryReport:
         assert [content.index(f"### {model}") for model in expected_model_order] == sorted(
             content.index(f"### {model}") for model in expected_model_order
         )
+        assert "`usable with caveats`" in chooser
+        assert "`usable_with_caveats`" not in chooser
         assert "*Verdict:*" not in content
         assert "*Maintainer:*" not in content
         assert "*Next action:*" not in content
@@ -4776,6 +4777,8 @@ class TestMarkdownGalleryReport:
         assert [html_chooser.index(model) for model in expected_model_order] == sorted(
             html_chooser.index(model) for model in expected_model_order
         )
+        assert "usable with caveats" in html_chooser
+        assert ">usable_with_caveats<" not in html_chooser
         html_complete_evidence = html_content[
             html_content.index('<section id="complete-model-evidence">') :
         ]
@@ -5237,43 +5240,6 @@ class TestMarkdownGalleryReport:
         assert "*Next action:*" not in content
 
 
-# ===================================================================
-# Stale retained report copies
-# ===================================================================
-
-
-class TestCleanStaleToplevelReports:
-    """Regression coverage for stale top-level report cleanup."""
-
-    def test_removes_stale_files_when_canonical_exists(self, tmp_path: Path) -> None:
-        """A stale top-level file is removed when the reports copy exists."""
-        reports_dir = tmp_path / "reports"
-        reports_dir.mkdir()
-        (tmp_path / "results.html").write_text("old", encoding="utf-8")
-        (reports_dir / "results.html").write_text("canonical", encoding="utf-8")
-        (tmp_path / "model_gallery.md").write_text("old gallery", encoding="utf-8")
-        (reports_dir / "model_gallery.md").write_text(
-            "canonical gallery",
-            encoding="utf-8",
-        )
-
-        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
-
-        assert removed == 2
-        assert not (tmp_path / "results.html").exists()
-        assert not (tmp_path / "model_gallery.md").exists()
-
-    def test_keeps_file_when_no_canonical(self, tmp_path: Path) -> None:
-        """A top-level file is kept when no reports copy exists."""
-        reports_dir = tmp_path / "reports"
-        reports_dir.mkdir()
-        only_copy = tmp_path / "results.html"
-        only_copy.write_text("only copy", encoding="utf-8")
-
-        assert _clean_stale_toplevel_reports(tmp_path, reports_dir) == 0
-        assert only_copy.exists()
-
-
 class TestGithubIssueReportsCleanup:
     """Regression coverage for live stale crash-draft cleanup."""
 
@@ -5701,7 +5667,7 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
     assert "Since the baseline sweep" in rendered
     assert "HEAD:src/output/results.jsonl" in rendered
     assert "usable → unusable" in rendered
-    assert "+repeated_output" in rendered
+    assert "+repeated text" in rendered
     assert "In baseline, not run this time: 11 models (targeted run" in rendered
     assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"
 
@@ -5873,7 +5839,7 @@ def test_comparison_surfaces_render_from_one_view(
         current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
     )
     view = check_models._comparison_view(comparison)
-    assert view.change_rows == (("org/m", "completed", "usable → unusable", "+repeated_output"),)
+    assert view.change_rows == (("org/m", "completed", "usable → unusable", "+repeated text"),)
     assert [row[0] for row in view.flag_rows] == ["org/m"]
 
     rendered = "\n".join(
@@ -5884,7 +5850,7 @@ def test_comparison_surfaces_render_from_one_view(
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
         check_models._log_run_comparison(comparison)
     logged = "\n".join(record.getMessage() for record in caplog.records)
-    for cell in ("usable → unusable", "+repeated_output"):
+    for cell in ("usable → unusable", "+repeated text"):
         assert cell in rendered
         assert cell in logged
     ratio_cell = view.flag_rows[0][3]

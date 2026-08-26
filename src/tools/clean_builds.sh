@@ -8,7 +8,6 @@
 # - Type checking caches (.mypy_cache/)
 # - Linter caches (.ruff_cache/)
 # - macOS Finder metadata (.DS_Store)
-# - Stale CI artifacts (.ci_* files)
 # - Test output files (output/test_*)
 #
 # Note: This does NOT remove compiled Metal kernels from system caches.
@@ -196,25 +195,6 @@ clean_directory() {
 		done < <(find "$dir" -type f -name '.DS_Store' -print0 2>/dev/null)
 		if [[ $ds_count -gt 0 ]]; then
 			echo "  ✓ Removed: $ds_count .DS_Store files"
-			((cleaned++))
-		fi
-	fi
-	
-	# Stale CI artifacts (.ci_* files - obsolete pytest caching)
-	local ci_count=0
-	if [[ $DRY_RUN -eq 1 ]]; then
-		ci_count=$(find "$dir" -maxdepth 1 -type f -name '.ci_*' 2>/dev/null | wc -l | tr -d ' ')
-		if [[ $ci_count -gt 0 ]]; then
-			echo "  [DRY RUN] Would remove: $ci_count stale .ci_* files"
-			((cleaned++))
-		fi
-	else
-		while IFS= read -r -d '' cifile; do
-			rm -f "$cifile"
-			((ci_count++))
-		done < <(find "$dir" -maxdepth 1 -type f -name '.ci_*' -print0 2>/dev/null)
-		if [[ $ci_count -gt 0 ]]; then
-			echo "  ✓ Removed: $ci_count stale .ci_* files"
 			((cleaned++))
 		fi
 	fi

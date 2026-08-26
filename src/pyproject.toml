@@ -177,8 +177,6 @@ exclude = [
     "_build",
     "build",
     "dist",
-    # Relative to the project root (src/), so no "src/" prefix.
-    "tools/.archived",
     "venv",
 ]
 indent-width = 4
@@ -270,16 +268,6 @@ ignore = [
     "S607",   # partial executable path - tools call known commands in PATH
     "BLE001", # blind Exception - tools use broad catches for robustness
 ]
-"src/tools/**" = [
-    "T201",   # Print statements - tools are CLI utilities
-    "S603",   # subprocess calls - tool commands are hardcoded, not user input
-    "S607",   # partial executable path - tools call known commands in PATH
-    "BLE001", # blind Exception - tools use broad catches for robustness
-]
-# Archived files: ignore all rules (these are not maintained)
-"tools/.archived/**" = ["ALL"]
-"src/tools/.archived/**" = ["ALL"]
-
 [tool.ruff.lint.pydocstyle]
 # Use Google docstring convention (resolves D203/D211 and D212/D213 conflicts)
 convention = "google"
@@ -389,7 +377,7 @@ extra-paths = ["../typings"]
 
 [tool.vulture]
 paths = ["check_models.py", "tools"]
-exclude = ["tests/", "tools/.archived/", "../typings/", "*.egg-info"]
+exclude = ["tests/", "../typings/", "*.egg-info"]
 min_confidence = 100
 sort_by_size = true
 
@@ -407,7 +395,6 @@ markers = [
 ]
 
 [tool.pyrefly]
-project-excludes = ["**/src/tools/.archived/"]
 search-path = ["../typings"]
 python-version = "3.13"
 # Shared quality scripts inject `python-interpreter-path` from the resolved

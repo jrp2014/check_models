@@ -8282,6 +8282,11 @@ def _assessment_actionability_key(
     return severity, _USABILITY_DISPLAY_PRIORITY[usability], model_name.casefold()
 
 
+def _human_status_label(status: str) -> str:
+    """Render a stable machine status for human-facing report surfaces."""
+    return status.replace("_", " ")
+
+
 def _human_observation_labels(
     observations: Sequence[ObservationCode],
     *,
@@ -8460,7 +8465,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
-            _markdown_inline_code(row.usability),
+            _markdown_inline_code(_human_status_label(row.usability)),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
@@ -8534,7 +8539,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability),
+                        _markdown_inline_code(_human_status_label(row.usability)),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
                     )
                     for row in data.avoided
@@ -10218,9 +10223,9 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     chooser_rows = [
         (
             _html_model_link(row.model),
-            assessments[row.model].execution,
-            row.usability,
-            assessments[row.model].maintainer_status,
+            _human_status_label(assessments[row.model].execution),
+            _human_status_label(row.usability),
+            _human_status_label(assessments[row.model].maintainer_status),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _format_float_or_dash(row.first_token_latency_s, digits=2),
@@ -10319,7 +10324,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                 rows=[
                     (
                         _html_model_link(row.model),
-                        row.usability,
+                        _human_status_label(row.usability),
                         _gallery_observation_labels(row.observations),
                         row.output_preview,
                     )
@@ -17182,7 +17187,7 @@ def _log_model_comparison_table_and_charts(
             "GB",
         ),
         rows=comparison.rows,
-        max_widths=(2, 21, 3, 5, 5, 5, 5, 6, 5, 5, 5, 5),
+        max_widths=(2, 21, 3, 5, 5, 5, 5, 6, 5, 6, 5, 5),
     )
 
     if comparison.tps_entries:
@@ -18812,13 +18817,18 @@ def _comparison_model_list(models: Sequence[str]) -> str:
 
 
 def _format_usability_transition(before: str, after: str) -> str:
-    return before if before == after else f"{before} → {after}"
+    before_label = _human_status_label(before)
+    return before_label if before == after else f"{before_label} → {_human_status_label(after)}"
 
 
 def _format_observation_delta(change: RunComparisonModelChange) -> str:
-    """Compact +added/-removed observation-code delta shared by every renderer."""
-    parts = [f"+{code}" for code in change.observations_added] + [
-        f"-{code}" for code in change.observations_removed
+    """Compact +added/-removed observation labels shared by every renderer."""
+    parts = [
+        f"+{_OBSERVATION_SELECTOR_GLOSSES[cast('ObservationCode', code)]}"
+        for code in change.observations_added
+    ] + [
+        f"-{_OBSERVATION_SELECTOR_GLOSSES[cast('ObservationCode', code)]}"
+        for code in change.observations_removed
     ]
     return "; ".join(parts) or "—"
 
@@ -19920,7 +19930,7 @@ def _run_issue_summary_quality_section(
         rows.append(
             (
                 result["model"],
-                result["assessment"]["usability"].replace("_", " "),
+                _human_status_label(result["assessment"]["usability"]),
                 total_cell,
                 tps_cell,
                 peak_cell,
@@ -19978,7 +19988,7 @@ def _run_issue_summary_surfaced_sections(
             rows.append(
                 (
                     result["model"],
-                    assessment["usability"].replace("_", " "),
+                    _human_status_label(assessment["usability"]),
                     _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
                         summary_path=summary_path,
@@ -21329,31 +21339,6 @@ def _generate_reports_and_log_outputs(
     return tuple(outcomes)
 
 
-def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
-    """Remove stale top-level report copies superseded by reports/ versions.
-
-    Earlier versions of the tool wrote reports directly into ``output/``.
-    Now they live under ``output/reports/``.  This removes any leftover
-    top-level duplicates so only the canonical copies remain.
-    """
-    stale_names = (
-        "results.html",
-        "diagnostics.md",
-        "model_gallery.md",
-    )
-    removed = 0
-    for name in stale_names:
-        stale = output_dir / name
-        canonical = reports_dir / name
-        if stale.is_file() and canonical.is_file():
-            try:
-                stale.unlink()
-                removed += 1
-            except OSError:
-                logger.debug("Failed to remove stale top-level report: %s", stale)
-    return removed
-
-
 # ---------- Phase 5: Automatic Differential Reruns ----------
 
 RERUN_TRIAGE_MAX_TOKENS: Final[int] = 100
@@ -21611,15 +21596,6 @@ def finalize_execution(
             ),
             None,
         )
-
-        # Remove stale top-level report copies superseded by reports/ subdirectory
-        reports_dir = output_paths.diagnostics.parent
-        output_dir = reports_dir.parent
-        stale_removed = _clean_stale_toplevel_reports(output_dir, reports_dir)
-        if stale_removed:
-            logger.info(
-                "Removed %d stale top-level report(s) superseded by reports/.", stale_removed
-            )
 
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(

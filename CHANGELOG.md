@@ -84,6 +84,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Human-facing gallery and baseline-comparison status cells now use readable
+  labels (`usable with caveats`, `title/keyword constraints failed`) while
+  machine artifacts retain their stable underscore-delimited codes.
+
 - `check_outdated.py` annotates local dev/editable builds in its outdated
   list — `mlx 0.32.2.dev… -> 0.32.2  (local dev build; PEP 440 ranks the
   final release above it)` — so the permanent ordering artefact reads as
@@ -123,6 +127,10 @@ Notable changes to this project will be documented in this file.
   pyrefly, ty, ruff, and the torch extra (2.13.0).
 
 ### Fixed
+
+- The terminal model-comparison table reserves enough width for three-digit
+  durations, preventing values such as `133.22` from folding their final digit
+  onto a continuation row.
 
 - Weight-file selection is shared and loader-exact: a single helper returns
   the containment-checked files mlx-vlm's `load_model` would actually select
@@ -304,6 +312,11 @@ Notable changes to this project will be documented in this file.
 ## [0.14.1] - 2026-08-23
 
 ### Removed
+
+- Retired migration cruft: placeholder quality tools under
+  `src/tools/.archived`, their Ruff exclusions, the completed MLX-integration
+  prompt, obsolete `.ci_*` cache cleanup, and automatic deletion of report
+  copies from the pre-`output/reports/` layout.
 
 - The `atexit` `mx.clear_streams()` exit hook in `main_cli()` and the
   `update.sh` smoke bootstrap. Both were workarounds for the mlx

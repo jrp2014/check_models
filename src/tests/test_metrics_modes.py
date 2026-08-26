@@ -619,6 +619,27 @@ def test_log_summary_comparison_table_is_one_row_per_model_at_realistic_width(
     assert all(value in row for value in ("0.12", "0.50", "0.03", "0.60", "0.40", "0.04"))
 
 
+def test_log_summary_comparison_table_keeps_long_total_on_one_line(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A three-digit duration must not fold its final digit onto another row."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/slow-model",
+        generation=_StubGeneration(generation_tps=4.8, peak_memory=39.94, text="clean output"),
+        success=True,
+        generation_time=127.88,
+        model_load_time=3.49,
+        total_time=133.22,
+    )
+
+    with patch("check_models.get_terminal_width", return_value=120):
+        log_summary([result])
+
+    comparison_lines = [record.getMessage() for record in caplog.records]
+    assert any("133.22" in line for line in comparison_lines)
+
+
 def test_log_summary_reports_execution_and_mechanical_observations(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
