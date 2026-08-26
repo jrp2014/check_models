@@ -592,7 +592,7 @@ def test_log_summary_comparison_table_is_one_row_per_model_at_realistic_width(
         generation_time=1.0,
         model_load_time=0.5,
         total_time=1.5,
-        quality_issues="⚠️harness(stop_token), output:zero_tokens",
+        quality_issues="⚠\ufe0fharness(stop_token), output:zero_tokens",
         runtime_diagnostics=RuntimeDiagnostics(
             input_validation_time_s=0.12,
             model_load_time_s=0.5,

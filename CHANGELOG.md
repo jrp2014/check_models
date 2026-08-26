@@ -11,6 +11,18 @@ Notable changes to this project will be documented in this file.
   inexact in binary — the same defect mlx-lm fixed in its `_parse_size`
   (ml-explore/mlx-lm#1726).
 
+- CodeQL can analyze the monolith again: GitHub's Python extractor
+  (tsg-python) mis-slices the U+FE0F emoji variation selector while
+  evaluating string literals in any file containing PEP 695 syntax, and when
+  the same literal carries a %-format directive its error reporter crashes
+  ("not enough arguments for format string"), silently dropping the whole
+  file from security analysis — `src/check_models.py` had been unanalyzable
+  since at least 2026-03 (when the first `type` alias landed). All `⚠️`
+  glyphs in Python sources are now written with the selector escaped
+  (`⚠\ufe0f`), which renders identically and keeps the source ASCII at
+  that position; a source-hygiene test guards the invariant, and the root
+  cause was bisected to a three-line reproducer with a local CodeQL CLI.
+
 ### Removed
 
 - The mlx-vlm stub-generation subsystem is fully retired: mlx-vlm 0.6.16+

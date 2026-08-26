@@ -1039,6 +1039,26 @@ def test_public_readme_uses_only_exported_report_api() -> None:
     assert "peak-memory\n  filters" not in readme
 
 
+def test_python_sources_write_variation_selectors_as_escapes() -> None:
+    r"""Raw U+FE0F must appear only via the \ufe0f escape in Python sources.
+
+    CodeQL's tsg-python extractor mis-slices emoji variation selectors while
+    evaluating string literals in any file containing PEP 695 syntax; when the
+    same literal carries a %-format directive the extractor's error reporter
+    crashes and the whole file is silently dropped from security analysis.
+    Writing the selector as an escape keeps the rendered glyph identical while
+    the source stays ASCII at that position.
+    """
+    excluded_parts = {".worktrees", "build", "output", "check_models.egg-info"}
+    offenders = [
+        str(path.relative_to(REPO_ROOT))
+        for path in sorted(REPO_ROOT.glob("src/**/*.py"))
+        if not excluded_parts.intersection(path.parts)
+        and "\ufe0f" in path.read_text(encoding="utf-8")
+    ]
+    assert offenders == [], offenders
+
+
 def test_production_logs_use_facts_first_observation_labels() -> None:
     """Persisted log messages must describe mechanical facts without quality verdicts."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")

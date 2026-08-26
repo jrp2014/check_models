@@ -138,7 +138,7 @@ def main() -> int:
         )
     except subprocess.TimeoutExpired:
         print(
-            "⚠️  Timed out while querying outdated packages "
+            "⚠\ufe0f  Timed out while querying outdated packages "
             f"(>{OUTDATED_TIMEOUT_SECONDS}s). Skipping.",
         )
         return 0
@@ -148,15 +148,17 @@ def main() -> int:
     )
     if result.returncode != 0:
         if combined_output and _looks_like_network_error(combined_output):
-            print("⚠️  Could not query package index (network error). Skipping outdated check.")
+            print(
+                "⚠\ufe0f  Could not query package index (network error). Skipping outdated check."
+            )
             return 0
-        print(f"⚠️  Error checking outdated packages:\n{combined_output}", file=sys.stderr)
+        print(f"⚠\ufe0f  Error checking outdated packages:\n{combined_output}", file=sys.stderr)
         return 1
 
     try:
         outdated: list[dict[str, str]] = json.loads(result.stdout or "[]")
     except json.JSONDecodeError as e:
-        print(f"⚠️  Failed to parse pip outdated output: {e}", file=sys.stderr)
+        print(f"⚠\ufe0f  Failed to parse pip outdated output: {e}", file=sys.stderr)
         return 1
 
     if not outdated:
@@ -172,7 +174,7 @@ def main() -> int:
         else:
             unmanaged_rows.append(row)
 
-    print(f"⚠️  Outdated packages found ({len(outdated)} total):")
+    print(f"⚠\ufe0f  Outdated packages found ({len(outdated)} total):")
     if managed_rows:
         print(f"\nManaged by pyproject.toml ({len(managed_rows)}):")
         _print_outdated_rows(managed_rows)

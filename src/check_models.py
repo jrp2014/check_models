@@ -12189,7 +12189,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
         ]
         for cache_warning in matching_warnings:
             logger.warning(
-                "⚠️  Cache Warning: Hugging Face reported corruption for %s: %s",
+                "⚠\ufe0f  Cache Warning: Hugging Face reported corruption for %s: %s",
                 model_identifier,
                 cache_warning,
             )
@@ -12208,13 +12208,13 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
                 # Check for missing or corrupt files
                 if repo.nb_files == 0:
                     logger.warning(
-                        "⚠️  Cache Warning: Model %s has 0 files "
+                        "⚠\ufe0f  Cache Warning: Model %s has 0 files "
                         "(incomplete download or corruption)",
                         model_identifier,
                     )
                 elif repo.size_on_disk < min_cache_size_mb * (1024**2):
                     logger.warning(
-                        "⚠️  Cache Warning: Model %s cache is suspiciously small (%s MB)",
+                        "⚠\ufe0f  Cache Warning: Model %s cache is suspiciously small (%s MB)",
                         model_identifier,
                         f"{repo.size_on_disk / (1024**2):.1f}",
                     )
@@ -14058,7 +14058,7 @@ def _attach_system_telemetry(
     degradation = _telemetry_degradation_note(telemetry)
     if degradation is not None:
         logger.warning(
-            "⚠️  System pressure during %s: %s",
+            "⚠\ufe0f  System pressure during %s: %s",
             model_identifier,
             degradation,
         )
@@ -14649,7 +14649,7 @@ def log_success(msg: str, *, prefix: str = "✓") -> None:
     _log_styled(logging.INFO, msg, prefix=prefix, separator=" ", style_hint=LogStyles.SUCCESS)
 
 
-def log_warning_note(msg: str, *, prefix: str = "⚠️") -> None:
+def log_warning_note(msg: str, *, prefix: str = "⚠\ufe0f") -> None:
     """Log a warning note (non-error condition worth noting)."""
     _log_styled(logging.WARNING, msg, prefix=prefix, separator="  ", style_hint=LogStyles.WARNING)
 
@@ -21770,7 +21770,7 @@ def _handle_dry_run(
     )
 
     if not model_identifiers:
-        logger.warning("   ⚠️  No models to process!")
+        logger.warning("   ⚠\ufe0f  No models to process!")
     else:
         unsupported_arch_count = 0
         capability_by_id = {
@@ -21790,7 +21790,7 @@ def _handle_dry_run(
                     f" (resolves to {resolved})" if resolved and resolved != model_type else ""
                 )
                 logger.info(
-                    "   %2d. %s  ⚠️ model_type %s%s not in installed mlx_vlm/models",
+                    "   %2d. %s  ⚠\ufe0f model_type %s%s not in installed mlx_vlm/models",
                     idx,
                     model_id,
                     model_type,

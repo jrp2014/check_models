@@ -2607,7 +2607,7 @@ def _make_harness_success(
         total_time=1.0,
         generation_time=0.5,
         model_load_time=0.5,
-        quality_issues=f"⚠️harness({harness_type})",
+        quality_issues=f"⚠\ufe0fharness({harness_type})",
         quality_analysis=qa,
     )
 
@@ -4384,7 +4384,7 @@ class TestMarkdownGalleryReport:
         assert "`usable`" in chooser_row
         assert "none" in chooser_row
         assert "### org/thinking" in content
-        assert "### ⚠️ org/thinking" not in content
+        assert "### ⚠\ufe0f org/thinking" not in content
 
     def test_gallery_is_evidence_only_without_scoreboard_duplication(
         self,
