@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-08-26
+
 ### Added
 
 - Nativ-informed discovery hardening (with review):
