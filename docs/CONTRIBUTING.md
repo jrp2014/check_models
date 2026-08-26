@@ -567,7 +567,7 @@ Build artifacts can accumulate during development, especially when working with 
 make clean              # Remove __pycache__, build/, dist/, test caches
 
 # Deep clean including type stubs
-make clean-all          # Also removes typings/
+make clean-all          # Deep clean
 
 # Clean local MLX development repositories
 make clean-mlx          # Remove build artifacts from mlx, mlx-lm, mlx-vlm, mlx-data
@@ -585,7 +585,6 @@ bash src/tools/clean_builds.sh --dry-run  # See what would be cleaned
 - Python build artifacts: `build/`, `dist/`, `*.egg-info/`, `.eggs/`
 - Bytecode caches: `__pycache__/`, `*.pyc`, `*.pyo`
 - Test caches: `.pytest_cache/`, `.mypy_cache/`
-- Type stubs: `typings/` (only with `clean-all`)
 
 **Note on Metal kernel caches:** Compiled Metal shaders are cached by macOS in system temp directories and persist across builds. These are automatically managed by the Metal framework and cleared on reboot. To manually clear (use with caution): `sudo rm -rf /tmp/com.apple.metal/*`
 

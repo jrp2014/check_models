@@ -11,6 +11,18 @@ Notable changes to this project will be documented in this file.
   inexact in binary — the same defect mlx-lm fixed in its `_parse_size`
   (ml-explore/mlx-lm#1726).
 
+### Removed
+
+- The mlx-vlm stub-generation subsystem is fully retired: mlx-vlm 0.6.16+
+  ships a PEP 561 `py.typed` marker on PyPI (from our Blaizzy/mlx-vlm#1985),
+  so every dependency in the typed surface now provides its own types.
+  Deleted `src/tools/generate_stubs.py` with its patches/contracts/manifest
+  handling, the `stubs`/`stubs-clear`/`clean-stubs` Make targets, the
+  update.sh and quality-gate stub steps, the `../typings` search paths in
+  mypy/ty/pyrefly/vulture configuration, and the stub contract tests. The
+  mlx-vlm floor rises to 0.6.16 (first release shipping `py.typed`) so the
+  guarantee holds by construction.
+
 ### Changed
 
 - The `tokenizers` ceiling is widened to `<0.24.0` (from `<0.23.0`) in both

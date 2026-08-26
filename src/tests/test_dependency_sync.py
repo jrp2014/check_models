@@ -8,13 +8,11 @@ from __future__ import annotations
 
 import ast
 import json
-import logging
 import os
 import re
 import subprocess
 import sys
 import tomllib
-import types
 import typing
 import zipfile
 from pathlib import Path
@@ -30,7 +28,6 @@ from tools import (
     bugtest,
     check_suppressions,
     filter_danger_report,
-    generate_stubs,
     install_precommit_hook,
     quarantine_broken_pip_metadata,
     safe_io,
@@ -153,91 +150,6 @@ def _extract_manual_block(readme: str) -> str:
     return m.group(1)
 
 
-def _write_stub_manifest(
-    typings_dir: Path,
-    *,
-    mlx_vlm_version: str,
-    stubgen_version: str,
-) -> None:
-    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
-    safe_io.write_text_no_follow(
-        manifest_path,
-        json.dumps(
-            {
-                "packages": {
-                    "mlx_vlm": {
-                        "distribution": "mlx-vlm",
-                        "version": mlx_vlm_version,
-                    },
-                },
-                "tool_version": generate_stubs.STUB_TOOL_VERSION,
-                "python_version": generate_stubs._python_version(),
-                "stubgen_version": stubgen_version,
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-    )
-
-
-def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
-    """Write the helper-based generate contract emitted by current mlx-vlm."""
-    generate_dir = typings_dir / "mlx_vlm" / "generate"
-    generate_dir.mkdir(parents=True)
-    safe_io.write_text_no_follow(
-        generate_dir / "__init__.pyi",
-        "from .types import GenerateKwargs as GenerateKwargs\n",
-    )
-    safe_io.write_text_no_follow(
-        generate_dir / "dispatch.pyi",
-        "import mlx.nn as nn\n"
-        "from .types import GenerateKwargs as GenerateKwargs, "
-        "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
-        "from .common import GenerationResult as GenerationResult\n"
-        "from collections.abc import Generator\n"
-        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
-        "\n"
-        "def stream_generate(model: nn.Module, "
-        "processor: ProcessorLike | PreTrainedTokenizer, prompt: str, "
-        "image: str | list[str] | None = None, "
-        "audio: str | list[str] | None = None, "
-        "video: str | list[str] | None = None, "
-        "**kwargs: Unpack[GenerateKwargs]) "
-        "-> Generator[GenerationResult, None, None]: ...\n"
-        "def generate(model: nn.Module, processor: ProcessorLike | PreTrainedTokenizer, "
-        "prompt: str, image: str | list[str] | None = None, "
-        "audio: str | list[str] | None = None, "
-        "video: str | list[str] | None = None, verbose: bool = False, "
-        "**kwargs: Unpack[GenerateKwargs]) -> GenerationResult: ...\n",
-    )
-    safe_io.write_text_no_follow(
-        generate_dir / "types.pyi",
-        "from typing import ClassVar, Protocol, TypedDict\n"
-        "from typing_extensions import Unpack as Unpack\n"
-        "\n"
-        "class ProcessorLike(Protocol): ...\n"
-        "class GenerateKwargs(TypedDict, total=False):\n"
-        "    temperature: float\n"
-        "    eos_tokens: list[int] | list[str] | None\n"
-        "    skip_special_tokens: bool\n"
-        "    enable_thinking: bool\n"
-        "    thinking_start_token: str | None\n"
-        "    thinking_end_token: str\n"
-        "    thinking_budget: int | None\n",
-    )
-    safe_io.write_text_no_follow(
-        generate_dir / "ar.pyi",
-        "from .types import GenerateKwargs as GenerateKwargs, "
-        "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
-        "def batch_generate(model: object, processor: ProcessorLike, "
-        "images: str | list[str] | None = None, "
-        "audios: str | list[str] | None = None, "
-        "prompts: list[str] | None = None, "
-        "**kwargs: Unpack[GenerateKwargs]) -> object: ...\n",
-    )
-
-
 def test_safe_io_read_text_no_follow_rejects_symlinked_file(tmp_path: Path) -> None:
     """Maintenance-tool text reads should not follow attacker-swapped symlinks."""
     target_path = tmp_path / "target.txt"
@@ -345,7 +257,7 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
 
 
 def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
-    """The project floor tracks the released mlx-vlm stack (0.6.13 metadata)."""
+    """The project floor tracks the released mlx-vlm stack (0.6.16, first py.typed)."""
     assert dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS["transformers"] == "5.14.0"
     assert dependency_policy.UPSTREAM_MLX_VLM_MINIMUMS["transformers"] == "5.14.0"
     # mlx-lm's own, lower floor remains a separate upstream fact.
@@ -370,13 +282,6 @@ def test_pillow_floor_uses_security_fixed_release() -> None:
         dependency_policy.VALIDATE_ENV_CORE_FALLBACK_SPECS["Pillow"]
         == f">={dependency_policy.PROJECT_PILLOW_MINIMUM_VERSION}"
     )
-
-
-def test_ty_uses_generated_typings_search_path() -> None:
-    """Ensure ty resolves repo-local generated stubs like mlx_vlm.*."""
-    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
-    ty_env = pyproject["tool"]["ty"]["environment"]
-    assert ty_env["extra-paths"] == ["../typings"]
 
 
 def test_ty_quality_check_resolves_gitignored_generated_stubs() -> None:
@@ -404,18 +309,6 @@ def test_pyrefly_quality_check_passes_explicit_targets() -> None:
         in common_quality
     )
     assert '"${targets[@]}" 2>&1 | tee "$output_path"' in common_quality
-
-
-def test_type_checkers_use_repo_root_generated_typings() -> None:
-    """All type checkers should resolve stubs generated at repo-root typings/."""
-    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
-
-    assert pyproject["tool"]["mypy"]["mypy_path"] == "../typings"
-    assert pyproject["tool"]["ty"]["environment"]["extra-paths"] == ["../typings"]
-    assert pyproject["tool"]["pyrefly"]["search-path"] == ["../typings"]
-
-    generate_stubs_source = (PKG_ROOT / "tools" / "generate_stubs.py").read_text(encoding="utf-8")
-    assert 'mypy_path = ["../typings"]' in generate_stubs_source
 
 
 def test_mypy_uses_generated_typings_without_gating_stub_internals() -> None:
@@ -1165,469 +1058,6 @@ def test_production_logs_use_facts_first_observation_labels() -> None:
         assert retired not in source
 
 
-def test_stub_refresh_reason_is_none_for_fresh_manifest(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    (typings_dir / "mlx_vlm").mkdir(parents=True)
-    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
-
-    monkeypatch.setattr(
-        generate_stubs,
-        "_installed_distribution_version",
-        _installed_version,
-    )
-
-    assert generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir) is None
-
-
-def test_partition_installed_packages_skips_absent_optional_distributions(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """mlx-lm is optional since mlx-vlm 0.6.14; its absence must not stall stub work.
-
-    Regression: CI on the first PyPI mlx-vlm 0.6.14 resolution had no mlx-lm, and
-    stub generation returned early instead of finalizing the installed subset.
-    """
-    versions = {"mlx-vlm": "0.6.14"}
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", versions.get)
-
-    installed, absent = generate_stubs._partition_installed_packages(["mlx_lm", "mlx_vlm"])
-
-    assert installed == ["mlx_vlm"]
-    assert absent == ["mlx_lm"]
-
-
-def test_stub_refresh_reason_detects_version_change(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    (typings_dir / "mlx_vlm").mkdir(parents=True)
-    _write_stub_manifest(typings_dir, mlx_vlm_version="0.30.0", stubgen_version="1.18.0")
-
-    monkeypatch.setattr(
-        generate_stubs,
-        "_installed_distribution_version",
-        _installed_version,
-    )
-
-    assert (
-        generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir)
-        == "mlx_vlm version metadata changed"
-    )
-
-
-def test_stub_integrity_issues_detect_missing_mlx_vlm_contract_markers(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Stub integrity checks should fail loudly when required mlx_vlm patches are absent."""
-    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    mlx_vlm_dir = typings_dir / "mlx_vlm"
-    mlx_vlm_dir.mkdir(parents=True)
-    (mlx_vlm_dir / "generate.pyi").write_text(
-        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
-        "def generate(model: object, processor: PreTrainedTokenizer, prompt: str) -> object: ...\n",
-        encoding="utf-8",
-    )
-    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
-
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
-
-    issues = generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir)
-    assert any(
-        "mlx_vlm generate stub is missing patched runtime-contract markers" in issue
-        for issue in issues
-    )
-
-
-def test_stub_integrity_issues_accept_package_layout_mlx_vlm_generate_contract(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """mlx_vlm integrity checks should accept package-layout generate dispatch stubs."""
-    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    dispatch_dir = typings_dir / "mlx_vlm" / "generate"
-    dispatch_dir.mkdir(parents=True)
-    (dispatch_dir / "dispatch.pyi").write_text(
-        "import mlx.nn as nn\n"
-        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
-        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
-        "from typing import Generator\n"
-        "\n"
-        "def stream_generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
-        "prompt: str, image: str | list[str] | None = None, "
-        "audio: str | list[str] | None = None, video: str | list[str] | None = None, "
-        "**kwargs) -> Generator[GenerationResult, None, None]: ...\n"
-        "def generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
-        "prompt: str, image: str | list[str] | None = None, "
-        "audio: str | list[str] | None = None, video: str | list[str] | None = None, "
-        "verbose: bool = False, *, max_tokens: int = ..., temperature: float = ..., "
-        "thinking_end_token: str = ..., thinking_start_token: str | None = None, "
-        "**kwargs) -> GenerationResult: ...\n",
-        encoding="utf-8",
-    )
-    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
-
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
-
-    issues = generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir)
-    assert issues == []
-
-
-def test_stub_integrity_accepts_upstream_mlx_vlm_generate_helpers(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Current mlx-vlm helper types should satisfy the local generate contract."""
-    versions = {"mlx-vlm": "0.6.8", "mypy": "2.3.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
-    _write_stub_manifest(typings_dir, mlx_vlm_version="0.6.8", stubgen_version="2.3.0")
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
-
-    assert generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir) == []
-
-
-@pytest.mark.parametrize(
-    "mutated_reexport",
-    [
-        "",
-        "from .types import GenerateKwargs\n",
-        "from .types import GenerateKwargs as ProcessorLike\n",
-    ],
-)
-def test_stub_integrity_requires_exact_generate_kwargs_reexport(
-    tmp_path: Path,
-    mutated_reexport: str,
-) -> None:
-    """The package stub must re-export GenerateKwargs under its public name."""
-    typings_dir = tmp_path / "typings"
-    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
-    safe_io.write_text_no_follow(
-        typings_dir / "mlx_vlm" / "generate" / "__init__.pyi",
-        mutated_reexport,
-    )
-
-    issues = generate_stubs._mlx_vlm_generate_helper_contract_issues(typings_dir)
-
-    assert any("GenerateKwargs as GenerateKwargs" in issue for issue in issues)
-
-
-@pytest.mark.parametrize(
-    "required_field",
-    [
-        "eos_tokens: list[int] | list[str] | None",
-        "skip_special_tokens: bool",
-        "enable_thinking: bool",
-        "thinking_start_token: str | None",
-        "thinking_end_token: str",
-        "thinking_budget: int | None",
-    ],
-)
-def test_stub_integrity_requires_upstream_generate_token_controls(
-    tmp_path: Path,
-    required_field: str,
-) -> None:
-    """The generated upstream TypedDict must retain every forwarded token control."""
-    typings_dir = tmp_path / "typings"
-    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
-    types_path = typings_dir / "mlx_vlm" / "generate" / "types.pyi"
-    types_path.write_text(
-        types_path.read_text(encoding="utf-8").replace(f"    {required_field}\n", ""),
-        encoding="utf-8",
-    )
-
-    issues = generate_stubs._mlx_vlm_generate_helper_contract_issues(typings_dir)
-
-    assert any(required_field in issue for issue in issues)
-
-
-def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Version-only manifest drift should be repairable from verified local stubs."""
-    versions = {"tokenizers": "0.22.2", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    tokenizers_dir = typings_dir / "tokenizers"
-    tokenizers_dir.mkdir(parents=True)
-    (tokenizers_dir / "__init__.pyi").write_text("class Encoding: ...\n", encoding="utf-8")
-    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
-    manifest_path.write_text(
-        json.dumps(
-            {
-                "packages": {
-                    "tokenizers": {
-                        "distribution": "tokenizers",
-                        "version": "0.22.1",
-                    },
-                },
-                "tool_version": generate_stubs.STUB_TOOL_VERSION,
-                "python_version": generate_stubs._python_version(),
-                "stubgen_version": "1.18.0",
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
-
-    assert generate_stubs.refresh_stub_manifest_from_existing_stubs(["tokenizers"], typings_dir)
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["packages"]["tokenizers"]["version"] == "0.22.2"
-
-
-def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> None:
-    """Patched mlx_vlm stubs should accept ProcessorMixin processors."""
-    typings_dir = tmp_path / "typings"
-    mlx_vlm_dir = typings_dir / "mlx_vlm"
-    mlx_vlm_dir.mkdir(parents=True)
-    generate_path = mlx_vlm_dir / "generate.pyi"
-    generate_path.write_text(
-        "import mlx.nn as nn\n"
-        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
-        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
-        "\n"
-        "def generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
-        "prompt: str, image: str | list[str] | None = None, "
-        "audio: str | list[str] | None = None, verbose: bool = False, **kwargs) "
-        "-> GenerationResult: ...\n",
-        encoding="utf-8",
-    )
-
-    generate_stubs._patch_mlx_vlm_stubs(typings_dir)
-
-    patched = generate_path.read_text(encoding="utf-8")
-    assert "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n" in patched
-    assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched
-    assert "video: str | list[str] | None = None" in patched
-    assert "temperature: float = ..." in patched
-    assert "kv_bits: float | None = None" in patched
-    assert "kv_quant_scheme: str = ..." in patched
-    assert "thinking_end_token: str = ..." in patched
-
-
-def test_patch_mlx_vlm_stubs_widens_package_layout_generate_types(tmp_path: Path) -> None:
-    """Package-layout mlx_vlm generate stubs should receive the same contract patches."""
-    typings_dir = tmp_path / "typings"
-    generate_dir = typings_dir / "mlx_vlm" / "generate"
-    generate_dir.mkdir(parents=True)
-    legacy_generate_path = typings_dir / "mlx_vlm" / "generate.pyi"
-    legacy_generate_path.write_text(
-        "def generate(*args, **kwargs) -> object: ...\n", encoding="utf-8"
-    )
-
-    dispatch_path = generate_dir / "dispatch.pyi"
-    dispatch_path.write_text(
-        "import mlx.nn as nn\n"
-        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
-        "from typing import Generator\n"
-        "\n"
-        "def stream_generate(model: nn.Module, processor: PreTrainedTokenizer, "
-        "prompt: str, image: str | list[str] = None, audio: str | list[str] = None, "
-        "video: str | list[str] = None, **kwargs) -> str | Generator[str, None, None]: ...\n"
-        "def generate(model: nn.Module, processor: PreTrainedTokenizer, prompt: str, "
-        "image: str | list[str] = None, audio: str | list[str] = None, "
-        "video: str | list[str] = None, verbose: bool = False, **kwargs) "
-        "-> GenerationResult: ...\n",
-        encoding="utf-8",
-    )
-    ar_path = generate_dir / "ar.pyi"
-    ar_path.write_text(
-        "def batch_generate(model, processor, images: str | list[str] = None, "
-        "audios: str | list[str] = None, prompts: list[str] = None, **kwargs): ...\n",
-        encoding="utf-8",
-    )
-
-    generate_stubs._patch_mlx_vlm_stubs(typings_dir)
-
-    patched_dispatch = dispatch_path.read_text(encoding="utf-8")
-    assert (
-        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
-        in patched_dispatch
-    )
-    assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched_dispatch
-    assert "video: str | list[str] | None = None" in patched_dispatch
-    assert "temperature: float = ..." in patched_dispatch
-    assert "thinking_end_token: str = ..." in patched_dispatch
-
-    patched_ar = ar_path.read_text(encoding="utf-8")
-    assert "images: str | list[str] | None = None" in patched_ar
-    assert "audios: str | list[str] | None = None" in patched_ar
-    assert "prompts: list[str] | None = None" in patched_ar
-    assert not legacy_generate_path.exists()
-
-
-def test_patch_mlx_vlm_stubs_accepts_upstream_generate_helpers(tmp_path: Path) -> None:
-    """Upstream helper types should replace legacy generate patch shims."""
-    typings_dir = tmp_path / "typings"
-    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
-    dispatch_path = typings_dir / "mlx_vlm" / "generate" / "dispatch.pyi"
-    dispatch_path.write_text(
-        dispatch_path.read_text(encoding="utf-8").replace(
-            "def stream_generate",
-            "@dataclass\nclass GenerationResult:\n    text: str = ...\n\ndef stream_generate",
-            1,
-        ),
-        encoding="utf-8",
-    )
-    raw_dispatch = dispatch_path.read_text(encoding="utf-8")
-
-    issues = generate_stubs._patch_mlx_vlm_stubs(typings_dir, audit=True)
-
-    assert issues == []
-    patched_dispatch = dispatch_path.read_text(encoding="utf-8")
-    assert patched_dispatch != raw_dispatch
-    assert not generate_stubs._stub_defines_top_level_class(patched_dispatch, "GenerationResult")
-    assert "from .common import GenerationResult as GenerationResult" in patched_dispatch
-    assert "ProcessorMixin" not in raw_dispatch
-
-
-def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path) -> None:
-    """Shared stub patch helper should report whether a file changed."""
-    stub_path = tmp_path / "sample.pyi"
-    stub_path.write_text("def f(value: str = None) -> None: ...\n", encoding="utf-8")
-
-    changed = generate_stubs._patch_stub_file(
-        stub_path,
-        [(re.compile(r"(value:\s*str)\s*=\s*None"), r"\1 | None = None")],
-    )
-
-    assert changed is True
-    assert "value: str | None = None" in stub_path.read_text(encoding="utf-8")
-    assert generate_stubs._patch_stub_file(stub_path, []) is False
-
-
-def test_stub_patch_audit_reports_named_patch_that_no_longer_changes_raw_stub(
-    tmp_path: Path,
-) -> None:
-    """Patch audits should flag stale shims when raw stubs already have the fix."""
-    typings_dir = tmp_path / "typings"
-    package_dir = typings_dir / "pkg"
-    package_dir.mkdir(parents=True)
-    stub_path = package_dir / "sample.pyi"
-    stub_path.write_text("def f(value: str | None = None) -> None: ...\n", encoding="utf-8")
-
-    issues = generate_stubs._patch_stub_file_in_typings(
-        typings_dir,
-        stub_path,
-        [
-            generate_stubs._stub_patch(
-                "optional value default",
-                re.compile(r"(value:\s*str)\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-        ],
-        audit=True,
-    )
-
-    assert issues == ["pkg/sample.pyi: patch 'optional value default' did not change the raw stub"]
-
-
-def test_stub_patch_audit_accepts_group_when_one_alternative_changes(
-    tmp_path: Path,
-) -> None:
-    """Alternative patch patterns should audit as one semantic shim."""
-    typings_dir = tmp_path / "typings"
-    package_dir = typings_dir / "pkg"
-    package_dir.mkdir(parents=True)
-    stub_path = package_dir / "sample.pyi"
-    stub_path.write_text("class Processor:\n    tokenizer: Any\n", encoding="utf-8")
-
-    issues = generate_stubs._patch_stub_file_in_typings(
-        typings_dir,
-        stub_path,
-        [
-            generate_stubs._stub_patch_group(
-                "processor runtime attrs",
-                [
-                    (re.compile(r"(    tokenizer:) Any$"), r"\1 object | None"),
-                    (re.compile(r"(    image_processor:) Any$"), r"\1 object | None"),
-                ],
-            ),
-        ],
-        audit=True,
-    )
-
-    assert issues == []
-    assert "tokenizer: object | None" in stub_path.read_text(encoding="utf-8")
-
-
-def test_patch_stub_file_rejects_symlink_target(tmp_path: Path) -> None:
-    """Stub patching should not follow a symlink target."""
-    target_path = tmp_path / "target.pyi"
-    target_path.write_text("def f(value: str = None) -> None: ...\n", encoding="utf-8")
-    stub_path = tmp_path / "sample.pyi"
-    stub_path.symlink_to(target_path)
-
-    with pytest.raises(OSError, match="symlink"):
-        generate_stubs._patch_stub_file(
-            stub_path,
-            [(re.compile(r"(value:\s*str)\s*=\s*None"), r"\1 | None = None")],
-        )
-
-    assert target_path.read_text(encoding="utf-8") == "def f(value: str = None) -> None: ...\n"
-
-
-def test_write_stub_manifest_rejects_symlink_target(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Stub manifest writes should not follow a symlink target."""
-    versions = {"tokenizers": "0.22.2", "mypy": "1.18.0"}
-
-    def _installed_version(distribution: str) -> str | None:
-        return versions.get(distribution)
-
-    typings_dir = tmp_path / "typings"
-    typings_dir.mkdir()
-    target_path = tmp_path / "target-manifest.json"
-    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
-    manifest_path.symlink_to(target_path)
-    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
-    caplog.set_level(logging.WARNING, logger="generate_stubs")
-
-    generate_stubs._write_stub_manifest(["tokenizers"], typings_dir)
-
-    assert not target_path.exists()
-    assert "Refusing to follow symlink" in caplog.text
-
-
 def test_install_hook_rejects_symlink_target(tmp_path: Path) -> None:
     """Hook installation should not write through a symlink target."""
     hooks_dir = tmp_path / "hooks"
@@ -1640,27 +1070,6 @@ def test_install_hook_rejects_symlink_target(tmp_path: Path) -> None:
         install_precommit_hook._install_hook(hooks_dir, "pre-commit", "#!/usr/bin/env bash\n")
 
     assert not target_path.exists()
-
-
-def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> None:
-    """Local update tooling should verify stub contracts and log editable provenance."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
-
-    # Derive the expected list from generate_stubs so adding a package there
-    # forces the shell paths (and this test) to follow.
-    stub_packages = " ".join(generate_stubs.DEFAULT_PACKAGES)
-    assert (
-        f'run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check '
-        f"{stub_packages}" in update_script
-    )
-    assert update_script.count(stub_packages) >= 2
-    assert (
-        '"$QUALITY_PYTHON" -m tools.generate_stubs --check --refresh-manifest-on-check'
-        in quality_script
-    )
-    assert quality_script.count(stub_packages) == 2
-    assert "Local package provenance:" in update_script
 
 
 def test_bugtest_formats_metal_regression_warning() -> None:
@@ -1942,12 +1351,10 @@ def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
             f"disabled exclude heuristics must be restored explicitly: {restored_default}"
         )
 
-    for entry in generated["search-path"]:
-        entry_path = Path(entry)
-        assert entry_path.is_absolute(), (
-            "search-path entries must be absolutized so worktrees resolve the "
-            f"primary checkout's stubs: {entry}"
-        )
+    # No search-path remains now that local stub generation is fully retired;
+    # the absolutizer must simply not fabricate one.
+    for entry in generated.get("search-path", []):
+        assert Path(entry).is_absolute(), entry
 
 
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
@@ -2126,15 +1533,13 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
     local_update_pos = main_flow.index("update_local_mlx_repos")
     pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-lm mlx-vlm")
     reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
-    stubs_pos = main_flow.index("generate_project_stubs")
     local_smoke_pos = main_flow.index("run_local_mlx_backend_smoke")
     critical_check_pos = main_flow.index("[update.sh] Verifying critical packages")
 
     assert local_update_pos < reconcile_pos
     assert pypi_update_pos < reconcile_pos
-    assert reconcile_pos < stubs_pos
     assert reconcile_pos < local_smoke_pos
-    assert stubs_pos < critical_check_pos
+    assert reconcile_pos < critical_check_pos
     assert "python -m pip check" in update_script
     assert "python -m tools.validate_env" in update_script
 
@@ -2679,39 +2084,6 @@ def test_check_if_needed_rejects_suppressions_without_justification(tmp_path: Pa
     )
     assert check_suppressions._suppression_rationale(justified_noqa)
     assert check_suppressions._suppression_rationale(justified_ignore)
-
-
-def test_provider_typed_packages_skip_stub_generation(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A package shipping py.typed gets no stubs, and stale stubs are purged.
-
-    mlx-vlm ships a PEP 561 marker since Blaizzy/mlx-vlm#1985; generated stubs
-    would shadow its inline annotations, so the tooling must remove them and
-    stand down. On installs predating the marker (PyPI 0.6.15) generation
-    continues unchanged — the subsystem retires itself per environment.
-    """
-    package_dir = tmp_path / "site" / "typed_pkg"
-    package_dir.mkdir(parents=True)
-    (package_dir / "__init__.py").write_text("", encoding="utf-8")
-
-    spec = types.SimpleNamespace(submodule_search_locations=[str(package_dir)])
-    monkeypatch.setattr(
-        generate_stubs.importlib.util,
-        "find_spec",
-        lambda name: spec if name == "typed_pkg" else None,
-    )
-    assert generate_stubs._package_ships_types("typed_pkg") is False
-    (package_dir / "py.typed").write_text("", encoding="utf-8")
-    assert generate_stubs._package_ships_types("typed_pkg") is True
-
-    typings_dir = tmp_path / "typings"
-    stale = typings_dir / "typed_pkg"
-    stale.mkdir(parents=True)
-    (stale / "__init__.pyi").write_text("x: int\n", encoding="utf-8")
-    generate_stubs._purge_shadowing_stubs("typed_pkg", typings_dir)
-    assert not stale.exists()
 
 
 def _run_update_pip_wrapper_harness(driver: str, tmp_path: Path) -> str:

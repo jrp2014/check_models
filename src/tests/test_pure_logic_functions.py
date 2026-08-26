@@ -1142,7 +1142,7 @@ class TestPreflightDependencyDiagnostics:
         legacy = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.13"})
         assert any("mlx-lm is missing" in issue for issue in legacy)
 
-        current = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.14"})
+        current = mod._detect_upstream_version_issues({**base, "mlx-vlm": "0.6.16"})
         assert not any("mlx-lm" in issue for issue in current)
 
     def test_detect_upstream_version_issues_reports_below_floor(
@@ -1178,7 +1178,7 @@ class TestPreflightDependencyDiagnostics:
         """Transformers releases above 5.12 should be accepted after the MLX fix."""
         issues = mod._detect_upstream_version_issues(
             {
-                "mlx-vlm": "0.6.13",
+                "mlx-vlm": "0.6.16",
                 "mlx-lm": "0.31.3",
                 "mlx": "0.32.1",
                 "mlx-audio": "0.4.3",

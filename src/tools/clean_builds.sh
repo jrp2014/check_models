@@ -241,19 +241,6 @@ if [[ -d "$OUTPUT_DIR" ]]; then
 	echo ""
 fi
 
-if [[ -d "$SCRIPTS_DIR/typings" ]]; then
-	echo "Cleaning: Type stubs"
-	echo "  Path: $SCRIPTS_DIR/typings"
-	if [[ $DRY_RUN -eq 1 ]]; then
-		echo "  [DRY RUN] Would remove: typings/"
-	else
-		rm -rf "$SCRIPTS_DIR/typings"
-		echo "  ✓ Removed: typings/"
-	fi
-	((TOTAL_CLEANED++))
-	echo ""
-fi
-
 # Clean root-level caches in check_models project
 echo "Cleaning: check_models root caches"
 echo "  Path: $SCRIPTS_DIR"

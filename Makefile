@@ -101,7 +101,7 @@ clean: ## Remove generated files and caches
 	rm -f $(SRC)/output/review.md $(SRC)/output/results.tsv $(SRC)/output/diagnostics.md
 
 .PHONY: clean-all
-clean-all: clean ## Deep clean including build artifacts and stubs
+clean-all: clean ## Deep clean including build artifacts
 	@$(MAKE) -C $(SRC) clean-all
 
 .PHONY: clean-mlx
@@ -117,7 +117,7 @@ check_models: ## Run VLM checker (pass args: make check_models ARGS='--model X -
 	$(MAKE) -C $(SRC) check_models ARGS='$(ARGS)'
 
 .PHONY: update
-update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs, smoke)
+update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, smoke)
 	$(MAKE) -C $(SRC) update
 
 .PHONY: update-quick
@@ -138,14 +138,6 @@ update-full: update ## Alias for 'update' (kept for compatibility)
 .PHONY: deps-sync
 deps-sync: ## Sync README dependency blocks with pyproject.toml
 	$(MAKE) -C $(SRC) deps-sync
-
-.PHONY: stubs
-stubs: ## Generate type stubs for mlx-vlm
-	$(MAKE) -C $(SRC) stubs
-
-.PHONY: stubs-clear
-stubs-clear: ## Remove generated type stubs
-	$(MAKE) -C $(SRC) stubs-clear
 
 .PHONY: quality-strict
 quality-strict: ## Run quality checks with strict markdown linting (requires node/npm)

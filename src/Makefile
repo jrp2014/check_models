@@ -143,14 +143,6 @@ validate-env: ## Validate the environment via tools.validate_env (single source 
 	@echo "🔍 Validating environment: $(ENV_NAME) ($(ENV_TYPE))"
 	@$(RUN_PY) -m tools.validate_env
 
-# Stubs
-.PHONY: stubs
-stubs: ## Generate/update local type stubs into ../typings/
-	$(RUN_PY) tools/generate_stubs.py
-
-.PHONY: stubs-clear
-stubs-clear: clean-stubs ## Alias for 'clean-stubs'
-
 # ------------------------
 # Run script
 # ------------------------
@@ -207,7 +199,7 @@ deps-sync: ## Sync README dependency blocks
 	$(RUN_PY) tools/update_readme_deps.py
 
 .PHONY: update
-update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, stubs, smoke)
+update: ## Full updater via tools/update.sh (conda/brew, local MLX builds, smoke)
 	bash tools/update.sh
 
 .PHONY: update-quick
@@ -292,10 +284,6 @@ clean-build: ## Remove build artifacts (build/, dist/, *.egg-info/)
 clean-test: ## Remove test and coverage artifacts
 	rm -rf .pytest_cache/ .coverage htmlcov/ .mypy_cache/
 
-.PHONY: clean-stubs
-clean-stubs: ## Remove generated type stubs
-	rm -rf ../typings/
-
 .PHONY: clean-mlx
 clean-mlx: ## Clean build artifacts from local MLX development repos
 	@bash tools/clean_builds.sh
@@ -309,5 +297,5 @@ clean: clean-pyc clean-build clean-test ## Clean all generated files (pyc, build
 	@echo "✓ Cleanup complete"
 
 .PHONY: clean-all
-clean-all: clean clean-stubs ## Clean everything including type stubs
+clean-all: clean ## Clean everything
 	@echo "✓ Deep cleanup complete (use 'make clean-mlx' to clean local MLX repos)"

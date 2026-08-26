@@ -34,8 +34,7 @@
 #   4. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
 #   5. Skip PyPI MLX updates for these packages
 #   6. Reinstall check_models from pyproject.toml to reconcile shared deps
-#   7. Generate stubs for this project (mlx_vlm)
-#   8. Run the local MLX runtime smoke if a local mlx build was installed
+#   7. Run the local MLX runtime smoke if a local mlx build was installed
 #
 # Requirements for local MLX builds:
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
@@ -43,7 +42,7 @@
 #   - Xcode >= 15.0 (macOS, for Metal support)
 #   - macOS SDK >= 14.0 and a native arm64 shell on Apple Silicon
 #   - typing_extensions (required by MLX build)
-#   - setuptools>=80 (required for stub generation)
+#   - setuptools>=80
 #
 # Note:
 # - If MLX_METAL_JIT is set, update.sh maps it directly to CMake option
@@ -586,18 +585,6 @@ run_metal_bug_reminder() {
 	fi
 }
 
-run_generate_stubs_command() {
-	local script_dir="$1"
-	shift
-	local src_dir
-	src_dir="$(cd "$script_dir/.." && pwd)"
-	if command -v conda &> /dev/null && conda env list | grep -q "^${CONDA_ENV} "; then
-		(cd "$src_dir" && conda run -n "$CONDA_ENV" python -m tools.generate_stubs "$@")
-	else
-		(cd "$src_dir" && python -m tools.generate_stubs "$@")
-	fi
-}
-
 # Ensure global Python packaging tools are current. Quarantine malformed
 # metadata for only these requested tools before pip attempts an uninstall.
 python "$SCRIPT_DIR/quarantine_broken_pip_metadata.py" \
@@ -629,28 +616,6 @@ reconcile_project_environment_from_pyproject() {
 		cd "$PROJECT_ROOT"
 		python -m tools.validate_env --expected-conda-env "${CONDA_DEFAULT_ENV:-$CONDA_ENV}"
 	)
-}
-
-generate_project_stubs() {
-	local ORIGINAL_DIR
-	ORIGINAL_DIR="$(pwd)"
-	cd "$SCRIPT_DIR"
-	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-		echo "[update.sh] Generating type stubs for mlx_vlm..."
-		if run_generate_stubs_command "$SCRIPT_DIR" mlx_vlm; then
-			echo "✓ Project stubs generated successfully"
-		else
-			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
-		fi
-
-		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_vlm; then
-			echo "❌ Project stub integrity verification failed"
-			cd "$ORIGINAL_DIR"
-			return 1
-		fi
-		echo "✓ Project stubs verified"
-	fi
-	cd "$ORIGINAL_DIR"
 }
 
 # Function to clean build artifacts from local MLX repositories
@@ -1013,10 +978,6 @@ update_local_mlx_repos() {
 
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 	
-		# Stubs are generated automatically by the build process now
-		# if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-		# 	echo "[update.sh] (MLX stubs are generated automatically during build)"
-		# fi
 		echo ""
 	done
 	cd "$ORIGINAL_DIR"
@@ -1136,7 +1097,6 @@ else
 fi
 
 reconcile_project_environment_from_pyproject
-generate_project_stubs
 
 if [[ $LOCAL_MLX_READY -eq 1 ]]; then
 	log_mlx_runtime_provenance

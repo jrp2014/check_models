@@ -5,14 +5,15 @@ from __future__ import annotations
 from typing import Final
 
 # Floors also guarantee upstream-shipped typing, which the quality gate relies
-# on now that local stubs are generated for mlx_vlm only: mlx >= 0.32.1 wheels
-# bundle mlx/core/*.pyi (0.32.0 shipped py.typed without stubs, ml-explore/mlx
-# #3916), and transformers >= 4.51 ships py.typed inline annotations
-# (huggingface/transformers#37022), so any floor at or above these keeps the
-# type checkers supplied without local stub generation.
+# on now that no local stubs are generated at all: mlx >= 0.32.1 wheels bundle
+# mlx/core/*.pyi (0.32.0 shipped py.typed without stubs, ml-explore/mlx#3916),
+# transformers >= 4.51 ships py.typed inline annotations
+# (huggingface/transformers#37022), and mlx-vlm >= 0.6.16 ships py.typed
+# (Blaizzy/mlx-vlm#1985), so these floors keep the type checkers supplied
+# without local stub generation.
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.32.1",
-    "mlx-vlm": "0.6.13",
+    "mlx-vlm": "0.6.16",
     "transformers": "5.14.0",
     "huggingface-hub": "1.10.1",
 }

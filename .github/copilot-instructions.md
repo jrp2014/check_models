@@ -101,7 +101,6 @@ The file is organized in this order — search for these exact landmark headers 
 | `make -C src lint-fix` | Apply safe Ruff lint fixes (`ruff check --fix`) before running the full quality gate |
 | `make lint` | Run Ruff lint early so lint errors are cleared before the full quality gate |
 | `make ci` | Full strict CI pipeline |
-| `make stubs` | Auto-generate `typings/` stubs for `mlx-vlm` only when the installed copy predates its PEP 561 `py.typed` marker (mlx-vlm ships one since #1985; provider-typed installs are skipped and stale stubs purged). mlx-lm, transformers, and tokenizers ship their own types; the monolith never imports mlx_lm |
 | `make deps-sync` | Sync README dependency blocks with pyproject.toml |
 | `make update` | Full updater via `src/tools/update.sh`: conda/brew refresh, local MLX repo builds, stubs, runtime smoke |
 | `make update-quick` | Quick in-env refresh: pip upgrade + editable reinstall with `[dev,extras,torch]` |

@@ -124,7 +124,6 @@ A single medium-sized, well-commented function is often clearer than a web of on
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated run artifacts; all are tracked in git except the append-only `results.history.jsonl`
-- **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via `make stubs`)
 - **Root `Makefile`** - User-friendly commands that orchestrate `src/` operations
 - **`README.md`** - Project overview and quick start guide (repo root)
 - **`src/README.md`** - Detailed package usage and CLI documentation
@@ -155,8 +154,7 @@ into the report tree.
 
 ### Generated Artifacts
 
-- Generated artifacts (e.g., `typings/`) are **not committed**
-- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers` (from `src/`)
+- Generated artifacts are **not committed**
 - See `.gitignore` for complete list of excluded files
 
 ### Evaluation Lane Isolation
@@ -175,31 +173,13 @@ compatibility checks separate from structured cataloguing benchmarks.
 
 ### Typings Policy
 
-- Third-party stubs are generated locally into `typings/` using `src/tools/generate_stubs.py`
-- `typings/` is git-ignored; do not commit generated stubs
-- `mypy_path = ["../typings"]` is configured in `src/pyproject.toml` so mypy
-  picks up the repo-root stubs while running from `src/`
-- mypy uses `follow_imports = "normal"` for `mlx_lm`/`mlx_vlm` and
-  `follow_imports = "silent"` for `transformers`/`tokenizers`; generated
-  stubs are available to call sites, but their internals use `ignore_errors`
-  because stubgen output can contain upstream/noisy annotations this project
-  does not own
-
-**Generating stubs**:
-
-```bash
-# From repo root
-make stubs
-
-# Or from src/ directory
-python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers
-```
-
-Or use the quality check with stub preflight:
-
-```bash
-make quality  # Validates existing typings/ coverage before type checks
-```
+- No local stub generation: every dependency in the typed surface ships its
+  own types upstream — mlx >= 0.32.1 bundles `mlx/core/*.pyi`,
+  transformers >= 4.51 and mlx-vlm >= 0.6.16 ship PEP 561 `py.typed`
+  inline annotations
+- mypy keeps `ignore_errors` overrides for those third-party internals;
+  their annotations inform call sites without gating the strict gate on
+  code this project does not own
 
 For manual Ty runs, use the repo wrapper instead of raw `ty check`:
 
