@@ -1528,19 +1528,41 @@ class TestTeeCaptureStreamFinalization:
         tee.close()
         assert tee.getvalue() == "captured"
 
-    def test_flush_tolerates_streams_without_closed_attribute(self) -> None:
-        """Exotic sinks that raise ValueError from flush are absorbed too."""
+    def test_open_sink_value_error_still_propagates(self) -> None:
+        """Only the racing-close case is benign; an open sink's error is real."""
 
-        class _Sink:
+        class _OpenSink:
+            closed = False
+
             def write(self, data: str) -> int:
                 return len(data)
 
             def flush(self) -> None:
-                msg = "I/O operation on closed file"
+                msg = "unrelated failure from an open sink"
                 raise ValueError(msg)
 
         # A minimal duck-typed sink, deliberately not a full TextIO.
-        tee = check_models._TeeCaptureStream(cast("TextIO", _Sink()))
+        tee = check_models._TeeCaptureStream(cast("TextIO", _OpenSink()))
+        tee.write("x")
+        with pytest.raises(ValueError, match="unrelated failure"):
+            tee.flush()
+
+    def test_racing_close_between_check_and_flush_is_silent(self) -> None:
+        """A sink closed between the closed-check and the flush is the benign case."""
+
+        class _RacingSink:
+            def __init__(self) -> None:
+                self.closed = False
+
+            def write(self, data: str) -> int:
+                return len(data)
+
+            def flush(self) -> None:
+                self.closed = True
+                msg = "I/O operation on closed file"
+                raise ValueError(msg)
+
+        tee = check_models._TeeCaptureStream(cast("TextIO", _RacingSink()))
         tee.write("x")
         tee.flush()
         tee.close()

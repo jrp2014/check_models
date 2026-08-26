@@ -2194,8 +2194,13 @@ class _TeeCaptureStream(io.TextIOBase):
         # late flush must not raise into the unraisable hook.
         if getattr(self._stream, "closed", False):
             return
-        with suppress(ValueError):
+        try:
             self._stream.flush()
+        except ValueError:
+            # Benign only when racing a close; an open sink's ValueError
+            # is a genuine error and must propagate.
+            if not getattr(self._stream, "closed", False):
+                raise
 
     def isatty(self) -> bool:
         return self._stream.isatty()
@@ -7604,17 +7609,15 @@ class ModelBurdenFacts:
 
 
 def _snapshot_weight_bytes(snapshot_path: Path) -> int | None:
-    """Sum the resolved sizes of the snapshot's safetensors weight files."""
-    try:
-        shard_names = sorted(path.name for path in snapshot_path.glob("*.safetensors"))
-    except OSError:
-        return None
+    """Sum the sizes of the weight files the loader would actually select.
+
+    Follows :func:`_loader_selected_weight_files`, so stale extra shard
+    families, adapters beside an indexed checkpoint, and
+    ``consolidated.safetensors`` never inflate the checkpoint bytes.
+    """
     total = 0
     counted = 0
-    for name in shard_names:
-        resolved = _resolve_snapshot_file(snapshot_path, name)
-        if resolved is None:
-            continue
+    for resolved in _loader_selected_weight_files(snapshot_path):
         try:
             total += resolved.stat().st_size
         except OSError:
@@ -7737,6 +7740,59 @@ INCOMPLETE_CACHE_REMEDY: Final[str] = (
 _SHARD_FAMILY_RE = re.compile(r"^(?P<stem>.+)-(?P<part>\d+)-of-(?P<total>\d+)\.safetensors$")
 
 
+_FULL_CHECKPOINT_LOOSE_NAMES: Final[frozenset[str]] = frozenset(
+    {"model.safetensors", "weights.safetensors"}
+)
+
+
+def _indexed_shard_names(snapshot_path: Path) -> tuple[str, ...] | None:
+    """Shard names from the safetensors index; None when absent or unusable."""
+    payload = _read_snapshot_json(snapshot_path, "model.safetensors.index.json")
+    weight_map = payload.get("weight_map") if payload is not None else None
+    if not isinstance(weight_map, dict):
+        return None
+    names = tuple(sorted({str(name) for name in weight_map.values() if name}))
+    return names or None
+
+
+def _glob_weight_names(snapshot_path: Path) -> tuple[str, ...] | None:
+    """The loader's glob candidates: *.safetensors minus consolidated.safetensors."""
+    try:
+        return tuple(
+            sorted(
+                path.name
+                for path in snapshot_path.glob("*.safetensors")
+                if not path.name.endswith("consolidated.safetensors")
+            )
+        )
+    except OSError:
+        return None
+
+
+def _loader_selected_weight_files(snapshot_path: Path) -> tuple[Path, ...]:
+    """Containment-checked weight files mlx-vlm's load_model would select.
+
+    Mirrors the loader's branch decision exactly: the indexed shards that
+    exist win (a partial subset is selected as-is); only when the index is
+    absent, unreadable, or empty — or none of its shards exist — does the
+    glob fallback apply. Selected names resolve through the containment
+    check; escaping or non-regular entries are dropped.
+    """
+    indexed = _indexed_shard_names(snapshot_path)
+    names: tuple[str, ...] | None = None
+    if indexed is not None:
+        existing = tuple(name for name in indexed if (snapshot_path / name).exists())
+        if existing:
+            names = existing
+    if names is None:
+        names = _glob_weight_names(snapshot_path) or ()
+    return tuple(
+        resolved
+        for name in names
+        if (resolved := _resolve_snapshot_file(snapshot_path, name)) is not None
+    )
+
+
 def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
     """Return whether mlx-vlm's glob fallback would find a complete weight set.
 
@@ -7748,15 +7804,12 @@ def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
     and any ``-NNNNN-of-MMMMM`` family among them must be complete (a blind
     glob cannot make a partial family loadable).
     """
-    try:
-        names = sorted(path.name for path in snapshot_path.glob("*.safetensors"))
-    except OSError:
+    names = _glob_weight_names(snapshot_path)
+    if names is None:
         return False
     families: dict[tuple[str, int], set[int]] = {}
-    loose_present = False
+    loose_full_checkpoint = False
     for name in names:
-        if name.endswith("consolidated.safetensors"):
-            continue
         resolved = _resolve_snapshot_file(snapshot_path, name)
         try:
             if resolved is None or resolved.stat().st_size == 0:
@@ -7765,7 +7818,11 @@ def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
             return False
         match = _SHARD_FAMILY_RE.match(name)
         if match is None:
-            loose_present = True
+            # Adapter and other auxiliary safetensors are swept up by the
+            # blind glob but cannot stand in for a full checkpoint; only a
+            # full-checkpoint name vouches for one.
+            if name in _FULL_CHECKPOINT_LOOSE_NAMES:
+                loose_full_checkpoint = True
             continue
         key = (match.group("stem"), int(match.group("total")))
         families.setdefault(key, set()).add(int(match.group("part")))
@@ -7777,7 +7834,7 @@ def _loader_fallback_weights_present(snapshot_path: Path) -> bool:
             return False
         if stem == "model":
             complete_model_family = True
-    return loose_present or complete_model_family
+    return loose_full_checkpoint or complete_model_family
 
 
 def _weight_shard_status(snapshot_path: Path) -> WeightShardStatus | None:

@@ -124,6 +124,20 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Weight-file selection is shared and loader-exact: a single helper returns
+  the containment-checked files mlx-vlm's `load_model` would actually select
+  (existing indexed shards first, the glob fallback minus
+  `consolidated.safetensors` otherwise), and both shard validation and the
+  burden facts consume it. Checkpoint weight bytes therefore no longer count
+  adapters beside an indexed checkpoint, stale extra shard families, or
+  consolidated files; and auxiliary safetensors (e.g. a LoRA
+  `adapter_model.safetensors`) can no longer vouch for a full checkpoint
+  when rescuing a broken or wholly stale index — only a full-checkpoint
+  loose name (`model.safetensors`/`weights.safetensors`) or a complete
+  `model`-stem family does.
+- `_TeeCaptureStream.flush()` suppresses only the racing-close case (the
+  stream reports closed after the `ValueError`); a genuine `ValueError`
+  from an open sink propagates again instead of being hidden.
 - `_TeeCaptureStream.flush()` tolerates an already-closed underlying stream:
   interpreter finalization closes the wrapper after the harness (or pytest's
   capture teardown) has closed the target, and the late flush raised

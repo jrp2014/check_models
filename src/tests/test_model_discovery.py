@@ -995,6 +995,31 @@ class TestWeightShardValidation:
 
         assert check_models._weight_shard_status(snapshot) is None
 
+    def test_adapter_file_alone_does_not_rescue_a_broken_index(self, tmp_path: Path) -> None:
+        """Auxiliary safetensors (LoRA adapters) cannot vouch for a full checkpoint."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", "{not json")
+        safe_io.write_text_no_follow(snapshot / "adapter_model.safetensors", "lora")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.index_error is not None
+
+    def test_adapter_file_does_not_rescue_a_stale_index(self, tmp_path: Path) -> None:
+        """A stale index with only an adapter on disk stays an incomplete download."""
+        repo_root = tmp_path / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        snapshot.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model-00001-of-00002.safetensors"}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        safe_io.write_text_no_follow(snapshot / "adapter_model.safetensors", "lora")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert status.missing == 1
+
     def test_consolidated_file_alone_does_not_satisfy_the_fallback(self, tmp_path: Path) -> None:
         """The loader's glob excludes consolidated.safetensors, so it cannot rescue."""
         repo_root = tmp_path / "models--org--m"
@@ -1261,6 +1286,29 @@ class TestModelBurdenFacts:
         assert burden.context_length is None
         # Name estimate still applies; only the config-sourced facts are lost.
         assert burden.parameter_count_source == "name-estimate"
+
+    def test_weight_bytes_follow_loader_selection(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Checkpoint bytes count only the files the loader would select.
+
+        An adapter beside an indexed checkpoint and a consolidated file are
+        swept up by a bare glob but never loaded as the checkpoint.
+        """
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(snapshot / "config.json", json.dumps({}))
+        names = [f"model-{i:05d}-of-00002.safetensors" for i in (1, 2)]
+        index = {"weight_map": {f"layer{i}": name for i, name in enumerate(names)}}
+        safe_io.write_text_no_follow(snapshot / "model.safetensors.index.json", json.dumps(index))
+        safe_io.write_text_no_follow(snapshot / names[0], "aa")
+        safe_io.write_text_no_follow(snapshot / names[1], "bbb")
+        safe_io.write_text_no_follow(snapshot / "adapter_model.safetensors", "0123456789")
+        safe_io.write_text_no_follow(snapshot / "consolidated.safetensors", "0123456789")
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("org/m")
+        assert burden is not None
+        assert burden.weight_bytes == 5
 
     def test_unresolvable_snapshot_returns_none(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """No cached snapshot means no burden facts, not a partial record."""
