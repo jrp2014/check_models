@@ -1542,10 +1542,15 @@ class TestTeeCaptureStreamFinalization:
                 raise ValueError(msg)
 
         # A minimal duck-typed sink, deliberately not a full TextIO.
-        tee = check_models._TeeCaptureStream(cast("TextIO", _OpenSink()))
+        sink = _OpenSink()
+        tee = check_models._TeeCaptureStream(cast("TextIO", sink))
         tee.write("x")
         with pytest.raises(ValueError, match="unrelated failure"):
             tee.flush()
+        # Close deliberately so the TextIOBase finalizer does not re-flush the
+        # still-raising sink at GC time — the exact unraisable noise under test.
+        sink.closed = True
+        tee.close()
 
     def test_racing_close_between_check_and_flush_is_silent(self) -> None:
         """A sink closed between the closed-check and the flush is the benign case."""
