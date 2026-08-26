@@ -124,6 +124,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `_TeeCaptureStream.flush()` tolerates an already-closed underlying stream:
+  interpreter finalization closes the wrapper after the harness (or pytest's
+  capture teardown) has closed the target, and the late flush raised
+  `ValueError: I/O operation on closed file` into the unraisable hook,
+  surfacing as `PytestUnraisableExceptionWarning` noise in test runs.
 - Snapshot metadata readers now handle the real HF cache layout, where every
   snapshot file is a symlink into the repo's `blobs/` store: a shared
   containment-checked reader (`_resolve_snapshot_file` and its text/JSON

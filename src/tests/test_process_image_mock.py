@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import io
 import json
 import logging
 import subprocess
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
 import pytest
@@ -17,6 +18,7 @@ from transformers.processing_utils import ProcessorMixin
 if TYPE_CHECKING:
     import argparse
     from collections.abc import Callable, Sequence
+    from typing import TextIO
 
 import check_models
 
@@ -1510,3 +1512,35 @@ class TestIsolatedExecution:
         assessment = check_models._assess_result(result)
         assert assessment.execution == "indeterminate"
         assert assessment.maintainer_status != "actionable_failure"
+
+
+class TestTeeCaptureStreamFinalization:
+    """Late finalization must not raise once the underlying stream is closed."""
+
+    def test_flush_after_underlying_stream_closes_is_silent(self) -> None:
+        """GC-time close() flushes the wrapper after pytest closes the target."""
+        target = io.StringIO()
+        tee = check_models._TeeCaptureStream(target)
+        tee.write("captured")
+        target.close()
+
+        tee.flush()  # must not raise ValueError("I/O operation on closed file")
+        tee.close()
+        assert tee.getvalue() == "captured"
+
+    def test_flush_tolerates_streams_without_closed_attribute(self) -> None:
+        """Exotic sinks that raise ValueError from flush are absorbed too."""
+
+        class _Sink:
+            def write(self, data: str) -> int:
+                return len(data)
+
+            def flush(self) -> None:
+                msg = "I/O operation on closed file"
+                raise ValueError(msg)
+
+        # A minimal duck-typed sink, deliberately not a full TextIO.
+        tee = check_models._TeeCaptureStream(cast("TextIO", _Sink()))
+        tee.write("x")
+        tee.flush()
+        tee.close()

@@ -2189,7 +2189,13 @@ class _TeeCaptureStream(io.TextIOBase):
         return self._stream.write(data)
 
     def flush(self) -> None:
-        self._stream.flush()
+        # Finalization closes this wrapper after the harness (or pytest's
+        # capture teardown) has already closed the underlying stream; that
+        # late flush must not raise into the unraisable hook.
+        if getattr(self._stream, "closed", False):
+            return
+        with suppress(ValueError):
+            self._stream.flush()
 
     def isatty(self) -> bool:
         return self._stream.isatty()
