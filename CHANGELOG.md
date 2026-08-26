@@ -132,6 +132,10 @@ Notable changes to this project will be documented in this file.
   durations, preventing values such as `133.22` from folding their final digit
   onto a continuation row.
 
+- Comparison observation deltas fall back to the raw code when a baseline
+  carries an observation the current glossary does not know (older harness
+  baselines must render, not crash), matching the existing fallback on the
+  issue-summary surface.
 - Weight-file selection is shared and loader-exact: a single helper returns
   the containment-checked files mlx-vlm's `load_model` would actually select
   (existing indexed shards first, the glob fallback minus

@@ -18823,11 +18823,14 @@ def _format_usability_transition(before: str, after: str) -> str:
 
 def _format_observation_delta(change: RunComparisonModelChange) -> str:
     """Compact +added/-removed observation labels shared by every renderer."""
+    # Baseline codes come from a JSONL on disk (possibly written by an older
+    # harness), so an unknown code falls back to its raw name instead of
+    # crashing comparison rendering.
     parts = [
-        f"+{_OBSERVATION_SELECTOR_GLOSSES[cast('ObservationCode', code)]}"
+        f"+{_OBSERVATION_SELECTOR_GLOSSES.get(cast('ObservationCode', code), code)}"
         for code in change.observations_added
     ] + [
-        f"-{_OBSERVATION_SELECTOR_GLOSSES[cast('ObservationCode', code)]}"
+        f"-{_OBSERVATION_SELECTOR_GLOSSES.get(cast('ObservationCode', code), code)}"
         for code in change.observations_removed
     ]
     return "; ".join(parts) or "—"

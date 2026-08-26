@@ -5819,6 +5819,22 @@ def test_unknown_comparability_withholds_performance_but_keeps_transitions() -> 
     assert "Comparability unknown" in rendered
 
 
+def test_observation_delta_falls_back_to_raw_code_for_unknown_baseline_codes() -> None:
+    """A baseline written by an older harness may carry retired observation codes."""
+    change = check_models.RunComparisonModelChange(
+        model="org/m",
+        baseline_execution="completed",
+        current_execution="completed",
+        baseline_usability="usable",
+        current_usability="usable",
+        observations_added=("repeated_output",),
+        observations_removed=("legacy_retired_code",),
+    )
+    rendered = check_models._format_observation_delta(change)
+    assert "+repeated text" in rendered
+    assert "-legacy_retired_code" in rendered
+
+
 def test_comparison_surfaces_render_from_one_view(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
