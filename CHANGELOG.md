@@ -12,9 +12,9 @@ Notable changes to this project will be documented in this file.
   four exact repeats of a substantial unit past a 200-token floor. An abort
   sets `finish_reason="repetition_abort"`, which flows into the runtime stop
   reason and a new `repetition_abort` observation ("stopped early:
-  repeating"). Per-token throughput stays cross-run comparable — the rate is
-  measured over generated tokens — and the token-cap observation no longer
-  conflates degenerate loops with genuinely long answers.
+  repeating"); aborted generations are excluded from cross-run throughput
+  comparisons and history bands (see Fixed below). The token-cap observation
+  no longer conflates degenerate loops with genuinely long answers.
 - Failures inside a repository's `trust_remote_code` modules now attribute to
   a dedicated `model-repo-code` owner instead of the library whose message
   they resemble: a `transformers_modules` frame (the dynamic-module cache) is

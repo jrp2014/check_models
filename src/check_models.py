@@ -13497,8 +13497,14 @@ def _generate_with_repetition_guard(
             aborted = True
             break
     if last is None:
-        msg = "Model produced no generation chunks"
-        raise ValueError(msg)
+        # Upstream generate() returns an empty result for an empty stream; an
+        # empty stream is an empty_output observation, not a crash.
+        return cast(
+            "SupportsGenerationResult",
+            types.SimpleNamespace(
+                text="", finish_reason=None, peak_memory=mx.get_peak_memory() / 1e9
+            ),
+        )
     text = "".join(pieces)
     finish_reason = "repetition_abort" if aborted else getattr(last, "finish_reason", None)
     if is_dataclass(last) and not isinstance(last, type):

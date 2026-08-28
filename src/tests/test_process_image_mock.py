@@ -1652,6 +1652,18 @@ class TestRepetitionGuard:
         )
         assert result.text == "real answer"
 
+    def test_empty_stream_returns_empty_result_like_upstream(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """No chunks yields an empty result (empty_output evidence), not a crash."""
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(()))
+        monkeypatch.setattr(check_models, "mx", _FakeMxRuntime())
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()), processor=_FakeProcessor(), prompt="p", image="i.jpg"
+        )
+        assert result.text == ""
+        assert result.finish_reason is None
+
     def test_abort_stop_reason_becomes_observation(self) -> None:
         """stop_reason=repetition_abort surfaces as the matching observation."""
         result = check_models.PerformanceResult(
