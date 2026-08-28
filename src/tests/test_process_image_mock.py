@@ -7,6 +7,7 @@ import json
 import logging
 import subprocess
 import sys
+import types
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -17,8 +18,8 @@ from transformers.processing_utils import ProcessorMixin
 
 if TYPE_CHECKING:
     import argparse
-    from collections.abc import Callable, Sequence
-    from typing import TextIO
+    from collections.abc import Callable, Iterator, Sequence
+    from typing import Any, TextIO
 
 import check_models
 
@@ -753,7 +754,9 @@ class TestProcessImageWithModelMock:
             ),
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ) as mock_generate,
             patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
@@ -795,7 +798,9 @@ class TestProcessImageWithModelMock:
             ),
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ) as mock_generate,
             patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
@@ -832,7 +837,9 @@ class TestProcessImageWithModelMock:
                 "apply_chat_template",
                 return_value="formatted prompt",
             ) as mock_template,
-            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ) as mock_generate,
             patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
@@ -878,7 +885,9 @@ class TestProcessImageWithModelMock:
             ),
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ) as mock_generate,
             patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
@@ -921,7 +930,7 @@ class TestProcessImageWithModelMock:
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
             patch.object(
                 check_models,
-                "generate",
+                "_generate_with_repetition_guard",
                 side_effect=ValueError("bad config"),
             ) as mock_generate,
             patch.object(check_models, "mx", _FakeMxRuntime()),
@@ -951,7 +960,9 @@ class TestProcessImageWithModelMock:
             ),
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation),
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ),
             patch.object(check_models, "mx", runtime),
         ):
             result = check_models._run_model_generation(params)
@@ -989,7 +1000,9 @@ class TestProcessImageWithModelMock:
             ),
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation),
+            patch.object(
+                check_models, "_generate_with_repetition_guard", return_value=fake_generation
+            ),
             patch.object(check_models, "mx", runtime),
         ):
             result = check_models._run_model_generation(params)
@@ -1512,6 +1525,85 @@ class TestIsolatedExecution:
         assessment = check_models._assess_result(result)
         assert assessment.execution == "indeterminate"
         assert assessment.maintainer_status != "actionable_failure"
+
+
+class TestRepetitionGuard:
+    """The streaming wrapper reproduces generate() and aborts degenerate loops."""
+
+    @staticmethod
+    def _chunks(
+        texts: list[str], finish_reason: str | None = "stop"
+    ) -> list[types.SimpleNamespace]:
+        made = []
+        for i, text in enumerate(texts):
+            made.append(
+                types.SimpleNamespace(
+                    text=text,
+                    generation_tokens=i + 1,
+                    finish_reason=finish_reason if i == len(texts) - 1 else None,
+                    prompt_tokens=5,
+                    generation_tps=10.0,
+                    peak_memory=1.0,
+                )
+            )
+        return made
+
+    def test_detector_requires_sustained_exact_cycle(self) -> None:
+        """Prose stays clean; four exact repeats of a unit at the tail trip it."""
+        assert check_models._detect_streaming_repetition("normal prose " * 3) is False
+        cycle = "boathouse, pond, foliage, "
+        assert check_models._detect_streaming_repetition("intro " + cycle * 4) is True
+
+    def test_wrapper_aborts_repeating_stream_and_marks_finish_reason(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A repeating stream stops early with finish_reason=repetition_abort."""
+        cycle_chunks = self._chunks(["keyword, boathouse, pond, "] * 600, finish_reason=None)
+        pulled = 0
+
+        def fake_stream(**_kwargs: object) -> Iterator[types.SimpleNamespace]:
+            nonlocal pulled
+            for chunk in cycle_chunks:
+                pulled += 1
+                yield chunk
+
+        monkeypatch.setattr(check_models, "stream_generate", fake_stream)
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+        )
+        assert result.finish_reason == "repetition_abort"
+        assert pulled < 600
+        text = result.text
+        assert text is not None
+        assert text.startswith("keyword, boathouse")
+
+    def test_wrapper_preserves_clean_stream_verbatim(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A healthy stream joins all chunks and keeps the upstream finish reason."""
+        texts = [f"word{i} " for i in range(300)]
+        monkeypatch.setattr(
+            check_models, "stream_generate", lambda **_kw: iter(self._chunks(texts))
+        )
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+        )
+        assert result.finish_reason == "stop"
+        assert result.text == "".join(texts)
+
+    def test_abort_stop_reason_becomes_observation(self) -> None:
+        """stop_reason=repetition_abort surfaces as the matching observation."""
+        result = check_models.PerformanceResult(
+            model_name="org/loop",
+            generation=_FakeGenerationResult(text="a, b, a, b"),
+            success=True,
+            runtime_diagnostics=check_models.RuntimeDiagnostics(stop_reason="repetition_abort"),
+        )
+        assert "repetition_abort" in check_models._assessment_observations(result)
 
 
 class TestTeeCaptureStreamFinalization:

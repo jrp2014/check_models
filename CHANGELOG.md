@@ -4,6 +4,29 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Streaming repetition guard: generation now runs through a thin accumulator
+  over upstream `stream_generate` (reproducing `generate()` semantics — joined
+  chunk text, final-chunk metrics) that stops decoding once the output tail is
+  four exact repeats of a substantial unit past a 200-token floor. An abort
+  sets `finish_reason="repetition_abort"`, which flows into the runtime stop
+  reason and a new `repetition_abort` observation ("stopped early:
+  repeating"). Per-token throughput stays cross-run comparable — the rate is
+  measured over generated tokens — and the token-cap observation no longer
+  conflates degenerate loops with genuinely long answers.
+- Failures inside a repository's `trust_remote_code` modules now attribute to
+  a dedicated `model-repo-code` owner instead of the library whose message
+  they resemble: a `transformers_modules` frame (the dynamic-module cache) is
+  checked before the message-first attribution flow, so e.g. a repo's fast
+  image processor importing a symbol transformers removed routes the issue to
+  the model repository rather than to transformers or mlx-vlm.
+- The run issue summary counts "Hit the token cap" and "Stopped early for
+  repetition" in its header, and renders a "Constraint-failure breakdown"
+  section aggregating fleet-wide catalogue-constraint failures (title-length,
+  keyword-count with medians, duplicate keywords) — separating "the prompt is
+  hard for everyone" from "individual models are sloppy" at a glance.
+
 ### Fixed
 
 - The e2e smoke tests' fixture model is now `LiquidAI/LFM2.5-VL-450M-MLX-bf16`

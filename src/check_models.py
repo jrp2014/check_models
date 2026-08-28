@@ -92,6 +92,7 @@ from importlib.resources import as_file, files
 from importlib.util import find_spec
 from pathlib import Path, PurePosixPath
 from shlex import join as shlex_join
+from statistics import median
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -169,7 +170,6 @@ else:
 if TYPE_CHECKING:
     from mlx import nn
     from mlx_vlm.generate import GenerationResult
-    from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
     from mlx_vlm.generate.types import GenerateKwargs, ProcessorLike
     from PIL.Image import Image as PILImage
     from transformers import PreTrainedTokenizer
@@ -790,6 +790,9 @@ vlm_version: str = NOT_AVAILABLE
 generate: Callable[..., GenerationResult] = cast(
     "Callable[..., GenerationResult]", _raise_mlx_vlm_missing
 )
+stream_generate: Callable[..., Iterator[GenerationResult]] = cast(
+    "Callable[..., Iterator[GenerationResult]]", _raise_mlx_vlm_missing
+)
 apply_chat_template: ApplyChatTemplateCallable = cast(
     "ApplyChatTemplateCallable", _raise_mlx_vlm_missing
 )
@@ -804,6 +807,7 @@ mlx_vlm_probe_error = _probe_import_runtime(
 if mlx_vlm_probe_error is None:
     try:
         from mlx_vlm.generate import generate as _mlx_vlm_generate
+        from mlx_vlm.generate import stream_generate as _mlx_vlm_stream_generate
         from mlx_vlm.prompt_utils import apply_chat_template as _mlx_vlm_apply_chat_template
         from mlx_vlm.utils import load as _mlx_vlm_load
         from mlx_vlm.utils import load_image as _mlx_vlm_load_image
@@ -831,6 +835,9 @@ if mlx_vlm_probe_error is None:
             return loaded
 
         generate = cast("Callable[..., GenerationResult]", _mlx_vlm_generate)
+        stream_generate = cast(
+            "Callable[..., Iterator[GenerationResult]]", _mlx_vlm_stream_generate
+        )
         apply_chat_template = _mlx_vlm_apply_chat_template
         load = _typed_mlx_vlm_load
         load_image = _mlx_vlm_load_image
@@ -1043,6 +1050,7 @@ type ObservationCode = Literal[
     "empty_output",
     "minimal_output",
     "repeated_output",
+    "repetition_abort",
     "missing_final_answer",
     "missing_requested_sections",
     "token_cap_truncation",
@@ -1851,7 +1859,7 @@ class PerformanceResult:
         quality_analysis: Structured mechanical analysis used by ``ResultAssessment``
         active_memory: GPU memory in use (GB), from mx.get_active_memory()
         cache_memory: GPU memory in cache (GB), from mx.get_cache_memory()
-        error_package: Which package raised the error (mlx, mlx-vlm, transformers)
+        error_package: Error owner (mlx, mlx-vlm, transformers, model-repo-code, ...)
         error_traceback: Full traceback for actionable error reports
         requested_max_tokens: Requested generation budget for cutoff diagnosis
         prompt_diagnostics: Prompt/template and generation-kwarg context for maintainers
@@ -8137,6 +8145,13 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         integration_signal=True,
     ),
     ObservationDisplaySpec(
+        "repetition_abort",
+        "Generation was stopped early after sustained repeated output",
+        "stopped early: repeating",
+        unusable=True,
+        integration_signal=True,
+    ),
+    ObservationDisplaySpec(
         "missing_final_answer",
         "Internal reasoning is present but no final answer was returned",
         "thinking only, no answer",
@@ -8747,6 +8762,9 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
     )
     if is_repetitive:
         observations.append("repeated_output")
+    runtime = result.runtime_diagnostics
+    if runtime is not None and runtime.stop_reason == "repetition_abort":
+        observations.append("repetition_abort")
     if analysis is None:
         return tuple(observations)
     non_thinking_wrappers = set(analysis.configured_generation_wrappers).difference(
@@ -12255,6 +12273,7 @@ _PACKAGE_CODE_MAP: Final[dict[str, str]] = {
     "mlx-vlm": "MLX_VLM",
     "mlx-lm": "MLX_LM",
     "transformers": "TRANSFORMERS",
+    "model-repo-code": "MODEL_REPO_CODE",
     "huggingface-hub": "HUGGINGFACE_HUB",
     "model-config": "MODEL_CONFIG",
     "unknown": "UNKNOWN",
@@ -12592,8 +12611,14 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     msg_lower = error_msg.lower()
     tb_lower = (traceback_str or "").lower()
     combined = msg_lower + " " + tb_lower
-    if _has_external_connectivity_signal(combined):
-        return _UNKNOWN_OWNER
+    # transformers_modules is the dynamic-module cache transformers uses for a
+    # repo's trust_remote_code files: a frame there means the failing code
+    # belongs to the model repository, not to any library — e.g. a repo's fast
+    # image processor importing a symbol a newer transformers removed. Checked
+    # before the message-first flow because such failures usually carry
+    # library-looking messages ("cannot import name ...").
+    if _has_external_connectivity_signal(combined) or "transformers_modules" in combined:
+        return _UNKNOWN_OWNER if _has_external_connectivity_signal(combined) else "model-repo-code"
 
     # (Package Name, List of unique identification patterns)
     # Order matters: matches earlier in list take precedence
@@ -13193,13 +13218,13 @@ def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
 
 def _generate_with_processor_passthrough(
     *,
-    generate_fn: Callable[..., GenerationResult],
+    generate_fn: Callable[..., GenerationResult | SupportsGenerationResult],
     model: nn.Module,
     processor: ProcessorLike | PreTrainedTokenizer,
     params: ProcessImageParams,
     formatted_prompt: str,
     generate_kwargs: GenerateKwargs,
-) -> GenerationResult:
+) -> GenerationResult | SupportsGenerationResult:
     """Call upstream generate() with user-provided passthrough kwargs.
 
     This branch is intentionally dynamic because ``processor_kwargs`` is a
@@ -13408,6 +13433,72 @@ def _prepare_generation(
     )
 
 
+# Streaming repetition guard: a degenerate greedy loop (keyword cycling and
+# similar) otherwise runs to the token cap, wasting sweep time to produce
+# evidence that is unambiguous after a few hundred tokens. The guard never
+# fires below the token floor, and requires four exact repeats of a
+# substantial unit at the very end of the accumulated text.
+_REPETITION_ABORT_MIN_TOKENS: Final[int] = 200
+_REPETITION_ABORT_CHECK_EVERY: Final[int] = 25
+_REPETITION_ABORT_TAIL_CHARS: Final[int] = 600
+_REPETITION_TAIL_CYCLE_RE: Final[re.Pattern[str]] = re.compile(
+    r"(.{12,160}?)(?:\1){3,}\Z", re.DOTALL
+)
+
+
+def _detect_streaming_repetition(tail: str) -> bool:
+    """Return whether the text tail ends in >=4 exact repeats of one unit."""
+    return _REPETITION_TAIL_CYCLE_RE.search(tail) is not None
+
+
+def _generate_with_repetition_guard(
+    model: nn.Module,
+    processor: ProcessorLike | PreTrainedTokenizer,
+    prompt: str,
+    image: str | list[str] | None = None,
+    **kwargs: object,
+) -> GenerationResult | SupportsGenerationResult:
+    """Upstream ``generate`` semantics with an early stop on degenerate loops.
+
+    Mirrors upstream ``generate`` (which accumulates ``stream_generate``
+    chunks and returns the final chunk's metrics with the joined text), adding
+    a tail-cycle check. An abort sets ``finish_reason="repetition_abort"``,
+    which flows into the runtime stop reason and the matching observation.
+    Per-token throughput stays comparable across runs — the rate is measured
+    over generated tokens, so stopping earlier does not bias it.
+    """
+    pieces: list[str] = []
+    last: GenerationResult | SupportsGenerationResult | None = None
+    aborted = False
+    chunk_count = 0
+    for chunk in stream_generate(
+        model=model, processor=processor, prompt=prompt, image=image, **kwargs
+    ):
+        last = chunk
+        pieces.append(chunk.text)
+        chunk_count += 1
+        if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
+            continue
+        generated = getattr(chunk, "generation_tokens", None)
+        if not isinstance(generated, int) or generated < _REPETITION_ABORT_MIN_TOKENS:
+            continue
+        joined_tail = "".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:]
+        if _detect_streaming_repetition(joined_tail):
+            aborted = True
+            break
+    if last is None:
+        msg = "Model produced no generation chunks"
+        raise ValueError(msg)
+    text = "".join(pieces)
+    finish_reason = "repetition_abort" if aborted else getattr(last, "finish_reason", None)
+    if is_dataclass(last) and not isinstance(last, type):
+        return replace(last, text=text, finish_reason=finish_reason)
+    duck = types.SimpleNamespace(**vars(last))
+    duck.text = text
+    duck.finish_reason = finish_reason
+    return cast("SupportsGenerationResult", duck)
+
+
 def _execute_prepared_generation(
     params: ProcessImageParams,
     prepared: _PreparedGeneration,
@@ -13421,22 +13512,18 @@ def _execute_prepared_generation(
     timing, MLX synchronisation, and exception tagging with prompt
     diagnostics. Metric attachment stays with the caller.
     """
-    if TYPE_CHECKING:
-        strict_generate = _mlx_vlm_generate_typecheck
-    else:
-        strict_generate = generate
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
         if prepared.processor_passthrough_kwargs:
             return _generate_with_processor_passthrough(
-                generate_fn=generate,
+                generate_fn=_generate_with_repetition_guard,
                 model=prepared.model,
                 processor=prepared.generation_processor,
                 params=params,
                 formatted_prompt=prepared.formatted_prompt,
                 generate_kwargs=prepared.generate_kwargs,
             )
-        return strict_generate(
+        return _generate_with_repetition_guard(
             model=prepared.model,
             processor=prepared.generation_processor,
             prompt=prepared.formatted_prompt,
@@ -19800,6 +19887,75 @@ def _run_issue_failure_observed_result(failure: JsonlFailureRecord, captured: st
     return f"Attempt stopped during {phase_label}"
 
 
+def _count_observation(results: Sequence[JsonlResultRecord], code: str) -> int:
+    """Count results whose assessment carries the given observation code."""
+    return sum(1 for result in results if code in result["assessment"]["observations"])
+
+
+def _run_issue_summary_constraint_breakdown(
+    results: Sequence[JsonlResultRecord],
+) -> ReportSection | None:
+    """Aggregate which catalogue constraint fails fleet-wide, with medians.
+
+    Distinguishes "the prompt's constraints are hard for everyone" from
+    "individual models are sloppy" without opening per-model diagnostics.
+    Rendered only when at least one model violated a constraint.
+    """
+    title_observed: list[int] = []
+    keyword_observed: list[int] = []
+    duplicate_models = 0
+    title_range: list[int] | None = None
+    keyword_range: list[int] | None = None
+    for result in results:
+        assessment = result["assessment"]
+        if "catalog_constraint_violation" not in assessment["observations"]:
+            continue
+        details = cast("dict[str, JsonLike]", assessment.get("details") or {})
+        title_count = details.get("title_word_count")
+        raw_title_range = details.get("title_word_range")
+        if isinstance(title_count, int) and isinstance(raw_title_range, list):
+            low, high = cast("int", raw_title_range[0]), cast("int", raw_title_range[1])
+            if not low <= title_count <= high:
+                title_observed.append(title_count)
+                title_range = [low, high]
+        keyword_count = details.get("keyword_count")
+        raw_keyword_range = details.get("keyword_count_range")
+        if isinstance(keyword_count, int) and isinstance(raw_keyword_range, list):
+            low, high = cast("int", raw_keyword_range[0]), cast("int", raw_keyword_range[1])
+            if not low <= keyword_count <= high:
+                keyword_observed.append(keyword_count)
+                keyword_range = [low, high]
+        if details.get("duplicate_keywords"):
+            duplicate_models += 1
+    if not (title_observed or keyword_observed or duplicate_models):
+        return None
+    lines: list[str] = []
+    if title_observed and title_range is not None:
+        lines.append(
+            f"Title length: {len(title_observed)} model(s) outside "
+            f"{title_range[0]}-{title_range[1]} words "
+            f"(median observed {int(median(title_observed))})"
+        )
+    if keyword_observed and keyword_range is not None:
+        lines.append(
+            f"Keyword count: {len(keyword_observed)} model(s) outside "
+            f"{keyword_range[0]}-{keyword_range[1]} "
+            f"(median observed {int(median(keyword_observed))})"
+        )
+    if duplicate_models:
+        lines.append(f"Duplicate keywords: {duplicate_models} model(s)")
+    return ReportSection(
+        "Constraint-failure breakdown",
+        (
+            ReportParagraph(
+                "How the fleet failed the catalogue constraints — a skew toward one "
+                "constraint suggests prompt difficulty rather than individual model faults."
+            ),
+            ReportBulletList(tuple(lines)),
+        ),
+    )
+
+
 def _run_issue_summary_observed_result(result: JsonlResultRecord) -> str:
     """Render one model row's observed result for the paste-ready review tables."""
     assessment = result["assessment"]
@@ -20259,6 +20415,14 @@ def generate_run_issue_summary_report(
                         ("Indeterminate", str(counts["indeterminate"])),
                         ("Crashes requiring action", str(len(actionable))),
                         ("Other results requiring review", str(len(other))),
+                        (
+                            "Hit the token cap",
+                            str(_count_observation(source.results, "token_cap_truncation")),
+                        ),
+                        (
+                            "Stopped early for repetition",
+                            str(_count_observation(source.results, "repetition_abort")),
+                        ),
                     )
                 ),
                 ReportParagraph(
@@ -20271,6 +20435,8 @@ def generate_run_issue_summary_report(
     if comparison is not None:
         blocks.append(_run_issue_summary_comparison_section(comparison))
     blocks.append(_run_issue_summary_quality_section(source.results))
+    if (constraint_section := _run_issue_summary_constraint_breakdown(source.results)) is not None:
+        blocks.append(constraint_section)
 
     if actionable:
         blocks.append(

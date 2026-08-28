@@ -87,6 +87,26 @@ def test_classify_error(message: str, expected_type: str) -> None:
             ),
             "transformers",
         ),
+        # A repo's trust_remote_code module (transformers dynamic-module cache)
+        # owns the failure even when transformers frames surround it.
+        (
+            "ImportError: cannot import name 'DefaultFastImageProcessorKwargs'",
+            (
+                '  File "transformers/dynamic_module_utils.py", line 309, in get_class_in_module\n'
+                '  File ".cache/huggingface/modules/transformers_modules/_8d30a0e4/71940f1d/'
+                'image_processing_siglip2_fast.py", line 7, in <module>\n'
+            ),
+            "model-repo-code",
+        ),
+        (
+            "Model loading failed: cannot import name 'X'",
+            (
+                '  File "transformers_modules/_abc/processing_custom.py", line 3, in <module>\n'
+                "The above exception was the direct cause of the following exception:\n"
+                '  File "mlx_vlm/utils.py", line 1212, in load\n'
+            ),
+            "model-repo-code",
+        ),
         # Unknown
         ("Random error", "unknown_lib/main.py", "unknown"),
     ],

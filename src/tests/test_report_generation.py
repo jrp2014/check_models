@@ -5819,6 +5819,68 @@ def test_unknown_comparability_withholds_performance_but_keeps_transitions() -> 
     assert "Comparability unknown" in rendered
 
 
+def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(
+    tmp_path: Path,
+) -> None:
+    """The header counts cap hits/aborts; constraint failures aggregate with medians."""
+    output_paths = _issue_summary_output_paths(tmp_path)
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/capped",
+                usability="unusable",
+                observations=["token_cap_truncation", "catalog_constraint_violation"],
+                details={
+                    "title_word_count": 4,
+                    "title_word_range": [5, 10],
+                    "keyword_count": 380,
+                    "keyword_count_range": [10, 18],
+                    "duplicate_keywords": ["pond"],
+                },
+            ),
+            _issue_summary_result(
+                "org/aborted",
+                usability="unusable",
+                observations=["repetition_abort", "catalog_constraint_violation"],
+                details={
+                    "keyword_count": 40,
+                    "keyword_count_range": [10, 18],
+                },
+            ),
+            _issue_summary_result("org/clean"),
+        ),
+    )
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "- *Hit the token cap:* 1" in content
+    assert "- *Stopped early for repetition:* 1" in content
+    assert "## Constraint-failure breakdown" in content
+    assert "Title length: 1 model(s) outside 5-10 words (median observed 4)" in content
+    assert "Keyword count: 2 model(s) outside 10-18 (median observed 210)" in content
+    assert "Duplicate keywords: 1 model(s)" in content
+
+
+def test_run_summary_omits_constraint_breakdown_without_violations(tmp_path: Path) -> None:
+    """No constraint violations means no breakdown section at all."""
+    output_paths = _issue_summary_output_paths(tmp_path)
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/plain",
+                usability="unusable",
+                observations=["missing_requested_sections"],
+            ),
+        ),
+    )
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "Constraint-failure breakdown" not in content
+
+
 def test_observation_delta_falls_back_to_raw_code_for_unknown_baseline_codes() -> None:
     """A baseline written by an older harness may carry retired observation codes."""
     change = check_models.RunComparisonModelChange(
