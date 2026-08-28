@@ -41,6 +41,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `update.sh` skips a local MLX repo's rebuild when `git pull` brought no
+  new commits **and** the installed package verifies as the editable from
+  that checkout — the verification is the dependency-change guard, so a
+  PyPI release that clobbered the editable, a rebuilt environment, or a
+  missing install still forces the full rebuild, `FORCE_REINSTALL=1`
+  still rebuilds unconditionally, and a skipped mlx build still applies
+  its pin against PyPI releases.
 - The `tokenizers` ceiling is widened to `<0.24.0` (from `<0.23.0`) in both
   `src/pyproject.toml` and the dependency policy: transformers 5.16.0
   requires `tokenizers>=0.23.1,<0.24.0`, so the old ceiling would have made

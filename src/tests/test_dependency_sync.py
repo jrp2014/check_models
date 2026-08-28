@@ -1377,6 +1377,36 @@ def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
         assert Path(entry).is_absolute(), entry
 
 
+def test_update_script_skips_rebuild_only_when_unchanged_and_verified() -> None:
+    """An unchanged repo skips its rebuild only behind the full safety guard.
+
+    The skip must require all three of: no new commits from the pull, a
+    verified editable install pointing at this checkout (the dependency-change
+    guard — a PyPI clobber, rebuilt env, or missing install fails it), and
+    FORCE_REINSTALL not being set. A skipped mlx build must still pin the
+    local build against PyPI releases.
+    """
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    guard_pos = update_script.index(
+        '[[ "${FORCE_REINSTALL:-0}" != "1" && ${REPO_UNCHANGED[idx]} -eq 1 ]]'
+    )
+    verify_pos = update_script.index(
+        'verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null'
+    )
+    skip_msg_pos = update_script.index("skipping rebuild")
+    assert guard_pos < verify_pos < skip_msg_pos
+
+    # The skip branch still pins the untouched local mlx build.
+    skip_branch = update_script[skip_msg_pos : skip_msg_pos + 400]
+    assert "pin_local_mlx_build" in skip_branch
+
+    # The unchanged flag is set only when the pulled HEAD equals the pre-pull
+    # HEAD; a failed rev-parse must never count as unchanged.
+    assert 'PRE_PULL_HEAD="$(git rev-parse HEAD 2>/dev/null || echo unknown)"' in update_script
+    assert '"$PRE_PULL_HEAD" != "unknown"' in update_script
+
+
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     """Local MLX builds should follow upstream's editable dev install guidance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

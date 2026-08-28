@@ -27,7 +27,8 @@
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to check_models/),
 #   the script will automatically:
-#   1. Run git pull in each repository
+#   1. Run git pull in each repository (an unchanged repo whose editable
+#      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides)
 #   2. Install requirements.txt (if present) for additional dependencies
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
@@ -788,6 +789,7 @@ update_local_mlx_repos() {
 	local -a REPO_NAMES=()
 	local -a REPO_PATHS=()
 	local -a REPO_SKIP=()
+	local -a REPO_UNCHANGED=()
 	
 	for repo in "${MLX_REPOS[@]}"; do
 		local REPO_PATH="$PARENT_DIR/$repo"
@@ -795,6 +797,7 @@ update_local_mlx_repos() {
 			REPO_NAMES+=("$repo")
 			REPO_PATHS+=("$REPO_PATH")
 			REPO_SKIP+=(0)
+			REPO_UNCHANGED+=(0)
 		fi
 	done
 	
@@ -832,8 +835,13 @@ update_local_mlx_repos() {
 	for idx in "${!REPO_NAMES[@]}"; do
 		cd "${REPO_PATHS[idx]}"
 		echo "[update.sh] ($((idx + 1))/${#REPO_NAMES[@]}) git pull -> ${REPO_NAMES[idx]}"
+		local PRE_PULL_HEAD
+		PRE_PULL_HEAD="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
 		if git pull; then
 			echo "✓ Git pull successful for ${REPO_NAMES[idx]}"
+			if [[ "$PRE_PULL_HEAD" != "unknown" && "$(git rev-parse HEAD 2>/dev/null)" == "$PRE_PULL_HEAD" ]]; then
+				REPO_UNCHANGED[idx]=1
+			fi
 		else
 			echo "⚠️  Git pull failed for ${REPO_NAMES[idx]} — skipping build"
 			REPO_SKIP[idx]=1
@@ -888,6 +896,24 @@ update_local_mlx_repos() {
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
+
+		# Nothing new from GitHub and the installed package is verifiably the
+		# editable from this checkout: rebuilding would produce the identical
+		# result, so skip it. The verification is the dependency-change guard —
+		# a PyPI release that clobbered the editable, a rebuilt environment, or
+		# a missing install all fail it and force the full rebuild path.
+		# FORCE_REINSTALL=1 keeps its documented meaning and never skips.
+		if [[ "${FORCE_REINSTALL:-0}" != "1" && ${REPO_UNCHANGED[idx]} -eq 1 ]] \
+			&& verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
+			echo "✓ ${REPO_NAMES[idx]} unchanged upstream; editable install verified — skipping rebuild"
+			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+				# The local build still needs its pin against PyPI releases.
+				pin_local_mlx_build
+			fi
+			echo ""
+			continue
+		fi
+
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		
 		# Record the currently installed version so we can restore on failure
