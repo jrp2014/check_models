@@ -77,6 +77,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Skylos quality findings now gate: `max_quality` drops from 10000 to 0 in
+  both the package and root configurations, so "quality passed" means no
+  quality warnings, not merely none blocking. The per-model comparison's
+  throughput/memory accumulation moved into `_compare_model_performance`,
+  bringing `compare_run_results` back under the configured complexity
+  ceiling; the repository scan is clean at the zero budget. Version-drift
+  noise remains absorbed by the per-rule ignore list, not a numeric
+  allowance.
 - `update.sh` skips a local MLX repo's rebuild when `git pull` brought no
   new commits **and** the installed package verifies as the editable from
   that checkout — the verification is the dependency-change guard, so a

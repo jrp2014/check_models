@@ -18695,6 +18695,34 @@ def _model_memory_change(
     return None
 
 
+def _compare_model_performance(
+    model: str,
+    now: JsonlResultRecord,
+    before: JsonlResultRecord,
+    *,
+    bands: Mapping[str, tuple[float, float, int]],
+    ratios: list[float],
+    flags: list[RunComparisonThroughputFlag],
+    memory: list[RunComparisonMemoryChange],
+) -> None:
+    """Accumulate throughput and memory deltas for one like-for-like model pair."""
+    if _record_repetition_aborted(now) or _record_repetition_aborted(before):
+        # A rate measured over an aborted (few-hundred-token) generation is
+        # not comparable with a full-length run; autoregressive throughput
+        # varies with sequence length.
+        return
+    now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
+    if now_tps is not None and before_tps is not None:
+        ratios.append(now_tps / before_tps)
+        flag = _model_throughput_flag(
+            model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)
+        )
+        if flag is not None:
+            flags.append(flag)
+    if (memory_change := _model_memory_change(model, now, before)) is not None:
+        memory.append(memory_change)
+
+
 def compare_run_results(
     current: Sequence[JsonlResultRecord],
     baseline: ComparisonBaseline,
@@ -18758,23 +18786,10 @@ def compare_run_results(
             text_compared += 1
             if now.get("generated_text", "") == before.get("generated_text", ""):
                 identical_text += 1
-        if not throughput_comparable:
-            continue
-        if _record_repetition_aborted(now) or _record_repetition_aborted(before):
-            # A rate measured over an aborted (few-hundred-token) generation is
-            # not comparable with a full-length run; autoregressive throughput
-            # varies with sequence length.
-            continue
-        now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
-        if now_tps is not None and before_tps is not None:
-            ratios.append(now_tps / before_tps)
-            flag = _model_throughput_flag(
-                model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)
+        if throughput_comparable:
+            _compare_model_performance(
+                model, now, before, bands=bands, ratios=ratios, flags=flags, memory=memory
             )
-            if flag is not None:
-                flags.append(flag)
-        if (memory_change := _model_memory_change(model, now, before)) is not None:
-            memory.append(memory_change)
 
     ratios_sorted = sorted(ratios)
     return RunComparison(

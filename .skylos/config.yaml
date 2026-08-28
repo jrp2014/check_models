@@ -45,5 +45,7 @@ gate:
   max_critical: 0
   max_high: 0
   max_security: 0
-  max_quality: 10000
+  # Zero: quality findings block. Version-drift noise is absorbed by the
+  # per-rule ignore list, not by a numeric allowance.
+  max_quality: 0
   strict: false

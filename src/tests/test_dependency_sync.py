@@ -404,7 +404,7 @@ def test_package_skylos_scan_excludes_generated_artifacts() -> None:
         "max_critical": 0,
         "max_high": 0,
         "max_security": 0,
-        "max_quality": 10000,
+        "max_quality": 0,
         "strict": False,
     }
 
