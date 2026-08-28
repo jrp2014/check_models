@@ -29,6 +29,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Review fixes on the repetition guard: the streaming wrapper now performs
+  upstream `generate()`'s stopping-criteria setup (custom `--eos-tokens`
+  register on the tokenizer, and reset to the model default otherwise, so a
+  prior model's registration cannot leak) and skips speculative/diffusion
+  draft chunks, whose text upstream excludes from the final answer.
+  Repetition-aborted generations are excluded from cross-run throughput
+  comparisons and history noise bands (a rate over a few hundred tokens is
+  not comparable with a full-length run). The runtime API drift check now
+  validates `stream_generate` — the call the harness actually makes — and
+  the unused `generate` module symbol is removed. The constraint-failure
+  aggregate validates retained `details` ranges before indexing (stale or
+  malformed artifacts degrade instead of crashing summary regeneration),
+  keeps fractional medians, and splits below-range from above-range counts.
 - The e2e smoke tests' fixture model is now `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
   (the smallest usable model in the standing suite); they previously targeted
   the retired `nanoLLaVA-1.5-4bit` and silently skipped their two

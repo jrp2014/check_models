@@ -1199,13 +1199,13 @@ class TestPreflightDependencyDiagnostics:
             return (model, processor, prompt)
 
         issues = mod._get_callable_contract_issues(
-            qualified_name="mlx_vlm.generate.generate",
+            qualified_name="mlx_vlm.generate.stream_generate",
             symbol_value=_fake_generate,
             required_keyword_params=("model", "processor", "prompt", "verbose", "temperature"),
         )
 
         assert issues == [
-            "mlx_vlm.generate.generate is missing required keyword parameter(s): verbose, temperature.",
+            "mlx_vlm.generate.stream_generate is missing required keyword parameter(s): verbose, temperature.",
         ]
 
     def test_import_probe_excerpt_preserves_actionable_import_error_tail(
@@ -1251,7 +1251,7 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
             "ImportError: tokenizers>=0.22.0,<=0.23.0 is required, but found tokenizers==0.23.1."
         )
         monkeypatch.setitem(mod.MISSING_DEPENDENCIES, "mlx-vlm", dependency_message)
-        for symbol_name in ("load", "apply_chat_template", "generate", "load_image"):
+        for symbol_name in ("load", "apply_chat_template", "stream_generate", "load_image"):
             monkeypatch.setattr(mod, symbol_name, mod._raise_mlx_vlm_missing)
 
         issues = mod._detect_runtime_api_drift_issues()
@@ -1260,7 +1260,7 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
             (
                 "mlx-vlm import unavailable; affected API surfaces: "
                 "mlx_vlm.utils.load, mlx_vlm.prompt_utils.apply_chat_template, "
-                "mlx_vlm.generate.generate, mlx_vlm.utils.load_image. "
+                "mlx_vlm.generate.stream_generate, mlx_vlm.utils.load_image. "
                 f"Root cause: {dependency_message}"
             ),
         )

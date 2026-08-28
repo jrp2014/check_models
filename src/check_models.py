@@ -787,9 +787,6 @@ def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
 
 
 vlm_version: str = NOT_AVAILABLE
-generate: Callable[..., GenerationResult] = cast(
-    "Callable[..., GenerationResult]", _raise_mlx_vlm_missing
-)
 stream_generate: Callable[..., Iterator[GenerationResult]] = cast(
     "Callable[..., Iterator[GenerationResult]]", _raise_mlx_vlm_missing
 )
@@ -806,7 +803,6 @@ mlx_vlm_probe_error = _probe_import_runtime(
 )
 if mlx_vlm_probe_error is None:
     try:
-        from mlx_vlm.generate import generate as _mlx_vlm_generate
         from mlx_vlm.generate import stream_generate as _mlx_vlm_stream_generate
         from mlx_vlm.prompt_utils import apply_chat_template as _mlx_vlm_apply_chat_template
         from mlx_vlm.utils import load as _mlx_vlm_load
@@ -834,7 +830,6 @@ if mlx_vlm_probe_error is None:
             )
             return loaded
 
-        generate = cast("Callable[..., GenerationResult]", _mlx_vlm_generate)
         stream_generate = cast(
             "Callable[..., Iterator[GenerationResult]]", _mlx_vlm_stream_generate
         )
@@ -5442,8 +5437,8 @@ _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
         "mlx_vlm.prompt_utils.apply_chat_template",
         ("processor", "config", "prompt", "num_images"),
     ),
-    "generate": (
-        "mlx_vlm.generate.generate",
+    "stream_generate": (
+        "mlx_vlm.generate.stream_generate",
         (*_GENERATE_CALL_ARGS, *_SENT_GENERATE_KEYWORDS),
     ),
     "load_image": (
@@ -5518,7 +5513,7 @@ def _get_callable_contract_issues(
 
 def _resolve_generation_result_type() -> type[object] | None:
     """Resolve ``mlx_vlm.generate.GenerationResult`` without importing on module load."""
-    if generate is _raise_mlx_vlm_missing:
+    if stream_generate is _raise_mlx_vlm_missing:
         return None
     try:
         generate_module = __import__("mlx_vlm.generate", fromlist=["GenerationResult"])
@@ -5532,7 +5527,7 @@ def _resolve_generation_result_type() -> type[object] | None:
 def _get_generation_result_contract_issues(result_type: type[object] | None) -> list[str]:
     """Return drift issues for the upstream ``GenerationResult`` shape we consume."""
     if result_type is None:
-        if generate is _raise_mlx_vlm_missing:
+        if stream_generate is _raise_mlx_vlm_missing:
             return []
         return [
             "mlx_vlm.generate.GenerationResult could not be imported for API drift checks.",
@@ -13460,13 +13455,24 @@ def _generate_with_repetition_guard(
 ) -> GenerationResult | SupportsGenerationResult:
     """Upstream ``generate`` semantics with an early stop on degenerate loops.
 
-    Mirrors upstream ``generate`` (which accumulates ``stream_generate``
-    chunks and returns the final chunk's metrics with the joined text), adding
-    a tail-cycle check. An abort sets ``finish_reason="repetition_abort"``,
-    which flows into the runtime stop reason and the matching observation.
-    Per-token throughput stays comparable across runs — the rate is measured
-    over generated tokens, so stopping earlier does not bias it.
+    Mirrors upstream ``generate``: it registers custom EOS tokens on the
+    tokenizer's stopping criteria (or resets them to the model default so a
+    prior model's registration cannot leak), skips draft chunks the way the
+    upstream accumulator does, and returns the final chunk's metrics with the
+    joined text — adding only a tail-cycle check. An abort sets
+    ``finish_reason="repetition_abort"``, which flows into the runtime stop
+    reason and the matching observation; aborted generations are excluded
+    from cross-run throughput comparisons and history bands because a rate
+    over a few hundred tokens is not comparable with a full-length run.
     """
+    tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
+    stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
+    eos_tokens = kwargs.get("eos_tokens")
+    if stopping_criteria is not None:
+        if eos_tokens is not None:
+            stopping_criteria.add_eos_token_ids(eos_tokens)
+        elif (eos_id := getattr(getattr(model, "config", None), "eos_token_id", None)) is not None:
+            stopping_criteria.reset(eos_id)
     pieces: list[str] = []
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
@@ -13475,6 +13481,10 @@ def _generate_with_repetition_guard(
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
     ):
         last = chunk
+        if getattr(chunk, "is_draft", False):
+            # Speculative/diffusion draft chunks are progress display only;
+            # upstream generate() excludes their text from the final answer.
+            continue
         pieces.append(chunk.text)
         chunk_count += 1
         if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
@@ -18464,6 +18474,20 @@ def _resolve_comparison_baseline(
         return None
 
 
+def _history_band_tps_sample(facts: object) -> float | None:
+    """Return one usable throughput sample from a history facts dict.
+
+    Aborted generations carry rates over truncated sequences; they must not
+    shape the noise band.
+    """
+    if not isinstance(facts, dict) or facts.get("stop_reason") == "repetition_abort":
+        return None
+    tps = facts.get("generation_tps")
+    if isinstance(tps, (int, float)) and tps > 0:
+        return float(tps)
+    return None
+
+
 def _history_tps_bands(
     history_path: Path,
     *,
@@ -18507,11 +18531,8 @@ def _history_tps_bands(
         if not isinstance(model_results, dict):
             continue
         for model, facts in model_results.items():
-            if not isinstance(facts, dict):
-                continue
-            tps = facts.get("generation_tps")
-            if isinstance(tps, (int, float)) and tps > 0:
-                samples.setdefault(model, []).append(float(tps))
+            if (tps := _history_band_tps_sample(facts)) is not None:
+                samples.setdefault(model, []).append(tps)
     bands: dict[str, tuple[float, float, int]] = {}
     for model, values in samples.items():
         if len(values) < _COMPARISON_MIN_BAND_SAMPLES:
@@ -18568,6 +18589,11 @@ def _comparison_component_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str
     if python_version:
         rows.append(("python", f"{python_version}"))
     return tuple(rows)
+
+
+def _record_repetition_aborted(record: JsonlResultRecord) -> bool:
+    """Return whether this result's generation was stopped by the repetition guard."""
+    return "repetition_abort" in record["assessment"]["observations"]
 
 
 def _result_generation_tps(record: JsonlResultRecord) -> float | None:
@@ -18727,6 +18753,11 @@ def compare_run_results(
             if now.get("generated_text", "") == before.get("generated_text", ""):
                 identical_text += 1
         if not throughput_comparable:
+            continue
+        if _record_repetition_aborted(now) or _record_repetition_aborted(before):
+            # A rate measured over an aborted (few-hundred-token) generation is
+            # not comparable with a full-length run; autoregressive throughput
+            # varies with sequence length.
             continue
         now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
         if now_tps is not None and before_tps is not None:
@@ -19901,47 +19932,62 @@ def _run_issue_summary_constraint_breakdown(
     "individual models are sloppy" without opening per-model diagnostics.
     Rendered only when at least one model violated a constraint.
     """
+
+    def _int_pair(value: JsonLike) -> tuple[int, int] | None:
+        # Retained artifacts are unvalidated here; never index blindly.
+        pair_length = 2
+        if (
+            isinstance(value, list)
+            and len(value) == pair_length
+            and all(isinstance(item, int) and not isinstance(item, bool) for item in value)
+        ):
+            return cast("int", value[0]), cast("int", value[1])
+        return None
+
     title_observed: list[int] = []
     keyword_observed: list[int] = []
     duplicate_models = 0
-    title_range: list[int] | None = None
-    keyword_range: list[int] | None = None
+    title_range: tuple[int, int] | None = None
+    keyword_range: tuple[int, int] | None = None
     for result in results:
         assessment = result["assessment"]
         if "catalog_constraint_violation" not in assessment["observations"]:
             continue
         details = cast("dict[str, JsonLike]", assessment.get("details") or {})
         title_count = details.get("title_word_count")
-        raw_title_range = details.get("title_word_range")
-        if isinstance(title_count, int) and isinstance(raw_title_range, list):
-            low, high = cast("int", raw_title_range[0]), cast("int", raw_title_range[1])
-            if not low <= title_count <= high:
-                title_observed.append(title_count)
-                title_range = [low, high]
+        if (
+            isinstance(title_count, int)
+            and (bounds := _int_pair(details.get("title_word_range")))
+            and not bounds[0] <= title_count <= bounds[1]
+        ):
+            title_observed.append(title_count)
+            title_range = bounds
         keyword_count = details.get("keyword_count")
-        raw_keyword_range = details.get("keyword_count_range")
-        if isinstance(keyword_count, int) and isinstance(raw_keyword_range, list):
-            low, high = cast("int", raw_keyword_range[0]), cast("int", raw_keyword_range[1])
-            if not low <= keyword_count <= high:
-                keyword_observed.append(keyword_count)
-                keyword_range = [low, high]
+        if (
+            isinstance(keyword_count, int)
+            and (bounds := _int_pair(details.get("keyword_count_range")))
+            and not bounds[0] <= keyword_count <= bounds[1]
+        ):
+            keyword_observed.append(keyword_count)
+            keyword_range = bounds
         if details.get("duplicate_keywords"):
             duplicate_models += 1
     if not (title_observed or keyword_observed or duplicate_models):
         return None
+
+    def _range_line(label: str, observed: list[int], bounds: tuple[int, int], unit: str) -> str:
+        below = sum(1 for value in observed if value < bounds[0])
+        above = sum(1 for value in observed if value > bounds[1])
+        return (
+            f"{label}: {len(observed)} model(s) outside {bounds[0]}-{bounds[1]}{unit} "
+            f"({below} below, {above} above; median observed {median(observed):g})"
+        )
+
     lines: list[str] = []
     if title_observed and title_range is not None:
-        lines.append(
-            f"Title length: {len(title_observed)} model(s) outside "
-            f"{title_range[0]}-{title_range[1]} words "
-            f"(median observed {int(median(title_observed))})"
-        )
+        lines.append(_range_line("Title length", title_observed, title_range, " words"))
     if keyword_observed and keyword_range is not None:
-        lines.append(
-            f"Keyword count: {len(keyword_observed)} model(s) outside "
-            f"{keyword_range[0]}-{keyword_range[1]} "
-            f"(median observed {int(median(keyword_observed))})"
-        )
+        lines.append(_range_line("Keyword count", keyword_observed, keyword_range, ""))
     if duplicate_models:
         lines.append(f"Duplicate keywords: {duplicate_models} model(s)")
     return ReportSection(

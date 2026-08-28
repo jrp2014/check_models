@@ -1595,6 +1595,63 @@ class TestRepetitionGuard:
         assert result.finish_reason == "stop"
         assert result.text == "".join(texts)
 
+    def test_wrapper_registers_custom_eos_tokens_upstream_style(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """eos_tokens reach the tokenizer's stopping criteria; absence resets them."""
+
+        class _Stopping:
+            def __init__(self) -> None:
+                self.added: list[object] = []
+                self.reset_to: list[object] = []
+
+            def add_eos_token_ids(self, tokens: object) -> None:
+                self.added.append(tokens)
+
+            def reset(self, eos_id: object) -> None:
+                self.reset_to.append(eos_id)
+
+        class _Tokenizer:
+            def __init__(self) -> None:
+                self.stopping_criteria = _Stopping()
+
+        class _Proc:
+            def __init__(self) -> None:
+                self.tokenizer = _Tokenizer()
+                self.detokenizer = object()
+
+        model = types.SimpleNamespace(config=types.SimpleNamespace(eos_token_id=7))
+        monkeypatch.setattr(
+            check_models, "stream_generate", lambda **_kw: iter(self._chunks(["ok "]))
+        )
+        proc = _Proc()
+        check_models._generate_with_repetition_guard(
+            model=cast("Any", model),
+            processor=cast("Any", proc),
+            prompt="p",
+            image="i.jpg",
+            eos_tokens=["</think>"],
+        )
+        assert proc.tokenizer.stopping_criteria.added == [["</think>"]]
+        assert proc.tokenizer.stopping_criteria.reset_to == []
+
+        proc = _Proc()
+        check_models._generate_with_repetition_guard(
+            model=cast("Any", model), processor=cast("Any", proc), prompt="p", image="i.jpg"
+        )
+        assert proc.tokenizer.stopping_criteria.added == []
+        assert proc.tokenizer.stopping_criteria.reset_to == [7]
+
+    def test_wrapper_excludes_draft_chunk_text(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Speculative/diffusion draft chunks never reach the final answer text."""
+        chunks = self._chunks(["real ", "draft-noise ", "answer"])
+        chunks[1].is_draft = True
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()), processor=_FakeProcessor(), prompt="p", image="i.jpg"
+        )
+        assert result.text == "real answer"
+
     def test_abort_stop_reason_becomes_observation(self) -> None:
         """stop_reason=repetition_abort surfaces as the matching observation."""
         result = check_models.PerformanceResult(

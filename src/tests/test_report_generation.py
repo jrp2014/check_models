@@ -5857,9 +5857,17 @@ def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(
     assert "- *Hit the token cap:* 1" in content
     assert "- *Stopped early for repetition:* 1" in content
     assert "## Constraint-failure breakdown" in content
-    assert "Title length: 1 model(s) outside 5-10 words (median observed 4)" in content
-    assert "Keyword count: 2 model(s) outside 10-18 (median observed 210)" in content
-    assert "Duplicate keywords: 1 model(s)" in content
+    # The renderer wraps bullet lines; compare against whitespace-normalized text.
+    normalized = " ".join(content.split())
+    assert (
+        "Title length: 1 model(s) outside 5-10 words (1 below, 0 above; median observed 4)"
+        in normalized
+    )
+    assert (
+        "Keyword count: 2 model(s) outside 10-18 (0 below, 2 above; median observed 210)"
+        in normalized
+    )
+    assert "Duplicate keywords: 1 model(s)" in normalized
 
 
 def test_run_summary_omits_constraint_breakdown_without_violations(tmp_path: Path) -> None:
@@ -5879,6 +5887,64 @@ def test_run_summary_omits_constraint_breakdown_without_violations(tmp_path: Pat
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
     assert "Constraint-failure breakdown" not in content
+
+
+def test_comparison_excludes_repetition_aborted_generations_from_throughput() -> None:
+    """A rate over an aborted (truncated) generation never enters ratios or flags."""
+    baseline = _comparison_baseline(
+        [
+            _comparison_record("org/aborted", tps=100.0),
+            _comparison_record("org/steady", tps=50.0),
+        ]
+    )
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record(
+                "org/aborted",
+                usability="unusable",
+                observations=["repetition_abort", "repeated_output"],
+                tps=400.0,
+            ),
+        ),
+        cast("check_models.JsonlResultRecord", _comparison_record("org/steady", tps=55.0)),
+    ]
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    )
+    assert comparison is not None
+    # Only the steady model contributes a ratio; the aborted 4x never appears.
+    assert comparison.tps_ratio_median == pytest.approx(55.0 / 50.0)
+    assert all(flag.model != "org/aborted" for flag in comparison.throughput_flags)
+
+
+def test_history_bands_skip_repetition_aborted_samples(tmp_path: Path) -> None:
+    """History rows from aborted generations must not shape the noise band."""
+    aborted = {"generation_tps": 400.0, "stop_reason": "repetition_abort"}
+    steady = {"generation_tps": 50.0, "stop_reason": "stop"}
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        json.dumps(
+            {
+                "_type": "run",
+                "prompt_hash": "h" * 8,
+                "model_results": {"org/m": aborted if i % 2 else steady},
+            }
+        )
+        for i in range(6)
+    ]
+    check_models._write_text_file(history, "\n".join(rows) + "\n")
+
+    bands, runs = check_models._history_tps_bands(history, prompt_hash="h" * 8, exclude_last=False)
+    assert runs == 6
+    # Only the three steady samples qualify; if that is below the minimum
+    # sample count the band is absent — either way the 400 tok/s aborts
+    # never widen the fence.
+    band = bands.get("org/m")
+    if band is not None:
+        _low, high, samples = band
+        assert samples == 3
+        assert high < 400.0
 
 
 def test_observation_delta_falls_back_to_raw_code_for_unknown_baseline_codes() -> None:
