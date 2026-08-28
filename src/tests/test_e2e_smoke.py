@@ -52,7 +52,9 @@ import check_models  # noqa: E402 - after HF cache env setup
 from tools import safe_io  # noqa: E402 - after HF cache env setup
 
 # Fixture model - small, fast, reliable MLX conversion
-FIXTURE_MODEL = "mlx-community/nanoLLaVA-1.5-4bit"
+# Smallest usable model in the standing suite; nanoLLaVA-1.5 was retired
+# from the cache (superseded, unusable output) and would skip these tests.
+FIXTURE_MODEL = "LiquidAI/LFM2.5-VL-450M-MLX-bf16"
 
 
 class CLIResult(NamedTuple):

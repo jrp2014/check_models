@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The e2e smoke tests' fixture model is now `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+  (the smallest usable model in the standing suite); they previously targeted
+  the retired `nanoLLaVA-1.5-4bit` and silently skipped their two
+  real-inference cases once that cache entry was removed.
 - Name-based parameter estimates use `Decimal` arithmetic:
   `int(float("4.1") * 1e9)` truncates to 4,099,999,999 because 4.1 is
   inexact in binary — the same defect mlx-lm fixed in its `_parse_size`
