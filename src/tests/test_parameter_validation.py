@@ -1,8 +1,12 @@
 """Tests for parameter validation functions."""
 
 import argparse
+import ast
 import dataclasses
-from collections.abc import Callable
+import importlib.util
+import json
+import subprocess
+import sys
 from pathlib import Path
 from typing import ClassVar
 
@@ -15,6 +19,7 @@ from check_models import (
     validate_sampling_params,
     validate_temperature,
 )
+from tools import safe_io
 
 
 class TestTemperatureValidation:
@@ -681,30 +686,39 @@ class TestUpstreamCliParity:
     # and this test must pass against both.
     DISPLAY_ONLY_FLAGS: ClassVar[frozenset[str]] = frozenset({"--verbose"})
 
-    @staticmethod
-    def _capture_parser_defaults(build: Callable[[], object]) -> dict[str, object]:
-        captured: dict[str, object] = {}
-        real_parse_args = argparse.ArgumentParser.parse_args
-
-        def _grab(self: argparse.ArgumentParser, *_args: object, **_kw: object) -> object:
-            for action in self._actions:
-                for option in action.option_strings:
-                    if option.startswith("--"):
-                        captured[option] = action.default
-            return argparse.Namespace()
-
-        argparse.ArgumentParser.parse_args = _grab  # type: ignore[method-assign, assignment]  # deliberate monkeypatch to capture parser defaults
-        try:
-            build()
-        finally:
-            argparse.ArgumentParser.parse_args = real_parse_args  # type: ignore[method-assign]  # restore the real parser
-        return captured
+    # Runs in a child interpreter: importing mlx_vlm initializes mlx.core's
+    # native Metal backend, which can abort the process (not raise) when Metal
+    # is unavailable. A subprocess contains the abort; importorskip cannot.
+    _UPSTREAM_DEFAULTS_PROBE: ClassVar[str] = (
+        "import argparse, json\n"
+        "from mlx_vlm.generate import dispatch\n"
+        "captured = {}\n"
+        "def _grab(self, *args, **kwargs):\n"
+        "    for action in self._actions:\n"
+        "        for option in action.option_strings:\n"
+        "            if option.startswith('--'):\n"
+        "                captured[option] = action.default\n"
+        "    return argparse.Namespace()\n"
+        "argparse.ArgumentParser.parse_args = _grab\n"
+        "dispatch.parse_arguments()\n"
+        "print(json.dumps(captured, default=str))\n"
+    )
 
     def test_shared_flag_defaults_match_mlx_vlm_generate(self) -> None:
         """Overlapping flags keep upstream defaults except documented divergences."""
-        dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
-
-        upstream = self._capture_parser_defaults(dispatch.parse_arguments)
+        probe = subprocess.run(  # noqa: S603 - fixed interpreter runs a literal probe script
+            [sys.executable, "-c", self._UPSTREAM_DEFAULTS_PROBE],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=120,
+        )
+        if probe.returncode != 0:
+            pytest.skip(
+                "mlx_vlm.generate.dispatch unavailable in a subprocess probe "
+                f"(exit {probe.returncode}): {probe.stderr.strip()[:200]}"
+            )
+        upstream: dict[str, object] = json.loads(probe.stdout)
         parser = check_models._build_cli_parser()
         ours: dict[str, object] = {}
         for action in parser._actions:
@@ -776,11 +790,32 @@ def test_per_tensor_kv_keywords_match_upstream_generate_kwargs() -> None:
     quantization, so skip (rather than fail) when the installed contract lacks
     the keys.  Against a git-HEAD install this locks the forwarded names to the
     upstream TypedDict spelling.
+
+    The installed ``types.py`` is read as source, never imported: importing
+    any ``mlx_vlm`` submodule executes the package root, which initializes
+    ``mlx.core``'s native Metal backend and can abort the whole pytest
+    interpreter (not raise) when Metal is unavailable —
+    ``pytest.importorskip`` cannot catch a native abort. Resolving the
+    top-level spec alone does not execute any module.
     """
-    types_module = pytest.importorskip("mlx_vlm.generate.types")
-    annotations: dict[str, object] = getattr(types_module.GenerateKwargs, "__annotations__", {})
+    spec = importlib.util.find_spec("mlx_vlm")
+    if spec is None or not spec.submodule_search_locations:
+        pytest.skip("mlx-vlm is not installed")
+    types_path = Path(next(iter(spec.submodule_search_locations))) / "generate" / "types.py"
+    if not types_path.is_file():
+        pytest.skip("installed mlx-vlm predates the generate.types module")
+    tree = ast.parse(safe_io.read_text_no_follow(types_path))
+    annotations: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == "GenerateKwargs":
+            annotations = {
+                stmt.target.id
+                for stmt in node.body
+                if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name)
+            }
+            break
     per_tensor_keys = {"kv_key_bits", "kv_value_bits", "kv_key_scheme", "kv_value_scheme"}
-    if not per_tensor_keys <= set(annotations):
+    if not per_tensor_keys <= annotations:
         pytest.skip("installed mlx-vlm predates per-tensor KV cache quantization")
 
     assert per_tensor_keys <= set(check_models._SENT_GENERATE_KEYWORDS)

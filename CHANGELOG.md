@@ -29,6 +29,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The upstream-parity tests no longer import `mlx_vlm` in the pytest
+  interpreter: importing any submodule executes the package root, which
+  initializes `mlx.core`'s native Metal backend and can abort the whole
+  process (not raise) when Metal is unavailable — `pytest.importorskip`
+  cannot catch a native abort. The GenerateKwargs parity test now reads the
+  installed `types.py` as source (AST), and the CLI-defaults parity test
+  captures upstream argparse defaults in a subprocess probe that skips
+  cleanly when the child dies. Retiring the in-process capture also removes
+  the suite's last `type: ignore` monkeypatch suppression.
 - Review fixes on the repetition guard: the streaming wrapper now performs
   upstream `generate()`'s stopping-criteria setup (custom `--eos-tokens`
   register on the tokenizer, and reset to the model default otherwise, so a
