@@ -21298,7 +21298,7 @@ def _generate_run_issue_summary_output(
             include_run_json=run_json_succeeded,
             comparison=inputs.comparison,
         )
-    except (OSError, TypeError, ValueError, RuntimeError) as error:
+    except Exception as error:  # report isolation must contain renderer defects
         cleanup_error = _remove_run_issue_summary(inputs.output_paths)
         logger.exception("Failed to generate paste-ready run issue summary.")
         error_message = str(error)
@@ -21338,7 +21338,7 @@ def _run_diagnostics_artifact(
             diagnostics_path=diagnostics_path,
             report_context=inputs.report_context,
         )
-    except (OSError, TypeError, ValueError, RuntimeError) as error:
+    except Exception as error:  # report isolation must contain renderer defects
         logger.exception("Failed to generate diagnostics report.")
         outcomes.append(
             ReportArtifactOutcome(
@@ -21385,37 +21385,44 @@ def _log_report_generation_outcomes(
 
 
 def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | None:
-    """Diff the just-written JSONL against the configured baseline (best effort)."""
-    spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
-    baseline = _resolve_comparison_baseline(
-        spec, inputs.output_paths.jsonl, inputs.output_paths.run_json
-    )
-    if baseline is None:
-        return None
+    """Diff the just-written JSONL against the configured baseline (best effort).
+
+    The entire computation — baseline resolution, current-source loading, and
+    the diff itself — sits behind one ordinary-exception boundary: comparison
+    is an enhancement, and no implementation defect in it may cost the run's
+    reports. ``KeyboardInterrupt``/``SystemExit`` still propagate.
+    """
     try:
+        spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
+        baseline = _resolve_comparison_baseline(
+            spec, inputs.output_paths.jsonl, inputs.output_paths.run_json
+        )
+        if baseline is None:
+            return None
         source = _load_run_issue_summary_source(inputs.output_paths, include_run_json=False)
-    except (OSError, ValueError, TypeError) as error:
-        logger.warning("Comparison skipped: current results.jsonl unreadable (%s)", error)
+        current_image = (
+            _run_image_record(inputs.image_path, inputs.report_context.image_profile)
+            if inputs.image_path is not None
+            else None
+        )
+        return compare_run_results(
+            source.results,
+            baseline,
+            history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
+            prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
+            history_excludes_current=inputs.history_appended,
+            current_execution_mode=str(source.metadata.get("execution_mode", "in_process")),
+            current_metadata=source.metadata,
+            current_image=current_image,
+            current_generation_settings=tuple(
+                (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
+                for key, value in sorted(_common_generation_settings(inputs.results).items())
+            ),
+        )
+    except Exception as error:  # comparison must never cost the run's reports
+        logger.warning("Comparison skipped: unexpected comparison failure (%s)", error)
+        logger.debug("Comparison failure detail", exc_info=True)
         return None
-    current_image = (
-        _run_image_record(inputs.image_path, inputs.report_context.image_profile)
-        if inputs.image_path is not None
-        else None
-    )
-    return compare_run_results(
-        source.results,
-        baseline,
-        history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
-        prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
-        history_excludes_current=inputs.history_appended,
-        current_execution_mode=str(source.metadata.get("execution_mode", "in_process")),
-        current_metadata=source.metadata,
-        current_image=current_image,
-        current_generation_settings=tuple(
-            (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
-            for key, value in sorted(_common_generation_settings(inputs.results).items())
-        ),
-    )
 
 
 def _generate_reports_and_log_outputs(
@@ -21438,7 +21445,7 @@ def _generate_reports_and_log_outputs(
             return False
         try:
             artifact.job()
-        except (OSError, TypeError, ValueError, RuntimeError) as error:
+        except Exception as error:  # report isolation must contain renderer defects
             logger.exception("Failed to generate %s report.", artifact.key)
             outcomes.append(
                 ReportArtifactOutcome(

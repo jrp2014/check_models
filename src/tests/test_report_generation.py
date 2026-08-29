@@ -11,6 +11,7 @@ import re
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Literal, cast, get_args
 from unittest.mock import patch
 
@@ -1647,6 +1648,107 @@ def _report_outcome(
 ) -> check_models.ReportArtifactOutcome:
     """Return one named report outcome for concise orchestration assertions."""
     return next(outcome for outcome in outcomes if outcome.key == key)
+
+
+def _report_generation_inputs(
+    tmp_path: Path,
+    *,
+    result: check_models.PerformanceResult,
+) -> check_models.ReportGenerationInputs:
+    """Build minimal orchestration inputs writing under tmp_path only."""
+    args = Namespace(
+        output_html=tmp_path / "output" / "reports" / "results.html",
+        output_gallery_markdown=tmp_path / "output" / "reports" / "model_gallery.md",
+        output_jsonl=tmp_path / "output" / "results.jsonl",
+        output_run_json=tmp_path / "output" / "run.json",
+        output_diagnostics=tmp_path / "output" / "reports" / "diagnostics.md",
+        output_log=tmp_path / "output" / "check_models.log",
+        output_env=tmp_path / "output" / "environment.log",
+        compare_with="none",
+    )
+    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+    return check_models.ReportGenerationInputs(
+        results=[result],
+        library_versions=_stub_versions(),
+        prompt="Describe the image.",
+        metadata=None,
+        overall_time=1.0,
+        image_path=None,
+        system_info={},
+        report_context=context,
+        output_paths=check_models._resolve_report_output_paths(args),
+        run_args=args,
+        runtime_fingerprint={},
+    )
+
+
+def test_report_artifact_key_error_is_contained(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """An unexpected renderer defect becomes a failed outcome, never an escape."""
+    inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    with (
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+        patch.object(
+            check_models,
+            "generate_html_report",
+            side_effect=KeyError("unexpected renderer field"),
+        ),
+    ):
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    html_outcome = _report_outcome(outcomes, "html")
+    assert html_outcome.succeeded is False
+    assert "unexpected renderer field" in (html_outcome.error_message or "")
+    assert _report_outcome(outcomes, "jsonl").succeeded is True
+    assert inputs.output_paths.jsonl.is_file()
+    assert "Failed to generate html report" in caplog.text
+
+
+def test_report_diagnostics_and_summary_key_errors_are_contained(
+    tmp_path: Path,
+) -> None:
+    """Diagnostics and summary boundaries also contain unexpected exceptions."""
+    inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    with (
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+        patch.object(
+            check_models,
+            "_write_diagnostics_artifacts",
+            side_effect=KeyError("diagnostics defect"),
+        ),
+        patch.object(
+            check_models,
+            "generate_run_issue_summary_report",
+            side_effect=KeyError("summary defect"),
+        ),
+    ):
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert _report_outcome(outcomes, "diagnostics").succeeded is False
+    assert _report_outcome(outcomes, "jsonl").succeeded is True
+
+
+def test_unexpected_comparison_error_degrades_to_no_comparison(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A comparison implementation defect skips comparison rather than the run."""
+    report_inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    with (
+        patch.object(check_models, "_resolve_comparison_baseline", return_value=object()),
+        patch.object(
+            check_models,
+            "_load_run_issue_summary_source",
+            return_value=SimpleNamespace(results=[], metadata={}),
+        ),
+        patch.object(check_models, "compare_run_results", side_effect=KeyError("bad diff")),
+    ):
+        comparison = check_models._compute_run_comparison(report_inputs)
+
+    assert comparison is None
+    assert "Comparison skipped" in caplog.text
 
 
 def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: Path) -> None:
