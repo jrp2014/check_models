@@ -13,6 +13,7 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
+from typing import cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -92,14 +93,14 @@ def _read_text_file(path: Path, *, label: str) -> str | None:
 def _resolve_output_text(args: argparse.Namespace) -> str | None:
     """Resolve the output text from CLI arguments."""
     if args.file is None:
-        return args.text
+        return cast("str | None", args.text)
     return _read_text_file(args.file, label="output text file")
 
 
 def _resolve_prompt_text(args: argparse.Namespace) -> str | None:
     """Resolve optional prompt text from CLI arguments."""
     if args.prompt_file is None:
-        return args.prompt
+        return cast("str | None", args.prompt)
     return _read_text_file(args.prompt_file, label="prompt file")
 
 

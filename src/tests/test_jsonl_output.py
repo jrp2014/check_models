@@ -359,15 +359,15 @@ def test_retained_metadata_captures_public_snapshot_contract(
         },
     )
 
-    payload, result_rows = _read_jsonl(out)
-    payload = dict(payload)
+    metadata, result_rows = _read_jsonl(out)
+    header: dict[str, object] = dict(metadata)
     # cache_discovery is optional: present only when a local HF cache scan
     # yields entries, so it is validated separately rather than required here.
-    discovery = payload.pop("cache_discovery", None)
+    discovery = header.pop("cache_discovery", None)
     if discovery is not None:
         assert isinstance(discovery, list)
         assert {"repo_id", "selected", "capability_verdict", "skip_reasons"} <= set(discovery[0])
-    assert set(payload) == {
+    assert set(header) == {
         "_type",
         "format_version",
         "timestamp",
@@ -388,20 +388,20 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "trust_remote_code",
         "comparison",
     }
-    assert payload["format_version"] == "3.0"
-    assert payload["eval_mode"] == "triage"
-    assert "semantic_rankings_grounded" not in payload
-    assert "selection_basis" not in payload
-    assert "has_descriptive_metadata" not in payload
-    assert payload["metadata_exposed_to_prompt"] is False
-    assert payload["counts"] == {
+    assert header["format_version"] == "3.0"
+    assert header["eval_mode"] == "triage"
+    assert "semantic_rankings_grounded" not in header
+    assert "selection_basis" not in header
+    assert "has_descriptive_metadata" not in header
+    assert header["metadata_exposed_to_prompt"] is False
+    assert header["counts"] == {
         "models_attempted": 1,
         "models_evaluated": 1,
         "models_completed": 1,
         "models_crashed": 0,
         "models_indeterminate": 0,
     }
-    assert payload["artifacts"] == {
+    assert header["artifacts"] == {
         "output_index": "index.md",
         "results_html": "reports/results.html",
         "model_gallery": "reports/model_gallery.md",
@@ -410,9 +410,9 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "log": "check_models.log",
         "environment": "environment.log",
     }
-    versions = cast("dict[str, str]", payload["library_versions"])
+    versions = cast("dict[str, str]", header["library_versions"])
     assert versions["mlx-vlm"] == "0.6.3"
-    image = cast("dict[str, object]", payload["image"])
+    image = cast("dict[str, object]", header["image"])
     assert image["name"] == "catalogue.jpg"
     assert image["source_url"] == "https://example.test/images/catalogue.jpg"
     assert image["width"] == 12
@@ -420,13 +420,13 @@ def test_retained_metadata_captures_public_snapshot_contract(
     assert image["sha256"]
     assert cast("int", image["size_bytes"]) > 0
     assert str(tmp_path) not in out.read_text(encoding="utf-8")
-    assert payload["generation_settings"] == {
+    assert header["generation_settings"] == {
         "max_tokens": 500,
         "prefill_step_size": 4096,
         "temperature": 0.0,
     }
-    assert payload["trust_remote_code"] is False
-    assert payload["prompt_sha256"] == check_models._sha256_text("Describe this image briefly.")
+    assert header["trust_remote_code"] is False
+    assert header["prompt_sha256"] == check_models._sha256_text("Describe this image briefly.")
     row = result_rows[0]
     assert row["model_provenance"] == {
         "model": result.model_name,
@@ -445,7 +445,7 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "processed_image_height": 480,
         "image_patch_count": 120,
     }
-    assert payload["producer"] == {
+    assert header["producer"] == {
         "name": "check_models",
         "version": "0.8.6",
         "git_revision": "abc123",

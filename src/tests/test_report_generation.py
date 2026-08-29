@@ -175,17 +175,37 @@ def _issue_summary_result(
     }
 
 
-def _write_issue_summary_fixture(
-    output_paths: check_models.ReportOutputPaths,
-    *,
+def _issue_summary_counts(results: Sequence[dict[str, object]]) -> dict[str, int]:
+    """Derive header counts from the fixture rows so the loader's cross-check holds.
+
+    Unrecognised executions land in the indeterminate bucket so the header stays
+    internally consistent even for malformed-row rejection fixtures (whose row
+    error must fire first).
+    """
+    executions = [
+        cast("dict[str, object]", row.get("assessment") or {}).get("execution") for row in results
+    ]
+    completed = sum(1 for execution in executions if execution == "completed")
+    crashed = sum(1 for execution in executions if execution == "crashed")
+    return {
+        "models_attempted": len(results),
+        "models_evaluated": completed + crashed,
+        "models_completed": completed,
+        "models_crashed": crashed,
+        "models_indeterminate": len(results) - completed - crashed,
+    }
+
+
+def _issue_summary_metadata(
     results: Sequence[dict[str, object]],
+    *,
     image_source_url: str | None = None,
     image_sha256: str | None = "a" * 64,
-    trust_remote_code: bool | None = False,
+    trust_remote_code: bool = False,
     total_runtime_seconds: float | None = None,
-) -> None:
-    """Write hand-authored retained input for issue-summary tests."""
-    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    comparison: dict[str, object] | None = None,
+) -> dict[str, object]:
+    """Build one literal, loader-valid schema-3.0 header for the given rows."""
     image: dict[str, object] = {
         "name": "fixture.jpg",
         "sha256": image_sha256,
@@ -196,11 +216,11 @@ def _write_issue_summary_fixture(
     }
     if image_source_url is not None:
         image["source_url"] = image_source_url
-    metadata = {
+    return {
         "_type": "metadata",
         "format_version": "3.0",
         "prompt": "full prompt that must not be copied",
-        "prompt_sha256": "b" * 64,
+        "prompt_sha256": "9738fd5ba66bfe341bbb67bcceb15019aae20950b5f6ee44ef804236247ca5d3",
         "system": {
             "macOS Version": "26.6",
             "GPU/Chip": "Apple M5 Max",
@@ -210,13 +230,7 @@ def _write_issue_summary_fixture(
         "total_runtime_seconds": (
             total_runtime_seconds if total_runtime_seconds is not None else 0.0
         ),
-        "counts": {
-            "models_attempted": len(results),
-            "models_evaluated": len(results),
-            "models_completed": len(results),
-            "models_crashed": 0,
-            "models_indeterminate": 0,
-        },
+        "counts": _issue_summary_counts(results),
         "artifacts": {"results_jsonl": "results.jsonl"},
         "producer": {
             "name": "check_models",
@@ -227,8 +241,8 @@ def _write_issue_summary_fixture(
         },
         "image": image,
         "generation_settings": {"max_tokens": 500, "temperature": 0.0},
-        **({"trust_remote_code": trust_remote_code} if trust_remote_code is not None else {}),
-        "comparison": None,
+        "trust_remote_code": trust_remote_code,
+        "comparison": comparison,
         "eval_mode": "assisted",
         "metadata_exposed_to_prompt": True,
         "library_versions": {
@@ -239,6 +253,28 @@ def _write_issue_summary_fixture(
         "component_provenance": {},
         "runtime_fingerprint": {},
     }
+
+
+def _write_issue_summary_fixture(
+    output_paths: check_models.ReportOutputPaths,
+    *,
+    results: Sequence[dict[str, object]],
+    image_source_url: str | None = None,
+    image_sha256: str | None = "a" * 64,
+    trust_remote_code: bool = False,
+    total_runtime_seconds: float | None = None,
+    comparison: dict[str, object] | None = None,
+) -> None:
+    """Write hand-authored retained input for issue-summary tests."""
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    metadata = _issue_summary_metadata(
+        results,
+        image_source_url=image_source_url,
+        image_sha256=image_sha256,
+        trust_remote_code=trust_remote_code,
+        total_runtime_seconds=total_runtime_seconds,
+        comparison=comparison,
+    )
     rows = (metadata, *results)
     check_models._write_text_file(
         output_paths.jsonl,
@@ -1000,11 +1036,11 @@ def test_run_issue_summary_withholds_command_without_valid_digest(
 
 @pytest.mark.parametrize(
     ("trust_remote_code", "expected_flag"),
-    [(True, True), (False, False), (None, False)],
+    [(True, True), (False, False)],
 )
 def test_run_issue_summary_preserves_remote_code_policy(
     tmp_path: Path,
-    trust_remote_code: bool | None,
+    trust_remote_code: bool,
     expected_flag: bool,
 ) -> None:
     """A retained reproduction must not silently broaden remote-code trust."""
@@ -1161,13 +1197,7 @@ def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> Non
         (({"_type": "metadata", "format_version": "2.0"},), "format_version must be 3.0"),
         (
             (
-                {
-                    "_type": "metadata",
-                    "format_version": "3.0",
-                    "prompt": "prompt",
-                    "system": {},
-                    "timestamp": "now",
-                },
+                _issue_summary_metadata(({"_type": "result", "model": "org/model"},)),
                 {"_type": "result", "model": "org/model"},
             ),
             "cached assessment",
@@ -1189,6 +1219,132 @@ def test_run_issue_summary_rejects_invalid_jsonl_contract(
 
     with pytest.raises(ValueError, match=expected):
         check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_retained_loader_rejects_missing_image_key(tmp_path: Path) -> None:
+    """Missing and explicit-null image must stay distinguishable in the header."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result("org/model")
+    metadata = _issue_summary_metadata((result,))
+    del metadata["image"]
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(metadata) + "\n" + json.dumps(result) + "\n",
+    )
+
+    with pytest.raises(ValueError, match="image field is missing"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_retained_loader_rejects_counts_disagreeing_with_rows(tmp_path: Path) -> None:
+    """A header claiming a completion over a crashed row must not load."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    crashed = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    metadata = _issue_summary_metadata((_issue_summary_result("org/crash"),))
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(metadata) + "\n" + json.dumps(crashed) + "\n",
+    )
+
+    with pytest.raises(ValueError, match="disagree with the result rows"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+@pytest.mark.parametrize(
+    "removed_field",
+    ["timestamp", "generated_text", "captured_output_on_fail", "metrics", "timing"],
+)
+def test_retained_loader_rejects_rows_missing_required_fields(
+    tmp_path: Path,
+    removed_field: str,
+) -> None:
+    """Every retained row field the reports and comparison consume must exist."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result("org/model")
+    del result[removed_field]
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(_issue_summary_metadata((result,))) + "\n" + json.dumps(result) + "\n",
+    )
+
+    with pytest.raises(ValueError, match="missing required retained fields"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_retained_loader_rejects_rows_with_misshapen_fields(tmp_path: Path) -> None:
+    """A non-mapping metrics blob must fail at the loader, not in a consumer."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result("org/model")
+    result["metrics"] = "not a mapping"
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(_issue_summary_metadata((result,))) + "\n" + json.dumps(result) + "\n",
+    )
+
+    with pytest.raises(ValueError, match="invalid retained field shapes"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path) -> None:
+    """Regeneration must rehydrate the retained comparison, not silently drop it."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    comparison_payload: dict[str, object] = {
+        "baseline": "results.jsonl @ HEAD",
+        "baseline_timestamp": "2026-07-30 12:00:00 BST",
+        "baseline_components": {"prompt": "identical"},
+        "comparability": "comparable",
+        "unverified_facts": [],
+        "throughput_comparable": True,
+        "revision_changes": [],
+        "compared_models": 1,
+        "models_added": [],
+        "models_removed": [],
+        "changes": [
+            {
+                "model": "org/clean",
+                "execution": ["completed", "completed"],
+                "usability": ["usable", "unusable"],
+                "observations_added": ["repeated_output"],
+                "observations_removed": [],
+            }
+        ],
+        "identical_text_models": 0,
+        "text_compared_models": 1,
+        "generation_tps_ratio": {
+            "median": 0.98,
+            "min": 0.98,
+            "max": 0.98,
+            "compared_models": 1,
+        },
+        "throughput_flags": [],
+        "memory_changes": [],
+        "history_runs_used": 0,
+        "execution_mode": {"baseline": "in_process", "current": "in_process"},
+    }
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(_issue_summary_result("org/clean"),),
+        comparison=comparison_payload,
+    )
+
+    generated = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+
+    if generated is None:
+        pytest.fail("the retained run must regenerate an issue summary")
+    content = generated.read_text(encoding="utf-8")
+    assert "Since the baseline sweep" in content
+    assert "results.jsonl @ HEAD" in content
+    assert "org/clean" in content
+    assert "0.980" in content
 
 
 @pytest.mark.parametrize(
@@ -2221,59 +2377,6 @@ def test_report_context_caches_only_live_cross_artifact_views() -> None:
     assert not hasattr(context, "machine_facts")
     assert not hasattr(context, "diagnostics_snapshot")
     assert not hasattr(context, "issue_clusters")
-
-
-def test_html_ignores_legacy_semantic_winners(
-    tmp_path: Path,
-) -> None:
-    """Legacy summary highlights must not leak into the facts-only HTML mirror."""
-    eligible = replace(
-        _make_success("org/eligible"),
-        generation=_MockGeneration(
-            text=getattr(_make_success().generation, "text", None),
-            generation_tps=10.0,
-            peak_memory=5.0,
-        ),
-        model_load_time=1.0,
-    )
-    warning = replace(
-        _make_harness_success(
-            "org/fast-warning",
-            text=getattr(_make_success().generation, "text", "") or "",
-            prompt_tokens=120,
-            generation_tokens=48,
-            harness_type="stop_token",
-            harness_detail="token_leak:<|endoftext|>",
-        ),
-        generation=_MockGeneration(
-            text=getattr(_make_success().generation, "text", None),
-            generation_tps=999.0,
-            peak_memory=0.5,
-        ),
-        model_load_time=0.01,
-    )
-    results = [warning, eligible]
-    context = _build_report_render_context(
-        results=results,
-        prompt="Create title, description, and keywords.",
-        metadata={"description": "Brick storefront", "keywords": "storefront, seating"},
-        eval_mode="blind",
-    )
-    html_path = tmp_path / "results.html"
-    generate_html_report(
-        results,
-        html_path,
-        versions={},
-        prompt="Create title, description, and keywords.",
-        total_runtime_seconds=2.0,
-        report_context=context,
-    )
-    html_text = html_path.read_text(encoding="utf-8")
-    assert "org/fast-warning" in html_text
-    assert "org/eligible" in html_text
-    assert "Best for cataloging" not in html_text
-    assert "Cataloging Utility" not in html_text
-    assert "reliability-gated" not in html_text
 
 
 def test_all_caveated_html_omits_cataloging_aggregates_and_winner(
@@ -3658,24 +3761,6 @@ def test_diagnostics_writer_never_exports_repro_bundles(
     assert not (tmp_path / "repro_bundles").exists()
 
 
-def test_retained_artifacts_have_no_owner_confidence_path(tmp_path: Path) -> None:
-    """Human and machine artifacts should omit inferred ownership confidence."""
-    failure = _make_failure_with_details("org/failure", error_msg="decode failed")
-    context = _build_report_render_context(results=[failure], prompt="Describe the image.")
-    jsonl_path = tmp_path / "results.jsonl"
-    check_models.save_jsonl_report(
-        [failure],
-        jsonl_path,
-        prompt="Describe the image.",
-        system_info={},
-        report_context=context,
-    )
-
-    jsonl_text = jsonl_path.read_text(encoding="utf-8")
-    assert "owner_confidence" not in jsonl_text
-    assert "suspected_owner" not in jsonl_text
-
-
 class TestHtmlReportEdgeCases:
     """Edge-case coverage for generate_html_report."""
 
@@ -3791,6 +3876,13 @@ class TestHtmlReportEdgeCases:
         assert "status=OK" not in log_text
         assert "Successful Models" not in log_text
         assert "Execution outcomes: completed=3, crashed=1, indeterminate=1" in log_text
+        # The one canonical guard against the retired semantic-scoring
+        # vocabulary, replacing the per-artifact absence tests.
+        jsonl_text = jsonl_path.read_text(encoding="utf-8")
+        retired_terms = ("quality score", "semantic winner", "owner_confidence", "suspected_owner")
+        for artifact_text in (jsonl_text, gallery, html_report, diagnostics, log_text):
+            lowered = artifact_text.casefold()
+            assert all(term not in lowered for term in retired_terms)
         for model, assessment in expected.items():
             serialized = records[model]["assessment"]
             assert serialized["execution"] == assessment.execution
@@ -3970,46 +4062,6 @@ class TestHtmlReportEdgeCases:
         assert "<summary>Exact raw output</summary>" not in model_entry.group(0)
         assert model_entry.group(0).count(escaped) == 1
 
-    def test_html_contains_gallery_and_diagnostics_without_semantic_scores(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """HTML should mirror the two human reports without legacy semantic judgements."""
-        results = [
-            _make_success("org/usable"),
-            _make_failure_with_details(
-                "org/crashed",
-                traceback_str="Traceback:\nRuntimeError: complete crash",
-            ),
-        ]
-        context = _build_report_render_context(results=results, prompt="Describe.")
-        out = tmp_path / "canonical.html"
-
-        generate_html_report(
-            results,
-            out,
-            _stub_versions(),
-            "Describe.",
-            2.0,
-            report_context=context,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Current-run Chooser" in content
-        assert "Complete Per-model Evidence" in content
-        assert "Maintainer Diagnostics" in content
-        assert "Crashes requiring action" in content
-        lowered = content.casefold()
-        for retired_phrase in (
-            "quality score",
-            "cataloging utility summary",
-            "owner confidence",
-            "best for cataloging",
-            "semantic winner",
-            "grade:",
-        ):
-            assert retired_phrase not in lowered
-
     def test_html_report_preview_applies_exif_orientation(self, tmp_path: Path) -> None:
         """The embedded preview should match mlx-vlm's orientation-corrected input."""
         image_path = tmp_path / "rotated.jpg"
@@ -4060,38 +4112,6 @@ class TestHtmlReportEdgeCases:
         assert "Completed Runs with Observations" in content
         assert "org/risky" in content
         assert "transformers" in content
-
-    def test_triage_html_report_suppresses_cataloging_scores(self, tmp_path: Path) -> None:
-        """HTML should never publish legacy lane or semantic score projections."""
-        out = tmp_path / "triage.html"
-        results = [_make_success("org/caption-model")]
-        report_context = _build_report_render_context(
-            results=results,
-            prompt="Describe this image briefly.",
-            metadata={"description": "", "keywords": ""},
-            eval_mode="triage",
-        )
-
-        generate_html_report(
-            results=results,
-            filename=out,
-            versions=_stub_versions(),
-            prompt="Describe this image briefly.",
-            total_runtime_seconds=1.0,
-            report_context=report_context,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Current-run Chooser" in content
-        assert 'data-execution="completed"' in content
-        assert 'data-usability="usable"' in content
-        assert 'data-maintainer-status="none"' in content
-        assert "Run Contract" not in content
-        assert "Semantic rankings" not in content
-        assert "Cataloging Utility Summary" not in content
-        assert "Best keywording" not in content
-        assert "Keywords 0" not in content
-        assert "Keywords 100" not in content
 
     def test_html_report_adds_exact_filterable_assessment_attributes(self, tmp_path: Path) -> None:
         """HTML chooser rows should filter only on the three canonical status strings."""
@@ -5752,18 +5772,11 @@ def test_resolve_comparison_baseline_handles_none_path_and_missing(tmp_path: Pat
     jsonl = tmp_path / "results.jsonl"
     assert check_models._resolve_comparison_baseline("none", jsonl) is None
     baseline_file = tmp_path / "baseline.jsonl"
+    baseline_row = _comparison_record("org/m")
     baseline_file.write_text(
-        json.dumps(
-            {
-                "_type": "metadata",
-                "format_version": "3.0",
-                "prompt": "p",
-                "system": {},
-                "timestamp": "t",
-            }
-        )
+        json.dumps(_issue_summary_metadata((baseline_row,)))
         + "\n"
-        + json.dumps(_comparison_record("org/m"))
+        + json.dumps(baseline_row)
         + "\n",
         encoding="utf-8",
     )

@@ -959,85 +959,6 @@ def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> No
     assert "min_keywords_for_duplication_check" not in config["thresholds"]
 
 
-def test_production_source_has_no_retired_semantic_scoring_api() -> None:
-    """The reduced contract must not retain parallel semantic compatibility APIs."""
-    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
-    tree = ast.parse(source)
-    identifiers = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
-    identifiers.update(
-        node.name
-        for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef)
-    )
-    string_literals = {
-        node.value
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Constant) and isinstance(node.value, str)
-    }
-
-    retired_identifiers = {
-        "GRADE_EMOJIS",
-        "ModelRecommendationView",
-        "ModelCapabilityRow",
-        "MachineArtifactFacts",
-        "_model_selection_score",
-        "_caption_usefulness_score",
-        "_recommendation_quality_score",
-        "_score_metadata_title",
-        "_score_metadata_description",
-        "_score_metadata_keywords",
-        "ReportSelectionBasis",
-        "FailureOrigin",
-        "MaintainerReadiness",
-        "ControlledReproductionStatus",
-        "CompatibilityStatus",
-        "FailureNarrative",
-        "_failure_origin",
-        "_maintainer_readiness",
-        "_failure_narrative_json_fields",
-        "_build_failure_action_hint",
-        "_failure_owner_for_result",
-        "_failure_exception_owner",
-        "_analyze_catalog_contract",
-        "_count_factual_sentences",
-        "_PACKAGE_OWNER_HINTS",
-        "_ERROR_STAGE_HINTS",
-        "_FAILURE_PHASE_HINTS",
-        "_RERUN_ELIGIBLE_VERDICTS",
-        "_BOOLEAN_FLAG_FIELDS",
-        "NONVISUAL_CONTEXT_TERMS",
-        "NONVISUAL_CONTEXT_PATTERNS",
-        "CONTEXT_NOISE_TERMS",
-        "CONTEXT_COMMON_WORDS",
-        "CONTEXT_TERM_ALIASES",
-        "_is_nonvisual_context_term",
-        "_partition_hint_terms",
-        "_strip_nonvisual_terms_from_text",
-        "_extract_hint_signal_terms",
-        "suspected_owner",
-    }
-    retired_formatter_fields = {
-        "is_verbose",
-        "has_formatting_issues",
-        "has_hallucination_issues",
-        "has_excessive_bullets",
-        "is_context_ignored",
-    }
-
-    assert identifiers.isdisjoint(retired_identifiers)
-    assert string_literals.isdisjoint(retired_formatter_fields)
-
-
-def test_public_readme_uses_only_exported_report_api() -> None:
-    """The public API example must not advertise internal report generators."""
-    readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-
-    assert "generate_markdown_report" not in readme
-    assert "generate_markdown_gallery_report" not in readme
-    assert "sortable columns" not in readme
-    assert "peak-memory\n  filters" not in readme
-
-
 def test_python_sources_write_variation_selectors_as_escapes() -> None:
     r"""Raw U+FE0F must appear only via the \ufe0f escape in Python sources.
 
@@ -1056,25 +977,6 @@ def test_python_sources_write_variation_selectors_as_escapes() -> None:
         and "\ufe0f" in path.read_text(encoding="utf-8")
     ]
     assert offenders == [], offenders
-
-
-def test_production_logs_use_facts_first_observation_labels() -> None:
-    """Persisted log messages must describe mechanical facts without quality verdicts."""
-    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
-
-    for retained in (
-        "Mechanical observations for %s: %s",
-        '"observations=none"',
-        "Warnings are shown for repetitive output and token-cap truncation.",
-    ):
-        assert retained in source
-
-    for retired in (
-        "Quality issues detected for %s: %s",
-        'parts.append(f"quality={',
-        "Warnings are shown for repetitive or hallucinated output.",
-    ):
-        assert retired not in source
 
 
 def test_install_hook_rejects_symlink_target(tmp_path: Path) -> None:

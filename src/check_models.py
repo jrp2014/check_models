@@ -15026,10 +15026,9 @@ def _preview_generation(
     log_generated_text(text_val, wrap=True)
 
 
-def _log_verbose_success_details_mode(
+def _log_verbose_success_details(
     res: PerformanceResult,
     *,
-    detailed: bool,
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
     context_marker: str = "Context:",
@@ -15060,17 +15059,14 @@ def _log_verbose_success_details_mode(
         log_metric_label("Generated Text:", emoji="📝")
         logger.info("   <empty>", extra={"style_hint": LogStyles.GENERATED_TEXT})
 
-    if detailed:
-        log_blank()
-        log_metric_label("Performance Metrics:", emoji="📊")
-        _log_token_summary(res)
-        _log_detailed_timings(res)
-        log_blank()
-        _log_perf_block(res)
-        log_blank()
-        _log_additional_diagnostics(res, gen_text)
-    else:
-        _log_compact_metrics(res)
+    log_blank()
+    log_metric_label("Performance Metrics:", emoji="📊")
+    _log_token_summary(res)
+    _log_detailed_timings(res)
+    log_blank()
+    _log_perf_block(res)
+    log_blank()
+    _log_additional_diagnostics(res, gen_text)
 
 
 def _log_token_summary(res: PerformanceResult) -> None:
@@ -15220,122 +15216,12 @@ def _log_additional_diagnostics(
         )
 
 
-def _format_compact_timing(
-    *,
-    total_time: float | None,
-    generation_time: float | None,
-    model_load_time: float | None,
-    prompt_prep_time: float | None,
-    first_token_latency: float | None,
-    stop_reason: str | None,
-) -> str:
-    """Format compact timing detail independently from metric logging."""
-    if total_time is None:
-        return NOT_AVAILABLE
-    timing_metrics = (
-        ("gen", generation_time),
-        ("load", model_load_time),
-        ("prep", _positive_runtime_duration(prompt_prep_time)),
-        ("first", _positive_runtime_duration(first_token_latency)),
-    )
-    sub_parts = [
-        f"{label}={_format_time_seconds(value)}"
-        for label, value in timing_metrics
-        if value is not None
-    ]
-    if stop_reason and stop_reason != "completed":
-        sub_parts.append(f"stop={stop_reason}")
-    breakdown = f" ({', '.join(sub_parts)})" if sub_parts else ""
-    return f"{_format_time_seconds(total_time)} total{breakdown}"
-
-
-def _log_compact_metrics(res: PerformanceResult) -> None:
-    """Emit two-line metrics for improved scannability.
-
-    Example output:
-        📊 Timing: 5.41s total (gen=4.53s, load=0.88s) | Memory: 5.5GB peak
-           Tokens: 1,759 (1,442 prompt + 317 gen) | Speed: 114 gen/s, 1,231 prompt/s
-    """
-    if not res.generation:
-        return
-
-    log_blank()  # Breathing room
-    gen = res.generation
-
-    # Extract values
-    total_time = res.total_time
-    gen_time = res.generation_time
-    load_time = res.model_load_time
-    runtime = res.runtime_diagnostics
-    peak_mem = _generation_float_metric(gen, "peak_memory") or 0.0
-    prompt_tokens = _generation_int_metric(gen, "prompt_tokens") or 0
-    gen_tokens = _generation_int_metric(gen, "generation_tokens") or 0
-    gen_tps = _generation_float_metric(gen, "generation_tps") or 0.0
-    prompt_tps = _generation_float_metric(gen, "prompt_tps") or 0.0
-    prompt_prep_time: float | None = None
-    first_token_latency: float | None = None
-    stop_reason: str | None = None
-    if runtime is not None:
-        prompt_prep_time = runtime.prompt_prep_time_s
-        first_token_latency = runtime.first_token_latency_s
-        stop_reason = runtime.stop_reason
-
-    # Line 1: Timing and Memory
-    timing_display = _format_compact_timing(
-        total_time=total_time,
-        generation_time=gen_time,
-        model_load_time=load_time,
-        prompt_prep_time=prompt_prep_time,
-        first_token_latency=first_token_latency,
-        stop_reason=stop_reason,
-    )
-
-    mem_part = ""
-    if peak_mem > 0:
-        mem_fmt = _format_peak_memory_context(
-            peak_mem,
-            _get_recommended_working_set_bytes(),
-        )
-        mem_str = (
-            mem_fmt
-            if "recommended working set" in mem_fmt or mem_fmt.endswith("GB")
-            else f"{mem_fmt}GB"
-        )
-        mem_part = f" | Memory: {mem_str} peak"
-
-    line1 = f"📊 Timing: {timing_display}{mem_part}"
-    logger.info(line1, extra={"style_hint": LogStyles.METRIC_LABEL})
-
-    # Line 2: Tokens and Speed
-    all_tokens = prompt_tokens + gen_tokens
-    tokens_part = ""
-    if all_tokens:
-        tokens_part = (
-            f"{fmt_num(all_tokens)} ({fmt_num(prompt_tokens)} prompt + {fmt_num(gen_tokens)} gen)"
-        )
-
-    speed_parts: list[str] = []
-    if gen_tps:
-        speed_parts.append(f"{fmt_num(gen_tps)} gen/s")
-    if prompt_tps:
-        speed_parts.append(f"{fmt_num(prompt_tps)} prompt/s")
-    speed_part = f" | Speed: {', '.join(speed_parts)}" if speed_parts else ""
-
-    if tokens_part or speed_part:
-        line2 = f"   Tokens: {tokens_part}{speed_part}"
-        logger.info(line2, extra={"style_hint": LogStyles.METRIC_LABEL})
-
-
-def log_metrics_legend(*, detailed: bool) -> None:
+def log_metrics_legend() -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
     log_blank()
-    mode_line = (
-        "Detailed mode: separate lines for timing, memory, tokens, TPS"
-        if detailed
-        else "Compact mode: tokens(total/prompt/gen) format with aligned keys"
-    )
     panel = Panel(
-        f"{mode_line}\nWarnings are shown for repetitive output and token-cap truncation.",
+        "Detailed mode: separate lines for timing, memory, tokens, TPS\n"
+        "Warnings are shown for repetitive output and token-cap truncation.",
         title="📖 Metrics Legend",
         border_style="blue",
         box=box.ROUNDED,
@@ -15419,9 +15305,8 @@ def print_model_result(
         _log_failure_details(result)
         return
     if result.generation and verbose:
-        _log_verbose_success_details_mode(
+        _log_verbose_success_details(
             result,
-            detailed=True,
             analysis=result.quality_analysis,
             prompt=prompt,
             context_marker=context_marker,
@@ -16783,7 +16668,7 @@ def process_models(
 
     # Emit legend once if verbose
     if args.verbose:
-        log_metrics_legend(detailed=True)
+        log_metrics_legend()
 
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
@@ -18835,6 +18720,183 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
     }
 
 
+def _comparison_opt_float(raw: JsonLike) -> float | None:
+    """Narrow one optional retained comparison number, rejecting non-numbers."""
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        message = f"comparison field is not a number: {raw!r}"
+        raise TypeError(message)
+    return float(raw)
+
+
+def _comparison_req_float(raw: JsonLike) -> float:
+    """Narrow one required retained comparison number."""
+    number = _comparison_opt_float(raw)
+    if number is None:
+        message = "comparison field is missing a required number"
+        raise TypeError(message)
+    return number
+
+
+def _comparison_req_int(raw: JsonLike) -> int:
+    """Narrow one required retained comparison integer."""
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        message = f"comparison field is not an integer: {raw!r}"
+        raise TypeError(message)
+    return raw
+
+
+def _comparison_req_str(raw: JsonLike) -> str:
+    """Narrow one required retained comparison string."""
+    if not isinstance(raw, str):
+        message = f"comparison field is not a string: {raw!r}"
+        raise TypeError(message)
+    return raw
+
+
+def _comparison_str_items(raw: JsonLike) -> tuple[str, ...]:
+    """Narrow one retained comparison list of strings."""
+    if not isinstance(raw, list):
+        message = f"comparison field is not a list: {raw!r}"
+        raise TypeError(message)
+    return tuple(_comparison_req_str(item) for item in raw)
+
+
+def _comparison_pair(raw: JsonLike) -> tuple[JsonLike, JsonLike]:
+    """Narrow one retained comparison before/after pair."""
+    if not isinstance(raw, list) or len(raw) != _COMPARISON_JSON_PAIR_LENGTH:
+        message = f"comparison field is not a two-item list: {raw!r}"
+        raise TypeError(message)
+    return raw[0], raw[1]
+
+
+def _comparison_rows(raw: JsonLike) -> tuple[dict[str, JsonLike], ...]:
+    """Narrow one retained comparison list of objects."""
+    if raw is None:
+        return ()
+    if not isinstance(raw, list) or any(not isinstance(item, dict) for item in raw):
+        message = f"comparison field is not a list of objects: {raw!r}"
+        raise TypeError(message)
+    return tuple(cast("dict[str, JsonLike]", item) for item in raw)
+
+
+def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
+    """Rehydrate the retained metadata comparison for summary regeneration.
+
+    Strict inverse of :func:`_run_comparison_to_json` for the fields every
+    renderer consumes; a malformed payload raises and the caller degrades to
+    regenerating without the baseline section.
+    """
+    components = value.get("baseline_components")
+    if not isinstance(components, dict):
+        components = {}
+    execution_mode = value.get("execution_mode")
+    if not isinstance(execution_mode, dict):
+        execution_mode = {}
+    comparability = cast(
+        "Literal['comparable', 'unknown', 'incomparable']",
+        value.get("comparability", "comparable"),
+    )
+    identity: dict[str, object] = {
+        "baseline_label": _comparison_req_str(value.get("baseline", "unknown baseline")),
+        "baseline_timestamp": cast("str | None", value.get("baseline_timestamp")),
+        "baseline_components": tuple(
+            (_comparison_req_str(name), _comparison_req_str(part))
+            for name, part in components.items()
+        ),
+        "baseline_execution_mode": _comparison_req_str(
+            execution_mode.get("baseline", "in_process")
+        ),
+        "current_execution_mode": _comparison_req_str(execution_mode.get("current", "in_process")),
+        "comparability": comparability,
+    }
+    if comparability == "incomparable":
+        return RunComparison(
+            compared_models=0,
+            models_added=(),
+            models_removed=(),
+            changes=(),
+            identical_text_models=0,
+            text_compared_models=0,
+            tps_ratio_median=None,
+            tps_ratio_min=None,
+            tps_ratio_max=None,
+            tps_compared_models=0,
+            throughput_flags=(),
+            memory_changes=(),
+            history_runs_used=0,
+            incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
+            **cast("dict[str, Any]", identity),
+        )
+    ratio = value.get("generation_tps_ratio")
+    if not isinstance(ratio, dict):
+        ratio = {}
+    changes = tuple(
+        RunComparisonModelChange(
+            model=_comparison_req_str(change["model"]),
+            baseline_execution=_comparison_req_str(_comparison_pair(change["execution"])[0]),
+            current_execution=_comparison_req_str(_comparison_pair(change["execution"])[1]),
+            baseline_usability=_comparison_req_str(_comparison_pair(change["usability"])[0]),
+            current_usability=_comparison_req_str(_comparison_pair(change["usability"])[1]),
+            observations_added=_comparison_str_items(change["observations_added"]),
+            observations_removed=_comparison_str_items(change["observations_removed"]),
+        )
+        for change in _comparison_rows(value.get("changes"))
+    )
+    throughput_flags = tuple(
+        RunComparisonThroughputFlag(
+            model=_comparison_req_str(flag["model"]),
+            baseline_tps=_comparison_req_float(flag["baseline_tps"]),
+            current_tps=_comparison_req_float(flag["current_tps"]),
+            ratio=_comparison_req_float(flag["ratio"]),
+            band_low=_comparison_req_float(_comparison_pair(flag["band"])[0]),
+            band_high=_comparison_req_float(_comparison_pair(flag["band"])[1]),
+            band_source=cast(
+                "Literal['history', 'fallback']", _comparison_req_str(flag["band_source"])
+            ),
+            band_samples=_comparison_req_int(flag["band_samples"]),
+        )
+        for flag in _comparison_rows(value.get("throughput_flags"))
+    )
+    memory_changes = tuple(
+        RunComparisonMemoryChange(
+            model=_comparison_req_str(change["model"]),
+            baseline_peak_gb=_comparison_req_float(change["baseline_peak_gb"]),
+            current_peak_gb=_comparison_req_float(change["current_peak_gb"]),
+            delta_gb=_comparison_req_float(change["delta_gb"]),
+        )
+        for change in _comparison_rows(value.get("memory_changes"))
+    )
+    return RunComparison(
+        compared_models=_comparison_req_int(value.get("compared_models", 0)),
+        models_added=_comparison_str_items(value.get("models_added") or []),
+        models_removed=_comparison_str_items(value.get("models_removed") or []),
+        changes=changes,
+        identical_text_models=_comparison_req_int(value.get("identical_text_models", 0)),
+        text_compared_models=_comparison_req_int(value.get("text_compared_models", 0)),
+        tps_ratio_median=_comparison_opt_float(ratio.get("median")),
+        tps_ratio_min=_comparison_opt_float(ratio.get("min")),
+        tps_ratio_max=_comparison_opt_float(ratio.get("max")),
+        tps_compared_models=_comparison_req_int(ratio.get("compared_models", 0)),
+        throughput_flags=throughput_flags,
+        memory_changes=memory_changes,
+        history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
+        unverified_facts=_comparison_str_items(value.get("unverified_facts") or []),
+        revision_changes=tuple(
+            (
+                _comparison_req_str(entry["model"]),
+                _comparison_req_str(entry["baseline"]),
+                _comparison_req_str(entry["current"]),
+            )
+            for entry in _comparison_rows(value.get("revision_changes"))
+        ),
+        throughput_comparable=bool(value.get("throughput_comparable", True)),
+        **cast("dict[str, Any]", identity),
+    )
+
+
+_COMPARISON_JSON_PAIR_LENGTH: Final[int] = 2
 _COMPARISON_MODEL_LIST_LIMIT: Final[int] = 8
 
 
@@ -18945,7 +19007,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         banner = (
             "**Comparability unknown** — could not verify: "
             + ", ".join(comparison.unverified_facts)
-            + " (the baseline's run.json was unavailable or incomplete). Quality "
+            + " (the baseline's retained metadata was unavailable or incomplete). Quality "
             "transitions are shown; throughput and memory comparisons are withheld."
         )
 
@@ -19134,7 +19196,82 @@ def _validate_run_issue_metadata(
     ):
         message = "JSONL metadata is missing required run context"
         raise ValueError(message)
+    _validate_schema3_metadata_fields(metadata_value)
     return cast("JsonlMetadataRecord", metadata_value)
+
+
+def _validate_schema3_counts(counts: JsonLike) -> None:
+    """Enforce shape, non-negativity, and internal arithmetic of the run counts."""
+    count_keys = (
+        "models_attempted",
+        "models_evaluated",
+        "models_completed",
+        "models_crashed",
+        "models_indeterminate",
+    )
+    if not isinstance(counts, dict) or any(
+        not isinstance(counts.get(key), int)
+        or isinstance(counts.get(key), bool)
+        or cast("int", counts.get(key)) < 0
+        for key in count_keys
+    ):
+        message = "JSONL metadata counts are missing or invalid"
+        raise ValueError(message)
+    attempted = cast("int", counts["models_attempted"])
+    completed = cast("int", counts["models_completed"])
+    crashed = cast("int", counts["models_crashed"])
+    indeterminate = cast("int", counts["models_indeterminate"])
+    if (
+        attempted != completed + crashed + indeterminate
+        or cast("int", counts["models_evaluated"]) != completed + crashed
+    ):
+        message = "JSONL metadata counts are internally inconsistent"
+        raise ValueError(message)
+
+
+def _validate_schema3_metadata_fields(metadata_value: dict[str, JsonLike]) -> None:
+    """Enforce the schema-3 required run-context fields the loader vouches for."""
+    prompt = metadata_value.get("prompt")
+    digest = metadata_value.get("prompt_sha256")
+    if (
+        not isinstance(digest, str)
+        or not isinstance(prompt, str)
+        or digest != hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    ):
+        message = "JSONL metadata prompt_sha256 is missing or does not match the prompt"
+        raise ValueError(message)
+    runtime = metadata_value.get("total_runtime_seconds")
+    if not isinstance(runtime, int | float) or isinstance(runtime, bool) or runtime < 0:
+        message = "JSONL metadata total_runtime_seconds is missing or invalid"
+        raise ValueError(message)
+    _validate_schema3_counts(metadata_value.get("counts"))
+    artifacts = metadata_value.get("artifacts")
+    if not isinstance(artifacts, dict) or any(
+        not isinstance(key, str) or not isinstance(value, str) for key, value in artifacts.items()
+    ):
+        message = "JSONL metadata artifacts manifest is missing or invalid"
+        raise ValueError(message)
+    if _narrow_run_issue_producer(metadata_value.get("producer")) is None:
+        message = "JSONL metadata producer identity is missing or invalid"
+        raise ValueError(message)
+    if "image" not in metadata_value:
+        message = "JSONL metadata image field is missing (use an explicit null)"
+        raise ValueError(message)
+    image = metadata_value.get("image")
+    if image is not None and _narrow_run_issue_image(image) is None:
+        message = "JSONL metadata image record is invalid"
+        raise ValueError(message)
+    if not isinstance(metadata_value.get("generation_settings"), dict):
+        message = "JSONL metadata generation_settings are missing"
+        raise RunIssueSummaryValidationError(message)
+    if not isinstance(metadata_value.get("trust_remote_code"), bool):
+        message = "JSONL metadata trust_remote_code is missing"
+        raise RunIssueSummaryValidationError(message)
+    if "comparison" not in metadata_value or not isinstance(
+        metadata_value.get("comparison"), dict | type(None)
+    ):
+        message = "JSONL metadata comparison field is missing or invalid"
+        raise RunIssueSummaryValidationError(message)
 
 
 class RunIssueSummaryValidationError(ValueError):
@@ -19222,10 +19359,36 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
     if any(key not in value for key in ("model", "assessment", "failure", "model_provenance")):
         message = f"JSONL result row {line_number} is missing its cached assessment"
         raise ValueError(message)
+    if any(
+        key not in value
+        for key in (
+            "timestamp",
+            "generated_text",
+            "captured_output_on_fail",
+            "metrics",
+            "timing",
+            "prompt_diagnostics",
+        )
+    ):
+        message = f"JSONL result row {line_number} is missing required retained fields"
+        raise ValueError(message)
     model = value["model"]
     assessment = value["assessment"]
     if not isinstance(model, str) or not isinstance(assessment, dict):
         message = f"JSONL result row {line_number} has invalid field types"
+        raise RunIssueSummaryValidationError(message)
+    shaped_fields = (
+        ("timestamp", str),
+        ("generated_text", str),
+        ("captured_output_on_fail", str),
+        ("metrics", dict),
+        ("timing", dict),
+    )
+    diagnostics = value["prompt_diagnostics"]
+    if any(not isinstance(value[name], shape) for name, shape in shaped_fields) or not (
+        diagnostics is None or isinstance(diagnostics, dict)
+    ):
+        message = f"JSONL result row {line_number} has invalid retained field shapes"
         raise RunIssueSummaryValidationError(message)
     vocabulary_violation = any(
         not isinstance(assessment.get(field), str) or assessment.get(field) not in vocabulary
@@ -19324,6 +19487,28 @@ def _load_retained_run_text(text: str, label: str) -> RetainedRun:
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
+    execution_counts = Counter(result["assessment"]["execution"] for result in results)
+    counts = metadata["counts"]
+    comparisons = (
+        ("models_attempted", counts["models_attempted"], len(results)),
+        ("models_completed", counts["models_completed"], execution_counts["completed"]),
+        ("models_crashed", counts["models_crashed"], execution_counts["crashed"]),
+        (
+            "models_indeterminate",
+            counts["models_indeterminate"],
+            execution_counts["indeterminate"],
+        ),
+    )
+    mismatched = [
+        f"{name}={actual} (rows say {expected})"
+        for name, actual, expected in comparisons
+        if actual != expected
+    ]
+    if mismatched:
+        message = f"{label}: metadata counts disagree with the result rows: " + "; ".join(
+            mismatched
+        )
+        raise ValueError(message)
     return RetainedRun(metadata=metadata, results=results)
 
 
@@ -20429,13 +20614,24 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
         model_name: path
         for model_name, path in _github_issue_report_paths(
             crash_models,
-            output_dir / "issues",
+            output_paths.index.parent / "issues",
         ).items()
         if path.is_file()
     }
+    comparison_value = source.metadata.get("comparison")
+    comparison: RunComparison | None = None
+    if isinstance(comparison_value, dict):
+        try:
+            comparison = _run_comparison_from_json(comparison_value)
+        except (KeyError, IndexError, TypeError, ValueError):
+            logger.warning(
+                "Retained comparison metadata could not be rehydrated; "
+                "regenerating the summary without the baseline section."
+            )
     return generate_run_issue_summary_report(
         output_paths,
         issue_reports=issue_reports,
+        comparison=comparison,
     )
 
 
@@ -21999,7 +22195,8 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
         default=DEFAULT_COMPARE_WITH,
         metavar="auto|none|PATH|GITREF",
         help=(
-            "Baseline sweep to diff this run against in run_summary.md and run.json. "
+            "Baseline sweep to diff this run against in run_summary.md and the retained "
+            "results.jsonl metadata. "
             "'auto' uses the retained results.jsonl at git HEAD when the output path is "
             "tracked (the last committed sweep); 'none' disables; a path reads that "
             "results.jsonl; any other value is a git ref for the same repo-relative path."

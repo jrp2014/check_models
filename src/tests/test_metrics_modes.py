@@ -961,7 +961,7 @@ def test_metrics_legend_names_only_retained_mechanical_warnings(
     )
     monkeypatch.setattr(check_models, "log_blank", lambda: None)
 
-    check_models.log_metrics_legend(detailed=False)
+    check_models.log_metrics_legend()
 
     assert len(panels) == 1
     legend = str(panels[0].renderable)
@@ -1510,9 +1510,8 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
     caplog.clear()
 
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
-        check_models._log_verbose_success_details_mode(
+        check_models._log_verbose_success_details(
             result,
-            detailed=False,
             analysis=analysis,
         )
     verbose_messages = "\n".join(record.message for record in caplog.records)

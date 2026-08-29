@@ -1362,11 +1362,12 @@ class TestModelBurdenFacts:
         """No cached snapshot means no burden facts, not a partial record."""
         self._install_snapshot(monkeypatch, None)
         refreshes: list[bool] = []
-        monkeypatch.setattr(
-            check_models,
-            "_get_hf_cache_info_cached",
-            lambda *, refresh=False: refreshes.append(refresh) or SimpleNamespace(repos=()),
-        )
+
+        def record_and_miss(*, refresh: bool = False) -> SimpleNamespace:
+            refreshes.append(refresh)
+            return SimpleNamespace(repos=())
+
+        monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", record_and_miss)
         assert check_models._collect_model_burden("org/uncached") is None
         # The miss triggered exactly one refreshed rescan before giving up.
         assert refreshes == [True]
