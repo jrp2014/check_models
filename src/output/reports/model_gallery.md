@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-29 02:11:29 BST
+Generated on: 2026-08-30 00:31:37 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,76 +16,77 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.74s   | 484 tok/s  | 0.12            | 1.9     | 2,117      | 118     | none                                                                                                                        |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.55s  | 29.0 tok/s | 3.33            | 23      | 2,401      | 121     | none                                                                                                                        |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 9.13s   | 32.5 tok/s | 1.09            | 18      | 2,618      | 164     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.99s   | 65.6 tok/s | 2.88            | 13      | 2,934      | 123     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.61s   | 189 tok/s  | 1.05            | 7.8     | 2,933      | 134     | none                                                                                                                        |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable`              | 4.47s   | 72.0 tok/s | 0.74            | 8.8     | 1,529      | 133     | none                                                                                                                        |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | 63.05s  | 79.0 tok/s | 58.51           | 23      | 16,552     | 129     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 68.39s  | 65.7 tok/s | 62.97           | 24      | 16,568     | 111     | none                                                                                                                        |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 15.17s  | 21.7 tok/s | 1.71            | 17      | 593        | 153     | none                                                                                                                        |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.45s   | 116 tok/s  | 0.41            | 16      | 598        | 100     | none                                                                                                                        |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.77s   | 27.6 tok/s | 1.05            | 20      | 598        | 95      | none                                                                                                                        |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.48s   | 169 tok/s  | 0.45            | 4.6     | 1,383      | 85      | none                                                                                                                        |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.00s  | 90.1 tok/s | 13.11           | 8.4     | 16,552     | 112     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable with caveats` | 10.28s  | 76.1 tok/s | 6.45            | 8.4     | 6,392      | 126     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 28.19s  | 38.8 tok/s | 17.45           | 78      | 6,392      | 95      | control tokens visible                                                                                                      |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 6.08s   | 34.6 tok/s | 0.82            | 17      | 2,118      | 99      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 158.48s | 4.46 tok/s | 1.28            | 40      | 1,329      | 682     | role tokens visible                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 7.18s   | 61.1 tok/s | 2.32            | 13      | 2,934      | 161     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 6.01s   | 166 tok/s  | 3.09            | 3.9     | 4,085      | 161     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable with caveats` | 75.73s  | 61.2 tok/s | 61.97           | 74      | 16,568     | 110     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.30s   | 54.8 tok/s | 0.29            | 9.4     | 1,138      | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable with caveats` | 43.07s  | 46.7 tok/s | 21.32           | 8.4     | 16,554     | 913     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 85.51s  | 37.5 tok/s | 78.20           | 10.0    | 16,568     | 139     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable with caveats` | 111.70s | 15.8 tok/s | 98.72           | 33      | 16,568     | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 96.92s  | 17.6 tok/s | 86.15           | 21      | 16,568     | 133     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.75s   | 127 tok/s  | 0.38            | 5.5     | 1,430      | 104     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 40.16s  | 40.5 tok/s | 28.57           | 70      | 3,496      | 108     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 5.75s   | 70.9 tok/s | 0.33            | 29      | 594        | 85      | control tokens visible                                                                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 6.02s   | 57.8 tok/s | 0.32            | 28      | 594        | 91      | control tokens visible                                                                                                      |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 7.01s   | 39.3 tok/s | 1.68            | 16      | 3,124      | 112     | title/keyword constraints failed                                                                                            |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 5.22s   | 85.1 tok/s | 1.00            | 3.7     | 2,072      | 225     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.95s  | 40.9 tok/s | 2.06            | 15      | 3,215      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 19.02s  | 60.9 tok/s | 2.42            | 60      | 1,641      | 575     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.46s   | 300 tok/s  | 0.09            | 2.1     | 339        | 54      | missing required fields                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.68s  | 46.0 tok/s | 5.43            | 13      | 6,388      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 5.47s   | 192 tok/s  | 0.34            | 4.0     | 2,117      | 275     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.21s   | 254 tok/s  | 0.26            | 3.8     | 937        | 76      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 28.15s  | 55.3 tok/s | 18.72           | 13      | 16,563     | 400     | stopped early: repeating; title/keyword constraints failed                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 6.79s   | 47.7 tok/s | 0.39            | 17      | 592        | 164     | missing required fields                                                                                                     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `not evaluated`       | 0.27s   | -          | -               | -       | -          | -       | none                                                                                                                        |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.57s   | -          | -               | -       | -          | -       | none                                                                                                                        |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.41s   | 203 tok/s           | 0.57            | 4.0     | 2,619      | 106     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 5.78s   | 66.2 tok/s          | 1.75            | 12      | 2,577      | 157     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.82s   | 189 tok/s           | 0.81            | 6.4     | 2,576      | 138     | none                                                                                                                        |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 74.88s  | 62.9 tok/s          | 60.91           | 74      | 16,639     | 112     | none                                                                                                                        |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 29.24s  | 85.5 tok/s          | 17.06           | 8.4     | 16,625     | 903     | none                                                                                                                        |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 62.50s  | 112 tok/s           | 57.79           | 24      | 16,639     | 150     | none                                                                                                                        |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 63.34s  | 90.5 tok/s          | 59.80           | 10      | 16,639     | 115     | none                                                                                                                        |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 88.48s  | 16.6 tok/s          | 78.04           | 33      | 16,639     | 106     | none                                                                                                                        |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.06s   | 130 tok/s           | 0.41            | 16      | 579        | 101     | none                                                                                                                        |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.45s   | 25.3 tok/s          | 1.18            | 20      | 579        | 107     | none                                                                                                                        |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.55s  | 92.9 tok/s          | 13.58           | 8.4     | 16,623     | 135     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 10.66s  | 29.6 tok/s          | 2.84            | 22      | 2,044      | 152     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 28.19s  | 64.0 tok/s          | 4.88            | 60      | 1,596      | 711     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 31.26s  | 41.0 tok/s          | 18.46           | 78      | 6,325      | 126     | control tokens visible; title/keyword constraints failed                                                                    |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 5.89s   | 34.4 tok/s          | 0.96            | 17      | 2,605      | 95      | title/keyword constraints failed                                                                                            |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.21s   | 185 tok/s           | 0.42            | 4.0     | 2,627      | 149     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.96s   | 62.3 tok/s          | 1.80            | 12      | 2,577      | 215     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.61s   | 219 tok/s           | 3.33            | 3.9     | 4,039      | 150     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.31s   | 54.5 tok/s          | 0.30            | 9.4     | 1,113      | 143     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 66.13s  | 83.3 tok/s          | 61.88           | 23      | 16,623     | 122     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 82.96s  | 28.8 tok/s          | 75.51           | 21      | 16,639     | 131     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.67s   | 124 tok/s           | 0.39            | 5.5     | 1,411      | 112     | title/keyword constraints failed; draft hints copied unchanged                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 27.32s  | 44.7 tok/s          | 16.56           | 70      | 3,472      | 118     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 22.78s  | 57.4 tok/s          | 18.21           | 14      | 16,634     | 149     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 6.08s   | 51.8 tok/s          | 0.33            | 29      | 575        | 85      | control tokens visible                                                                                                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 6.12s   | 46.5 tok/s          | 0.33            | 28      | 575        | 85      | control tokens visible; title/keyword constraints failed                                                                    |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 8.30s   | 28.4 tok/s          | 1.10            | 17      | 570        | 127     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable with caveats` | 2.45s   | 170 tok/s           | 0.45            | 4.8     | 1,510      | 118     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.75s   | 39.1 tok/s          | 1.46            | 15      | 2,648      | 125     | title/keyword constraints failed                                                                                            |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `unusable`            | 1.64s   | 472 tok/s           | 0.12            | 1.7     | 2,627      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.32s   | 138 tok/s           | 0.94            | 3.8     | 2,047      | 275     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 27.61s  | 42.0 tok/s          | 1.75            | 14      | 2,739      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.96s   | 344 tok/s           | 0.10            | 2.2     | 314        | 41      | missing required fields                                                                                                     |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 28.33s  | 47.7 tok/s          | 5.25            | 13      | 6,321      | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 10.66s  | 80.5 tok/s          | 6.41            | 8.4     | 6,325      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 11.34s  | 32.2 tok/s          | 1.09            | 18      | 2,603      | 250     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 225.09s | 4.55 tok/s          | 1.28            | 40      | 1,307      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.87s   | 267 tok/s           | 0.35            | 3.8     | 916        | 50      | missing required fields; extra text before Title                                                                            |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `unusable`            | 16.71s  | 70.0 tok/s          | 0.88            | 9.0     | 1,504      | 1,000   | repeated text; missing required fields; cut off at token limit                                                              |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 3.15s   | insufficient sample | 0.38            | 17      | 569        | 1       | empty response; missing required fields                                                                                     |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 0.99s   | -                   | -               | -       | -          | -       | none                                                                                                                        |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 484 tok/s
+Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 203 tok/s
 
-Average clean-completion throughput: 113 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 98.0 tok/s (indicative only: tokenizers and architectures differ across models)
 
-Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
+Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 4.0 GB
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                                                                |
-|--------------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                          | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | stopped early: repeating; title/keyword constraints failed                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                                     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                       | `not evaluated` | none                                                                                                                        |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                        | `not evaluated` | none                                                                                                                        |
+| Model                                                                                                  | Usability       | Observations                                                                                                                |
+|--------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                           | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                    | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx) | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                             | `unusable`      | missing required fields                                                                                                     |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)             | `unusable`      | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                       | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)  | `unusable`      | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                           | `unusable`      | missing required fields; extra text before Title                                                                            |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                  | `unusable`      | repeated text; missing required fields; cut off at token limit                                                              |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                      | `unusable`      | empty response; missing required fields                                                                                     |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                  | `not evaluated` | none                                                                                                                        |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -94,55 +95,55 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                   |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | Title:<br>Boathouse on stilts in a wetland<br><br>Description:<br>A weathered wooden boathouse stands on stilts over a serene pond, framed by lush overhanging tree branches and surrounding wetland foliage. The scene is bathed in soft, diffused light under a cloudy sky, with reflections of...             |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | Title:<br>Weathered Boathouse Over Serene Pond<br><br>Description:<br>A weathered wooden boathouse on stilts overlooks a tranquil pond, framed by lush overhanging tree branches and surrounded by wetland foliage, captured on a cloudy afternoon in August 2026.<br><br>Keywords:<br>Boathouse, Pond, We...    |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | Title: Weathered Wooden Boathouse on Stilts Over a Serene Pond.<br><br>Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage. The boathouse's roof is...                    |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**"Stilted Boathouse Over a Wetland Pond"**<br><br>Description:<br>A weathered wooden boathouse on stilts extends over a calm pond, surrounded by lush foliage and overhanging tree branches, captured on a cloudy August afternoon in a wetland landscape.<br><br>Keywords:<br>Boathouse, wetla...    |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Weathered Pondside Wooden Shed in Overgrown Wetland<br><br>Description:<br>A rustic, elevated wooden boathouse or bird hide, constructed on a wooden deck over a shallow pond, is bathed in soft cloudy light amid dense foliage, moss, and reeds. The structure’s weathered planks and...             |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable`              | Title: Stilted Wooden Hide in Marshy Wetland<br><br>Description: A weathered wooden structure on stilts overlooks a serene pond, surrounded by lush foliage and reeds. Built for birdwatching, it features a wooden deck and is partially obscured by overhanging branches, with a cloudy s...                   |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | Title: Weathered wooden boathouse on a calm pond<br>Description: A weathered wooden boathouse stands on stilts over a calm pond, its dark timber walls and moss-covered roof contrasting with the lush green foliage and overhanging tree branches. The scene, captured on a cloudy day,...                      |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Weathered Wooden Boathouse Over Pond<br><br>Description: Captured on 21 August 2026, this weathered wooden boathouse stands on stilts over a calm pond, framed by lush overhanging tree branches and surrounded by wetland foliage under a cloudy sky.<br><br>Keywords: boathouse, pond, w...             |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | Title: Boathouse on Stilts, Wetland Landscape<br><br>Description: Captured on 21st August 2026 at 14:34 UTC+01, this weathered wooden boathouse stands on stilts above a pond at 51.441113°N, 0.565406°W, with a cloudy sky and reflected light on the water. The structure is framed by lu...                   |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Weathered wooden boathouse over a serene pond<br>Description: A rustic wooden boathouse built on stilts stands over a calm pond, framed by lush overhanging tree branches and wetland foliage under a cloudy sky. The structure features a wooden deck and reflects the surroundi...                      |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Weathered Wooden Bird Hide Over a Serene Pond<br>Description: A weathered wooden bird hide on stilts extends over a pond, framed by lush overhanging tree branches under a cloudy sky. The structure is accessed via a wooden boardwalk and surrounded by wetland foliage.<br>Keywor...                   |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | Title: "Weathered Wooden Boathouse by a Serene Pond"<br>Description: A weathered wooden boathouse stands on stilts over a calm pond, surrounded by lush foliage and a serene wetland landscape.<br>Keywords: Weathered Boathouse, Pond, Wetland, Lush Foliage, Marshland, Bird Hide, Birdwa...                   |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title: Wooden boathouse by pond<br><br>Description: A weathered wooden boathouse on stilts stands over a calm pond, surrounded by lush green foliage and reeds under a cloudy sky, with a wooden deck and moss-covered roof.<br><br>Keywords: boathouse, pond, wooden shed, stilts, foliage, reed...             |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Weathered Boathouse by Serene Pond<br>Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br>Keywords: weathered boathouse, serene pond, ove...                   |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Weathered Wooden Boathouse Over Pond<br>Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush tree branches, wooden decking, and surrounding wetland foliage, under a cloudy sky.<br>Keywords: boathouse, wooden, stilts, po...                 |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Stilted Boathouse Over Pond<br>Description: A weathered wooden boathouse on stilts overlooks a tranquil pond, surrounded by lush foliage and under a cloudy sky. The scene captures serene outdoor architecture amidst a wetland setting.<br>Keywords: Wooden boathouse, Stilts, Pon...                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.<br><br>Starting with the title: The image shows a weathered woo...                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*"Weathered Boathouse Over Serene Wetland Pond"*<br><br>**Description:**<br>A weathered wooden boathouse, built on stilts, stands over a calm pond surrounded by lush foliage, reeds, and overhanging branches. Captured on **21 August 2026** under a cloudy sky, its wooden decki...             |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable_with_caveats` | Title: Boathouse in the Wetland Landscape<br><br>Description: A weathered wooden boathouse stands over the edge of a serene pond, framed by lush overhanging tree branches. The structure features wooden decking and a rustic wooden shed, with a wooden railing leading up to it. The sur...                   |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | Title: Wooden boathouse on stilts over a pond<br>Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br>Keywords: Cloudy Sky, Foliage, Forest, Gras...                   |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: Serene Wooden Boathouse Over Pond<br><br>Description: A weathered wooden boathouse stands majestically over a tranquil pond, surrounded by lush greenery and a cloudy sky, offering a peaceful retreat for nature enthusiasts.<br><br>Keywords: wooden boathouse, pond, serene, lush, gree...             |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a weathered wooden boathouse on stilts over a pond, with trees and wetland. So maybe "Weathered Stilt Boathouse by Pond with Mossy Roof" – that's 9 words, fits.<br><br>Next, the descript...                   |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable_with_caveats` | Title:<br>Weathered Wooden Bird Hide Over Serene Pond in Wetland<br><br>Description:<br>A weathered wooden bird hide stands on stilts over a calm pond, surrounded by lush greenery and overhanging trees under a cloudy sky. The structure features a wooden deck with railings and vertical pla...             |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable_with_caveats` | Title:<br>Wooden Boathouse on Stilts Over a Pond<br><br>Description:<br>A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage. The scene is set under a cloudy sky, with...              |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable_with_caveats` | Title:<br>Weathered wooden boathouse on a serene wetland pond<br><br>Description:<br>A weathered wooden boathouse with a mossy roof stands on stilts over a calm pond, featuring a wooden boardwalk with cross-braced railings. The structure is framed by overhanging green tree branches and su...             |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Wooden Boathouse<br>Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br>Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Le...                   |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Weathered wooden boathouse over a pond<br><br>Description:<br>A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br><br>Keywords:<br>Cloudy Sky, Foliage, Forest, Gr...    |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse Over Serene Pond<br>Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.<br>Keywords: architecture, bird hide, boardwal...              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse Over a Serene Wetland Pond<br>Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland...                  |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Weathered Boathouse Overlooking Serene Wetland Pond<br><br>Description:<br>A weathered wooden boathouse stands on stilts over a tranquil pond, surrounded by lush foliage and framed by overhanging tree branches under a cloudy sky.<br><br>Keywords:<br>Cloudy Sky, Foliage, Forest, Grass, La...    |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | Title:<br>A Serene Pondside Hideout<br>Description:<br>A rustic wooden boathouse built on stilts overlooks a tranquil pond, surrounded by lush foliage and framed by the overhanging branches of a nearby tree. The wooden deck and railing add to the charm of this peaceful outdoor retreat,...                |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not c...                      |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | Alright, let's get to work. I've got an image and some hints to work with, and my task is to create some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a boathouse, and I hav...                         |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A weathered wooden boathouse stands over a serene pond, surrounded by lush foliage and a cloudy sky, with a concrete 5-10-word title: "A tranquil lakeside scene with a weathered wooden boathouse and overhanging trees."                                                                                       |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image: weathered wooden boathouse, stilts, pond, trees, etc. Maybe "Weathered Wooden Boathouse by the Pond".<br><br>Next, the description: combine context (date/time...             |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | Title: "Moss-Covered Wooden Boathouse Over Wetland Pond"<br><br>Description: A weathered wooden boathouse stands elevated on stilts over a serene pond, surrounded by lush foliage and marshland. The overhanging tree branches frame the structure, while the cloudy sky casts a soft, dif...                   |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Weathered wooden boathouse by calm pond under cloudy skies.<br>It stands elevated over the water surrounded by lush greenery and dense foliage.<br><br>Keywords: wooden boathouse, pond, cloudy sky, foliage, marshland, reeds, wetland, trees, water reflection, moss, outdoors, landscape, d...                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title:<br>Wooden Boathouse Over Serene Pond<br><br>Description:<br>A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.<br><br>Keywords:<br>Wooden boathouse, stilted, po...    |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | ## Image Description<br><br>A weathered wooden boathouse stands on stilts over a calm pond. The boathouse is constructed from vertical wooden planks and has a simple, pitched roof covered in moss. A wooden walkway with railings leads to the boathouse. Lush green foliage overhangs th...                   |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `not_evaluated`       | Model loading failed: Received 600 parameters not in model:<br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.embedding_norm.weight,<br>model.layers.0.conv.conv.weight,<br>model.layers.0.conv.in_proj.biases,<br>model.layers.0.conv.in_proj.scales,<br>mo... |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not_evaluated`       | Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)                                                                                                                                                                    |
+| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | Title: White motor cruiser boat cruising on calm waterway<br>Description: A white motor cruiser boat named 'Wavey Katey II' with a blue canopy and British flag cruises past a riverside cottage and lush foliage.<br>Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Can...                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**"Wavey Katey II – British Motor Cruiser on Serene Waterway"**<br><br>Description:<br>A white Yamaha-powered motor cruiser, *Wavey Katey II*, cruises at dusk along a tranquil waterway near a rustic riverside cottage, flying a British maritime flag. The boat features a blue cano...          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>A British Cruiser Boat on a Riverbank Serenade<br><br>Description:<br>A white motor cruiser named *Wavey Katey II* glides calmly along a river, adorned with a British maritime flag, under a rustic wooden cottage and lush greenery. The midday sunlight casts soft shadows on the bo...          |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | Title: Wavey Katey II motor cruiser on a river<br>Description: The white 4Plus2 motor cruiser 'Wavey Katey II' navigates a calm waterway under a blue canvas canopy, flying a Red Ensign past a rustic wooden house with a balcony.<br>Keywords: Boat, Cabin cruiser, Canopy, Cottage, Crui...                |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The main subject is the boat named "Wavey Katey II" on a river. So maybe "Wavey Katey II Motor Cruiser on Riverbank" but let's check word count. "Wavey Katey II Motor Cruiser Cruising on River" –...                       |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Wavey Katey II Motor Cruiser on River<br><br>Description: Captured on 28 August 2026, this white cabin cruiser named 'Wavey Katey II' navigates a calm waterway, flying a Red Ensign flag past a rustic wooden riverside house and lush green trees. The vessel features a blue cano...                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title:<br>Wavey Katey II Cruises Past Riverside Cottage on Calm River<br><br>Description:<br>A white cabin cruiser named 'Wavey Katey II' glides along a tranquil river, flying a British maritime flag, with a rustic wooden riverside cottage and lush green trees in the background under soft...          |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>White Cabin Cruiser Cruising Past Riverside Cottage<br><br>Description:<br>The white cabin cruiser 'Wavey Katey II' moves along a calm waterway, flying a red ensign past a rustic wooden riverside house surrounded by lush greenery.<br><br>Keywords:<br>Cabin cruiser, Motorboat, River, Cott... |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: White motor cruiser Wavey Katey II cruising on river<br>Description: A white motor cruiser named Wavey Katey II cruises along a calm river past a rustic wooden house and lush green foliage. The boat features a blue canopy and flies a small British maritime flag under brigh...                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: White Motor Cruiser Wavey Katey II on a River<br>Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green foliage. The boat features a blue canopy and flies a British maritime flag under bri...                   |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title: Wavey Katey II motorboat on river<br><br>Description: A white motorboat named 'Wavey Katey II' with a blue canopy and a British flag sails along a calm river, passing a rustic wooden cottage surrounded by lush greenery and trees. The boat is equipped with fenders and an outbo...                |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>White motor cruiser 'Wavey Katey II' on calm waterway<br><br>Description:<br>A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees on a sunny afternoon in August 2026....          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | Alright, let's get to work. I've got an image of a boat, and I need to generate some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a white motor cruiser, and I have some hin...                      |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Wavey Katey II Motor Cruiser on River<br>Description: A white motor cruiser named "Wavey Katey II" cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees, with a blue canopy and visible fende...                 |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable_with_caveats` | Title: Boating on Calm Waterway<br><br>Description: A white motor cruiser named 'Wavey Katey II' cruises past a rustic wooden house, flying a British maritime flag, with lush greenery in the background.<br><br>Keywords: Boat, Wavey Katey II, Cruiser, British flag, Wooden house, Lush green...          |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Wavey Katey II Motor Cruiser Cruising<br><br>Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees. The boat is equipped with a blue canopy, a mot...                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Wavey Katey II Cruising Along British Waterway (2026-08-28)*<br><br>**Description:**<br>A white Yamaha motor cruiser, *Wavey Katey II* (with blue canopy and fenders attached to its hull railings) cruises past a rustic wooden riverside cottage, flying a British maritime flag...          |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable_with_caveats` | Title: Wavey Katey II - A White Motor Cruiser Boat<br><br>Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees. The boat features a blue canopy, an outb...                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: "Wavey Katey II Boat Cruising on a Serene River"<br><br>Description: The white motorboat 'Wavey Katey II' is seen cruising on a calm river, with a British flag flying from its mast, past a rustic riverside house and lush greenery.<br><br>Keywords: Wavey Katey II, motorboat, British...          |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable_with_caveats` | Title: White motor cruiser cruising on a river<br>Description: A white motor cruiser named 'Wavey Katey II' cruises on a calm river, its outboard motor creating a wake. The boat, featuring a blue canopy and a British flag, passes a wooden riverside cottage surrounded by lush gree...                   |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable_with_caveats` | Title:<br>Wavey Katey II Cruising Past a Rustic Riverside Cottage<br><br>Description:<br>The white cabin cruiser Wavey Katey II moves along a calm river, flying a red ensign past a wooden riverside cottage and lush green trees. The boat features a blue canvas canopy and white fenders, wit...          |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Cruising Motorboat<br>Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.<br>Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser,...                 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>British motor cruiser 'Wavey Katey II' cruising on a calm river<br><br>Description:<br>A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.<br><br>Keywords:<br>Boat, Boat dri... |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | Title:<br>"Wavey Katey II Cruising Along the River"<br><br>Description:<br>A white motor cruiser named "Wavey Katey II" glides through calm waters, its British flag fluttering in the breeze, as it passes a rustic wooden riverside cottage surrounded by lush greenery. The scene captures lei...          |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.<br>Keywords: Boat, cabin cruiser, motorboat, ri...           |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.<br>Keywords: Boat, motor cruiser, cabin c...           |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Wavey Katey II on River Cruise, August 2026<br><br>Description: Captured on 28th August 2026, the white motor cruiser 'Wavey Katey II' cruises along a calm river, passing a wooden house and trees in bright daylight. A British maritime flag is flown from the stern of the boat....                |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable_with_caveats` | Title: "Wavey Katey II Cruising Along a Serene Waterway"<br>Description: "A white motor cruiser named 'Wavey Katey II' glides through calm waters, passing by a rustic riverside cottage and lush greenery, under a British maritime flag."<br>Keywords: Boat, Motor cruiser, British flag,...                |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Motor Cruiser "Wavey Katey II" on Calm River<br><br>Description:<br>The white motor cruiser "Wavey Katey II" cruises along a serene river, displaying a British maritime flag, with a rustic riverside cottage and lush greenery in the background.<br><br>Keywords:<br>Boat, Boat driver, Boat...  |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `unusable`            | Title:<br>Boat Cruising on a Calm River<br><br>Description:<br>A white motor cruiser boat named 'Wavey Katey II' cruises along a calm river, with a British maritime flag flying and lush green trees in the background.<br><br>Keywords:<br>Boat, Cruising, River, Riverbank, Foliage, Nautical, Outboard... |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | Title:<br>A White Motor Cruiser named 'Wavey Katey II' Cruises Along a Calm Waterway<br><br>Description:<br>A white motor cruiser named 'Wavey Katey II' is seen cruising along a calm waterway, flying a British maritime flag. The boat is passing by a rustic wooden riverside house and lush...           |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time: 2026-08-28 16:17:42 UTC+01:00. The descriptive hints: description hint: "A white motor cruiser boat named 'Wavey Kate...                   |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A serene white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.                                                                                                                            |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The boat is named "Wavey Katey II" and it's a motor cruiser. So maybe "Wavey Katey II Motor Cruiser on Waterway".<br><br>Next, the description: need to combine context (capture dat...          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | Title: Wavey Katey II Motor Cruiser<br>Description: The white motor cruiser 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.<br>Keywords: Wavey Katey II, motor cruiser, British maritime flag, c...                |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | Title: "Wavey Katey II Cruises Along Calm Waterway".<br><br>Description: "The 'Wavey Katey II' motor cruiser boat, adorned with a British maritime flag, glides smoothly along a serene waterway. The boat, painted white with a blue canopy, is accompanied by a rustic wooden riverside h...                |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | ◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and context provided. Let's start by analyzing the image.<br><br>The image shows a white motor cruiser named "Wavey Katey II" on a calm waterway. There's a rustic wooden...                |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | White motorboat cruising near rustic cottage on calm water.<br><br>Keywords: boat, cruiser, waterway, cottage, flag, fenders, canopy, leisure, outboard, trees, railing, foliage, nautical, river, cabin, passenger                                                                                           |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `unusable`            | Wavey Katey II Cruises Calm River Past Rustic Cottage<br><br>A white motor cruiser named Wavey Katey II glides smoothly along a tranquil waterway, its blue canopy and red flag visible against the backdrop of a rustic wooden riverside house and lush green trees. The boat's name is cl...                |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | empty output                                                                                                                                                                                                                                                                                                  |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not_evaluated`       | Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)                                                                                                                                                                 |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.7.0rc0`
-- `mlx`: `0.32.3.dev20260828+99e45f71d`
+- `mlx`: `0.32.3.dev20260829+052e77db9`
 - `mlx-lm`: `0.32.0`
 - `transformers`: `5.16.1`
 - `tokenizers`: `0.23.1`
@@ -159,21 +160,19 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 ## Image Metadata
 
-- *Description:* A weathered wooden boathouse built on stilts stands over the
-  edge of a serene pond, framed by lush overhanging tree branches, wooden
-  decking, and surrounding wetland foliage.
-- *Keywords:* Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves,
-  Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland,
-  Wooden shed, architecture, bird hide, birdwatching, boardwalk, boathouse,
-  cabin, conservation, countryside, ecology, environment, habitat, jetty,
-  marsh, mossy roof, nature, nature reserve, observation hide, outdoor,
-  overcast, peaceful, pier, platform, reflection, rustic, scenic, secluded,
-  serene, stilt house, stilts, swamp, timber, tranquility, water, waterfront,
-  weathered wood, wildlife observation, wooden cabin, wooden deck, wooden hut,
-  wooden railing, wooden structure
-- *Date:* 2026-08-21 14:34:53 UTC+01:00
-- *Time:* 14:34:53
-- *GPS:* 51.441113°N, 0.565406°W
+- *Description:* A white motor cruiser boat named 'Wavey Katey II' cruises
+  along a calm waterway, flying a British maritime flag, past a rustic wooden
+  riverside house and lush green trees.
+- *Keywords:* Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy,
+  Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard
+  motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Vessel,
+  Watercraft, Waterfront, Waterway, Wooden house, boathouse, british, calm
+  water, canal, day trip, england, fenders, holiday, hull, landscape,
+  lifestyle, motor cruiser, nature, navigation, outdoor, powerboat,
+  recreation, relaxation, riverboat, riverfront, riverside, scenic, summer,
+  tourism, tranquil, travel, united kingdom, vacation, water, water transport
+- *Date:* 2026-08-28 16:17:42 UTC+01:00
+- *Time:* 16:17:42
 
 ## Prompt
 
@@ -189,16 +188,15 @@ The first 280 characters of each model's actual output (or failure evidence for 
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-08-21 14:34:53 UTC+01:00
-> &#45; GPS: 51.441113°N, 0.565406°W
+> &#45; Capture date/time: 2026-08-28 16:17:42 UTC+01:00
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: A weathered wooden boathouse built on stilts stands over
-> the edge of a serene pond, framed by lush overhanging tree branches, wooden
-> decking, and surrounding wetland foliage.
-> &#45; Keyword hints: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape,
-> Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection,
-> Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+> &#45; Description hint: A white motor cruiser boat named 'Wavey Katey II'
+> cruises along a calm waterway, flying a British maritime flag, past a rustic
+> wooden riverside house and lush green trees.
+> &#45; Keyword hints: Boat, Boat driver, Boat fender, Boating, Cabin cruiser,
+> Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical,
+> Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -217,47 +215,47 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
 
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
 
 <details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.50s
-- *Generation time:* 0.88s
-- *Total time:* 1.74s
-- *Input validation time:* 0.358
-- *Prompt preparation time:* 0.00743
-- *First-token latency:* 0.125
-- *Cleanup time:* 0.0667
-- *Prompt tokens:* 2,117
-- *Generation tokens:* 118
-- *Total tokens:* 2,235
-- *Prompt throughput (raw):* 16,945 tok/s
-- *Generation throughput (raw):* 484 tok/s
-- *Peak memory:* 1.9
-- *Active memory:* 0.90
-- *Cache memory:* 0.08
-- *Model-load active memory:* 0.897
-- *Post-cleanup active memory:* 0.000149
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.83s
+- *Generation time:* 1.56s
+- *Total time:* 2.41s
+- *Input validation time:* 5.77e-05
+- *Prompt preparation time:* 0.00984
+- *First-token latency:* 0.566
+- *Cleanup time:* 0.0998
+- *Prompt tokens:* 2,619
+- *Generation tokens:* 106
+- *Total tokens:* 2,725
+- *Prompt throughput (raw):* 4,624 tok/s
+- *Generation throughput (raw):* 203 tok/s
+- *Peak memory:* 4.0
+- *Active memory:* 2.8
+- *Cache memory:* 0.10
+- *Model-load active memory:* 2.82
+- *Post-cleanup active memory:* 0.00436
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1360
+- *Rendered prompt characters:* 1325
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved model revision:* 12c5ae49304158b0a133fcea9ba4486a6d6c8cad
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/12c5ae49304158b0a133fcea9ba4486a6d6c8cad
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -265,135 +263,9 @@ Complete generated or crash evidence for every attempted model.
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Boathouse on stilts in a wetland
-
-Description:
-A weathered wooden boathouse stands on stilts over a serene pond, framed by lush overhanging tree branches and surrounding wetland foliage. The scene is bathed in soft, diffused light under a cloudy sky, with reflections of trees and reeds visible in the still water.
-
-Keywords:
-Boathouse, wetland, wooden, stilts, cloudy, overhanging, trees, reeds, pond, reflections, moss, landscape, nature, birdwatching, boardwalk
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-<details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.44s
-- *Generation time:* 8.09s
-- *Total time:* 10.55s
-- *Input validation time:* 7.31e-05
-- *Prompt preparation time:* 0.00782
-- *First-token latency:* 3.33
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 2,401
-- *Generation tokens:* 121
-- *Total tokens:* 2,522
-- *Prompt throughput (raw):* 722 tok/s
-- *Generation throughput (raw):* 29.0 tok/s
-- *Peak memory:* 23
-- *Active memory:* 18
-- *Cache memory:* 0.47
-- *Model-load active memory:* 18
-- *Post-cleanup active memory:* 0.0013
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1309
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Weathered Boathouse Over Serene Pond
-
-Description:
-A weathered wooden boathouse on stilts overlooks a tranquil pond, framed by lush overhanging tree branches and surrounded by wetland foliage, captured on a cloudy afternoon in August 2026.
-
-Keywords:
-Boathouse, Pond, Wetland, Wooden Decking, Overhanging Trees, Cloudy Sky, Moss, Reeds, Foliage, Reflection, Boardwalk, Architecture, Bird Hide, Birdwatching, Landscape, Outdoors, Water, Stilted Structure
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.24s
-- *Generation time:* 6.88s
-- *Total time:* 9.13s
-- *Input validation time:* 7.82e-05
-- *Prompt preparation time:* 0.00205
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 2,618
-- *Generation tokens:* 164
-- *Total tokens:* 2,782
-- *Prompt throughput (raw):* 2,392 tok/s
-- *Generation throughput (raw):* 32.5 tok/s
-- *Peak memory:* 18
-- *Active memory:* 17
-- *Cache memory:* 0.43
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00302
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1346
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Weathered Wooden Boathouse on Stilts Over a Serene Pond.
-
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage. The boathouse's roof is covered in moss, and the wooden structure shows signs of age and wear. The pond's calm surface reflects the cloudy sky above, and the surrounding wetland is filled with reeds and other vegetation. The scene is a tranquil and picturesque example of a natural landscape.
-
-Keywords: weathered wooden boathouse, stilts, serene pond, lush overhanging tree branches, wooden decking, wetland foliage, moss, cloudy sky, reflection, reeds, wetland, natural landscape.
+Title: White motor cruiser boat cruising on calm waterway
+Description: A white motor cruiser boat named 'Wavey Katey II' with a blue canopy and British flag cruises past a riverside cottage and lush foliage.
+Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Passenger, Railing, River, Riverbank, Shrubs, Trees
 </pre>
 
 </details>
@@ -412,27 +284,27 @@ Keywords: weathered wooden boathouse, stilts, serene pond, lush overhanging tree
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.67s
-- *Generation time:* 5.31s
-- *Total time:* 6.99s
-- *Input validation time:* 4.52e-05
-- *Prompt preparation time:* 0.00817
-- *First-token latency:* 2.88
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 2,934
-- *Generation tokens:* 123
-- *Total tokens:* 3,057
-- *Prompt throughput (raw):* 1,020 tok/s
-- *Generation throughput (raw):* 65.6 tok/s
-- *Peak memory:* 13
+- *Model load time:* 1.20s
+- *Generation time:* 4.56s
+- *Total time:* 5.78s
+- *Input validation time:* 7.03e-05
+- *Prompt preparation time:* 0.00754
+- *First-token latency:* 1.75
+- *Cleanup time:* 0.0968
+- *Prompt tokens:* 2,577
+- *Generation tokens:* 157
+- *Total tokens:* 2,734
+- *Prompt throughput (raw):* 1,476 tok/s
+- *Generation throughput (raw):* 66.2 tok/s
+- *Peak memory:* 12
 - *Active memory:* 8.0
-- *Cache memory:* 0.56
+- *Cache memory:* 0.51
 - *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.0049
+- *Post-cleanup active memory:* 0.00515
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3747
+- *Rendered prompt characters:* 3712
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -449,13 +321,13 @@ Keywords: weathered wooden boathouse, stilts, serene pond, lush overhanging tree
 
 <pre class="model-output-readable">
 Title:
-**"Stilted Boathouse Over a Wetland Pond"**
+**"Wavey Katey II – British Motor Cruiser on Serene Waterway"**
 
 Description:
-A weathered wooden boathouse on stilts extends over a calm pond, surrounded by lush foliage and overhanging tree branches, captured on a cloudy August afternoon in a wetland landscape.
+A white Yamaha-powered motor cruiser, *Wavey Katey II*, cruises at dusk along a tranquil waterway near a rustic riverside cottage, flying a British maritime flag. The boat features a blue canopy, two passengers, and protective fenders, with lush greenery and calm lighting enhancing the nautical scene.
 
 Keywords:
-Boathouse, wetland, pond, wooden structure, stilts, foliage, overhanging branches, cloudy sky, marshland, landscape, boardwalk, moss, reeds, water reflection, birdwatching hide, serene nature, August 2026, UK countryside
+Boat, Yamaha motor cruiser, Wavey Katey II, British maritime flag, motorboat, cabin cruiser, leisure boating, riverside cottage, calm waterway, blue canopy, passenger boat, outboard motor, fenders, dusk lighting, foliage, riverbank, nautical, rustic setting
 </pre>
 
 </details>
@@ -474,27 +346,27 @@ Boathouse, wetland, pond, wooden structure, stilts, foliage, overhanging branche
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.29s
-- *Generation time:* 2.31s
-- *Total time:* 3.61s
-- *Input validation time:* 6.16e-05
-- *Prompt preparation time:* 0.00729
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.089
-- *Prompt tokens:* 2,933
-- *Generation tokens:* 134
-- *Total tokens:* 3,067
-- *Prompt throughput (raw):* 2,803 tok/s
+- *Model load time:* 0.81s
+- *Generation time:* 1.99s
+- *Total time:* 2.82s
+- *Input validation time:* 7.7e-05
+- *Prompt preparation time:* 0.00792
+- *First-token latency:* 0.806
+- *Cleanup time:* 0.0959
+- *Prompt tokens:* 2,576
+- *Generation tokens:* 138
+- *Total tokens:* 2,714
+- *Prompt throughput (raw):* 3,197 tok/s
 - *Generation throughput (raw):* 189 tok/s
-- *Peak memory:* 7.8
+- *Peak memory:* 6.4
 - *Active memory:* 2.8
-- *Cache memory:* 0.38
+- *Cache memory:* 0.35
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.00542
+- *Post-cleanup active memory:* 0.00567
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3746
+- *Rendered prompt characters:* 3711
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -511,119 +383,60 @@ Boathouse, wetland, pond, wooden structure, stilts, foliage, overhanging branche
 
 <pre class="model-output-readable">
 Title:
-Weathered Pondside Wooden Shed in Overgrown Wetland
+A British Cruiser Boat on a Riverbank Serenade
 
 Description:
-A rustic, elevated wooden boathouse or bird hide, constructed on a wooden deck over a shallow pond, is bathed in soft cloudy light amid dense foliage, moss, and reeds. The structure’s weathered planks and cross supports contrast with the tranquil water and lush greenery beyond.
+A white motor cruiser named *Wavey Katey II* glides calmly along a river, adorned with a British maritime flag, under a rustic wooden cottage and lush greenery. The midday sunlight casts soft shadows on the boat’s canopy and fenders, with a lone driver navigating leisurely.
 
 Keywords:
-boardwalk, cloudy sky, moss-covered deck, pond edge, reedy wetland, rustic wooden shed, stilts, tree canopy, water reflection, woodland setting, bird hide, architecture, serene lighting, wetland foliage
+British maritime flag, cabin cruiser, calm river cruising, fenders, motor cruiser *Wavey Katey II*, nautical leisure, outboard motor, passenger boat, red-and-white flag, riverbank cottage, shrubs, trees, UK boating scene
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
+<a id="model-mlx-community-ornith-10-35b-bf16"></a>
 
-### mlx-community/Molmo2-8B-4bit
+### mlx-community/Ornith-1.0-35B-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.22s
-- *Generation time:* 3.23s
-- *Total time:* 4.47s
-- *Input validation time:* 5.47e-05
-- *Prompt preparation time:* 0.006
-- *First-token latency:* 0.736
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 1,529
-- *Generation tokens:* 133
-- *Total tokens:* 1,662
-- *Prompt throughput (raw):* 2,076 tok/s
-- *Generation throughput (raw):* 72.0 tok/s
-- *Peak memory:* 8.8
-- *Active memory:* 6.5
-- *Cache memory:* 0.31
-- *Model-load active memory:* 6.45
-- *Post-cleanup active memory:* 0.00574
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
+- *Model load time:* 11.24s
+- *Generation time:* 63.62s
+- *Total time:* 74.88s
+- *Input validation time:* 6.48e-05
+- *Prompt preparation time:* 0.0168
+- *First-token latency:* 60.9
+- *Cleanup time:* 0.294
+- *Prompt tokens:* 16,639
+- *Generation tokens:* 112
+- *Total tokens:* 16,751
+- *Prompt throughput (raw):* 273 tok/s
+- *Generation throughput (raw):* 62.9 tok/s
+- *Peak memory:* 74
+- *Active memory:* 70
+- *Cache memory:* 0.89
+- *Model-load active memory:* 70.2
+- *Post-cleanup active memory:* 0.00701
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1347
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Stilted Wooden Hide in Marshy Wetland
-
-Description: A weathered wooden structure on stilts overlooks a serene pond, surrounded by lush foliage and reeds. Built for birdwatching, it features a wooden deck and is partially obscured by overhanging branches, with a cloudy sky visible through the trees.
-
-Keywords: Stilted building, Marshland, Wetland, Pond, Reeds, Wooden deck, Bird hide, Birdwatching, Cloudy sky, Foliage, Trees, Water reflection, Wetland architecture, Outdoors, Marshy landscape, Stilted structure, Marshy pond, Stilted hide
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.96s
-- *Generation time:* 61.09s
-- *Total time:* 63.05s
-- *Input validation time:* 5.45e-05
-- *Prompt preparation time:* 0.00191
-- *First-token latency:* 58.5
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 16,552
-- *Generation tokens:* 129
-- *Total tokens:* 16,681
-- *Prompt throughput (raw):* 283 tok/s
-- *Generation throughput (raw):* 79.0 tok/s
-- *Peak memory:* 23
-- *Active memory:* 18
-- *Cache memory:* 2.3
-- *Model-load active memory:* 18.3
-- *Post-cleanup active memory:* 0.00746
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1381
+- *Rendered prompt characters:* 1365
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -631,10 +444,94 @@ Keywords: Stilted building, Marshland, Wetland, Pond, Reeds, Wooden deck, Bird h
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Weathered wooden boathouse on a calm pond
-Description: A weathered wooden boathouse stands on stilts over a calm pond, its dark timber walls and moss-covered roof contrasting with the lush green foliage and overhanging tree branches. The scene, captured on a cloudy day, features a wooden deck and railings, with reeds and water reflections visible in the foreground.
-Keywords: wooden boathouse, pond, wetland, reeds, trees, foliage, moss, wooden deck, stilts, cloudy sky, water reflection, landscape, nature, outdoors, architecture, bird hide, marshland, grass
+Title: Wavey Katey II motor cruiser on a river
+Description: The white 4Plus2 motor cruiser 'Wavey Katey II' navigates a calm waterway under a blue canvas canopy, flying a Red Ensign past a rustic wooden house with a balcony.
+Keywords: Boat, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Railing, River, Riverbank, Shrubs, Trees, Fender, Wavey Katey II
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.72s
+- *Generation time:* 28.50s
+- *Total time:* 29.24s
+- *Input validation time:* 6.8e-05
+- *Prompt preparation time:* 0.0124
+- *First-token latency:* 17.1
+- *Cleanup time:* 0.155
+- *Prompt tokens:* 16,625
+- *Generation tokens:* 903
+- *Total tokens:* 17,528
+- *Prompt throughput (raw):* 975 tok/s
+- *Generation throughput (raw):* 85.5 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.7
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00739
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1354
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The main subject is the boat named "Wavey Katey II" on a river. So maybe "Wavey Katey II Motor Cruiser on Riverbank" but let's check word count. "Wavey Katey II Motor Cruiser Cruising on River" – that's 8 words, good.
+
+Next, the description. It has to combine context (capture date/time is given but we don't claim it's visible, so just mention the time as part of the context). The boat is white, named Wavey Katey II, flying a British flag (the red flag with Union Jack), past a rustic wooden house, lush green trees, calm water. Action is cruising. Lighting: probably daylight, since it's a clear day. Distinctive details: blue canopy, Yamaha outboard motor (visible on the back), fenders, the house with a deck. Let's structure it: "White motor cruiser Wavey Katey II, with blue canopy and British flag, cruises along a calm river past rustic wooden cottage with lush greenery, under daylight lighting."
+
+Then keywords. Need 10-18 unique, comma-separated. From context: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage. Let's check the image: the boat has "4PLUS2" on it, so maybe "4PLUS2" is a keyword? Wait, the context says "Boat" is a keyword, so include that. Also, the house is a cottage, so "Cottage" is there. Let's list: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha (since the outboard is Yamaha), Wavey Katey II (but maybe not, since it's a name, but the context says "Boat" is a keyword, so include the name as a keyword? Wait, the context says "Keyword hints" include "Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees". So we need to pick from these. Let's check the image: the boat has "4PLUS2" on it, so "4PLUS2" is a detail. The boat is white, has a blue canopy, the house is a cottage, there's a Yamaha outboard motor (visible on the back), the flag is British (Union Jack), the water is calm, trees and shrubs. So keywords: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II (but maybe not, since it's a name, but the context says "Keyword hints" include "Boat" so maybe include the name as a keyword? Wait, the problem says "10-18 unique, comma-separated keywords covering relevant context and visible details." So from the context and image: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II. Wait, but "Wavey Katey II" is the name of the boat, so it's a visible detail. Let's check the image: the boat is named "Wavey Katey
+&lt;/think&gt;
+
+Title: Wavey Katey II Motor Cruiser on Riverbank
+Description: White motor cruiser Wavey Katey II with blue canopy and British flag cruises along a calm river past rustic wooden cottage, lush greenery, and daylight lighting.
+Keywords: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The main subject is the boat named "Wavey Katey II" on a river. So maybe "Wavey Katey II Motor Cruiser on Riverbank" but let's check word count. "Wavey Katey II Motor Cruiser Cruising on River" – that's 8 words, good.
+
+Next, the description. It has to combine context (capture date/time is given but we don't claim it's visible, so just mention the time as part of the context). The boat is white, named Wavey Katey II, flying a British flag (the red flag with Union Jack), past a rustic wooden house, lush green trees, calm water. Action is cruising. Lighting: probably daylight, since it's a clear day. Distinctive details: blue canopy, Yamaha outboard motor (visible on the back), fenders, the house with a deck. Let's structure it: "White motor cruiser Wavey Katey II, with blue canopy and British flag, cruises along a calm river past rustic wooden cottage with lush greenery, under daylight lighting."
+
+Then keywords. Need 10-18 unique, comma-separated. From context: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage. Let's check the image: the boat has "4PLUS2" on it, so maybe "4PLUS2" is a keyword? Wait, the context says "Boat" is a keyword, so include that. Also, the house is a cottage, so "Cottage" is there. Let's list: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha (since the outboard is Yamaha), Wavey Katey II (but maybe not, since it's a name, but the context says "Boat" is a keyword, so include the name as a keyword? Wait, the context says "Keyword hints" include "Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees". So we need to pick from these. Let's check the image: the boat has "4PLUS2" on it, so "4PLUS2" is a detail. The boat is white, has a blue canopy, the house is a cottage, there's a Yamaha outboard motor (visible on the back), the flag is British (Union Jack), the water is calm, trees and shrubs. So keywords: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II (but maybe not, since it's a name, but the context says "Keyword hints" include "Boat" so maybe include the name as a keyword? Wait, the problem says "10-18 unique, comma-separated keywords covering relevant context and visible details." So from the context and image: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II. Wait, but "Wavey Katey II" is the name of the boat, so it's a visible detail. Let's check the image: the boat is named "Wavey Katey
+</think>
+
+Title: Wavey Katey II Motor Cruiser on Riverbank  
+Description: White motor cruiser Wavey Katey II with blue canopy and British flag cruises along a calm river past rustic wooden cottage, lush greenery, and daylight lighting.  
+Keywords: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliage, Leisure, Boating, Outboard motor, Passenger, Railing, Trees, Cottage, Yamaha, Wavey Katey II
+```
+
+</details>
 
 </details>
 
@@ -652,27 +549,27 @@ Keywords: wooden boathouse, pond, wetland, reeds, trees, foliage, moss, wooden d
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.74s
-- *Generation time:* 65.62s
-- *Total time:* 68.39s
-- *Input validation time:* 7.11e-05
-- *Prompt preparation time:* 0.0157
-- *First-token latency:* 63
-- *Cleanup time:* 0.244
-- *Prompt tokens:* 16,568
-- *Generation tokens:* 111
-- *Total tokens:* 16,679
-- *Prompt throughput (raw):* 263 tok/s
-- *Generation throughput (raw):* 65.7 tok/s
+- *Model load time:* 2.51s
+- *Generation time:* 59.96s
+- *Total time:* 62.50s
+- *Input validation time:* 6.4e-05
+- *Prompt preparation time:* 0.0169
+- *First-token latency:* 57.8
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 16,639
+- *Generation tokens:* 150
+- *Total tokens:* 16,789
+- *Prompt throughput (raw):* 288 tok/s
+- *Generation throughput (raw):* 112 tok/s
 - *Peak memory:* 24
 - *Active memory:* 20
 - *Cache memory:* 0.89
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00796
+- *Post-cleanup active memory:* 0.00821
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1400
+- *Rendered prompt characters:* 1365
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -688,70 +585,151 @@ Keywords: wooden boathouse, pond, wetland, reeds, trees, foliage, moss, wooden d
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Weathered Wooden Boathouse Over Pond
+Title: Wavey Katey II Motor Cruiser on River
 
-Description: Captured on 21 August 2026, this weathered wooden boathouse stands on stilts over a calm pond, framed by lush overhanging tree branches and surrounded by wetland foliage under a cloudy sky.
+Description: Captured on 28 August 2026, this white cabin cruiser named 'Wavey Katey II' navigates a calm waterway, flying a Red Ensign flag past a rustic wooden riverside house and lush green trees. The vessel features a blue canopy, Yamaha outboard motor, and white fenders, with passengers visible inside the cabin.
 
-Keywords: boathouse, pond, wooden structure, wetland, foliage, cloudy sky, trees, reeds, water reflection, boardwalk, moss, nature, architecture, bird hide, landscape, outdoors, greenery, stillness
+Keywords: Wavey Katey II, motor cruiser, cabin cruiser, British maritime flag, Red Ensign, Yamaha outboard motor, blue canopy, river, riverside house, wooden cabin, green trees, foliage, leisure boating, nautical, passenger, fender, railing, shrubs
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
-### mlx-community/gemma-3-27b-it-qat-4bit
+### mlx-community/Qwen3.5-9B-MLX-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 5.86s
-- *Generation time:* 9.29s
-- *Total time:* 15.17s
-- *Input validation time:* 7.19e-05
-- *Prompt preparation time:* 0.0035
-- *First-token latency:* 1.71
-- *Cleanup time:* 0.165
-- *Prompt tokens:* 593
-- *Generation tokens:* 153
-- *Total tokens:* 746
-- *Prompt throughput (raw):* 347 tok/s
-- *Generation throughput (raw):* 21.7 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.45
-- *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.0107
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.38s
+- *Generation time:* 61.95s
+- *Total time:* 63.34s
+- *Input validation time:* 5.67e-05
+- *Prompt preparation time:* 0.00196
+- *First-token latency:* 59.8
+- *Cleanup time:* 0.0936
+- *Prompt tokens:* 16,639
+- *Generation tokens:* 115
+- *Total tokens:* 16,754
+- *Prompt throughput (raw):* 278 tok/s
+- *Generation throughput (raw):* 90.5 tok/s
+- *Peak memory:* 10
+- *Active memory:* 6.0
+- *Cache memory:* 1.2
+- *Model-load active memory:* 5.96
+- *Post-cleanup active memory:* 0.00873
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1364
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1365
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boathouse on Stilts, Wetland Landscape
+Title:
+Wavey Katey II Cruises Past Riverside Cottage on Calm River
 
-Description: Captured on 21st August 2026 at 14:34 UTC+01, this weathered wooden boathouse stands on stilts above a pond at 51.441113°N, 0.565406°W, with a cloudy sky and reflected light on the water. The structure is framed by lush foliage and accessed via a wooden deck and boardwalk.
+Description:
+A white cabin cruiser named 'Wavey Katey II' glides along a tranquil river, flying a British maritime flag, with a rustic wooden riverside cottage and lush green trees in the background under soft daylight.
 
-Keywords: Boathouse, Wooden structure, Stilts, Pond, Wetland, Marshland, Trees, Foliage, Water reflection, Cloudy Sky, Wooden decking, Boardwalk, Moss, Architecture, Exterior, Landscape, Reeds, Grass
+Keywords:
+Boat, Cabin cruiser, River, Riverbank, Cottage, Trees, Foliage, Flag, Fender, Outboard motor, Passenger, Railing, Canopy, Leisure, Boating, Nautical, Motorboat
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title:  
+Wavey Katey II Cruises Past Riverside Cottage on Calm River
+
+Description:  
+A white cabin cruiser named 'Wavey Katey II' glides along a tranquil river, flying a British maritime flag, with a rustic wooden riverside cottage and lush green trees in the background under soft daylight.
+
+Keywords:  
+Boat, Cabin cruiser, River, Riverbank, Cottage, Trees, Foliage, Flag, Fender, Outboard motor, Passenger, Railing, Canopy, Leisure, Boating, Nautical, Motorboat
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### mlx-community/Qwen3.6-27B-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 3.18s
+- *Generation time:* 85.27s
+- *Total time:* 88.48s
+- *Input validation time:* 7.23e-05
+- *Prompt preparation time:* 0.0165
+- *First-token latency:* 78
+- *Cleanup time:* 0.148
+- *Prompt tokens:* 16,639
+- *Generation tokens:* 106
+- *Total tokens:* 16,745
+- *Prompt throughput (raw):* 213 tok/s
+- *Generation throughput (raw):* 16.6 tok/s
+- *Peak memory:* 33
+- *Active memory:* 29
+- *Cache memory:* 1.9
+- *Model-load active memory:* 28.7
+- *Post-cleanup active memory:* 0.00924
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1365
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+White Cabin Cruiser Cruising Past Riverside Cottage
+
+Description:
+The white cabin cruiser 'Wavey Katey II' moves along a calm waterway, flying a red ensign past a rustic wooden riverside house surrounded by lush greenery.
+
+Keywords:
+Cabin cruiser, Motorboat, River, Cottage, British flag, Fenders, Outboard motor, Canopy, Riverbank, Trees, Leisure, Nautical, White boat, Waterway, House, Railing, Shrubs, Boating
 </pre>
 
 </details>
@@ -770,27 +748,27 @@ Keywords: Boathouse, Wooden structure, Stilts, Pond, Wetland, Marshland, Trees, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.56s
-- *Generation time:* 1.86s
-- *Total time:* 4.45s
-- *Input validation time:* 5.96e-05
-- *Prompt preparation time:* 0.023
-- *First-token latency:* 0.413
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 598
-- *Generation tokens:* 100
-- *Total tokens:* 698
-- *Prompt throughput (raw):* 1,449 tok/s
-- *Generation throughput (raw):* 116 tok/s
+- *Model load time:* 2.34s
+- *Generation time:* 1.69s
+- *Total time:* 4.06s
+- *Input validation time:* 5.63e-05
+- *Prompt preparation time:* 0.0235
+- *First-token latency:* 0.409
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 579
+- *Generation tokens:* 101
+- *Total tokens:* 680
+- *Prompt throughput (raw):* 1,415 tok/s
+- *Generation throughput (raw):* 130 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.20
 - *Model-load active memory:* 15.4
-- *Post-cleanup active memory:* 0.0118
+- *Post-cleanup active memory:* 0.012
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1363
+- *Rendered prompt characters:* 1328
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -806,9 +784,9 @@ Keywords: Boathouse, Wooden structure, Stilts, Pond, Wetland, Marshland, Trees, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Weathered wooden boathouse over a serene pond
-Description: A rustic wooden boathouse built on stilts stands over a calm pond, framed by lush overhanging tree branches and wetland foliage under a cloudy sky. The structure features a wooden deck and reflects the surrounding greenery in the still water.
-Keywords: architecture, bird hide, birdwatching, boardwalk, foliage, forest, lake, marshland, moss, pond, reeds, trees, water reflection, wetland, wooden shed
+Title: White motor cruiser Wavey Katey II cruising on river
+Description: A white motor cruiser named Wavey Katey II cruises along a calm river past a rustic wooden house and lush green foliage. The boat features a blue canopy and flies a small British maritime flag under bright daylight.
+Keywords: Boat, Cabin cruiser, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, River, Riverbank, Shrubs, Trees, Waterway, Watercraft
 </pre>
 
 </details>
@@ -827,27 +805,27 @@ Keywords: architecture, bird hide, birdwatching, boardwalk, foliage, forest, lak
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.67s
-- *Generation time:* 5.09s
-- *Total time:* 7.77s
-- *Input validation time:* 6.39e-05
-- *Prompt preparation time:* 0.00112
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.152
-- *Prompt tokens:* 598
-- *Generation tokens:* 95
-- *Total tokens:* 693
-- *Prompt throughput (raw):* 569 tok/s
-- *Generation throughput (raw):* 27.6 tok/s
+- *Model load time:* 2.54s
+- *Generation time:* 5.90s
+- *Total time:* 8.45s
+- *Input validation time:* 5.39e-05
+- *Prompt preparation time:* 0.00181
+- *First-token latency:* 1.18
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 579
+- *Generation tokens:* 107
+- *Total tokens:* 686
+- *Prompt throughput (raw):* 492 tok/s
+- *Generation throughput (raw):* 25.3 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.78
+- *Cache memory:* 0.76
 - *Model-load active memory:* 18.4
-- *Post-cleanup active memory:* 0.0123
+- *Post-cleanup active memory:* 0.0126
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1363
+- *Rendered prompt characters:* 1328
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -863,66 +841,9 @@ Keywords: architecture, bird hide, birdwatching, boardwalk, foliage, forest, lak
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Weathered Wooden Bird Hide Over a Serene Pond
-Description: A weathered wooden bird hide on stilts extends over a pond, framed by lush overhanging tree branches under a cloudy sky. The structure is accessed via a wooden boardwalk and surrounded by wetland foliage.
-Keywords: bird hide, birdwatching, wooden shed, pond, wetland, boardwalk, foliage, trees, water reflection, marshland, reeds, cloudy sky, architecture, landscape, outdoors, nature
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
-
-### mlx-community/granite-4.0-3b-vision-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.72s
-- *Generation time:* 1.74s
-- *Total time:* 2.48s
-- *Input validation time:* 8.81e-05
-- *Prompt preparation time:* 0.0114
-- *First-token latency:* 0.451
-- *Cleanup time:* 0.0963
-- *Prompt tokens:* 1,383
-- *Generation tokens:* 85
-- *Total tokens:* 1,468
-- *Prompt throughput (raw):* 3,068 tok/s
-- *Generation throughput (raw):* 169 tok/s
-- *Peak memory:* 4.6
-- *Active memory:* 3.0
-- *Cache memory:* 0.23
-- *Model-load active memory:* 3.03
-- *Post-cleanup active memory:* 0.0126
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1533
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Weathered Wooden Boathouse by a Serene Pond"
-Description: A weathered wooden boathouse stands on stilts over a calm pond, surrounded by lush foliage and a serene wetland landscape.
-Keywords: Weathered Boathouse, Pond, Wetland, Lush Foliage, Marshland, Bird Hide, Birdwatching, Boardwalk, Moss, Reeds, Architecture
+Title: White Motor Cruiser Wavey Katey II on a River
+Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green foliage. The boat features a blue canopy and flies a British maritime flag under bright daylight.
+Keywords: Boat, Wavey Katey II, cabin cruiser, motorboat, river, riverbank, cottage, British maritime flag, blue canopy, outboard motor, boat fender, nautical, leisure, foliage, trees, cruising
 </pre>
 
 </details>
@@ -939,30 +860,30 @@ Keywords: Weathered Boathouse, Pond, Wetland, Lush Foliage, Marshland, Bird Hide
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Keyword list has 24
-  terms (requested 10-18); Duplicate keywords: pond, trees
+- *Observations:* Keyword list has 22 terms (requested 10-18); Duplicate
+  keywords: river, trees, passenger
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.76s
-- *Generation time:* 15.23s
-- *Total time:* 16.00s
-- *Input validation time:* 6.01e-05
-- *Prompt preparation time:* 0.00995
-- *First-token latency:* 13.1
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 16,552
-- *Generation tokens:* 112
-- *Total tokens:* 16,664
-- *Prompt throughput (raw):* 1,262 tok/s
-- *Generation throughput (raw):* 90.1 tok/s
+- *Model load time:* 0.67s
+- *Generation time:* 15.87s
+- *Total time:* 16.55s
+- *Input validation time:* 4.72e-05
+- *Prompt preparation time:* 0.00963
+- *First-token latency:* 13.6
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 16,623
+- *Generation tokens:* 135
+- *Total tokens:* 16,758
+- *Prompt throughput (raw):* 1,225 tok/s
+- *Generation throughput (raw):* 92.9 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00046
+- *Post-cleanup active memory:* 0.000443
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1381
+- *Rendered prompt characters:* 1346
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -978,69 +899,194 @@ Keywords: Weathered Boathouse, Pond, Wetland, Lush Foliage, Marshland, Bird Hide
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Wooden boathouse by pond
+Title: Wavey Katey II motorboat on river
 
-Description: A weathered wooden boathouse on stilts stands over a calm pond, surrounded by lush green foliage and reeds under a cloudy sky, with a wooden deck and moss-covered roof.
+Description: A white motorboat named 'Wavey Katey II' with a blue canopy and a British flag sails along a calm river, passing a rustic wooden cottage surrounded by lush greenery and trees. The boat is equipped with fenders and an outboard motor, and a passenger is visible in the cabin.
 
-Keywords: boathouse, pond, wooden shed, stilts, foliage, reeds, moss, cloudy sky, wetland, lake, trees, water reflection, outdoor, birdwatching, architecture, bird hide, landscape, grass, marshland, wooden decking, leaves, pond, trees, water
+Keywords: motorboat, Wavey Katey II, British flag, river, riverbank, cottage, foliage, trees, leisure, boating, cabin cruiser, canopy, passenger, outboard motor, fender, nautical, river, passenger, railing, shrubs, trees, cruising
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
-### mlx-community/GLM-4.6V-Flash-mxfp4
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 25 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.60s
-- *Generation time:* 8.67s
-- *Total time:* 10.28s
-- *Input validation time:* 7.4e-05
-- *Prompt preparation time:* 0.00922
-- *First-token latency:* 6.45
-- *Cleanup time:* 0.117
-- *Prompt tokens:* 6,392
-- *Generation tokens:* 126
-- *Total tokens:* 6,518
-- *Prompt throughput (raw):* 992 tok/s
-- *Generation throughput (raw):* 76.1 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 6.8
-- *Cache memory:* 0.46
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00244
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.17s
+- *Generation time:* 8.47s
+- *Total time:* 10.66s
+- *Input validation time:* 7.35e-05
+- *Prompt preparation time:* 0.00854
+- *First-token latency:* 2.84
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 2,044
+- *Generation tokens:* 152
+- *Total tokens:* 2,196
+- *Prompt throughput (raw):* 720 tok/s
+- *Generation throughput (raw):* 29.6 tok/s
+- *Peak memory:* 22
+- *Active memory:* 18
+- *Cache memory:* 0.42
+- *Model-load active memory:* 18
+- *Post-cleanup active memory:* 0.00128
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1390
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1274
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Weathered Boathouse by Serene Pond
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.
-Keywords: weathered boathouse, serene pond, overhanging tree branches, wooden decking, wetland foliage, cloudy sky, foliage, forest, grass, lake, landscape, leaves, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed, architecture, bird hide, birdwatching, boardwalk
+Title:
+White motor cruiser 'Wavey Katey II' on calm waterway
+
+Description:
+A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees on a sunny afternoon in August 2026.
+
+Keywords:
+Boat, Motor cruiser, 'Wavey Katey II', British maritime flag, Calm waterway, Rustic wooden house, Lush green trees, Sunny afternoon, August 2026, Cabin cruiser, Canopy, Outboard motor, Boat fender, Passenger, Railing, Riverbank, Shrubs, Leisure, Nautical
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 21 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 10.49s
+- *Generation time:* 17.68s
+- *Total time:* 28.19s
+- *Input validation time:* 8.29e-05
+- *Prompt preparation time:* 0.0105
+- *First-token latency:* 4.88
+- *Cleanup time:* 0.233
+- *Prompt tokens:* 1,596
+- *Generation tokens:* 711
+- *Total tokens:* 2,307
+- *Prompt throughput (raw):* 327 tok/s
+- *Generation throughput (raw):* 64.0 tok/s
+- *Peak memory:* 60
+- *Active memory:* 59
+- *Cache memory:* 0.17
+- *Model-load active memory:* 58.8
+- *Post-cleanup active memory:* 0.00149
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1464
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get to work. I've got an image of a boat, and I need to generate some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a white motor cruiser, and I have some hints to work with.
+
+Okay, the image itself. It's a white motor cruiser, a "Wavey Katey II," judging by the name on the stern. It's got a blue canopy, and I can see a British flag flying. The setting is a calm river or lake, with a wooden house and some greenery in the background. The lighting seems to be a bit overcast, which is important to note.
+
+Now, the hints. The title hint is a bit of a mess, but I can extract the key elements: boat, flag, house, trees. The description hint is much better, but it has some errors. I need to be careful here. The keywords are a good starting point, but I need to refine them.
+
+Let's start with the title. I need something concise and descriptive. "Wavey Katey II Cruising on the River" is a good start.
+
+Next, the description. I need to combine the context, the image, and the hints. I'll start with the boat's name and the setting. Then I'll add the details about the flag, the house, and the weather. I'll make sure to mention the calm water and the overcast sky.
+
+Finally, the keywords. I need to be comprehensive. I'll include the boat's name, the type of boat, the setting, the key features, and the overall mood. I'll make sure to include the British flag, the wooden house, and the overcast sky.
+
+Okay, let's put it all together.
+
+**Title:** Wavey Katey II Cruising on the River
+
+**Description:** A white motor cruiser named 'Wavey Katey II' sails on a calm river, flying a British flag past a wooden house and lush green trees under an overcast sky.
+
+**Keywords:** Wavey Katey II, boat, motor cruiser, river, wooden house, British flag, overcast sky, white, blue canopy, cabin cruiser, leisure, nautical, riverbank, trees, foliage, houseboat, outboard motor, passenger, cabin, calm water, UK.
+
+That should be it. I've followed the instructions, used the image evidence, and avoided making claims about things I can't see. I'm confident this is a good representation of the image.
+&lt;/think&gt;
+
+Title: Wavey Katey II Cruising on the River
+
+Description: A white motor cruiser named 'Wavey Katey II' sails on a calm river, flying a British flag past a wooden house and lush green trees under an overcast sky.
+
+Keywords: Wavey Katey II, boat, motor cruiser, river, wooden house, British flag, overcast sky, white, blue canopy, cabin cruiser, leisure, nautical, riverbank, trees, foliage, houseboat, outboard motor, passenger, cabin, calm water, UK.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. I've got an image of a boat, and I need to generate some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a white motor cruiser, and I have some hints to work with.
+
+Okay, the image itself. It's a white motor cruiser, a "Wavey Katey II," judging by the name on the stern. It's got a blue canopy, and I can see a British flag flying. The setting is a calm river or lake, with a wooden house and some greenery in the background. The lighting seems to be a bit overcast, which is important to note.
+
+Now, the hints. The title hint is a bit of a mess, but I can extract the key elements: boat, flag, house, trees. The description hint is much better, but it has some errors. I need to be careful here. The keywords are a good starting point, but I need to refine them.
+
+Let's start with the title. I need something concise and descriptive. "Wavey Katey II Cruising on the River" is a good start.
+
+Next, the description. I need to combine the context, the image, and the hints. I'll start with the boat's name and the setting. Then I'll add the details about the flag, the house, and the weather. I'll make sure to mention the calm water and the overcast sky.
+
+Finally, the keywords. I need to be comprehensive. I'll include the boat's name, the type of boat, the setting, the key features, and the overall mood. I'll make sure to include the British flag, the wooden house, and the overcast sky.
+
+Okay, let's put it all together.
+
+**Title:** Wavey Katey II Cruising on the River
+
+**Description:** A white motor cruiser named 'Wavey Katey II' sails on a calm river, flying a British flag past a wooden house and lush green trees under an overcast sky.
+
+**Keywords:** Wavey Katey II, boat, motor cruiser, river, wooden house, British flag, overcast sky, white, blue canopy, cabin cruiser, leisure, nautical, riverbank, trees, foliage, houseboat, outboard motor, passenger, cabin, calm water, UK.
+
+That should be it. I've followed the instructions, used the image evidence, and avoided making claims about things I can't see. I'm confident this is a good representation of the image.
+</think>
+
+Title: Wavey Katey II Cruising on the River
+
+Description: A white motor cruiser named 'Wavey Katey II' sails on a calm river, flying a British flag past a wooden house and lush green trees under an overcast sky.
+
+Keywords: Wavey Katey II, boat, motor cruiser, river, wooden house, British flag, overcast sky, white, blue canopy, cabin cruiser, leisure, nautical, riverbank, trees, foliage, houseboat, outboard motor, passenger, cabin, calm water, UK.
+```
+
+</details>
 
 </details>
 
@@ -1056,29 +1102,30 @@ Keywords: weathered boathouse, serene pond, overhanging tree branches, wooden de
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Keyword
+  list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 7.72s
-- *Generation time:* 20.46s
-- *Total time:* 28.19s
-- *Input validation time:* 8.26e-05
-- *Prompt preparation time:* 0.00942
-- *First-token latency:* 17.5
-- *Cleanup time:* 0.261
-- *Prompt tokens:* 6,392
-- *Generation tokens:* 95
-- *Total tokens:* 6,487
-- *Prompt throughput (raw):* 366 tok/s
-- *Generation throughput (raw):* 38.8 tok/s
+- *Model load time:* 9.24s
+- *Generation time:* 22.00s
+- *Total time:* 31.26s
+- *Input validation time:* 4.71e-05
+- *Prompt preparation time:* 0.0115
+- *First-token latency:* 18.5
+- *Cleanup time:* 0.238
+- *Prompt tokens:* 6,325
+- *Generation tokens:* 126
+- *Total tokens:* 6,451
+- *Prompt throughput (raw):* 343 tok/s
+- *Generation throughput (raw):* 41.0 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
 - *Model-load active memory:* 61.9
-- *Post-cleanup active memory:* 0.00275
+- *Post-cleanup active memory:* 0.00274
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1390
+- *Rendered prompt characters:* 1355
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1094,18 +1141,18 @@ Keywords: weathered boathouse, serene pond, overhanging tree branches, wooden de
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Weathered Wooden Boathouse Over Pond
-Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush tree branches, wooden decking, and surrounding wetland foliage, under a cloudy sky.
-Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, marshland, reeds, water reflection, boardwalk, bird hide, architecture, outdoors, landscape&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: Wavey Katey II Motor Cruiser on River
+Description: A white motor cruiser named "Wavey Katey II" cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees, with a blue canopy and visible fenders.
+Keywords: Boat, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, White boat, British flag, Blue canopy, Rustic house, Lush greenery&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: Weathered Wooden Boathouse Over Pond
-Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush tree branches, wooden decking, and surrounding wetland foliage, under a cloudy sky.
-Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, marshland, reeds, water reflection, boardwalk, bird hide, architecture, outdoors, landscape<|end_of_box|>
+<|begin_of_box|>Title: Wavey Katey II Motor Cruiser on River
+Description: A white motor cruiser named "Wavey Katey II" cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees, with a blue canopy and visible fenders.
+Keywords: Boat, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, White boat, British flag, Blue canopy, Rustic house, Lush greenery<|end_of_box|>
 ```
 
 </details>
@@ -1126,27 +1173,27 @@ Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, 
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.75s
-- *Generation time:* 4.32s
-- *Total time:* 6.08s
-- *Input validation time:* 8.18e-05
-- *Prompt preparation time:* 0.00294
-- *First-token latency:* 0.82
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 2,118
-- *Generation tokens:* 99
-- *Total tokens:* 2,217
-- *Prompt throughput (raw):* 2,582 tok/s
-- *Generation throughput (raw):* 34.6 tok/s
+- *Model load time:* 1.62s
+- *Generation time:* 4.27s
+- *Total time:* 5.89s
+- *Input validation time:* 6.75e-05
+- *Prompt preparation time:* 0.00272
+- *First-token latency:* 0.96
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 2,605
+- *Generation tokens:* 95
+- *Total tokens:* 2,700
+- *Prompt throughput (raw):* 2,713 tok/s
+- *Generation throughput (raw):* 34.4 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
-- *Cache memory:* 0.17
+- *Cache memory:* 0.21
 - *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.00333
+- *Post-cleanup active memory:* 0.00331
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1314
+- *Rendered prompt characters:* 1279
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1162,90 +1209,71 @@ Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Stilted Boathouse Over Pond
-Description: A weathered wooden boathouse on stilts overlooks a tranquil pond, surrounded by lush foliage and under a cloudy sky. The scene captures serene outdoor architecture amidst a wetland setting.
-Keywords: Wooden boathouse, Stilts, Pond, Lush foliage, Cloudy sky, Wetland, Reeds, Water reflection, Architecture, Outdoors, Boardwalk, Trees, Leaves, Grass, Lake, Landscape
+Title: Boating on Calm Waterway
+
+Description: A white motor cruiser named 'Wavey Katey II' cruises past a rustic wooden house, flying a British maritime flag, with lush greenery in the background.
+
+Keywords: Boat, Wavey Katey II, Cruiser, British flag, Wooden house, Lush greenery, River, Fender, Cabin, Canopy, Railing, Leisure, Motorboat, Foliage, Outboard motor
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
-### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+### mlx-community/LFM2.5-VL-1.6B-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.56s
-- *Generation time:* 154.91s
-- *Total time:* 158.48s
-- *Input validation time:* 6.5e-05
-- *Prompt preparation time:* 0.00361
-- *First-token latency:* 1.28
-- *Cleanup time:* 0.514
-- *Prompt tokens:* 1,329
-- *Generation tokens:* 682
-- *Total tokens:* 2,011
-- *Prompt throughput (raw):* 1,035 tok/s
-- *Generation throughput (raw):* 4.46 tok/s
-- *Peak memory:* 40
-- *Active memory:* 33
-- *Cache memory:* 5.6
-- *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.00398
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.48s
+- *Generation time:* 1.71s
+- *Total time:* 2.21s
+- *Input validation time:* 5.38e-05
+- *Prompt preparation time:* 0.00505
+- *First-token latency:* 0.422
+- *Cleanup time:* 0.08
+- *Prompt tokens:* 2,627
+- *Generation tokens:* 149
+- *Total tokens:* 2,776
+- *Prompt throughput (raw):* 6,228 tok/s
+- *Generation throughput (raw):* 185 tok/s
+- *Peak memory:* 4.0
+- *Active memory:* 3.2
+- *Cache memory:* 0.08
+- *Model-load active memory:* 3.2
+- *Post-cleanup active memory:* 0.0041
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1496
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1325
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* [EOS]
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.
+Title: Wavey Katey II Motor Cruiser Cruising
 
-Starting with the title: The image shows a weathered wooden boathouse on stilts over a pond, surrounded by trees and foliage. The context mentions a serene pond, so maybe something like "Weathered Wooden Boathouse Over Serene Pond" but that's a bit long. Maybe shorten to "Weathered wooden boathouse over serene pond". That's 7 words.
+Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees. The boat is equipped with a blue canopy, a motor fender, and a cabin cruiser design, offering a leisurely boating experience.
 
-Next, the description: Need to combine context and visible details. The boathouse is weathered, on stilts, over a pond, with lush foliage, trees, wooden decking, wetland. So something like "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees framing the scene under a cloudy sky." That's a bit long, maybe trim to "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees under a cloudy sky." That's 2 sentences.
-
-Keywords: Need to pick 10-18 unique ones. From the hints: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Let's pick the most relevant: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching, Landscape. Wait, maybe check the image: the boathouse is a bird hide, so include that. Also, the decking is visible. So maybe: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching, Landscape. That's 14 keywords. Let me check if they are all visible or inferred. The image has a cloudy sky, foliage, forest, grass, lake, landscape, leaves, marshland, pond, wetland, wooden shed, boardwalk, water reflection, bird hide, birdwatching, and landscape again. Maybe remove one "Landscape" to avoid repetition. So: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching. That's 14.◁/think▷Title: Weathered wooden boathouse over serene pond
-Description: A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees under a cloudy sky.
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching&lt;|im_assistant|&gt;
+Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, River, Riverbank, Shrubs, Trees
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. 
-
-Starting with the title: The image shows a weathered wooden boathouse on stilts over a pond, surrounded by trees and foliage. The context mentions a serene pond, so maybe something like "Weathered Wooden Boathouse Over Serene Pond" but that's a bit long. Maybe shorten to "Weathered wooden boathouse over serene pond". That's 7 words.
-
-Next, the description: Need to combine context and visible details. The boathouse is weathered, on stilts, over a pond, with lush foliage, trees, wooden decking, wetland. So something like "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees framing the scene under a cloudy sky." That's a bit long, maybe trim to "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees under a cloudy sky." That's 2 sentences.
-
-Keywords: Need to pick 10-18 unique ones. From the hints: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Let's pick the most relevant: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching, Landscape. Wait, maybe check the image: the boathouse is a bird hide, so include that. Also, the decking is visible. So maybe: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching, Landscape. That's 14 keywords. Let me check if they are all visible or inferred. The image has a cloudy sky, foliage, forest, grass, lake, landscape, leaves, marshland, pond, wetland, wooden shed, boardwalk, water reflection, bird hide, birdwatching, and landscape again. Maybe remove one "Landscape" to avoid repetition. So: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching. That's 14.◁/think▷Title: Weathered wooden boathouse over serene pond  
-Description: A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and wetland vegetation, with a wooden deck and overhanging trees under a cloudy sky.  
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Pond, Wetland, Wooden shed, Boardwalk, Water reflection, Bird hide, Birdwatching<|im_assistant|>
-```
-
-</details>
 
 </details>
 
@@ -1261,29 +1289,29 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Observations:* Keyword list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.66s
-- *Generation time:* 5.51s
-- *Total time:* 7.18s
-- *Input validation time:* 5.95e-05
-- *Prompt preparation time:* 0.00116
-- *First-token latency:* 2.32
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 2,934
-- *Generation tokens:* 161
-- *Total tokens:* 3,095
-- *Prompt throughput (raw):* 1,264 tok/s
-- *Generation throughput (raw):* 61.1 tok/s
-- *Peak memory:* 13
+- *Model load time:* 1.25s
+- *Generation time:* 5.70s
+- *Total time:* 6.96s
+- *Input validation time:* 6.55e-05
+- *Prompt preparation time:* 0.000988
+- *First-token latency:* 1.8
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 2,577
+- *Generation tokens:* 215
+- *Total tokens:* 2,792
+- *Prompt throughput (raw):* 1,429 tok/s
+- *Generation throughput (raw):* 62.3 tok/s
+- *Peak memory:* 12
 - *Active memory:* 8.4
-- *Cache memory:* 0.60
+- *Cache memory:* 0.51
 - *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00516
+- *Post-cleanup active memory:* 0.00541
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3747
+- *Rendered prompt characters:* 3712
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1300,13 +1328,13 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 
 <pre class="model-output-readable">
 **Title:**
-*"Weathered Boathouse Over Serene Wetland Pond"*
+*Wavey Katey II Cruising Along British Waterway (2026-08-28)*
 
 **Description:**
-A weathered wooden boathouse, built on stilts, stands over a calm pond surrounded by lush foliage, reeds, and overhanging branches. Captured on **21 August 2026** under a cloudy sky, its wooden decking and reflections highlight its rustic charm and natural setting.
+A white Yamaha motor cruiser, *Wavey Katey II* (with blue canopy and fenders attached to its hull railings) cruises past a rustic wooden riverside cottage, flying a British maritime flag. Captured on **2026-08-28 at 16:17:42 UTC+01:00** under calm, reflective sunlight, the boat navigates a serene waterway lined with lush green foliage and shrubs.
 
 **Keywords:**
-Boathouse, Stilts, Wetland, Pond, Lush Foliage, Reeds, Overhanging Branches, Wooden Decking, Cloudy Sky, Rustic Architecture, Reflection, Forest Landscape, Marshland, Moss, Birdwatching Hide, Stilts Structure, Natural Lighting, Serene Waterscape, UK Landscape
+Boat, *Wavey Katey II*, Yamaha motor cruiser, British maritime flag, cruising, waterway, riverside cottage, blue canopy, boat fenders, hull railings, calm water, serene sunlight, lush foliage, shrubs, leisure boating, nautical scene, wooden cottage, passenger boat, outboard motor, riverbank, leisure cruising
 </pre>
 
 </details>
@@ -1323,30 +1351,29 @@ Boathouse, Stilts, Wetland, Pond, Lush Foliage, Reeds, Overhanging Branches, Woo
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 24 terms (requested 10-18); Duplicate
-  keywords: boathouse
+- *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.17s
-- *Generation time:* 4.83s
-- *Total time:* 6.01s
-- *Input validation time:* 4.77e-05
-- *Prompt preparation time:* 0.00423
-- *First-token latency:* 3.09
-- *Cleanup time:* 0.0987
-- *Prompt tokens:* 4,085
-- *Generation tokens:* 161
-- *Total tokens:* 4,246
-- *Prompt throughput (raw):* 1,323 tok/s
-- *Generation throughput (raw):* 166 tok/s
+- *Model load time:* 0.87s
+- *Generation time:* 4.72s
+- *Total time:* 5.61s
+- *Input validation time:* 6.78e-05
+- *Prompt preparation time:* 0.005
+- *First-token latency:* 3.33
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 4,039
+- *Generation tokens:* 150
+- *Total tokens:* 4,189
+- *Prompt throughput (raw):* 1,214 tok/s
+- *Generation throughput (raw):* 219 tok/s
 - *Peak memory:* 3.9
 - *Active memory:* 2.2
 - *Cache memory:* 0.64
 - *Model-load active memory:* 2.18
-- *Post-cleanup active memory:* 0.00626
+- *Post-cleanup active memory:* 0.00651
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1440
+- *Rendered prompt characters:* 1405
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1362,69 +1389,11 @@ Boathouse, Stilts, Wetland, Pond, Lush Foliage, Reeds, Overhanging Branches, Woo
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Boathouse in the Wetland Landscape
+Title: Wavey Katey II - A White Motor Cruiser Boat
 
-Description: A weathered wooden boathouse stands over the edge of a serene pond, framed by lush overhanging tree branches. The structure features wooden decking and a rustic wooden shed, with a wooden railing leading up to it. The surrounding area is filled with wetland foliage, reeds, and a calm body of water reflecting the cloudy sky. The scene is tranquil, with the boathouse serving as a focal point in the natural landscape.
+Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees. The boat features a blue canopy, an outboard motor, and a cabin cruiser setup with a visible driver. The surrounding environment includes a serene riverbank with trees and shrubs, and a quaint wooden house in the background.
 
-Keywords: Boathouse, Wetland Landscape, Foliage, Reeds, Water, Cloudy Sky, Outdoor, Pond, Architecture, Birdwatching, Forest, Moss, Leaves, Grass, Reflection, Nature, Wooden structure, Boathouse, Landscape, Wildlife, Serenity, Natural setting, Outdoor scene, Wetland environment.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ornith-10-35b-bf16"></a>
-
-### mlx-community/Ornith-1.0-35B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18); Title,
-  Description and Keywords copy all supplied hints unchanged
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 10.65s
-- *Generation time:* 65.06s
-- *Total time:* 75.73s
-- *Input validation time:* 4.62e-05
-- *Prompt preparation time:* 0.0177
-- *First-token latency:* 62
-- *Cleanup time:* 0.254
-- *Prompt tokens:* 16,568
-- *Generation tokens:* 110
-- *Total tokens:* 16,678
-- *Prompt throughput (raw):* 267 tok/s
-- *Generation throughput (raw):* 61.2 tok/s
-- *Peak memory:* 74
-- *Active memory:* 70
-- *Cache memory:* 0.89
-- *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00677
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1400
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Wooden boathouse on stilts over a pond
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
 </pre>
 
 </details>
@@ -1441,29 +1410,30 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Keyword list has 19 terms (requested 10-18); Duplicate
+  keywords: nautical, outboard motor
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.03s
-- *Generation time:* 3.26s
-- *Total time:* 4.30s
-- *Input validation time:* 6.68e-05
-- *Prompt preparation time:* 0.00168
-- *First-token latency:* 0.289
-- *Cleanup time:* 0.0898
-- *Prompt tokens:* 1,138
-- *Generation tokens:* 135
-- *Total tokens:* 1,273
-- *Prompt throughput (raw):* 3,938 tok/s
-- *Generation throughput (raw):* 54.8 tok/s
+- *Model load time:* 0.96s
+- *Generation time:* 3.34s
+- *Total time:* 4.31s
+- *Input validation time:* 7.23e-05
+- *Prompt preparation time:* 0.00172
+- *First-token latency:* 0.297
+- *Cleanup time:* 0.0912
+- *Prompt tokens:* 1,113
+- *Generation tokens:* 143
+- *Total tokens:* 1,256
+- *Prompt throughput (raw):* 3,745 tok/s
+- *Generation throughput (raw):* 54.5 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
 - *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00683
+- *Post-cleanup active memory:* 0.00708
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1330
+- *Rendered prompt characters:* 1295
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1479,146 +1449,58 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Serene Wooden Boathouse Over Pond
+Title: "Wavey Katey II Boat Cruising on a Serene River"
 
-Description: A weathered wooden boathouse stands majestically over a tranquil pond, surrounded by lush greenery and a cloudy sky, offering a peaceful retreat for nature enthusiasts.
+Description: The white motorboat 'Wavey Katey II' is seen cruising on a calm river, with a British flag flying from its mast, past a rustic riverside house and lush greenery.
 
-Keywords: wooden boathouse, pond, serene, lush, greenery, cloudy sky, tranquil, nature enthusiasts, weathered, architecture, wetland, foliage, overhanging branches, wooden decking, water reflection, reeds, marshland, moss, outdoors, bird hide
+Keywords: Wavey Katey II, motorboat, British flag, calm river, rustic house, lush greenery, nautical, outboard motor, passenger, riverbank, foliage, leisure, boating, canopy, cabin cruiser, nautical, outboard motor, flag, river.
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
 
-### mlx-community/Qwen3-VL-2B-Thinking-bf16
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
+<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.23s
-- *Generation time:* 41.81s
-- *Total time:* 43.07s
-- *Input validation time:* 7e-05
-- *Prompt preparation time:* 0.012
-- *First-token latency:* 21.3
-- *Cleanup time:* 0.0944
-- *Prompt tokens:* 16,554
-- *Generation tokens:* 913
-- *Total tokens:* 17,467
-- *Prompt throughput (raw):* 776 tok/s
-- *Generation throughput (raw):* 46.7 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 4.3
-- *Cache memory:* 2.7
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00714
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Model load time:* 1.88s
+- *Generation time:* 64.25s
+- *Total time:* 66.13s
+- *Input validation time:* 6.88e-05
+- *Prompt preparation time:* 0.00144
+- *First-token latency:* 61.9
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 16,623
+- *Generation tokens:* 122
+- *Total tokens:* 16,745
+- *Prompt throughput (raw):* 269 tok/s
+- *Generation throughput (raw):* 83.3 tok/s
+- *Peak memory:* 23
+- *Active memory:* 18
+- *Cache memory:* 2.3
+- *Model-load active memory:* 18.3
+- *Post-cleanup active memory:* 0.0077
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1346
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a weathered wooden boathouse on stilts over a pond, with trees and wetland. So maybe "Weathered Stilt Boathouse by Pond with Mossy Roof" – that's 9 words, fits.
-
-Next, the description. It has to combine context and visible details. Context is capture date/time and GPS, but we don't claim them visible. The main subject is the boathouse. Setting: over pond, lush trees, wetland. Action: standing, serene. Lighting: cloudy sky. Distinctive details: wooden decking, moss on roof, reeds, water reflection. So: "Weathered wooden boathouse on stilts over calm pond, framed by mossy roof and lush trees, with wooden deck and reeds lining the water, under cloudy sky."
-
-Then keywords. Need 10-18 unique, comma-separated. From context: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, the descriptive hints have some, but we need to pick relevant ones. Let's check the image: boathouse (wooden shed), pond, moss on roof, reeds, trees, water reflection, wetland, cloudy sky, foliage. So list: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, but the descriptive hints include "Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk". But we need to pick 10-18 unique. Let's check the image: the boathouse is wooden, so "Wooden shed" is there. The pond is a lake? Wait, the context says "Lake" but the image is a pond. Wait, the descriptive hints have "Lake" but the image is a pond. Wait, the problem says "Descriptive hints" include "Lake" but the image is a pond. Wait, the image shows a pond, so maybe "Pond" is correct. Let's list the keywords:
-
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, but "boardwalk" is in the descriptive hints? The image has a wooden deck, which is a boardwalk. So "boardwalk" is a keyword. Let's check the descriptive hints: "boardwalk" is listed. So the keywords should include those. Let's count: 1. Cloudy Sky, 2. Foliage, 3. Forest, 4. Grass, 5. Lake, 6. Landscape, 7. Leaves, 8. Marshland, 9. Moss, 10. Outdoors, 11. Pond, 12. Reeds, 13. Trees, 14. Water reflection, 15. Wetland, 16. Wooden shed, 17. architecture, 18. bird hide, 19. birdwatching, 20. boardwalk. Wait, but the problem says 10-1
-&lt;/think&gt;
-
-Title: Weathered Stilt Boathouse by Pond with Mossy Roof
-Description: Weathered wooden boathouse on stilts over calm pond, framed by mossy roof and lush trees, with wooden deck and reeds lining water, under cloudy sky.
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a weathered wooden boathouse on stilts over a pond, with trees and wetland. So maybe "Weathered Stilt Boathouse by Pond with Mossy Roof" – that's 9 words, fits.
-
-Next, the description. It has to combine context and visible details. Context is capture date/time and GPS, but we don't claim them visible. The main subject is the boathouse. Setting: over pond, lush trees, wetland. Action: standing, serene. Lighting: cloudy sky. Distinctive details: wooden decking, moss on roof, reeds, water reflection. So: "Weathered wooden boathouse on stilts over calm pond, framed by mossy roof and lush trees, with wooden deck and reeds lining the water, under cloudy sky."
-
-Then keywords. Need 10-18 unique, comma-separated. From context: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, the descriptive hints have some, but we need to pick relevant ones. Let's check the image: boathouse (wooden shed), pond, moss on roof, reeds, trees, water reflection, wetland, cloudy sky, foliage. So list: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, but the descriptive hints include "Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk". But we need to pick 10-18 unique. Let's check the image: the boathouse is wooden, so "Wooden shed" is there. The pond is a lake? Wait, the context says "Lake" but the image is a pond. Wait, the descriptive hints have "Lake" but the image is a pond. Wait, the problem says "Descriptive hints" include "Lake" but the image is a pond. Wait, the image shows a pond, so maybe "Pond" is correct. Let's list the keywords:
-
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Wait, but "boardwalk" is in the descriptive hints? The image has a wooden deck, which is a boardwalk. So "boardwalk" is a keyword. Let's check the descriptive hints: "boardwalk" is listed. So the keywords should include those. Let's count: 1. Cloudy Sky, 2. Foliage, 3. Forest, 4. Grass, 5. Lake, 6. Landscape, 7. Leaves, 8. Marshland, 9. Moss, 10. Outdoors, 11. Pond, 12. Reeds, 13. Trees, 14. Water reflection, 15. Wetland, 16. Wooden shed, 17. architecture, 18. bird hide, 19. birdwatching, 20. boardwalk. Wait, but the problem says 10-1
-</think>
-
-Title: Weathered Stilt Boathouse by Pond with Mossy Roof
-Description: Weathered wooden boathouse on stilts over calm pond, framed by mossy roof and lush trees, with wooden deck and reeds lining water, under cloudy sky.
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-### mlx-community/Qwen3.5-9B-MLX-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.39s
-- *Generation time:* 83.11s
-- *Total time:* 85.51s
-- *Input validation time:* 8.38e-05
-- *Prompt preparation time:* 0.00187
-- *First-token latency:* 78.2
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 16,568
-- *Generation tokens:* 139
-- *Total tokens:* 16,707
-- *Prompt throughput (raw):* 212 tok/s
-- *Generation throughput (raw):* 37.5 tok/s
-- *Peak memory:* 10.0
-- *Active memory:* 6.0
-- *Cache memory:* 1.2
-- *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00849
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1400
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -1626,92 +1508,9 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Weathered Wooden Bird Hide Over Serene Pond in Wetland
-
-Description:
-A weathered wooden bird hide stands on stilts over a calm pond, surrounded by lush greenery and overhanging trees under a cloudy sky. The structure features a wooden deck with railings and vertical planks, with visible moss on the roof and faint engraved text on the side.
-
-Keywords:
-Bird hide, wooden structure, pond, wetland, stilts, overhanging trees, cloudy sky, wooden deck, railings, moss, reeds, foliage, water reflection, forest, landscape, birdwatching, architecture, outdoors, UK, 2026
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title:  
-Weathered Wooden Bird Hide Over Serene Pond in Wetland
-
-Description:  
-A weathered wooden bird hide stands on stilts over a calm pond, surrounded by lush greenery and overhanging trees under a cloudy sky. The structure features a wooden deck with railings and vertical planks, with visible moss on the roof and faint engraved text on the side.
-
-Keywords:  
-Bird hide, wooden structure, pond, wetland, stilts, overhanging trees, cloudy sky, wooden deck, railings, moss, reeds, foliage, water reflection, forest, landscape, birdwatching, architecture, outdoors, UK, 2026
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
-
-### mlx-community/Qwen3.6-27B-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.42s
-- *Generation time:* 108.26s
-- *Total time:* 111.70s
-- *Input validation time:* 6.17e-05
-- *Prompt preparation time:* 0.0163
-- *First-token latency:* 98.7
-- *Cleanup time:* 0.162
-- *Prompt tokens:* 16,568
-- *Generation tokens:* 135
-- *Total tokens:* 16,703
-- *Prompt throughput (raw):* 168 tok/s
-- *Generation throughput (raw):* 15.8 tok/s
-- *Peak memory:* 33
-- *Active memory:* 29
-- *Cache memory:* 1.9
-- *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.009
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1400
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.6-27B-mxfp8/snapshots/5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Wooden Boathouse on Stilts Over a Pond
-
-Description:
-A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage. The scene is set under a cloudy sky, with water reflections and reeds adding to the tranquil atmosphere.
-
-Keywords:
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+Title: White motor cruiser cruising on a river
+Description: A white motor cruiser named 'Wavey Katey II' cruises on a calm river, its outboard motor creating a wake. The boat, featuring a blue canopy and a British flag, passes a wooden riverside cottage surrounded by lush green trees and foliage under bright daylight.
+Keywords: motor cruiser, boat, river, cottage, outboard motor, canopy, British flag, trees, foliage, shrubs, water, boating, leisure, nautical, cabin cruiser, passenger, railing, fender, lifebuoy, motorboat
 </pre>
 
 </details>
@@ -1730,27 +1529,27 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.23s
-- *Generation time:* 94.67s
-- *Total time:* 96.92s
-- *Input validation time:* 7.04e-05
-- *Prompt preparation time:* 0.0172
-- *First-token latency:* 86.2
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,568
-- *Generation tokens:* 133
-- *Total tokens:* 16,701
-- *Prompt throughput (raw):* 192 tok/s
-- *Generation throughput (raw):* 17.6 tok/s
+- *Model load time:* 2.03s
+- *Generation time:* 80.90s
+- *Total time:* 82.96s
+- *Input validation time:* 6.41e-05
+- *Prompt preparation time:* 0.0174
+- *First-token latency:* 75.5
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,639
+- *Generation tokens:* 131
+- *Total tokens:* 16,770
+- *Prompt throughput (raw):* 220 tok/s
+- *Generation throughput (raw):* 28.8 tok/s
 - *Peak memory:* 21
 - *Active memory:* 16
 - *Cache memory:* 1.9
 - *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.0095
+- *Post-cleanup active memory:* 0.00975
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1400
+- *Rendered prompt characters:* 1365
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1767,13 +1566,13 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 
 <pre class="model-output-readable">
 Title:
-Weathered wooden boathouse on a serene wetland pond
+Wavey Katey II Cruising Past a Rustic Riverside Cottage
 
 Description:
-A weathered wooden boathouse with a mossy roof stands on stilts over a calm pond, featuring a wooden boardwalk with cross-braced railings. The structure is framed by overhanging green tree branches and surrounded by lush wetland foliage under a cloudy sky.
+The white cabin cruiser Wavey Katey II moves along a calm river, flying a red ensign past a wooden riverside cottage and lush green trees. The boat features a blue canvas canopy and white fenders, with passengers visible inside the cabin.
 
 Keywords:
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
 </pre>
 
 </details>
@@ -1794,27 +1593,27 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
   terms (requested 10-18); Title, Description and Keywords copy all supplied
   hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.79s
-- *Generation time:* 1.95s
-- *Total time:* 2.75s
-- *Input validation time:* 7.09e-05
-- *Prompt preparation time:* 0.00309
-- *First-token latency:* 0.382
-- *Cleanup time:* 0.0868
-- *Prompt tokens:* 1,430
-- *Generation tokens:* 104
-- *Total tokens:* 1,534
-- *Prompt throughput (raw):* 3,744 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Model load time:* 0.73s
+- *Generation time:* 1.93s
+- *Total time:* 2.67s
+- *Input validation time:* 6.54e-05
+- *Prompt preparation time:* 0.00261
+- *First-token latency:* 0.387
+- *Cleanup time:* 0.0863
+- *Prompt tokens:* 1,411
+- *Generation tokens:* 112
+- *Total tokens:* 1,523
+- *Prompt throughput (raw):* 3,644 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
 - *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00962
+- *Post-cleanup active memory:* 0.00986
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1341
+- *Rendered prompt characters:* 1306
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1830,9 +1629,9 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Wooden Boathouse
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.
-Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+ Title: Cruising Motorboat
+Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
+Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
 </pre>
 
 </details>
@@ -1849,30 +1648,30 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18); Title,
-  Description and Keywords copy all supplied hints unchanged
+- *Observations:* Title has 11 words (requested 5-10); Keyword list has 20
+  terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 8.09s
-- *Generation time:* 32.04s
-- *Total time:* 40.16s
-- *Input validation time:* 6.18e-05
-- *Prompt preparation time:* 0.0159
-- *First-token latency:* 28.6
-- *Cleanup time:* 0.25
-- *Prompt tokens:* 3,496
-- *Generation tokens:* 108
-- *Total tokens:* 3,604
-- *Prompt throughput (raw):* 122 tok/s
-- *Generation throughput (raw):* 40.5 tok/s
+- *Model load time:* 7.36s
+- *Generation time:* 19.93s
+- *Total time:* 27.32s
+- *Input validation time:* 7.67e-05
+- *Prompt preparation time:* 0.0165
+- *First-token latency:* 16.6
+- *Cleanup time:* 0.245
+- *Prompt tokens:* 3,472
+- *Generation tokens:* 118
+- *Total tokens:* 3,590
+- *Prompt throughput (raw):* 210 tok/s
+- *Generation throughput (raw):* 44.7 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.41
 - *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.00988
+- *Post-cleanup active memory:* 0.0101
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
+- *Rendered prompt characters:* 1352
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1889,13 +1688,75 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 
 <pre class="model-output-readable">
 Title:
-Weathered wooden boathouse over a pond
+British motor cruiser 'Wavey Katey II' cruising on a calm river
 
 Description:
-A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.
+A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
 
 Keywords:
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 25 terms (requested 10-18); Duplicate
+  keywords: cabin cruiser
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.14s
+- *Generation time:* 21.63s
+- *Total time:* 22.78s
+- *Input validation time:* 6.79e-05
+- *Prompt preparation time:* 0.0047
+- *First-token latency:* 18.2
+- *Cleanup time:* 0.0997
+- *Prompt tokens:* 16,634
+- *Generation tokens:* 149
+- *Total tokens:* 16,783
+- *Prompt throughput (raw):* 913 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
+- *Peak memory:* 14
+- *Active memory:* 9.5
+- *Cache memory:* 1.4
+- *Model-load active memory:* 9.46
+- *Post-cleanup active memory:* 0.0104
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1404
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+"Wavey Katey II Cruising Along the River"
+
+Description:
+A white motor cruiser named "Wavey Katey II" glides through calm waters, its British flag fluttering in the breeze, as it passes a rustic wooden riverside cottage surrounded by lush greenery. The scene captures leisurely boating activity under soft, diffused lighting.
+
+Keywords: Boat, Wavey Katey II, British flag, motor cruiser, riverside cottage, wooden structure, lush foliage, calm water, leisure boating, outboard motor, cabin cruiser, canopy, fenders, shrubs, trees, riverbank, nautical, cabin, passenger, driver, motorboat, cabin cruiser, boating, river, countryside.
 </pre>
 
 </details>
@@ -1915,26 +1776,26 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Model load time:* 3.43s
-- *Generation time:* 2.29s
-- *Total time:* 5.75s
-- *Input validation time:* 5.6e-05
-- *Prompt preparation time:* 0.0235
+- *Generation time:* 2.62s
+- *Total time:* 6.08s
+- *Input validation time:* 6.07e-05
+- *Prompt preparation time:* 0.0227
 - *First-token latency:* 0.334
-- *Cleanup time:* 0.165
-- *Prompt tokens:* 594
+- *Cleanup time:* 0.149
+- *Prompt tokens:* 575
 - *Generation tokens:* 85
-- *Total tokens:* 679
-- *Prompt throughput (raw):* 1,778 tok/s
-- *Generation throughput (raw):* 70.9 tok/s
+- *Total tokens:* 660
+- *Prompt throughput (raw):* 1,722 tok/s
+- *Generation throughput (raw):* 51.8 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
 - *Model-load active memory:* 28
-- *Post-cleanup active memory:* 0.0102
+- *Post-cleanup active memory:* 0.0104
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1335
+- *Rendered prompt characters:* 1300
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1951,9 +1812,9 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Weathered Wooden Boathouse Over Serene Pond
-Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.
-Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
+&lt;channel|&gt;Title: White motor cruiser Wavey Katey II cruising on a river
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.
+Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, maritime flag, fender, railing, canopy, cottage, leisure, riverbank, trees, shrubs
 </pre>
 
 <details>
@@ -1961,9 +1822,9 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse Over Serene Pond
-Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.
-Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
+<channel|>Title: White motor cruiser Wavey Katey II cruising on a river
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.
+Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, maritime flag, fender, railing, canopy, cottage, leisure, riverbank, trees, shrubs
 ```
 
 </details>
@@ -1982,29 +1843,30 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
+- *Observations:* Unrecognised model control tokens remain visible; Duplicate
+  keywords: nautical
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.33s
-- *Generation time:* 2.68s
-- *Total time:* 6.02s
-- *Input validation time:* 5.94e-05
-- *Prompt preparation time:* 0.00106
-- *First-token latency:* 0.324
-- *Cleanup time:* 0.158
-- *Prompt tokens:* 594
-- *Generation tokens:* 91
-- *Total tokens:* 685
-- *Prompt throughput (raw):* 1,835 tok/s
-- *Generation throughput (raw):* 57.8 tok/s
+- *Model load time:* 3.30s
+- *Generation time:* 2.81s
+- *Total time:* 6.12s
+- *Input validation time:* 5.12e-05
+- *Prompt preparation time:* 0.0015
+- *First-token latency:* 0.328
+- *Cleanup time:* 0.138
+- *Prompt tokens:* 575
+- *Generation tokens:* 85
+- *Total tokens:* 660
+- *Prompt throughput (raw):* 1,755 tok/s
+- *Generation throughput (raw):* 46.5 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
 - *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0102
+- *Post-cleanup active memory:* 0.0104
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1335
+- *Rendered prompt characters:* 1300
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2021,9 +1883,9 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Weathered Wooden Boathouse Over a Serene Wetland Pond
-Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland foliage.
-Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wooden shed
+&lt;channel|&gt;Title: White motor cruiser Wavey Katey II cruising on a river
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.
+Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, fender, canopy, flag, cottage, foliage, shrubs, trees, leisure, nautical, nautical
 </pre>
 
 <details>
@@ -2031,12 +1893,128 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse Over a Serene Wetland Pond
-Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland foliage.
-Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wooden shed
+<channel|>Title: White motor cruiser Wavey Katey II cruising on a river
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.
+Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, fender, canopy, flag, cottage, foliage, shrubs, trees, leisure, nautical, nautical
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.26s
+- *Generation time:* 6.02s
+- *Total time:* 8.30s
+- *Input validation time:* 5.47e-05
+- *Prompt preparation time:* 0.0037
+- *First-token latency:* 1.1
+- *Cleanup time:* 0.132
+- *Prompt tokens:* 570
+- *Generation tokens:* 127
+- *Total tokens:* 697
+- *Prompt throughput (raw):* 519 tok/s
+- *Generation throughput (raw):* 28.4 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.1
+- *Post-cleanup active memory:* 0.011
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1329
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Wavey Katey II on River Cruise, August 2026
+
+Description: Captured on 28th August 2026, the white motor cruiser 'Wavey Katey II' cruises along a calm river, passing a wooden house and trees in bright daylight. A British maritime flag is flown from the stern of the boat.
+
+Keywords: Boat, Motorboat, Cabin cruiser, Cruising, River, Riverbank, Trees, Foliage, Cottage, House, Flag, Wavey Katey II, Outboard motor, Railing, Fender, Leisure, Nautical, Canopy, Plus2
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
+
+### mlx-community/granite-4.0-3b-vision-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: outboard motor
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.62s
+- *Generation time:* 1.82s
+- *Total time:* 2.45s
+- *Input validation time:* 6.55e-05
+- *Prompt preparation time:* 0.0113
+- *First-token latency:* 0.454
+- *Cleanup time:* 0.0921
+- *Prompt tokens:* 1,510
+- *Generation tokens:* 118
+- *Total tokens:* 1,628
+- *Prompt throughput (raw):* 3,328 tok/s
+- *Generation throughput (raw):* 170 tok/s
+- *Peak memory:* 4.8
+- *Active memory:* 3.0
+- *Cache memory:* 0.25
+- *Model-load active memory:* 3.03
+- *Post-cleanup active memory:* 0.0128
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1498
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Wavey Katey II Cruising Along a Serene Waterway"
+Description: "A white motor cruiser named 'Wavey Katey II' glides through calm waters, passing by a rustic riverside cottage and lush greenery, under a British maritime flag."
+Keywords: Boat, Motor cruiser, British flag, Cottage, Waterway, Trees, Canopy, Outboard motor, Nautical, Leisure, YAMAHA, Outboard motor, British-English, 2026-08-28 16:17:42 UTC+01:00
+</pre>
 
 </details>
 
@@ -2054,27 +2032,27 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.93s
-- *Generation time:* 5.07s
-- *Total time:* 7.01s
-- *Input validation time:* 5.83e-05
-- *Prompt preparation time:* 0.00492
-- *First-token latency:* 1.68
+- *Model load time:* 1.66s
+- *Generation time:* 5.08s
+- *Total time:* 6.75s
+- *Input validation time:* 6.18e-05
+- *Prompt preparation time:* 0.00389
+- *First-token latency:* 1.46
 - *Cleanup time:* 0.113
-- *Prompt tokens:* 3,124
-- *Generation tokens:* 112
-- *Total tokens:* 3,236
-- *Prompt throughput (raw):* 1,861 tok/s
-- *Generation throughput (raw):* 39.3 tok/s
-- *Peak memory:* 16
+- *Prompt tokens:* 2,648
+- *Generation tokens:* 125
+- *Total tokens:* 2,773
+- *Prompt throughput (raw):* 1,816 tok/s
+- *Generation throughput (raw):* 39.1 tok/s
+- *Peak memory:* 15
 - *Active memory:* 13
-- *Cache memory:* 0.59
+- *Cache memory:* 0.50
 - *Model-load active memory:* 13.5
-- *Post-cleanup active memory:* 0.0128
+- *Post-cleanup active memory:* 0.0131
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1309
+- *Rendered prompt characters:* 1274
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2091,13 +2069,77 @@ Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshl
 
 <pre class="model-output-readable">
 Title:
-Weathered Boathouse Overlooking Serene Wetland Pond
+Motor Cruiser "Wavey Katey II" on Calm River
 
 Description:
-A weathered wooden boathouse stands on stilts over a tranquil pond, surrounded by lush foliage and framed by overhanging tree branches under a cloudy sky.
+The white motor cruiser "Wavey Katey II" cruises along a serene river, displaying a British maritime flag, with a rustic riverside cottage and lush greenery in the background.
 
 Keywords:
-Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
+</pre>
+
+</details>
+
+---
+
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+
+<details>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Keyword list has 42 terms (requested
+  10-18); Duplicate keywords: boat fender, boat driver
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.41s
+- *Generation time:* 0.96s
+- *Total time:* 1.64s
+- *Input validation time:* 0.258
+- *Prompt preparation time:* 0.00657
+- *First-token latency:* 0.125
+- *Cleanup time:* 0.0632
+- *Prompt tokens:* 2,627
+- *Generation tokens:* 200
+- *Total tokens:* 2,827
+- *Prompt throughput (raw):* 21,065 tok/s
+- *Generation throughput (raw):* 472 tok/s
+- *Peak memory:* 1.7
+- *Active memory:* 0.90
+- *Cache memory:* 0.23
+- *Model-load active memory:* 0.897
+- *Post-cleanup active memory:* 0.000132
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1325
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Boat Cruising on a Calm River
+
+Description:
+A white motor cruiser boat named 'Wavey Katey II' cruises along a calm river, with a British maritime flag flying and lush green trees in the background.
+
+Keywords:
+Boat, Cruising, River, Riverbank, Foliage, Nautical, Outboard motor, Passenger, Cabin cruiser, Canopy, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver, Boat fender, Boat driver,
 </pre>
 
 </details>
@@ -2115,32 +2157,32 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Title has 4 words (requested 5-10); Keyword
-  list has 61 terms (requested 10-18); Duplicate keywords: boathouse, pond,
-  foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching,
-  pondside
+  after sustained repeated output; Title has 13 words (requested 5-10);
+  Keyword list has 54 terms (requested 10-18); Duplicate keywords: outboard
+  motor, passenger, railing, river, riverbank, shrubs, trees, leisure,
+  cruising, nautical
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Model load time:* 0.70s
-- *Generation time:* 4.52s
-- *Total time:* 5.22s
-- *Input validation time:* 6.69e-05
-- *Prompt preparation time:* 0.00221
-- *First-token latency:* 1
-- *Cleanup time:* 0.0893
-- *Prompt tokens:* 2,072
-- *Generation tokens:* 225
-- *Total tokens:* 2,297
-- *Prompt throughput (raw):* 2,071 tok/s
-- *Generation throughput (raw):* 85.1 tok/s
-- *Peak memory:* 3.7
+- *Model load time:* 0.60s
+- *Generation time:* 3.71s
+- *Total time:* 4.32s
+- *Input validation time:* 5.01e-05
+- *Prompt preparation time:* 0.00268
+- *First-token latency:* 0.939
+- *Cleanup time:* 0.0805
+- *Prompt tokens:* 2,047
+- *Generation tokens:* 275
+- *Total tokens:* 2,322
+- *Prompt throughput (raw):* 2,180 tok/s
+- *Generation throughput (raw):* 138 tok/s
+- *Peak memory:* 3.8
 - *Active memory:* 2.1
-- *Cache memory:* 0.92
+- *Cache memory:* 1.2
 - *Model-load active memory:* 2.11
-- *Post-cleanup active memory:* 0.000771
+- *Post-cleanup active memory:* 0.000755
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1321
+- *Rendered prompt characters:* 1286
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2157,11 +2199,13 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 
 <pre class="model-output-readable">
 Title:
-A Serene Pondside Hideout
+A White Motor Cruiser named 'Wavey Katey II' Cruises Along a Calm Waterway
+
 Description:
-A rustic wooden boathouse built on stilts overlooks a tranquil pond, surrounded by lush foliage and framed by the overhanging branches of a nearby tree. The wooden deck and railing add to the charm of this peaceful outdoor retreat, perfect for birdwatching or simply enjoying the serenity of nature.
+A white motor cruiser named 'Wavey Katey II' is seen cruising along a calm waterway, flying a British maritime flag. The boat is passing by a rustic wooden riverside house and lush green trees. The boat driver is visible inside the cabin, enjoying the peaceful surroundings. The boat is equipped with a canopy, fenders, and an outboard motor. The scene is set during the daytime under clear skies.
+
 Keywords:
-boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck,
+Boat, Wavey Katey II, Motor Cruiser, British Maritime Flag, Calm Waterway, Rustic Wooden Riverbank, Lush Green Trees, Boat Driver, Cabin Cruiser, Canopy, Outboard Motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Leisure, Cruising, Nautical, Outboard Motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Leisure, Cruising, Nautical, Outboard Motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Leisure, Cruising, Nautical, Outboard Motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Leisure, Cruising, Nautical, Outboard Motor, Passenger, Railing, River,
 </pre>
 
 </details>
@@ -2182,27 +2226,27 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.87s
-- *Generation time:* 27.07s
-- *Total time:* 28.95s
-- *Input validation time:* 7.18e-05
-- *Prompt preparation time:* 0.00895
-- *First-token latency:* 2.06
-- *Cleanup time:* 0.117
-- *Prompt tokens:* 3,215
+- *Model load time:* 1.59s
+- *Generation time:* 26.01s
+- *Total time:* 27.61s
+- *Input validation time:* 5.4e-05
+- *Prompt preparation time:* 0.0086
+- *First-token latency:* 1.75
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 2,739
 - *Generation tokens:* 1,000
-- *Total tokens:* 4,215
-- *Prompt throughput (raw):* 1,560 tok/s
-- *Generation throughput (raw):* 40.9 tok/s
-- *Peak memory:* 15
+- *Total tokens:* 3,739
+- *Prompt throughput (raw):* 1,566 tok/s
+- *Generation throughput (raw):* 42.0 tok/s
+- *Peak memory:* 14
 - *Active memory:* 13
-- *Cache memory:* 0.87
+- *Cache memory:* 0.77
 - *Model-load active memory:* 12.6
-- *Post-cleanup active memory:* 0.00103
+- *Post-cleanup active memory:* 0.00102
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1683
+- *Rendered prompt characters:* 1648
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2219,129 +2263,26 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can include them in description? The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can mention that the image was captured on 21 August 2026 at 14:34:53 (UTC+01:00) at coordinates 51.441113°N, 0.565406°W. But we need to be careful: The description should be 1-2 sentences factual, combining relevant context with main visible subject, setting, action, lighting, and distinctive details. So we can say something like: "A weathered wooden boathouse on stilts overlooks a tranquil pond, surrounded by lush overhanging foliage and wetland reeds, captured on 21 August 2026 at 14:34:53 UTC+01:00 at 51.441113°N, 0.565406°W under a cloudy sky." That would be a single sentence. Or we can break into two sentences: "A weathered wooden boathouse on stilts overlooks a tranquil pond, surrounded by lush overhanging foliage and wetland reeds. The scene was captured on 21 August 2026 at 14:34:53 UTC+01:00 at 51.441113°N, 0.565406°W under a cloudy sky." That is two sentences.
+We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time: 2026-08-28 16:17:42 UTC+01:00. The descriptive hints: description hint: "A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees." Keyword hints: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees.
 
-Now the title: 5-10 words, concrete. Something like "Stilted Boathouse Over Serene Pond". That's 5 words. Or "Weathered Boathouse on Stilts by Pond". That's 7 words. Let's pick "Weathered Boathouse on Stilts by Pond". That's 7 words.
+We need to produce:
 
-Now keywords: 10-18 unique, comma-separated. Should cover relevant context and visible details. Use British English. Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. That's 20 items, but we need 10-18. So we need to select 10-18 unique keywords. Let's pick 14 maybe. Let's list: Cloudy Sky, Foliage, Forest, Grass, Pond, Reeds, Wetland, Wooden shed, Architecture, Bird hide, Birdwatching, Boardwalk, Water reflection, Moss. That's 14. Ensure they are unique and separated by commas. Use British spelling: "Grass" is fine. "Lake" maybe not needed because it's a pond. "Landscape" maybe. But we have enough.
+- a concrete 5-10-word title (so 5-10 words, presumably a short title).
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
-Now we need to output exactly three sections: Title, Description, Keywords. No extra text. Ensure each line starts with the label and colon. Title: "Weathered Boathouse on Stilts by Pond". Description: two sentences. Keywords: list.
+We must treat capture date/time as authoritative fact, but not claim they are visible. So we can incorporate date/time in description if needed, but not claim it's visible. The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. So we need to mention the boat name "Wavey Katey II", the British maritime flag (the Union Jack?), the white motor cruiser, the calm waterway, the rustic wooden riverside house, lush green trees, the canopy (blue canopy), fenders, etc. Also mention the time of day: 16:17:42 UTC+01:00, which is 4:17 PM BST (British Summer Time). Lighting: likely bright daylight, maybe warm afternoon light. The boat appears to be moving, leaving a wake. The boat has a blue canopy, a white hull, a small cabin, a flag on the stern (red? Actually the hint says British maritime flag, which is the Red Ensign with the Union Jack in the canton? But the image shows a red flag? The hint says British maritime flag, but the image shows a red flag? Actually the image shows a red flag on the stern, which could be the British Red Ensign (a red field with the Union Jack in the canton). The hint says British maritime flag, so we can mention that.
 
-Check for any conflict: The descriptive hints mention "bird hide, birdwatching". The image shows a wooden structure that could be a bird hide. So we can include those keywords. The context includes capture date/time and GPS. We can mention them in description. The description should combine relevant context with main visible subject, setting, action, lighting, and distinctive details. So we need to mention the cloudy sky (lighting). The image shows overcast, diffused light. So we can mention "overcast lighting". The description can mention "soft, diffused light from an overcast sky". That is good.
+We need to produce 10-18 unique keywords. The hints provide many, but we can also add others like "cabin cruiser", "fender", "riverbank", "shrubs", "trees", "cottage", "railings", "outboard motor", "passenger", "leisure", "nautical", "motorboat", "boat driver", "flag", "canopy", "calm water", "wake". We need 10-18 unique keywords, separated by commas.
 
-Now we need to ensure the description is 1-2 sentences. Let's craft:
+We need to ensure we have 5-10 words in the title. Title: "Wavey Katey II cruising past riverside cottage". That's 7 words. Or "White cruiser Wavey Katey II on calm river". That's 9 words. Or "Wavey Katey II glides past wooden cottage". That's 7 words. Title must be concrete 5-10 words. Let's choose "White cruiser Wavey Katey II on calm river". That's 9 words.
 
-"Weathered wooden boathouse on stilts overlooks a tranquil pond, framed by lush overhanging foliage, reeds, and wetland vegetation under a cloudy sky. Captured on 21 August 2026 at 14:34:53 UTC+01:00 at 51.441113°N, 0.565406°W, the scene shows soft, diffused lighting and a calm water reflection."
+Now description: 1-2 sentences. Must combine relevant context with main visible subject, setting, action, lighting, distinctive details. So something like: "On 28 August 2026 at 16:17 BST, the white cabin cruiser Wavey Katey II glides along a tranquil river, its blue canopy and British maritime flag contrasting against the lush green foliage and a rustic wooden riverside cottage in the background." That's one sentence. Could add second sentence about lighting: "Bright afternoon light highlights the boat’s polished hull and the gentle wake trailing behind." That's two sentences. That's fine.
 
-That's two sentences. Good.
+Now keywords: 10-18 unique, comma-separated. Let's list: Boat, Cabin cruiser, Wavey Katey II, British flag, Blue canopy, River, Calm water, Riverside cottage, Wooden house, Lush foliage, Trees, Shrubs, Fender, Outboard motor, Passenger, Nautical, Leisure, Wake. That's 18 keywords. Ensure they are unique and separated by commas. That's fine.
 
-Now keywords: we
+We need to ensure we
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: boardwalk
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 5.96s
-- *Generation time:* 13.05s
-- *Total time:* 19.02s
-- *Input validation time:* 6.58e-05
-- *Prompt preparation time:* 0.00931
-- *First-token latency:* 2.42
-- *Cleanup time:* 0.216
-- *Prompt tokens:* 1,641
-- *Generation tokens:* 575
-- *Total tokens:* 2,216
-- *Prompt throughput (raw):* 677 tok/s
-- *Generation throughput (raw):* 60.9 tok/s
-- *Peak memory:* 60
-- *Active memory:* 59
-- *Cache memory:* 0.16
-- *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00151
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1499
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get to work. I've got an image and some hints to work with, and my task is to create some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a boathouse, and I have the context to work with.
-
-The image itself is a bit of a mess, but I can see the core elements. It's a wooden boathouse, likely a traditional one, built on stilts over water. The setting is a wetland or marsh, with reeds, willows, and a pond. The lighting is overcast, which is important for the mood.
-
-Now, the hints. The description is a bit repetitive, but I can extract the key elements: weathered wooden boathouse, stilts, pond, tree branches, decking, wetland foliage. The keywords are more useful, but some are redundant. I need to be careful about what to include.
-
-The authoritative context is crucial. The date and time are useless for the image itself, but the GPS coordinates are gold. That's the key to the location. I'll use that to pinpoint the location.
-
-Okay, time to synthesize. The title needs to be concise and descriptive. I'll go with "Wooden Boathouse Over a Wetland Pond." The description needs to be factual and incorporate the context. I'll start with the location, then describe the boathouse, the setting, and the weather. The keywords need to be unique and relevant. I'll use the authoritative GPS coordinates, the key elements from the hints, and the location name.
-
-Let's refine the description. I'll make sure it's accurate and flows well. I'll also make sure to include the location name.
-
-Final check: Title, description, keywords. All good. I'm ready to output the metadata.
-&lt;/think&gt;
-
-Title: Wooden Boathouse Over a Wetland Pond
-
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond in a wetland, framed by lush overhanging tree branches and surrounding reeds. The scene is set in a tranquil, overcast landscape with a damp, green atmosphere.
-
-Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, board
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get to work. I've got an image and some hints to work with, and my task is to create some metadata for it. First things first, I need to break down the request. It's a straightforward task: title, description, and keywords. The image is of a boathouse, and I have the context to work with.
-
-The image itself is a bit of a mess, but I can see the core elements. It's a wooden boathouse, likely a traditional one, built on stilts over water. The setting is a wetland or marsh, with reeds, willows, and a pond. The lighting is overcast, which is important for the mood.
-
-Now, the hints. The description is a bit repetitive, but I can extract the key elements: weathered wooden boathouse, stilts, pond, tree branches, decking, wetland foliage. The keywords are more useful, but some are redundant. I need to be careful about what to include.
-
-The authoritative context is crucial. The date and time are useless for the image itself, but the GPS coordinates are gold. That's the key to the location. I'll use that to pinpoint the location.
-
-Okay, time to synthesize. The title needs to be concise and descriptive. I'll go with "Wooden Boathouse Over a Wetland Pond." The description needs to be factual and incorporate the context. I'll start with the location, then describe the boathouse, the setting, and the weather. The keywords need to be unique and relevant. I'll use the authoritative GPS coordinates, the key elements from the hints, and the location name.
-
-Let's refine the description. I'll make sure it's accurate and flows well. I'll also make sure to include the location name.
-
-Final check: Title, description, keywords. All good. I'm ready to output the metadata.
-</think>
-
-Title: Wooden Boathouse Over a Wetland Pond
-
-Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond in a wetland, framed by lush overhanging tree branches and surrounding reeds. The scene is set in a tranquil, overcast landscape with a damp, green atmosphere.
-
-Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, board
-```
-
-</details>
 
 </details>
 
@@ -2360,27 +2301,27 @@ Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, ov
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 1.10s
-- *Generation time:* 1.35s
-- *Total time:* 2.46s
-- *Input validation time:* 7.25e-05
-- *Prompt preparation time:* 0.00268
-- *First-token latency:* 0.0946
-- *Cleanup time:* 0.089
-- *Prompt tokens:* 339
-- *Generation tokens:* 54
-- *Total tokens:* 393
-- *Prompt throughput (raw):* 3,583 tok/s
-- *Generation throughput (raw):* 300 tok/s
-- *Peak memory:* 2.1
+- *Model load time:* 0.64s
+- *Generation time:* 1.31s
+- *Total time:* 1.96s
+- *Input validation time:* 6.3e-05
+- *Prompt preparation time:* 0.00219
+- *First-token latency:* 0.0983
+- *Cleanup time:* 0.0827
+- *Prompt tokens:* 314
+- *Generation tokens:* 41
+- *Total tokens:* 355
+- *Prompt throughput (raw):* 3,193 tok/s
+- *Generation throughput (raw):* 344 tok/s
+- *Peak memory:* 2.2
 - *Active memory:* 1.2
-- *Cache memory:* 0.02
+- *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
-- *Post-cleanup active memory:* 0.00182
+- *Post-cleanup active memory:* 0.0018
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1404
+- *Rendered prompt characters:* 1369
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2396,7 +2337,7 @@ Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, ov
 *Readable output:*
 
 <pre class="model-output-readable">
-A weathered wooden boathouse stands over a serene pond, surrounded by lush foliage and a cloudy sky, with a concrete 5-10-word title: "A tranquil lakeside scene with a weathered wooden boathouse and overhanging trees."
+A serene white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
 </pre>
 
 </details>
@@ -2413,34 +2354,32 @@ A weathered wooden boathouse stands over a serene pond, surrounded by lush folia
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Extra text appears before
-  the Title field; Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete; Keyword list has 80 terms (requested
-  10-18); Duplicate keywords: foliage, pond, wetland, wooden shed, trees,
-  water reflection, marshland, reeds, leaves, outdoors, landscape, moss,
-  boardwalk, architecture, grass, bird hide, birdwatching
+- *Observations:* Extra text appears before the Title field; Response appears
+  cut off at the token limit; Internal reasoning block appears incomplete;
+  Title has 11 words (requested 5-10); Keyword list has 29 terms (requested
+  10-18); Duplicate keywords: trees
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.94s
-- *Generation time:* 27.73s
-- *Total time:* 29.68s
-- *Input validation time:* 5.87e-05
-- *Prompt preparation time:* 0.00298
-- *First-token latency:* 5.43
-- *Cleanup time:* 0.124
-- *Prompt tokens:* 6,388
+- *Model load time:* 1.67s
+- *Generation time:* 26.65s
+- *Total time:* 28.33s
+- *Input validation time:* 5.38e-05
+- *Prompt preparation time:* 0.00252
+- *First-token latency:* 5.25
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 6,321
 - *Generation tokens:* 1,000
-- *Total tokens:* 7,388
-- *Prompt throughput (raw):* 1,176 tok/s
-- *Generation throughput (raw):* 46.0 tok/s
+- *Total tokens:* 7,321
+- *Prompt throughput (raw):* 1,204 tok/s
+- *Generation throughput (raw):* 47.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.43
 - *Model-load active memory:* 11.8
-- *Post-cleanup active memory:* 0.00213
+- *Post-cleanup active memory:* 0.00211
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
+- *Rendered prompt characters:* 1331
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2456,42 +2395,86 @@ A weathered wooden boathouse stands over a serene pond, surrounded by lush folia
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image: weathered wooden boathouse, stilts, pond, trees, etc. Maybe "Weathered Wooden Boathouse by the Pond".
+&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The boat is named "Wavey Katey II" and it's a motor cruiser. So maybe "Wavey Katey II Motor Cruiser on Waterway".
 
-Next, the description: combine context (date/time, GPS) with main subject, setting, action, lighting, distinctive details. The image has a weathered wooden structure on stilts over water, lush trees, cloudy sky, wetland. So something like "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21." Wait, need to make sure it's 1-2 sentences. Let's check the hints and image. The boathouse is on stilts, over pond, framed by trees, wooden decking. So description: "A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging trees and wetland vegetation, under a cloudy sky, captured on 2026-08-21."
+Next, the description: need to combine context (capture date, maybe) with main subject, setting, action, lighting, distinctive details. The boat is cruising, past a wooden riverside house, flying a British flag, calm waterway, etc. Let's make it a 1-2 sentence factual description.
 
-Then keywords: need 10-18 unique, comma-separated. From hints and image: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Let's pick the most relevant ones. Let's list: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture, Grass. Wait, need to make sure they are unique. Let's check each hint.
+Then keywords: need 10-18 unique ones from the hints, covering context and visible details. Let's list them out: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs. Wait, let's check the hints. The hints include Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees. So pick unique ones, maybe 12-15.
 
 Now, let's structure each part:
 
-Title: "Weathered Wooden Boathouse by the Pond" (about 8 words, concrete)
+Title: "Wavey Katey II Motor Cruiser on Waterway" (about 8 words, concrete)
 
-Description: Combine context (date/time, GPS) with subject, setting, etc. So: "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21 at 14:34:53 UTC+01:00 near 51.441113°N, 0.565406°W." Wait, but need to make it 1-2 sentences. Maybe shorter: "A weathered wooden boathouse on stilts stands over a serene pond, framed by lush trees and wetland vegetation, under a cloudy sky, captured on 2026-08-21." That's two sentences? Wait, no, 1-2 sentences. Let's make it one: "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21."
+Description: Combine context (capture date) with subject, setting, action. So "The motor cruiser 'Wavey Katey II' cruises along a calm waterway on 2026-08-28, passing a rustic wooden riverside house with lush greenery, flying a British maritime flag." Wait, need to make sure it's 1-2 sentences. Let's make it: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, with a British maritime flag visible."
 
-Keywords: Let's pick the most relevant ones from hints and image. Let's list: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture, Grass. Wait, let's check the hints again. The hints include: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. So unique ones: Cloudy Sky, Foliage, Forest (or Trees), Grass, Lake (or Pond), Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, Architecture, Bird hide, Birdwatching, Boardwalk. Let's pick 12-15. Let's do: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture. That's 15, unique.
+Keywords: Let's list them comma-separated. Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs. That's 17, which is within 10-18.
 
-Wait, let's make sure the description is factual, combining context with main subject. So: "A weathered wooden boathouse on stilts stands over a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21 at 14:34:53 UTC+01:00 near 51.441113°N, 0.565406°W." That's two sentences, but maybe can make it one. "A weathered wooden boathouse on stilts overlooks a serene pond, framed by lush trees and wetland vegetation, under a cloudy sky, captured
+Wait, let's check the image details. The boat has "4PLUS2" on it, "Wavey Katey II" on the side, Yamaha outboard motor, blue canopy, fenders, British flag. The setting is a river with a wooden cottage, trees, etc.
+
+So finalizing:
+
+Title: "Wavey Katey II Motor Cruiser"
+
+Description: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, flying a British maritime flag."
+
+Keywords: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical
+
+Wait, let's count keywords: 19, maybe trim one. Let's do Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical. That's 19, maybe remove "Nautical" to make 18.
+
+Wait, the hints include "Nautical" as a keyword, so maybe include it. Let's check the image: the boat is on a river, has maritime elements, so Nautical is appropriate.
+
+Now, let's make sure the description is factual, combining context (capture date) with subject, setting, action, lighting (calm waterway, maybe daylight), distinctive details (British flag, wooden house, lush trees).
+
+Final check:
+
+Title: "Wavey Katey II Motor Cruiser" (5 words, concrete)
+
+Description: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, flying a British maritime flag." (1 sentence, combines context, subject, setting, action, distinctive details)
+
+Keywords: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical (18
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. Looking at the image: weathered wooden boathouse, stilts, pond, trees, etc. Maybe "Weathered Wooden Boathouse by the Pond". 
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The boat is named "Wavey Katey II" and it's a motor cruiser. So maybe "Wavey Katey II Motor Cruiser on Waterway". 
 
-Next, the description: combine context (date/time, GPS) with main subject, setting, action, lighting, distinctive details. The image has a weathered wooden structure on stilts over water, lush trees, cloudy sky, wetland. So something like "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21." Wait, need to make sure it's 1-2 sentences. Let's check the hints and image. The boathouse is on stilts, over pond, framed by trees, wooden decking. So description: "A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging trees and wetland vegetation, under a cloudy sky, captured on 2026-08-21." 
+Next, the description: need to combine context (capture date, maybe) with main subject, setting, action, lighting, distinctive details. The boat is cruising, past a wooden riverside house, flying a British flag, calm waterway, etc. Let's make it a 1-2 sentence factual description. 
 
-Then keywords: need 10-18 unique, comma-separated. From hints and image: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. Let's pick the most relevant ones. Let's list: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture, Grass. Wait, need to make sure they are unique. Let's check each hint. 
+Then keywords: need 10-18 unique ones from the hints, covering context and visible details. Let's list them out: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs. Wait, let's check the hints. The hints include Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees. So pick unique ones, maybe 12-15. 
 
 Now, let's structure each part:
 
-Title: "Weathered Wooden Boathouse by the Pond" (about 8 words, concrete)
+Title: "Wavey Katey II Motor Cruiser on Waterway" (about 8 words, concrete)
 
-Description: Combine context (date/time, GPS) with subject, setting, etc. So: "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21 at 14:34:53 UTC+01:00 near 51.441113°N, 0.565406°W." Wait, but need to make it 1-2 sentences. Maybe shorter: "A weathered wooden boathouse on stilts stands over a serene pond, framed by lush trees and wetland vegetation, under a cloudy sky, captured on 2026-08-21." That's two sentences? Wait, no, 1-2 sentences. Let's make it one: "A weathered wooden boathouse on stilts overlooks a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21." 
+Description: Combine context (capture date) with subject, setting, action. So "The motor cruiser 'Wavey Katey II' cruises along a calm waterway on 2026-08-28, passing a rustic wooden riverside house with lush greenery, flying a British maritime flag." Wait, need to make sure it's 1-2 sentences. Let's make it: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, with a British maritime flag visible." 
 
-Keywords: Let's pick the most relevant ones from hints and image. Let's list: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture, Grass. Wait, let's check the hints again. The hints include: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk. So unique ones: Cloudy Sky, Foliage, Forest (or Trees), Grass, Lake (or Pond), Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, Architecture, Bird hide, Birdwatching, Boardwalk. Let's pick 12-15. Let's do: Cloudy Sky, Foliage, Pond, Wetland, Wooden shed, Trees, Water reflection, Marshland, Reeds, Leaves, Outdoors, Landscape, Moss, Boardwalk, Architecture. That's 15, unique. 
+Keywords: Let's list them comma-separated. Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs. That's 17, which is within 10-18. 
 
-Wait, let's make sure the description is factual, combining context with main subject. So: "A weathered wooden boathouse on stilts stands over a serene pond, surrounded by lush foliage and under a cloudy sky, captured on 2026-08-21 at 14:34:53 UTC+01:00 near 51.441113°N, 0.565406°W." That's two sentences, but maybe can make it one. "A weathered wooden boathouse on stilts overlooks a serene pond, framed by lush trees and wetland vegetation, under a cloudy sky, captured
+Wait, let's check the image details. The boat has "4PLUS2" on it, "Wavey Katey II" on the side, Yamaha outboard motor, blue canopy, fenders, British flag. The setting is a river with a wooden cottage, trees, etc. 
+
+So finalizing:
+
+Title: "Wavey Katey II Motor Cruiser"
+
+Description: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, flying a British maritime flag."
+
+Keywords: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical
+
+Wait, let's count keywords: 19, maybe trim one. Let's do Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical. That's 19, maybe remove "Nautical" to make 18. 
+
+Wait, the hints include "Nautical" as a keyword, so maybe include it. Let's check the image: the boat is on a river, has maritime elements, so Nautical is appropriate. 
+
+Now, let's make sure the description is factual, combining context (capture date) with subject, setting, action, lighting (calm waterway, maybe daylight), distinctive details (British flag, wooden house, lush trees). 
+
+Final check:
+
+Title: "Wavey Katey II Motor Cruiser" (5 words, concrete)
+
+Description: "The motor cruiser 'Wavey Katey II' cruises along a calm waterway past a rustic wooden riverside house and lush green trees on 2026-08-28, flying a British maritime flag." (1 sentence, combines context, subject, setting, action, distinctive details)
+
+Keywords: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, Boating, Leisure, Outboard motor, Passenger, Railing, Canopy, Boat fender, Cruising, Riverbank, Shrubs, Nautical (18
 ```
 
 </details>
@@ -2500,64 +2483,255 @@ Wait, let's make sure the description is factual, combining context with main su
 
 ---
 
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
-### mlx-community/LFM2.5-VL-1.6B-bf16
+### mlx-community/GLM-4.6V-Flash-mxfp4
 
 <details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Keyword list has 76 terms (requested
-  10-18); Duplicate keywords: elevated, wetland, pond, outdoor, railings,
-  reflection, natural, environment, architecture, birdwatching, peaceful,
-  serene
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 3.10s
-- *Generation time:* 2.35s
-- *Total time:* 5.47s
-- *Input validation time:* 0.000424
-- *Prompt preparation time:* 0.0224
-- *First-token latency:* 0.341
-- *Cleanup time:* 0.0813
-- *Prompt tokens:* 2,117
-- *Generation tokens:* 275
-- *Total tokens:* 2,392
-- *Prompt throughput (raw):* 6,209 tok/s
-- *Generation throughput (raw):* 192 tok/s
-- *Peak memory:* 4.0
-- *Active memory:* 3.2
-- *Cache memory:* 0.07
-- *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.00411
+  after sustained repeated output; Keyword list has 50 terms (requested
+  10-18); Duplicate keywords: boat, boat driver, boat fender
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.31s
+- *Generation time:* 9.33s
+- *Total time:* 10.66s
+- *Input validation time:* 7.25e-05
+- *Prompt preparation time:* 0.00933
+- *First-token latency:* 6.41
+- *Cleanup time:* 0.0897
+- *Prompt tokens:* 6,325
+- *Generation tokens:* 200
+- *Total tokens:* 6,525
+- *Prompt throughput (raw):* 987 tok/s
+- *Generation throughput (raw):* 80.5 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 6.8
+- *Cache memory:* 0.73
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00243
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1360
+- *Rendered prompt characters:* 1355
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Moss-Covered Wooden Boathouse Over Wetland Pond"
-
-Description: A weathered wooden boathouse stands elevated on stilts over a serene pond, surrounded by lush foliage and marshland. The overhanging tree branches frame the structure, while the cloudy sky casts a soft, diffused light over the scene. The wooden decking and railings add to the rustic charm of this tranquil outdoor setting.
-
-Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage, marshland, cloudy, diffused, light, rustic, tranquil, outdoor, setting, structure, railings, decking, railings, trees, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated
+Title: Wavey Katey II Motor Cruiser
+Description: The white motor cruiser 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
+Keywords: Wavey Katey II, motor cruiser, British maritime flag, calm waterway, rustic wooden riverside house, lush green trees, boat, boating, leisure, motorboat, nautical, outboard motor, river, riverbank, shrubs, trees, canopy, cabin cruiser, fender, passenger, railing, flag, foliage, cottage, cruising, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat driver, boat fender, boat, boat
 </pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Keyword list has 61 terms (requested
+  10-18); Duplicate keywords: boat, waterway, flag, motor, cruiser, maritime,
+  british
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 1.88s
+- *Generation time:* 9.45s
+- *Total time:* 11.34s
+- *Input validation time:* 6.73e-05
+- *Prompt preparation time:* 0.00202
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 2,603
+- *Generation tokens:* 250
+- *Total tokens:* 2,853
+- *Prompt throughput (raw):* 2,382 tok/s
+- *Generation throughput (raw):* 32.2 tok/s
+- *Peak memory:* 18
+- *Active memory:* 17
+- *Cache memory:* 0.83
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.003
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1311
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: "Wavey Katey II Cruises Along Calm Waterway".
+
+Description: "The 'Wavey Katey II' motor cruiser boat, adorned with a British maritime flag, glides smoothly along a serene waterway. The boat, painted white with a blue canopy, is accompanied by a rustic wooden riverside house and lush green trees, creating a picturesque scene. The boat's outboard motor propels it forward, and the calm water reflects the surrounding foliage, adding to the tranquil atmosphere."
+
+Keywords: motor cruiser, boat, Wavey Katey II, British maritime flag, calm waterway, rustic wooden riverside house, lush green trees, serene, outboard motor, picturesque, tranquil, waterway, boat, flag, canopy, motor, boat, motor, cruiser, boat, waterway, boat, flag, maritime, British, boat, cruiser, motor, boat, waterway, boat, flag, maritime, British, boat, cruiser, motor, boat, waterway, boat, flag, maritime, British, boat, cruiser, motor, boat, waterway, boat, flag, maritime, British, boat, cruiser, motor, boat, waterway, boat, flag, maritime, British,
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Extra text appears before
+  the Title field; Response appears cut off at the token limit; Internal
+  reasoning block appears incomplete; Keyword list has 73 terms (requested
+  10-18); Duplicate keywords: motorboat, cruising, river, calm water, rustic
+  house, lush foliage, british flag, fenders, wait, boating, cabin cruiser,
+  leisure, nautical
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 3.20s
+- *Generation time:* 221.87s
+- *Total time:* 225.09s
+- *Input validation time:* 5.85e-05
+- *Prompt preparation time:* 0.00376
+- *First-token latency:* 1.28
+- *Cleanup time:* 0.199
+- *Prompt tokens:* 1,307
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,307
+- *Prompt throughput (raw):* 1,020 tok/s
+- *Generation throughput (raw):* 4.55 tok/s
+- *Peak memory:* 40
+- *Active memory:* 33
+- *Cache memory:* 5.9
+- *Model-load active memory:* 32.8
+- *Post-cleanup active memory:* 0.00397
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1461
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and context provided. Let's start by analyzing the image.
+
+The image shows a white motor cruiser named "Wavey Katey II" on a calm waterway. There's a rustic wooden riverside house in the background, lush green trees, and the boat has a British maritime flag. The capture date/time is 2026-08-28 16:17:42 UTC+01:00.
+
+For the title, I need a 5-10 word British-English title. Maybe "Wavey Katey II Cruising on a Calm River". That's concise and descriptive.
+
+Next, the description: combine context and main subject. The boat is a motor cruiser, name, on a calm river, with a rustic house and trees. So: "A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying."
+
+Keywords: Need 10-18 unique keywords. Let's list them: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Motor Cruiser, Fenders, Cabin Cruiser. That's 10 keywords.
+
+Wait, check if all hints are covered. The hints include Boat, Boat driver (but no driver visible), Boat fender (yes, the fenders are there), Boating, Cabin cruiser, Canopy (the blue canopy), Cottage (the house), Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor (maybe the engine), Passenger (no visible passenger), Railing (the house's railing), River, Riverbank, Shrubs, Trees. But the image might not show all. Let's pick the most visible: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical. That's 10. Maybe add "Leisure" as well. Let's adjust.
+
+Wait, the hints mention "Boating" and "Leisure" as keywords. So include those. Let's check again. The image has the boat, motorboat, cruising, river, calm water, rustic house, lush foliage, British flag, fenders, cabin cruiser, nautical, boating, leisure. That's 12. Maybe "Outboard motor" if visible. The boat has an outboard? The image shows the engine area, so maybe. Let's include that. So: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Outboard Motor. That's 12. Maybe that's enough.
+
+Now, structure:
+
+Title: Wavey Katey II Cruising on a Calm River
+
+Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying.
+
+Keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Outboard Motor
+
+Wait, the hints also mention "Passenger" but no passenger is visible. So maybe omit. Let's stick to what's visible. Let's check the image again. The boat has a canopy (blue), so include Canopy. So add Canopy. Now keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Canopy, Outboard Motor. That's 13. Maybe that's okay.
+
+Wait, the hints also have "Shrubs" and "Trees" but the image has trees in the background. Maybe "Trees" is covered under Lush Foliage. So maybe not necessary. Let's finalize.
+
+Title: Wavey Katey II Cruising on a Calm River
+
+Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying.
+
+Keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Canopy, Outboard Motor
+
+Wait, the hints mention "Boating" and "Leisure" as keywords. Let's check if all are covered. Yes. The boat is a cabin cruiser, so Cabin Cruiser is good. The outboard
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷Got it, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and context provided. Let's start by analyzing the image.
+
+The image shows a white motor cruiser named "Wavey Katey II" on a calm waterway. There's a rustic wooden riverside house in the background, lush green trees, and the boat has a British maritime flag. The capture date/time is 2026-08-28 16:17:42 UTC+01:00. 
+
+For the title, I need a 5-10 word British-English title. Maybe "Wavey Katey II Cruising on a Calm River". That's concise and descriptive.
+
+Next, the description: combine context and main subject. The boat is a motor cruiser, name, on a calm river, with a rustic house and trees. So: "A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying."
+
+Keywords: Need 10-18 unique keywords. Let's list them: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Motor Cruiser, Fenders, Cabin Cruiser. That's 10 keywords.
+
+Wait, check if all hints are covered. The hints include Boat, Boat driver (but no driver visible), Boat fender (yes, the fenders are there), Boating, Cabin cruiser, Canopy (the blue canopy), Cottage (the house), Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor (maybe the engine), Passenger (no visible passenger), Railing (the house's railing), River, Riverbank, Shrubs, Trees. But the image might not show all. Let's pick the most visible: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical. That's 10. Maybe add "Leisure" as well. Let's adjust.
+
+Wait, the hints mention "Boating" and "Leisure" as keywords. So include those. Let's check again. The image has the boat, motorboat, cruising, river, calm water, rustic house, lush foliage, British flag, fenders, cabin cruiser, nautical, boating, leisure. That's 12. Maybe "Outboard motor" if visible. The boat has an outboard? The image shows the engine area, so maybe. Let's include that. So: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Outboard Motor. That's 12. Maybe that's enough.
+
+Now, structure:
+
+Title: Wavey Katey II Cruising on a Calm River
+
+Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying.
+
+Keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Outboard Motor
+
+Wait, the hints also mention "Passenger" but no passenger is visible. So maybe omit. Let's stick to what's visible. Let's check the image again. The boat has a canopy (blue), so include Canopy. So add Canopy. Now keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Canopy, Outboard Motor. That's 13. Maybe that's okay.
+
+Wait, the hints also have "Shrubs" and "Trees" but the image has trees in the background. Maybe "Trees" is covered under Lush Foliage. So maybe not necessary. Let's finalize.
+
+Title: Wavey Katey II Cruising on a Calm River
+
+Description: A white motor cruiser named 'Wavey Katey II' cruises along a calm river, passing a rustic wooden riverside house surrounded by lush green trees, with a British maritime flag flying.
+
+Keywords: Boat, Motorboat, Cruising, River, Calm Water, Rustic House, Lush Foliage, British Flag, Fenders, Cabin Cruiser, Nautical, Boating, Leisure, Canopy, Outboard Motor
+
+Wait, the hints mention "Boating" and "Leisure" as keywords. Let's check if all are covered. Yes. The boat is a cabin cruiser, so Cabin Cruiser is good. The outboard
+```
+
+</details>
 
 </details>
 
@@ -2576,27 +2750,27 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.97s
-- *Generation time:* 1.22s
-- *Total time:* 2.21s
-- *Input validation time:* 5.89e-05
-- *Prompt preparation time:* 0.0101
-- *First-token latency:* 0.258
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 937
-- *Generation tokens:* 76
-- *Total tokens:* 1,013
-- *Prompt throughput (raw):* 3,627 tok/s
-- *Generation throughput (raw):* 254 tok/s
+- *Model load time:* 0.75s
+- *Generation time:* 1.11s
+- *Total time:* 1.87s
+- *Input validation time:* 5.35e-05
+- *Prompt preparation time:* 0.00923
+- *First-token latency:* 0.354
+- *Cleanup time:* 0.0955
+- *Prompt tokens:* 916
+- *Generation tokens:* 50
+- *Total tokens:* 966
+- *Prompt throughput (raw):* 2,587 tok/s
+- *Generation throughput (raw):* 267 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
 - *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00464
+- *Post-cleanup active memory:* 0.00488
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1377
+- *Rendered prompt characters:* 1342
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2612,73 +2786,57 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 *Readable output:*
 
 <pre class="model-output-readable">
-Weathered wooden boathouse by calm pond under cloudy skies.
-It stands elevated over the water surrounded by lush greenery and dense foliage.
+White motorboat cruising near rustic cottage on calm water.
 
-Keywords: wooden boathouse, pond, cloudy sky, foliage, marshland, reeds, wetland, trees, water reflection, moss, outdoors, landscape, deck, railing, greenery, overhanging branches
+Keywords: boat, cruiser, waterway, cottage, flag, fenders, canopy, leisure, outboard, trees, railing, foliage, nautical, river, cabin, passenger
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Weathered wooden boathouse by calm pond under cloudy skies.  
-It stands elevated over the water surrounded by lush greenery and dense foliage.
-
-Keywords: wooden boathouse, pond, cloudy sky, foliage, marshland, reeds, wetland, trees, water reflection, moss, outdoors, landscape, deck, railing, greenery, overhanging branches
-```
-
-</details>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
 
-### mlx-community/X-Reasoner-7B-8bit
+### mlx-community/Molmo2-8B-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Keyword list has 135 terms (requested 10-18); Duplicate keywords:
-  pond, wetland, grass, reeds, trees, architecture, moss, weathered,
-  landscape, outdoor, nature, structure, environment, ecosystem, habitat,
-  accurate, precise, detailed, comprehensive, thorough
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.25s
-- *Generation time:* 26.89s
-- *Total time:* 28.15s
-- *Input validation time:* 6.43e-05
-- *Prompt preparation time:* 0.00468
-- *First-token latency:* 18.7
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 16,563
-- *Generation tokens:* 400
-- *Total tokens:* 16,963
-- *Prompt throughput (raw):* 885 tok/s
-- *Generation throughput (raw):* 55.3 tok/s
-- *Peak memory:* 13
-- *Active memory:* 9.5
-- *Cache memory:* 2.4
-- *Model-load active memory:* 9.46
-- *Post-cleanup active memory:* 0.0102
+- *Observations:* Response repeats the same text; Missing or empty fields:
+  Title, Description, Keywords; Response appears cut off at the token limit
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 0.95s
+- *Generation time:* 15.74s
+- *Total time:* 16.71s
+- *Input validation time:* 7.14e-05
+- *Prompt preparation time:* 0.00631
+- *First-token latency:* 0.876
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 1,504
+- *Generation tokens:* 1,000
+- *Total tokens:* 2,504
+- *Prompt throughput (raw):* 1,717 tok/s
+- *Generation throughput (raw):* 70.0 tok/s
+- *Peak memory:* 9.0
+- *Active memory:* 6.5
+- *Cache memory:* 0.40
+- *Model-load active memory:* 6.45
+- *Post-cleanup active memory:* 0.00598
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1439
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1312
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2686,31 +2844,12 @@ Keywords: wooden boathouse, pond, cloudy sky, foliage, marshland, reeds, wetland
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Wooden Boathouse Over Serene Pond
+Wavey Katey II Cruises Calm River Past Rustic Cottage
 
-Description:
-A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.
+A white motor cruiser named Wavey Katey II glides smoothly along a tranquil waterway, its blue canopy and red flag visible against the backdrop of a rustic wooden riverside house and lush green trees. The boat's name is clearly displayed on its side, and the scene captures a peaceful moment of leisure boating.
 
-Keywords:
-Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise,
+Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees, Waterway, Rustic house, Blue canopy, Red flag, White boat, Calm water, Rustic wooden house, Lush green trees, Boat name, Boat side, Boat side name, Boat side display, Boat side text, Boat side writing, Boat side lettering, Boat side branding, Boat side logo, Boat side emblem, Boat side insignia, Boat side marking, Boat side identification, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text, Boat side identification writing, Boat side identification lettering, Boat side identification branding, Boat side identification emblem, Boat side identification insignia, Boat side identification marking, Boat side identification text,
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title:
-Wooden Boathouse Over Serene Pond
-
-Description:
-A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.
-
-Keywords: 
-Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise,
-```
-
-</details>
 
 </details>
 
@@ -2725,30 +2864,31 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* No response text was returned; Missing or empty fields:
+  Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.40s
-- *Generation time:* 4.37s
-- *Total time:* 6.79s
-- *Input validation time:* 8.63e-05
-- *Prompt preparation time:* 0.0035
-- *First-token latency:* 0.385
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 592
-- *Generation tokens:* 164
-- *Total tokens:* 756
-- *Prompt throughput (raw):* 1,537 tok/s
-- *Generation throughput (raw):* 47.7 tok/s
+- *Model load time:* 2.28s
+- *Generation time:* 0.85s
+- *Total time:* 3.15s
+- *Input validation time:* 5.75e-05
+- *Prompt preparation time:* 0.00413
+- *First-token latency:* 0.383
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 569
+- *Generation tokens:* 1
+- *Total tokens:* 570
+- *Prompt throughput (raw):* 1,484 tok/s
+- *Generation throughput (raw):* 55,429 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
 - *Model-load active memory:* 15.7
-- *Post-cleanup active memory:* 0.0113
+- *Post-cleanup active memory:* 0.0115
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1366
+- *Rendered prompt characters:* 1331
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2761,1342 +2901,9 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
 
-*Readable output:*
+#### Complete generated output
 
-<pre class="model-output-readable">
-## Image Description
-
-A weathered wooden boathouse stands on stilts over a calm pond. The boathouse is constructed from vertical wooden planks and has a simple, pitched roof covered in moss. A wooden walkway with railings leads to the boathouse. Lush green foliage overhangs the structure, creating dappled shade. The pond reflects the surrounding greenery and the overcast sky. Reeds and other aquatic plants grow along the water's edge. The overall scene evokes a sense of tranquility and rustic charm.
-
-## Keywords
-
-boathouse, wooden, pond, water, reflection, foliage, trees, green, stilts, walkway, railings, rustic, tranquil, overcast, nature, landscape, reeds, aquatic plants, countryside, rural, peaceful, summer, outdoors, architecture, building, boat storage.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
-
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
-
-- *Execution:* crashed
-- *Usability:* not_evaluated
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Received 600 parameters not in model:
-  <br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.embedding_norm.weight,<br>model.layers.0.conv.conv.weight,<br>model.layers.0.conv.in_proj.biases,<br>model.layers.0.conv.in_proj.scales,<br>model.layers.0.conv.in_proj.weight,<br>model.layers.0.conv.out_proj.biases,<br>model.layers.0.conv.out_proj.scales,<br>model.layers.0.conv.out_proj.weight,<br>model.layers.0.feed_forward.w1.biases,<br>model.layers.0.feed_forward.w1.scales,<br>model.layers.0.feed_forward.w1.weight,<br>model.layers.0.feed_forward.w2.biases,<br>model.layers.0.feed_forward.w2.scales,<br>model.layers.0.feed_forward.w2.weight,<br>model.layers.0.feed_forward.w3.biases,<br>model.layers.0.feed_forward.w3.scales,<br>model.layers.0.feed_forward.w3.weight,<br>model.layers.0.ffn_norm.weight,<br>model.layers.0.operator_norm.weight,<br>model.layers.1.conv.conv.weight,<br>model.layers.1.conv.in_proj.biases,<br>model.layers.1.conv.in_proj.scales,<br>model.layers.1.conv.in_proj.weight,<br>model.layers.1.conv.out_proj.biases,<br>model.layers.1.conv.out_proj.scales,<br>model.layers.1.conv.out_proj.weight,<br>model.layers.1.feed_forward.w1.biases,<br>model.layers.1.feed_forward.w1.scales,<br>model.layers.1.feed_forward.w1.weight,<br>model.layers.1.feed_forward.w2.biases,<br>model.layers.1.feed_forward.w2.scales,<br>model.layers.1.feed_forward.w2.weight,<br>model.layers.1.feed_forward.w3.biases,<br>model.layers.1.feed_forward.w3.scales,<br>model.layers.1.feed_forward.w3.weight,<br>model.layers.1.ffn_norm.weight,<br>model.layers.1.operator_norm.weight,<br>model.layers.10.conv.conv.weight,<br>model.layers.10.conv.in_proj.biases,<br>model.layers.10.conv.in_proj.scales,<br>model.layers.10.conv.in_proj.weight,<br>model.layers.10.conv.out_proj.biases,<br>model.layers.10.conv.out_proj.scales,<br>model.layers.10.conv.out_proj.weight,<br>model.layers.10.feed_forward.w1.biases,<br>model.layers.10.feed_forward.w1.scales,<br>model.layers.10.feed_forward.w1.weight,<br>model.layers.10.feed_forward.w2.biases,<br>model.layers.10.feed_forward.w2.scales,<br>model.layers.10.feed_forward.w2.weight,<br>model.layers.10.feed_forward.w3.biases,<br>model.layers.10.feed_forward.w3.scales,<br>model.layers.10.feed_forward.w3.weight,<br>model.layers.10.ffn_norm.weight,<br>model.layers.10.operator_norm.weight,<br>model.layers.11.conv.conv.weight,<br>model.layers.11.conv.in_proj.biases,<br>model.layers.11.conv.in_proj.scales,<br>model.layers.11.conv.in_proj.weight,<br>model.layers.11.conv.out_proj.biases,<br>model.layers.11.conv.out_proj.scales,<br>model.layers.11.conv.out_proj.weight,<br>model.layers.11.feed_forward.w1.biases,<br>model.layers.11.feed_forward.w1.scales,<br>model.layers.11.feed_forward.w1.weight,<br>model.layers.11.feed_forward.w2.biases,<br>model.layers.11.feed_forward.w2.scales,<br>model.layers.11.feed_forward.w2.weight,<br>model.layers.11.feed_forward.w3.biases,<br>model.layers.11.feed_forward.w3.scales,<br>model.layers.11.feed_forward.w3.weight,<br>model.layers.11.ffn_norm.weight,<br>model.layers.11.operator_norm.weight,<br>model.layers.12.conv.conv.weight,<br>model.layers.12.conv.in_proj.biases,<br>model.layers.12.conv.in_proj.scales,<br>model.layers.12.conv.in_proj.weight,<br>model.layers.12.conv.out_proj.biases,<br>model.layers.12.conv.out_proj.scales,<br>model.layers.12.conv.out_proj.weight,<br>model.layers.12.feed_forward.w1.biases,<br>model.layers.12.feed_forward.w1.scales,<br>model.layers.12.feed_forward.w1.weight,<br>model.layers.12.feed_forward.w2.biases,<br>model.layers.12.feed_forward.w2.scales,<br>model.layers.12.feed_forward.w2.weight,<br>model.layers.12.feed_forward.w3.biases,<br>model.layers.12.feed_forward.w3.scales,<br>model.layers.12.feed_forward.w3.weight,<br>model.layers.12.ffn_norm.weight,<br>model.layers.12.operator_norm.weight,<br>model.layers.13.feed_forward.w1.biases,<br>model.layers.13.feed_forward.w1.scales,<br>model.layers.13.feed_forward.w1.weight,<br>model.layers.13.feed_forward.w2.biases,<br>model.layers.13.feed_forward.w2.scales,<br>model.layers.13.feed_forward.w2.weight,<br>model.layers.13.feed_forward.w3.biases,<br>model.layers.13.feed_forward.w3.scales,<br>model.layers.13.feed_forward.w3.weight,<br>model.layers.13.ffn_norm.weight,<br>model.layers.13.operator_norm.weight,<br>model.layers.13.self_attn.k_layernorm.weight,<br>model.layers.13.self_attn.k_proj.biases,<br>model.layers.13.self_attn.k_proj.scales,<br>model.layers.13.self_attn.k_proj.weight,<br>model.layers.13.self_attn.out_proj.biases,<br>model.layers.13.self_attn.out_proj.scales,<br>model.layers.13.self_attn.out_proj.weight,<br>model.layers.13.self_attn.q_layernorm.weight,<br>model.layers.13.self_attn.q_proj.biases,<br>model.layers.13.self_attn.q_proj.scales,<br>model.layers.13.self_attn.q_proj.weight,<br>model.layers.13.self_attn.v_proj.biases,<br>model.layers.13.self_attn.v_proj.scales,<br>model.layers.13.self_attn.v_proj.weight,<br>model.layers.14.conv.conv.weight,<br>model.layers.14.conv.in_proj.biases,<br>model.layers.14.conv.in_proj.scales,<br>model.layers.14.conv.in_proj.weight,<br>model.layers.14.conv.out_proj.biases,<br>model.layers.14.conv.out_proj.scales,<br>model.layers.14.conv.out_proj.weight,<br>model.layers.14.feed_forward.w1.biases,<br>model.layers.14.feed_forward.w1.scales,<br>model.layers.14.feed_forward.w1.weight,<br>model.layers.14.feed_forward.w2.biases,<br>model.layers.14.feed_forward.w2.scales,<br>model.layers.14.feed_forward.w2.weight,<br>model.layers.14.feed_forward.w3.biases,<br>model.layers.14.feed_forward.w3.scales,<br>model.layers.14.feed_forward.w3.weight,<br>model.layers.14.ffn_norm.weight,<br>model.layers.14.operator_norm.weight,<br>model.layers.15.conv.conv.weight,<br>model.layers.15.conv.in_proj.biases,<br>model.layers.15.conv.in_proj.scales,<br>model.layers.15.conv.in_proj.weight,<br>model.layers.15.conv.out_proj.biases,<br>model.layers.15.conv.out_proj.scales,<br>model.layers.15.conv.out_proj.weight,<br>model.layers.15.feed_forward.w1.biases,<br>model.layers.15.feed_forward.w1.scales,<br>model.layers.15.feed_forward.w1.weight,<br>model.layers.15.feed_forward.w2.biases,<br>model.layers.15.feed_forward.w2.scales,<br>model.layers.15.feed_forward.w2.weight,<br>model.layers.15.feed_forward.w3.biases,<br>model.layers.15.feed_forward.w3.scales,<br>model.layers.15.feed_forward.w3.weight,<br>model.layers.15.ffn_norm.weight,<br>model.layers.15.operator_norm.weight,<br>model.layers.16.conv.conv.weight,<br>model.layers.16.conv.in_proj.biases,<br>model.layers.16.conv.in_proj.scales,<br>model.layers.16.conv.in_proj.weight,<br>model.layers.16.conv.out_proj.biases,<br>model.layers.16.conv.out_proj.scales,<br>model.layers.16.conv.out_proj.weight,<br>model.layers.16.feed_forward.w1.biases,<br>model.layers.16.feed_forward.w1.scales,<br>model.layers.16.feed_forward.w1.weight,<br>model.layers.16.feed_forward.w2.biases,<br>model.layers.16.feed_forward.w2.scales,<br>model.layers.16.feed_forward.w2.weight,<br>model.layers.16.feed_forward.w3.biases,<br>model.layers.16.feed_forward.w3.scales,<br>model.layers.16.feed_forward.w3.weight,<br>model.layers.16.ffn_norm.weight,<br>model.layers.16.operator_norm.weight,<br>model.layers.17.feed_forward.w1.biases,<br>model.layers.17.feed_forward.w1.scales,<br>model.layers.17.feed_forward.w1.weight,<br>model.layers.17.feed_forward.w2.biases,<br>model.layers.17.feed_forward.w2.scales,<br>model.layers.17.feed_forward.w2.weight,<br>model.layers.17.feed_forward.w3.biases,<br>model.layers.17.feed_forward.w3.scales,<br>model.layers.17.feed_forward.w3.weight,<br>model.layers.17.ffn_norm.weight,<br>model.layers.17.operator_norm.weight,<br>model.layers.17.self_attn.k_layernorm.weight,<br>model.layers.17.self_attn.k_proj.biases,<br>model.layers.17.self_attn.k_proj.scales,<br>model.layers.17.self_attn.k_proj.weight,<br>model.layers.17.self_attn.out_proj.biases,<br>model.layers.17.self_attn.out_proj.scales,<br>model.layers.17.self_attn.out_proj.weight,<br>model.layers.17.self_attn.q_layernorm.weight,<br>model.layers.17.self_attn.q_proj.biases,<br>model.layers.17.self_attn.q_proj.scales,<br>model.layers.17.self_attn.q_proj.weight,<br>model.layers.17.self_attn.v_proj.biases,<br>model.layers.17.self_attn.v_proj.scales,<br>model.layers.17.self_attn.v_proj.weight,<br>model.layers.18.conv.conv.weight,<br>model.layers.18.conv.in_proj.biases,<br>model.layers.18.conv.in_proj.scales,<br>model.layers.18.conv.in_proj.weight,<br>model.layers.18.conv.out_proj.biases,<br>model.layers.18.conv.out_proj.scales,<br>model.layers.18.conv.out_proj.weight,<br>model.layers.18.feed_forward.w1.biases,<br>model.layers.18.feed_forward.w1.scales,<br>model.layers.18.feed_forward.w1.weight,<br>model.layers.18.feed_forward.w2.biases,<br>model.layers.18.feed_forward.w2.scales,<br>model.layers.18.feed_forward.w2.weight,<br>model.layers.18.feed_forward.w3.biases,<br>model.layers.18.feed_forward.w3.scales,<br>model.layers.18.feed_forward.w3.weight,<br>model.layers.18.ffn_norm.weight,<br>model.layers.18.operator_norm.weight,<br>model.layers.19.conv.conv.weight,<br>model.layers.19.conv.in_proj.biases,<br>model.layers.19.conv.in_proj.scales,<br>model.layers.19.conv.in_proj.weight,<br>model.layers.19.conv.out_proj.biases,<br>model.layers.19.conv.out_proj.scales,<br>model.layers.19.conv.out_proj.weight,<br>model.layers.19.feed_forward.w1.biases,<br>model.layers.19.feed_forward.w1.scales,<br>model.layers.19.feed_forward.w1.weight,<br>model.layers.19.feed_forward.w2.biases,<br>model.layers.19.feed_forward.w2.scales,<br>model.layers.19.feed_forward.w2.weight,<br>model.layers.19.feed_forward.w3.biases,<br>model.layers.19.feed_forward.w3.scales,<br>model.layers.19.feed_forward.w3.weight,<br>model.layers.19.ffn_norm.weight,<br>model.layers.19.operator_norm.weight,<br>model.layers.2.feed_forward.w1.biases,<br>model.layers.2.feed_forward.w1.scales,<br>model.layers.2.feed_forward.w1.weight,<br>model.layers.2.feed_forward.w2.biases,<br>model.layers.2.feed_forward.w2.scales,<br>model.layers.2.feed_forward.w2.weight,<br>model.layers.2.feed_forward.w3.biases,<br>model.layers.2.feed_forward.w3.scales,<br>model.layers.2.feed_forward.w3.weight,<br>model.layers.2.ffn_norm.weight,<br>model.layers.2.operator_norm.weight,<br>model.layers.2.self_attn.k_layernorm.weight,<br>model.layers.2.self_attn.k_proj.biases,<br>model.layers.2.self_attn.k_proj.scales,<br>model.layers.2.self_attn.k_proj.weight,<br>model.layers.2.self_attn.out_proj.biases,<br>model.layers.2.self_attn.out_proj.scales,<br>model.layers.2.self_attn.out_proj.weight,<br>model.layers.2.self_attn.q_layernorm.weight,<br>model.layers.2.self_attn.q_proj.biases,<br>model.layers.2.self_attn.q_proj.scales,<br>model.layers.2.self_attn.q_proj.weight,<br>model.layers.2.self_attn.v_proj.biases,<br>model.layers.2.self_attn.v_proj.scales,<br>model.layers.2.self_attn.v_proj.weight,<br>model.layers.20.conv.conv.weight,<br>model.layers.20.conv.in_proj.biases,<br>model.layers.20.conv.in_proj.scales,<br>model.layers.20.conv.in_proj.weight,<br>model.layers.20.conv.out_proj.biases,<br>model.layers.20.conv.out_proj.scales,<br>model.layers.20.conv.out_proj.weight,<br>model.layers.20.feed_forward.w1.biases,<br>model.layers.20.feed_forward.w1.scales,<br>model.layers.20.feed_forward.w1.weight,<br>model.layers.20.feed_forward.w2.biases,<br>model.layers.20.feed_forward.w2.scales,<br>model.layers.20.feed_forward.w2.weight,<br>model.layers.20.feed_forward.w3.biases,<br>model.layers.20.feed_forward.w3.scales,<br>model.layers.20.feed_forward.w3.weight,<br>model.layers.20.ffn_norm.weight,<br>model.layers.20.operator_norm.weight,<br>model.layers.21.feed_forward.w1.biases,<br>model.layers.21.feed_forward.w1.scales,<br>model.layers.21.feed_forward.w1.weight,<br>model.layers.21.feed_forward.w2.biases,<br>model.layers.21.feed_forward.w2.scales,<br>model.layers.21.feed_forward.w2.weight,<br>model.layers.21.feed_forward.w3.biases,<br>model.layers.21.feed_forward.w3.scales,<br>model.layers.21.feed_forward.w3.weight,<br>model.layers.21.ffn_norm.weight,<br>model.layers.21.operator_norm.weight,<br>model.layers.21.self_attn.k_layernorm.weight,<br>model.layers.21.self_attn.k_proj.biases,<br>model.layers.21.self_attn.k_proj.scales,<br>model.layers.21.self_attn.k_proj.weight,<br>model.layers.21.self_attn.out_proj.biases,<br>model.layers.21.self_attn.out_proj.scales,<br>model.layers.21.self_attn.out_proj.weight,<br>model.layers.21.self_attn.q_layernorm.weight,<br>model.layers.21.self_attn.q_proj.biases,<br>model.layers.21.self_attn.q_proj.scales,<br>model.layers.21.self_attn.q_proj.weight,<br>model.layers.21.self_attn.v_proj.biases,<br>model.layers.21.self_attn.v_proj.scales,<br>model.layers.21.self_attn.v_proj.weight,<br>model.layers.22.conv.conv.weight,<br>model.layers.22.conv.in_proj.biases,<br>model.layers.22.conv.in_proj.scales,<br>model.layers.22.conv.in_proj.weight,<br>model.layers.22.conv.out_proj.biases,<br>model.layers.22.conv.out_proj.scales,<br>model.layers.22.conv.out_proj.weight,<br>model.layers.22.feed_forward.w1.biases,<br>model.layers.22.feed_forward.w1.scales,<br>model.layers.22.feed_forward.w1.weight,<br>model.layers.22.feed_forward.w2.biases,<br>model.layers.22.feed_forward.w2.scales,<br>model.layers.22.feed_forward.w2.weight,<br>model.layers.22.feed_forward.w3.biases,<br>model.layers.22.feed_forward.w3.scales,<br>model.layers.22.feed_forward.w3.weight,<br>model.layers.22.ffn_norm.weight,<br>model.layers.22.operator_norm.weight,<br>model.layers.23.conv.conv.weight,<br>model.layers.23.conv.in_proj.biases,<br>model.layers.23.conv.in_proj.scales,<br>model.layers.23.conv.in_proj.weight,<br>model.layers.23.conv.out_proj.biases,<br>model.layers.23.conv.out_proj.scales,<br>model.layers.23.conv.out_proj.weight,<br>model.layers.23.feed_forward.w1.biases,<br>model.layers.23.feed_forward.w1.scales,<br>model.layers.23.feed_forward.w1.weight,<br>model.layers.23.feed_forward.w2.biases,<br>model.layers.23.feed_forward.w2.scales,<br>model.layers.23.feed_forward.w2.weight,<br>model.layers.23.feed_forward.w3.biases,<br>model.layers.23.feed_forward.w3.scales,<br>model.layers.23.feed_forward.w3.weight,<br>model.layers.23.ffn_norm.weight,<br>model.layers.23.operator_norm.weight,<br>model.layers.24.feed_forward.w1.biases,<br>model.layers.24.feed_forward.w1.scales,<br>model.layers.24.feed_forward.w1.weight,<br>model.layers.24.feed_forward.w2.biases,<br>model.layers.24.feed_forward.w2.scales,<br>model.layers.24.feed_forward.w2.weight,<br>model.layers.24.feed_forward.w3.biases,<br>model.layers.24.feed_forward.w3.scales,<br>model.layers.24.feed_forward.w3.weight,<br>model.layers.24.ffn_norm.weight,<br>model.layers.24.operator_norm.weight,<br>model.layers.24.self_attn.k_layernorm.weight,<br>model.layers.24.self_attn.k_proj.biases,<br>model.layers.24.self_attn.k_proj.scales,<br>model.layers.24.self_attn.k_proj.weight,<br>model.layers.24.self_attn.out_proj.biases,<br>model.layers.24.self_attn.out_proj.scales,<br>model.layers.24.self_attn.out_proj.weight,<br>model.layers.24.self_attn.q_layernorm.weight,<br>model.layers.24.self_attn.q_proj.biases,<br>model.layers.24.self_attn.q_proj.scales,<br>model.layers.24.self_attn.q_proj.weight,<br>model.layers.24.self_attn.v_proj.biases,<br>model.layers.24.self_attn.v_proj.scales,<br>model.layers.24.self_attn.v_proj.weight,<br>model.layers.25.conv.conv.weight,<br>model.layers.25.conv.in_proj.biases,<br>model.layers.25.conv.in_proj.scales,<br>model.layers.25.conv.in_proj.weight,<br>model.layers.25.conv.out_proj.biases,<br>model.layers.25.conv.out_proj.scales,<br>model.layers.25.conv.out_proj.weight,<br>model.layers.25.feed_forward.w1.biases,<br>model.layers.25.feed_forward.w1.scales,<br>model.layers.25.feed_forward.w1.weight,<br>model.layers.25.feed_forward.w2.biases,<br>model.layers.25.feed_forward.w2.scales,<br>model.layers.25.feed_forward.w2.weight,<br>model.layers.25.feed_forward.w3.biases,<br>model.layers.25.feed_forward.w3.scales,<br>model.layers.25.feed_forward.w3.weight,<br>model.layers.25.ffn_norm.weight,<br>model.layers.25.operator_norm.weight,<br>model.layers.26.conv.conv.weight,<br>model.layers.26.conv.in_proj.biases,<br>model.layers.26.conv.in_proj.scales,<br>model.layers.26.conv.in_proj.weight,<br>model.layers.26.conv.out_proj.biases,<br>model.layers.26.conv.out_proj.scales,<br>model.layers.26.conv.out_proj.weight,<br>model.layers.26.feed_forward.w1.biases,<br>model.layers.26.feed_forward.w1.scales,<br>model.layers.26.feed_forward.w1.weight,<br>model.layers.26.feed_forward.w2.biases,<br>model.layers.26.feed_forward.w2.scales,<br>model.layers.26.feed_forward.w2.weight,<br>model.layers.26.feed_forward.w3.biases,<br>model.layers.26.feed_forward.w3.scales,<br>model.layers.26.feed_forward.w3.weight,<br>model.layers.26.ffn_norm.weight,<br>model.layers.26.operator_norm.weight,<br>model.layers.27.feed_forward.w1.biases,<br>model.layers.27.feed_forward.w1.scales,<br>model.layers.27.feed_forward.w1.weight,<br>model.layers.27.feed_forward.w2.biases,<br>model.layers.27.feed_forward.w2.scales,<br>model.layers.27.feed_forward.w2.weight,<br>model.layers.27.feed_forward.w3.biases,<br>model.layers.27.feed_forward.w3.scales,<br>model.layers.27.feed_forward.w3.weight,<br>model.layers.27.ffn_norm.weight,<br>model.layers.27.operator_norm.weight,<br>model.layers.27.self_attn.k_layernorm.weight,<br>model.layers.27.self_attn.k_proj.biases,<br>model.layers.27.self_attn.k_proj.scales,<br>model.layers.27.self_attn.k_proj.weight,<br>model.layers.27.self_attn.out_proj.biases,<br>model.layers.27.self_attn.out_proj.scales,<br>model.layers.27.self_attn.out_proj.weight,<br>model.layers.27.self_attn.q_layernorm.weight,<br>model.layers.27.self_attn.q_proj.biases,<br>model.layers.27.self_attn.q_proj.scales,<br>model.layers.27.self_attn.q_proj.weight,<br>model.layers.27.self_attn.v_proj.biases,<br>model.layers.27.self_attn.v_proj.scales,<br>model.layers.27.self_attn.v_proj.weight,<br>model.layers.28.conv.conv.weight,<br>model.layers.28.conv.in_proj.biases,<br>model.layers.28.conv.in_proj.scales,<br>model.layers.28.conv.in_proj.weight,<br>model.layers.28.conv.out_proj.biases,<br>model.layers.28.conv.out_proj.scales,<br>model.layers.28.conv.out_proj.weight,<br>model.layers.28.feed_forward.w1.biases,<br>model.layers.28.feed_forward.w1.scales,<br>model.layers.28.feed_forward.w1.weight,<br>model.layers.28.feed_forward.w2.biases,<br>model.layers.28.feed_forward.w2.scales,<br>model.layers.28.feed_forward.w2.weight,<br>model.layers.28.feed_forward.w3.biases,<br>model.layers.28.feed_forward.w3.scales,<br>model.layers.28.feed_forward.w3.weight,<br>model.layers.28.ffn_norm.weight,<br>model.layers.28.operator_norm.weight,<br>model.layers.29.conv.conv.weight,<br>model.layers.29.conv.in_proj.biases,<br>model.layers.29.conv.in_proj.scales,<br>model.layers.29.conv.in_proj.weight,<br>model.layers.29.conv.out_proj.biases,<br>model.layers.29.conv.out_proj.scales,<br>model.layers.29.conv.out_proj.weight,<br>model.layers.29.feed_forward.w1.biases,<br>model.layers.29.feed_forward.w1.scales,<br>model.layers.29.feed_forward.w1.weight,<br>model.layers.29.feed_forward.w2.biases,<br>model.layers.29.feed_forward.w2.scales,<br>model.layers.29.feed_forward.w2.weight,<br>model.layers.29.feed_forward.w3.biases,<br>model.layers.29.feed_forward.w3.scales,<br>model.layers.29.feed_forward.w3.weight,<br>model.layers.29.ffn_norm.weight,<br>model.layers.29.operator_norm.weight,<br>model.layers.3.conv.conv.weight,<br>model.layers.3.conv.in_proj.biases,<br>model.layers.3.conv.in_proj.scales,<br>model.layers.3.conv.in_proj.weight,<br>model.layers.3.conv.out_proj.biases,<br>model.layers.3.conv.out_proj.scales,<br>model.layers.3.conv.out_proj.weight,<br>model.layers.3.feed_forward.w1.biases,<br>model.layers.3.feed_forward.w1.scales,<br>model.layers.3.feed_forward.w1.weight,<br>model.layers.3.feed_forward.w2.biases,<br>model.layers.3.feed_forward.w2.scales,<br>model.layers.3.feed_forward.w2.weight,<br>model.layers.3.feed_forward.w3.biases,<br>model.layers.3.feed_forward.w3.scales,<br>model.layers.3.feed_forward.w3.weight,<br>model.layers.3.ffn_norm.weight,<br>model.layers.3.operator_norm.weight,<br>model.layers.4.conv.conv.weight,<br>model.layers.4.conv.in_proj.biases,<br>model.layers.4.conv.in_proj.scales,<br>model.layers.4.conv.in_proj.weight,<br>model.layers.4.conv.out_proj.biases,<br>model.layers.4.conv.out_proj.scales,<br>model.layers.4.conv.out_proj.weight,<br>model.layers.4.feed_forward.w1.biases,<br>model.layers.4.feed_forward.w1.scales,<br>model.layers.4.feed_forward.w1.weight,<br>model.layers.4.feed_forward.w2.biases,<br>model.layers.4.feed_forward.w2.scales,<br>model.layers.4.feed_forward.w2.weight,<br>model.layers.4.feed_forward.w3.biases,<br>model.layers.4.feed_forward.w3.scales,<br>model.layers.4.feed_forward.w3.weight,<br>model.layers.4.ffn_norm.weight,<br>model.layers.4.operator_norm.weight,<br>model.layers.5.feed_forward.w1.biases,<br>model.layers.5.feed_forward.w1.scales,<br>model.layers.5.feed_forward.w1.weight,<br>model.layers.5.feed_forward.w2.biases,<br>model.layers.5.feed_forward.w2.scales,<br>model.layers.5.feed_forward.w2.weight,<br>model.layers.5.feed_forward.w3.biases,<br>model.layers.5.feed_forward.w3.scales,<br>model.layers.5.feed_forward.w3.weight,<br>model.layers.5.ffn_norm.weight,<br>model.layers.5.operator_norm.weight,<br>model.layers.5.self_attn.k_layernorm.weight,<br>model.layers.5.self_attn.k_proj.biases,<br>model.layers.5.self_attn.k_proj.scales,<br>model.layers.5.self_attn.k_proj.weight,<br>model.layers.5.self_attn.out_proj.biases,<br>model.layers.5.self_attn.out_proj.scales,<br>model.layers.5.self_attn.out_proj.weight,<br>model.layers.5.self_attn.q_layernorm.weight,<br>model.layers.5.self_attn.q_proj.biases,<br>model.layers.5.self_attn.q_proj.scales,<br>model.layers.5.self_attn.q_proj.weight,<br>model.layers.5.self_attn.v_proj.biases,<br>model.layers.5.self_attn.v_proj.scales,<br>model.layers.5.self_attn.v_proj.weight,<br>model.layers.6.conv.conv.weight,<br>model.layers.6.conv.in_proj.biases,<br>model.layers.6.conv.in_proj.scales,<br>model.layers.6.conv.in_proj.weight,<br>model.layers.6.conv.out_proj.biases,<br>model.layers.6.conv.out_proj.scales,<br>model.layers.6.conv.out_proj.weight,<br>model.layers.6.feed_forward.w1.biases,<br>model.layers.6.feed_forward.w1.scales,<br>model.layers.6.feed_forward.w1.weight,<br>model.layers.6.feed_forward.w2.biases,<br>model.layers.6.feed_forward.w2.scales,<br>model.layers.6.feed_forward.w2.weight,<br>model.layers.6.feed_forward.w3.biases,<br>model.layers.6.feed_forward.w3.scales,<br>model.layers.6.feed_forward.w3.weight,<br>model.layers.6.ffn_norm.weight,<br>model.layers.6.operator_norm.weight,<br>model.layers.7.conv.conv.weight,<br>model.layers.7.conv.in_proj.biases,<br>model.layers.7.conv.in_proj.scales,<br>model.layers.7.conv.in_proj.weight,<br>model.layers.7.conv.out_proj.biases,<br>model.layers.7.conv.out_proj.scales,<br>model.layers.7.conv.out_proj.weight,<br>model.layers.7.feed_forward.w1.biases,<br>model.layers.7.feed_forward.w1.scales,<br>model.layers.7.feed_forward.w1.weight,<br>model.layers.7.feed_forward.w2.biases,<br>model.layers.7.feed_forward.w2.scales,<br>model.layers.7.feed_forward.w2.weight,<br>model.layers.7.feed_forward.w3.biases,<br>model.layers.7.feed_forward.w3.scales,<br>model.layers.7.feed_forward.w3.weight,<br>model.layers.7.ffn_norm.weight,<br>model.layers.7.operator_norm.weight,<br>model.layers.8.conv.conv.weight,<br>model.layers.8.conv.in_proj.biases,<br>model.layers.8.conv.in_proj.scales,<br>model.layers.8.conv.in_proj.weight,<br>model.layers.8.conv.out_proj.biases,<br>model.layers.8.conv.out_proj.scales,<br>model.layers.8.conv.out_proj.weight,<br>model.layers.8.feed_forward.w1.biases,<br>model.layers.8.feed_forward.w1.scales,<br>model.layers.8.feed_forward.w1.weight,<br>model.layers.8.feed_forward.w2.biases,<br>model.layers.8.feed_forward.w2.scales,<br>model.layers.8.feed_forward.w2.weight,<br>model.layers.8.feed_forward.w3.biases,<br>model.layers.8.feed_forward.w3.scales,<br>model.layers.8.feed_forward.w3.weight,<br>model.layers.8.ffn_norm.weight,<br>model.layers.8.operator_norm.weight,<br>model.layers.9.feed_forward.w1.biases,<br>model.layers.9.feed_forward.w1.scales,<br>model.layers.9.feed_forward.w1.weight,<br>model.layers.9.feed_forward.w2.biases,<br>model.layers.9.feed_forward.w2.scales,<br>model.layers.9.feed_forward.w2.weight,<br>model.layers.9.feed_forward.w3.biases,<br>model.layers.9.feed_forward.w3.scales,<br>model.layers.9.feed_forward.w3.weight,<br>model.layers.9.ffn_norm.weight,<br>model.layers.9.operator_norm.weight,<br>model.layers.9.self_attn.k_layernorm.weight,<br>model.layers.9.self_attn.k_proj.biases,<br>model.layers.9.self_attn.k_proj.scales,<br>model.layers.9.self_attn.k_proj.weight,<br>model.layers.9.self_attn.out_proj.biases,<br>model.layers.9.self_attn.out_proj.scales,<br>model.layers.9.self_attn.out_proj.weight,<br>model.layers.9.self_attn.q_layernorm.weight,<br>model.layers.9.self_attn.q_proj.biases,<br>model.layers.9.self_attn.q_proj.scales,<br>model.layers.9.self_attn.q_proj.weight,<br>model.layers.9.self_attn.v_proj.biases,<br>model.layers.9.self_attn.v_proj.scales,<br>model.layers.9.self_attn.v_proj.weight.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* Received 600 parameters not in model:
-  <br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.embedding_norm.weight,<br>model.layers.0.conv.conv.weight,<br>model.layers.0.conv.in_proj.biases,<br>model.layers.0.conv.in_proj.scales,<br>model.layers.0.conv.in_proj.weight,<br>model.layers.0.conv.out_proj.biases,<br>model.layers.0.conv.out_proj.scales,<br>model.layers.0.conv.out_proj.weight,<br>model.layers.0.feed_forward.w1.biases,<br>model.layers.0.feed_forward.w1.scales,<br>model.layers.0.feed_forward.w1.weight,<br>model.layers.0.feed_forward.w2.biases,<br>model.layers.0.feed_forward.w2.scales,<br>model.layers.0.feed_forward.w2.weight,<br>model.layers.0.feed_forward.w3.biases,<br>model.layers.0.feed_forward.w3.scales,<br>model.layers.0.feed_forward.w3.weight,<br>model.layers.0.ffn_norm.weight,<br>model.layers.0.operator_norm.weight,<br>model.layers.1.conv.conv.weight,<br>model.layers.1.conv.in_proj.biases,<br>model.layers.1.conv.in_proj.scales,<br>model.layers.1.conv.in_proj.weight,<br>model.layers.1.conv.out_proj.biases,<br>model.layers.1.conv.out_proj.scales,<br>model.layers.1.conv.out_proj.weight,<br>model.layers.1.feed_forward.w1.biases,<br>model.layers.1.feed_forward.w1.scales,<br>model.layers.1.feed_forward.w1.weight,<br>model.layers.1.feed_forward.w2.biases,<br>model.layers.1.feed_forward.w2.scales,<br>model.layers.1.feed_forward.w2.weight,<br>model.layers.1.feed_forward.w3.biases,<br>model.layers.1.feed_forward.w3.scales,<br>model.layers.1.feed_forward.w3.weight,<br>model.layers.1.ffn_norm.weight,<br>model.layers.1.operator_norm.weight,<br>model.layers.10.conv.conv.weight,<br>model.layers.10.conv.in_proj.biases,<br>model.layers.10.conv.in_proj.scales,<br>model.layers.10.conv.in_proj.weight,<br>model.layers.10.conv.out_proj.biases,<br>model.layers.10.conv.out_proj.scales,<br>model.layers.10.conv.out_proj.weight,<br>model.layers.10.feed_forward.w1.biases,<br>model.layers.10.feed_forward.w1.scales,<br>model.layers.10.feed_forward.w1.weight,<br>model.layers.10.feed_forward.w2.biases,<br>model.layers.10.feed_forward.w2.scales,<br>model.layers.10.feed_forward.w2.weight,<br>model.layers.10.feed_forward.w3.biases,<br>model.layers.10.feed_forward.w3.scales,<br>model.layers.10.feed_forward.w3.weight,<br>model.layers.10.ffn_norm.weight,<br>model.layers.10.operator_norm.weight,<br>model.layers.11.conv.conv.weight,<br>model.layers.11.conv.in_proj.biases,<br>model.layers.11.conv.in_proj.scales,<br>model.layers.11.conv.in_proj.weight,<br>model.layers.11.conv.out_proj.biases,<br>model.layers.11.conv.out_proj.scales,<br>model.layers.11.conv.out_proj.weight,<br>model.layers.11.feed_forward.w1.biases,<br>model.layers.11.feed_forward.w1.scales,<br>model.layers.11.feed_forward.w1.weight,<br>model.layers.11.feed_forward.w2.biases,<br>model.layers.11.feed_forward.w2.scales,<br>model.layers.11.feed_forward.w2.weight,<br>model.layers.11.feed_forward.w3.biases,<br>model.layers.11.feed_forward.w3.scales,<br>model.layers.11.feed_forward.w3.weight,<br>model.layers.11.ffn_norm.weight,<br>model.layers.11.operator_norm.weight,<br>model.layers.12.conv.conv.weight,<br>model.layers.12.conv.in_proj.biases,<br>model.layers.12.conv.in_proj.scales,<br>model.layers.12.conv.in_proj.weight,<br>model.layers.12.conv.out_proj.biases,<br>model.layers.12.conv.out_proj.scales,<br>model.layers.12.conv.out_proj.weight,<br>model.layers.12.feed_forward.w1.biases,<br>model.layers.12.feed_forward.w1.scales,<br>model.layers.12.feed_forward.w1.weight,<br>model.layers.12.feed_forward.w2.biases,<br>model.layers.12.feed_forward.w2.scales,<br>model.layers.12.feed_forward.w2.weight,<br>model.layers.12.feed_forward.w3.biases,<br>model.layers.12.feed_forward.w3.scales,<br>model.layers.12.feed_forward.w3.weight,<br>model.layers.12.ffn_norm.weight,<br>model.layers.12.operator_norm.weight,<br>model.layers.13.feed_forward.w1.biases,<br>model.layers.13.feed_forward.w1.scales,<br>model.layers.13.feed_forward.w1.weight,<br>model.layers.13.feed_forward.w2.biases,<br>model.layers.13.feed_forward.w2.scales,<br>model.layers.13.feed_forward.w2.weight,<br>model.layers.13.feed_forward.w3.biases,<br>model.layers.13.feed_forward.w3.scales,<br>model.layers.13.feed_forward.w3.weight,<br>model.layers.13.ffn_norm.weight,<br>model.layers.13.operator_norm.weight,<br>model.layers.13.self_attn.k_layernorm.weight,<br>model.layers.13.self_attn.k_proj.biases,<br>model.layers.13.self_attn.k_proj.scales,<br>model.layers.13.self_attn.k_proj.weight,<br>model.layers.13.self_attn.out_proj.biases,<br>model.layers.13.self_attn.out_proj.scales,<br>model.layers.13.self_attn.out_proj.weight,<br>model.layers.13.self_attn.q_layernorm.weight,<br>model.layers.13.self_attn.q_proj.biases,<br>model.layers.13.self_attn.q_proj.scales,<br>model.layers.13.self_attn.q_proj.weight,<br>model.layers.13.self_attn.v_proj.biases,<br>model.layers.13.self_attn.v_proj.scales,<br>model.layers.13.self_attn.v_proj.weight,<br>model.layers.14.conv.conv.weight,<br>model.layers.14.conv.in_proj.biases,<br>model.layers.14.conv.in_proj.scales,<br>model.layers.14.conv.in_proj.weight,<br>model.layers.14.conv.out_proj.biases,<br>model.layers.14.conv.out_proj.scales,<br>model.layers.14.conv.out_proj.weight,<br>model.layers.14.feed_forward.w1.biases,<br>model.layers.14.feed_forward.w1.scales,<br>model.layers.14.feed_forward.w1.weight,<br>model.layers.14.feed_forward.w2.biases,<br>model.layers.14.feed_forward.w2.scales,<br>model.layers.14.feed_forward.w2.weight,<br>model.layers.14.feed_forward.w3.biases,<br>model.layers.14.feed_forward.w3.scales,<br>model.layers.14.feed_forward.w3.weight,<br>model.layers.14.ffn_norm.weight,<br>model.layers.14.operator_norm.weight,<br>model.layers.15.conv.conv.weight,<br>model.layers.15.conv.in_proj.biases,<br>model.layers.15.conv.in_proj.scales,<br>model.layers.15.conv.in_proj.weight,<br>model.layers.15.conv.out_proj.biases,<br>model.layers.15.conv.out_proj.scales,<br>model.layers.15.conv.out_proj.weight,<br>model.layers.15.feed_forward.w1.biases,<br>model.layers.15.feed_forward.w1.scales,<br>model.layers.15.feed_forward.w1.weight,<br>model.layers.15.feed_forward.w2.biases,<br>model.layers.15.feed_forward.w2.scales,<br>model.layers.15.feed_forward.w2.weight,<br>model.layers.15.feed_forward.w3.biases,<br>model.layers.15.feed_forward.w3.scales,<br>model.layers.15.feed_forward.w3.weight,<br>model.layers.15.ffn_norm.weight,<br>model.layers.15.operator_norm.weight,<br>model.layers.16.conv.conv.weight,<br>model.layers.16.conv.in_proj.biases,<br>model.layers.16.conv.in_proj.scales,<br>model.layers.16.conv.in_proj.weight,<br>model.layers.16.conv.out_proj.biases,<br>model.layers.16.conv.out_proj.scales,<br>model.layers.16.conv.out_proj.weight,<br>model.layers.16.feed_forward.w1.biases,<br>model.layers.16.feed_forward.w1.scales,<br>model.layers.16.feed_forward.w1.weight,<br>model.layers.16.feed_forward.w2.biases,<br>model.layers.16.feed_forward.w2.scales,<br>model.layers.16.feed_forward.w2.weight,<br>model.layers.16.feed_forward.w3.biases,<br>model.layers.16.feed_forward.w3.scales,<br>model.layers.16.feed_forward.w3.weight,<br>model.layers.16.ffn_norm.weight,<br>model.layers.16.operator_norm.weight,<br>model.layers.17.feed_forward.w1.biases,<br>model.layers.17.feed_forward.w1.scales,<br>model.layers.17.feed_forward.w1.weight,<br>model.layers.17.feed_forward.w2.biases,<br>model.layers.17.feed_forward.w2.scales,<br>model.layers.17.feed_forward.w2.weight,<br>model.layers.17.feed_forward.w3.biases,<br>model.layers.17.feed_forward.w3.scales,<br>model.layers.17.feed_forward.w3.weight,<br>model.layers.17.ffn_norm.weight,<br>model.layers.17.operator_norm.weight,<br>model.layers.17.self_attn.k_layernorm.weight,<br>model.layers.17.self_attn.k_proj.biases,<br>model.layers.17.self_attn.k_proj.scales,<br>model.layers.17.self_attn.k_proj.weight,<br>model.layers.17.self_attn.out_proj.biases,<br>model.layers.17.self_attn.out_proj.scales,<br>model.layers.17.self_attn.out_proj.weight,<br>model.layers.17.self_attn.q_layernorm.weight,<br>model.layers.17.self_attn.q_proj.biases,<br>model.layers.17.self_attn.q_proj.scales,<br>model.layers.17.self_attn.q_proj.weight,<br>model.layers.17.self_attn.v_proj.biases,<br>model.layers.17.self_attn.v_proj.scales,<br>model.layers.17.self_attn.v_proj.weight,<br>model.layers.18.conv.conv.weight,<br>model.layers.18.conv.in_proj.biases,<br>model.layers.18.conv.in_proj.scales,<br>model.layers.18.conv.in_proj.weight,<br>model.layers.18.conv.out_proj.biases,<br>model.layers.18.conv.out_proj.scales,<br>model.layers.18.conv.out_proj.weight,<br>model.layers.18.feed_forward.w1.biases,<br>model.layers.18.feed_forward.w1.scales,<br>model.layers.18.feed_forward.w1.weight,<br>model.layers.18.feed_forward.w2.biases,<br>model.layers.18.feed_forward.w2.scales,<br>model.layers.18.feed_forward.w2.weight,<br>model.layers.18.feed_forward.w3.biases,<br>model.layers.18.feed_forward.w3.scales,<br>model.layers.18.feed_forward.w3.weight,<br>model.layers.18.ffn_norm.weight,<br>model.layers.18.operator_norm.weight,<br>model.layers.19.conv.conv.weight,<br>model.layers.19.conv.in_proj.biases,<br>model.layers.19.conv.in_proj.scales,<br>model.layers.19.conv.in_proj.weight,<br>model.layers.19.conv.out_proj.biases,<br>model.layers.19.conv.out_proj.scales,<br>model.layers.19.conv.out_proj.weight,<br>model.layers.19.feed_forward.w1.biases,<br>model.layers.19.feed_forward.w1.scales,<br>model.layers.19.feed_forward.w1.weight,<br>model.layers.19.feed_forward.w2.biases,<br>model.layers.19.feed_forward.w2.scales,<br>model.layers.19.feed_forward.w2.weight,<br>model.layers.19.feed_forward.w3.biases,<br>model.layers.19.feed_forward.w3.scales,<br>model.layers.19.feed_forward.w3.weight,<br>model.layers.19.ffn_norm.weight,<br>model.layers.19.operator_norm.weight,<br>model.layers.2.feed_forward.w1.biases,<br>model.layers.2.feed_forward.w1.scales,<br>model.layers.2.feed_forward.w1.weight,<br>model.layers.2.feed_forward.w2.biases,<br>model.layers.2.feed_forward.w2.scales,<br>model.layers.2.feed_forward.w2.weight,<br>model.layers.2.feed_forward.w3.biases,<br>model.layers.2.feed_forward.w3.scales,<br>model.layers.2.feed_forward.w3.weight,<br>model.layers.2.ffn_norm.weight,<br>model.layers.2.operator_norm.weight,<br>model.layers.2.self_attn.k_layernorm.weight,<br>model.layers.2.self_attn.k_proj.biases,<br>model.layers.2.self_attn.k_proj.scales,<br>model.layers.2.self_attn.k_proj.weight,<br>model.layers.2.self_attn.out_proj.biases,<br>model.layers.2.self_attn.out_proj.scales,<br>model.layers.2.self_attn.out_proj.weight,<br>model.layers.2.self_attn.q_layernorm.weight,<br>model.layers.2.self_attn.q_proj.biases,<br>model.layers.2.self_attn.q_proj.scales,<br>model.layers.2.self_attn.q_proj.weight,<br>model.layers.2.self_attn.v_proj.biases,<br>model.layers.2.self_attn.v_proj.scales,<br>model.layers.2.self_attn.v_proj.weight,<br>model.layers.20.conv.conv.weight,<br>model.layers.20.conv.in_proj.biases,<br>model.layers.20.conv.in_proj.scales,<br>model.layers.20.conv.in_proj.weight,<br>model.layers.20.conv.out_proj.biases,<br>model.layers.20.conv.out_proj.scales,<br>model.layers.20.conv.out_proj.weight,<br>model.layers.20.feed_forward.w1.biases,<br>model.layers.20.feed_forward.w1.scales,<br>model.layers.20.feed_forward.w1.weight,<br>model.layers.20.feed_forward.w2.biases,<br>model.layers.20.feed_forward.w2.scales,<br>model.layers.20.feed_forward.w2.weight,<br>model.layers.20.feed_forward.w3.biases,<br>model.layers.20.feed_forward.w3.scales,<br>model.layers.20.feed_forward.w3.weight,<br>model.layers.20.ffn_norm.weight,<br>model.layers.20.operator_norm.weight,<br>model.layers.21.feed_forward.w1.biases,<br>model.layers.21.feed_forward.w1.scales,<br>model.layers.21.feed_forward.w1.weight,<br>model.layers.21.feed_forward.w2.biases,<br>model.layers.21.feed_forward.w2.scales,<br>model.layers.21.feed_forward.w2.weight,<br>model.layers.21.feed_forward.w3.biases,<br>model.layers.21.feed_forward.w3.scales,<br>model.layers.21.feed_forward.w3.weight,<br>model.layers.21.ffn_norm.weight,<br>model.layers.21.operator_norm.weight,<br>model.layers.21.self_attn.k_layernorm.weight,<br>model.layers.21.self_attn.k_proj.biases,<br>model.layers.21.self_attn.k_proj.scales,<br>model.layers.21.self_attn.k_proj.weight,<br>model.layers.21.self_attn.out_proj.biases,<br>model.layers.21.self_attn.out_proj.scales,<br>model.layers.21.self_attn.out_proj.weight,<br>model.layers.21.self_attn.q_layernorm.weight,<br>model.layers.21.self_attn.q_proj.biases,<br>model.layers.21.self_attn.q_proj.scales,<br>model.layers.21.self_attn.q_proj.weight,<br>model.layers.21.self_attn.v_proj.biases,<br>model.layers.21.self_attn.v_proj.scales,<br>model.layers.21.self_attn.v_proj.weight,<br>model.layers.22.conv.conv.weight,<br>model.layers.22.conv.in_proj.biases,<br>model.layers.22.conv.in_proj.scales,<br>model.layers.22.conv.in_proj.weight,<br>model.layers.22.conv.out_proj.biases,<br>model.layers.22.conv.out_proj.scales,<br>model.layers.22.conv.out_proj.weight,<br>model.layers.22.feed_forward.w1.biases,<br>model.layers.22.feed_forward.w1.scales,<br>model.layers.22.feed_forward.w1.weight,<br>model.layers.22.feed_forward.w2.biases,<br>model.layers.22.feed_forward.w2.scales,<br>model.layers.22.feed_forward.w2.weight,<br>model.layers.22.feed_forward.w3.biases,<br>model.layers.22.feed_forward.w3.scales,<br>model.layers.22.feed_forward.w3.weight,<br>model.layers.22.ffn_norm.weight,<br>model.layers.22.operator_norm.weight,<br>model.layers.23.conv.conv.weight,<br>model.layers.23.conv.in_proj.biases,<br>model.layers.23.conv.in_proj.scales,<br>model.layers.23.conv.in_proj.weight,<br>model.layers.23.conv.out_proj.biases,<br>model.layers.23.conv.out_proj.scales,<br>model.layers.23.conv.out_proj.weight,<br>model.layers.23.feed_forward.w1.biases,<br>model.layers.23.feed_forward.w1.scales,<br>model.layers.23.feed_forward.w1.weight,<br>model.layers.23.feed_forward.w2.biases,<br>model.layers.23.feed_forward.w2.scales,<br>model.layers.23.feed_forward.w2.weight,<br>model.layers.23.feed_forward.w3.biases,<br>model.layers.23.feed_forward.w3.scales,<br>model.layers.23.feed_forward.w3.weight,<br>model.layers.23.ffn_norm.weight,<br>model.layers.23.operator_norm.weight,<br>model.layers.24.feed_forward.w1.biases,<br>model.layers.24.feed_forward.w1.scales,<br>model.layers.24.feed_forward.w1.weight,<br>model.layers.24.feed_forward.w2.biases,<br>model.layers.24.feed_forward.w2.scales,<br>model.layers.24.feed_forward.w2.weight,<br>model.layers.24.feed_forward.w3.biases,<br>model.layers.24.feed_forward.w3.scales,<br>model.layers.24.feed_forward.w3.weight,<br>model.layers.24.ffn_norm.weight,<br>model.layers.24.operator_norm.weight,<br>model.layers.24.self_attn.k_layernorm.weight,<br>model.layers.24.self_attn.k_proj.biases,<br>model.layers.24.self_attn.k_proj.scales,<br>model.layers.24.self_attn.k_proj.weight,<br>model.layers.24.self_attn.out_proj.biases,<br>model.layers.24.self_attn.out_proj.scales,<br>model.layers.24.self_attn.out_proj.weight,<br>model.layers.24.self_attn.q_layernorm.weight,<br>model.layers.24.self_attn.q_proj.biases,<br>model.layers.24.self_attn.q_proj.scales,<br>model.layers.24.self_attn.q_proj.weight,<br>model.layers.24.self_attn.v_proj.biases,<br>model.layers.24.self_attn.v_proj.scales,<br>model.layers.24.self_attn.v_proj.weight,<br>model.layers.25.conv.conv.weight,<br>model.layers.25.conv.in_proj.biases,<br>model.layers.25.conv.in_proj.scales,<br>model.layers.25.conv.in_proj.weight,<br>model.layers.25.conv.out_proj.biases,<br>model.layers.25.conv.out_proj.scales,<br>model.layers.25.conv.out_proj.weight,<br>model.layers.25.feed_forward.w1.biases,<br>model.layers.25.feed_forward.w1.scales,<br>model.layers.25.feed_forward.w1.weight,<br>model.layers.25.feed_forward.w2.biases,<br>model.layers.25.feed_forward.w2.scales,<br>model.layers.25.feed_forward.w2.weight,<br>model.layers.25.feed_forward.w3.biases,<br>model.layers.25.feed_forward.w3.scales,<br>model.layers.25.feed_forward.w3.weight,<br>model.layers.25.ffn_norm.weight,<br>model.layers.25.operator_norm.weight,<br>model.layers.26.conv.conv.weight,<br>model.layers.26.conv.in_proj.biases,<br>model.layers.26.conv.in_proj.scales,<br>model.layers.26.conv.in_proj.weight,<br>model.layers.26.conv.out_proj.biases,<br>model.layers.26.conv.out_proj.scales,<br>model.layers.26.conv.out_proj.weight,<br>model.layers.26.feed_forward.w1.biases,<br>model.layers.26.feed_forward.w1.scales,<br>model.layers.26.feed_forward.w1.weight,<br>model.layers.26.feed_forward.w2.biases,<br>model.layers.26.feed_forward.w2.scales,<br>model.layers.26.feed_forward.w2.weight,<br>model.layers.26.feed_forward.w3.biases,<br>model.layers.26.feed_forward.w3.scales,<br>model.layers.26.feed_forward.w3.weight,<br>model.layers.26.ffn_norm.weight,<br>model.layers.26.operator_norm.weight,<br>model.layers.27.feed_forward.w1.biases,<br>model.layers.27.feed_forward.w1.scales,<br>model.layers.27.feed_forward.w1.weight,<br>model.layers.27.feed_forward.w2.biases,<br>model.layers.27.feed_forward.w2.scales,<br>model.layers.27.feed_forward.w2.weight,<br>model.layers.27.feed_forward.w3.biases,<br>model.layers.27.feed_forward.w3.scales,<br>model.layers.27.feed_forward.w3.weight,<br>model.layers.27.ffn_norm.weight,<br>model.layers.27.operator_norm.weight,<br>model.layers.27.self_attn.k_layernorm.weight,<br>model.layers.27.self_attn.k_proj.biases,<br>model.layers.27.self_attn.k_proj.scales,<br>model.layers.27.self_attn.k_proj.weight,<br>model.layers.27.self_attn.out_proj.biases,<br>model.layers.27.self_attn.out_proj.scales,<br>model.layers.27.self_attn.out_proj.weight,<br>model.layers.27.self_attn.q_layernorm.weight,<br>model.layers.27.self_attn.q_proj.biases,<br>model.layers.27.self_attn.q_proj.scales,<br>model.layers.27.self_attn.q_proj.weight,<br>model.layers.27.self_attn.v_proj.biases,<br>model.layers.27.self_attn.v_proj.scales,<br>model.layers.27.self_attn.v_proj.weight,<br>model.layers.28.conv.conv.weight,<br>model.layers.28.conv.in_proj.biases,<br>model.layers.28.conv.in_proj.scales,<br>model.layers.28.conv.in_proj.weight,<br>model.layers.28.conv.out_proj.biases,<br>model.layers.28.conv.out_proj.scales,<br>model.layers.28.conv.out_proj.weight,<br>model.layers.28.feed_forward.w1.biases,<br>model.layers.28.feed_forward.w1.scales,<br>model.layers.28.feed_forward.w1.weight,<br>model.layers.28.feed_forward.w2.biases,<br>model.layers.28.feed_forward.w2.scales,<br>model.layers.28.feed_forward.w2.weight,<br>model.layers.28.feed_forward.w3.biases,<br>model.layers.28.feed_forward.w3.scales,<br>model.layers.28.feed_forward.w3.weight,<br>model.layers.28.ffn_norm.weight,<br>model.layers.28.operator_norm.weight,<br>model.layers.29.conv.conv.weight,<br>model.layers.29.conv.in_proj.biases,<br>model.layers.29.conv.in_proj.scales,<br>model.layers.29.conv.in_proj.weight,<br>model.layers.29.conv.out_proj.biases,<br>model.layers.29.conv.out_proj.scales,<br>model.layers.29.conv.out_proj.weight,<br>model.layers.29.feed_forward.w1.biases,<br>model.layers.29.feed_forward.w1.scales,<br>model.layers.29.feed_forward.w1.weight,<br>model.layers.29.feed_forward.w2.biases,<br>model.layers.29.feed_forward.w2.scales,<br>model.layers.29.feed_forward.w2.weight,<br>model.layers.29.feed_forward.w3.biases,<br>model.layers.29.feed_forward.w3.scales,<br>model.layers.29.feed_forward.w3.weight,<br>model.layers.29.ffn_norm.weight,<br>model.layers.29.operator_norm.weight,<br>model.layers.3.conv.conv.weight,<br>model.layers.3.conv.in_proj.biases,<br>model.layers.3.conv.in_proj.scales,<br>model.layers.3.conv.in_proj.weight,<br>model.layers.3.conv.out_proj.biases,<br>model.layers.3.conv.out_proj.scales,<br>model.layers.3.conv.out_proj.weight,<br>model.layers.3.feed_forward.w1.biases,<br>model.layers.3.feed_forward.w1.scales,<br>model.layers.3.feed_forward.w1.weight,<br>model.layers.3.feed_forward.w2.biases,<br>model.layers.3.feed_forward.w2.scales,<br>model.layers.3.feed_forward.w2.weight,<br>model.layers.3.feed_forward.w3.biases,<br>model.layers.3.feed_forward.w3.scales,<br>model.layers.3.feed_forward.w3.weight,<br>model.layers.3.ffn_norm.weight,<br>model.layers.3.operator_norm.weight,<br>model.layers.4.conv.conv.weight,<br>model.layers.4.conv.in_proj.biases,<br>model.layers.4.conv.in_proj.scales,<br>model.layers.4.conv.in_proj.weight,<br>model.layers.4.conv.out_proj.biases,<br>model.layers.4.conv.out_proj.scales,<br>model.layers.4.conv.out_proj.weight,<br>model.layers.4.feed_forward.w1.biases,<br>model.layers.4.feed_forward.w1.scales,<br>model.layers.4.feed_forward.w1.weight,<br>model.layers.4.feed_forward.w2.biases,<br>model.layers.4.feed_forward.w2.scales,<br>model.layers.4.feed_forward.w2.weight,<br>model.layers.4.feed_forward.w3.biases,<br>model.layers.4.feed_forward.w3.scales,<br>model.layers.4.feed_forward.w3.weight,<br>model.layers.4.ffn_norm.weight,<br>model.layers.4.operator_norm.weight,<br>model.layers.5.feed_forward.w1.biases,<br>model.layers.5.feed_forward.w1.scales,<br>model.layers.5.feed_forward.w1.weight,<br>model.layers.5.feed_forward.w2.biases,<br>model.layers.5.feed_forward.w2.scales,<br>model.layers.5.feed_forward.w2.weight,<br>model.layers.5.feed_forward.w3.biases,<br>model.layers.5.feed_forward.w3.scales,<br>model.layers.5.feed_forward.w3.weight,<br>model.layers.5.ffn_norm.weight,<br>model.layers.5.operator_norm.weight,<br>model.layers.5.self_attn.k_layernorm.weight,<br>model.layers.5.self_attn.k_proj.biases,<br>model.layers.5.self_attn.k_proj.scales,<br>model.layers.5.self_attn.k_proj.weight,<br>model.layers.5.self_attn.out_proj.biases,<br>model.layers.5.self_attn.out_proj.scales,<br>model.layers.5.self_attn.out_proj.weight,<br>model.layers.5.self_attn.q_layernorm.weight,<br>model.layers.5.self_attn.q_proj.biases,<br>model.layers.5.self_attn.q_proj.scales,<br>model.layers.5.self_attn.q_proj.weight,<br>model.layers.5.self_attn.v_proj.biases,<br>model.layers.5.self_attn.v_proj.scales,<br>model.layers.5.self_attn.v_proj.weight,<br>model.layers.6.conv.conv.weight,<br>model.layers.6.conv.in_proj.biases,<br>model.layers.6.conv.in_proj.scales,<br>model.layers.6.conv.in_proj.weight,<br>model.layers.6.conv.out_proj.biases,<br>model.layers.6.conv.out_proj.scales,<br>model.layers.6.conv.out_proj.weight,<br>model.layers.6.feed_forward.w1.biases,<br>model.layers.6.feed_forward.w1.scales,<br>model.layers.6.feed_forward.w1.weight,<br>model.layers.6.feed_forward.w2.biases,<br>model.layers.6.feed_forward.w2.scales,<br>model.layers.6.feed_forward.w2.weight,<br>model.layers.6.feed_forward.w3.biases,<br>model.layers.6.feed_forward.w3.scales,<br>model.layers.6.feed_forward.w3.weight,<br>model.layers.6.ffn_norm.weight,<br>model.layers.6.operator_norm.weight,<br>model.layers.7.conv.conv.weight,<br>model.layers.7.conv.in_proj.biases,<br>model.layers.7.conv.in_proj.scales,<br>model.layers.7.conv.in_proj.weight,<br>model.layers.7.conv.out_proj.biases,<br>model.layers.7.conv.out_proj.scales,<br>model.layers.7.conv.out_proj.weight,<br>model.layers.7.feed_forward.w1.biases,<br>model.layers.7.feed_forward.w1.scales,<br>model.layers.7.feed_forward.w1.weight,<br>model.layers.7.feed_forward.w2.biases,<br>model.layers.7.feed_forward.w2.scales,<br>model.layers.7.feed_forward.w2.weight,<br>model.layers.7.feed_forward.w3.biases,<br>model.layers.7.feed_forward.w3.scales,<br>model.layers.7.feed_forward.w3.weight,<br>model.layers.7.ffn_norm.weight,<br>model.layers.7.operator_norm.weight,<br>model.layers.8.conv.conv.weight,<br>model.layers.8.conv.in_proj.biases,<br>model.layers.8.conv.in_proj.scales,<br>model.layers.8.conv.in_proj.weight,<br>model.layers.8.conv.out_proj.biases,<br>model.layers.8.conv.out_proj.scales,<br>model.layers.8.conv.out_proj.weight,<br>model.layers.8.feed_forward.w1.biases,<br>model.layers.8.feed_forward.w1.scales,<br>model.layers.8.feed_forward.w1.weight,<br>model.layers.8.feed_forward.w2.biases,<br>model.layers.8.feed_forward.w2.scales,<br>model.layers.8.feed_forward.w2.weight,<br>model.layers.8.feed_forward.w3.biases,<br>model.layers.8.feed_forward.w3.scales,<br>model.layers.8.feed_forward.w3.weight,<br>model.layers.8.ffn_norm.weight,<br>model.layers.8.operator_norm.weight,<br>model.layers.9.feed_forward.w1.biases,<br>model.layers.9.feed_forward.w1.scales,<br>model.layers.9.feed_forward.w1.weight,<br>model.layers.9.feed_forward.w2.biases,<br>model.layers.9.feed_forward.w2.scales,<br>model.layers.9.feed_forward.w2.weight,<br>model.layers.9.feed_forward.w3.biases,<br>model.layers.9.feed_forward.w3.scales,<br>model.layers.9.feed_forward.w3.weight,<br>model.layers.9.ffn_norm.weight,<br>model.layers.9.operator_norm.weight,<br>model.layers.9.self_attn.k_layernorm.weight,<br>model.layers.9.self_attn.k_proj.biases,<br>model.layers.9.self_attn.k_proj.scales,<br>model.layers.9.self_attn.k_proj.weight,<br>model.layers.9.self_attn.out_proj.biases,<br>model.layers.9.self_attn.out_proj.scales,<br>model.layers.9.self_attn.out_proj.weight,<br>model.layers.9.self_attn.q_layernorm.weight,<br>model.layers.9.self_attn.q_proj.biases,<br>model.layers.9.self_attn.q_proj.scales,<br>model.layers.9.self_attn.q_proj.weight,<br>model.layers.9.self_attn.v_proj.biases,<br>model.layers.9.self_attn.v_proj.scales,<br>model.layers.9.self_attn.v_proj.weight.
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.26s
-- *Generation time:* -
-- *Total time:* 0.27s
-- *Input validation time:* 6.46e-05
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.0723
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory:* -
-- *Active memory:* -
-- *Cache memory:* -
-- *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.00411
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Image placeholders:* not captured
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* 12c5ae49304158b0a133fcea9ba4486a6d6c8cad
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/12c5ae49304158b0a133fcea9ba4486a6d6c8cad
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 822, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1202, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1067, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
-    raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
-    )
-ValueError: Received 600 parameters not in model: 
-model.embed_tokens.biases,
-model.embed_tokens.scales,
-model.embed_tokens.weight,
-model.embedding_norm.weight,
-model.layers.0.conv.conv.weight,
-model.layers.0.conv.in_proj.biases,
-model.layers.0.conv.in_proj.scales,
-model.layers.0.conv.in_proj.weight,
-model.layers.0.conv.out_proj.biases,
-model.layers.0.conv.out_proj.scales,
-model.layers.0.conv.out_proj.weight,
-model.layers.0.feed_forward.w1.biases,
-model.layers.0.feed_forward.w1.scales,
-model.layers.0.feed_forward.w1.weight,
-model.layers.0.feed_forward.w2.biases,
-model.layers.0.feed_forward.w2.scales,
-model.layers.0.feed_forward.w2.weight,
-model.layers.0.feed_forward.w3.biases,
-model.layers.0.feed_forward.w3.scales,
-model.layers.0.feed_forward.w3.weight,
-model.layers.0.ffn_norm.weight,
-model.layers.0.operator_norm.weight,
-model.layers.1.conv.conv.weight,
-model.layers.1.conv.in_proj.biases,
-model.layers.1.conv.in_proj.scales,
-model.layers.1.conv.in_proj.weight,
-model.layers.1.conv.out_proj.biases,
-model.layers.1.conv.out_proj.scales,
-model.layers.1.conv.out_proj.weight,
-model.layers.1.feed_forward.w1.biases,
-model.layers.1.feed_forward.w1.scales,
-model.layers.1.feed_forward.w1.weight,
-model.layers.1.feed_forward.w2.biases,
-model.layers.1.feed_forward.w2.scales,
-model.layers.1.feed_forward.w2.weight,
-model.layers.1.feed_forward.w3.biases,
-model.layers.1.feed_forward.w3.scales,
-model.layers.1.feed_forward.w3.weight,
-model.layers.1.ffn_norm.weight,
-model.layers.1.operator_norm.weight,
-model.layers.10.conv.conv.weight,
-model.layers.10.conv.in_proj.biases,
-model.layers.10.conv.in_proj.scales,
-model.layers.10.conv.in_proj.weight,
-model.layers.10.conv.out_proj.biases,
-model.layers.10.conv.out_proj.scales,
-model.layers.10.conv.out_proj.weight,
-model.layers.10.feed_forward.w1.biases,
-model.layers.10.feed_forward.w1.scales,
-model.layers.10.feed_forward.w1.weight,
-model.layers.10.feed_forward.w2.biases,
-model.layers.10.feed_forward.w2.scales,
-model.layers.10.feed_forward.w2.weight,
-model.layers.10.feed_forward.w3.biases,
-model.layers.10.feed_forward.w3.scales,
-model.layers.10.feed_forward.w3.weight,
-model.layers.10.ffn_norm.weight,
-model.layers.10.operator_norm.weight,
-model.layers.11.conv.conv.weight,
-model.layers.11.conv.in_proj.biases,
-model.layers.11.conv.in_proj.scales,
-model.layers.11.conv.in_proj.weight,
-model.layers.11.conv.out_proj.biases,
-model.layers.11.conv.out_proj.scales,
-model.layers.11.conv.out_proj.weight,
-model.layers.11.feed_forward.w1.biases,
-model.layers.11.feed_forward.w1.scales,
-model.layers.11.feed_forward.w1.weight,
-model.layers.11.feed_forward.w2.biases,
-model.layers.11.feed_forward.w2.scales,
-model.layers.11.feed_forward.w2.weight,
-model.layers.11.feed_forward.w3.biases,
-model.layers.11.feed_forward.w3.scales,
-model.layers.11.feed_forward.w3.weight,
-model.layers.11.ffn_norm.weight,
-model.layers.11.operator_norm.weight,
-model.layers.12.conv.conv.weight,
-model.layers.12.conv.in_proj.biases,
-model.layers.12.conv.in_proj.scales,
-model.layers.12.conv.in_proj.weight,
-model.layers.12.conv.out_proj.biases,
-model.layers.12.conv.out_proj.scales,
-model.layers.12.conv.out_proj.weight,
-model.layers.12.feed_forward.w1.biases,
-model.layers.12.feed_forward.w1.scales,
-model.layers.12.feed_forward.w1.weight,
-model.layers.12.feed_forward.w2.biases,
-model.layers.12.feed_forward.w2.scales,
-model.layers.12.feed_forward.w2.weight,
-model.layers.12.feed_forward.w3.biases,
-model.layers.12.feed_forward.w3.scales,
-model.layers.12.feed_forward.w3.weight,
-model.layers.12.ffn_norm.weight,
-model.layers.12.operator_norm.weight,
-model.layers.13.feed_forward.w1.biases,
-model.layers.13.feed_forward.w1.scales,
-model.layers.13.feed_forward.w1.weight,
-model.layers.13.feed_forward.w2.biases,
-model.layers.13.feed_forward.w2.scales,
-model.layers.13.feed_forward.w2.weight,
-model.layers.13.feed_forward.w3.biases,
-model.layers.13.feed_forward.w3.scales,
-model.layers.13.feed_forward.w3.weight,
-model.layers.13.ffn_norm.weight,
-model.layers.13.operator_norm.weight,
-model.layers.13.self_attn.k_layernorm.weight,
-model.layers.13.self_attn.k_proj.biases,
-model.layers.13.self_attn.k_proj.scales,
-model.layers.13.self_attn.k_proj.weight,
-model.layers.13.self_attn.out_proj.biases,
-model.layers.13.self_attn.out_proj.scales,
-model.layers.13.self_attn.out_proj.weight,
-model.layers.13.self_attn.q_layernorm.weight,
-model.layers.13.self_attn.q_proj.biases,
-model.layers.13.self_attn.q_proj.scales,
-model.layers.13.self_attn.q_proj.weight,
-model.layers.13.self_attn.v_proj.biases,
-model.layers.13.self_attn.v_proj.scales,
-model.layers.13.self_attn.v_proj.weight,
-model.layers.14.conv.conv.weight,
-model.layers.14.conv.in_proj.biases,
-model.layers.14.conv.in_proj.scales,
-model.layers.14.conv.in_proj.weight,
-model.layers.14.conv.out_proj.biases,
-model.layers.14.conv.out_proj.scales,
-model.layers.14.conv.out_proj.weight,
-model.layers.14.feed_forward.w1.biases,
-model.layers.14.feed_forward.w1.scales,
-model.layers.14.feed_forward.w1.weight,
-model.layers.14.feed_forward.w2.biases,
-model.layers.14.feed_forward.w2.scales,
-model.layers.14.feed_forward.w2.weight,
-model.layers.14.feed_forward.w3.biases,
-model.layers.14.feed_forward.w3.scales,
-model.layers.14.feed_forward.w3.weight,
-model.layers.14.ffn_norm.weight,
-model.layers.14.operator_norm.weight,
-model.layers.15.conv.conv.weight,
-model.layers.15.conv.in_proj.biases,
-model.layers.15.conv.in_proj.scales,
-model.layers.15.conv.in_proj.weight,
-model.layers.15.conv.out_proj.biases,
-model.layers.15.conv.out_proj.scales,
-model.layers.15.conv.out_proj.weight,
-model.layers.15.feed_forward.w1.biases,
-model.layers.15.feed_forward.w1.scales,
-model.layers.15.feed_forward.w1.weight,
-model.layers.15.feed_forward.w2.biases,
-model.layers.15.feed_forward.w2.scales,
-model.layers.15.feed_forward.w2.weight,
-model.layers.15.feed_forward.w3.biases,
-model.layers.15.feed_forward.w3.scales,
-model.layers.15.feed_forward.w3.weight,
-model.layers.15.ffn_norm.weight,
-model.layers.15.operator_norm.weight,
-model.layers.16.conv.conv.weight,
-model.layers.16.conv.in_proj.biases,
-model.layers.16.conv.in_proj.scales,
-model.layers.16.conv.in_proj.weight,
-model.layers.16.conv.out_proj.biases,
-model.layers.16.conv.out_proj.scales,
-model.layers.16.conv.out_proj.weight,
-model.layers.16.feed_forward.w1.biases,
-model.layers.16.feed_forward.w1.scales,
-model.layers.16.feed_forward.w1.weight,
-model.layers.16.feed_forward.w2.biases,
-model.layers.16.feed_forward.w2.scales,
-model.layers.16.feed_forward.w2.weight,
-model.layers.16.feed_forward.w3.biases,
-model.layers.16.feed_forward.w3.scales,
-model.layers.16.feed_forward.w3.weight,
-model.layers.16.ffn_norm.weight,
-model.layers.16.operator_norm.weight,
-model.layers.17.feed_forward.w1.biases,
-model.layers.17.feed_forward.w1.scales,
-model.layers.17.feed_forward.w1.weight,
-model.layers.17.feed_forward.w2.biases,
-model.layers.17.feed_forward.w2.scales,
-model.layers.17.feed_forward.w2.weight,
-model.layers.17.feed_forward.w3.biases,
-model.layers.17.feed_forward.w3.scales,
-model.layers.17.feed_forward.w3.weight,
-model.layers.17.ffn_norm.weight,
-model.layers.17.operator_norm.weight,
-model.layers.17.self_attn.k_layernorm.weight,
-model.layers.17.self_attn.k_proj.biases,
-model.layers.17.self_attn.k_proj.scales,
-model.layers.17.self_attn.k_proj.weight,
-model.layers.17.self_attn.out_proj.biases,
-model.layers.17.self_attn.out_proj.scales,
-model.layers.17.self_attn.out_proj.weight,
-model.layers.17.self_attn.q_layernorm.weight,
-model.layers.17.self_attn.q_proj.biases,
-model.layers.17.self_attn.q_proj.scales,
-model.layers.17.self_attn.q_proj.weight,
-model.layers.17.self_attn.v_proj.biases,
-model.layers.17.self_attn.v_proj.scales,
-model.layers.17.self_attn.v_proj.weight,
-model.layers.18.conv.conv.weight,
-model.layers.18.conv.in_proj.biases,
-model.layers.18.conv.in_proj.scales,
-model.layers.18.conv.in_proj.weight,
-model.layers.18.conv.out_proj.biases,
-model.layers.18.conv.out_proj.scales,
-model.layers.18.conv.out_proj.weight,
-model.layers.18.feed_forward.w1.biases,
-model.layers.18.feed_forward.w1.scales,
-model.layers.18.feed_forward.w1.weight,
-model.layers.18.feed_forward.w2.biases,
-model.layers.18.feed_forward.w2.scales,
-model.layers.18.feed_forward.w2.weight,
-model.layers.18.feed_forward.w3.biases,
-model.layers.18.feed_forward.w3.scales,
-model.layers.18.feed_forward.w3.weight,
-model.layers.18.ffn_norm.weight,
-model.layers.18.operator_norm.weight,
-model.layers.19.conv.conv.weight,
-model.layers.19.conv.in_proj.biases,
-model.layers.19.conv.in_proj.scales,
-model.layers.19.conv.in_proj.weight,
-model.layers.19.conv.out_proj.biases,
-model.layers.19.conv.out_proj.scales,
-model.layers.19.conv.out_proj.weight,
-model.layers.19.feed_forward.w1.biases,
-model.layers.19.feed_forward.w1.scales,
-model.layers.19.feed_forward.w1.weight,
-model.layers.19.feed_forward.w2.biases,
-model.layers.19.feed_forward.w2.scales,
-model.layers.19.feed_forward.w2.weight,
-model.layers.19.feed_forward.w3.biases,
-model.layers.19.feed_forward.w3.scales,
-model.layers.19.feed_forward.w3.weight,
-model.layers.19.ffn_norm.weight,
-model.layers.19.operator_norm.weight,
-model.layers.2.feed_forward.w1.biases,
-model.layers.2.feed_forward.w1.scales,
-model.layers.2.feed_forward.w1.weight,
-model.layers.2.feed_forward.w2.biases,
-model.layers.2.feed_forward.w2.scales,
-model.layers.2.feed_forward.w2.weight,
-model.layers.2.feed_forward.w3.biases,
-model.layers.2.feed_forward.w3.scales,
-model.layers.2.feed_forward.w3.weight,
-model.layers.2.ffn_norm.weight,
-model.layers.2.operator_norm.weight,
-model.layers.2.self_attn.k_layernorm.weight,
-model.layers.2.self_attn.k_proj.biases,
-model.layers.2.self_attn.k_proj.scales,
-model.layers.2.self_attn.k_proj.weight,
-model.layers.2.self_attn.out_proj.biases,
-model.layers.2.self_attn.out_proj.scales,
-model.layers.2.self_attn.out_proj.weight,
-model.layers.2.self_attn.q_layernorm.weight,
-model.layers.2.self_attn.q_proj.biases,
-model.layers.2.self_attn.q_proj.scales,
-model.layers.2.self_attn.q_proj.weight,
-model.layers.2.self_attn.v_proj.biases,
-model.layers.2.self_attn.v_proj.scales,
-model.layers.2.self_attn.v_proj.weight,
-model.layers.20.conv.conv.weight,
-model.layers.20.conv.in_proj.biases,
-model.layers.20.conv.in_proj.scales,
-model.layers.20.conv.in_proj.weight,
-model.layers.20.conv.out_proj.biases,
-model.layers.20.conv.out_proj.scales,
-model.layers.20.conv.out_proj.weight,
-model.layers.20.feed_forward.w1.biases,
-model.layers.20.feed_forward.w1.scales,
-model.layers.20.feed_forward.w1.weight,
-model.layers.20.feed_forward.w2.biases,
-model.layers.20.feed_forward.w2.scales,
-model.layers.20.feed_forward.w2.weight,
-model.layers.20.feed_forward.w3.biases,
-model.layers.20.feed_forward.w3.scales,
-model.layers.20.feed_forward.w3.weight,
-model.layers.20.ffn_norm.weight,
-model.layers.20.operator_norm.weight,
-model.layers.21.feed_forward.w1.biases,
-model.layers.21.feed_forward.w1.scales,
-model.layers.21.feed_forward.w1.weight,
-model.layers.21.feed_forward.w2.biases,
-model.layers.21.feed_forward.w2.scales,
-model.layers.21.feed_forward.w2.weight,
-model.layers.21.feed_forward.w3.biases,
-model.layers.21.feed_forward.w3.scales,
-model.layers.21.feed_forward.w3.weight,
-model.layers.21.ffn_norm.weight,
-model.layers.21.operator_norm.weight,
-model.layers.21.self_attn.k_layernorm.weight,
-model.layers.21.self_attn.k_proj.biases,
-model.layers.21.self_attn.k_proj.scales,
-model.layers.21.self_attn.k_proj.weight,
-model.layers.21.self_attn.out_proj.biases,
-model.layers.21.self_attn.out_proj.scales,
-model.layers.21.self_attn.out_proj.weight,
-model.layers.21.self_attn.q_layernorm.weight,
-model.layers.21.self_attn.q_proj.biases,
-model.layers.21.self_attn.q_proj.scales,
-model.layers.21.self_attn.q_proj.weight,
-model.layers.21.self_attn.v_proj.biases,
-model.layers.21.self_attn.v_proj.scales,
-model.layers.21.self_attn.v_proj.weight,
-model.layers.22.conv.conv.weight,
-model.layers.22.conv.in_proj.biases,
-model.layers.22.conv.in_proj.scales,
-model.layers.22.conv.in_proj.weight,
-model.layers.22.conv.out_proj.biases,
-model.layers.22.conv.out_proj.scales,
-model.layers.22.conv.out_proj.weight,
-model.layers.22.feed_forward.w1.biases,
-model.layers.22.feed_forward.w1.scales,
-model.layers.22.feed_forward.w1.weight,
-model.layers.22.feed_forward.w2.biases,
-model.layers.22.feed_forward.w2.scales,
-model.layers.22.feed_forward.w2.weight,
-model.layers.22.feed_forward.w3.biases,
-model.layers.22.feed_forward.w3.scales,
-model.layers.22.feed_forward.w3.weight,
-model.layers.22.ffn_norm.weight,
-model.layers.22.operator_norm.weight,
-model.layers.23.conv.conv.weight,
-model.layers.23.conv.in_proj.biases,
-model.layers.23.conv.in_proj.scales,
-model.layers.23.conv.in_proj.weight,
-model.layers.23.conv.out_proj.biases,
-model.layers.23.conv.out_proj.scales,
-model.layers.23.conv.out_proj.weight,
-model.layers.23.feed_forward.w1.biases,
-model.layers.23.feed_forward.w1.scales,
-model.layers.23.feed_forward.w1.weight,
-model.layers.23.feed_forward.w2.biases,
-model.layers.23.feed_forward.w2.scales,
-model.layers.23.feed_forward.w2.weight,
-model.layers.23.feed_forward.w3.biases,
-model.layers.23.feed_forward.w3.scales,
-model.layers.23.feed_forward.w3.weight,
-model.layers.23.ffn_norm.weight,
-model.layers.23.operator_norm.weight,
-model.layers.24.feed_forward.w1.biases,
-model.layers.24.feed_forward.w1.scales,
-model.layers.24.feed_forward.w1.weight,
-model.layers.24.feed_forward.w2.biases,
-model.layers.24.feed_forward.w2.scales,
-model.layers.24.feed_forward.w2.weight,
-model.layers.24.feed_forward.w3.biases,
-model.layers.24.feed_forward.w3.scales,
-model.layers.24.feed_forward.w3.weight,
-model.layers.24.ffn_norm.weight,
-model.layers.24.operator_norm.weight,
-model.layers.24.self_attn.k_layernorm.weight,
-model.layers.24.self_attn.k_proj.biases,
-model.layers.24.self_attn.k_proj.scales,
-model.layers.24.self_attn.k_proj.weight,
-model.layers.24.self_attn.out_proj.biases,
-model.layers.24.self_attn.out_proj.scales,
-model.layers.24.self_attn.out_proj.weight,
-model.layers.24.self_attn.q_layernorm.weight,
-model.layers.24.self_attn.q_proj.biases,
-model.layers.24.self_attn.q_proj.scales,
-model.layers.24.self_attn.q_proj.weight,
-model.layers.24.self_attn.v_proj.biases,
-model.layers.24.self_attn.v_proj.scales,
-model.layers.24.self_attn.v_proj.weight,
-model.layers.25.conv.conv.weight,
-model.layers.25.conv.in_proj.biases,
-model.layers.25.conv.in_proj.scales,
-model.layers.25.conv.in_proj.weight,
-model.layers.25.conv.out_proj.biases,
-model.layers.25.conv.out_proj.scales,
-model.layers.25.conv.out_proj.weight,
-model.layers.25.feed_forward.w1.biases,
-model.layers.25.feed_forward.w1.scales,
-model.layers.25.feed_forward.w1.weight,
-model.layers.25.feed_forward.w2.biases,
-model.layers.25.feed_forward.w2.scales,
-model.layers.25.feed_forward.w2.weight,
-model.layers.25.feed_forward.w3.biases,
-model.layers.25.feed_forward.w3.scales,
-model.layers.25.feed_forward.w3.weight,
-model.layers.25.ffn_norm.weight,
-model.layers.25.operator_norm.weight,
-model.layers.26.conv.conv.weight,
-model.layers.26.conv.in_proj.biases,
-model.layers.26.conv.in_proj.scales,
-model.layers.26.conv.in_proj.weight,
-model.layers.26.conv.out_proj.biases,
-model.layers.26.conv.out_proj.scales,
-model.layers.26.conv.out_proj.weight,
-model.layers.26.feed_forward.w1.biases,
-model.layers.26.feed_forward.w1.scales,
-model.layers.26.feed_forward.w1.weight,
-model.layers.26.feed_forward.w2.biases,
-model.layers.26.feed_forward.w2.scales,
-model.layers.26.feed_forward.w2.weight,
-model.layers.26.feed_forward.w3.biases,
-model.layers.26.feed_forward.w3.scales,
-model.layers.26.feed_forward.w3.weight,
-model.layers.26.ffn_norm.weight,
-model.layers.26.operator_norm.weight,
-model.layers.27.feed_forward.w1.biases,
-model.layers.27.feed_forward.w1.scales,
-model.layers.27.feed_forward.w1.weight,
-model.layers.27.feed_forward.w2.biases,
-model.layers.27.feed_forward.w2.scales,
-model.layers.27.feed_forward.w2.weight,
-model.layers.27.feed_forward.w3.biases,
-model.layers.27.feed_forward.w3.scales,
-model.layers.27.feed_forward.w3.weight,
-model.layers.27.ffn_norm.weight,
-model.layers.27.operator_norm.weight,
-model.layers.27.self_attn.k_layernorm.weight,
-model.layers.27.self_attn.k_proj.biases,
-model.layers.27.self_attn.k_proj.scales,
-model.layers.27.self_attn.k_proj.weight,
-model.layers.27.self_attn.out_proj.biases,
-model.layers.27.self_attn.out_proj.scales,
-model.layers.27.self_attn.out_proj.weight,
-model.layers.27.self_attn.q_layernorm.weight,
-model.layers.27.self_attn.q_proj.biases,
-model.layers.27.self_attn.q_proj.scales,
-model.layers.27.self_attn.q_proj.weight,
-model.layers.27.self_attn.v_proj.biases,
-model.layers.27.self_attn.v_proj.scales,
-model.layers.27.self_attn.v_proj.weight,
-model.layers.28.conv.conv.weight,
-model.layers.28.conv.in_proj.biases,
-model.layers.28.conv.in_proj.scales,
-model.layers.28.conv.in_proj.weight,
-model.layers.28.conv.out_proj.biases,
-model.layers.28.conv.out_proj.scales,
-model.layers.28.conv.out_proj.weight,
-model.layers.28.feed_forward.w1.biases,
-model.layers.28.feed_forward.w1.scales,
-model.layers.28.feed_forward.w1.weight,
-model.layers.28.feed_forward.w2.biases,
-model.layers.28.feed_forward.w2.scales,
-model.layers.28.feed_forward.w2.weight,
-model.layers.28.feed_forward.w3.biases,
-model.layers.28.feed_forward.w3.scales,
-model.layers.28.feed_forward.w3.weight,
-model.layers.28.ffn_norm.weight,
-model.layers.28.operator_norm.weight,
-model.layers.29.conv.conv.weight,
-model.layers.29.conv.in_proj.biases,
-model.layers.29.conv.in_proj.scales,
-model.layers.29.conv.in_proj.weight,
-model.layers.29.conv.out_proj.biases,
-model.layers.29.conv.out_proj.scales,
-model.layers.29.conv.out_proj.weight,
-model.layers.29.feed_forward.w1.biases,
-model.layers.29.feed_forward.w1.scales,
-model.layers.29.feed_forward.w1.weight,
-model.layers.29.feed_forward.w2.biases,
-model.layers.29.feed_forward.w2.scales,
-model.layers.29.feed_forward.w2.weight,
-model.layers.29.feed_forward.w3.biases,
-model.layers.29.feed_forward.w3.scales,
-model.layers.29.feed_forward.w3.weight,
-model.layers.29.ffn_norm.weight,
-model.layers.29.operator_norm.weight,
-model.layers.3.conv.conv.weight,
-model.layers.3.conv.in_proj.biases,
-model.layers.3.conv.in_proj.scales,
-model.layers.3.conv.in_proj.weight,
-model.layers.3.conv.out_proj.biases,
-model.layers.3.conv.out_proj.scales,
-model.layers.3.conv.out_proj.weight,
-model.layers.3.feed_forward.w1.biases,
-model.layers.3.feed_forward.w1.scales,
-model.layers.3.feed_forward.w1.weight,
-model.layers.3.feed_forward.w2.biases,
-model.layers.3.feed_forward.w2.scales,
-model.layers.3.feed_forward.w2.weight,
-model.layers.3.feed_forward.w3.biases,
-model.layers.3.feed_forward.w3.scales,
-model.layers.3.feed_forward.w3.weight,
-model.layers.3.ffn_norm.weight,
-model.layers.3.operator_norm.weight,
-model.layers.4.conv.conv.weight,
-model.layers.4.conv.in_proj.biases,
-model.layers.4.conv.in_proj.scales,
-model.layers.4.conv.in_proj.weight,
-model.layers.4.conv.out_proj.biases,
-model.layers.4.conv.out_proj.scales,
-model.layers.4.conv.out_proj.weight,
-model.layers.4.feed_forward.w1.biases,
-model.layers.4.feed_forward.w1.scales,
-model.layers.4.feed_forward.w1.weight,
-model.layers.4.feed_forward.w2.biases,
-model.layers.4.feed_forward.w2.scales,
-model.layers.4.feed_forward.w2.weight,
-model.layers.4.feed_forward.w3.biases,
-model.layers.4.feed_forward.w3.scales,
-model.layers.4.feed_forward.w3.weight,
-model.layers.4.ffn_norm.weight,
-model.layers.4.operator_norm.weight,
-model.layers.5.feed_forward.w1.biases,
-model.layers.5.feed_forward.w1.scales,
-model.layers.5.feed_forward.w1.weight,
-model.layers.5.feed_forward.w2.biases,
-model.layers.5.feed_forward.w2.scales,
-model.layers.5.feed_forward.w2.weight,
-model.layers.5.feed_forward.w3.biases,
-model.layers.5.feed_forward.w3.scales,
-model.layers.5.feed_forward.w3.weight,
-model.layers.5.ffn_norm.weight,
-model.layers.5.operator_norm.weight,
-model.layers.5.self_attn.k_layernorm.weight,
-model.layers.5.self_attn.k_proj.biases,
-model.layers.5.self_attn.k_proj.scales,
-model.layers.5.self_attn.k_proj.weight,
-model.layers.5.self_attn.out_proj.biases,
-model.layers.5.self_attn.out_proj.scales,
-model.layers.5.self_attn.out_proj.weight,
-model.layers.5.self_attn.q_layernorm.weight,
-model.layers.5.self_attn.q_proj.biases,
-model.layers.5.self_attn.q_proj.scales,
-model.layers.5.self_attn.q_proj.weight,
-model.layers.5.self_attn.v_proj.biases,
-model.layers.5.self_attn.v_proj.scales,
-model.layers.5.self_attn.v_proj.weight,
-model.layers.6.conv.conv.weight,
-model.layers.6.conv.in_proj.biases,
-model.layers.6.conv.in_proj.scales,
-model.layers.6.conv.in_proj.weight,
-model.layers.6.conv.out_proj.biases,
-model.layers.6.conv.out_proj.scales,
-model.layers.6.conv.out_proj.weight,
-model.layers.6.feed_forward.w1.biases,
-model.layers.6.feed_forward.w1.scales,
-model.layers.6.feed_forward.w1.weight,
-model.layers.6.feed_forward.w2.biases,
-model.layers.6.feed_forward.w2.scales,
-model.layers.6.feed_forward.w2.weight,
-model.layers.6.feed_forward.w3.biases,
-model.layers.6.feed_forward.w3.scales,
-model.layers.6.feed_forward.w3.weight,
-model.layers.6.ffn_norm.weight,
-model.layers.6.operator_norm.weight,
-model.layers.7.conv.conv.weight,
-model.layers.7.conv.in_proj.biases,
-model.layers.7.conv.in_proj.scales,
-model.layers.7.conv.in_proj.weight,
-model.layers.7.conv.out_proj.biases,
-model.layers.7.conv.out_proj.scales,
-model.layers.7.conv.out_proj.weight,
-model.layers.7.feed_forward.w1.biases,
-model.layers.7.feed_forward.w1.scales,
-model.layers.7.feed_forward.w1.weight,
-model.layers.7.feed_forward.w2.biases,
-model.layers.7.feed_forward.w2.scales,
-model.layers.7.feed_forward.w2.weight,
-model.layers.7.feed_forward.w3.biases,
-model.layers.7.feed_forward.w3.scales,
-model.layers.7.feed_forward.w3.weight,
-model.layers.7.ffn_norm.weight,
-model.layers.7.operator_norm.weight,
-model.layers.8.conv.conv.weight,
-model.layers.8.conv.in_proj.biases,
-model.layers.8.conv.in_proj.scales,
-model.layers.8.conv.in_proj.weight,
-model.layers.8.conv.out_proj.biases,
-model.layers.8.conv.out_proj.scales,
-model.layers.8.conv.out_proj.weight,
-model.layers.8.feed_forward.w1.biases,
-model.layers.8.feed_forward.w1.scales,
-model.layers.8.feed_forward.w1.weight,
-model.layers.8.feed_forward.w2.biases,
-model.layers.8.feed_forward.w2.scales,
-model.layers.8.feed_forward.w2.weight,
-model.layers.8.feed_forward.w3.biases,
-model.layers.8.feed_forward.w3.scales,
-model.layers.8.feed_forward.w3.weight,
-model.layers.8.ffn_norm.weight,
-model.layers.8.operator_norm.weight,
-model.layers.9.feed_forward.w1.biases,
-model.layers.9.feed_forward.w1.scales,
-model.layers.9.feed_forward.w1.weight,
-model.layers.9.feed_forward.w2.biases,
-model.layers.9.feed_forward.w2.scales,
-model.layers.9.feed_forward.w2.weight,
-model.layers.9.feed_forward.w3.biases,
-model.layers.9.feed_forward.w3.scales,
-model.layers.9.feed_forward.w3.weight,
-model.layers.9.ffn_norm.weight,
-model.layers.9.operator_norm.weight,
-model.layers.9.self_attn.k_layernorm.weight,
-model.layers.9.self_attn.k_proj.biases,
-model.layers.9.self_attn.k_proj.scales,
-model.layers.9.self_attn.k_proj.weight,
-model.layers.9.self_attn.out_proj.biases,
-model.layers.9.self_attn.out_proj.scales,
-model.layers.9.self_attn.out_proj.weight,
-model.layers.9.self_attn.q_layernorm.weight,
-model.layers.9.self_attn.q_proj.biases,
-model.layers.9.self_attn.q_proj.scales,
-model.layers.9.self_attn.q_proj.weight,
-model.layers.9.self_attn.v_proj.biases,
-model.layers.9.self_attn.v_proj.scales,
-model.layers.9.self_attn.v_proj.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 600 parameters not in model: 
-model.embed_tokens.biases,
-model.embed_tokens.scales,
-model.embed_tokens.weight,
-model.embedding_norm.weight,
-model.layers.0.conv.conv.weight,
-model.layers.0.conv.in_proj.biases,
-model.layers.0.conv.in_proj.scales,
-model.layers.0.conv.in_proj.weight,
-model.layers.0.conv.out_proj.biases,
-model.layers.0.conv.out_proj.scales,
-model.layers.0.conv.out_proj.weight,
-model.layers.0.feed_forward.w1.biases,
-model.layers.0.feed_forward.w1.scales,
-model.layers.0.feed_forward.w1.weight,
-model.layers.0.feed_forward.w2.biases,
-model.layers.0.feed_forward.w2.scales,
-model.layers.0.feed_forward.w2.weight,
-model.layers.0.feed_forward.w3.biases,
-model.layers.0.feed_forward.w3.scales,
-model.layers.0.feed_forward.w3.weight,
-model.layers.0.ffn_norm.weight,
-model.layers.0.operator_norm.weight,
-model.layers.1.conv.conv.weight,
-model.layers.1.conv.in_proj.biases,
-model.layers.1.conv.in_proj.scales,
-model.layers.1.conv.in_proj.weight,
-model.layers.1.conv.out_proj.biases,
-model.layers.1.conv.out_proj.scales,
-model.layers.1.conv.out_proj.weight,
-model.layers.1.feed_forward.w1.biases,
-model.layers.1.feed_forward.w1.scales,
-model.layers.1.feed_forward.w1.weight,
-model.layers.1.feed_forward.w2.biases,
-model.layers.1.feed_forward.w2.scales,
-model.layers.1.feed_forward.w2.weight,
-model.layers.1.feed_forward.w3.biases,
-model.layers.1.feed_forward.w3.scales,
-model.layers.1.feed_forward.w3.weight,
-model.layers.1.ffn_norm.weight,
-model.layers.1.operator_norm.weight,
-model.layers.10.conv.conv.weight,
-model.layers.10.conv.in_proj.biases,
-model.layers.10.conv.in_proj.scales,
-model.layers.10.conv.in_proj.weight,
-model.layers.10.conv.out_proj.biases,
-model.layers.10.conv.out_proj.scales,
-model.layers.10.conv.out_proj.weight,
-model.layers.10.feed_forward.w1.biases,
-model.layers.10.feed_forward.w1.scales,
-model.layers.10.feed_forward.w1.weight,
-model.layers.10.feed_forward.w2.biases,
-model.layers.10.feed_forward.w2.scales,
-model.layers.10.feed_forward.w2.weight,
-model.layers.10.feed_forward.w3.biases,
-model.layers.10.feed_forward.w3.scales,
-model.layers.10.feed_forward.w3.weight,
-model.layers.10.ffn_norm.weight,
-model.layers.10.operator_norm.weight,
-model.layers.11.conv.conv.weight,
-model.layers.11.conv.in_proj.biases,
-model.layers.11.conv.in_proj.scales,
-model.layers.11.conv.in_proj.weight,
-model.layers.11.conv.out_proj.biases,
-model.layers.11.conv.out_proj.scales,
-model.layers.11.conv.out_proj.weight,
-model.layers.11.feed_forward.w1.biases,
-model.layers.11.feed_forward.w1.scales,
-model.layers.11.feed_forward.w1.weight,
-model.layers.11.feed_forward.w2.biases,
-model.layers.11.feed_forward.w2.scales,
-model.layers.11.feed_forward.w2.weight,
-model.layers.11.feed_forward.w3.biases,
-model.layers.11.feed_forward.w3.scales,
-model.layers.11.feed_forward.w3.weight,
-model.layers.11.ffn_norm.weight,
-model.layers.11.operator_norm.weight,
-model.layers.12.conv.conv.weight,
-model.layers.12.conv.in_proj.biases,
-model.layers.12.conv.in_proj.scales,
-model.layers.12.conv.in_proj.weight,
-model.layers.12.conv.out_proj.biases,
-model.layers.12.conv.out_proj.scales,
-model.layers.12.conv.out_proj.weight,
-model.layers.12.feed_forward.w1.biases,
-model.layers.12.feed_forward.w1.scales,
-model.layers.12.feed_forward.w1.weight,
-model.layers.12.feed_forward.w2.biases,
-model.layers.12.feed_forward.w2.scales,
-model.layers.12.feed_forward.w2.weight,
-model.layers.12.feed_forward.w3.biases,
-model.layers.12.feed_forward.w3.scales,
-model.layers.12.feed_forward.w3.weight,
-model.layers.12.ffn_norm.weight,
-model.layers.12.operator_norm.weight,
-model.layers.13.feed_forward.w1.biases,
-model.layers.13.feed_forward.w1.scales,
-model.layers.13.feed_forward.w1.weight,
-model.layers.13.feed_forward.w2.biases,
-model.layers.13.feed_forward.w2.scales,
-model.layers.13.feed_forward.w2.weight,
-model.layers.13.feed_forward.w3.biases,
-model.layers.13.feed_forward.w3.scales,
-model.layers.13.feed_forward.w3.weight,
-model.layers.13.ffn_norm.weight,
-model.layers.13.operator_norm.weight,
-model.layers.13.self_attn.k_layernorm.weight,
-model.layers.13.self_attn.k_proj.biases,
-model.layers.13.self_attn.k_proj.scales,
-model.layers.13.self_attn.k_proj.weight,
-model.layers.13.self_attn.out_proj.biases,
-model.layers.13.self_attn.out_proj.scales,
-model.layers.13.self_attn.out_proj.weight,
-model.layers.13.self_attn.q_layernorm.weight,
-model.layers.13.self_attn.q_proj.biases,
-model.layers.13.self_attn.q_proj.scales,
-model.layers.13.self_attn.q_proj.weight,
-model.layers.13.self_attn.v_proj.biases,
-model.layers.13.self_attn.v_proj.scales,
-model.layers.13.self_attn.v_proj.weight,
-model.layers.14.conv.conv.weight,
-model.layers.14.conv.in_proj.biases,
-model.layers.14.conv.in_proj.scales,
-model.layers.14.conv.in_proj.weight,
-model.layers.14.conv.out_proj.biases,
-model.layers.14.conv.out_proj.scales,
-model.layers.14.conv.out_proj.weight,
-model.layers.14.feed_forward.w1.biases,
-model.layers.14.feed_forward.w1.scales,
-model.layers.14.feed_forward.w1.weight,
-model.layers.14.feed_forward.w2.biases,
-model.layers.14.feed_forward.w2.scales,
-model.layers.14.feed_forward.w2.weight,
-model.layers.14.feed_forward.w3.biases,
-model.layers.14.feed_forward.w3.scales,
-model.layers.14.feed_forward.w3.weight,
-model.layers.14.ffn_norm.weight,
-model.layers.14.operator_norm.weight,
-model.layers.15.conv.conv.weight,
-model.layers.15.conv.in_proj.biases,
-model.layers.15.conv.in_proj.scales,
-model.layers.15.conv.in_proj.weight,
-model.layers.15.conv.out_proj.biases,
-model.layers.15.conv.out_proj.scales,
-model.layers.15.conv.out_proj.weight,
-model.layers.15.feed_forward.w1.biases,
-model.layers.15.feed_forward.w1.scales,
-model.layers.15.feed_forward.w1.weight,
-model.layers.15.feed_forward.w2.biases,
-model.layers.15.feed_forward.w2.scales,
-model.layers.15.feed_forward.w2.weight,
-model.layers.15.feed_forward.w3.biases,
-model.layers.15.feed_forward.w3.scales,
-model.layers.15.feed_forward.w3.weight,
-model.layers.15.ffn_norm.weight,
-model.layers.15.operator_norm.weight,
-model.layers.16.conv.conv.weight,
-model.layers.16.conv.in_proj.biases,
-model.layers.16.conv.in_proj.scales,
-model.layers.16.conv.in_proj.weight,
-model.layers.16.conv.out_proj.biases,
-model.layers.16.conv.out_proj.scales,
-model.layers.16.conv.out_proj.weight,
-model.layers.16.feed_forward.w1.biases,
-model.layers.16.feed_forward.w1.scales,
-model.layers.16.feed_forward.w1.weight,
-model.layers.16.feed_forward.w2.biases,
-model.layers.16.feed_forward.w2.scales,
-model.layers.16.feed_forward.w2.weight,
-model.layers.16.feed_forward.w3.biases,
-model.layers.16.feed_forward.w3.scales,
-model.layers.16.feed_forward.w3.weight,
-model.layers.16.ffn_norm.weight,
-model.layers.16.operator_norm.weight,
-model.layers.17.feed_forward.w1.biases,
-model.layers.17.feed_forward.w1.scales,
-model.layers.17.feed_forward.w1.weight,
-model.layers.17.feed_forward.w2.biases,
-model.layers.17.feed_forward.w2.scales,
-model.layers.17.feed_forward.w2.weight,
-model.layers.17.feed_forward.w3.biases,
-model.layers.17.feed_forward.w3.scales,
-model.layers.17.feed_forward.w3.weight,
-model.layers.17.ffn_norm.weight,
-model.layers.17.operator_norm.weight,
-model.layers.17.self_attn.k_layernorm.weight,
-model.layers.17.self_attn.k_proj.biases,
-model.layers.17.self_attn.k_proj.scales,
-model.layers.17.self_attn.k_proj.weight,
-model.layers.17.self_attn.out_proj.biases,
-model.layers.17.self_attn.out_proj.scales,
-model.layers.17.self_attn.out_proj.weight,
-model.layers.17.self_attn.q_layernorm.weight,
-model.layers.17.self_attn.q_proj.biases,
-model.layers.17.self_attn.q_proj.scales,
-model.layers.17.self_attn.q_proj.weight,
-model.layers.17.self_attn.v_proj.biases,
-model.layers.17.self_attn.v_proj.scales,
-model.layers.17.self_attn.v_proj.weight,
-model.layers.18.conv.conv.weight,
-model.layers.18.conv.in_proj.biases,
-model.layers.18.conv.in_proj.scales,
-model.layers.18.conv.in_proj.weight,
-model.layers.18.conv.out_proj.biases,
-model.layers.18.conv.out_proj.scales,
-model.layers.18.conv.out_proj.weight,
-model.layers.18.feed_forward.w1.biases,
-model.layers.18.feed_forward.w1.scales,
-model.layers.18.feed_forward.w1.weight,
-model.layers.18.feed_forward.w2.biases,
-model.layers.18.feed_forward.w2.scales,
-model.layers.18.feed_forward.w2.weight,
-model.layers.18.feed_forward.w3.biases,
-model.layers.18.feed_forward.w3.scales,
-model.layers.18.feed_forward.w3.weight,
-model.layers.18.ffn_norm.weight,
-model.layers.18.operator_norm.weight,
-model.layers.19.conv.conv.weight,
-model.layers.19.conv.in_proj.biases,
-model.layers.19.conv.in_proj.scales,
-model.layers.19.conv.in_proj.weight,
-model.layers.19.conv.out_proj.biases,
-model.layers.19.conv.out_proj.scales,
-model.layers.19.conv.out_proj.weight,
-model.layers.19.feed_forward.w1.biases,
-model.layers.19.feed_forward.w1.scales,
-model.layers.19.feed_forward.w1.weight,
-model.layers.19.feed_forward.w2.biases,
-model.layers.19.feed_forward.w2.scales,
-model.layers.19.feed_forward.w2.weight,
-model.layers.19.feed_forward.w3.biases,
-model.layers.19.feed_forward.w3.scales,
-model.layers.19.feed_forward.w3.weight,
-model.layers.19.ffn_norm.weight,
-model.layers.19.operator_norm.weight,
-model.layers.2.feed_forward.w1.biases,
-model.layers.2.feed_forward.w1.scales,
-model.layers.2.feed_forward.w1.weight,
-model.layers.2.feed_forward.w2.biases,
-model.layers.2.feed_forward.w2.scales,
-model.layers.2.feed_forward.w2.weight,
-model.layers.2.feed_forward.w3.biases,
-model.layers.2.feed_forward.w3.scales,
-model.layers.2.feed_forward.w3.weight,
-model.layers.2.ffn_norm.weight,
-model.layers.2.operator_norm.weight,
-model.layers.2.self_attn.k_layernorm.weight,
-model.layers.2.self_attn.k_proj.biases,
-model.layers.2.self_attn.k_proj.scales,
-model.layers.2.self_attn.k_proj.weight,
-model.layers.2.self_attn.out_proj.biases,
-model.layers.2.self_attn.out_proj.scales,
-model.layers.2.self_attn.out_proj.weight,
-model.layers.2.self_attn.q_layernorm.weight,
-model.layers.2.self_attn.q_proj.biases,
-model.layers.2.self_attn.q_proj.scales,
-model.layers.2.self_attn.q_proj.weight,
-model.layers.2.self_attn.v_proj.biases,
-model.layers.2.self_attn.v_proj.scales,
-model.layers.2.self_attn.v_proj.weight,
-model.layers.20.conv.conv.weight,
-model.layers.20.conv.in_proj.biases,
-model.layers.20.conv.in_proj.scales,
-model.layers.20.conv.in_proj.weight,
-model.layers.20.conv.out_proj.biases,
-model.layers.20.conv.out_proj.scales,
-model.layers.20.conv.out_proj.weight,
-model.layers.20.feed_forward.w1.biases,
-model.layers.20.feed_forward.w1.scales,
-model.layers.20.feed_forward.w1.weight,
-model.layers.20.feed_forward.w2.biases,
-model.layers.20.feed_forward.w2.scales,
-model.layers.20.feed_forward.w2.weight,
-model.layers.20.feed_forward.w3.biases,
-model.layers.20.feed_forward.w3.scales,
-model.layers.20.feed_forward.w3.weight,
-model.layers.20.ffn_norm.weight,
-model.layers.20.operator_norm.weight,
-model.layers.21.feed_forward.w1.biases,
-model.layers.21.feed_forward.w1.scales,
-model.layers.21.feed_forward.w1.weight,
-model.layers.21.feed_forward.w2.biases,
-model.layers.21.feed_forward.w2.scales,
-model.layers.21.feed_forward.w2.weight,
-model.layers.21.feed_forward.w3.biases,
-model.layers.21.feed_forward.w3.scales,
-model.layers.21.feed_forward.w3.weight,
-model.layers.21.ffn_norm.weight,
-model.layers.21.operator_norm.weight,
-model.layers.21.self_attn.k_layernorm.weight,
-model.layers.21.self_attn.k_proj.biases,
-model.layers.21.self_attn.k_proj.scales,
-model.layers.21.self_attn.k_proj.weight,
-model.layers.21.self_attn.out_proj.biases,
-model.layers.21.self_attn.out_proj.scales,
-model.layers.21.self_attn.out_proj.weight,
-model.layers.21.self_attn.q_layernorm.weight,
-model.layers.21.self_attn.q_proj.biases,
-model.layers.21.self_attn.q_proj.scales,
-model.layers.21.self_attn.q_proj.weight,
-model.layers.21.self_attn.v_proj.biases,
-model.layers.21.self_attn.v_proj.scales,
-model.layers.21.self_attn.v_proj.weight,
-model.layers.22.conv.conv.weight,
-model.layers.22.conv.in_proj.biases,
-model.layers.22.conv.in_proj.scales,
-model.layers.22.conv.in_proj.weight,
-model.layers.22.conv.out_proj.biases,
-model.layers.22.conv.out_proj.scales,
-model.layers.22.conv.out_proj.weight,
-model.layers.22.feed_forward.w1.biases,
-model.layers.22.feed_forward.w1.scales,
-model.layers.22.feed_forward.w1.weight,
-model.layers.22.feed_forward.w2.biases,
-model.layers.22.feed_forward.w2.scales,
-model.layers.22.feed_forward.w2.weight,
-model.layers.22.feed_forward.w3.biases,
-model.layers.22.feed_forward.w3.scales,
-model.layers.22.feed_forward.w3.weight,
-model.layers.22.ffn_norm.weight,
-model.layers.22.operator_norm.weight,
-model.layers.23.conv.conv.weight,
-model.layers.23.conv.in_proj.biases,
-model.layers.23.conv.in_proj.scales,
-model.layers.23.conv.in_proj.weight,
-model.layers.23.conv.out_proj.biases,
-model.layers.23.conv.out_proj.scales,
-model.layers.23.conv.out_proj.weight,
-model.layers.23.feed_forward.w1.biases,
-model.layers.23.feed_forward.w1.scales,
-model.layers.23.feed_forward.w1.weight,
-model.layers.23.feed_forward.w2.biases,
-model.layers.23.feed_forward.w2.scales,
-model.layers.23.feed_forward.w2.weight,
-model.layers.23.feed_forward.w3.biases,
-model.layers.23.feed_forward.w3.scales,
-model.layers.23.feed_forward.w3.weight,
-model.layers.23.ffn_norm.weight,
-model.layers.23.operator_norm.weight,
-model.layers.24.feed_forward.w1.biases,
-model.layers.24.feed_forward.w1.scales,
-model.layers.24.feed_forward.w1.weight,
-model.layers.24.feed_forward.w2.biases,
-model.layers.24.feed_forward.w2.scales,
-model.layers.24.feed_forward.w2.weight,
-model.layers.24.feed_forward.w3.biases,
-model.layers.24.feed_forward.w3.scales,
-model.layers.24.feed_forward.w3.weight,
-model.layers.24.ffn_norm.weight,
-model.layers.24.operator_norm.weight,
-model.layers.24.self_attn.k_layernorm.weight,
-model.layers.24.self_attn.k_proj.biases,
-model.layers.24.self_attn.k_proj.scales,
-model.layers.24.self_attn.k_proj.weight,
-model.layers.24.self_attn.out_proj.biases,
-model.layers.24.self_attn.out_proj.scales,
-model.layers.24.self_attn.out_proj.weight,
-model.layers.24.self_attn.q_layernorm.weight,
-model.layers.24.self_attn.q_proj.biases,
-model.layers.24.self_attn.q_proj.scales,
-model.layers.24.self_attn.q_proj.weight,
-model.layers.24.self_attn.v_proj.biases,
-model.layers.24.self_attn.v_proj.scales,
-model.layers.24.self_attn.v_proj.weight,
-model.layers.25.conv.conv.weight,
-model.layers.25.conv.in_proj.biases,
-model.layers.25.conv.in_proj.scales,
-model.layers.25.conv.in_proj.weight,
-model.layers.25.conv.out_proj.biases,
-model.layers.25.conv.out_proj.scales,
-model.layers.25.conv.out_proj.weight,
-model.layers.25.feed_forward.w1.biases,
-model.layers.25.feed_forward.w1.scales,
-model.layers.25.feed_forward.w1.weight,
-model.layers.25.feed_forward.w2.biases,
-model.layers.25.feed_forward.w2.scales,
-model.layers.25.feed_forward.w2.weight,
-model.layers.25.feed_forward.w3.biases,
-model.layers.25.feed_forward.w3.scales,
-model.layers.25.feed_forward.w3.weight,
-model.layers.25.ffn_norm.weight,
-model.layers.25.operator_norm.weight,
-model.layers.26.conv.conv.weight,
-model.layers.26.conv.in_proj.biases,
-model.layers.26.conv.in_proj.scales,
-model.layers.26.conv.in_proj.weight,
-model.layers.26.conv.out_proj.biases,
-model.layers.26.conv.out_proj.scales,
-model.layers.26.conv.out_proj.weight,
-model.layers.26.feed_forward.w1.biases,
-model.layers.26.feed_forward.w1.scales,
-model.layers.26.feed_forward.w1.weight,
-model.layers.26.feed_forward.w2.biases,
-model.layers.26.feed_forward.w2.scales,
-model.layers.26.feed_forward.w2.weight,
-model.layers.26.feed_forward.w3.biases,
-model.layers.26.feed_forward.w3.scales,
-model.layers.26.feed_forward.w3.weight,
-model.layers.26.ffn_norm.weight,
-model.layers.26.operator_norm.weight,
-model.layers.27.feed_forward.w1.biases,
-model.layers.27.feed_forward.w1.scales,
-model.layers.27.feed_forward.w1.weight,
-model.layers.27.feed_forward.w2.biases,
-model.layers.27.feed_forward.w2.scales,
-model.layers.27.feed_forward.w2.weight,
-model.layers.27.feed_forward.w3.biases,
-model.layers.27.feed_forward.w3.scales,
-model.layers.27.feed_forward.w3.weight,
-model.layers.27.ffn_norm.weight,
-model.layers.27.operator_norm.weight,
-model.layers.27.self_attn.k_layernorm.weight,
-model.layers.27.self_attn.k_proj.biases,
-model.layers.27.self_attn.k_proj.scales,
-model.layers.27.self_attn.k_proj.weight,
-model.layers.27.self_attn.out_proj.biases,
-model.layers.27.self_attn.out_proj.scales,
-model.layers.27.self_attn.out_proj.weight,
-model.layers.27.self_attn.q_layernorm.weight,
-model.layers.27.self_attn.q_proj.biases,
-model.layers.27.self_attn.q_proj.scales,
-model.layers.27.self_attn.q_proj.weight,
-model.layers.27.self_attn.v_proj.biases,
-model.layers.27.self_attn.v_proj.scales,
-model.layers.27.self_attn.v_proj.weight,
-model.layers.28.conv.conv.weight,
-model.layers.28.conv.in_proj.biases,
-model.layers.28.conv.in_proj.scales,
-model.layers.28.conv.in_proj.weight,
-model.layers.28.conv.out_proj.biases,
-model.layers.28.conv.out_proj.scales,
-model.layers.28.conv.out_proj.weight,
-model.layers.28.feed_forward.w1.biases,
-model.layers.28.feed_forward.w1.scales,
-model.layers.28.feed_forward.w1.weight,
-model.layers.28.feed_forward.w2.biases,
-model.layers.28.feed_forward.w2.scales,
-model.layers.28.feed_forward.w2.weight,
-model.layers.28.feed_forward.w3.biases,
-model.layers.28.feed_forward.w3.scales,
-model.layers.28.feed_forward.w3.weight,
-model.layers.28.ffn_norm.weight,
-model.layers.28.operator_norm.weight,
-model.layers.29.conv.conv.weight,
-model.layers.29.conv.in_proj.biases,
-model.layers.29.conv.in_proj.scales,
-model.layers.29.conv.in_proj.weight,
-model.layers.29.conv.out_proj.biases,
-model.layers.29.conv.out_proj.scales,
-model.layers.29.conv.out_proj.weight,
-model.layers.29.feed_forward.w1.biases,
-model.layers.29.feed_forward.w1.scales,
-model.layers.29.feed_forward.w1.weight,
-model.layers.29.feed_forward.w2.biases,
-model.layers.29.feed_forward.w2.scales,
-model.layers.29.feed_forward.w2.weight,
-model.layers.29.feed_forward.w3.biases,
-model.layers.29.feed_forward.w3.scales,
-model.layers.29.feed_forward.w3.weight,
-model.layers.29.ffn_norm.weight,
-model.layers.29.operator_norm.weight,
-model.layers.3.conv.conv.weight,
-model.layers.3.conv.in_proj.biases,
-model.layers.3.conv.in_proj.scales,
-model.layers.3.conv.in_proj.weight,
-model.layers.3.conv.out_proj.biases,
-model.layers.3.conv.out_proj.scales,
-model.layers.3.conv.out_proj.weight,
-model.layers.3.feed_forward.w1.biases,
-model.layers.3.feed_forward.w1.scales,
-model.layers.3.feed_forward.w1.weight,
-model.layers.3.feed_forward.w2.biases,
-model.layers.3.feed_forward.w2.scales,
-model.layers.3.feed_forward.w2.weight,
-model.layers.3.feed_forward.w3.biases,
-model.layers.3.feed_forward.w3.scales,
-model.layers.3.feed_forward.w3.weight,
-model.layers.3.ffn_norm.weight,
-model.layers.3.operator_norm.weight,
-model.layers.4.conv.conv.weight,
-model.layers.4.conv.in_proj.biases,
-model.layers.4.conv.in_proj.scales,
-model.layers.4.conv.in_proj.weight,
-model.layers.4.conv.out_proj.biases,
-model.layers.4.conv.out_proj.scales,
-model.layers.4.conv.out_proj.weight,
-model.layers.4.feed_forward.w1.biases,
-model.layers.4.feed_forward.w1.scales,
-model.layers.4.feed_forward.w1.weight,
-model.layers.4.feed_forward.w2.biases,
-model.layers.4.feed_forward.w2.scales,
-model.layers.4.feed_forward.w2.weight,
-model.layers.4.feed_forward.w3.biases,
-model.layers.4.feed_forward.w3.scales,
-model.layers.4.feed_forward.w3.weight,
-model.layers.4.ffn_norm.weight,
-model.layers.4.operator_norm.weight,
-model.layers.5.feed_forward.w1.biases,
-model.layers.5.feed_forward.w1.scales,
-model.layers.5.feed_forward.w1.weight,
-model.layers.5.feed_forward.w2.biases,
-model.layers.5.feed_forward.w2.scales,
-model.layers.5.feed_forward.w2.weight,
-model.layers.5.feed_forward.w3.biases,
-model.layers.5.feed_forward.w3.scales,
-model.layers.5.feed_forward.w3.weight,
-model.layers.5.ffn_norm.weight,
-model.layers.5.operator_norm.weight,
-model.layers.5.self_attn.k_layernorm.weight,
-model.layers.5.self_attn.k_proj.biases,
-model.layers.5.self_attn.k_proj.scales,
-model.layers.5.self_attn.k_proj.weight,
-model.layers.5.self_attn.out_proj.biases,
-model.layers.5.self_attn.out_proj.scales,
-model.layers.5.self_attn.out_proj.weight,
-model.layers.5.self_attn.q_layernorm.weight,
-model.layers.5.self_attn.q_proj.biases,
-model.layers.5.self_attn.q_proj.scales,
-model.layers.5.self_attn.q_proj.weight,
-model.layers.5.self_attn.v_proj.biases,
-model.layers.5.self_attn.v_proj.scales,
-model.layers.5.self_attn.v_proj.weight,
-model.layers.6.conv.conv.weight,
-model.layers.6.conv.in_proj.biases,
-model.layers.6.conv.in_proj.scales,
-model.layers.6.conv.in_proj.weight,
-model.layers.6.conv.out_proj.biases,
-model.layers.6.conv.out_proj.scales,
-model.layers.6.conv.out_proj.weight,
-model.layers.6.feed_forward.w1.biases,
-model.layers.6.feed_forward.w1.scales,
-model.layers.6.feed_forward.w1.weight,
-model.layers.6.feed_forward.w2.biases,
-model.layers.6.feed_forward.w2.scales,
-model.layers.6.feed_forward.w2.weight,
-model.layers.6.feed_forward.w3.biases,
-model.layers.6.feed_forward.w3.scales,
-model.layers.6.feed_forward.w3.weight,
-model.layers.6.ffn_norm.weight,
-model.layers.6.operator_norm.weight,
-model.layers.7.conv.conv.weight,
-model.layers.7.conv.in_proj.biases,
-model.layers.7.conv.in_proj.scales,
-model.layers.7.conv.in_proj.weight,
-model.layers.7.conv.out_proj.biases,
-model.layers.7.conv.out_proj.scales,
-model.layers.7.conv.out_proj.weight,
-model.layers.7.feed_forward.w1.biases,
-model.layers.7.feed_forward.w1.scales,
-model.layers.7.feed_forward.w1.weight,
-model.layers.7.feed_forward.w2.biases,
-model.layers.7.feed_forward.w2.scales,
-model.layers.7.feed_forward.w2.weight,
-model.layers.7.feed_forward.w3.biases,
-model.layers.7.feed_forward.w3.scales,
-model.layers.7.feed_forward.w3.weight,
-model.layers.7.ffn_norm.weight,
-model.layers.7.operator_norm.weight,
-model.layers.8.conv.conv.weight,
-model.layers.8.conv.in_proj.biases,
-model.layers.8.conv.in_proj.scales,
-model.layers.8.conv.in_proj.weight,
-model.layers.8.conv.out_proj.biases,
-model.layers.8.conv.out_proj.scales,
-model.layers.8.conv.out_proj.weight,
-model.layers.8.feed_forward.w1.biases,
-model.layers.8.feed_forward.w1.scales,
-model.layers.8.feed_forward.w1.weight,
-model.layers.8.feed_forward.w2.biases,
-model.layers.8.feed_forward.w2.scales,
-model.layers.8.feed_forward.w2.weight,
-model.layers.8.feed_forward.w3.biases,
-model.layers.8.feed_forward.w3.scales,
-model.layers.8.feed_forward.w3.weight,
-model.layers.8.ffn_norm.weight,
-model.layers.8.operator_norm.weight,
-model.layers.9.feed_forward.w1.biases,
-model.layers.9.feed_forward.w1.scales,
-model.layers.9.feed_forward.w1.weight,
-model.layers.9.feed_forward.w2.biases,
-model.layers.9.feed_forward.w2.scales,
-model.layers.9.feed_forward.w2.weight,
-model.layers.9.feed_forward.w3.biases,
-model.layers.9.feed_forward.w3.scales,
-model.layers.9.feed_forward.w3.weight,
-model.layers.9.ffn_norm.weight,
-model.layers.9.operator_norm.weight,
-model.layers.9.self_attn.k_layernorm.weight,
-model.layers.9.self_attn.k_proj.biases,
-model.layers.9.self_attn.k_proj.scales,
-model.layers.9.self_attn.k_proj.weight,
-model.layers.9.self_attn.out_proj.biases,
-model.layers.9.self_attn.out_proj.scales,
-model.layers.9.self_attn.out_proj.weight,
-model.layers.9.self_attn.q_layernorm.weight,
-model.layers.9.self_attn.q_proj.biases,
-model.layers.9.self_attn.q_proj.scales,
-model.layers.9.self_attn.q_proj.weight,
-model.layers.9.self_attn.v_proj.biases,
-model.layers.9.self_attn.v_proj.scales,
-model.layers.9.self_attn.v_proj.weight.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
-```
+empty output
 
 </details>
 
@@ -4127,10 +2934,10 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
-- *Model load time:* 1.57s
+- *Model load time:* 0.99s
 - *Generation time:* -
-- *Total time:* 1.57s
-- *Input validation time:* 6.7e-05
+- *Total time:* 0.99s
+- *Input validation time:* 5.73e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
 - *Cleanup time:* 0.145
@@ -4143,7 +2950,7 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
 - *Active memory:* -
 - *Cache memory:* -
 - *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.0128
+- *Post-cleanup active memory:* 0.0131
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -4163,10 +2970,10 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13547, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12694, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -4176,7 +2983,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 822, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -4186,9 +2993,9 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1212, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1217, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1357, in load_processor
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1362, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, **kwargs)
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
@@ -4272,7 +3079,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14560, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -4283,7 +3090,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13562, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -4293,8 +3100,15 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 
 ```text
 === STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3217.66it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 4053.91it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[00:31:35] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 </details>

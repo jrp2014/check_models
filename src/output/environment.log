@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-08-29 00:33:48 BST
+FULL ENVIRONMENT DUMP - 2026-08-30 00:13:41 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -19,11 +19,11 @@ certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.1
-check_models==0.15.0
-check_models==0.15.0
+check_models==0.16.2
+check_models==0.16.0
 click==8.5.0
 cmake==4.4.2
-coverage==7.15.4
+coverage==7.16.0
 cryptography==50.0.1
 cyclonedx-python-lib==11.12.0
 defusedxml==0.7.1
@@ -56,7 +56,7 @@ keyring==25.7.0
 libcst==1.9.0
 librt==0.15.0
 license-expression==30.4.4
-linkify-it-py==2.1.1
+linkify-it-py==2.2.0
 llguidance==1.8.0
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
@@ -65,8 +65,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.3.dev20260828+99e45f71d
-mlx==0.32.3.dev20260828+99e45f71d
+mlx==0.32.3.dev20260829+052e77db9
+mlx==0.32.3.dev20260829+052e77db9
 mlx-audio==0.5.0
 mlx-lm==0.32.0
 mlx-lm==0.32.0
@@ -163,7 +163,7 @@ typing_extensions==4.16.0
 uc-micro-py==2.0.0
 urllib3==2.7.0
 uvicorn==0.52.4
-virtualenv==21.7.6
+virtualenv==21.7.7
 vulture==2.16
 wcwidth==0.8.3
 websockets==17.1
@@ -172,5 +172,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-08-29 00:33:48 BST
+Environment dump completed at 2026-08-30 00:13:41 BST
 ================================================================================

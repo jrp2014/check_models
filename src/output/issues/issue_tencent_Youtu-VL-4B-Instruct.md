@@ -30,7 +30,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
   from 'transformers.image_processing_utils_fast' (unknown location)
 - *Resolved model revision:* 8d30a0e49662a1d628a472b12df264dbcd768753
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.012813544
+- *Post-cleanup active memory (GB):* 0.013059304
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 10.68
 - *Parameter count:* 4.00B (name-estimate)
@@ -44,10 +44,10 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13547, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12694, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -57,7 +57,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 822, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -67,9 +67,9 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1212, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1217, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1357, in load_processor
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1362, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, **kwargs)
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
@@ -153,7 +153,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14560, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -164,7 +164,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13562, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -176,16 +176,23 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 
 ```text
 === STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3217.66it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 4053.91it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[00:31:35] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,409 x 6,273 pixels
-- *Image size:* 51,431,731 bytes
-- *Image SHA-256:* dadec238f988c92cd592f7ba686543f85856f67b00665ba8d8d2830881d211b5
+- *Image dimensions:* 9,984 x 5,616 pixels
+- *Image size:* 33,850,802 bytes
+- *Image SHA-256:* b318746396941f675647ccf9ebdf8652161618926a84538fac85170096a7f92c
 
 <details>
 <summary>Exact prompt</summary>
@@ -196,12 +203,11 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-21 14:34:53 UTC+01:00
-- GPS: 51.441113°N, 0.565406°W
+- Capture date/time: 2026-08-28 16:17:42 UTC+01:00
 
 Descriptive hints:
-- Description hint: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.
-- Keyword hints: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Outdoors, Pond, Reeds, Trees, Water reflection, Wetland, Wooden shed, architecture, bird hide, birdwatching, boardwalk
+- Description hint: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
+- Keyword hints: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
 
 Write:
 - a concrete 5-10-word title;
@@ -231,7 +237,7 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Component       | Value                                                            |
 |-----------------|------------------------------------------------------------------|
 | mlx-vlm         | 0.7.0rc0                                                         |
-| mlx             | 0.32.3.dev20260828+99e45f71d                                     |
+| mlx             | 0.32.3.dev20260829+052e77db9                                     |
 | mlx-lm          | 0.32.0                                                           |
 | transformers    | 5.16.1                                                           |
 | tokenizers      | 0.23.1                                                           |
@@ -240,7 +246,7 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.15.0; revision 701362c5e26c6db3340353fad597d04039fb1d52; clean |
+| check_models    | 0.16.2; revision 4d237a553582888244f2a903f368fa7ca27a99de; clean |
 
 ### Full environment evidence
 
