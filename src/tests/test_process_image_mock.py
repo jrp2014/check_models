@@ -1647,6 +1647,49 @@ class TestRepetitionGuard:
         )
         assert result.text == "real answer"
 
+    def test_wrapper_echoes_stream_live_under_verbose(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Verbose sweeps must still show output as it streams.
+
+        Upstream stream_generate does not echo the way generate(verbose=True)
+        did, so the guard supplies the live echo.
+        """
+        chunks = self._chunks(["Title: ", "draft-noise ", "Boathouse"])
+        chunks[1].is_draft = True
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
+
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+            verbose=True,
+        )
+
+        assert result.text == "Title: Boathouse"
+        streamed = capsys.readouterr().out
+        assert streamed == "Title: Boathouse\n"
+        assert "draft-noise" not in streamed
+
+    def test_wrapper_streams_silently_without_verbose(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """The guard must not echo raw chunks without verbose.
+
+        Non-verbose runs keep the formatted finalization preview as the only
+        text surface.
+        """
+        monkeypatch.setattr(
+            check_models, "stream_generate", lambda **_kw: iter(self._chunks(["quiet "]))
+        )
+
+        check_models._generate_with_repetition_guard(
+            model=cast("Any", object()), processor=_FakeProcessor(), prompt="p", image="i.jpg"
+        )
+
+        assert capsys.readouterr().out == ""
+
     def test_empty_stream_returns_empty_result_like_upstream(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

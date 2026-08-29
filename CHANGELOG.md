@@ -29,6 +29,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Verbose sweeps stream generated text live again: the repetition guard now
+  echoes each retained (non-draft) chunk to stdout as it arrives, restoring
+  the ergonomics lost when guarded generation replaced upstream
+  `generate(verbose=True)` (which echoed) with `stream_generate` (which does
+  not). The echo runs inside the tee capture, so the live console and the
+  retained upstream-output capture both keep the text; draft chunks are
+  neither echoed nor retained, and non-verbose runs are unchanged.
 - Observation `details` contents are validated at the loader against their
   declared shapes (string lists of strings, non-bool integer counts,
   exactly-two-int ranges, plain-string fragments; unknown keys stay

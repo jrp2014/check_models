@@ -13403,6 +13403,12 @@ def _generate_with_repetition_guard(
     reason and the matching observation; aborted generations are excluded
     from cross-run throughput comparisons and history bands because a rate
     over a few hundred tokens is not comparable with a full-length run.
+
+    Upstream ``stream_generate`` does not echo text the way
+    ``generate(verbose=True)`` did, so under ``verbose`` the guard streams
+    each retained (non-draft) chunk to stdout as it arrives — inside the
+    tee capture, so the live console and the retained upstream capture both
+    keep the text.
     """
     tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
     stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
@@ -13416,15 +13422,20 @@ def _generate_with_repetition_guard(
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
     chunk_count = 0
+    echo = sys.stdout if kwargs.get("verbose") else None
     for chunk in stream_generate(
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
     ):
         last = chunk
         if getattr(chunk, "is_draft", False):
             # Speculative/diffusion draft chunks are progress display only;
-            # upstream generate() excludes their text from the final answer.
+            # upstream generate() excludes their text from the final answer,
+            # so they are neither echoed nor retained.
             continue
         pieces.append(chunk.text)
+        if echo is not None and chunk.text:
+            echo.write(chunk.text)
+            echo.flush()
         chunk_count += 1
         if chunk_count % _REPETITION_ABORT_CHECK_EVERY != 0:
             continue
@@ -13435,6 +13446,9 @@ def _generate_with_repetition_guard(
         if _detect_streaming_repetition(joined_tail):
             aborted = True
             break
+    if echo is not None and pieces:
+        echo.write("\n")
+        echo.flush()
     if last is None:
         # Upstream generate() returns an empty result for an empty stream; an
         # empty stream is an empty_output observation, not a crash.
@@ -15019,11 +15033,13 @@ def _log_verbose_success_details(
     prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> None:
-    """Emit verbose block with warnings and metrics after upstream streamed output."""
+    """Emit verbose block with warnings and metrics after the guard's live echo."""
     if not res.generation:
         return
 
-    # Generated text has already been streamed by upstream generate(verbose=True).
+    # Generated text was already streamed live by the repetition guard's
+    # verbose echo inside the passthrough window; only its absence needs a
+    # marker here.
     gen_text = getattr(res.generation, "text", None) or ""
     gen_tokens = _generation_int_metric(res.generation, "generation_tokens")
 
