@@ -247,7 +247,7 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Compact mode should emit Timing and Tokens lines."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
-    print_model_result(res, verbose=True, detailed_metrics=False)
+    print_model_result(res, verbose=True)
     # New format uses "Timing:" (line 1) and "Tokens:" (line 2)
     timing_lines = [r.message for r in caplog.records if "Timing:" in r.message]
     assert timing_lines, "Expected Timing line in compact mode logs"
@@ -268,7 +268,7 @@ def test_metrics_mode_compact_shows_working_set_context(
     )
 
     with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
-        print_model_result(res, verbose=True, detailed_metrics=False)
+        print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
@@ -288,7 +288,7 @@ def test_metrics_mode_verbose_does_not_repeat_generated_text(
         total_time=1.5,
     )
 
-    print_model_result(res, verbose=True, detailed_metrics=False)
+    print_model_result(res, verbose=True)
 
     messages = [record.message for record in caplog.records]
     assert not any("Generated Text:" in message for message in messages)
@@ -296,10 +296,10 @@ def test_metrics_mode_verbose_does_not_repeat_generated_text(
     assert any("Timing:" in message for message in messages)
 
 
-def test_metrics_mode_compact_surfaces_runtime_hints(
+def test_verbose_metrics_show_phase_timings_and_stop_reason(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Compact mode should surface prep, first-token, and abnormal stop hints."""
+    """Verbose always renders the detailed phase tree — no second flag needed."""
     caplog.set_level(logging.INFO)
     res = PerformanceResult(
         model_name="dummy/model",
@@ -319,19 +319,19 @@ def test_metrics_mode_compact_surfaces_runtime_hints(
         ),
     )
 
-    print_model_result(res, verbose=True, detailed_metrics=False)
+    print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "prep=0.15s" in messages
-    assert "first=0.30s" in messages
-    assert "stop=timeout" in messages
+    assert "Prompt prep:    0.15s" in messages
+    assert "first token:    0.30s" in messages
+    assert "Stop reason: timeout" in messages
 
 
 def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Detailed mode should emit token lines plus Performance Metrics header."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
-    print_model_result(res, verbose=True, detailed_metrics=True)
+    print_model_result(res, verbose=True)
     # Detailed mode uses "Performance Metrics:" header and separate "Tokens:" section
     perf_lines = [r.message for r in caplog.records if "Performance Metrics:" in r.message]
     token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
@@ -354,7 +354,7 @@ def test_metrics_mode_detailed_shows_working_set_context(
     )
 
     with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
-        print_model_result(res, verbose=True, detailed_metrics=True)
+        print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
@@ -383,7 +383,7 @@ def test_metrics_mode_detailed_logs_runtime_phase_details(
         ),
     )
 
-    print_model_result(res, verbose=True, detailed_metrics=True)
+    print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Validation:" in messages
@@ -1173,7 +1173,7 @@ def test_finalize_execution_separates_each_model_result_block(
     first_timing = next(
         index
         for index, message in enumerate(messages[first_summary:second_summary], first_summary)
-        if "Timing:" in message
+        if "Tokens:" in message
     )
     separators = [
         index

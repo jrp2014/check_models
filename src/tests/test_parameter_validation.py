@@ -237,7 +237,6 @@ class TestCliArgumentNormalization:
             "frequency_context_size": 20,
             "logit_bias": None,
             "verbose": False,
-            "detailed_metrics": False,
             "resize_shape": None,
             "eos_tokens": None,
             "processor_kwargs": None,
@@ -462,23 +461,20 @@ class TestCliArgumentNormalization:
         with pytest.raises(ValueError, match="thinking_end_token must be non-empty"):
             validate_cli_arguments(args)
 
-    def test_detailed_metrics_without_verbose_warns(
-        self,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Detailed metrics should warn when requested without verbose mode."""
-        args = self._build_args(detailed_metrics=True, verbose=False)
-
-        validate_cli_arguments(args)
-
-        assert "has no effect unless --verbose is also set" in caplog.text
-
     def test_parser_defaults_eval_mode_to_auto(self) -> None:
         """Default eval mode should be resolved after image metadata is known."""
         parser = check_models._build_cli_parser()
         args = parser.parse_args(["--folder", "test-folder"])
 
         assert args.eval_mode == "auto"
+
+    @pytest.mark.parametrize("retired_mode", ["stress", "quality"])
+    def test_retired_eval_modes_are_rejected(self, retired_mode: str) -> None:
+        """The deprecated evaluation aliases fail loudly instead of remapping."""
+        parser = check_models._build_cli_parser()
+        with pytest.raises(SystemExit) as exc_info:
+            parser.parse_args(["--eval-mode", retired_mode])
+        assert exc_info.value.code == 2
 
     def test_output_dir_derives_the_canonical_layout(self, tmp_path: Path) -> None:
         """One output root derives every retained artifact location."""
@@ -642,27 +638,6 @@ class TestCliArgumentNormalization:
 
         with pytest.raises(ValueError, match=r"assisted.*descriptive metadata"):
             check_models._apply_eval_mode_defaults(args, {})
-
-    def test_legacy_quality_mode_maps_to_assisted_with_quality_budget(self) -> None:
-        """The quality alias should retain its token budget while recording the new lane."""
-        args = self._build_args(eval_mode="quality", max_tokens=None)
-
-        check_models._apply_eval_mode_defaults(args, {"description": "Reference caption"})
-
-        assert args.eval_mode == "assisted"
-        assert args.max_tokens == check_models.QUALITY_MAX_TOKENS
-
-    @pytest.mark.parametrize("legacy_mode", ["stress", "quality"])
-    def test_legacy_modes_map_to_blind_without_descriptive_metadata(
-        self,
-        legacy_mode: str,
-    ) -> None:
-        """Legacy inputs should remain aliases and never become persisted lanes."""
-        args = self._build_args(eval_mode=legacy_mode, max_tokens=None)
-
-        check_models._apply_eval_mode_defaults(args, {"date": "2026-07-10"})
-
-        assert args.eval_mode == "blind"
 
 
 class TestUpstreamCliParity:

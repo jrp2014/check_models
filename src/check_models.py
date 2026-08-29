@@ -63,7 +63,6 @@ import threading
 import time
 import traceback
 import types
-import webbrowser
 from collections import Counter
 from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence, Sized
 from contextlib import (
@@ -862,7 +861,7 @@ type JsonLike = bool | int | float | str | list[JsonLike] | dict[str, JsonLike] 
 type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type EvaluationLane = Literal["triage", "blind", "assisted"]
-type RequestedEvaluationMode = EvaluationLane | Literal["auto", "stress", "quality"]
+type RequestedEvaluationMode = EvaluationLane | Literal["auto"]
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
     str, list[SystemProfilerEntry]
@@ -1683,7 +1682,6 @@ DEFAULT_MAX_TOKENS: Final[int] = 1000
 DEFAULT_EVAL_MODE: Final[RequestedEvaluationMode] = "auto"
 _UNKNOWN_OWNER: Final[str] = "unknown"
 TRIAGE_MAX_TOKENS: Final[int] = 200
-QUALITY_MAX_TOKENS: Final[int] = 1000
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 # Output paths relative to script's directory (not CWD) for consistency
 _SCRIPT_DIR = Path(__file__).parent
@@ -11496,12 +11494,6 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
 
-    if bool(getattr(args, "detailed_metrics", False)) and not bool(getattr(args, "verbose", False)):
-        logger.warning(
-            "--detailed-metrics has no effect unless --verbose is also set; "
-            "continuing with compact metrics output.",
-        )
-
 
 def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     """Collect optional generate kwargs for benchmark runs."""
@@ -15388,7 +15380,6 @@ def print_model_result(
     *,
     assessment: ResultAssessment | None = None,
     verbose: bool = False,
-    detailed_metrics: bool = False,
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,
@@ -15430,7 +15421,7 @@ def print_model_result(
     if result.generation and verbose:
         _log_verbose_success_details_mode(
             result,
-            detailed=detailed_metrics,
+            detailed=True,
             analysis=result.quality_analysis,
             prompt=prompt,
             context_marker=context_marker,
@@ -15744,7 +15735,7 @@ def _resolve_eval_mode(
     match eval_mode:
         case "triage" | "blind" | "assisted":
             return eval_mode
-        case "auto" | "stress" | "quality":
+        case "auto":
             return "assisted" if _metadata_has_descriptive_reference(metadata) else "blind"
         case _:
             msg = f"Unsupported evaluation mode: {eval_mode}"
@@ -15771,12 +15762,6 @@ def _apply_eval_mode_defaults(
             else "no descriptive image metadata found"
         )
         logger.info("Auto eval mode selected '%s' (%s).", resolved_eval_mode, reason)
-    elif requested_eval_mode in {"stress", "quality"}:
-        logger.warning(
-            "Evaluation mode '%s' is a deprecated alias; using the '%s' lane.",
-            requested_eval_mode,
-            resolved_eval_mode,
-        )
     if getattr(args, "prompt", None):
         logger.info(
             "--prompt overrides the '%s' lane prompt; the lane still governs the "
@@ -15790,12 +15775,7 @@ def _apply_eval_mode_defaults(
     # replaced an explicit 500 with the triage cap).
     if getattr(args, "max_tokens", None) is not None:
         return
-    if resolved_eval_mode == "triage":
-        args.max_tokens = TRIAGE_MAX_TOKENS
-    elif requested_eval_mode == "quality":
-        args.max_tokens = QUALITY_MAX_TOKENS
-    else:
-        args.max_tokens = DEFAULT_MAX_TOKENS
+    args.max_tokens = TRIAGE_MAX_TOKENS if resolved_eval_mode == "triage" else DEFAULT_MAX_TOKENS
 
 
 def _compact_prompt_text(value: str, *, max_chars: int) -> str:
@@ -16803,7 +16783,7 @@ def process_models(
 
     # Emit legend once if verbose
     if args.verbose:
-        log_metrics_legend(detailed=args.detailed_metrics)
+        log_metrics_legend(detailed=True)
 
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
@@ -21676,7 +21656,6 @@ def finalize_execution(
                 result,
                 assessment=assessments[result.model_name],
                 verbose=bool(getattr(args, "verbose", False)),
-                detailed_metrics=getattr(args, "detailed_metrics", False),
                 run_index=index,
                 total_runs=len(results),
                 prompt=prompt,
@@ -21752,17 +21731,6 @@ def finalize_execution(
             run_issue_summary=run_issue_summary,
         )
 
-        # Open HTML report in default browser if requested — only when this
-        # run actually produced it; a stale file must not be opened.
-        html_succeeded = any(
-            outcome.key == "html" and outcome.succeeded for outcome in report_outcomes
-        )
-        if getattr(args, "open_report", False) and html_succeeded:
-            try:
-                webbrowser.open(output_paths.html.as_uri())
-                logger.info("Automatically opened HTML report: %s", output_paths.html.name)
-            except (OSError, webbrowser.Error) as e:
-                logger.warning("Could not automatically open HTML report: %s", e)
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
@@ -22221,24 +22189,16 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
         "--eval-mode",
-        choices=[
-            DEFAULT_EVAL_MODE,
-            "triage",
-            "blind",
-            "assisted",
-            "stress",
-            "quality",
-        ],
+        choices=[DEFAULT_EVAL_MODE, "triage", "blind", "assisted"],
         default=DEFAULT_EVAL_MODE,
         help=(
             "Evaluation lane: 'auto' (default) selects 'assisted' when descriptive metadata "
             "is available and 'blind' otherwise; 'triage' = brief compatibility caption, "
             f"{TRIAGE_MAX_TOKENS} tokens; 'blind' = structured cataloguing without metadata "
             f"hints, {DEFAULT_MAX_TOKENS} tokens; 'assisted' = structured cataloguing with "
-            f"metadata hints, {DEFAULT_MAX_TOKENS} tokens. Deprecated 'stress' and 'quality' "
-            f"inputs are aliases, not separate lanes; 'quality' retains its "
-            f"{QUALITY_MAX_TOKENS}-token default. A custom --prompt overrides the lane prompt "
-            "only; the lane still governs the default token cap and report labeling."
+            f"metadata hints, {DEFAULT_MAX_TOKENS} tokens. A custom --prompt overrides the "
+            "lane prompt only; the lane still governs the default token cap and report "
+            "labeling."
         ),
     )
     generation_group.add_argument(
@@ -22248,9 +22208,8 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         default=None,
         help=(
             "Max new tokens to generate. When omitted, the resolved evaluation lane "
-            f"supplies the default ({DEFAULT_MAX_TOKENS}; triage {TRIAGE_MAX_TOKENS}; "
-            f"deprecated 'quality' alias {QUALITY_MAX_TOKENS}). An explicit value always "
-            "wins over the lane default."
+            f"supplies the default ({DEFAULT_MAX_TOKENS}; triage {TRIAGE_MAX_TOKENS}). "
+            "An explicit value always wins over the lane default."
         ),
     )
     generation_group.add_argument(
@@ -22457,13 +22416,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
 
     quality_group = parser.add_argument_group("Quality and Workflow")
     quality_group.add_argument(
-        "-d",
-        "--detailed-metrics",
-        action="store_true",
-        default=False,
-        help=("Show expanded multi-line metrics block; ignored unless --verbose is also set."),
-    )
-    quality_group.add_argument(
         "-c",
         "--quality-config",
         type=Path,
@@ -22507,12 +22459,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
             "content keeps working outside the local checkout; "
             "'relative' generates offline-friendly local relative paths."
         ),
-    )
-    quality_group.add_argument(
-        "--open-report",
-        action="store_true",
-        default=False,
-        help="Automatically open the HTML performance report in the default web browser upon completion.",
     )
     quality_group.add_argument(
         "-n",

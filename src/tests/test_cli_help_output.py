@@ -48,11 +48,11 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--thinking-budget" in output
     assert "--thinking-start-token" in output
     assert "--thinking-end-token" in output
-    assert "--detailed-metrics" in output
+    assert "--detailed-metrics" not in output
+    assert "--open-report" not in output
     assert "--min-p" in output
     assert "--top-k" in output
     assert "--kv-quant-scheme" in output
-    assert "ignored unless" in output
     assert "--verbose" in output
     assert "most recently modified image file in the folder" in normalized_output
     assert str(check_models.DEFAULT_FOLDER) in output
