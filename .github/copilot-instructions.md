@@ -64,7 +64,7 @@ The file is organized in this order — search for these exact landmark headers 
 
 - **Single CLI runner**: discovers models (HF cache scan), runs each with per-model
   isolation (timeouts, try/except), and generates retained HTML, gallery Markdown,
-  diagnostics Markdown, JSONL, run JSON, index, log, environment, and raw history
+  diagnostics Markdown, schema-3 JSONL, index, log, environment, and raw history
   artifacts.
 - **Configuration hierarchy**: `src/check_models_data/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
 - **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.

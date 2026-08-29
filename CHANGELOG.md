@@ -29,6 +29,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Observation `details` contents are validated at the loader against their
+  declared shapes (string lists of strings, non-bool integer counts,
+  exactly-two-int ranges, plain-string fragments; unknown keys stay
+  permitted for forward compatibility), so a mistyped retained value like
+  `"title_word_count": "five"` is rejected before a renderer compares it.
 - The schema-3 loader also validates the nested structures reports index
   into (`assessment.details`, `prompt_diagnostics.generate_kwargs` must be
   mappings when present), and comparison rehydration is strictly typed: a

@@ -1392,6 +1392,59 @@ def test_retained_loader_rejects_non_mapping_nested_structures(tmp_path: Path) -
         check_models.generate_run_issue_summary_report(output_paths)
 
 
+@pytest.mark.parametrize(
+    ("details", "field"),
+    [
+        ({"title_word_count": "five"}, "title_word_count"),
+        ({"title_word_count": True}, "title_word_count"),
+        ({"title_word_range": [5]}, "title_word_range"),
+        ({"title_word_range": ["five", "ten"]}, "title_word_range"),
+        ({"missing_sections": [1]}, "missing_sections"),
+        ({"duplicate_keywords": [1]}, "duplicate_keywords"),
+        ({"repeated_fragment": ["listed"]}, "repeated_fragment"),
+    ],
+)
+def test_retained_loader_rejects_mistyped_observation_details(
+    tmp_path: Path,
+    details: dict[str, object],
+    field: str,
+) -> None:
+    """Known detail keys must carry renderer-safe types at the loader."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result(
+        "org/model",
+        usability="usable_with_caveats",
+        maintainer_status="observation_needs_reproduction",
+        observations=["catalog_constraint_violation"],
+        details=details,
+    )
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(_issue_summary_metadata((result,))) + "\n" + json.dumps(result) + "\n",
+    )
+
+    with pytest.raises(ValueError, match=f"invalid observation detail {field}"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_retained_loader_permits_unknown_observation_detail_keys(tmp_path: Path) -> None:
+    """Forward-compatible detail keys from newer producers must still load."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/model",
+        usability="usable_with_caveats",
+        maintainer_status="observation_needs_reproduction",
+        observations=["catalog_constraint_violation"],
+        details={"future_field": {"nested": 1}, "title_word_count": 5},
+    )
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+
+
 def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path) -> None:
     """Regeneration must rehydrate the retained comparison, not silently drop it."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")

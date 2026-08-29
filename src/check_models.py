@@ -19366,6 +19366,69 @@ _RUN_ISSUE_ASSESSMENT_VOCABULARIES: Final[tuple[tuple[str, frozenset[str]], ...]
 )
 
 
+_DETAIL_STRING_LIST_FIELDS: Final[tuple[str, ...]] = (
+    "missing_sections",
+    "instruction_echo_fragments",
+    "unexpected_special_tokens",
+    "configured_generation_wrappers",
+    "thinking_trace_markers",
+    "role_boundary_tokens",
+    "duplicate_keywords",
+    "token_cap_reasons",
+    "unchanged_draft_fields",
+)
+_DETAIL_TEXT_FIELDS: Final[tuple[str, ...]] = (
+    "repeated_fragment",
+    "unexpected_catalog_preamble",
+)
+_DETAIL_COUNT_FIELDS: Final[tuple[str, ...]] = ("title_word_count", "keyword_count")
+_DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = ("title_word_range", "keyword_count_range")
+
+_DETAIL_RANGE_LENGTH: Final[int] = 2
+
+
+def _is_detail_count(value: JsonLike) -> bool:
+    """A count is an int and never a bool (bool subclasses int)."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_detail_string_list(value: JsonLike) -> bool:
+    return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+
+def _is_detail_text(value: JsonLike) -> bool:
+    return isinstance(value, str)
+
+
+def _is_detail_int_pair(value: JsonLike) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == _DETAIL_RANGE_LENGTH
+        and all(_is_detail_count(item) for item in value)
+    )
+
+
+def _validate_run_issue_details(details: dict[str, JsonLike], line_number: int) -> None:
+    """Enforce the observation-detail value types the renderers index into.
+
+    Known ``JsonlObservationDetailsRecord`` keys must carry their declared
+    shapes (string lists of strings, non-bool integer counts, exactly-two-int
+    ranges, plain-string fragments); unknown keys stay permitted for forward
+    compatibility.
+    """
+    checks: tuple[tuple[tuple[str, ...], Callable[[JsonLike], bool]], ...] = (
+        (_DETAIL_STRING_LIST_FIELDS, _is_detail_string_list),
+        (_DETAIL_TEXT_FIELDS, _is_detail_text),
+        (_DETAIL_COUNT_FIELDS, _is_detail_count),
+        (_DETAIL_RANGE_FIELDS, _is_detail_int_pair),
+    )
+    for field_names, is_valid in checks:
+        for field in field_names:
+            if field in details and not is_valid(details[field]):
+                message = f"JSONL result row {line_number} has invalid observation detail {field}"
+                raise RunIssueSummaryValidationError(message)
+
+
 def _validate_run_issue_result_shapes(
     value: dict[str, JsonLike],
     assessment: dict[str, JsonLike],
@@ -19386,9 +19449,11 @@ def _validate_run_issue_result_shapes(
         message = f"JSONL result row {line_number} has invalid retained field shapes"
         raise RunIssueSummaryValidationError(message)
     details = assessment.get("details")
-    if details is not None and not isinstance(details, dict):
-        message = f"JSONL result row {line_number} has a non-mapping assessment details"
-        raise RunIssueSummaryValidationError(message)
+    if details is not None:
+        if not isinstance(details, dict):
+            message = f"JSONL result row {line_number} has a non-mapping assessment details"
+            raise RunIssueSummaryValidationError(message)
+        _validate_run_issue_details(details, line_number)
     generate_kwargs = diagnostics.get("generate_kwargs") if diagnostics else None
     if generate_kwargs is not None and not isinstance(generate_kwargs, dict):
         message = f"JSONL result row {line_number} has non-mapping prompt generate_kwargs"
