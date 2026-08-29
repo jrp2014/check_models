@@ -4,7 +4,7 @@
 
 - Models attempted: 41 (completed 39, crashed 2, indeterminate 0)
 - Usability: usable 12, usable with caveats 18, unusable 9, not evaluated 2
-- Top observations: Response repeats the same text (5), Unrecognised model control tokens remain visible (3), Required fields are missing or empty (4), Response repeats the task instructions instead of only returning the requested fields (1), Extra text appears before the Title field (2)
+- Top observations: Response repeats the same text (4), Generation was stopped early after sustained repeated output (4), Unrecognised model control tokens remain visible (3), Required fields are missing or empty (4), Response repeats the task instructions instead of only returning the requested fields (1)
 
 ## Start here
 

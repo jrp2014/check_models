@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-28 20:07:02 BST
+Generated on: 2026-08-29 02:11:29 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -18,54 +18,54 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.60s   | 481 tok/s  | 0.11            | 1.9     | 2,117      | 118     | none                                                                                                                        |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.95s  | 29.4 tok/s | 3.58            | 23      | 2,401      | 121     | none                                                                                                                        |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 8.59s   | 34.0 tok/s | 1.08            | 18      | 2,618      | 164     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 5.82s   | 67.6 tok/s | 1.99            | 13      | 2,934      | 123     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.21s   | 190 tok/s  | 0.98            | 7.8     | 2,933      | 134     | none                                                                                                                        |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable`              | 5.50s   | 72.5 tok/s | 1.93            | 8.8     | 1,529      | 133     | none                                                                                                                        |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | 59.53s  | 87.1 tok/s | 55.14           | 23      | 16,552     | 129     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 56.24s  | 110 tok/s  | 51.54           | 24      | 16,568     | 111     | none                                                                                                                        |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 8.77s   | 31.3 tok/s | 1.03            | 17      | 593        | 153     | none                                                                                                                        |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.18s   | 129 tok/s  | 0.41            | 16      | 598        | 100     | none                                                                                                                        |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.88s   | 26.4 tok/s | 1.13            | 20      | 598        | 95      | none                                                                                                                        |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.88s   | 171 tok/s  | 0.92            | 4.6     | 1,383      | 85      | none                                                                                                                        |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 15.97s  | 93.4 tok/s | 13.25           | 8.4     | 16,552     | 112     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable with caveats` | 9.72s   | 79.6 tok/s | 6.23            | 8.4     | 6,392      | 126     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 29.24s  | 41.5 tok/s | 18.02           | 78      | 6,392      | 95      | control tokens visible                                                                                                      |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 6.30s   | 36.5 tok/s | 1.30            | 17      | 2,118      | 99      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 150.24s | 4.73 tok/s | 1.84            | 40      | 1,329      | 682     | role tokens visible                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.45s   | 64.8 tok/s | 2.01            | 13      | 2,934      | 161     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.61s   | 230 tok/s  | 3.10            | 3.9     | 4,085      | 161     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable with caveats` | 66.45s  | 64.2 tok/s | 53.62           | 74      | 16,568     | 110     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.40s   | 56.3 tok/s | 0.43            | 9.4     | 1,138      | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable with caveats` | 27.70s  | 90.3 tok/s | 15.88           | 8.4     | 16,554     | 913     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 65.40s  | 89.0 tok/s | 61.47           | 10.0    | 16,568     | 139     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable with caveats` | 98.20s  | 17.2 tok/s | 85.84           | 33      | 16,568     | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 83.60s  | 29.5 tok/s | 75.98           | 21      | 16,568     | 133     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.67s   | 123 tok/s  | 0.39            | 5.5     | 1,430      | 104     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 38.45s  | 18.8 tok/s | 22.33           | 70      | 3,496      | 108     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 6.48s   | 53.4 tok/s | 0.65            | 29      | 594        | 88      | control tokens visible                                                                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 6.00s   | 60.4 tok/s | 0.42            | 28      | 594        | 84      | control tokens visible                                                                                                      |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.96s   | 39.4 tok/s | 1.90            | 16      | 3,124      | 112     | title/keyword constraints failed                                                                                            |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 10.15s  | 133 tok/s  | 1.34            | 3.7     | 2,072      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.43s  | 41.3 tok/s | 2.03            | 15      | 3,215      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 33.20s  | 50.9 tok/s | 3.95            | 60      | 1,641      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.18s   | 344 tok/s  | 0.22            | 2.1     | 339        | 54      | missing required fields                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.14s  | 47.0 tok/s | 5.57            | 13      | 6,388      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 6.86s   | 186 tok/s  | 0.34            | 4.0     | 2,117      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.03s   | 275 tok/s  | 0.25            | 3.8     | 937        | 76      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 38.23s  | 55.8 tok/s | 18.09           | 13      | 16,563     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 7.10s   | 48.7 tok/s | 0.87            | 17      | 592        | 164     | missing required fields                                                                                                     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `not evaluated`       | 0.21s   | -          | -               | -       | -          | -       | none                                                                                                                        |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.01s   | -          | -               | -       | -          | -       | none                                                                                                                        |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 1.74s   | 484 tok/s  | 0.12            | 1.9     | 2,117      | 118     | none                                                                                                                        |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 10.55s  | 29.0 tok/s | 3.33            | 23      | 2,401      | 121     | none                                                                                                                        |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 9.13s   | 32.5 tok/s | 1.09            | 18      | 2,618      | 164     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.99s   | 65.6 tok/s | 2.88            | 13      | 2,934      | 123     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.61s   | 189 tok/s  | 1.05            | 7.8     | 2,933      | 134     | none                                                                                                                        |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable`              | 4.47s   | 72.0 tok/s | 0.74            | 8.8     | 1,529      | 133     | none                                                                                                                        |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | 63.05s  | 79.0 tok/s | 58.51           | 23      | 16,552     | 129     | none                                                                                                                        |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 68.39s  | 65.7 tok/s | 62.97           | 24      | 16,568     | 111     | none                                                                                                                        |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 15.17s  | 21.7 tok/s | 1.71            | 17      | 593        | 153     | none                                                                                                                        |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.45s   | 116 tok/s  | 0.41            | 16      | 598        | 100     | none                                                                                                                        |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.77s   | 27.6 tok/s | 1.05            | 20      | 598        | 95      | none                                                                                                                        |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.48s   | 169 tok/s  | 0.45            | 4.6     | 1,383      | 85      | none                                                                                                                        |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.00s  | 90.1 tok/s | 13.11           | 8.4     | 16,552     | 112     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable with caveats` | 10.28s  | 76.1 tok/s | 6.45            | 8.4     | 6,392      | 126     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 28.19s  | 38.8 tok/s | 17.45           | 78      | 6,392      | 95      | control tokens visible                                                                                                      |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 6.08s   | 34.6 tok/s | 0.82            | 17      | 2,118      | 99      | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 158.48s | 4.46 tok/s | 1.28            | 40      | 1,329      | 682     | role tokens visible                                                                                                         |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 7.18s   | 61.1 tok/s | 2.32            | 13      | 2,934      | 161     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 6.01s   | 166 tok/s  | 3.09            | 3.9     | 4,085      | 161     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable with caveats` | 75.73s  | 61.2 tok/s | 61.97           | 74      | 16,568     | 110     | title/keyword constraints failed; draft hints copied unchanged                                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.30s   | 54.8 tok/s | 0.29            | 9.4     | 1,138      | 135     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable with caveats` | 43.07s  | 46.7 tok/s | 21.32           | 8.4     | 16,554     | 913     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 85.51s  | 37.5 tok/s | 78.20           | 10.0    | 16,568     | 139     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable with caveats` | 111.70s | 15.8 tok/s | 98.72           | 33      | 16,568     | 135     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 96.92s  | 17.6 tok/s | 86.15           | 21      | 16,568     | 133     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.75s   | 127 tok/s  | 0.38            | 5.5     | 1,430      | 104     | title/keyword constraints failed; draft hints copied unchanged                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 40.16s  | 40.5 tok/s | 28.57           | 70      | 3,496      | 108     | title/keyword constraints failed; draft hints copied unchanged                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 5.75s   | 70.9 tok/s | 0.33            | 29      | 594        | 85      | control tokens visible                                                                                                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 6.02s   | 57.8 tok/s | 0.32            | 28      | 594        | 91      | control tokens visible                                                                                                      |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 7.01s   | 39.3 tok/s | 1.68            | 16      | 3,124      | 112     | title/keyword constraints failed                                                                                            |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 5.22s   | 85.1 tok/s | 1.00            | 3.7     | 2,072      | 225     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.95s  | 40.9 tok/s | 2.06            | 15      | 3,215      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 19.02s  | 60.9 tok/s | 2.42            | 60      | 1,641      | 575     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.46s   | 300 tok/s  | 0.09            | 2.1     | 339        | 54      | missing required fields                                                                                                     |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.68s  | 46.0 tok/s | 5.43            | 13      | 6,388      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 5.47s   | 192 tok/s  | 0.34            | 4.0     | 2,117      | 275     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.21s   | 254 tok/s  | 0.26            | 3.8     | 937        | 76      | missing required fields; extra text before Title                                                                            |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 28.15s  | 55.3 tok/s | 18.72           | 13      | 16,563     | 400     | stopped early: repeating; title/keyword constraints failed                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 6.79s   | 47.7 tok/s | 0.39            | 17      | 592        | 164     | missing required fields                                                                                                     |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `not evaluated`       | 0.27s   | -          | -               | -       | -          | -       | none                                                                                                                        |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.57s   | -          | -               | -       | -          | -       | none                                                                                                                        |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 481 tok/s
+Fastest clean completion: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 484 tok/s
 
-Average clean-completion throughput: 119 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 113 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -75,14 +75,14 @@ Lowest peak memory among clean completions: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` a
 
 | Model                                                                                                        | Usability       | Observations                                                                                                                |
 |--------------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                          | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                          | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
 | [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `unusable`      | missing required fields                                                                                                     |
 | [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                   | `unusable`      | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
 | [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `unusable`      | stopped early: repeating; title/keyword constraints failed                                                                  |
 | [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                            | `unusable`      | missing required fields                                                                                                     |
 | [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                       | `not evaluated` | none                                                                                                                        |
 | [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                        | `not evaluated` | none                                                                                                                        |
@@ -123,8 +123,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable_with_caveats` | Title:<br>Weathered wooden boathouse on a serene wetland pond<br><br>Description:<br>A weathered wooden boathouse with a mossy roof stands on stilts over a calm pond, featuring a wooden boardwalk with cross-braced railings. The structure is framed by overhanging green tree branches and su...             |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Wooden Boathouse<br>Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br>Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Le...                   |
 | [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Weathered wooden boathouse over a pond<br><br>Description:<br>A weathered wooden boathouse built on stilts stands over the edge of a serene pond, framed by lush overhanging tree branches, wooden decking, and surrounding wetland foliage.<br><br>Keywords:<br>Cloudy Sky, Foliage, Forest, Gr...    |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse Over Serene Wetland Pond<br>Description: A weathered wooden boathouse built on stilts stands over a serene pond, framed by lush green trees and wetland foliage under a cloudy sky.<br>Keywords: architecture, birdwatching,...               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse over a Serene Pond<br>Description: A weathered wooden boathouse built on stilts stands over a pond, framed by lush green foliage under a cloudy sky.<br>Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, B...              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse Over Serene Pond<br>Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.<br>Keywords: architecture, bird hide, boardwal...              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: Weathered Wooden Boathouse Over a Serene Wetland Pond<br>Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland...                  |
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Weathered Boathouse Overlooking Serene Wetland Pond<br><br>Description:<br>A weathered wooden boathouse stands on stilts over a tranquil pond, surrounded by lush foliage and framed by overhanging tree branches under a cloudy sky.<br><br>Keywords:<br>Cloudy Sky, Foliage, Forest, Grass, La...    |
 | [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | Title:<br>A Serene Pondside Hideout<br>Description:<br>A rustic wooden boathouse built on stilts overlooks a tranquil pond, surrounded by lush foliage and framed by the overhanging branches of a nearby tree. The wooden deck and railing add to the charm of this peaceful outdoor retreat,...                |
 | [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The context includes capture date/time and GPS. The descriptive hints are given. We need to treat capture date/time and GPS as authoritative facts, but not c...                      |
@@ -229,23 +229,23 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.39s
-- *Generation time:* 0.85s
-- *Total time:* 1.60s
-- *Input validation time:* 0.349
-- *Prompt preparation time:* 0.00663
-- *First-token latency:* 0.11
-- *Cleanup time:* 0.0635
+- *Model load time:* 0.50s
+- *Generation time:* 0.88s
+- *Total time:* 1.74s
+- *Input validation time:* 0.358
+- *Prompt preparation time:* 0.00743
+- *First-token latency:* 0.125
+- *Cleanup time:* 0.0667
 - *Prompt tokens:* 2,117
 - *Generation tokens:* 118
 - *Total tokens:* 2,235
-- *Prompt throughput (raw):* 19,319 tok/s
-- *Generation throughput (raw):* 481 tok/s
+- *Prompt throughput (raw):* 16,945 tok/s
+- *Generation throughput (raw):* 484 tok/s
 - *Peak memory:* 1.9
 - *Active memory:* 0.90
 - *Cache memory:* 0.08
 - *Model-load active memory:* 0.897
-- *Post-cleanup active memory:* 0.000132
+- *Post-cleanup active memory:* 0.000149
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -292,22 +292,22 @@ Boathouse, wetland, wooden, stilts, cloudy, overhanging, trees, reeds, pond, ref
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
 - *Model load time:* 2.44s
-- *Generation time:* 8.49s
-- *Total time:* 10.95s
-- *Input validation time:* 7.25e-05
-- *Prompt preparation time:* 0.0131
-- *First-token latency:* 3.58
-- *Cleanup time:* 0.125
+- *Generation time:* 8.09s
+- *Total time:* 10.55s
+- *Input validation time:* 7.31e-05
+- *Prompt preparation time:* 0.00782
+- *First-token latency:* 3.33
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 2,401
 - *Generation tokens:* 121
 - *Total tokens:* 2,522
-- *Prompt throughput (raw):* 671 tok/s
-- *Generation throughput (raw):* 29.4 tok/s
+- *Prompt throughput (raw):* 722 tok/s
+- *Generation throughput (raw):* 29.0 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 0.47
 - *Model-load active memory:* 18
-- *Post-cleanup active memory:* 0.00128
+- *Post-cleanup active memory:* 0.0013
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -353,23 +353,23 @@ Boathouse, Pond, Wetland, Wooden Decking, Overhanging Trees, Cloudy Sky, Moss, R
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.95s
-- *Generation time:* 6.63s
-- *Total time:* 8.59s
-- *Input validation time:* 5.52e-05
-- *Prompt preparation time:* 0.00226
-- *First-token latency:* 1.08
-- *Cleanup time:* 0.122
+- *Model load time:* 2.24s
+- *Generation time:* 6.88s
+- *Total time:* 9.13s
+- *Input validation time:* 7.82e-05
+- *Prompt preparation time:* 0.00205
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 2,618
 - *Generation tokens:* 164
 - *Total tokens:* 2,782
-- *Prompt throughput (raw):* 2,414 tok/s
-- *Generation throughput (raw):* 34.0 tok/s
+- *Prompt throughput (raw):* 2,392 tok/s
+- *Generation throughput (raw):* 32.5 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
 - *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.003
+- *Post-cleanup active memory:* 0.00302
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -412,23 +412,23 @@ Keywords: weathered wooden boathouse, stilts, serene pond, lush overhanging tree
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.45s
-- *Generation time:* 4.36s
-- *Total time:* 5.82s
-- *Input validation time:* 5.98e-05
-- *Prompt preparation time:* 0.00749
-- *First-token latency:* 1.99
-- *Cleanup time:* 0.0941
+- *Model load time:* 1.67s
+- *Generation time:* 5.31s
+- *Total time:* 6.99s
+- *Input validation time:* 4.52e-05
+- *Prompt preparation time:* 0.00817
+- *First-token latency:* 2.88
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 2,934
 - *Generation tokens:* 123
 - *Total tokens:* 3,057
-- *Prompt throughput (raw):* 1,475 tok/s
-- *Generation throughput (raw):* 67.6 tok/s
+- *Prompt throughput (raw):* 1,020 tok/s
+- *Generation throughput (raw):* 65.6 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.0
 - *Cache memory:* 0.56
 - *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.00488
+- *Post-cleanup active memory:* 0.0049
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -474,23 +474,23 @@ Boathouse, wetland, pond, wooden structure, stilts, foliage, overhanging branche
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.95s
-- *Generation time:* 2.24s
-- *Total time:* 3.21s
-- *Input validation time:* 4.7e-05
-- *Prompt preparation time:* 0.00756
-- *First-token latency:* 0.982
-- *Cleanup time:* 0.0828
+- *Model load time:* 1.29s
+- *Generation time:* 2.31s
+- *Total time:* 3.61s
+- *Input validation time:* 6.16e-05
+- *Prompt preparation time:* 0.00729
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.089
 - *Prompt tokens:* 2,933
 - *Generation tokens:* 134
 - *Total tokens:* 3,067
-- *Prompt throughput (raw):* 2,987 tok/s
-- *Generation throughput (raw):* 190 tok/s
+- *Prompt throughput (raw):* 2,803 tok/s
+- *Generation throughput (raw):* 189 tok/s
 - *Peak memory:* 7.8
 - *Active memory:* 2.8
 - *Cache memory:* 0.38
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.00541
+- *Post-cleanup active memory:* 0.00542
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -536,23 +536,23 @@ boardwalk, cloudy sky, moss-covered deck, pond edge, reedy wetland, rustic woode
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.07s
-- *Generation time:* 4.42s
-- *Total time:* 5.50s
-- *Input validation time:* 4.23e-05
-- *Prompt preparation time:* 0.0056
-- *First-token latency:* 1.93
-- *Cleanup time:* 0.087
+- *Model load time:* 1.22s
+- *Generation time:* 3.23s
+- *Total time:* 4.47s
+- *Input validation time:* 5.47e-05
+- *Prompt preparation time:* 0.006
+- *First-token latency:* 0.736
+- *Cleanup time:* 0.101
 - *Prompt tokens:* 1,529
 - *Generation tokens:* 133
 - *Total tokens:* 1,662
-- *Prompt throughput (raw):* 793 tok/s
-- *Generation throughput (raw):* 72.5 tok/s
+- *Prompt throughput (raw):* 2,076 tok/s
+- *Generation throughput (raw):* 72.0 tok/s
 - *Peak memory:* 8.8
 - *Active memory:* 6.5
 - *Cache memory:* 0.31
 - *Model-load active memory:* 6.45
-- *Post-cleanup active memory:* 0.00572
+- *Post-cleanup active memory:* 0.00574
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -595,23 +595,23 @@ Keywords: Stilted building, Marshland, Wetland, Pond, Reeds, Wooden deck, Bird h
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.90s
-- *Generation time:* 57.62s
-- *Total time:* 59.53s
-- *Input validation time:* 5.47e-05
-- *Prompt preparation time:* 0.00149
-- *First-token latency:* 55.1
-- *Cleanup time:* 0.129
+- *Model load time:* 1.96s
+- *Generation time:* 61.09s
+- *Total time:* 63.05s
+- *Input validation time:* 5.45e-05
+- *Prompt preparation time:* 0.00191
+- *First-token latency:* 58.5
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 16,552
 - *Generation tokens:* 129
 - *Total tokens:* 16,681
-- *Prompt throughput (raw):* 300 tok/s
-- *Generation throughput (raw):* 87.1 tok/s
+- *Prompt throughput (raw):* 283 tok/s
+- *Generation throughput (raw):* 79.0 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 2.3
 - *Model-load active memory:* 18.3
-- *Post-cleanup active memory:* 0.00744
+- *Post-cleanup active memory:* 0.00746
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -652,23 +652,23 @@ Keywords: wooden boathouse, pond, wetland, reeds, trees, foliage, moss, wooden d
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.71s
-- *Generation time:* 53.50s
-- *Total time:* 56.24s
-- *Input validation time:* 7.1e-05
-- *Prompt preparation time:* 0.0159
-- *First-token latency:* 51.5
-- *Cleanup time:* 0.126
+- *Model load time:* 2.74s
+- *Generation time:* 65.62s
+- *Total time:* 68.39s
+- *Input validation time:* 7.11e-05
+- *Prompt preparation time:* 0.0157
+- *First-token latency:* 63
+- *Cleanup time:* 0.244
 - *Prompt tokens:* 16,568
 - *Generation tokens:* 111
 - *Total tokens:* 16,679
-- *Prompt throughput (raw):* 321 tok/s
-- *Generation throughput (raw):* 110 tok/s
+- *Prompt throughput (raw):* 263 tok/s
+- *Generation throughput (raw):* 65.7 tok/s
 - *Peak memory:* 24
 - *Active memory:* 20
 - *Cache memory:* 0.89
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00795
+- *Post-cleanup active memory:* 0.00796
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -711,18 +711,18 @@ Keywords: boathouse, pond, wooden structure, wetland, foliage, cloudy sky, trees
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.28s
-- *Generation time:* 6.48s
-- *Total time:* 8.77s
-- *Input validation time:* 6.99e-05
-- *Prompt preparation time:* 0.00425
-- *First-token latency:* 1.03
-- *Cleanup time:* 0.132
+- *Model load time:* 5.86s
+- *Generation time:* 9.29s
+- *Total time:* 15.17s
+- *Input validation time:* 7.19e-05
+- *Prompt preparation time:* 0.0035
+- *First-token latency:* 1.71
+- *Cleanup time:* 0.165
 - *Prompt tokens:* 593
 - *Generation tokens:* 153
 - *Total tokens:* 746
-- *Prompt throughput (raw):* 577 tok/s
-- *Generation throughput (raw):* 31.3 tok/s
+- *Prompt throughput (raw):* 347 tok/s
+- *Generation throughput (raw):* 21.7 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.45
@@ -770,18 +770,18 @@ Keywords: Boathouse, Wooden structure, Stilts, Pond, Wetland, Marshland, Trees, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.38s
-- *Generation time:* 1.77s
-- *Total time:* 4.18s
-- *Input validation time:* 5.57e-05
-- *Prompt preparation time:* 0.0229
-- *First-token latency:* 0.409
-- *Cleanup time:* 0.123
+- *Model load time:* 2.56s
+- *Generation time:* 1.86s
+- *Total time:* 4.45s
+- *Input validation time:* 5.96e-05
+- *Prompt preparation time:* 0.023
+- *First-token latency:* 0.413
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 598
 - *Generation tokens:* 100
 - *Total tokens:* 698
-- *Prompt throughput (raw):* 1,462 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 1,449 tok/s
+- *Generation throughput (raw):* 116 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.20
@@ -827,18 +827,18 @@ Keywords: architecture, bird hide, birdwatching, boardwalk, foliage, forest, lak
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.54s
-- *Generation time:* 5.33s
-- *Total time:* 7.88s
-- *Input validation time:* 5.55e-05
-- *Prompt preparation time:* 0.00185
-- *First-token latency:* 1.13
-- *Cleanup time:* 0.142
+- *Model load time:* 2.67s
+- *Generation time:* 5.09s
+- *Total time:* 7.77s
+- *Input validation time:* 6.39e-05
+- *Prompt preparation time:* 0.00112
+- *First-token latency:* 1.05
+- *Cleanup time:* 0.152
 - *Prompt tokens:* 598
 - *Generation tokens:* 95
 - *Total tokens:* 693
-- *Prompt throughput (raw):* 529 tok/s
-- *Generation throughput (raw):* 26.4 tok/s
+- *Prompt throughput (raw):* 569 tok/s
+- *Generation throughput (raw):* 27.6 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.78
@@ -884,23 +884,23 @@ Keywords: bird hide, birdwatching, wooden shed, pond, wetland, boardwalk, foliag
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.66s
-- *Generation time:* 2.20s
-- *Total time:* 2.88s
-- *Input validation time:* 7.33e-05
-- *Prompt preparation time:* 0.0101
-- *First-token latency:* 0.916
-- *Cleanup time:* 0.0886
+- *Model load time:* 0.72s
+- *Generation time:* 1.74s
+- *Total time:* 2.48s
+- *Input validation time:* 8.81e-05
+- *Prompt preparation time:* 0.0114
+- *First-token latency:* 0.451
+- *Cleanup time:* 0.0963
 - *Prompt tokens:* 1,383
 - *Generation tokens:* 85
 - *Total tokens:* 1,468
-- *Prompt throughput (raw):* 1,511 tok/s
-- *Generation throughput (raw):* 171 tok/s
+- *Prompt throughput (raw):* 3,068 tok/s
+- *Generation throughput (raw):* 169 tok/s
 - *Peak memory:* 4.6
 - *Active memory:* 3.0
 - *Cache memory:* 0.23
 - *Model-load active memory:* 3.03
-- *Post-cleanup active memory:* 0.0125
+- *Post-cleanup active memory:* 0.0126
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -942,23 +942,23 @@ Keywords: Weathered Boathouse, Pond, Wetland, Lush Foliage, Marshland, Bird Hide
 - *Observations:* Title has 4 words (requested 5-10); Keyword list has 24
   terms (requested 10-18); Duplicate keywords: pond, trees
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.66s
-- *Generation time:* 15.29s
-- *Total time:* 15.97s
-- *Input validation time:* 4.6e-05
-- *Prompt preparation time:* 0.00979
-- *First-token latency:* 13.2
-- *Cleanup time:* 0.0841
+- *Model load time:* 0.76s
+- *Generation time:* 15.23s
+- *Total time:* 16.00s
+- *Input validation time:* 6.01e-05
+- *Prompt preparation time:* 0.00995
+- *First-token latency:* 13.1
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 16,552
 - *Generation tokens:* 112
 - *Total tokens:* 16,664
-- *Prompt throughput (raw):* 1,249 tok/s
-- *Generation throughput (raw):* 93.4 tok/s
+- *Prompt throughput (raw):* 1,262 tok/s
+- *Generation throughput (raw):* 90.1 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.000443
+- *Post-cleanup active memory:* 0.00046
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1001,23 +1001,23 @@ Keywords: boathouse, pond, wooden shed, stilts, foliage, reeds, moss, cloudy sky
 - *Maintainer status:* none
 - *Observations:* Keyword list has 25 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.34s
-- *Generation time:* 8.37s
-- *Total time:* 9.72s
-- *Input validation time:* 6.9e-05
-- *Prompt preparation time:* 0.00825
-- *First-token latency:* 6.23
-- *Cleanup time:* 0.1
+- *Model load time:* 1.60s
+- *Generation time:* 8.67s
+- *Total time:* 10.28s
+- *Input validation time:* 7.4e-05
+- *Prompt preparation time:* 0.00922
+- *First-token latency:* 6.45
+- *Cleanup time:* 0.117
 - *Prompt tokens:* 6,392
 - *Generation tokens:* 126
 - *Total tokens:* 6,518
-- *Prompt throughput (raw):* 1,026 tok/s
-- *Generation throughput (raw):* 79.6 tok/s
+- *Prompt throughput (raw):* 992 tok/s
+- *Generation throughput (raw):* 76.1 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
 - *Cache memory:* 0.46
 - *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00243
+- *Post-cleanup active memory:* 0.00244
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1058,23 +1058,23 @@ Keywords: weathered boathouse, serene pond, overhanging tree branches, wooden de
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 8.25s
-- *Generation time:* 20.97s
-- *Total time:* 29.24s
-- *Input validation time:* 7.58e-05
-- *Prompt preparation time:* 0.00882
-- *First-token latency:* 18
-- *Cleanup time:* 0.266
+- *Model load time:* 7.72s
+- *Generation time:* 20.46s
+- *Total time:* 28.19s
+- *Input validation time:* 8.26e-05
+- *Prompt preparation time:* 0.00942
+- *First-token latency:* 17.5
+- *Cleanup time:* 0.261
 - *Prompt tokens:* 6,392
 - *Generation tokens:* 95
 - *Total tokens:* 6,487
-- *Prompt throughput (raw):* 355 tok/s
-- *Generation throughput (raw):* 41.5 tok/s
+- *Prompt throughput (raw):* 366 tok/s
+- *Generation throughput (raw):* 38.8 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
 - *Model-load active memory:* 61.9
-- *Post-cleanup active memory:* 0.00274
+- *Post-cleanup active memory:* 0.00275
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1126,23 +1126,23 @@ Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, 
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.64s
-- *Generation time:* 4.65s
-- *Total time:* 6.30s
-- *Input validation time:* 7.1e-05
-- *Prompt preparation time:* 0.00302
-- *First-token latency:* 1.3
-- *Cleanup time:* 0.106
+- *Model load time:* 1.75s
+- *Generation time:* 4.32s
+- *Total time:* 6.08s
+- *Input validation time:* 8.18e-05
+- *Prompt preparation time:* 0.00294
+- *First-token latency:* 0.82
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 2,118
 - *Generation tokens:* 99
 - *Total tokens:* 2,217
-- *Prompt throughput (raw):* 1,625 tok/s
-- *Generation throughput (raw):* 36.5 tok/s
+- *Prompt throughput (raw):* 2,582 tok/s
+- *Generation throughput (raw):* 34.6 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.17
 - *Model-load active memory:* 15.9
-- *Post-cleanup active memory:* 0.00331
+- *Post-cleanup active memory:* 0.00333
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1183,23 +1183,23 @@ Keywords: Wooden boathouse, Stilts, Pond, Lush foliage, Cloudy sky, Wetland, Ree
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.29s
-- *Generation time:* 146.94s
-- *Total time:* 150.24s
-- *Input validation time:* 6.91e-05
-- *Prompt preparation time:* 0.0037
-- *First-token latency:* 1.84
-- *Cleanup time:* 0.187
+- *Model load time:* 3.56s
+- *Generation time:* 154.91s
+- *Total time:* 158.48s
+- *Input validation time:* 6.5e-05
+- *Prompt preparation time:* 0.00361
+- *First-token latency:* 1.28
+- *Cleanup time:* 0.514
 - *Prompt tokens:* 1,329
 - *Generation tokens:* 682
 - *Total tokens:* 2,011
-- *Prompt throughput (raw):* 724 tok/s
-- *Generation throughput (raw):* 4.73 tok/s
+- *Prompt throughput (raw):* 1,035 tok/s
+- *Generation throughput (raw):* 4.46 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.6
 - *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.00397
+- *Post-cleanup active memory:* 0.00398
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1263,23 +1263,23 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.40s
-- *Generation time:* 5.04s
-- *Total time:* 6.45s
-- *Input validation time:* 5.52e-05
-- *Prompt preparation time:* 0.00095
-- *First-token latency:* 2.01
-- *Cleanup time:* 0.0956
+- *Model load time:* 1.66s
+- *Generation time:* 5.51s
+- *Total time:* 7.18s
+- *Input validation time:* 5.95e-05
+- *Prompt preparation time:* 0.00116
+- *First-token latency:* 2.32
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,934
 - *Generation tokens:* 161
 - *Total tokens:* 3,095
-- *Prompt throughput (raw):* 1,458 tok/s
-- *Generation throughput (raw):* 64.8 tok/s
+- *Prompt throughput (raw):* 1,264 tok/s
+- *Generation throughput (raw):* 61.1 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.4
 - *Cache memory:* 0.60
 - *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00515
+- *Post-cleanup active memory:* 0.00516
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1326,23 +1326,23 @@ Boathouse, Stilts, Wetland, Pond, Lush Foliage, Reeds, Overhanging Branches, Woo
 - *Observations:* Keyword list has 24 terms (requested 10-18); Duplicate
   keywords: boathouse
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.00s
-- *Generation time:* 4.60s
-- *Total time:* 5.61s
-- *Input validation time:* 9.96e-05
-- *Prompt preparation time:* 0.00514
-- *First-token latency:* 3.1
-- *Cleanup time:* 0.0857
+- *Model load time:* 1.17s
+- *Generation time:* 4.83s
+- *Total time:* 6.01s
+- *Input validation time:* 4.77e-05
+- *Prompt preparation time:* 0.00423
+- *First-token latency:* 3.09
+- *Cleanup time:* 0.0987
 - *Prompt tokens:* 4,085
 - *Generation tokens:* 161
 - *Total tokens:* 4,246
-- *Prompt throughput (raw):* 1,318 tok/s
-- *Generation throughput (raw):* 230 tok/s
+- *Prompt throughput (raw):* 1,323 tok/s
+- *Generation throughput (raw):* 166 tok/s
 - *Peak memory:* 3.9
 - *Active memory:* 2.2
 - *Cache memory:* 0.64
 - *Model-load active memory:* 2.18
-- *Post-cleanup active memory:* 0.00624
+- *Post-cleanup active memory:* 0.00626
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1386,23 +1386,23 @@ Keywords: Boathouse, Wetland Landscape, Foliage, Reeds, Water, Cloudy Sky, Outdo
 - *Observations:* Keyword list has 20 terms (requested 10-18); Title,
   Description and Keywords copy all supplied hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 9.86s
-- *Generation time:* 56.56s
-- *Total time:* 66.45s
-- *Input validation time:* 6.7e-05
-- *Prompt preparation time:* 0.0193
-- *First-token latency:* 53.6
-- *Cleanup time:* 0.272
+- *Model load time:* 10.65s
+- *Generation time:* 65.06s
+- *Total time:* 75.73s
+- *Input validation time:* 4.62e-05
+- *Prompt preparation time:* 0.0177
+- *First-token latency:* 62
+- *Cleanup time:* 0.254
 - *Prompt tokens:* 16,568
 - *Generation tokens:* 110
 - *Total tokens:* 16,678
-- *Prompt throughput (raw):* 309 tok/s
-- *Generation throughput (raw):* 64.2 tok/s
+- *Prompt throughput (raw):* 267 tok/s
+- *Generation throughput (raw):* 61.2 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
 - *Cache memory:* 0.89
 - *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.00675
+- *Post-cleanup active memory:* 0.00677
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1443,23 +1443,23 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.05s
-- *Generation time:* 3.35s
-- *Total time:* 4.40s
-- *Input validation time:* 7.61e-05
-- *Prompt preparation time:* 0.00172
-- *First-token latency:* 0.425
-- *Cleanup time:* 0.0887
+- *Model load time:* 1.03s
+- *Generation time:* 3.26s
+- *Total time:* 4.30s
+- *Input validation time:* 6.68e-05
+- *Prompt preparation time:* 0.00168
+- *First-token latency:* 0.289
+- *Cleanup time:* 0.0898
 - *Prompt tokens:* 1,138
 - *Generation tokens:* 135
 - *Total tokens:* 1,273
-- *Prompt throughput (raw):* 2,676 tok/s
-- *Generation throughput (raw):* 56.3 tok/s
+- *Prompt throughput (raw):* 3,938 tok/s
+- *Generation throughput (raw):* 54.8 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
 - *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00682
+- *Post-cleanup active memory:* 0.00683
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1502,23 +1502,23 @@ Keywords: wooden boathouse, pond, serene, lush, greenery, cloudy sky, tranquil, 
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.71s
-- *Generation time:* 26.97s
-- *Total time:* 27.70s
-- *Input validation time:* 6.27e-05
+- *Model load time:* 1.23s
+- *Generation time:* 41.81s
+- *Total time:* 43.07s
+- *Input validation time:* 7e-05
 - *Prompt preparation time:* 0.012
-- *First-token latency:* 15.9
-- *Cleanup time:* 0.0953
+- *First-token latency:* 21.3
+- *Cleanup time:* 0.0944
 - *Prompt tokens:* 16,554
 - *Generation tokens:* 913
 - *Total tokens:* 17,467
-- *Prompt throughput (raw):* 1,042 tok/s
-- *Generation throughput (raw):* 90.3 tok/s
+- *Prompt throughput (raw):* 776 tok/s
+- *Generation throughput (raw):* 46.7 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.7
 - *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00713
+- *Post-cleanup active memory:* 0.00714
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1590,23 +1590,23 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.38s
-- *Generation time:* 64.01s
-- *Total time:* 65.40s
-- *Input validation time:* 6.43e-05
-- *Prompt preparation time:* 0.00113
-- *First-token latency:* 61.5
-- *Cleanup time:* 0.106
+- *Model load time:* 2.39s
+- *Generation time:* 83.11s
+- *Total time:* 85.51s
+- *Input validation time:* 8.38e-05
+- *Prompt preparation time:* 0.00187
+- *First-token latency:* 78.2
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 16,568
 - *Generation tokens:* 139
 - *Total tokens:* 16,707
-- *Prompt throughput (raw):* 270 tok/s
-- *Generation throughput (raw):* 89.0 tok/s
+- *Prompt throughput (raw):* 212 tok/s
+- *Generation throughput (raw):* 37.5 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.0
 - *Cache memory:* 1.2
 - *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00847
+- *Post-cleanup active memory:* 0.00849
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1668,23 +1668,23 @@ Bird hide, wooden structure, pond, wetland, stilts, overhanging trees, cloudy sk
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.34s
-- *Generation time:* 94.84s
-- *Total time:* 98.20s
-- *Input validation time:* 8.95e-05
-- *Prompt preparation time:* 0.0174
-- *First-token latency:* 85.8
-- *Cleanup time:* 0.16
+- *Model load time:* 3.42s
+- *Generation time:* 108.26s
+- *Total time:* 111.70s
+- *Input validation time:* 6.17e-05
+- *Prompt preparation time:* 0.0163
+- *First-token latency:* 98.7
+- *Cleanup time:* 0.162
 - *Prompt tokens:* 16,568
 - *Generation tokens:* 135
 - *Total tokens:* 16,703
-- *Prompt throughput (raw):* 193 tok/s
-- *Generation throughput (raw):* 17.2 tok/s
+- *Prompt throughput (raw):* 168 tok/s
+- *Generation throughput (raw):* 15.8 tok/s
 - *Peak memory:* 33
 - *Active memory:* 29
 - *Cache memory:* 1.9
 - *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.00898
+- *Post-cleanup active memory:* 0.009
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1730,23 +1730,23 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.11s
-- *Generation time:* 81.46s
-- *Total time:* 83.60s
-- *Input validation time:* 7.82e-05
-- *Prompt preparation time:* 0.0177
-- *First-token latency:* 76
+- *Model load time:* 2.23s
+- *Generation time:* 94.67s
+- *Total time:* 96.92s
+- *Input validation time:* 7.04e-05
+- *Prompt preparation time:* 0.0172
+- *First-token latency:* 86.2
 - *Cleanup time:* 0.133
 - *Prompt tokens:* 16,568
 - *Generation tokens:* 133
 - *Total tokens:* 16,701
-- *Prompt throughput (raw):* 218 tok/s
-- *Generation throughput (raw):* 29.5 tok/s
+- *Prompt throughput (raw):* 192 tok/s
+- *Generation throughput (raw):* 17.6 tok/s
 - *Peak memory:* 21
 - *Active memory:* 16
 - *Cache memory:* 1.9
 - *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.00949
+- *Post-cleanup active memory:* 0.0095
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1794,23 +1794,23 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
   terms (requested 10-18); Title, Description and Keywords copy all supplied
   hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.65s
-- *Generation time:* 2.01s
-- *Total time:* 2.67s
-- *Input validation time:* 7.97e-05
-- *Prompt preparation time:* 0.0032
-- *First-token latency:* 0.394
-- *Cleanup time:* 0.0888
+- *Model load time:* 0.79s
+- *Generation time:* 1.95s
+- *Total time:* 2.75s
+- *Input validation time:* 7.09e-05
+- *Prompt preparation time:* 0.00309
+- *First-token latency:* 0.382
+- *Cleanup time:* 0.0868
 - *Prompt tokens:* 1,430
 - *Generation tokens:* 104
 - *Total tokens:* 1,534
-- *Prompt throughput (raw):* 3,626 tok/s
-- *Generation throughput (raw):* 123 tok/s
+- *Prompt throughput (raw):* 3,744 tok/s
+- *Generation throughput (raw):* 127 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
 - *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.0096
+- *Post-cleanup active memory:* 0.00962
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1852,23 +1852,23 @@ Keywords: Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland
 - *Observations:* Keyword list has 20 terms (requested 10-18); Title,
   Description and Keywords copy all supplied hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 9.46s
-- *Generation time:* 28.97s
-- *Total time:* 38.45s
-- *Input validation time:* 5.06e-05
-- *Prompt preparation time:* 0.0198
-- *First-token latency:* 22.3
-- *Cleanup time:* 0.365
+- *Model load time:* 8.09s
+- *Generation time:* 32.04s
+- *Total time:* 40.16s
+- *Input validation time:* 6.18e-05
+- *Prompt preparation time:* 0.0159
+- *First-token latency:* 28.6
+- *Cleanup time:* 0.25
 - *Prompt tokens:* 3,496
 - *Generation tokens:* 108
 - *Total tokens:* 3,604
-- *Prompt throughput (raw):* 157 tok/s
-- *Generation throughput (raw):* 18.8 tok/s
+- *Prompt throughput (raw):* 122 tok/s
+- *Generation throughput (raw):* 40.5 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.41
 - *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.00986
+- *Post-cleanup active memory:* 0.00988
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1914,18 +1914,18 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.41s
-- *Generation time:* 3.05s
-- *Total time:* 6.48s
-- *Input validation time:* 6.31e-05
-- *Prompt preparation time:* 0.0232
-- *First-token latency:* 0.65
-- *Cleanup time:* 0.143
+- *Model load time:* 3.43s
+- *Generation time:* 2.29s
+- *Total time:* 5.75s
+- *Input validation time:* 5.6e-05
+- *Prompt preparation time:* 0.0235
+- *First-token latency:* 0.334
+- *Cleanup time:* 0.165
 - *Prompt tokens:* 594
-- *Generation tokens:* 88
-- *Total tokens:* 682
-- *Prompt throughput (raw):* 914 tok/s
-- *Generation throughput (raw):* 53.4 tok/s
+- *Generation tokens:* 85
+- *Total tokens:* 679
+- *Prompt throughput (raw):* 1,778 tok/s
+- *Generation throughput (raw):* 70.9 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1951,9 +1951,9 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Weathered Wooden Boathouse Over Serene Wetland Pond
-Description: A weathered wooden boathouse built on stilts stands over a serene pond, framed by lush green trees and wetland foliage under a cloudy sky.
-Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
+&lt;channel|&gt;Title: Weathered Wooden Boathouse Over Serene Pond
+Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
 </pre>
 
 <details>
@@ -1961,9 +1961,9 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse Over Serene Wetland Pond
-Description: A weathered wooden boathouse built on stilts stands over a serene pond, framed by lush green trees and wetland foliage under a cloudy sky.
-Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
+<channel|>Title: Weathered Wooden Boathouse Over Serene Pond
+Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
 ```
 
 </details>
@@ -1984,18 +1984,18 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.38s
-- *Generation time:* 2.60s
-- *Total time:* 6.00s
-- *Input validation time:* 8.07e-05
-- *Prompt preparation time:* 0.00196
-- *First-token latency:* 0.422
-- *Cleanup time:* 0.135
+- *Model load time:* 3.33s
+- *Generation time:* 2.68s
+- *Total time:* 6.02s
+- *Input validation time:* 5.94e-05
+- *Prompt preparation time:* 0.00106
+- *First-token latency:* 0.324
+- *Cleanup time:* 0.158
 - *Prompt tokens:* 594
-- *Generation tokens:* 84
-- *Total tokens:* 678
-- *Prompt throughput (raw):* 1,407 tok/s
-- *Generation throughput (raw):* 60.4 tok/s
+- *Generation tokens:* 91
+- *Total tokens:* 685
+- *Prompt throughput (raw):* 1,835 tok/s
+- *Generation throughput (raw):* 57.8 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -2021,9 +2021,9 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;Title: Weathered Wooden Boathouse over a Serene Pond
-Description: A weathered wooden boathouse built on stilts stands over a pond, framed by lush green foliage under a cloudy sky.
-Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, Re, Marshland, Reflection, Cloudy Sky, Architecture, Nature, Outdoors
+&lt;channel|&gt;Title: Weathered Wooden Boathouse Over a Serene Wetland Pond
+Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland foliage.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wooden shed
 </pre>
 
 <details>
@@ -2031,9 +2031,9 @@ Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, R
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse over a Serene Pond
-Description: A weathered wooden boathouse built on stilts stands over a pond, framed by lush green foliage under a cloudy sky.
-Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, Re, Marshland, Reflection, Cloudy Sky, Architecture, Nature, Outdoors
+<channel|>Title: Weathered Wooden Boathouse Over a Serene Wetland Pond
+Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland foliage.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wooden shed
 ```
 
 </details>
@@ -2054,18 +2054,18 @@ Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, R
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.67s
-- *Generation time:* 5.28s
-- *Total time:* 6.96s
-- *Input validation time:* 4.61e-05
-- *Prompt preparation time:* 0.00372
-- *First-token latency:* 1.9
-- *Cleanup time:* 0.107
+- *Model load time:* 1.93s
+- *Generation time:* 5.07s
+- *Total time:* 7.01s
+- *Input validation time:* 5.83e-05
+- *Prompt preparation time:* 0.00492
+- *First-token latency:* 1.68
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 3,124
 - *Generation tokens:* 112
 - *Total tokens:* 3,236
-- *Prompt throughput (raw):* 1,646 tok/s
-- *Generation throughput (raw):* 39.4 tok/s
+- *Prompt throughput (raw):* 1,861 tok/s
+- *Generation throughput (raw):* 39.3 tok/s
 - *Peak memory:* 16
 - *Active memory:* 13
 - *Cache memory:* 0.59
@@ -2114,30 +2114,31 @@ Cloudy Sky, Foliage, Forest, Grass, Lake, Landscape, Leaves, Marshland, Moss, Ou
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Title has 4 words (requested 5-10); Keyword list has 380
-  terms (requested 10-18); Duplicate keywords: boathouse, pond, foliage, tree,
-  deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Title has 4 words (requested 5-10); Keyword
+  list has 61 terms (requested 10-18); Duplicate keywords: boathouse, pond,
+  foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching,
+  pondside
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Model load time:* 0.46s
-- *Generation time:* 9.68s
-- *Total time:* 10.15s
-- *Input validation time:* 5.12e-05
-- *Prompt preparation time:* 0.00207
-- *First-token latency:* 1.34
-- *Cleanup time:* 0.0768
+- *Model load time:* 0.70s
+- *Generation time:* 4.52s
+- *Total time:* 5.22s
+- *Input validation time:* 6.69e-05
+- *Prompt preparation time:* 0.00221
+- *First-token latency:* 1
+- *Cleanup time:* 0.0893
 - *Prompt tokens:* 2,072
-- *Generation tokens:* 1,000
-- *Total tokens:* 3,072
-- *Prompt throughput (raw):* 1,546 tok/s
-- *Generation throughput (raw):* 133 tok/s
+- *Generation tokens:* 225
+- *Total tokens:* 2,297
+- *Prompt throughput (raw):* 2,071 tok/s
+- *Generation throughput (raw):* 85.1 tok/s
 - *Peak memory:* 3.7
 - *Active memory:* 2.1
-- *Cache memory:* 0.38
+- *Cache memory:* 0.92
 - *Model-load active memory:* 2.11
-- *Post-cleanup active memory:* 0.000755
+- *Post-cleanup active memory:* 0.000771
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1321
 - *Image placeholders:* 1
@@ -2160,7 +2161,7 @@ A Serene Pondside Hideout
 Description:
 A rustic wooden boathouse built on stilts overlooks a tranquil pond, surrounded by lush foliage and framed by the overhanging branches of a nearby tree. The wooden deck and railing add to the charm of this peaceful outdoor retreat, perfect for birdwatching or simply enjoying the serenity of nature.
 Keywords:
-boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond,
+boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck,
 </pre>
 
 </details>
@@ -2181,23 +2182,23 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.62s
-- *Generation time:* 26.80s
-- *Total time:* 28.43s
-- *Input validation time:* 5.88e-05
-- *Prompt preparation time:* 0.00786
-- *First-token latency:* 2.03
+- *Model load time:* 1.87s
+- *Generation time:* 27.07s
+- *Total time:* 28.95s
+- *Input validation time:* 7.18e-05
+- *Prompt preparation time:* 0.00895
+- *First-token latency:* 2.06
 - *Cleanup time:* 0.117
 - *Prompt tokens:* 3,215
 - *Generation tokens:* 1,000
 - *Total tokens:* 4,215
-- *Prompt throughput (raw):* 1,583 tok/s
-- *Generation throughput (raw):* 41.3 tok/s
+- *Prompt throughput (raw):* 1,560 tok/s
+- *Generation throughput (raw):* 40.9 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.87
 - *Model-load active memory:* 12.6
-- *Post-cleanup active memory:* 0.00102
+- *Post-cleanup active memory:* 0.00103
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2251,29 +2252,28 @@ Now keywords: we
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 158 terms (requested 10-18); Duplicate
-  keywords: boardwalk
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: boardwalk
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 7.74s
-- *Generation time:* 25.44s
-- *Total time:* 33.20s
-- *Input validation time:* 6.88e-05
-- *Prompt preparation time:* 0.0108
-- *First-token latency:* 3.95
-- *Cleanup time:* 0.253
+- *Model load time:* 5.96s
+- *Generation time:* 13.05s
+- *Total time:* 19.02s
+- *Input validation time:* 6.58e-05
+- *Prompt preparation time:* 0.00931
+- *First-token latency:* 2.42
+- *Cleanup time:* 0.216
 - *Prompt tokens:* 1,641
-- *Generation tokens:* 1,000
-- *Total tokens:* 2,641
-- *Prompt throughput (raw):* 415 tok/s
-- *Generation throughput (raw):* 50.9 tok/s
+- *Generation tokens:* 575
+- *Total tokens:* 2,216
+- *Prompt throughput (raw):* 677 tok/s
+- *Generation throughput (raw):* 60.9 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
-- *Cache memory:* 0.17
+- *Cache memory:* 0.16
 - *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00149
+- *Post-cleanup active memory:* 0.00151
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1499
 - *Image placeholders:* 0
@@ -2312,7 +2312,7 @@ Title: Wooden Boathouse Over a Wetland Pond
 
 Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond in a wetland, framed by lush overhanging tree branches and surrounding reeds. The scene is set in a tranquil, overcast landscape with a damp, green atmosphere.
 
-Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk,
+Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, board
 </pre>
 
 <details>
@@ -2338,7 +2338,7 @@ Title: Wooden Boathouse Over a Wetland Pond
 
 Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond in a wetland, framed by lush overhanging tree branches and surrounding reeds. The scene is set in a tranquil, overcast landscape with a damp, green atmosphere.
 
-Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk,
+Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, board
 ```
 
 </details>
@@ -2360,23 +2360,23 @@ Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, ov
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.63s
-- *Generation time:* 1.54s
-- *Total time:* 2.18s
-- *Input validation time:* 6.4e-05
-- *Prompt preparation time:* 0.00244
-- *First-token latency:* 0.217
-- *Cleanup time:* 0.0797
+- *Model load time:* 1.10s
+- *Generation time:* 1.35s
+- *Total time:* 2.46s
+- *Input validation time:* 7.25e-05
+- *Prompt preparation time:* 0.00268
+- *First-token latency:* 0.0946
+- *Cleanup time:* 0.089
 - *Prompt tokens:* 339
 - *Generation tokens:* 54
 - *Total tokens:* 393
-- *Prompt throughput (raw):* 1,559 tok/s
-- *Generation throughput (raw):* 344 tok/s
+- *Prompt throughput (raw):* 3,583 tok/s
+- *Generation throughput (raw):* 300 tok/s
 - *Peak memory:* 2.1
 - *Active memory:* 1.2
-- *Cache memory:* 0.03
+- *Cache memory:* 0.02
 - *Model-load active memory:* 1.25
-- *Post-cleanup active memory:* 0.0018
+- *Post-cleanup active memory:* 0.00182
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2420,23 +2420,23 @@ A weathered wooden boathouse stands over a serene pond, surrounded by lush folia
   water reflection, marshland, reeds, leaves, outdoors, landscape, moss,
   boardwalk, architecture, grass, bird hide, birdwatching
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.71s
-- *Generation time:* 27.43s
-- *Total time:* 29.14s
-- *Input validation time:* 6.22e-05
-- *Prompt preparation time:* 0.00256
-- *First-token latency:* 5.57
-- *Cleanup time:* 0.106
+- *Model load time:* 1.94s
+- *Generation time:* 27.73s
+- *Total time:* 29.68s
+- *Input validation time:* 5.87e-05
+- *Prompt preparation time:* 0.00298
+- *First-token latency:* 5.43
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 6,388
 - *Generation tokens:* 1,000
 - *Total tokens:* 7,388
-- *Prompt throughput (raw):* 1,146 tok/s
-- *Generation throughput (raw):* 47.0 tok/s
+- *Prompt throughput (raw):* 1,176 tok/s
+- *Generation throughput (raw):* 46.0 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.43
 - *Model-load active memory:* 11.8
-- *Post-cleanup active memory:* 0.00211
+- *Post-cleanup active memory:* 0.00213
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2510,30 +2510,31 @@ Wait, let's make sure the description is factual, combining context with main su
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 395 terms (requested 10-18); Duplicate
-  keywords: elevated, wetland, pond, outdoor, railings, reflection, natural,
-  environment, architecture, birdwatching, peaceful, serene
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Keyword list has 76 terms (requested
+  10-18); Duplicate keywords: elevated, wetland, pond, outdoor, railings,
+  reflection, natural, environment, architecture, birdwatching, peaceful,
+  serene
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.61s
-- *Generation time:* 6.25s
-- *Total time:* 6.86s
-- *Input validation time:* 6.67e-05
-- *Prompt preparation time:* 0.00417
-- *First-token latency:* 0.336
-- *Cleanup time:* 0.0807
+- *Model load time:* 3.10s
+- *Generation time:* 2.35s
+- *Total time:* 5.47s
+- *Input validation time:* 0.000424
+- *Prompt preparation time:* 0.0224
+- *First-token latency:* 0.341
+- *Cleanup time:* 0.0813
 - *Prompt tokens:* 2,117
-- *Generation tokens:* 1,000
-- *Total tokens:* 3,117
-- *Prompt throughput (raw):* 6,303 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Generation tokens:* 275
+- *Total tokens:* 2,392
+- *Prompt throughput (raw):* 6,209 tok/s
+- *Generation throughput (raw):* 192 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 3.2
 - *Cache memory:* 0.07
 - *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.0041
+- *Post-cleanup active memory:* 0.00411
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1360
 - *Image placeholders:* 1
@@ -2555,7 +2556,7 @@ Title: "Moss-Covered Wooden Boathouse Over Wetland Pond"
 
 Description: A weathered wooden boathouse stands elevated on stilts over a serene pond, surrounded by lush foliage and marshland. The overhanging tree branches frame the structure, while the cloudy sky casts a soft, diffused light over the scene. The wooden decking and railings add to the rustic charm of this tranquil outdoor setting.
 
-Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage, marshland, cloudy, diffused, light, rustic, tranquil, outdoor, setting, structure, railings, decking, railings, trees, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated
+Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage, marshland, cloudy, diffused, light, rustic, tranquil, outdoor, setting, structure, railings, decking, railings, trees, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated
 </pre>
 
 </details>
@@ -2575,23 +2576,23 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.83s
-- *Generation time:* 1.18s
-- *Total time:* 2.03s
-- *Input validation time:* 5.43e-05
-- *Prompt preparation time:* 0.00962
-- *First-token latency:* 0.247
-- *Cleanup time:* 0.0918
+- *Model load time:* 0.97s
+- *Generation time:* 1.22s
+- *Total time:* 2.21s
+- *Input validation time:* 5.89e-05
+- *Prompt preparation time:* 0.0101
+- *First-token latency:* 0.258
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 937
 - *Generation tokens:* 76
 - *Total tokens:* 1,013
-- *Prompt throughput (raw):* 3,791 tok/s
-- *Generation throughput (raw):* 275 tok/s
+- *Prompt throughput (raw):* 3,627 tok/s
+- *Generation throughput (raw):* 254 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
 - *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00462
+- *Post-cleanup active memory:* 0.00464
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2643,31 +2644,31 @@ Keywords: wooden boathouse, pond, cloudy sky, foliage, marshland, reeds, wetland
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Keyword list has 436 terms (requested 10-18); Duplicate
-  keywords: pond, wetland, grass, reeds, trees, architecture, moss, weathered,
+- *Observations:* Generation was stopped early after sustained repeated
+  output; Keyword list has 135 terms (requested 10-18); Duplicate keywords:
+  pond, wetland, grass, reeds, trees, architecture, moss, weathered,
   landscape, outdoor, nature, structure, environment, ecosystem, habitat,
   accurate, precise, detailed, comprehensive, thorough
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.27s
-- *Generation time:* 36.95s
-- *Total time:* 38.23s
-- *Input validation time:* 8.15e-05
-- *Prompt preparation time:* 0.00526
-- *First-token latency:* 18.1
-- *Cleanup time:* 0.0988
+- *Model load time:* 1.25s
+- *Generation time:* 26.89s
+- *Total time:* 28.15s
+- *Input validation time:* 6.43e-05
+- *Prompt preparation time:* 0.00468
+- *First-token latency:* 18.7
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 16,563
-- *Generation tokens:* 1,000
-- *Total tokens:* 17,563
-- *Prompt throughput (raw):* 916 tok/s
-- *Generation throughput (raw):* 55.8 tok/s
+- *Generation tokens:* 400
+- *Total tokens:* 16,963
+- *Prompt throughput (raw):* 885 tok/s
+- *Generation throughput (raw):* 55.3 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
-- *Cache memory:* 1.3
+- *Cache memory:* 2.4
 - *Model-load active memory:* 9.46
 - *Post-cleanup active memory:* 0.0102
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
 - *Rendered prompt characters:* 1439
 - *Image placeholders:* 0
@@ -2692,7 +2693,7 @@ Description:
 A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.
 
 Keywords:
-Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed,
+Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise,
 </pre>
 
 <details>
@@ -2706,7 +2707,7 @@ Description:
 A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.
 
 Keywords: 
-Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed,
+Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise,
 ```
 
 </details>
@@ -2727,18 +2728,18 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.28s
-- *Generation time:* 4.80s
-- *Total time:* 7.10s
-- *Input validation time:* 6.04e-05
-- *Prompt preparation time:* 0.00505
-- *First-token latency:* 0.871
-- *Cleanup time:* 0.126
+- *Model load time:* 2.40s
+- *Generation time:* 4.37s
+- *Total time:* 6.79s
+- *Input validation time:* 8.63e-05
+- *Prompt preparation time:* 0.0035
+- *First-token latency:* 0.385
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 592
 - *Generation tokens:* 164
 - *Total tokens:* 756
-- *Prompt throughput (raw):* 680 tok/s
-- *Generation throughput (raw):* 48.7 tok/s
+- *Prompt throughput (raw):* 1,537 tok/s
+- *Generation throughput (raw):* 47.7 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2799,13 +2800,13 @@ boathouse, wooden, pond, water, reflection, foliage, trees, green, stilts, walkw
 - *Root exception message:* Received 600 parameters not in model:
   <br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.embedding_norm.weight,<br>model.layers.0.conv.conv.weight,<br>model.layers.0.conv.in_proj.biases,<br>model.layers.0.conv.in_proj.scales,<br>model.layers.0.conv.in_proj.weight,<br>model.layers.0.conv.out_proj.biases,<br>model.layers.0.conv.out_proj.scales,<br>model.layers.0.conv.out_proj.weight,<br>model.layers.0.feed_forward.w1.biases,<br>model.layers.0.feed_forward.w1.scales,<br>model.layers.0.feed_forward.w1.weight,<br>model.layers.0.feed_forward.w2.biases,<br>model.layers.0.feed_forward.w2.scales,<br>model.layers.0.feed_forward.w2.weight,<br>model.layers.0.feed_forward.w3.biases,<br>model.layers.0.feed_forward.w3.scales,<br>model.layers.0.feed_forward.w3.weight,<br>model.layers.0.ffn_norm.weight,<br>model.layers.0.operator_norm.weight,<br>model.layers.1.conv.conv.weight,<br>model.layers.1.conv.in_proj.biases,<br>model.layers.1.conv.in_proj.scales,<br>model.layers.1.conv.in_proj.weight,<br>model.layers.1.conv.out_proj.biases,<br>model.layers.1.conv.out_proj.scales,<br>model.layers.1.conv.out_proj.weight,<br>model.layers.1.feed_forward.w1.biases,<br>model.layers.1.feed_forward.w1.scales,<br>model.layers.1.feed_forward.w1.weight,<br>model.layers.1.feed_forward.w2.biases,<br>model.layers.1.feed_forward.w2.scales,<br>model.layers.1.feed_forward.w2.weight,<br>model.layers.1.feed_forward.w3.biases,<br>model.layers.1.feed_forward.w3.scales,<br>model.layers.1.feed_forward.w3.weight,<br>model.layers.1.ffn_norm.weight,<br>model.layers.1.operator_norm.weight,<br>model.layers.10.conv.conv.weight,<br>model.layers.10.conv.in_proj.biases,<br>model.layers.10.conv.in_proj.scales,<br>model.layers.10.conv.in_proj.weight,<br>model.layers.10.conv.out_proj.biases,<br>model.layers.10.conv.out_proj.scales,<br>model.layers.10.conv.out_proj.weight,<br>model.layers.10.feed_forward.w1.biases,<br>model.layers.10.feed_forward.w1.scales,<br>model.layers.10.feed_forward.w1.weight,<br>model.layers.10.feed_forward.w2.biases,<br>model.layers.10.feed_forward.w2.scales,<br>model.layers.10.feed_forward.w2.weight,<br>model.layers.10.feed_forward.w3.biases,<br>model.layers.10.feed_forward.w3.scales,<br>model.layers.10.feed_forward.w3.weight,<br>model.layers.10.ffn_norm.weight,<br>model.layers.10.operator_norm.weight,<br>model.layers.11.conv.conv.weight,<br>model.layers.11.conv.in_proj.biases,<br>model.layers.11.conv.in_proj.scales,<br>model.layers.11.conv.in_proj.weight,<br>model.layers.11.conv.out_proj.biases,<br>model.layers.11.conv.out_proj.scales,<br>model.layers.11.conv.out_proj.weight,<br>model.layers.11.feed_forward.w1.biases,<br>model.layers.11.feed_forward.w1.scales,<br>model.layers.11.feed_forward.w1.weight,<br>model.layers.11.feed_forward.w2.biases,<br>model.layers.11.feed_forward.w2.scales,<br>model.layers.11.feed_forward.w2.weight,<br>model.layers.11.feed_forward.w3.biases,<br>model.layers.11.feed_forward.w3.scales,<br>model.layers.11.feed_forward.w3.weight,<br>model.layers.11.ffn_norm.weight,<br>model.layers.11.operator_norm.weight,<br>model.layers.12.conv.conv.weight,<br>model.layers.12.conv.in_proj.biases,<br>model.layers.12.conv.in_proj.scales,<br>model.layers.12.conv.in_proj.weight,<br>model.layers.12.conv.out_proj.biases,<br>model.layers.12.conv.out_proj.scales,<br>model.layers.12.conv.out_proj.weight,<br>model.layers.12.feed_forward.w1.biases,<br>model.layers.12.feed_forward.w1.scales,<br>model.layers.12.feed_forward.w1.weight,<br>model.layers.12.feed_forward.w2.biases,<br>model.layers.12.feed_forward.w2.scales,<br>model.layers.12.feed_forward.w2.weight,<br>model.layers.12.feed_forward.w3.biases,<br>model.layers.12.feed_forward.w3.scales,<br>model.layers.12.feed_forward.w3.weight,<br>model.layers.12.ffn_norm.weight,<br>model.layers.12.operator_norm.weight,<br>model.layers.13.feed_forward.w1.biases,<br>model.layers.13.feed_forward.w1.scales,<br>model.layers.13.feed_forward.w1.weight,<br>model.layers.13.feed_forward.w2.biases,<br>model.layers.13.feed_forward.w2.scales,<br>model.layers.13.feed_forward.w2.weight,<br>model.layers.13.feed_forward.w3.biases,<br>model.layers.13.feed_forward.w3.scales,<br>model.layers.13.feed_forward.w3.weight,<br>model.layers.13.ffn_norm.weight,<br>model.layers.13.operator_norm.weight,<br>model.layers.13.self_attn.k_layernorm.weight,<br>model.layers.13.self_attn.k_proj.biases,<br>model.layers.13.self_attn.k_proj.scales,<br>model.layers.13.self_attn.k_proj.weight,<br>model.layers.13.self_attn.out_proj.biases,<br>model.layers.13.self_attn.out_proj.scales,<br>model.layers.13.self_attn.out_proj.weight,<br>model.layers.13.self_attn.q_layernorm.weight,<br>model.layers.13.self_attn.q_proj.biases,<br>model.layers.13.self_attn.q_proj.scales,<br>model.layers.13.self_attn.q_proj.weight,<br>model.layers.13.self_attn.v_proj.biases,<br>model.layers.13.self_attn.v_proj.scales,<br>model.layers.13.self_attn.v_proj.weight,<br>model.layers.14.conv.conv.weight,<br>model.layers.14.conv.in_proj.biases,<br>model.layers.14.conv.in_proj.scales,<br>model.layers.14.conv.in_proj.weight,<br>model.layers.14.conv.out_proj.biases,<br>model.layers.14.conv.out_proj.scales,<br>model.layers.14.conv.out_proj.weight,<br>model.layers.14.feed_forward.w1.biases,<br>model.layers.14.feed_forward.w1.scales,<br>model.layers.14.feed_forward.w1.weight,<br>model.layers.14.feed_forward.w2.biases,<br>model.layers.14.feed_forward.w2.scales,<br>model.layers.14.feed_forward.w2.weight,<br>model.layers.14.feed_forward.w3.biases,<br>model.layers.14.feed_forward.w3.scales,<br>model.layers.14.feed_forward.w3.weight,<br>model.layers.14.ffn_norm.weight,<br>model.layers.14.operator_norm.weight,<br>model.layers.15.conv.conv.weight,<br>model.layers.15.conv.in_proj.biases,<br>model.layers.15.conv.in_proj.scales,<br>model.layers.15.conv.in_proj.weight,<br>model.layers.15.conv.out_proj.biases,<br>model.layers.15.conv.out_proj.scales,<br>model.layers.15.conv.out_proj.weight,<br>model.layers.15.feed_forward.w1.biases,<br>model.layers.15.feed_forward.w1.scales,<br>model.layers.15.feed_forward.w1.weight,<br>model.layers.15.feed_forward.w2.biases,<br>model.layers.15.feed_forward.w2.scales,<br>model.layers.15.feed_forward.w2.weight,<br>model.layers.15.feed_forward.w3.biases,<br>model.layers.15.feed_forward.w3.scales,<br>model.layers.15.feed_forward.w3.weight,<br>model.layers.15.ffn_norm.weight,<br>model.layers.15.operator_norm.weight,<br>model.layers.16.conv.conv.weight,<br>model.layers.16.conv.in_proj.biases,<br>model.layers.16.conv.in_proj.scales,<br>model.layers.16.conv.in_proj.weight,<br>model.layers.16.conv.out_proj.biases,<br>model.layers.16.conv.out_proj.scales,<br>model.layers.16.conv.out_proj.weight,<br>model.layers.16.feed_forward.w1.biases,<br>model.layers.16.feed_forward.w1.scales,<br>model.layers.16.feed_forward.w1.weight,<br>model.layers.16.feed_forward.w2.biases,<br>model.layers.16.feed_forward.w2.scales,<br>model.layers.16.feed_forward.w2.weight,<br>model.layers.16.feed_forward.w3.biases,<br>model.layers.16.feed_forward.w3.scales,<br>model.layers.16.feed_forward.w3.weight,<br>model.layers.16.ffn_norm.weight,<br>model.layers.16.operator_norm.weight,<br>model.layers.17.feed_forward.w1.biases,<br>model.layers.17.feed_forward.w1.scales,<br>model.layers.17.feed_forward.w1.weight,<br>model.layers.17.feed_forward.w2.biases,<br>model.layers.17.feed_forward.w2.scales,<br>model.layers.17.feed_forward.w2.weight,<br>model.layers.17.feed_forward.w3.biases,<br>model.layers.17.feed_forward.w3.scales,<br>model.layers.17.feed_forward.w3.weight,<br>model.layers.17.ffn_norm.weight,<br>model.layers.17.operator_norm.weight,<br>model.layers.17.self_attn.k_layernorm.weight,<br>model.layers.17.self_attn.k_proj.biases,<br>model.layers.17.self_attn.k_proj.scales,<br>model.layers.17.self_attn.k_proj.weight,<br>model.layers.17.self_attn.out_proj.biases,<br>model.layers.17.self_attn.out_proj.scales,<br>model.layers.17.self_attn.out_proj.weight,<br>model.layers.17.self_attn.q_layernorm.weight,<br>model.layers.17.self_attn.q_proj.biases,<br>model.layers.17.self_attn.q_proj.scales,<br>model.layers.17.self_attn.q_proj.weight,<br>model.layers.17.self_attn.v_proj.biases,<br>model.layers.17.self_attn.v_proj.scales,<br>model.layers.17.self_attn.v_proj.weight,<br>model.layers.18.conv.conv.weight,<br>model.layers.18.conv.in_proj.biases,<br>model.layers.18.conv.in_proj.scales,<br>model.layers.18.conv.in_proj.weight,<br>model.layers.18.conv.out_proj.biases,<br>model.layers.18.conv.out_proj.scales,<br>model.layers.18.conv.out_proj.weight,<br>model.layers.18.feed_forward.w1.biases,<br>model.layers.18.feed_forward.w1.scales,<br>model.layers.18.feed_forward.w1.weight,<br>model.layers.18.feed_forward.w2.biases,<br>model.layers.18.feed_forward.w2.scales,<br>model.layers.18.feed_forward.w2.weight,<br>model.layers.18.feed_forward.w3.biases,<br>model.layers.18.feed_forward.w3.scales,<br>model.layers.18.feed_forward.w3.weight,<br>model.layers.18.ffn_norm.weight,<br>model.layers.18.operator_norm.weight,<br>model.layers.19.conv.conv.weight,<br>model.layers.19.conv.in_proj.biases,<br>model.layers.19.conv.in_proj.scales,<br>model.layers.19.conv.in_proj.weight,<br>model.layers.19.conv.out_proj.biases,<br>model.layers.19.conv.out_proj.scales,<br>model.layers.19.conv.out_proj.weight,<br>model.layers.19.feed_forward.w1.biases,<br>model.layers.19.feed_forward.w1.scales,<br>model.layers.19.feed_forward.w1.weight,<br>model.layers.19.feed_forward.w2.biases,<br>model.layers.19.feed_forward.w2.scales,<br>model.layers.19.feed_forward.w2.weight,<br>model.layers.19.feed_forward.w3.biases,<br>model.layers.19.feed_forward.w3.scales,<br>model.layers.19.feed_forward.w3.weight,<br>model.layers.19.ffn_norm.weight,<br>model.layers.19.operator_norm.weight,<br>model.layers.2.feed_forward.w1.biases,<br>model.layers.2.feed_forward.w1.scales,<br>model.layers.2.feed_forward.w1.weight,<br>model.layers.2.feed_forward.w2.biases,<br>model.layers.2.feed_forward.w2.scales,<br>model.layers.2.feed_forward.w2.weight,<br>model.layers.2.feed_forward.w3.biases,<br>model.layers.2.feed_forward.w3.scales,<br>model.layers.2.feed_forward.w3.weight,<br>model.layers.2.ffn_norm.weight,<br>model.layers.2.operator_norm.weight,<br>model.layers.2.self_attn.k_layernorm.weight,<br>model.layers.2.self_attn.k_proj.biases,<br>model.layers.2.self_attn.k_proj.scales,<br>model.layers.2.self_attn.k_proj.weight,<br>model.layers.2.self_attn.out_proj.biases,<br>model.layers.2.self_attn.out_proj.scales,<br>model.layers.2.self_attn.out_proj.weight,<br>model.layers.2.self_attn.q_layernorm.weight,<br>model.layers.2.self_attn.q_proj.biases,<br>model.layers.2.self_attn.q_proj.scales,<br>model.layers.2.self_attn.q_proj.weight,<br>model.layers.2.self_attn.v_proj.biases,<br>model.layers.2.self_attn.v_proj.scales,<br>model.layers.2.self_attn.v_proj.weight,<br>model.layers.20.conv.conv.weight,<br>model.layers.20.conv.in_proj.biases,<br>model.layers.20.conv.in_proj.scales,<br>model.layers.20.conv.in_proj.weight,<br>model.layers.20.conv.out_proj.biases,<br>model.layers.20.conv.out_proj.scales,<br>model.layers.20.conv.out_proj.weight,<br>model.layers.20.feed_forward.w1.biases,<br>model.layers.20.feed_forward.w1.scales,<br>model.layers.20.feed_forward.w1.weight,<br>model.layers.20.feed_forward.w2.biases,<br>model.layers.20.feed_forward.w2.scales,<br>model.layers.20.feed_forward.w2.weight,<br>model.layers.20.feed_forward.w3.biases,<br>model.layers.20.feed_forward.w3.scales,<br>model.layers.20.feed_forward.w3.weight,<br>model.layers.20.ffn_norm.weight,<br>model.layers.20.operator_norm.weight,<br>model.layers.21.feed_forward.w1.biases,<br>model.layers.21.feed_forward.w1.scales,<br>model.layers.21.feed_forward.w1.weight,<br>model.layers.21.feed_forward.w2.biases,<br>model.layers.21.feed_forward.w2.scales,<br>model.layers.21.feed_forward.w2.weight,<br>model.layers.21.feed_forward.w3.biases,<br>model.layers.21.feed_forward.w3.scales,<br>model.layers.21.feed_forward.w3.weight,<br>model.layers.21.ffn_norm.weight,<br>model.layers.21.operator_norm.weight,<br>model.layers.21.self_attn.k_layernorm.weight,<br>model.layers.21.self_attn.k_proj.biases,<br>model.layers.21.self_attn.k_proj.scales,<br>model.layers.21.self_attn.k_proj.weight,<br>model.layers.21.self_attn.out_proj.biases,<br>model.layers.21.self_attn.out_proj.scales,<br>model.layers.21.self_attn.out_proj.weight,<br>model.layers.21.self_attn.q_layernorm.weight,<br>model.layers.21.self_attn.q_proj.biases,<br>model.layers.21.self_attn.q_proj.scales,<br>model.layers.21.self_attn.q_proj.weight,<br>model.layers.21.self_attn.v_proj.biases,<br>model.layers.21.self_attn.v_proj.scales,<br>model.layers.21.self_attn.v_proj.weight,<br>model.layers.22.conv.conv.weight,<br>model.layers.22.conv.in_proj.biases,<br>model.layers.22.conv.in_proj.scales,<br>model.layers.22.conv.in_proj.weight,<br>model.layers.22.conv.out_proj.biases,<br>model.layers.22.conv.out_proj.scales,<br>model.layers.22.conv.out_proj.weight,<br>model.layers.22.feed_forward.w1.biases,<br>model.layers.22.feed_forward.w1.scales,<br>model.layers.22.feed_forward.w1.weight,<br>model.layers.22.feed_forward.w2.biases,<br>model.layers.22.feed_forward.w2.scales,<br>model.layers.22.feed_forward.w2.weight,<br>model.layers.22.feed_forward.w3.biases,<br>model.layers.22.feed_forward.w3.scales,<br>model.layers.22.feed_forward.w3.weight,<br>model.layers.22.ffn_norm.weight,<br>model.layers.22.operator_norm.weight,<br>model.layers.23.conv.conv.weight,<br>model.layers.23.conv.in_proj.biases,<br>model.layers.23.conv.in_proj.scales,<br>model.layers.23.conv.in_proj.weight,<br>model.layers.23.conv.out_proj.biases,<br>model.layers.23.conv.out_proj.scales,<br>model.layers.23.conv.out_proj.weight,<br>model.layers.23.feed_forward.w1.biases,<br>model.layers.23.feed_forward.w1.scales,<br>model.layers.23.feed_forward.w1.weight,<br>model.layers.23.feed_forward.w2.biases,<br>model.layers.23.feed_forward.w2.scales,<br>model.layers.23.feed_forward.w2.weight,<br>model.layers.23.feed_forward.w3.biases,<br>model.layers.23.feed_forward.w3.scales,<br>model.layers.23.feed_forward.w3.weight,<br>model.layers.23.ffn_norm.weight,<br>model.layers.23.operator_norm.weight,<br>model.layers.24.feed_forward.w1.biases,<br>model.layers.24.feed_forward.w1.scales,<br>model.layers.24.feed_forward.w1.weight,<br>model.layers.24.feed_forward.w2.biases,<br>model.layers.24.feed_forward.w2.scales,<br>model.layers.24.feed_forward.w2.weight,<br>model.layers.24.feed_forward.w3.biases,<br>model.layers.24.feed_forward.w3.scales,<br>model.layers.24.feed_forward.w3.weight,<br>model.layers.24.ffn_norm.weight,<br>model.layers.24.operator_norm.weight,<br>model.layers.24.self_attn.k_layernorm.weight,<br>model.layers.24.self_attn.k_proj.biases,<br>model.layers.24.self_attn.k_proj.scales,<br>model.layers.24.self_attn.k_proj.weight,<br>model.layers.24.self_attn.out_proj.biases,<br>model.layers.24.self_attn.out_proj.scales,<br>model.layers.24.self_attn.out_proj.weight,<br>model.layers.24.self_attn.q_layernorm.weight,<br>model.layers.24.self_attn.q_proj.biases,<br>model.layers.24.self_attn.q_proj.scales,<br>model.layers.24.self_attn.q_proj.weight,<br>model.layers.24.self_attn.v_proj.biases,<br>model.layers.24.self_attn.v_proj.scales,<br>model.layers.24.self_attn.v_proj.weight,<br>model.layers.25.conv.conv.weight,<br>model.layers.25.conv.in_proj.biases,<br>model.layers.25.conv.in_proj.scales,<br>model.layers.25.conv.in_proj.weight,<br>model.layers.25.conv.out_proj.biases,<br>model.layers.25.conv.out_proj.scales,<br>model.layers.25.conv.out_proj.weight,<br>model.layers.25.feed_forward.w1.biases,<br>model.layers.25.feed_forward.w1.scales,<br>model.layers.25.feed_forward.w1.weight,<br>model.layers.25.feed_forward.w2.biases,<br>model.layers.25.feed_forward.w2.scales,<br>model.layers.25.feed_forward.w2.weight,<br>model.layers.25.feed_forward.w3.biases,<br>model.layers.25.feed_forward.w3.scales,<br>model.layers.25.feed_forward.w3.weight,<br>model.layers.25.ffn_norm.weight,<br>model.layers.25.operator_norm.weight,<br>model.layers.26.conv.conv.weight,<br>model.layers.26.conv.in_proj.biases,<br>model.layers.26.conv.in_proj.scales,<br>model.layers.26.conv.in_proj.weight,<br>model.layers.26.conv.out_proj.biases,<br>model.layers.26.conv.out_proj.scales,<br>model.layers.26.conv.out_proj.weight,<br>model.layers.26.feed_forward.w1.biases,<br>model.layers.26.feed_forward.w1.scales,<br>model.layers.26.feed_forward.w1.weight,<br>model.layers.26.feed_forward.w2.biases,<br>model.layers.26.feed_forward.w2.scales,<br>model.layers.26.feed_forward.w2.weight,<br>model.layers.26.feed_forward.w3.biases,<br>model.layers.26.feed_forward.w3.scales,<br>model.layers.26.feed_forward.w3.weight,<br>model.layers.26.ffn_norm.weight,<br>model.layers.26.operator_norm.weight,<br>model.layers.27.feed_forward.w1.biases,<br>model.layers.27.feed_forward.w1.scales,<br>model.layers.27.feed_forward.w1.weight,<br>model.layers.27.feed_forward.w2.biases,<br>model.layers.27.feed_forward.w2.scales,<br>model.layers.27.feed_forward.w2.weight,<br>model.layers.27.feed_forward.w3.biases,<br>model.layers.27.feed_forward.w3.scales,<br>model.layers.27.feed_forward.w3.weight,<br>model.layers.27.ffn_norm.weight,<br>model.layers.27.operator_norm.weight,<br>model.layers.27.self_attn.k_layernorm.weight,<br>model.layers.27.self_attn.k_proj.biases,<br>model.layers.27.self_attn.k_proj.scales,<br>model.layers.27.self_attn.k_proj.weight,<br>model.layers.27.self_attn.out_proj.biases,<br>model.layers.27.self_attn.out_proj.scales,<br>model.layers.27.self_attn.out_proj.weight,<br>model.layers.27.self_attn.q_layernorm.weight,<br>model.layers.27.self_attn.q_proj.biases,<br>model.layers.27.self_attn.q_proj.scales,<br>model.layers.27.self_attn.q_proj.weight,<br>model.layers.27.self_attn.v_proj.biases,<br>model.layers.27.self_attn.v_proj.scales,<br>model.layers.27.self_attn.v_proj.weight,<br>model.layers.28.conv.conv.weight,<br>model.layers.28.conv.in_proj.biases,<br>model.layers.28.conv.in_proj.scales,<br>model.layers.28.conv.in_proj.weight,<br>model.layers.28.conv.out_proj.biases,<br>model.layers.28.conv.out_proj.scales,<br>model.layers.28.conv.out_proj.weight,<br>model.layers.28.feed_forward.w1.biases,<br>model.layers.28.feed_forward.w1.scales,<br>model.layers.28.feed_forward.w1.weight,<br>model.layers.28.feed_forward.w2.biases,<br>model.layers.28.feed_forward.w2.scales,<br>model.layers.28.feed_forward.w2.weight,<br>model.layers.28.feed_forward.w3.biases,<br>model.layers.28.feed_forward.w3.scales,<br>model.layers.28.feed_forward.w3.weight,<br>model.layers.28.ffn_norm.weight,<br>model.layers.28.operator_norm.weight,<br>model.layers.29.conv.conv.weight,<br>model.layers.29.conv.in_proj.biases,<br>model.layers.29.conv.in_proj.scales,<br>model.layers.29.conv.in_proj.weight,<br>model.layers.29.conv.out_proj.biases,<br>model.layers.29.conv.out_proj.scales,<br>model.layers.29.conv.out_proj.weight,<br>model.layers.29.feed_forward.w1.biases,<br>model.layers.29.feed_forward.w1.scales,<br>model.layers.29.feed_forward.w1.weight,<br>model.layers.29.feed_forward.w2.biases,<br>model.layers.29.feed_forward.w2.scales,<br>model.layers.29.feed_forward.w2.weight,<br>model.layers.29.feed_forward.w3.biases,<br>model.layers.29.feed_forward.w3.scales,<br>model.layers.29.feed_forward.w3.weight,<br>model.layers.29.ffn_norm.weight,<br>model.layers.29.operator_norm.weight,<br>model.layers.3.conv.conv.weight,<br>model.layers.3.conv.in_proj.biases,<br>model.layers.3.conv.in_proj.scales,<br>model.layers.3.conv.in_proj.weight,<br>model.layers.3.conv.out_proj.biases,<br>model.layers.3.conv.out_proj.scales,<br>model.layers.3.conv.out_proj.weight,<br>model.layers.3.feed_forward.w1.biases,<br>model.layers.3.feed_forward.w1.scales,<br>model.layers.3.feed_forward.w1.weight,<br>model.layers.3.feed_forward.w2.biases,<br>model.layers.3.feed_forward.w2.scales,<br>model.layers.3.feed_forward.w2.weight,<br>model.layers.3.feed_forward.w3.biases,<br>model.layers.3.feed_forward.w3.scales,<br>model.layers.3.feed_forward.w3.weight,<br>model.layers.3.ffn_norm.weight,<br>model.layers.3.operator_norm.weight,<br>model.layers.4.conv.conv.weight,<br>model.layers.4.conv.in_proj.biases,<br>model.layers.4.conv.in_proj.scales,<br>model.layers.4.conv.in_proj.weight,<br>model.layers.4.conv.out_proj.biases,<br>model.layers.4.conv.out_proj.scales,<br>model.layers.4.conv.out_proj.weight,<br>model.layers.4.feed_forward.w1.biases,<br>model.layers.4.feed_forward.w1.scales,<br>model.layers.4.feed_forward.w1.weight,<br>model.layers.4.feed_forward.w2.biases,<br>model.layers.4.feed_forward.w2.scales,<br>model.layers.4.feed_forward.w2.weight,<br>model.layers.4.feed_forward.w3.biases,<br>model.layers.4.feed_forward.w3.scales,<br>model.layers.4.feed_forward.w3.weight,<br>model.layers.4.ffn_norm.weight,<br>model.layers.4.operator_norm.weight,<br>model.layers.5.feed_forward.w1.biases,<br>model.layers.5.feed_forward.w1.scales,<br>model.layers.5.feed_forward.w1.weight,<br>model.layers.5.feed_forward.w2.biases,<br>model.layers.5.feed_forward.w2.scales,<br>model.layers.5.feed_forward.w2.weight,<br>model.layers.5.feed_forward.w3.biases,<br>model.layers.5.feed_forward.w3.scales,<br>model.layers.5.feed_forward.w3.weight,<br>model.layers.5.ffn_norm.weight,<br>model.layers.5.operator_norm.weight,<br>model.layers.5.self_attn.k_layernorm.weight,<br>model.layers.5.self_attn.k_proj.biases,<br>model.layers.5.self_attn.k_proj.scales,<br>model.layers.5.self_attn.k_proj.weight,<br>model.layers.5.self_attn.out_proj.biases,<br>model.layers.5.self_attn.out_proj.scales,<br>model.layers.5.self_attn.out_proj.weight,<br>model.layers.5.self_attn.q_layernorm.weight,<br>model.layers.5.self_attn.q_proj.biases,<br>model.layers.5.self_attn.q_proj.scales,<br>model.layers.5.self_attn.q_proj.weight,<br>model.layers.5.self_attn.v_proj.biases,<br>model.layers.5.self_attn.v_proj.scales,<br>model.layers.5.self_attn.v_proj.weight,<br>model.layers.6.conv.conv.weight,<br>model.layers.6.conv.in_proj.biases,<br>model.layers.6.conv.in_proj.scales,<br>model.layers.6.conv.in_proj.weight,<br>model.layers.6.conv.out_proj.biases,<br>model.layers.6.conv.out_proj.scales,<br>model.layers.6.conv.out_proj.weight,<br>model.layers.6.feed_forward.w1.biases,<br>model.layers.6.feed_forward.w1.scales,<br>model.layers.6.feed_forward.w1.weight,<br>model.layers.6.feed_forward.w2.biases,<br>model.layers.6.feed_forward.w2.scales,<br>model.layers.6.feed_forward.w2.weight,<br>model.layers.6.feed_forward.w3.biases,<br>model.layers.6.feed_forward.w3.scales,<br>model.layers.6.feed_forward.w3.weight,<br>model.layers.6.ffn_norm.weight,<br>model.layers.6.operator_norm.weight,<br>model.layers.7.conv.conv.weight,<br>model.layers.7.conv.in_proj.biases,<br>model.layers.7.conv.in_proj.scales,<br>model.layers.7.conv.in_proj.weight,<br>model.layers.7.conv.out_proj.biases,<br>model.layers.7.conv.out_proj.scales,<br>model.layers.7.conv.out_proj.weight,<br>model.layers.7.feed_forward.w1.biases,<br>model.layers.7.feed_forward.w1.scales,<br>model.layers.7.feed_forward.w1.weight,<br>model.layers.7.feed_forward.w2.biases,<br>model.layers.7.feed_forward.w2.scales,<br>model.layers.7.feed_forward.w2.weight,<br>model.layers.7.feed_forward.w3.biases,<br>model.layers.7.feed_forward.w3.scales,<br>model.layers.7.feed_forward.w3.weight,<br>model.layers.7.ffn_norm.weight,<br>model.layers.7.operator_norm.weight,<br>model.layers.8.conv.conv.weight,<br>model.layers.8.conv.in_proj.biases,<br>model.layers.8.conv.in_proj.scales,<br>model.layers.8.conv.in_proj.weight,<br>model.layers.8.conv.out_proj.biases,<br>model.layers.8.conv.out_proj.scales,<br>model.layers.8.conv.out_proj.weight,<br>model.layers.8.feed_forward.w1.biases,<br>model.layers.8.feed_forward.w1.scales,<br>model.layers.8.feed_forward.w1.weight,<br>model.layers.8.feed_forward.w2.biases,<br>model.layers.8.feed_forward.w2.scales,<br>model.layers.8.feed_forward.w2.weight,<br>model.layers.8.feed_forward.w3.biases,<br>model.layers.8.feed_forward.w3.scales,<br>model.layers.8.feed_forward.w3.weight,<br>model.layers.8.ffn_norm.weight,<br>model.layers.8.operator_norm.weight,<br>model.layers.9.feed_forward.w1.biases,<br>model.layers.9.feed_forward.w1.scales,<br>model.layers.9.feed_forward.w1.weight,<br>model.layers.9.feed_forward.w2.biases,<br>model.layers.9.feed_forward.w2.scales,<br>model.layers.9.feed_forward.w2.weight,<br>model.layers.9.feed_forward.w3.biases,<br>model.layers.9.feed_forward.w3.scales,<br>model.layers.9.feed_forward.w3.weight,<br>model.layers.9.ffn_norm.weight,<br>model.layers.9.operator_norm.weight,<br>model.layers.9.self_attn.k_layernorm.weight,<br>model.layers.9.self_attn.k_proj.biases,<br>model.layers.9.self_attn.k_proj.scales,<br>model.layers.9.self_attn.k_proj.weight,<br>model.layers.9.self_attn.out_proj.biases,<br>model.layers.9.self_attn.out_proj.scales,<br>model.layers.9.self_attn.out_proj.weight,<br>model.layers.9.self_attn.q_layernorm.weight,<br>model.layers.9.self_attn.q_proj.biases,<br>model.layers.9.self_attn.q_proj.scales,<br>model.layers.9.self_attn.q_proj.weight,<br>model.layers.9.self_attn.v_proj.biases,<br>model.layers.9.self_attn.v_proj.scales,<br>model.layers.9.self_attn.v_proj.weight.
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.21s
+- *Model load time:* 0.26s
 - *Generation time:* -
-- *Total time:* 0.21s
-- *Input validation time:* 6.73e-05
+- *Total time:* 0.27s
+- *Input validation time:* 6.46e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0778
+- *Cleanup time:* 0.0723
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -2815,7 +2816,7 @@ boathouse, wooden, pond, water, reflection, foliage, trees, green, stilts, walkw
 - *Active memory:* -
 - *Cache memory:* -
 - *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.0041
+- *Post-cleanup active memory:* 0.00411
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -2835,10 +2836,10 @@ boathouse, wooden, pond, water, reflection, foliage, trees, green, stilts, walkw
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3472,7 +3473,7 @@ model.layers.9.self_attn.v_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3483,7 +3484,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 600 parameters not in model: 
 model.embed_tokens.biases,
@@ -4093,15 +4094,8 @@ model.layers.9.self_attn.v_proj.weight.
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2621.77it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[19:56:34] DEBUG    HF Cache Info for mlx-community/LFM2.5-VL-3B-OptiQ-4bit: size=2698.2 MB, files=12
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
 ```
 
 </details>
@@ -4121,9 +4115,9 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Observations:* none
 - *Failure phase:* model_load
 - *Error stage:* Lib Version
-- *Error code:* TRANSFORMERS_MODEL_LOAD_LIB_VERSION
+- *Error code:* MODEL_REPO_CODE_MODEL_LOAD_LIB_VERSION
 - *Error type:* ValueError
-- *Error package:* transformers
+- *Error package:* model-repo-code
 - *Error message:* Model loading failed: cannot import name
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
@@ -4133,13 +4127,13 @@ Reconstruction complete: |          |  0.00B /  0.00B
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
-- *Model load time:* 1.01s
+- *Model load time:* 1.57s
 - *Generation time:* -
-- *Total time:* 1.01s
-- *Input validation time:* 6.31e-05
+- *Total time:* 1.57s
+- *Input validation time:* 6.7e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.153
+- *Cleanup time:* 0.145
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -4169,10 +4163,10 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -4278,7 +4272,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -4289,7 +4283,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -4299,15 +4293,8 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3082.50it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[20:07:00] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3217.66it/s]
 ```
 
 </details>

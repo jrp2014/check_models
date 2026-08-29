@@ -31,7 +31,7 @@ builtins.ValueError: Model loading failed: Received 600 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* 12c5ae49304158b0a133fcea9ba4486a6d6c8cad
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00409712
+- *Post-cleanup active memory (GB):* 0.004113504
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 2.81
 - *Parameter count:* 3.00B (name-estimate)
@@ -46,10 +46,10 @@ builtins.ValueError: Model loading failed: Received 600 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -683,7 +683,7 @@ model.layers.9.self_attn.v_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -694,7 +694,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 600 parameters not in model: 
 model.embed_tokens.biases,
@@ -1306,15 +1306,8 @@ model.layers.9.self_attn.v_proj.weight.
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2621.77it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[19:56:34] DEBUG    HF Cache Info for mlx-community/LFM2.5-VL-3B-OptiQ-4bit: size=2698.2 MB, files=12
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
 ```
 
 ## Reproduction inputs
@@ -1377,7 +1370,7 @@ python -m mlx_vlm.generate --model mlx-community/LFM2.5-VL-3B-OptiQ-4bit --image
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.15.0; revision 16c1d866344fffe1a27a511e7aa8100161a61810; clean |
+| check_models    | 0.15.0; revision 701362c5e26c6db3340353fad597d04039fb1d52; clean |
 
 ### Full environment evidence
 

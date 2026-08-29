@@ -35,12 +35,13 @@ Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| Response repeats the same text                                                        | 5     |
+| Response repeats the same text                                                        | 4     |
+| Generation was stopped early after sustained repeated output                          | 4     |
 | Unrecognised model control tokens remain visible                                      | 3     |
 | Required fields are missing or empty                                                  | 4     |
 | Response repeats the task instructions instead of only returning the requested fields | 1     |
 | Extra text appears before the Title field                                             | 2     |
-| Response appears cut off at the token limit                                           | 6     |
+| Response appears cut off at the token limit                                           | 2     |
 | Internal reasoning block appears incomplete                                           | 1     |
 | Conversation-role control tokens remain visible                                       | 1     |
 | Title or keywords do not meet requested constraints                                   | 19    |
@@ -52,11 +53,11 @@ Observation counts
 |-----------------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | [mlx-community/LFM2.5-VL-3B-OptiQ-4bit](#diagnostic-mlx-community-lfm25-vl-3b-optiq-4bit)                       | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                        |
 | [tencent/Youtu-VL-4B-Instruct](#diagnostic-tencent-youtu-vl-4b-instruct)                                        | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                        |
-| [jinaai/jina-vlm-mlx](#diagnostic-jinaai-jina-vlm-mlx)                                                          | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [jinaai/jina-vlm-mlx](#diagnostic-jinaai-jina-vlm-mlx)                                                          | completed | unusable            | observation_needs_reproduction | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed | unusable            | observation_needs_reproduction | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
 | [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)                   | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
+| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                | completed | unusable            | observation_needs_reproduction | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | unusable            | observation_needs_reproduction | stopped early: repeating; title/keyword constraints failed                                                                  |
 | [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                      |
 | [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                      |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                      |
@@ -95,7 +96,7 @@ builtins.ValueError: Model loading failed: Received 600 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* 12c5ae49304158b0a133fcea9ba4486a6d6c8cad
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00409712
+- *Post-cleanup active memory (GB):* 0.004113504
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 2.81
 - *Parameter count:* 3.00B (name-estimate)
@@ -110,10 +111,10 @@ builtins.ValueError: Model loading failed: Received 600 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -747,7 +748,7 @@ model.layers.9.self_attn.v_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -758,7 +759,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 600 parameters not in model: 
 model.embed_tokens.biases,
@@ -1370,15 +1371,8 @@ model.layers.9.self_attn.v_proj.weight.
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2621.77it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[19:56:34] DEBUG    HF Cache Info for mlx-community/LFM2.5-VL-3B-OptiQ-4bit: size=2698.2 MB, files=12
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2510.21it/s]
 ```
 
 <a id="diagnostic-tencent-youtu-vl-4b-instruct"></a>
@@ -1401,7 +1395,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
 - *Phase:* model_load
 - *Stage:* Lib Version
-- *Package:* transformers
+- *Package:* model-repo-code
 - *Error type:* ValueError
 - *Error message:* Model loading failed: cannot import name
   'DefaultFastImageProcessorKwargs' from
@@ -1411,7 +1405,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
   from 'transformers.image_processing_utils_fast' (unknown location)
 - *Resolved model revision:* 8d30a0e49662a1d628a472b12df264dbcd768753
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.01279716
+- *Post-cleanup active memory (GB):* 0.012813544
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 10.68
 - *Parameter count:* 4.00B (name-estimate)
@@ -1425,10 +1419,10 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1534,7 +1528,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1545,7 +1539,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -1557,15 +1551,8 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3082.50it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[20:07:00] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3217.66it/s]
 ```
 
 ## Completed Runs with Observations
@@ -1573,7 +1560,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 <a id="diagnostic-jinaai-jina-vlm-mlx"></a>
 
 <details>
-<summary>jinaai/jina-vlm-mlx — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+<summary>jinaai/jina-vlm-mlx — unusable — repeated text; stopped early: repeating; title/keyword constraints failed</summary>
 
 ### jinaai/jina-vlm-mlx
 
@@ -1582,23 +1569,22 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
+- *Observations:* repeated_output, repetition_abort,
   catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
 - *Repeated fragment:* keyword: "serene"
 - *Title word count:* 4
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 380
+- *Keyword count:* 61
 - *Requested keyword count range:* [10, 18]
 - *Duplicate keywords:* ["boathouse", "pond", "foliage", "tree", "deck",
   "railing", "rustic", "outdoor", "serene", "nature", "birdwatching",
   "pondside"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
 - *Resolved model revision:* a987631a01dc554a787d87a45fb01fb48f8aaca4
 - *Processor class:* mlx_vlm.models.jina_vlm.processing_jinavlm.JinaVLMProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.000754728
+- *Stop reason:* repetition_abort
+- *Post-cleanup active memory (GB):* 0.000771112
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2072
 - *Prompt composition:* 2,072 = 329 text/template (tokenizer-exact) + 1,743
@@ -1607,7 +1593,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Quantization:* 4-bit, group 64
 - *Declared context length:* 40,960 (text_config.max_sequence_length)
 - *Load active memory vs checkpoint:* 1.00x (2.11 GB vs 2.11 GB on disk)
-- *Generation tokens:* 1000
+- *Generation tokens:* 225
 - *Configured EOS token ID:* 151643
 - *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -1622,7 +1608,7 @@ A Serene Pondside Hideout
 Description:
 A rustic wooden boathouse built on stilts overlooks a tranquil pond, surrounded by lush foliage and framed by the overhanging branches of a nearby tree. The wooden deck and railing add to the charm of this peaceful outdoor retreat, perfect for birdwatching or simply enjoying the serenity of nature.
 Keywords:
-boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond,
+boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, birdwatching, pondside, serene, pondside, boathouse, pond, foliage, tree, deck,
 ```
 
 </details>
@@ -1630,7 +1616,7 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
 <a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — repeated text; stopped early: repeating; title/keyword constraints failed</summary>
 
 ### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
@@ -1639,7 +1625,7 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
+- *Observations:* repeated_output, repetition_abort,
   catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
 - *Repeated fragment:* keyword: "boardwalk"
@@ -1647,15 +1633,14 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
 - *Thinking trace markers:* ["&lt;think&gt;", "&lt;/think&gt;"]
 - *Title word count:* 6
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 158
+- *Keyword count:* 17
 - *Requested keyword count range:* [10, 18]
 - *Duplicate keywords:* ["boardwalk"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
 - *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.001492014
+- *Stop reason:* repetition_abort
+- *Post-cleanup active memory (GB):* 0.001508398
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1641
 - *Prompt composition:* 1,641 = 400 text/template (tokenizer-exact) + 1,241
@@ -1664,7 +1649,7 @@ boathouse, pond, foliage, tree, deck, railing, rustic, outdoor, serene, nature, 
 - *Parameter count:* 28.00B (name-estimate)
 - *Declared context length:* 131,072 (max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (58.80 GB vs 58.80 GB on disk)
-- *Generation tokens:* 1000
+- *Generation tokens:* 575
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;/s&gt;
 - *Configured thinking start token:* &lt;think&gt;
@@ -1696,7 +1681,7 @@ Title: Wooden Boathouse Over a Wetland Pond
 
 Description: A weathered wooden boathouse built on stilts stands over the edge of a serene pond in a wetland, framed by lush overhanging tree branches and surrounding reeds. The scene is set in a tranquil, overcast landscape with a damp, green atmosphere.
 
-Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk,
+Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, overcast sky, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, boardwalk, board
 ```
 
 </details>
@@ -1754,7 +1739,7 @@ Keywords: 51.441113°N, 0.565406°W, boathouse, wetland, pond, reeds, willow, ov
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.002114608
+- *Post-cleanup active memory (GB):* 0.002130992
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6388
 - *Prompt composition:* 6,388 = 309 text/template (tokenizer-exact) + 6,079
@@ -1796,7 +1781,7 @@ Wait, let's make sure the description is factual, combining context with main su
 <a id="diagnostic-mlx-community-lfm25-vl-16b-bf16"></a>
 
 <details>
-<summary>mlx-community/LFM2.5-VL-1.6B-bf16 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+<summary>mlx-community/LFM2.5-VL-1.6B-bf16 — unusable — repeated text; stopped early: repeating; title/keyword constraints failed</summary>
 
 ### mlx-community/LFM2.5-VL-1.6B-bf16
 
@@ -1805,23 +1790,22 @@ Wait, let's make sure the description is factual, combining context with main su
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
+- *Observations:* repeated_output, repetition_abort,
   catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
 - *Repeated fragment:* keyword: "elevated"
 - *Title word count:* 6
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 395
+- *Keyword count:* 76
 - *Requested keyword count range:* [10, 18]
 - *Duplicate keywords:* ["elevated", "wetland", "pond", "outdoor", "railings",
   "reflection", "natural", "environment", "architecture", "birdwatching",
   "peaceful", "serene"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
 - *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
 - *Processor class:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.00409712
+- *Stop reason:* repetition_abort
+- *Post-cleanup active memory (GB):* 0.004113504
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2117
 - *Prompt composition:* 2,117 = 327 text/template (tokenizer-exact) + 1,790
@@ -1830,7 +1814,7 @@ Wait, let's make sure the description is factual, combining context with main su
 - *Parameter count:* 1.60B (name-estimate)
 - *Declared context length:* 128,000 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (3.20 GB vs 3.19 GB on disk)
-- *Generation tokens:* 1000
+- *Generation tokens:* 275
 - *Configured EOS token ID:* 7
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -1844,7 +1828,7 @@ Title: "Moss-Covered Wooden Boathouse Over Wetland Pond"
 
 Description: A weathered wooden boathouse stands elevated on stilts over a serene pond, surrounded by lush foliage and marshland. The overhanging tree branches frame the structure, while the cloudy sky casts a soft, diffused light over the scene. The wooden decking and railings add to the rustic charm of this tranquil outdoor setting.
 
-Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage, marshland, cloudy, diffused, light, rustic, tranquil, outdoor, setting, structure, railings, decking, railings, trees, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated
+Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage, marshland, cloudy, diffused, light, rustic, tranquil, outdoor, setting, structure, railings, decking, railings, trees, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated, wetland, pond, reflection, natural, environment, architecture, birdwatching, outdoor, peaceful, serene, elevated
 ```
 
 </details>
@@ -1852,7 +1836,7 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 <a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
 
 <details>
-<summary>mlx-community/X-Reasoner-7B-8bit — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+<summary>mlx-community/X-Reasoner-7B-8bit — unusable — stopped early: repeating; title/keyword constraints failed</summary>
 
 ### mlx-community/X-Reasoner-7B-8bit
 
@@ -1861,24 +1845,21 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
+- *Observations:* repetition_abort, catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Repeated fragment:* keyword: "accurate"
 - *Title word count:* 5
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 436
+- *Keyword count:* 135
 - *Requested keyword count range:* [10, 18]
 - *Duplicate keywords:* ["pond", "wetland", "grass", "reeds", "trees",
   "architecture", "moss", "weathered", "landscape", "outdoor", "nature",
   "structure", "environment", "ecosystem", "habitat", "accurate", "precise",
   "detailed", "comprehensive", "thorough"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
 - *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.01017563
+- *Stop reason:* repetition_abort
+- *Post-cleanup active memory (GB):* 0.010192014
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16563
 - *Prompt composition:* 16,563 = 340 text/template (tokenizer-exact) + 16,223
@@ -1888,7 +1869,7 @@ Keywords: boathouse, wooden, moss, elevated, wetland, pond, overhanging, foliage
 - *Quantization:* 8-bit, group 64
 - *Declared context length:* 128,000 (max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (9.46 GB vs 9.45 GB on disk)
-- *Generation tokens:* 1000
+- *Generation tokens:* 400
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -1905,7 +1886,7 @@ Description:
 A weathered wooden boathouse, elevated on stilts, stands over a tranquil pond, framed by lush greenery and overhanging tree branches, with a cloudy sky and reflections on the water.
 
 Keywords: 
-Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed,
+Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging branches, water reflection, wetland, grass, reeds, trees, architecture, bird hide, birdwatching, boardwalk, moss, weathered, landscape, outdoor, nature, countryside, 2026-08-21, 51.441113°N, 0.565406°W, architecture, boathouse, shed, structure, stillness, calm, natural setting, rural, environment, ecosystem, wildlife, habitat, peaceful, quiet, still, calmness, tranquility, natural beauty, greenery, foliage, leaves, moss, water, reflection, pond, lake, wetland, marshland, forest, grass, reeds, trees, sky, clouds, overcast, weathered, aged, rustic, traditional, historical, cultural, heritage, preservation, conservation, nature reserve, wildlife sanctuary, ecological, biodiversity, ecosystem, habitat, natural, environment, outdoor, outdoors, nature, landscape, scenery, view, perspective, angle, composition, balance, symmetry, harmony, contrast, texture, material, wood, wooden, structure, building, shelter, protection, weather, climate, season, summer, August, 2026, date, time, location, coordinates, GPS, authoritative, factual, descriptive, evidence-based, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise, detailed, comprehensive, thorough, accurate, precise,
 ```
 
 </details>
@@ -1930,7 +1911,7 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01017565
+- *Post-cleanup active memory (GB):* 0.010192034
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 594
 - *Prompt composition:* 594 = 333 text/template (tokenizer-exact) + 261
@@ -1940,7 +1921,7 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
 - *Quantization:* 8-bit, group 64, affine
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (27.99 GB vs 27.97 GB on disk)
-- *Generation tokens:* 88
+- *Generation tokens:* 85
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -1951,9 +1932,9 @@ Wooden boathouse, stilted, pond, serene, cloudy sky, lush foliage, overhanging b
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse Over Serene Wetland Pond
-Description: A weathered wooden boathouse built on stilts stands over a serene pond, framed by lush green trees and wetland foliage under a cloudy sky.
-Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
+<channel|>Title: Weathered Wooden Boathouse Over Serene Pond
+Description: A weathered wooden boathouse on stilts stands over a serene pond, framed by lush overhanging branches and wetland foliage under a cloudy sky.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wetland, wooden shed
 ```
 
 </details>
@@ -1978,7 +1959,7 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01017565
+- *Post-cleanup active memory (GB):* 0.010192034
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 594
 - *Prompt composition:* 594 = 333 text/template (tokenizer-exact) + 261
@@ -1988,7 +1969,7 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 - *Quantization:* 8-bit, group 32, mxfp8
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (27.21 GB vs 27.20 GB on disk)
-- *Generation tokens:* 84
+- *Generation tokens:* 91
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -1999,9 +1980,9 @@ Keywords: architecture, birdwatching, hide, boardwalk, foliage, forest, landscap
 
 ```text
 <|channel>thought
-<channel|>Title: Weathered Wooden Boathouse over a Serene Pond
-Description: A weathered wooden boathouse built on stilts stands over a pond, framed by lush green foliage under a cloudy sky.
-Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, Re, Marshland, Reflection, Cloudy Sky, Architecture, Nature, Outdoors
+<channel|>Title: Weathered Wooden Boathouse Over a Serene Wetland Pond
+Description: A weathered wooden shed built on stilts stands over the edge of a serene pond under a cloudy sky. The structure is framed by lush overhanging branches and surrounding wetland foliage.
+Keywords: architecture, bird hide, boardwalk, foliage, forest, landscape, marshland, moss, outdoors, pond, reeds, trees, water reflection, wooden shed
 ```
 
 </details>
@@ -2026,7 +2007,7 @@ Keywords: Boathouse, Wooden, Pond, Stilts, Wetland, Foliage, Trees, Boardwalk, R
 - *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002737212
+- *Post-cleanup active memory (GB):* 0.002753596
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 6392
 - *Prompt composition:* 6,392 = 313 text/template (tokenizer-exact) + 6,079
@@ -2072,7 +2053,7 @@ Keywords: boathouse, wooden, stilts, pond, cloudy sky, foliage, trees, wetland, 
 - *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003966048
+- *Post-cleanup active memory (GB):* 0.003982432
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1329
 - *Prompt composition:* 1,329 = 316 text/template (tokenizer-exact) + 1,013
@@ -2142,18 +2123,18 @@ is in the model gallery.
 
 | Model                                                 | Runtime identity                                          | Performance                                                                               |
 |-------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed         | 2117 prompt / 118 generated; 481 tok/s; 1.9 GB peak; cleanup 0.000132/0.0 GB active/cache |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed       | 2401 prompt / 121 generated; 29.4 tok/s; 23 GB peak; cleanup 0.00128/0.0 GB active/cache  |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed         | 593 prompt / 153 generated; 31.3 tok/s; 17 GB peak; cleanup 0.0107/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed         | 598 prompt / 100 generated; 129 tok/s; 16 GB peak; cleanup 0.0118/0.0 GB active/cache     |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed         | 598 prompt / 95 generated; 26.4 tok/s; 20 GB peak; cleanup 0.0123/0.0 GB active/cache     |
-| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed | 1383 prompt / 85 generated; 171 tok/s; 4.6 GB peak; cleanup 0.0125/0.0 GB active/cache    |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed       | 2618 prompt / 164 generated; 34.0 tok/s; 18 GB peak; cleanup 0.003/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed       | 2934 prompt / 123 generated; 67.6 tok/s; 13 GB peak; cleanup 0.00488/0.0 GB active/cache  |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed       | 2933 prompt / 134 generated; 190 tok/s; 7.8 GB peak; cleanup 0.00541/0.0 GB active/cache  |
-| mlx-community/Molmo2-8B-4bit                          | rev 4fcbe9265776; Molmo2Processor; stop completed         | 1529 prompt / 133 generated; 72.5 tok/s; 8.8 GB peak; cleanup 0.00572/0.0 GB active/cache |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed        | 16552 prompt / 129 generated; 87.1 tok/s; 23 GB peak; cleanup 0.00744/0.0 GB active/cache |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed        | 16568 prompt / 111 generated; 110 tok/s; 24 GB peak; cleanup 0.00795/0.0 GB active/cache  |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed         | 2117 prompt / 118 generated; 484 tok/s; 1.9 GB peak; cleanup 0.000149/0.0 GB active/cache |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed       | 2401 prompt / 121 generated; 29.0 tok/s; 23 GB peak; cleanup 0.0013/0.0 GB active/cache   |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed         | 593 prompt / 153 generated; 21.7 tok/s; 17 GB peak; cleanup 0.0107/0.0 GB active/cache    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed         | 598 prompt / 100 generated; 116 tok/s; 16 GB peak; cleanup 0.0118/0.0 GB active/cache     |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed         | 598 prompt / 95 generated; 27.6 tok/s; 20 GB peak; cleanup 0.0123/0.0 GB active/cache     |
+| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed | 1383 prompt / 85 generated; 169 tok/s; 4.6 GB peak; cleanup 0.0126/0.0 GB active/cache    |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed       | 2618 prompt / 164 generated; 32.5 tok/s; 18 GB peak; cleanup 0.00302/0.0 GB active/cache  |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed       | 2934 prompt / 123 generated; 65.6 tok/s; 13 GB peak; cleanup 0.0049/0.0 GB active/cache   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed       | 2933 prompt / 134 generated; 189 tok/s; 7.8 GB peak; cleanup 0.00542/0.0 GB active/cache  |
+| mlx-community/Molmo2-8B-4bit                          | rev 4fcbe9265776; Molmo2Processor; stop completed         | 1529 prompt / 133 generated; 72.0 tok/s; 8.8 GB peak; cleanup 0.00574/0.0 GB active/cache |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed        | 16552 prompt / 129 generated; 79.0 tok/s; 23 GB peak; cleanup 0.00746/0.0 GB active/cache |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed        | 16568 prompt / 111 generated; 65.7 tok/s; 24 GB peak; cleanup 0.00796/0.0 GB active/cache |
 
 </details>
 

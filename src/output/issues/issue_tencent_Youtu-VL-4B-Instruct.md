@@ -20,7 +20,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
 - *Phase:* model_load
 - *Stage:* Lib Version
-- *Package:* transformers
+- *Package:* model-repo-code
 - *Error type:* ValueError
 - *Error message:* Model loading failed: cannot import name
   'DefaultFastImageProcessorKwargs' from
@@ -30,7 +30,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
   from 'transformers.image_processing_utils_fast' (unknown location)
 - *Resolved model revision:* 8d30a0e49662a1d628a472b12df264dbcd768753
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.01279716
+- *Post-cleanup active memory (GB):* 0.012813544
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 10.68
 - *Parameter count:* 4.00B (name-estimate)
@@ -44,10 +44,10 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12735, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12755, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -153,7 +153,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14520, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14623, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -164,7 +164,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13520, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13623, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -176,15 +176,8 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3082.50it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[20:07:00] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3217.66it/s]
 ```
 
 ## Reproduction inputs
@@ -247,7 +240,7 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.15.0; revision 16c1d866344fffe1a27a511e7aa8100161a61810; clean |
+| check_models    | 0.15.0; revision 701362c5e26c6db3340353fad597d04039fb1d52; clean |
 
 ### Full environment evidence
 

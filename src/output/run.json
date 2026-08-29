@@ -628,24 +628,205 @@
     }
   ],
   "comparison": {
-    "baseline": "16c1d866:src/output/results.jsonl",
+    "baseline": "701362c5:src/output/results.jsonl",
     "baseline_components": {
-      "check_models": "0.14.1 @ 93a90d917",
-      "mlx": "0.32.2.dev20260824+43d2f06cb @ 43d2f06cb",
-      "mlx-vlm": "0.6.16 @ 2b31570bd",
+      "check_models": "0.15.0 @ 16c1d8663",
+      "mlx": "0.32.3.dev20260828+99e45f71d @ 99e45f71d",
+      "mlx-vlm": "0.7.0rc0 @ 24b244ee2",
       "python": "3.14.7",
-      "transformers": "5.15.1"
+      "transformers": "5.16.1"
     },
-    "baseline_timestamp": "2026-08-24 23:59:43 BST",
-    "comparability": "incomparable",
+    "baseline_timestamp": "2026-08-28 20:07:01 BST",
+    "changes": [
+      {
+        "execution": [
+          "completed",
+          "completed"
+        ],
+        "model": "mlx-community/LFM2.5-VL-1.6B-bf16",
+        "observations_added": [
+          "repetition_abort"
+        ],
+        "observations_removed": [
+          "token_cap_truncation"
+        ],
+        "usability": [
+          "unusable",
+          "unusable"
+        ]
+      },
+      {
+        "execution": [
+          "completed",
+          "completed"
+        ],
+        "model": "jinaai/jina-vlm-mlx",
+        "observations_added": [
+          "repetition_abort"
+        ],
+        "observations_removed": [
+          "token_cap_truncation"
+        ],
+        "usability": [
+          "unusable",
+          "unusable"
+        ]
+      },
+      {
+        "execution": [
+          "completed",
+          "completed"
+        ],
+        "model": "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16",
+        "observations_added": [
+          "repetition_abort"
+        ],
+        "observations_removed": [
+          "token_cap_truncation"
+        ],
+        "usability": [
+          "unusable",
+          "unusable"
+        ]
+      },
+      {
+        "execution": [
+          "completed",
+          "completed"
+        ],
+        "model": "mlx-community/X-Reasoner-7B-8bit",
+        "observations_added": [
+          "repetition_abort"
+        ],
+        "observations_removed": [
+          "repeated_output",
+          "token_cap_truncation"
+        ],
+        "usability": [
+          "unusable",
+          "unusable"
+        ]
+      }
+    ],
+    "comparability": "comparable",
+    "compared_models": 41,
     "execution_mode": {
       "baseline": "in_process",
       "current": "in_process"
     },
-    "incomparable_reasons": [
-      "prompt differs",
-      "image differs (sha256 4d57e07687c4\u2026 \u2192 dadec238f988\u2026)"
-    ]
+    "generation_tps_ratio": {
+      "compared_models": 35,
+      "max": 2.1569,
+      "median": 0.9562,
+      "min": 0.4215
+    },
+    "history_runs_used": 2,
+    "identical_text_models": 33,
+    "memory_changes": [],
+    "models_added": [],
+    "models_removed": [],
+    "revision_changes": [],
+    "text_compared_models": 39,
+    "throughput_comparable": true,
+    "throughput_flags": [
+      {
+        "band": [
+          45.3984,
+          61.4214
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 53.4099,
+        "current_tps": 70.8976,
+        "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit",
+        "ratio": 1.3274
+      },
+      {
+        "band": [
+          195.8532,
+          264.9779
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 230.4155,
+        "current_tps": 166.0877,
+        "model": "mlx-community/North-Micro-Vision-Instruct-4bit",
+        "ratio": 0.7208
+      },
+      {
+        "band": [
+          26.5795,
+          35.9605
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 31.27,
+        "current_tps": 21.7304,
+        "model": "mlx-community/gemma-3-27b-it-qat-4bit",
+        "ratio": 0.6949
+      },
+      {
+        "band": [
+          15.9698,
+          21.6062
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 18.788,
+        "current_tps": 40.5236,
+        "model": "mlx-community/Step-3.7-Flash-oQ2e",
+        "ratio": 2.1569
+      },
+      {
+        "band": [
+          76.7714,
+          103.8672
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 90.3193,
+        "current_tps": 46.746,
+        "model": "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        "ratio": 0.5176
+      },
+      {
+        "band": [
+          93.8893,
+          127.0267
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 110.458,
+        "current_tps": 65.7444,
+        "model": "mlx-community/Qwen3.5-35B-A3B-4bit",
+        "ratio": 0.5952
+      },
+      {
+        "band": [
+          75.6252,
+          102.3164
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 88.9708,
+        "current_tps": 37.5045,
+        "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
+        "ratio": 0.4215
+      },
+      {
+        "band": [
+          25.0656,
+          33.9123
+        ],
+        "band_samples": 0,
+        "band_source": "fallback",
+        "baseline_tps": 29.4889,
+        "current_tps": 17.5955,
+        "model": "mlx-community/Qwen3.8-27B-4bit",
+        "ratio": 0.5967
+      }
+    ],
+    "unverified_facts": []
   },
   "component_provenance": {
     "Pillow": {
@@ -660,7 +841,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "16c1d866344fffe1a27a511e7aa8100161a61810",
+      "source_revision": "701362c5e26c6db3340353fad597d04039fb1d52",
       "vcs_revision": null,
       "version": "0.15.0"
     },
@@ -745,7 +926,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-08-28 20:07:02 BST",
+  "generated_at": "2026-08-29 02:11:29 BST",
   "generation_settings": {
     "max_tokens": 1000,
     "prefill_step_size": 2048,
@@ -1064,7 +1245,7 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "16c1d866344fffe1a27a511e7aa8100161a61810",
+    "git_revision": "701362c5e26c6db3340353fad597d04039fb1d52",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.15.0"
@@ -1525,6 +1706,6 @@
   },
   "prompt_sha256": "fb8948bebcac9f2586f1e262e49934e6c835d0509d032b447bdd2f74adfdb0a2",
   "schema_version": "2.0",
-  "total_runtime_seconds": 972.484,
+  "total_runtime_seconds": 1048.398,
   "trust_remote_code": true
 }
