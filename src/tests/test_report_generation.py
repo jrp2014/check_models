@@ -5971,6 +5971,31 @@ def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(
     assert "Duplicate keywords: 1 model(s)" in normalized
 
 
+def test_constraint_breakdown_keeps_each_declared_range() -> None:
+    """Mixed declared ranges aggregate per-range, not against the last seen."""
+    first = _issue_summary_result(
+        "org/above",
+        observations=["catalog_constraint_violation"],
+        details={"title_word_count": 6, "title_word_range": [2, 4]},
+    )
+    second = _issue_summary_result(
+        "org/below",
+        observations=["catalog_constraint_violation"],
+        details={"title_word_count": 5, "title_word_range": [6, 8]},
+    )
+
+    section = check_models._run_issue_summary_constraint_breakdown(
+        [
+            cast("check_models.JsonlResultRecord", first),
+            cast("check_models.JsonlResultRecord", second),
+        ]
+    )
+    assert section is not None
+    rendered = " ".join("\n".join(check_models.render_report_markdown((section,))).split())
+    assert "outside 2-4 words (0 below, 1 above" in rendered
+    assert "outside 6-8 words (1 below, 0 above" in rendered
+
+
 def test_run_summary_omits_constraint_breakdown_without_violations(tmp_path: Path) -> None:
     """No constraint violations means no breakdown section at all."""
     output_paths = _issue_summary_output_paths(tmp_path)

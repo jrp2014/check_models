@@ -19908,35 +19908,38 @@ def _run_issue_summary_constraint_breakdown(
             return cast("int", value[0]), cast("int", value[1])
         return None
 
-    title_observed: list[int] = []
-    keyword_observed: list[int] = []
+    title_by_range: dict[tuple[int, int], list[int]] = {}
+    keyword_by_range: dict[tuple[int, int], list[int]] = {}
     duplicate_models = 0
-    title_range: tuple[int, int] | None = None
-    keyword_range: tuple[int, int] | None = None
+
+    def _record_outside_range(
+        groups: dict[tuple[int, int], list[int]],
+        count: JsonLike,
+        bounds_value: JsonLike,
+    ) -> None:
+        bounds = _int_pair(bounds_value)
+        if (
+            isinstance(count, int)
+            and not isinstance(count, bool)
+            and bounds is not None
+            and not bounds[0] <= count <= bounds[1]
+        ):
+            groups.setdefault(bounds, []).append(count)
+
     for result in results:
         assessment = result["assessment"]
         if "catalog_constraint_violation" not in assessment["observations"]:
             continue
         details = cast("dict[str, JsonLike]", assessment.get("details") or {})
-        title_count = details.get("title_word_count")
-        if (
-            isinstance(title_count, int)
-            and (bounds := _int_pair(details.get("title_word_range")))
-            and not bounds[0] <= title_count <= bounds[1]
-        ):
-            title_observed.append(title_count)
-            title_range = bounds
-        keyword_count = details.get("keyword_count")
-        if (
-            isinstance(keyword_count, int)
-            and (bounds := _int_pair(details.get("keyword_count_range")))
-            and not bounds[0] <= keyword_count <= bounds[1]
-        ):
-            keyword_observed.append(keyword_count)
-            keyword_range = bounds
+        _record_outside_range(
+            title_by_range, details.get("title_word_count"), details.get("title_word_range")
+        )
+        _record_outside_range(
+            keyword_by_range, details.get("keyword_count"), details.get("keyword_count_range")
+        )
         if details.get("duplicate_keywords"):
             duplicate_models += 1
-    if not (title_observed or keyword_observed or duplicate_models):
+    if not (title_by_range or keyword_by_range or duplicate_models):
         return None
 
     def _range_line(label: str, observed: list[int], bounds: tuple[int, int], unit: str) -> str:
@@ -19948,10 +19951,10 @@ def _run_issue_summary_constraint_breakdown(
         )
 
     lines: list[str] = []
-    if title_observed and title_range is not None:
-        lines.append(_range_line("Title length", title_observed, title_range, " words"))
-    if keyword_observed and keyword_range is not None:
-        lines.append(_range_line("Keyword count", keyword_observed, keyword_range, ""))
+    for bounds, observed in sorted(title_by_range.items()):
+        lines.append(_range_line("Title length", observed, bounds, " words"))
+    for bounds, observed in sorted(keyword_by_range.items()):
+        lines.append(_range_line("Keyword count", observed, bounds, ""))
     if duplicate_models:
         lines.append(f"Duplicate keywords: {duplicate_models} model(s)")
     return ReportSection(
