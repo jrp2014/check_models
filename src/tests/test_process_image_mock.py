@@ -204,7 +204,6 @@ class TestProcessImageWithModelMock:
         assert result.model_name == "test/fake-model"
         assert result.generation is not None
         assert result.quality_analysis is not None
-        assert result.quality_issues is None
         assert result.runtime_diagnostics is not None
         assert result.runtime_diagnostics.first_token_latency_s == 0.5
 
@@ -538,8 +537,6 @@ class TestProcessImageWithModelMock:
         assert result.success is False
         assert result.quality_analysis is not None
         assert result.quality_analysis.is_repetitive is True
-        assert result.quality_issues is not None
-        assert "repetitive" in result.quality_issues
 
     def test_build_failure_result_helper_preserves_capture(self) -> None:
         """Centralized failure builder should preserve diagnostics fields."""
@@ -693,14 +690,12 @@ class TestProcessImageWithModelMock:
                 model_name="test/fake-model",
                 error=err,
                 captured_output="=== STDOUT ===\nloop loop loop",
-                quality_issues="repetitive(loop)",
                 quality_analysis=analysis,
             )
         else:  # pragma: no cover - defensive guard for static analysis
             raise AssertionError
 
         assert result.quality_analysis is analysis
-        assert result.quality_issues == "repetitive(loop)"
 
     def test_build_failure_result_respects_tagged_phase(self) -> None:
         """Failure phase tags should flow into the final result payload."""

@@ -2607,7 +2607,6 @@ def _make_harness_success(
         total_time=1.0,
         generation_time=0.5,
         model_load_time=0.5,
-        quality_issues=f"⚠\ufe0fharness({harness_type})",
         quality_analysis=qa,
     )
 

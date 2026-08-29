@@ -70,7 +70,7 @@ def test_analyze_output_quality_special_token_observation(
 
     captured = capsys.readouterr()
     assert "Unexpected Special Tokens : [<|endoftext|>]" in captured.out
-    assert "OBSERVATION (unexpected-special-token)" in captured.out
+    assert "OBSERVATION (Unrecognised model control tokens remain visible)" in captured.out
 
 
 def test_analyze_output_quality_with_file(
@@ -190,7 +190,7 @@ def test_analyze_output_quality_json_clean_output(
     payload = json.loads(captured.out)
     assert payload["status"] == "clean"
     assert payload["exit_code"] == 0
-    assert payload["summary"]["issue_string"] == ""
+    assert payload["assessment"]["observations"] == []
     assert payload["analysis"]["unexpected_special_tokens"] == []
 
 
@@ -217,4 +217,32 @@ def test_analyze_output_quality_json_special_token_observation(
     assert payload["status"] == "observation"
     assert payload["exit_code"] == 0
     assert payload["analysis"]["unexpected_special_tokens"] == ["<|endoftext|>"]
-    assert payload["summary"]["issue_string"] == "unexpected-special-token"
+    assert payload["assessment"]["observations"] == ["unexpected_special_token"]
+
+
+@pytest.mark.parametrize(
+    ("text", "observation", "status", "exit_code"),
+    [
+        ("", "empty_output", "unusable", 1),
+        ("<think>unfinished reasoning", "thinking_trace_incomplete", "unusable", 1),
+        ("x", "minimal_output", "observation", 0),
+    ],
+)
+def test_json_mode_uses_canonical_assessment(
+    text: str,
+    observation: str,
+    status: str,
+    exit_code: int,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The standalone tool must agree with the main harness's assessment rules."""
+    monkeypatch.setattr(sys, "argv", ["analyze_output_quality.py", "--text", text, "--json"])
+
+    assert main() == exit_code
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["status"] == status
+    assert observation in payload["assessment"]["observations"]
+    assert payload["assessment"]["usability"] == (
+        "unusable" if exit_code else "usable_with_caveats"
+    )

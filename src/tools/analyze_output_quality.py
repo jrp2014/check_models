@@ -1,7 +1,9 @@
 """Standalone script to analyze arbitrary output with project quality heuristics.
 
 This lets developers inspect check_models quality and harness detection without
-running a local MLX model.
+running a local MLX model. Verdicts come from the same canonical observation
+projection and completed-result assessment the main harness uses, so this tool
+cannot disagree with the retained reports.
 """
 
 from __future__ import annotations
@@ -16,7 +18,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from check_models import (
     GenerationQualityAnalysis,
-    _build_quality_issues_string,
+    ResultAssessment,
+    _completed_assessment,
+    _human_observation_labels,
+    _quality_observations,
     analyze_generation_text,
     load_quality_config,
 )
@@ -106,33 +111,16 @@ def _estimate_tokens(text: str) -> int:
     return estimated_tokens
 
 
-def _print_diagnostic_observations(analysis: GenerationQualityAnalysis) -> None:
-    """Print retained non-fault output observations when present."""
-    if analysis.special_token_wrappers:
-        _print_field("Special Token Wrappers", analysis.special_token_wrappers)
-
-
-def _analysis_status_text(
-    analysis: GenerationQualityAnalysis,
-    issue_string: str | None,
-) -> str:
-    """Return a fault, observation, or clean status without conflating them."""
-    if issue_string:
-        prefix = "🔴 UNUSABLE" if _analysis_exit_code(analysis) else "🟡 OBSERVATION"
-        return f"{prefix} ({issue_string})"
-    if analysis.special_token_wrappers:
-        return "🟡 OBSERVATION (special-token wrapper retained)"
-    return "🟢 CLEAN (No issues detected)"
-
-
-def _analysis_exit_code(analysis: GenerationQualityAnalysis) -> int:
-    """Return nonzero only for a mechanically unusable standalone sample."""
-    unusable = analysis.is_repetitive or bool(analysis.missing_sections)
-    return 1 if unusable else 0
+def _assessment_status(assessment: ResultAssessment) -> str:
+    """Return the canonical fault/observation/clean status token."""
+    if assessment.usability == "unusable":
+        return "unusable"
+    return "observation" if assessment.observations else "clean"
 
 
 def _print_analysis_report(
     analysis: GenerationQualityAnalysis,
+    assessment: ResultAssessment,
     *,
     word_count: int,
     estimated_tokens: int,
@@ -146,7 +134,8 @@ def _print_analysis_report(
     print("=" * 60 + "\n")
 
     print("Mechanical Observations:")
-    _print_diagnostic_observations(analysis)
+    if analysis.special_token_wrappers:
+        _print_field("Special Token Wrappers", analysis.special_token_wrappers)
     _print_field("Is Repetitive", analysis.is_repetitive)
     if analysis.is_repetitive:
         _print_field("Repeated Token", analysis.repeated_token)
@@ -160,30 +149,38 @@ def _print_analysis_report(
     _print_field("Keyword Overlap", analysis.keyword_overlap)
 
     print("\n" + "-" * 60)
-    issue_string = _build_quality_issues_string(analysis)
-    print("Final Tag Output string:")
-    print(f"  {_analysis_status_text(analysis, issue_string)}")
+    status = _assessment_status(assessment)
+    if status == "clean":
+        print("  🟢 CLEAN (No issues detected)")
+    else:
+        prefix = "🔴 UNUSABLE" if status == "unusable" else "🟡 OBSERVATION"
+        labels = _human_observation_labels(assessment.observations)
+        print(f"  {prefix} ({labels})")
     print("-" * 60 + "\n")
 
 
 def _build_json_payload(
     analysis: GenerationQualityAnalysis,
+    assessment: ResultAssessment,
     *,
     word_count: int,
     estimated_tokens: int,
     prompt_tokens: int | None,
 ) -> dict[str, object]:
     """Build a stable machine-readable JSON payload for CLI consumers."""
-    issue_string = _build_quality_issues_string(analysis) or ""
-    exit_code = _analysis_exit_code(analysis)
     return {
-        "status": ("unusable" if exit_code else "observation" if issue_string else "clean"),
-        "exit_code": exit_code,
+        "status": _assessment_status(assessment),
+        "exit_code": 1 if assessment.usability == "unusable" else 0,
         "summary": {
             "word_count": word_count,
             "estimated_tokens": estimated_tokens,
             "prompt_tokens": prompt_tokens,
-            "issue_string": issue_string,
+        },
+        "assessment": {
+            "execution": assessment.execution,
+            "usability": assessment.usability,
+            "maintainer_status": assessment.maintainer_status,
+            "observations": list(assessment.observations),
         },
         "analysis": asdict(analysis),
     }
@@ -215,12 +212,19 @@ def main() -> int:
         prompt_tokens=prompt_tokens,
         context_marker=args.context_marker,
     )
-    exit_code = _analysis_exit_code(analysis)
+    observations = _quality_observations(
+        text=output_text,
+        generated_tokens=estimated_tokens,
+        analysis=analysis,
+    )
+    assessment = _completed_assessment(observations)
+    exit_code = 1 if assessment.usability == "unusable" else 0
     if args.json:
         print(
             json.dumps(
                 _build_json_payload(
                     analysis,
+                    assessment,
                     word_count=word_count,
                     estimated_tokens=estimated_tokens,
                     prompt_tokens=prompt_tokens,
@@ -233,6 +237,7 @@ def main() -> int:
 
     _print_analysis_report(
         analysis,
+        assessment,
         word_count=word_count,
         estimated_tokens=estimated_tokens,
         prompt_tokens=prompt_tokens,

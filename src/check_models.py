@@ -1850,7 +1850,6 @@ class PerformanceResult:
         model_load_time: Wall-clock time to load model into GPU memory
         total_time: End-to-end time including all stages
         error_type: Exception class name for error categorization in reports
-        quality_issues: Compact log-only mechanical observation labels
         quality_analysis: Structured mechanical analysis used by ``ResultAssessment``
         active_memory: GPU memory in use (GB), from mx.get_active_memory()
         cache_memory: GPU memory in cache (GB), from mx.get_cache_memory()
@@ -1881,7 +1880,6 @@ class PerformanceResult:
     root_error_module: str | None = None
     root_error_message: str | None = None
     exception_chain: tuple[FailureException, ...] = ()
-    quality_issues: str | None = None
     quality_analysis: GenerationQualityAnalysis | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
@@ -3459,7 +3457,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
-    "quality_issues": ("Quality", "Issues"),
     "active_memory": ("Active", "Mem (GB)"),
     "cache_memory": ("Cache", "Mem (GB)"),
     "error_package": ("Error", "Package"),
@@ -3485,8 +3482,7 @@ MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross
 PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     field
     for field in FIELD_ABBREVIATIONS
-    if field
-    in {"generation_time", "model_load_time", "total_time", "quality_issues", "error_package"}
+    if field in {"generation_time", "model_load_time", "total_time", "error_package"}
 ]
 # =============================================================================
 # FORMATTING UTILITIES (Numbers, Memory, Time, Tokens/sec, Field Values)
@@ -4421,7 +4417,6 @@ class GenerationQualityAnalysis:
     unexpected_catalog_preamble: str | None = None
     likely_capped: bool = False
     token_cap_reasons: list[str] = dataclass_field(default_factory=list)
-    requested_max_tokens: int | None = None
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
@@ -4738,7 +4733,6 @@ def analyze_generation_text(
         unexpected_catalog_preamble=prompt_signals.unexpected_catalog_preamble,
         likely_capped=likely_capped,
         token_cap_reasons=cutoff_reasons,
-        requested_max_tokens=requested_max_tokens,
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
@@ -4756,37 +4750,6 @@ def analyze_generation_text(
         keyword_overlap=prompt_signals.keyword_overlap,
         unchanged_draft_fields=list(prompt_signals.unchanged_draft_fields),
     )
-
-
-def _analyze_text_quality(
-    text: str,
-    generated_tokens: int | None,
-    *,
-    prompt_tokens: int | None = None,
-    prompt: str | None = None,
-    requested_max_tokens: int | None = None,
-    context_marker: str = "Context:",
-    known_special_tokens: Sequence[str] = (),
-    configured_generation_wrappers: Sequence[str] = (),
-    thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
-    seeded_thinking_text: str = "",
-    prompt_text_tokens: int | None = None,
-) -> tuple[GenerationQualityAnalysis, str | None]:
-    """Return mechanical quality analysis plus a compact log-only label string."""
-    analysis = analyze_generation_text(
-        text,
-        generated_tokens,
-        prompt_tokens=prompt_tokens,
-        prompt=prompt,
-        requested_max_tokens=requested_max_tokens,
-        context_marker=context_marker,
-        known_special_tokens=known_special_tokens,
-        configured_generation_wrappers=configured_generation_wrappers,
-        thinking_trace_delimiters=thinking_trace_delimiters,
-        seeded_thinking_text=seeded_thinking_text,
-        prompt_text_tokens=prompt_text_tokens,
-    )
-    return analysis, _build_quality_issues_string(analysis)
 
 
 def local_now_str(fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
@@ -8736,32 +8699,34 @@ def _has_catalog_constraint_violation(analysis: GenerationQualityAnalysis) -> bo
     )
 
 
-def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode, ...]:
-    """Project approved current-run facts into stable ordered observation codes."""
-    text = _generation_text_value(result.generation)
-    analysis = result.quality_analysis
+def _quality_observations(
+    *,
+    text: str,
+    generated_tokens: int | None,
+    analysis: GenerationQualityAnalysis | None,
+    stop_reason: str | None = None,
+) -> tuple[ObservationCode, ...]:
+    """Project text facts into stable ordered observation codes.
+
+    Pure canonical projection shared by completed-result assessment and the
+    standalone ``tools.analyze_output_quality`` tool, so no surface can carry
+    a second, drifting verdict.
+    """
     observations: list[ObservationCode] = []
     if not text.strip():
         observations.append("empty_output")
-    else:
-        generated_tokens = _generation_int_metric(result.generation, "generation_tokens")
-        is_minimal, _minimal_reason = _detect_minimal_output(
-            text,
-            generated_tokens,
-        )
-        if is_minimal:
-            observations.append("minimal_output")
-
+    elif _detect_minimal_output(text, generated_tokens)[0]:
+        observations.append("minimal_output")
     is_repetitive = (
         analysis.is_repetitive if analysis is not None else _detect_repetitive_output(text)[0]
     )
     if is_repetitive:
         observations.append("repeated_output")
-    runtime = result.runtime_diagnostics
-    if runtime is not None and runtime.stop_reason == "repetition_abort":
+    if stop_reason == "repetition_abort":
         observations.append("repetition_abort")
     if analysis is None:
         return tuple(observations)
+
     non_thinking_wrappers = set(analysis.configured_generation_wrappers).difference(
         analysis.thinking_trace_markers
     )
@@ -8778,10 +8743,7 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         (analysis.thinking_only_output, "missing_final_answer"),
         (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
-        (
-            _has_catalog_constraint_violation(analysis),
-            "catalog_constraint_violation",
-        ),
+        (_has_catalog_constraint_violation(analysis), "catalog_constraint_violation"),
         (analysis.keyword_overlap == "no_overlap", "no_keyword_overlap"),
         (bool(analysis.unchanged_draft_fields), "draft_returned_unchanged"),
     )
@@ -8789,30 +8751,42 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
     return tuple(observations)
 
 
+def _completed_assessment(observations: Sequence[ObservationCode]) -> ResultAssessment:
+    """Derive the completed-result assessment from canonical observations."""
+    ordered = tuple(observations)
+    usability: ModelUsability = (
+        "unusable"
+        if set(ordered) & _UNUSABLE_OBSERVATIONS
+        else "usable_with_caveats"
+        if ordered
+        else "usable"
+    )
+    maintainer_status: MaintainerStatus = (
+        "observation_needs_reproduction"
+        if set(ordered) & _INTEGRATION_SIGNAL_OBSERVATIONS
+        else "none"
+    )
+    return ResultAssessment("completed", usability, maintainer_status, ordered)
+
+
+def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode, ...]:
+    """Thin result adapter over the canonical observation projection."""
+    runtime = result.runtime_diagnostics
+    return _quality_observations(
+        text=_generation_text_value(result.generation),
+        generated_tokens=_generation_int_metric(result.generation, "generation_tokens"),
+        analysis=result.quality_analysis,
+        stop_reason=runtime.stop_reason if runtime is not None else None,
+    )
+
+
 def _assess_result(result: PerformanceResult) -> ResultAssessment:
     """Return the minimal current-run outcome without legacy presentation policy."""
     execution = _execution_status(result)
-    observations = _assessment_observations(result) if execution == "completed" else ()
-    if execution != "completed":
-        usability: ModelUsability = "not_evaluated"
-    elif set(observations) & _UNUSABLE_OBSERVATIONS:
-        usability = "unusable"
-    elif observations:
-        usability = "usable_with_caveats"
-    else:
-        usability = "usable"
-
-    if execution == "crashed":
-        maintainer_status: MaintainerStatus = "actionable_failure"
-    elif set(observations) & _INTEGRATION_SIGNAL_OBSERVATIONS:
-        maintainer_status = "observation_needs_reproduction"
-    else:
-        # Compliance-only observations (constraint counts, missing fields,
-        # hint copying, instruction echo, cap hits) inform model choosers but
-        # are not evidence of an mlx-vlm defect.
-        maintainer_status = "none"
-
-    return ResultAssessment(execution, usability, maintainer_status, observations)
+    if execution == "completed":
+        return _completed_assessment(_assessment_observations(result))
+    maintainer_status: MaintainerStatus = "actionable_failure" if execution == "crashed" else "none"
+    return ResultAssessment(execution, "not_evaluated", maintainer_status, ())
 
 
 def _catalog_constraint_observation_details(
@@ -13654,7 +13628,6 @@ def _build_failure_result(
     model_name: str,
     error: BaseException,
     captured_output: str | None,
-    quality_issues: str | None = None,
     quality_analysis: GenerationQualityAnalysis | None = None,
     failure_phase: str | None = None,
     generation_time: float | None = None,
@@ -13713,7 +13686,6 @@ def _build_failure_result(
         root_error_module=root_error.module,
         root_error_message=root_error_msg,
         exception_chain=exception_chain,
-        quality_issues=quality_issues,
         quality_analysis=quality_analysis,
         error_package=error_package,
         error_traceback=tb_str,
@@ -13892,14 +13864,15 @@ def _build_exception_process_result(
     stdout_clean = stdout_text.strip()
     stderr_clean = _sanitize_failure_stderr_capture(stderr_text)
     failure_quality_analysis: GenerationQualityAnalysis | None = None
-    failure_quality_issues: str | None = None
     if stdout_clean:
         captured_sections.append("=== STDOUT ===\n" + stdout_clean)
         if (
             len(stdout_clean) >= QUALITY.min_text_length
             or len(stdout_clean.split()) >= QUALITY.min_token_count
         ):
-            failure_quality_analysis, failure_quality_issues = _analyze_text_quality(
+            # Neutral captured-output evidence; the canonical assessment for
+            # failures stays "not_evaluated" and carries no verdict string.
+            failure_quality_analysis = analyze_generation_text(
                 stdout_clean,
                 max(len(stdout_clean.split()), 1),
                 prompt=params.prompt,
@@ -13914,7 +13887,6 @@ def _build_exception_process_result(
         model_name=params.model_identifier,
         error=error,
         captured_output=captured_output,
-        quality_issues=failure_quality_issues,
         quality_analysis=failure_quality_analysis,
         failure_phase=current_phase,
         generation_time=phase_timer.duration("decode"),
@@ -16866,11 +16838,12 @@ def process_models(
                 result.model_name,
                 _format_quality_analysis_for_log(analysis),
             )
-            if result.quality_issues:
+            assessment = _assess_result(result)
+            if assessment.observations:
                 logger.info(
                     "Mechanical observations for %s: %s",
                     result.model_name,
-                    result.quality_issues,
+                    ", ".join(assessment.observations),
                 )
 
         results.append(replace(result, completed_at=local_now_str()))
@@ -16943,32 +16916,6 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
     parts.append(f"words={analysis.word_count}")
 
     return ", ".join(parts) if parts else "no issues detected"
-
-
-def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
-    """Build a compact log-only label string from mechanical observations."""
-    repetitive_label = (
-        f"repetitive({analysis.repeated_token})" if analysis.repeated_token else "repetitive"
-    )
-    issue_candidates = [
-        (analysis.is_repetitive, repetitive_label),
-        (
-            bool(analysis.missing_sections),
-            f"missing-sections({'+'.join(analysis.missing_sections)})",
-        ),
-        (analysis.thinking_trace_incomplete, "thinking-incomplete"),
-        (analysis.thinking_only_output, "missing-final-answer"),
-        (analysis.instruction_echo, "instruction-echo"),
-        (bool(analysis.unexpected_catalog_preamble), "unexpected-catalog-preamble"),
-        (bool(analysis.unexpected_special_tokens), "unexpected-special-token"),
-        (
-            analysis.likely_capped and bool(analysis.token_cap_reasons),
-            "token-cap-truncation",
-        ),
-        (analysis.keyword_overlap == "no_overlap", "no-keyword-overlap"),
-    ]
-    issues = [label for condition, label in issue_candidates if condition]
-    return ", ".join(issues) if issues else None
 
 
 def _truncate_text_preview(text: str, *, max_chars: int) -> str:
@@ -17071,7 +17018,7 @@ def _populate_result_quality_analysis(
             configured_pair = (start_marker, end_marker)
             if all(configured_pair) and configured_pair not in thinking_trace_delimiters:
                 thinking_trace_delimiters.append(configured_pair)
-    analysis, quality_issues = _analyze_text_quality(
+    analysis = analyze_generation_text(
         text,
         generated_tokens,
         prompt_tokens=prompt_tokens,
@@ -17090,11 +17037,7 @@ def _populate_result_quality_analysis(
             diagnostics.rendered_prompt_token_count if diagnostics is not None else None
         ),
     )
-    return replace(
-        result,
-        quality_analysis=analysis,
-        quality_issues=quality_issues,
-    )
+    return replace(result, quality_analysis=analysis)
 
 
 # =============================================================================
