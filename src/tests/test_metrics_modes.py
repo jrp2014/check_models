@@ -1353,8 +1353,7 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         "log",
         "environment",
     )
-    public_map = check_models._public_output_artifact_map(inputs)
-    assert set(public_map) == {
+    assert {artifact.public_key for artifact in artifacts} == {
         "output_index",
         "results_html",
         "model_gallery",

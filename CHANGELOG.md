@@ -29,6 +29,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The schema-3 loader also validates the nested structures reports index
+  into (`assessment.details`, `prompt_diagnostics.generate_kwargs` must be
+  mappings when present), and comparison rehydration is strictly typed: a
+  JSON string where a boolean/enum/timestamp belongs raises into the
+  degrade-to-no-baseline path instead of being truthiness-coerced (e.g.
+  `"false"` no longer reads as `True` for `throughput_comparable`).
+- Remaining `run.json` descriptions in the root README, feature lists, the
+  monolith's architecture header, and internal docstrings now describe the
+  schema-3 `results.jsonl` contract.
 - Report, diagnostics, summary, and comparison rendering are contained at
   their orchestration boundaries: an unexpected exception in one renderer
   degrades that artifact (and logs it) instead of terminating finalisation,
@@ -105,6 +114,10 @@ Notable changes to this project will be documented in this file.
   parsing), `--detailed-metrics`, and `--open-report`; verbose mode always
   renders the full detailed metrics tree, and the unreachable compact
   verbose renderer and legend branch are deleted.
+- Dead definitions with no reference sites (`FLOAT_ZERO_EPSILON`,
+  `ERROR_MESSAGE_TRUNCATE_LEN`, `BPE_BYTE_ARTIFACTS`, `_html_code_block`,
+  and the test-only `_public_output_artifact_map`), plus a duplicate
+  `--output-dir` parsing test already covered by the layout-derivation test.
 - Reporting-archaeology tests asserting the absence of long-retired
   surfaces, replaced by one canonical retired-terms guard across every
   rendered artifact (test count 903 → 896 before the new schema-3 loader

@@ -37,9 +37,10 @@ Tracked in git (browsable on GitHub):
 - `reports/diagnostics.md` — maintainer triage tables and per-model evidence
 - `issues/run_summary.md` — paste-ready whole-run issue summary (when findings exist)
 - `issues/issue_*.md` — per-crash issue drafts (hard actionable crashes only)
-- `results.jsonl` — canonical machine-readable per-model records, including
-  full rendered prompts and captured upstream console output
-- `run.json` — run-level metadata, provenance, artifact manifest
+- `results.jsonl` — the sole schema-3 machine contract: a run-level metadata
+  header (provenance, counts, artifact manifest, baseline comparison) followed
+  by per-model records including full rendered prompts and captured upstream
+  console output
 - `check_models.log` — full run log (timeline, tee'd model console output)
 - `environment.log` — complete dependency and toolchain inventory
 

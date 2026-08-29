@@ -77,7 +77,8 @@ The file is organized in this order — search for these exact landmark headers 
   `results.history.jsonl`); relocate the whole layout with `--output-dir`,
   the only output-location control. `results.jsonl` (schema 3.0) is the sole
   current-run machine contract: its metadata header carries the run-level
-  context that `run.json` used to hold. Navigation surfaces (`index.md`,
+  context formerly split into a separate run-level JSON file. Navigation
+  surfaces (`index.md`,
   terminal artifact log) list only artifacts whose `ReportArtifactOutcome`
   succeeded this run — never stale files found on disk. Hard actionable
   crashes additionally create factual issue drafts under

@@ -524,17 +524,6 @@ class TestCliArgumentNormalization:
 
         assert exc_info.value.code == 2
 
-    def test_retained_output_destinations_can_be_overridden(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """The single output root relocates every retained artifact."""
-        parser = check_models._build_cli_parser()
-
-        args = parser.parse_args(["--output-dir", str(tmp_path)])
-
-        assert args.output_dir == tmp_path
-
     def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:
         """Auto mode should use metadata-assisted cataloguing when references exist."""
         args = self._build_args(eval_mode="auto", max_tokens=None)

@@ -22,7 +22,8 @@ Architecture at a glance:
   ``finalize_execution``): one run emits the console dashboard plus
   ``index.md`` (dashboard + links), ``reports/results.html``,
   ``reports/model_gallery.md``, ``reports/diagnostics.md``,
-  ``results.jsonl`` (canonical, schema 2.0), ``run.json``, append-only
+  ``results.jsonl`` (the sole machine contract, schema 3.0: run-level
+  metadata header plus per-model rows), append-only
   ``results.history.jsonl``, and paste-ready issue drafts under ``issues/``.
   The run-issue summary re-reads validated ``results.jsonl`` rather than
   trusting in-memory state.
@@ -142,8 +143,6 @@ from check_models_data.dependency_policy import (
     UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM,
     UPSTREAM_MLX_VLM_MINIMUMS,
 )
-
-FLOAT_ZERO_EPSILON: Final[float] = 1e-9
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
 # Keep a nullable module binding so downstream checks can stay simple.
@@ -3447,7 +3446,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "error_package": ("Error", "Package"),
 }
 
-ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
@@ -4306,12 +4304,6 @@ def _detect_likely_cutoff(
 # These detect issues that are likely bugs in mlx-vlm or model integration,
 # NOT inherent model quality problems. Separating them helps users know
 # whether to report issues upstream vs. use a different model.
-
-BPE_BYTE_ARTIFACTS: Final[tuple[tuple[str, str], ...]] = (
-    ("\u0100", "byte_0"),
-    ("\u0101", "byte_1"),
-    ("\u0102", "byte_2"),
-)
 
 SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     (r"<end_of_turn>", "<end_of_turn>"),
@@ -6795,12 +6787,6 @@ def _html_status_attrs(
             _html_class_attr((assessment.execution, assessment.usability)),
         )
     )
-
-
-def _html_code_block(content: str, *, language: str = "text") -> str:
-    """Render complete escaped evidence without normalising captured text."""
-    class_attr = _html_attr("class", f"language-{language}") if language else ""
-    return f"<pre><code{class_attr}>{html.escape(content, quote=True)}</code></pre>"
 
 
 def _html_table(
@@ -16277,8 +16263,9 @@ def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
 def _cache_discovery_records() -> list[CacheDiscoveryEntryRecord]:
     """Serialise every cached repo's classification for machine artifacts.
 
-    Retained in run.json so downstream tools can distinguish an intentional
-    non-test (capability exclusion) from a crash or an unavailable model.
+    Retained in the ``results.jsonl`` metadata header so downstream tools can
+    distinguish an intentional non-test (capability exclusion) from a crash or
+    an unavailable model.
     Skipped non-image models never enter the per-model results.
     """
     return [
@@ -18108,8 +18095,9 @@ class RunComparison:
 class ComparisonBaseline:
     """A loaded baseline: where it came from plus its validated JSONL rows.
 
-    ``image`` and ``generation_settings`` come from the baseline's ``run.json``
-    when it can be read from the same source; they drive the like-for-like
+    ``image`` and ``generation_settings`` come from the baseline's retained
+    metadata header when it can be read from the same source; they drive the
+    like-for-like
     check so a prompt, image, or settings change is never reported as a model
     regression.
     """
@@ -18642,7 +18630,7 @@ def _comparison_compatibility(
 
 
 def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonLike] | None:
-    """Serialise a RunComparison for run.json."""
+    """Serialise a RunComparison for the retained ``results.jsonl`` metadata."""
     if comparison is None:
         return None
 
@@ -18771,6 +18759,40 @@ def _comparison_pair(raw: JsonLike) -> tuple[JsonLike, JsonLike]:
     return raw[0], raw[1]
 
 
+def _comparison_band_source(raw: JsonLike) -> Literal["history", "fallback"]:
+    """Narrow one retained throughput-band source to its known values."""
+    if raw not in ("history", "fallback"):
+        message = f"comparison band_source is not a known value: {raw!r}"
+        raise ValueError(message)
+    return cast("Literal['history', 'fallback']", raw)
+
+
+def _comparison_req_bool(raw: JsonLike) -> bool:
+    """Narrow one required retained comparison boolean (never bool() coercion)."""
+    if not isinstance(raw, bool):
+        message = f"comparison field is not a boolean: {raw!r}"
+        raise TypeError(message)
+    return raw
+
+
+def _comparison_opt_str(raw: JsonLike) -> str | None:
+    """Narrow one optional retained comparison string."""
+    if raw is not None and not isinstance(raw, str):
+        message = f"comparison field is not a string or null: {raw!r}"
+        raise TypeError(message)
+    return raw
+
+
+def _comparison_mapping(raw: JsonLike) -> dict[str, JsonLike]:
+    """Narrow one retained comparison object, defaulting only true absence."""
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        message = f"comparison field is not an object: {raw!r}"
+        raise TypeError(message)
+    return raw
+
+
 def _comparison_rows(raw: JsonLike) -> tuple[dict[str, JsonLike], ...]:
     """Narrow one retained comparison list of objects."""
     if raw is None:
@@ -18788,19 +18810,16 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     renderer consumes; a malformed payload raises and the caller degrades to
     regenerating without the baseline section.
     """
-    components = value.get("baseline_components")
-    if not isinstance(components, dict):
-        components = {}
-    execution_mode = value.get("execution_mode")
-    if not isinstance(execution_mode, dict):
-        execution_mode = {}
-    comparability = cast(
-        "Literal['comparable', 'unknown', 'incomparable']",
-        value.get("comparability", "comparable"),
-    )
+    components = _comparison_mapping(value.get("baseline_components"))
+    execution_mode = _comparison_mapping(value.get("execution_mode"))
+    comparability_value = value.get("comparability", "comparable")
+    if comparability_value not in ("comparable", "unknown", "incomparable"):
+        message = f"comparison comparability is not a known value: {comparability_value!r}"
+        raise ValueError(message)
+    comparability = cast("Literal['comparable', 'unknown', 'incomparable']", comparability_value)
     identity: dict[str, object] = {
         "baseline_label": _comparison_req_str(value.get("baseline", "unknown baseline")),
-        "baseline_timestamp": cast("str | None", value.get("baseline_timestamp")),
+        "baseline_timestamp": _comparison_opt_str(value.get("baseline_timestamp")),
         "baseline_components": tuple(
             (_comparison_req_str(name), _comparison_req_str(part))
             for name, part in components.items()
@@ -18829,9 +18848,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
             **cast("dict[str, Any]", identity),
         )
-    ratio = value.get("generation_tps_ratio")
-    if not isinstance(ratio, dict):
-        ratio = {}
+    ratio = _comparison_mapping(value.get("generation_tps_ratio"))
     changes = tuple(
         RunComparisonModelChange(
             model=_comparison_req_str(change["model"]),
@@ -18852,9 +18869,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             ratio=_comparison_req_float(flag["ratio"]),
             band_low=_comparison_req_float(_comparison_pair(flag["band"])[0]),
             band_high=_comparison_req_float(_comparison_pair(flag["band"])[1]),
-            band_source=cast(
-                "Literal['history', 'fallback']", _comparison_req_str(flag["band_source"])
-            ),
+            band_source=_comparison_band_source(flag["band_source"]),
             band_samples=_comparison_req_int(flag["band_samples"]),
         )
         for flag in _comparison_rows(value.get("throughput_flags"))
@@ -18891,7 +18906,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             )
             for entry in _comparison_rows(value.get("revision_changes"))
         ),
-        throughput_comparable=bool(value.get("throughput_comparable", True)),
+        throughput_comparable=_comparison_req_bool(value.get("throughput_comparable", True)),
         **cast("dict[str, Any]", identity),
     )
 
@@ -18931,9 +18946,9 @@ def _format_observation_delta(change: RunComparisonModelChange) -> str:
 class _ComparisonView:
     """Formatted comparison rows derived once and shared by Markdown and terminal.
 
-    ``run.json`` keeps its own raw-number serialization; everything human-facing
-    renders from this view so wording and withholding rules cannot drift
-    between surfaces.
+    The retained metadata keeps its own raw-number serialization; everything
+    human-facing renders from this view so wording and withholding rules cannot
+    drift between surfaces.
     """
 
     identity_rows: tuple[tuple[str, str], ...]
@@ -19167,7 +19182,7 @@ def _validate_run_issue_metadata(
     metadata_value: JsonLike,
     jsonl_path: Path,
 ) -> JsonlMetadataRecord:
-    """Validate and narrow the schema-2.0 metadata row."""
+    """Validate and narrow the schema-3.0 metadata row."""
     if not isinstance(metadata_value, dict) or metadata_value.get("_type") != "metadata":
         message = f"First JSONL row in {jsonl_path} must be metadata"
         raise ValueError(message)
@@ -19351,6 +19366,35 @@ _RUN_ISSUE_ASSESSMENT_VOCABULARIES: Final[tuple[tuple[str, frozenset[str]], ...]
 )
 
 
+def _validate_run_issue_result_shapes(
+    value: dict[str, JsonLike],
+    assessment: dict[str, JsonLike],
+    line_number: int,
+) -> None:
+    """Enforce the retained row-field shapes every report consumer indexes into."""
+    shaped_fields = (
+        ("timestamp", str),
+        ("generated_text", str),
+        ("captured_output_on_fail", str),
+        ("metrics", dict),
+        ("timing", dict),
+    )
+    diagnostics = value["prompt_diagnostics"]
+    if any(not isinstance(value[name], shape) for name, shape in shaped_fields) or not (
+        diagnostics is None or isinstance(diagnostics, dict)
+    ):
+        message = f"JSONL result row {line_number} has invalid retained field shapes"
+        raise RunIssueSummaryValidationError(message)
+    details = assessment.get("details")
+    if details is not None and not isinstance(details, dict):
+        message = f"JSONL result row {line_number} has a non-mapping assessment details"
+        raise RunIssueSummaryValidationError(message)
+    generate_kwargs = diagnostics.get("generate_kwargs") if diagnostics else None
+    if generate_kwargs is not None and not isinstance(generate_kwargs, dict):
+        message = f"JSONL result row {line_number} has non-mapping prompt generate_kwargs"
+        raise RunIssueSummaryValidationError(message)
+
+
 def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResultRecord:
     """Validate and narrow one cached per-model assessment row."""
     if not isinstance(value, dict) or value.get("_type") != "result":
@@ -19377,19 +19421,7 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
     if not isinstance(model, str) or not isinstance(assessment, dict):
         message = f"JSONL result row {line_number} has invalid field types"
         raise RunIssueSummaryValidationError(message)
-    shaped_fields = (
-        ("timestamp", str),
-        ("generated_text", str),
-        ("captured_output_on_fail", str),
-        ("metrics", dict),
-        ("timing", dict),
-    )
-    diagnostics = value["prompt_diagnostics"]
-    if any(not isinstance(value[name], shape) for name, shape in shaped_fields) or not (
-        diagnostics is None or isinstance(diagnostics, dict)
-    ):
-        message = f"JSONL result row {line_number} has invalid retained field shapes"
-        raise RunIssueSummaryValidationError(message)
+    _validate_run_issue_result_shapes(value, assessment, line_number)
     vocabulary_violation = any(
         not isinstance(assessment.get(field), str) or assessment.get(field) not in vocabulary
         for field, vocabulary in _RUN_ISSUE_ASSESSMENT_VOCABULARIES
@@ -21185,14 +21217,6 @@ def _public_artifact_path(path: Path) -> str:
             return str(PurePosixPath(*resolved.relative_to(_SCRIPT_DIR.resolve()).parts))
         except ValueError:
             return _home_relative_report_text(str(path))
-
-
-def _public_output_artifact_map(inputs: ReportGenerationInputs) -> dict[str, str]:
-    """Return stable artifact paths for run-level JSON metadata."""
-    return {
-        artifact.public_key: _public_artifact_path(artifact.path)
-        for artifact in _build_report_artifacts(inputs)
-    }
 
 
 def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:

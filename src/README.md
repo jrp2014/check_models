@@ -74,11 +74,11 @@ python -m check_models --dry-run
   - Memory: peak, active/cache snapshots, and post-cleanup active/cache residue (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
-  - **CLI**: Colorized with compact or detailed metrics modes
+  - **CLI**: Colorized; `--verbose` adds the detailed metrics tree
   - **HTML**: Standalone report with inline CSS, failed row highlighting
   - **Markdown**: Tiny run index, evidence gallery, and conditional diagnostics
-  - **JSONL**: Canonical machine-readable per-result export for downstream analysis
-  - **Run JSON**: Stable run-level metadata contract for public snapshots
+  - **JSONL**: The sole schema-3 machine contract — run-level metadata header
+    plus per-result records — for downstream analysis and public snapshots
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
 - **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output

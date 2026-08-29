@@ -129,7 +129,7 @@ def _issue_summary_result(
     observations: list[str] | None = None,
     details: dict[str, object] | None = None,
 ) -> dict[str, object]:
-    """Build one literal schema-2.0 result without production serializers."""
+    """Build one literal schema-3.0 result without production serializers."""
     crashed = execution == "crashed"
     return {
         "_type": "result",
@@ -1069,7 +1069,7 @@ def test_run_issue_summary_preserves_remote_code_policy(
 def test_run_issue_summary_uses_cached_assessment_without_reclassification(
     tmp_path: Path,
 ) -> None:
-    """Report-only rendering must preserve cached schema-2.0 assessment values."""
+    """Report-only rendering must preserve cached schema-3.0 assessment values."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     _write_issue_summary_fixture(
         output_paths,
@@ -1294,10 +1294,9 @@ def test_retained_loader_rejects_rows_with_misshapen_fields(tmp_path: Path) -> N
         check_models.generate_run_issue_summary_report(output_paths)
 
 
-def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path) -> None:
-    """Regeneration must rehydrate the retained comparison, not silently drop it."""
-    output_paths = _issue_summary_output_paths(tmp_path / "output")
-    comparison_payload: dict[str, object] = {
+def _retained_comparison_payload() -> dict[str, object]:
+    """One serialized comparison exactly as the schema-3 metadata retains it."""
+    return {
         "baseline": "results.jsonl @ HEAD",
         "baseline_timestamp": "2026-07-30 12:00:00 BST",
         "baseline_components": {"prompt": "identical"},
@@ -1330,6 +1329,73 @@ def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path
         "history_runs_used": 0,
         "execution_mode": {"baseline": "in_process", "current": "in_process"},
     }
+
+
+@pytest.mark.parametrize(
+    ("mutation", "match"),
+    [
+        ({"throughput_comparable": "false"}, "not a boolean"),
+        ({"comparability": "sideways"}, "not a known value"),
+        ({"baseline_timestamp": 5}, "not a string or null"),
+        ({"baseline_components": "bad"}, "not an object"),
+        (
+            {
+                "throughput_flags": [
+                    {
+                        "model": "org/clean",
+                        "baseline_tps": 10.0,
+                        "current_tps": 5.0,
+                        "ratio": 0.5,
+                        "band": [0.9, 1.1],
+                        "band_source": "guess",
+                        "band_samples": 3,
+                    }
+                ]
+            },
+            "band_source",
+        ),
+    ],
+)
+def test_run_comparison_from_json_rejects_malformed_values(
+    mutation: dict[str, object],
+    match: str,
+) -> None:
+    """A damaged retained comparison must raise, never be coerced or misread."""
+    payload = _retained_comparison_payload()
+    payload.update(mutation)
+
+    with pytest.raises((TypeError, ValueError), match=match):
+        check_models._run_comparison_from_json(cast("dict[str, check_models.JsonLike]", payload))
+
+
+def test_retained_loader_rejects_non_mapping_nested_structures(tmp_path: Path) -> None:
+    """Nested objects the reports index into must be mappings at the loader."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+
+    bad_details = _issue_summary_result("org/model", observations=["catalog_constraint_violation"])
+    cast("dict[str, object]", bad_details["assessment"])["details"] = "bad"
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(_issue_summary_metadata((bad_details,))) + "\n" + json.dumps(bad_details) + "\n",
+    )
+    with pytest.raises(ValueError, match="non-mapping assessment details"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+    bad_kwargs = _issue_summary_result("org/model")
+    bad_kwargs["prompt_diagnostics"] = {"generate_kwargs": "bad"}
+    check_models._write_text_file(
+        output_paths.jsonl,
+        json.dumps(_issue_summary_metadata((bad_kwargs,))) + "\n" + json.dumps(bad_kwargs) + "\n",
+    )
+    with pytest.raises(ValueError, match="non-mapping prompt generate_kwargs"):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_regenerated_summary_restores_baseline_comparison_section(tmp_path: Path) -> None:
+    """Regeneration must rehydrate the retained comparison, not silently drop it."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    comparison_payload = _retained_comparison_payload()
     _write_issue_summary_fixture(
         output_paths,
         results=(_issue_summary_result("org/clean"),),
