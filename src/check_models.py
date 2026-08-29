@@ -79,7 +79,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from functools import lru_cache
+from functools import lru_cache, partial
 from importlib import import_module
 from importlib.metadata import (
     Distribution,
@@ -218,7 +218,6 @@ __all__ = [
     "print_model_result",
     "print_version_info",
     "process_image_with_model",
-    "save_run_json_report",
     "validate_cli_arguments",
     "validate_image_accessible",
     "validate_inputs",
@@ -325,8 +324,7 @@ _REPORTING_EMPTY_WRAPPER_PATTERNS: Final[
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 # Artifact schema versions. Three distinct schemas; writers and readers must
 # reference these constants, never bare "2.0"/"1.0" literals.
-JSONL_FORMAT_VERSION: Final = "2.0"
-RUN_JSON_SCHEMA_VERSION: Final = "2.0"
+JSONL_FORMAT_VERSION: Final = "3.0"
 HISTORY_FORMAT_VERSION: Final = "1.0"
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
@@ -1120,13 +1118,28 @@ class CheckModelsProvenanceRecord(TypedDict):
 
 
 class JsonlMetadataRecord(TypedDict, total=False):
-    """Shared header row for ``results.jsonl`` format."""
+    """Schema-3 header row: the complete run context for ``results.jsonl``.
+
+    The sole current-run machine contract; the former ``run.json`` fields
+    live here, while per-model provenance and prompt-burden facts stay on
+    each result row.
+    """
 
     _type: Required[Literal["metadata"]]
-    format_version: Required[Literal["2.0"]]
+    format_version: Required[Literal["3.0"]]
     prompt: Required[str]
+    prompt_sha256: Required[str]
     system: Required[dict[str, str]]
     timestamp: Required[str]
+    total_runtime_seconds: Required[float]
+    counts: Required[RunOutcomeCounts]
+    artifacts: Required[dict[str, str]]
+    producer: Required[CheckModelsProvenanceRecord]
+    image: Required[RunImageRecord | None]
+    generation_settings: Required[dict[str, JsonLike]]
+    trust_remote_code: Required[bool]
+    comparison: Required[dict[str, JsonLike] | None]
+    cache_discovery: NotRequired[list[CacheDiscoveryEntryRecord]]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
     eval_mode: EvaluationLane
@@ -1167,20 +1180,6 @@ class RunImageRecord(TypedDict):
     megapixels: float | None
 
 
-class RunPromptBurdenRecord(TypedDict):
-    """Per-model prompt and processed-image facts retained by run JSON."""
-
-    total_tokens: int | None
-    text_tokens_est: int | None
-    nontext_tokens_est: int | None
-    text_tokens_source: str | None
-    nontext_ratio: float | None
-    kind: str
-    processed_image_width: int | None
-    processed_image_height: int | None
-    image_patch_count: int | None
-
-
 class CacheDiscoveryEntryRecord(TypedDict):
     """One cached repo's default-discovery classification and decision."""
 
@@ -1197,28 +1196,12 @@ class CacheDiscoveryEntryRecord(TypedDict):
     arch_supported: bool | None
 
 
-class RunJsonReportRecord(TypedDict):
-    """Stable run-level machine artifact schema."""
+@dataclass(frozen=True)
+class RetainedRun:
+    """One validated in-memory retained run: metadata plus ordered results."""
 
-    schema_version: Literal["2.0"]
-    generated_at: str
-    eval_mode: EvaluationLane
-    prompt: str
-    prompt_sha256: str
-    metadata_exposed_to_prompt: bool
-    total_runtime_seconds: float
-    counts: RunOutcomeCounts
-    artifacts: dict[str, str]
-    library_versions: LibraryVersionDict
-    component_provenance: dict[str, ComponentProvenanceRecord]
-    producer: CheckModelsProvenanceRecord
-    image: RunImageRecord | None
-    generation_settings: dict[str, JsonLike]
-    trust_remote_code: bool
-    model_provenance: dict[str, ModelProvenanceRecord]
-    prompt_burden: dict[str, RunPromptBurdenRecord]
-    comparison: dict[str, JsonLike] | None
-    cache_discovery: NotRequired[list[CacheDiscoveryEntryRecord]]
+    metadata: JsonlMetadataRecord
+    results: tuple[JsonlResultRecord, ...]
 
 
 class JsonlAssessmentRecord(TypedDict):
@@ -1289,6 +1272,7 @@ class JsonlResultRecord(TypedDict):
     model_provenance: ModelProvenanceRecord
     prompt_diagnostics: dict[str, JsonLike] | None
     model_burden: NotRequired[dict[str, JsonLike]]
+    prompt_burden: NotRequired[dict[str, JsonLike]]
     architecture: NotRequired[JsonlArchitectureRecord]
     system_telemetry: NotRequired[SystemTelemetryRecord]
 
@@ -1373,7 +1357,6 @@ class ReportOutputPaths:
     html: Path
     gallery_markdown: Path
     jsonl: Path
-    run_json: Path
     diagnostics: Path
     log: Path
     environment: Path
@@ -1695,7 +1678,6 @@ DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "m
 DEFAULT_OUTPUT_INDEX: Final[Path] = _SCRIPT_DIR / "output" / "index.md"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
-DEFAULT_RUN_JSON_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "run.json"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
@@ -1715,7 +1697,6 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_OUTPUT_INDEX.name,
         DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
-        DEFAULT_RUN_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
     }
 )
@@ -17717,18 +17698,37 @@ def _build_jsonl_metadata_record(
     *,
     prompt: str,
     system_info: dict[str, str],
+    mode_policy: ReportModePolicy,
+    counts: RunOutcomeCounts,
+    generation_settings: dict[str, JsonLike],
+    image: RunImageRecord | None,
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
-    mode_policy: ReportModePolicy,
     execution_mode: Literal["in_process", "isolated"] = "in_process",
+    total_runtime_seconds: float = 0.0,
+    artifacts: Mapping[str, str] | None = None,
+    producer: CheckModelsProvenanceRecord | None = None,
+    trust_remote_code: bool = True,
+    comparison: RunComparison | None = None,
 ) -> JsonlMetadataRecord:
-    """Build shared metadata header row for JSONL results."""
+    """Build the schema-3 metadata header row carrying the whole run context."""
     record: JsonlMetadataRecord = {
         "_type": "metadata",
         "format_version": JSONL_FORMAT_VERSION,
         "prompt": prompt,
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "system": {key: _home_relative_report_text(value) for key, value in system_info.items()},
         "timestamp": local_now_str(),
+        "total_runtime_seconds": round(total_runtime_seconds, 3),
+        "counts": counts,
+        "artifacts": {
+            key: _home_relative_report_text(value) for key, value in (artifacts or {}).items()
+        },
+        "producer": producer or _collect_check_models_provenance(),
+        "image": image,
+        "generation_settings": generation_settings,
+        "trust_remote_code": trust_remote_code,
+        "comparison": _run_comparison_to_json(comparison),
         "eval_mode": mode_policy.eval_mode,
         "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
         "execution_mode": execution_mode,
@@ -17738,6 +17738,9 @@ def _build_jsonl_metadata_record(
         record["component_provenance"] = _collect_component_provenance(library_versions)
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
+    discovery = _cache_discovery_records()
+    if discovery:
+        record["cache_discovery"] = discovery
     return record
 
 
@@ -17904,20 +17907,26 @@ def _build_jsonl_result_record(
     return record
 
 
-def save_jsonl_report(
-    results: list[PerformanceResult],
-    filename: Path,
+def _build_retained_run(
+    results: Sequence[PerformanceResult],
+    *,
     prompt: str,
     system_info: dict[str, str],
-    *,
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     mode_policy: ReportModePolicy | None = None,
     requested_revision: str | None = None,
     report_context: ReportRenderContext | None = None,
     execution_mode: Literal["in_process", "isolated"] = "in_process",
-) -> None:
-    """Save the narrow JSONL machine contract with complete captured evidence."""
+    total_runtime_seconds: float = 0.0,
+    artifacts: Mapping[str, str] | None = None,
+    image_path: Path | None = None,
+    image_source_url: str | None = None,
+    trust_remote_code: bool = True,
+    comparison: RunComparison | None = None,
+    producer: CheckModelsProvenanceRecord | None = None,
+) -> RetainedRun:
+    """Build the schema-3 retained run: one metadata row plus ordered results."""
     resolved_policy = (
         mode_policy
         if mode_policy is not None
@@ -17929,7 +17938,7 @@ def save_jsonl_report(
     )
     if report_context is None:
         report_context = _build_report_render_context(
-            results=results,
+            results=list(results),
             prompt=prompt,
             eval_mode=resolved_policy.eval_mode,
             metadata_exposed_to_prompt=resolved_policy.metadata_exposed_to_prompt,
@@ -17945,9 +17954,22 @@ def save_jsonl_report(
         runtime_fingerprint=runtime_fingerprint,
         mode_policy=resolved_policy,
         execution_mode=execution_mode,
+        counts=_run_outcome_counts(report_context.assessments),
+        generation_settings=_common_generation_settings(list(results)),
+        image=_run_image_record(
+            image_path,
+            report_context.image_profile,
+            source_url=image_source_url,
+        )
+        if image_path is not None
+        else None,
+        total_runtime_seconds=total_runtime_seconds,
+        artifacts=artifacts,
+        producer=producer,
+        trust_remote_code=trust_remote_code,
+        comparison=comparison,
     )
-    lines = [json.dumps(header)]
-
+    records: list[JsonlResultRecord] = []
     for original_result in results:
         result = cached_results.get(original_result.model_name, original_result)
         record = _build_jsonl_result_record(
@@ -17957,8 +17979,46 @@ def save_jsonl_report(
             model_provenance=model_provenance.get(result.model_name),
             recommended_working_set_bytes=report_context.recommended_working_set_bytes,
         )
-        lines.append(json.dumps(record))
+        burden = _prompt_burden_for_result(result, report_context.image_profile)
+        record["prompt_burden"] = {
+            "total_tokens": burden.total_tokens,
+            "text_tokens_est": burden.text_tokens_est,
+            "nontext_tokens_est": burden.nontext_tokens_est,
+            "text_tokens_source": burden.text_tokens_source,
+            "nontext_ratio": (
+                round(burden.nontext_ratio, 2) if burden.nontext_ratio is not None else None
+            ),
+            "kind": burden.kind,
+            "processed_image_width": burden.processed_width,
+            "processed_image_height": burden.processed_height,
+            "image_patch_count": burden.patch_count,
+        }
+        records.append(record)
+    return RetainedRun(metadata=header, results=tuple(records))
+
+
+def _write_retained_run(run: RetainedRun, filename: Path) -> None:
+    """Serialize one retained run as a metadata line plus ordered result lines."""
+    lines = [json.dumps(run.metadata)]
+    lines.extend(json.dumps(result) for result in run.results)
     _write_text_file(filename, "\n".join(lines) + "\n")
+
+
+def save_jsonl_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    prompt: str,
+    system_info: dict[str, str],
+    **retained_kwargs: object,
+) -> None:
+    """Build and write the sole machine artifact in one step (test/regen seam)."""
+    run = _build_retained_run(
+        results,
+        prompt=prompt,
+        system_info=system_info,
+        **cast("dict[str, Any]", retained_kwargs),
+    )
+    _write_retained_run(run, filename)
 
 
 def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
@@ -18048,95 +18108,6 @@ def _run_image_record(
     if source_url is not None:
         record["source_url"] = source_url
     return record
-
-
-def _run_prompt_burden_records(
-    results: Sequence[PerformanceResult],
-    image_profile: ImageInputProfile | None,
-) -> dict[str, RunPromptBurdenRecord]:
-    """Return publication-safe prompt and processed-image facts by model."""
-    records: dict[str, RunPromptBurdenRecord] = {}
-    for result in results:
-        burden = _prompt_burden_for_result(result, image_profile)
-        records[result.model_name] = {
-            "total_tokens": burden.total_tokens,
-            "text_tokens_est": burden.text_tokens_est,
-            "nontext_tokens_est": burden.nontext_tokens_est,
-            "text_tokens_source": burden.text_tokens_source,
-            "nontext_ratio": (
-                round(burden.nontext_ratio, 4) if burden.nontext_ratio is not None else None
-            ),
-            "kind": burden.kind,
-            "processed_image_width": burden.processed_width,
-            "processed_image_height": burden.processed_height,
-            "image_patch_count": burden.patch_count,
-        }
-    return records
-
-
-def save_run_json_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    *,
-    versions: LibraryVersionDict,
-    prompt: str,
-    total_runtime_seconds: float,
-    report_context: ReportRenderContext,
-    output_paths: Mapping[str, str],
-    image_path: Path | None = None,
-    image_source_url: str | None = None,
-    producer: CheckModelsProvenanceRecord | None = None,
-    trust_remote_code: bool = True,
-    requested_revision: str | None = None,
-    comparison: RunComparison | None = None,
-) -> None:
-    """Write stable run-level metadata for public benchmark snapshots."""
-    policy = report_context.mode_policy
-    counts = _run_outcome_counts(report_context.assessments)
-    artifacts = {key: _home_relative_report_text(value) for key, value in output_paths.items()}
-    if any(
-        assessment.execution == "indeterminate" or assessment.maintainer_status != "none"
-        for _model_name, assessment in report_context.assessments
-    ):
-        artifacts["run_issue_summary"] = "issues/run_summary.md"
-    provenance_by_model = _model_provenance_by_model(report_context)
-    payload: RunJsonReportRecord = {
-        "schema_version": RUN_JSON_SCHEMA_VERSION,
-        "generated_at": local_now_str(),
-        "eval_mode": policy.eval_mode,
-        "prompt": prompt,
-        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
-        "total_runtime_seconds": round(total_runtime_seconds, 3),
-        "counts": counts,
-        "artifacts": artifacts,
-        "library_versions": dict(versions),
-        "component_provenance": _collect_component_provenance(versions),
-        "producer": producer or _collect_check_models_provenance(),
-        "image": _run_image_record(
-            image_path,
-            report_context.image_profile,
-            source_url=image_source_url,
-        ),
-        "generation_settings": _common_generation_settings(results),
-        "trust_remote_code": trust_remote_code,
-        "model_provenance": {
-            result.model_name: _public_model_provenance(
-                provenance_by_model.get(result.model_name)
-                or _collect_model_provenance(
-                    result.model_name,
-                    requested_revision=requested_revision,
-                )
-            )
-            for result in results
-        },
-        "prompt_burden": _run_prompt_burden_records(results, report_context.image_profile),
-        "comparison": _run_comparison_to_json(comparison),
-    }
-    discovery = _cache_discovery_records()
-    if discovery:
-        payload["cache_discovery"] = discovery
-    _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
 def _output_index_link(index_filename: Path, artifact_path: Path, label: str) -> str:
@@ -18322,40 +18293,26 @@ def _parse_jsonl_text_rows(text: str, label: str) -> list[JsonLike]:
     return rows
 
 
-def _baseline_from_jsonl_text(
-    text: str,
-    label: str,
-    *,
-    run_json_text: str | None = None,
-) -> ComparisonBaseline:
-    """Validate baseline JSONL text (plus optional run.json text) into a ComparisonBaseline."""
-    rows = _parse_jsonl_text_rows(text, label)
-    metadata = _validate_run_issue_metadata(rows[0], Path(label))
-    results = tuple(
-        _validate_run_issue_result(value, line_number)
-        for line_number, value in enumerate(rows[1:], start=2)
-    )
-    image: RunImageRecord | None = None
-    generation_settings: tuple[tuple[str, str], ...] = ()
-    if run_json_text:
-        try:
-            run_value: JsonLike = json.loads(run_json_text)
-        except json.JSONDecodeError:
-            run_value = None
-        image, generation_settings, _, _, _ = _narrow_run_issue_enrichment(run_value)
+def _baseline_from_jsonl_text(text: str, label: str) -> ComparisonBaseline:
+    """Validate baseline JSONL text into a ComparisonBaseline.
+
+    A schema-2 baseline fails the single loader's format check; the caller
+    logs that one-time incomparability instead of keeping an adapter.
+    """
+    run = _load_retained_run_text(text, label)
+    source = _run_issue_summary_source_from_run(run)
     return ComparisonBaseline(
         label=label,
-        metadata=metadata,
-        results=results,
-        image=image,
-        generation_settings=generation_settings,
+        metadata=run.metadata,
+        results=run.results,
+        image=source.image,
+        generation_settings=source.generation_settings,
     )
 
 
 def _resolve_comparison_baseline(
     spec: str | None,
     jsonl_path: Path,
-    run_json_path: Path | None = None,
 ) -> ComparisonBaseline | None:
     """Resolve ``--compare-with`` into a loaded baseline, or None when unavailable.
 
@@ -18374,13 +18331,7 @@ def _resolve_comparison_baseline(
         if choice.lower() != "auto":
             candidate = Path(choice).expanduser()
             if candidate.is_file():
-                sibling = candidate.with_name(
-                    run_json_path.name if run_json_path is not None else "run.json"
-                )
-                sibling_text = _read_text_file(sibling) if sibling.is_file() else None
-                return _baseline_from_jsonl_text(
-                    _read_text_file(candidate), str(candidate), run_json_text=sibling_text
-                )
+                return _baseline_from_jsonl_text(_read_text_file(candidate), str(candidate))
         tracked = _git_tracked_relpath(jsonl_path)
         if tracked is None:
             if choice.lower() != "auto":
@@ -18408,14 +18359,7 @@ def _resolve_comparison_baseline(
             sha = _run_git_capture(["rev-parse", "--short", "HEAD"], repo_root)
             if sha:
                 label = f"{sha.strip()}:{relpath}"
-        run_json_text: str | None = None
-        if run_json_path is not None:
-            tracked_run_json = _git_tracked_relpath(run_json_path)
-            if tracked_run_json is not None:
-                run_json_text = _run_git_capture(
-                    ["show", f"{ref}:{tracked_run_json[1]}"], repo_root
-                )
-        return _baseline_from_jsonl_text(text, label, run_json_text=run_json_text)
+        return _baseline_from_jsonl_text(text, label)
     except (OSError, ValueError, TypeError) as error:
         logger.warning(
             "--compare-with %s: baseline unusable (%s); skipping comparison.", choice, error
@@ -19160,11 +19104,6 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("No changes beyond noise against the baseline sweep.")
 
 
-def _parse_run_issue_jsonl_rows(jsonl_path: Path) -> list[JsonLike]:
-    """Read retained JSONL safely and return decoded rows with line-aware errors."""
-    return _parse_jsonl_text_rows(_read_text_file(jsonl_path), str(jsonl_path))
-
-
 def _validate_run_issue_metadata(
     metadata_value: JsonLike,
     jsonl_path: Path,
@@ -19174,7 +19113,10 @@ def _validate_run_issue_metadata(
         message = f"First JSONL row in {jsonl_path} must be metadata"
         raise ValueError(message)
     if metadata_value.get("format_version") != JSONL_FORMAT_VERSION:
-        message = f"Run issue summary requires results.jsonl format_version {JSONL_FORMAT_VERSION}"
+        message = (
+            f"results.jsonl format_version must be {JSONL_FORMAT_VERSION} "
+            f"(found {metadata_value.get('format_version')!r})"
+        )
         raise ValueError(message)
     system = metadata_value.get("system")
     versions = metadata_value.get("library_versions")
@@ -19374,89 +19316,66 @@ def _narrow_run_issue_producer(value: JsonLike) -> CheckModelsProvenanceRecord |
     return record
 
 
-def _narrow_run_issue_enrichment(
-    run_value: JsonLike,
-) -> tuple[
-    RunImageRecord | None,
-    tuple[tuple[str, str], ...],
-    bool | None,
-    CheckModelsProvenanceRecord | None,
-    tuple[datetime, datetime] | None,
-]:
-    """Narrow optional image/settings enrichment from a parsed run JSON value."""
-    image_record: RunImageRecord | None = None
-    generation_settings: tuple[tuple[str, str], ...] = ()
-    trust_remote_code: bool | None = None
-    producer: CheckModelsProvenanceRecord | None = None
-    run_window: tuple[datetime, datetime] | None = None
-    if isinstance(run_value, dict):
-        image_record = _narrow_run_issue_image(run_value.get("image"))
-        producer = _narrow_run_issue_producer(run_value.get("producer"))
-        raw_trust_remote_code = run_value.get("trust_remote_code")
-        if isinstance(raw_trust_remote_code, bool):
-            trust_remote_code = raw_trust_remote_code
-        settings = run_value.get("generation_settings")
-        if isinstance(settings, dict):
-            generation_settings = tuple(
-                (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
-                for key, value in sorted(settings.items())
-            )
-        run_end = _parse_local_timestamp(run_value.get("generated_at"))
-        runtime = run_value.get("total_runtime_seconds")
-        if (
-            run_end is not None
-            and isinstance(runtime, int | float)
-            and not isinstance(runtime, bool)
-            and runtime >= 0
-        ):
-            run_window = run_end - timedelta(seconds=runtime), run_end
-    return image_record, generation_settings, trust_remote_code, producer, run_window
-
-
-def _load_run_issue_enrichment(
-    run_json_path: Path,
-) -> tuple[
-    RunImageRecord | None,
-    tuple[tuple[str, str], ...],
-    bool | None,
-    CheckModelsProvenanceRecord | None,
-    tuple[datetime, datetime] | None,
-]:
-    """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
-    try:
-        run_value: JsonLike = json.loads(_read_text_file(run_json_path))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-        return None, (), None, None, None
-    return _narrow_run_issue_enrichment(run_value)
-
-
-def _load_run_issue_summary_source(
-    output_paths: ReportOutputPaths,
-    *,
-    include_run_json: bool = True,
-) -> RunIssueSummarySource:
-    """Load and validate the cached schema-2.0 inputs used by the issue summary."""
-    parsed_rows = _parse_run_issue_jsonl_rows(output_paths.jsonl)
-    metadata = _validate_run_issue_metadata(parsed_rows[0], output_paths.jsonl)
+def _load_retained_run_text(text: str, label: str) -> RetainedRun:
+    """Decode and validate one retained run from JSONL text (the sole loader)."""
+    parsed_rows = _parse_jsonl_text_rows(text, label)
+    if not parsed_rows:
+        message = f"{label} contains no rows"
+        raise ValueError(message)
+    metadata = _validate_run_issue_metadata(parsed_rows[0], Path(label))
     results = tuple(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
-    image, generation_settings, trust_remote_code, producer, run_window = (
-        _load_run_issue_enrichment(output_paths.run_json)
-        if include_run_json
-        else (None, (), None, None, None)
-    )
+    return RetainedRun(metadata=metadata, results=results)
 
+
+def _load_retained_run(path: Path) -> RetainedRun:
+    """Load and validate the retained run at ``path``."""
+    return _load_retained_run_text(_read_text_file(path), str(path))
+
+
+def _retained_run_window(metadata: JsonlMetadataRecord) -> tuple[datetime, datetime] | None:
+    """Derive the run's wall-clock window from its end timestamp and runtime."""
+    run_end = _parse_local_timestamp(metadata.get("timestamp"))
+    runtime = metadata.get("total_runtime_seconds")
+    if (
+        run_end is not None
+        and isinstance(runtime, int | float)
+        and not isinstance(runtime, bool)
+        and runtime >= 0
+    ):
+        return run_end - timedelta(seconds=runtime), run_end
+    return None
+
+
+def _run_issue_summary_source_from_run(run: RetainedRun) -> RunIssueSummarySource:
+    """Project one retained run into the paste-ready summary's source shape."""
+    metadata = run.metadata
+    settings = metadata.get("generation_settings")
+    generation_settings = (
+        tuple(
+            (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
+            for key, value in sorted(settings.items())
+        )
+        if isinstance(settings, dict)
+        else ()
+    )
+    raw_trust = metadata.get("trust_remote_code")
     return RunIssueSummarySource(
         metadata=metadata,
-        results=results,
-        image=image,
+        results=run.results,
+        image=_narrow_run_issue_image(cast("JsonLike", metadata.get("image"))),
         generation_settings=generation_settings,
-        trust_remote_code=trust_remote_code,
-        producer=producer,
-        run_window=run_window,
+        trust_remote_code=raw_trust if isinstance(raw_trust, bool) else None,
+        producer=_narrow_run_issue_producer(cast("JsonLike", metadata.get("producer"))),
+        run_window=_retained_run_window(metadata),
     )
+
+
+def _load_run_issue_summary_source(output_paths: ReportOutputPaths) -> RunIssueSummarySource:
+    """Load and validate the retained schema-3 inputs used by the issue summary."""
+    return _run_issue_summary_source_from_run(_load_retained_run(output_paths.jsonl))
 
 
 def _run_issue_summary_path(output_paths: ReportOutputPaths) -> Path:
@@ -20286,7 +20205,6 @@ def _run_issue_summary_artifacts_section(
     *,
     source: RunIssueSummarySource,
     include_gallery_markdown: bool,
-    include_run_json: bool,
 ) -> ReportSection:
     """Build links to the complete retained artifacts."""
     artifact_rows = [
@@ -20295,8 +20213,6 @@ def _run_issue_summary_artifacts_section(
     if include_gallery_markdown:
         artifact_rows.append(("Model gallery", output_paths.gallery_markdown))
     artifact_rows.append(("Results JSONL", output_paths.jsonl))
-    if include_run_json:
-        artifact_rows.append(("Run JSON", output_paths.run_json))
     retained_logs = (("Environment", output_paths.environment), ("Log", output_paths.log))
     stale_names = {
         path.name
@@ -20387,14 +20303,10 @@ def generate_run_issue_summary_report(
     *,
     issue_reports: Mapping[str, Path] | None = None,
     include_gallery_markdown: bool = True,
-    include_run_json: bool = True,
     comparison: RunComparison | None = None,
 ) -> Path | None:
-    """Generate a paste-ready whole-run issue from retained schema-2.0 artifacts."""
-    source = _load_run_issue_summary_source(
-        output_paths,
-        include_run_json=include_run_json,
-    )
+    """Generate a paste-ready whole-run issue from the retained schema-3 artifact."""
+    source = _load_run_issue_summary_source(output_paths)
     summary_path = _run_issue_summary_path(output_paths)
     actionable = tuple(
         result
@@ -20494,7 +20406,6 @@ def generate_run_issue_summary_report(
                 summary_path,
                 source=source,
                 include_gallery_markdown=include_gallery_markdown,
-                include_run_json=include_run_json,
             ),
         )
     )
@@ -20514,7 +20425,6 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
         html=output_dir / "reports" / DEFAULT_HTML_OUTPUT.name,
         gallery_markdown=output_dir / "reports" / DEFAULT_GALLERY_MD_OUTPUT.name,
         jsonl=output_dir / DEFAULT_JSONL_OUTPUT.name,
-        run_json=output_dir / DEFAULT_RUN_JSON_OUTPUT.name,
         diagnostics=output_dir / "reports" / DEFAULT_DIAGNOSTICS_OUTPUT.name,
         log=output_dir / DEFAULT_LOG_OUTPUT.name,
         environment=output_dir / DEFAULT_ENV_OUTPUT.name,
@@ -21076,13 +20986,12 @@ def _write_environment_failure_diagnostics(
 
 def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
     """Resolve all final report/log output paths once for finalization."""
-    run_json_path = args.output_run_json.resolve()
+    jsonl_path = args.output_jsonl.resolve()
     return ReportOutputPaths(
-        index=run_json_path.parent / DEFAULT_OUTPUT_INDEX.name,
+        index=jsonl_path.parent / DEFAULT_OUTPUT_INDEX.name,
         html=args.output_html.resolve(),
         gallery_markdown=args.output_gallery_markdown.resolve(),
-        jsonl=args.output_jsonl.resolve(),
-        run_json=run_json_path,
+        jsonl=jsonl_path,
         diagnostics=args.output_diagnostics.resolve(),
         log=args.output_log.resolve(),
         environment=args.output_env.resolve(),
@@ -21183,46 +21092,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             label="   JSONL Report:    ",
             path=output_paths.jsonl,
             dashboard_label="JSONL Data",
-            dashboard_purpose="Machine-readable per-model evidence",
-            job=lambda: save_jsonl_report(
-                inputs.results,
-                output_paths.jsonl,
-                prompt=inputs.prompt,
-                system_info=inputs.system_info,
-                library_versions=inputs.library_versions,
-                runtime_fingerprint=inputs.runtime_fingerprint,
-                requested_revision=inputs.model_revision,
-                report_context=inputs.report_context,
-                execution_mode=(
-                    "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
-                ),
-            ),
-        ),
-        ReportArtifact(
-            key="run_json",
-            public_key="run_json",
-            label="   Run JSON:        ",
-            path=output_paths.run_json,
-            dashboard_label="Run JSON",
-            dashboard_purpose="Run metadata and artifact manifest",
-            job=lambda: save_run_json_report(
-                inputs.results,
-                output_paths.run_json,
-                versions=inputs.library_versions,
-                prompt=inputs.prompt,
-                total_runtime_seconds=inputs.overall_time,
-                report_context=inputs.report_context,
-                output_paths=_public_output_artifact_map(inputs),
-                image_path=inputs.image_path,
-                image_source_url=(
-                    getattr(inputs.run_args, "image_source_url", None)
-                    if inputs.run_args is not None
-                    else None
-                ),
-                trust_remote_code=inputs.trust_remote_code,
-                requested_revision=inputs.model_revision,
-                comparison=inputs.comparison,
-            ),
+            dashboard_purpose="Machine-readable run and per-model evidence",
         ),
         ReportArtifact(
             key="log",
@@ -21263,7 +21133,6 @@ def _generate_run_issue_summary_output(
     jsonl_succeeded: bool,
     diagnostics_succeeded: bool,
     gallery_succeeded: bool,
-    run_json_succeeded: bool,
 ) -> tuple[Path | None, ReportArtifactOutcome | None]:
     """Generate the optional summary only from current-run canonical inputs."""
     summary_path = _run_issue_summary_path(inputs.output_paths)
@@ -21296,7 +21165,6 @@ def _generate_run_issue_summary_output(
             inputs.output_paths,
             issue_reports=issue_reports,
             include_gallery_markdown=gallery_succeeded,
-            include_run_json=run_json_succeeded,
             comparison=inputs.comparison,
         )
     except Exception as error:  # report isolation must contain renderer defects
@@ -21380,8 +21248,10 @@ def _log_report_generation_outcomes(
         log_file_path(run_issue_summary, label="   Run Issue:       ")
 
 
-def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | None:
-    """Diff the just-written JSONL against the configured baseline (best effort).
+def _compute_run_comparison(
+    inputs: ReportGenerationInputs, current: RetainedRun
+) -> RunComparison | None:
+    """Diff the in-memory retained run against the configured baseline (best effort).
 
     The entire computation — baseline resolution, current-source loading, and
     the diff itself — sits behind one ordinary-exception boundary: comparison
@@ -21390,25 +21260,22 @@ def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | N
     """
     try:
         spec = getattr(inputs.run_args, "compare_with", DEFAULT_COMPARE_WITH)
-        baseline = _resolve_comparison_baseline(
-            spec, inputs.output_paths.jsonl, inputs.output_paths.run_json
-        )
+        baseline = _resolve_comparison_baseline(spec, inputs.output_paths.jsonl)
         if baseline is None:
             return None
-        source = _load_run_issue_summary_source(inputs.output_paths, include_run_json=False)
         current_image = (
             _run_image_record(inputs.image_path, inputs.report_context.image_profile)
             if inputs.image_path is not None
             else None
         )
         return compare_run_results(
-            source.results,
+            current.results,
             baseline,
             history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
             prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
             history_excludes_current=inputs.history_appended,
-            current_execution_mode=str(source.metadata.get("execution_mode", "in_process")),
-            current_metadata=source.metadata,
+            current_execution_mode=str(current.metadata.get("execution_mode", "in_process")),
+            current_metadata=current.metadata,
             current_image=current_image,
             current_generation_settings=tuple(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
@@ -21419,6 +21286,65 @@ def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | N
         logger.warning("Comparison skipped: unexpected comparison failure (%s)", error)
         logger.debug("Comparison failure detail", exc_info=True)
         return None
+
+
+def _build_retained_run_guarded(
+    inputs: ReportGenerationInputs, artifacts: Sequence[ReportArtifact]
+) -> RetainedRun | None:
+    """Build the retained run behind the report isolation boundary."""
+    manifest = {artifact.public_key: _public_artifact_path(artifact.path) for artifact in artifacts}
+    if any(
+        assessment.execution == "indeterminate" or assessment.maintainer_status != "none"
+        for _model_name, assessment in inputs.report_context.assessments
+    ):
+        manifest["run_issue_summary"] = "issues/run_summary.md"
+    try:
+        return _build_retained_run(
+            inputs.results,
+            prompt=inputs.prompt,
+            system_info=inputs.system_info,
+            library_versions=inputs.library_versions,
+            runtime_fingerprint=inputs.runtime_fingerprint,
+            requested_revision=inputs.model_revision,
+            report_context=inputs.report_context,
+            execution_mode=(
+                "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
+            ),
+            total_runtime_seconds=inputs.overall_time,
+            artifacts=manifest,
+            image_path=inputs.image_path,
+            image_source_url=(
+                getattr(inputs.run_args, "image_source_url", None)
+                if inputs.run_args is not None
+                else None
+            ),
+            trust_remote_code=inputs.trust_remote_code,
+            comparison=inputs.comparison,
+        )
+    except Exception:
+        logger.exception("Failed to build the retained run record.")
+        return None
+
+
+def _run_jsonl_artifact(
+    retained: RetainedRun | None,
+    artifact: ReportArtifact,
+    jsonl_path: Path,
+    run_artifact: Callable[[ReportArtifact], bool],
+    outcomes: list[ReportArtifactOutcome],
+) -> bool:
+    """Write the retained run through the artifact boundary, or record the miss."""
+    if retained is None:
+        outcomes.append(
+            ReportArtifactOutcome(
+                key="jsonl",
+                path=jsonl_path,
+                succeeded=False,
+                error_message="retained-run build failed",
+            )
+        )
+        return False
+    return run_artifact(replace(artifact, job=partial(_write_retained_run, retained, jsonl_path)))
 
 
 def _generate_reports_and_log_outputs(
@@ -21462,10 +21388,10 @@ def _generate_reports_and_log_outputs(
             )
             return True
 
-    jsonl_succeeded = run_artifact(by_key["jsonl"])
+    retained = _build_retained_run_guarded(inputs, artifacts)
 
-    if jsonl_succeeded and inputs.comparison is None:
-        comparison = _compute_run_comparison(inputs)
+    if retained is not None and inputs.comparison is None:
+        comparison = _compute_run_comparison(inputs, retained)
         if comparison is not None:
             try:
                 _log_run_comparison(comparison)
@@ -21476,8 +21402,20 @@ def _generate_reports_and_log_outputs(
                 comparison = None
         if comparison is not None:
             inputs = replace(inputs, comparison=comparison)
+            retained = RetainedRun(
+                metadata={**retained.metadata, "comparison": _run_comparison_to_json(comparison)},
+                results=retained.results,
+            )
             artifacts = _build_report_artifacts(inputs)
             by_key = {artifact.key: artifact for artifact in artifacts}
+
+    jsonl_succeeded = _run_jsonl_artifact(
+        retained,
+        by_key["jsonl"],
+        inputs.output_paths.jsonl,
+        run_artifact,
+        outcomes,
+    )
 
     diagnostics_artifacts, diagnostics_succeeded = _run_diagnostics_artifact(inputs, outcomes)
     _log_maintainer_summary(
@@ -21485,7 +21423,6 @@ def _generate_reports_and_log_outputs(
         diagnostics_path=inputs.output_paths.diagnostics,
     )
 
-    run_json_succeeded = run_artifact(by_key["run_json"])
     gallery_succeeded = run_artifact(by_key["markdown_gallery"])
 
     run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
@@ -21494,7 +21431,6 @@ def _generate_reports_and_log_outputs(
         jsonl_succeeded=jsonl_succeeded,
         diagnostics_succeeded=diagnostics_succeeded,
         gallery_succeeded=gallery_succeeded,
-        run_json_succeeded=run_json_succeeded,
     )
     if summary_outcome is not None:
         outcomes.append(summary_outcome)
@@ -21508,7 +21444,6 @@ def _generate_reports_and_log_outputs(
         if artifact.job is not None and artifact.key not in {
             "output_index",
             "jsonl",
-            "run_json",
             "diagnostics",
             "markdown_gallery",
         }:
@@ -21763,7 +21698,6 @@ def finalize_execution(
             output_paths.html,
             output_paths.gallery_markdown,
             output_paths.jsonl,
-            output_paths.run_json,
             output_paths.diagnostics,
             output_paths.log,
             output_paths.environment,
@@ -22100,11 +22034,6 @@ OUTPUT_PATH_ARGUMENT_SPECS: Final[tuple[OutputPathArgumentSpec, ...]] = (
         "Output GitHub Markdown model gallery filename.",
     ),
     OutputPathArgumentSpec("--output-jsonl", DEFAULT_JSONL_OUTPUT, "Output JSONL report filename."),
-    OutputPathArgumentSpec(
-        "--output-run-json",
-        DEFAULT_RUN_JSON_OUTPUT,
-        "Output run summary JSON filename.",
-    ),
     OutputPathArgumentSpec(
         "--output-log",
         DEFAULT_LOG_OUTPUT,

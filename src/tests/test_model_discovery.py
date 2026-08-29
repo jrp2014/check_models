@@ -717,7 +717,7 @@ class TestCapabilityAwareSelection:
     def test_cache_discovery_records_retain_classification(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """run.json retains classification, evidence, and decision per cached repo."""
+        """Retained metadata keeps classification, evidence, and decision per repo."""
         monkeypatch.setattr(check_models, "get_cached_model_eligibility", self._entries)
 
         records = check_models._cache_discovery_records()

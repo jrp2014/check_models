@@ -90,8 +90,6 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         str(output_dir / "e2e_gallery.md"),
         "--output-jsonl",
         str(output_dir / "e2e.jsonl"),
-        "--output-run-json",
-        str(output_dir / "e2e_run.json"),
         "--output-env",
         str(output_dir / "e2e_env.log"),
         "--output-diagnostics",
@@ -110,12 +108,10 @@ def test_get_e2e_output_args_redirects_retained_artifacts(tmp_path: Path) -> Non
         "--output-html",
         "--output-gallery-markdown",
         "--output-jsonl",
-        "--output-run-json",
         "--output-env",
         "--output-diagnostics",
     }
     assert output_map["--output-gallery-markdown"] == str(output_dir / "e2e_gallery.md")
-    assert output_map["--output-run-json"] == str(output_dir / "e2e_run.json")
 
 
 @pytest.fixture
@@ -243,7 +239,6 @@ class TestE2ESmoke:
             html=e2e_output_dir / "e2e.html",
             gallery_markdown=e2e_output_dir / "e2e_gallery.md",
             jsonl=e2e_output_dir / "e2e.jsonl",
-            run_json=e2e_output_dir / "e2e_run.json",
             diagnostics=e2e_output_dir / "e2e_diagnostics.md",
             log=e2e_output_dir / "e2e.log",
             environment=e2e_output_dir / "e2e_env.log",
@@ -253,7 +248,6 @@ class TestE2ESmoke:
             retained_paths.html,
             retained_paths.gallery_markdown,
             retained_paths.jsonl,
-            retained_paths.run_json,
             retained_paths.diagnostics,
             retained_paths.log,
             retained_paths.environment,

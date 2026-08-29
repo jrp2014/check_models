@@ -11,7 +11,6 @@ import re
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Literal, cast, get_args
 from unittest.mock import patch
 
@@ -115,7 +114,6 @@ def _issue_summary_output_paths(output_dir: Path) -> check_models.ReportOutputPa
         html=output_dir / "reports" / "results.html",
         gallery_markdown=output_dir / "reports" / "model_gallery.md",
         jsonl=output_dir / "results.jsonl",
-        run_json=output_dir / "run.json",
         diagnostics=output_dir / "reports" / "diagnostics.md",
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
@@ -188,16 +186,49 @@ def _write_issue_summary_fixture(
 ) -> None:
     """Write hand-authored retained input for issue-summary tests."""
     output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    image: dict[str, object] = {
+        "name": "fixture.jpg",
+        "sha256": image_sha256,
+        "size_bytes": 12_345,
+        "width": 640,
+        "height": 480,
+        "megapixels": 0.3072,
+    }
+    if image_source_url is not None:
+        image["source_url"] = image_source_url
     metadata = {
         "_type": "metadata",
-        "format_version": "2.0",
+        "format_version": "3.0",
         "prompt": "full prompt that must not be copied",
+        "prompt_sha256": "b" * 64,
         "system": {
             "macOS Version": "26.6",
             "GPU/Chip": "Apple M5 Max",
             "Python Version": "3.13.13",
         },
-        "timestamp": "2026-07-31 12:00:00 BST",
+        "timestamp": "2026-07-31 12:02:00 BST",
+        "total_runtime_seconds": (
+            total_runtime_seconds if total_runtime_seconds is not None else 0.0
+        ),
+        "counts": {
+            "models_attempted": len(results),
+            "models_evaluated": len(results),
+            "models_completed": len(results),
+            "models_crashed": 0,
+            "models_indeterminate": 0,
+        },
+        "artifacts": {"results_jsonl": "results.jsonl"},
+        "producer": {
+            "name": "check_models",
+            "version": "0.8.9",
+            "git_revision": "abc123",
+            "install_type": "source-tree",
+            "dirty": False,
+        },
+        "image": image,
+        "generation_settings": {"max_tokens": 500, "temperature": 0.0},
+        **({"trust_remote_code": trust_remote_code} if trust_remote_code is not None else {}),
+        "comparison": None,
         "eval_mode": "assisted",
         "metadata_exposed_to_prompt": True,
         "library_versions": {
@@ -212,45 +243,6 @@ def _write_issue_summary_fixture(
     check_models._write_text_file(
         output_paths.jsonl,
         "".join(json.dumps(row) + "\n" for row in rows),
-    )
-    image: dict[str, object] = {
-        "name": "fixture.jpg",
-        "sha256": image_sha256,
-        "size_bytes": 12_345,
-        "width": 640,
-        "height": 480,
-        "megapixels": 0.3072,
-    }
-    if image_source_url is not None:
-        image["source_url"] = image_source_url
-    check_models._write_text_file(
-        output_paths.run_json,
-        json.dumps(
-            {
-                "generated_at": "2026-07-31 12:02:00 BST",
-                **(
-                    {"total_runtime_seconds": total_runtime_seconds}
-                    if total_runtime_seconds is not None
-                    else {}
-                ),
-                "eval_mode": "assisted",
-                "generation_settings": {"max_tokens": 500, "temperature": 0.0},
-                "image": image,
-                **(
-                    {"trust_remote_code": trust_remote_code}
-                    if trust_remote_code is not None
-                    else {}
-                ),
-                "producer": {
-                    "name": "check_models",
-                    "version": "0.8.9",
-                    "git_revision": "abc123",
-                    "install_type": "source-tree",
-                    "dirty": False,
-                },
-            }
-        )
-        + "\n",
     )
 
 
@@ -1166,12 +1158,12 @@ def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> Non
     ("rows", "expected"),
     [
         ((), "Missing JSONL metadata"),
-        (({"_type": "metadata", "format_version": "1.0"},), "format_version 2.0"),
+        (({"_type": "metadata", "format_version": "2.0"},), "format_version must be 3.0"),
         (
             (
                 {
                     "_type": "metadata",
-                    "format_version": "2.0",
+                    "format_version": "3.0",
                     "prompt": "prompt",
                     "system": {},
                     "timestamp": "now",
@@ -1257,8 +1249,8 @@ def test_run_issue_summary_rejects_malformed_consumed_result_structures(
         check_models.generate_run_issue_summary_report(output_paths)
 
 
-def test_run_issue_summary_ignores_malformed_optional_run_json(tmp_path: Path) -> None:
-    """Malformed optional enrichment must not block rendering cached assessments."""
+def test_run_issue_summary_never_reads_a_sibling_run_json(tmp_path: Path) -> None:
+    """results.jsonl is the sole machine source; a stray run.json is inert."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
     _write_issue_summary_fixture(
         output_paths,
@@ -1270,12 +1262,19 @@ def test_run_issue_summary_ignores_malformed_optional_run_json(tmp_path: Path) -
             ),
         ),
     )
-    check_models._write_text_file(output_paths.run_json, "{not json\n")
+    stray = output_paths.jsonl.with_name("run.json")
+    check_models._write_text_file(stray, '{"image": {"name": "stray-should-not-appear.jpg"}}\n')
 
     summary = check_models.generate_run_issue_summary_report(output_paths)
-
     assert summary is not None
-    assert "org/observed" in summary.read_text(encoding="utf-8")
+    content = summary.read_text(encoding="utf-8")
+    assert "org/observed" in content
+    assert "stray-should-not-appear" not in content
+
+    stray.unlink()
+    regenerated = check_models.generate_run_issue_summary_report(output_paths)
+    assert regenerated is not None
+    assert regenerated.read_text(encoding="utf-8") == content
 
 
 def test_regenerate_run_issue_summary_only_writes_derived_artifact(tmp_path: Path) -> None:
@@ -1295,9 +1294,7 @@ def test_regenerate_run_issue_summary_only_writes_derived_artifact(tmp_path: Pat
     issue_draft = output_paths.index.parent / "issues" / "issue_org_crash.md"
     issue_draft.parent.mkdir(parents=True, exist_ok=True)
     check_models._write_text_file(issue_draft, "# Existing crash draft\n")
-    retained = {
-        path: path.read_bytes() for path in (output_paths.jsonl, output_paths.run_json, issue_draft)
-    }
+    retained = {path: path.read_bytes() for path in (output_paths.jsonl, issue_draft)}
 
     with patch.object(check_models._LinkStyleState, "value", "relative"):
         generated = check_models.regenerate_run_issue_summary(output_paths.index.parent)
@@ -1520,7 +1517,6 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
         html=output_dir / "reports" / "results.html",
         gallery_markdown=output_dir / "reports" / "model_gallery.md",
         jsonl=output_dir / "results.jsonl",
-        run_json=output_dir / "run.json",
         diagnostics=output_dir / "reports" / "diagnostics.md",
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
@@ -1538,7 +1534,6 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
         "- [model_gallery.md](reports/model_gallery.md)\n"
         "- [diagnostics.md](reports/diagnostics.md)\n"
         "- [results.jsonl](results.jsonl)\n"
-        "- [run.json](run.json)\n"
         "- [check_models.log](check_models.log)\n"
         "- [environment.log](environment.log)\n"
     )
@@ -1568,7 +1563,6 @@ def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Pa
         html=output_dir / "reports" / "results.html",
         gallery_markdown=output_dir / "reports" / "model_gallery.md",
         jsonl=output_dir / "results.jsonl",
-        run_json=output_dir / "run.json",
         diagnostics=output_dir / "reports" / "diagnostics.md",
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
@@ -1600,7 +1594,6 @@ def test_output_index_renders_run_dashboard(tmp_path: Path) -> None:
         html=output_dir / "reports" / "results.html",
         gallery_markdown=output_dir / "reports" / "model_gallery.md",
         jsonl=output_dir / "results.jsonl",
-        run_json=output_dir / "run.json",
         diagnostics=output_dir / "reports" / "diagnostics.md",
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
@@ -1689,7 +1682,6 @@ def _report_generation_inputs(
         output_html=tmp_path / "output" / "reports" / "results.html",
         output_gallery_markdown=tmp_path / "output" / "reports" / "model_gallery.md",
         output_jsonl=tmp_path / "output" / "results.jsonl",
-        output_run_json=tmp_path / "output" / "run.json",
         output_diagnostics=tmp_path / "output" / "reports" / "diagnostics.md",
         output_log=tmp_path / "output" / "check_models.log",
         output_env=tmp_path / "output" / "environment.log",
@@ -1765,16 +1757,14 @@ def test_unexpected_comparison_error_degrades_to_no_comparison(
 ) -> None:
     """A comparison implementation defect skips comparison rather than the run."""
     report_inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    current = check_models.RetainedRun(
+        metadata=cast("check_models.JsonlMetadataRecord", {}), results=()
+    )
     with (
         patch.object(check_models, "_resolve_comparison_baseline", return_value=object()),
-        patch.object(
-            check_models,
-            "_load_run_issue_summary_source",
-            return_value=SimpleNamespace(results=[], metadata={}),
-        ),
         patch.object(check_models, "compare_run_results", side_effect=KeyError("bad diff")),
     ):
-        comparison = check_models._compute_run_comparison(report_inputs)
+        comparison = check_models._compute_run_comparison(report_inputs, current)
 
     assert comparison is None
     assert "Comparison skipped" in caplog.text
@@ -1863,7 +1853,6 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
         output_html=tmp_path / "output" / "reports" / "results.html",
         output_gallery_markdown=tmp_path / "output" / "reports" / "model_gallery.md",
         output_jsonl=tmp_path / "output" / "results.jsonl",
-        output_run_json=tmp_path / "output" / "run.json",
         output_diagnostics=tmp_path / "output" / "reports" / "diagnostics.md",
         output_log=tmp_path / "output" / "check_models.log",
         output_env=tmp_path / "output" / "environment.log",
@@ -1917,7 +1906,6 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
             output_paths.html,
             output_paths.gallery_markdown,
             output_paths.jsonl,
-            output_paths.run_json,
             output_paths.diagnostics,
         )
     )
@@ -1927,7 +1915,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     with (
         patch.object(
             check_models,
-            "save_jsonl_report",
+            "_write_retained_run",
             side_effect=OSError("current JSONL write failed"),
         ),
         patch.object(
@@ -1946,7 +1934,7 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     with (
         patch.object(
             check_models,
-            "save_jsonl_report",
+            "_write_retained_run",
             side_effect=OSError("current JSONL write failed"),
         ),
         patch.object(check_models, "_remove_run_issue_summary", return_value=cleanup_error),
@@ -1984,27 +1972,6 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     )
     assert not stale_diagnostics_summary.succeeded
     assert "diagnostics" in (stale_diagnostics_summary.error_message or "").lower()
-
-    check_models._write_text_file(
-        output_paths.run_json,
-        json.dumps(
-            {
-                "image": {"name": "stale-prior-run.jpg"},
-                "generation_settings": {"max_tokens": 9999},
-            }
-        ),
-    )
-    with patch.object(
-        check_models,
-        "save_run_json_report",
-        side_effect=OSError("current run JSON write failed"),
-    ):
-        stale_run_json_outcomes = check_models._generate_reports_and_log_outputs(inputs)
-
-    assert not _report_outcome(stale_run_json_outcomes, "run_json").succeeded
-    stale_run_json_summary = summary_path.read_text(encoding="utf-8")
-    assert "stale-prior-run.jpg" not in stale_run_json_summary
-    assert "run.json" not in stale_run_json_summary
 
     check_models._write_text_file(
         output_paths.gallery_markdown,
@@ -2052,14 +2019,13 @@ def _relative_output_artifact_map(
     output_dir: Path,
     output_paths: check_models.ReportOutputPaths,
 ) -> dict[str, str]:
-    """Return the retained run-json artifact map rooted at one output directory."""
+    """Return the retained artifact manifest rooted at one output directory."""
     return {
         "output_index": output_paths.index.relative_to(output_dir).as_posix(),
         "results_html": output_paths.html.relative_to(output_dir).as_posix(),
         "model_gallery": output_paths.gallery_markdown.relative_to(output_dir).as_posix(),
         "diagnostics": output_paths.diagnostics.relative_to(output_dir).as_posix(),
         "results_jsonl": output_paths.jsonl.relative_to(output_dir).as_posix(),
-        "run_json": output_paths.run_json.relative_to(output_dir).as_posix(),
         "log": output_paths.log.relative_to(output_dir).as_posix(),
         "environment": output_paths.environment.relative_to(output_dir).as_posix(),
     }
@@ -2092,7 +2058,6 @@ def _generate_output_artifacts_for_link_style(
         html=reports_dir / "results.html",
         gallery_markdown=reports_dir / "model_gallery.md",
         jsonl=output_dir / "results.jsonl",
-        run_json=output_dir / "run.json",
         diagnostics=reports_dir / "diagnostics.md",
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
@@ -2127,15 +2092,8 @@ def _generate_output_artifacts_for_link_style(
             system_info=system_info,
             library_versions=versions,
             report_context=report_context,
-        )
-        check_models.save_run_json_report(
-            results,
-            output_paths.run_json,
-            versions=versions,
-            prompt=prompt,
             total_runtime_seconds=1.0,
-            report_context=report_context,
-            output_paths=_relative_output_artifact_map(output_dir, output_paths),
+            artifacts=_relative_output_artifact_map(output_dir, output_paths),
         )
         issue_reports = _generate_github_issue_reports(
             report_context=report_context,
@@ -2453,7 +2411,6 @@ def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
     diagnostics_path = tmp_path / "diagnostics.md"
     html_path = tmp_path / "results.html"
     jsonl_path = tmp_path / "results.jsonl"
-    run_path = tmp_path / "run.json"
 
     generate_markdown_gallery_report(
         results,
@@ -2483,15 +2440,8 @@ def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
         prompt="Describe the image.",
         system_info={},
         report_context=context,
-    )
-    check_models.save_run_json_report(
-        results,
-        run_path,
-        versions=_stub_versions(),
-        prompt="Describe the image.",
         total_runtime_seconds=1.0,
-        report_context=context,
-        output_paths={
+        artifacts={
             "external": "/Users/alice/published/results.html",
             "private": "/private/tmp/results.jsonl",
         },
@@ -2525,11 +2475,10 @@ def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
     assert "/Users/alice/" not in json.dumps(crash_row)
     assert "/private/" not in json.dumps(crash_row)
     assert crash_row["failure"]["exception_chain"][0]["origin"] == "~/project/model.py"
-    run_payload = json.loads(run_path.read_text(encoding="utf-8"))
-    assert run_payload["artifacts"] == {
+    header = records[0]
+    assert header["artifacts"] == {
         "external": "~/published/results.html",
         "private": "<private>/tmp/results.jsonl",
-        "run_issue_summary": "issues/run_summary.md",
     }
 
 
@@ -2627,7 +2576,6 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
         model_provenance={result.model_name: provenance},
     )
     jsonl_path = tmp_path / "results.jsonl"
-    run_json_path = tmp_path / "run.json"
     gallery_path = tmp_path / "model_gallery.md"
     html_path = tmp_path / "results.html"
 
@@ -2639,16 +2587,6 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
             system_info={},
             requested_revision="requested-tag",
             report_context=context,
-        )
-        check_models.save_run_json_report(
-            [result],
-            run_json_path,
-            versions=_stub_versions(),
-            prompt="Describe the image.",
-            total_runtime_seconds=1.0,
-            report_context=context,
-            output_paths={},
-            requested_revision="requested-tag",
         )
         generate_markdown_gallery_report(
             [result],
@@ -2666,9 +2604,7 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
         )
 
     jsonl_record = json.loads(jsonl_path.read_text(encoding="utf-8").splitlines()[1])
-    run_record = json.loads(run_json_path.read_text(encoding="utf-8"))
     assert jsonl_record["model_provenance"] == provenance
-    assert run_record["model_provenance"] == {result.model_name: provenance}
     gallery = gallery_path.read_text(encoding="utf-8")
     html_report = html.unescape(html_path.read_text(encoding="utf-8"))
     assert "*Requested model revision:* requested-tag" in gallery
@@ -3812,7 +3748,6 @@ class TestHtmlReportEdgeCases:
         diagnostics_path = tmp_path / "diagnostics.md"
         gallery_path = tmp_path / "model_gallery.md"
         html_path = tmp_path / "results.html"
-        run_path = tmp_path / "run.json"
 
         with patch.object(check_models, "_assess_result", side_effect=AssertionError):
             check_models.save_jsonl_report(
@@ -3844,15 +3779,6 @@ class TestHtmlReportEdgeCases:
                 5.0,
                 report_context=context,
             )
-            check_models.save_run_json_report(
-                results,
-                run_path,
-                versions=_stub_versions(),
-                prompt=prompt,
-                total_runtime_seconds=5.0,
-                report_context=context,
-                output_paths={},
-            )
             check_models.log_summary(results, assessments=expected)
 
         records = {
@@ -3863,8 +3789,8 @@ class TestHtmlReportEdgeCases:
         diagnostics = diagnostics_path.read_text(encoding="utf-8")
         gallery = gallery_path.read_text(encoding="utf-8")
         html_report = html_path.read_text(encoding="utf-8")
-        run_report = json.loads(run_path.read_text(encoding="utf-8"))
-        assert run_report["counts"] == {
+        header = json.loads(jsonl_path.read_text(encoding="utf-8").splitlines()[0])
+        assert header["counts"] == {
             "models_attempted": 5,
             "models_evaluated": 4,
             "models_completed": 3,
@@ -4427,7 +4353,6 @@ class TestRetainedMarkdownArtifactEdges:
         expected_non_markdown_artifacts = {
             "reports/results.html",
             "results.jsonl",
-            "run.json",
         }
         mode_summaries: dict[str, dict[str, object]] = {}
 
@@ -4474,7 +4399,7 @@ class TestRetainedMarkdownArtifactEdges:
                 json.loads(line)
                 for line in output_paths.jsonl.read_text(encoding="utf-8").splitlines()
             ]
-            run_payload = json.loads(output_paths.run_json.read_text(encoding="utf-8"))
+            run_payload = jsonl_records[0]
             mode_summaries[link_style] = {
                 "html_markers": (
                     "Action Snapshot" in html_content,
@@ -4483,13 +4408,13 @@ class TestRetainedMarkdownArtifactEdges:
                 ),
                 "jsonl_header": jsonl_records[0]["_type"],
                 "jsonl_models": [record["model"] for record in jsonl_records[1:]],
-                "run_json_counts": run_payload["counts"],
-                "run_json_artifacts": sorted(run_payload["artifacts"]),
+                "metadata_counts": run_payload["counts"],
+                "metadata_artifacts": sorted(run_payload["artifacts"]),
             }
 
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "2.0"
+            assert run_payload["format_version"] == "3.0"
             assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
                 "models_attempted": 2,
@@ -5841,7 +5766,7 @@ def test_resolve_comparison_baseline_handles_none_path_and_missing(tmp_path: Pat
         json.dumps(
             {
                 "_type": "metadata",
-                "format_version": "2.0",
+                "format_version": "3.0",
                 "prompt": "p",
                 "system": {},
                 "timestamp": "t",
@@ -5856,6 +5781,24 @@ def test_resolve_comparison_baseline_handles_none_path_and_missing(tmp_path: Pat
     assert loaded is not None
     assert loaded.label == str(baseline_file)
     assert [r["model"] for r in loaded.results] == ["org/m"]
+
+    # A schema-2 baseline is rejected by the single loader (no adapter): the
+    # one-time incomparability is logged and no comparison is produced.
+    schema2 = tmp_path / "schema2.jsonl"
+    schema2.write_text(
+        json.dumps(
+            {
+                "_type": "metadata",
+                "format_version": "2.0",
+                "prompt": "p",
+                "system": {},
+                "timestamp": "t",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    assert check_models._resolve_comparison_baseline(str(schema2), jsonl) is None
     # An untracked temp path under 'auto' yields no baseline rather than an error.
     assert check_models._resolve_comparison_baseline("auto", jsonl) is None
 

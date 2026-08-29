@@ -488,7 +488,6 @@ class TestCliArgumentNormalization:
         assert args.output_html == check_models.DEFAULT_HTML_OUTPUT
         assert args.output_gallery_markdown == check_models.DEFAULT_GALLERY_MD_OUTPUT
         assert args.output_jsonl == check_models.DEFAULT_JSONL_OUTPUT
-        assert args.output_run_json == check_models.DEFAULT_RUN_JSON_OUTPUT
         assert args.output_diagnostics == check_models.DEFAULT_DIAGNOSTICS_OUTPUT
 
     @pytest.mark.parametrize(
@@ -500,6 +499,7 @@ class TestCliArgumentNormalization:
             "--output-model-capabilities",
             "--output-model-capabilities-json",
             "--output-tsv",
+            "--output-run-json",
         ],
     )
     def test_retired_output_flags_are_rejected(self, retired_flag: str) -> None:
@@ -520,7 +520,6 @@ class TestCliArgumentNormalization:
         html = tmp_path / "results.html"
         gallery = tmp_path / "gallery.md"
         jsonl = tmp_path / "results.jsonl"
-        run_json = tmp_path / "run.json"
         diagnostics = tmp_path / "diagnostics.md"
 
         args = parser.parse_args(
@@ -531,8 +530,6 @@ class TestCliArgumentNormalization:
                 str(gallery),
                 "--output-jsonl",
                 str(jsonl),
-                "--output-run-json",
-                str(run_json),
                 "--output-diagnostics",
                 str(diagnostics),
             ],
@@ -541,7 +538,6 @@ class TestCliArgumentNormalization:
         assert args.output_html == html
         assert args.output_gallery_markdown == gallery
         assert args.output_jsonl == jsonl
-        assert args.output_run_json == run_json
         assert args.output_diagnostics == diagnostics
 
     def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:

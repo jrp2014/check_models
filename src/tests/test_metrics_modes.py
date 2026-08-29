@@ -96,7 +96,6 @@ _FINALIZE_REPORT_PATCHES = (
     "check_models.generate_html_report",
     "check_models.generate_markdown_gallery_report",
     "check_models.save_jsonl_report",
-    "check_models.save_run_json_report",
 )
 
 _EXPECTED_REPORT_ARTIFACT_LOG_LABELS = (
@@ -105,7 +104,6 @@ _EXPECTED_REPORT_ARTIFACT_LOG_LABELS = (
     "Gallery Report:",
     "Diagnostics:",
     "JSONL Report:",
-    "Run JSON:",
 )
 
 
@@ -1114,7 +1112,6 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         output_html=tmp_path / "report.html",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_jsonl=tmp_path / "report.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=custom_log,
         output_env=custom_env,
@@ -1158,7 +1155,6 @@ def test_finalize_execution_separates_each_model_result_block(
         output_html=tmp_path / "report.html",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_jsonl=tmp_path / "report.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -1206,7 +1202,6 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         output_html=tmp_path / "report.html",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_jsonl=tmp_path / "report.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -1232,7 +1227,6 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "markdown_gallery",
         "diagnostics",
         "jsonl",
-        "run_json",
         "log",
         "environment",
     ]
@@ -1242,14 +1236,14 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "Gallery Report:",
         "Diagnostics:",
         "JSONL Report:",
-        "Run JSON:",
         "Log File:",
         "Environment:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     # diagnostics runs via its dedicated runner; log/environment are produced
-    # by the run itself, so only those three carry no generation job.
-    joblessly_produced = {"diagnostics", "log", "environment"}
+    # by the run itself; the jsonl job is supplied by the orchestrator from
+    # the in-memory retained run.
+    joblessly_produced = {"diagnostics", "log", "environment", "jsonl"}
     assert all(
         artifact.job is not None for artifact in artifacts if artifact.key not in joblessly_produced
     )
@@ -1269,7 +1263,6 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
         output_html=tmp_path / "reports/results.html",
         output_gallery_markdown=tmp_path / "reports/model_gallery.md",
         output_jsonl=tmp_path / "results.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "reports/diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -1300,7 +1293,6 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
         paths.html,
         paths.gallery_markdown,
         paths.jsonl,
-        paths.run_json,
         paths.diagnostics,
     ):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -1359,7 +1351,6 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         output_html=tmp_path / "report.html",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_jsonl=tmp_path / "report.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -1385,7 +1376,6 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         "markdown_gallery",
         "diagnostics",
         "jsonl",
-        "run_json",
         "log",
         "environment",
     )
@@ -1396,7 +1386,6 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         "model_gallery",
         "diagnostics",
         "results_jsonl",
-        "run_json",
         "log",
         "environment",
     }
@@ -1411,7 +1400,6 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
         gallery_markdown=reports_dir / "model_gallery.md",
         diagnostics=reports_dir / "diagnostics.md",
         jsonl=tmp_path / "results.jsonl",
-        run_json=tmp_path / "run.json",
         log=tmp_path / "check_models.log",
         environment=tmp_path / "environment.log",
     )
@@ -1443,7 +1431,6 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
         "- [model_gallery.md](reports/model_gallery.md)",
         "- [diagnostics.md](reports/diagnostics.md)",
         "- [results.jsonl](results.jsonl)",
-        "- [run.json](run.json)",
         "- [check_models.log](check_models.log)",
         "- [environment.log](environment.log)",
     ]
@@ -1455,7 +1442,6 @@ def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: 
         output_html=tmp_path / "report.html",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_jsonl=tmp_path / "report.jsonl",
-        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",

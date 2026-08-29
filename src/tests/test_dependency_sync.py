@@ -809,7 +809,6 @@ def test_readme_documents_only_the_simplified_report_contract() -> None:
         "reports/model_gallery.md",
         "reports/results.html",
         "results.jsonl",
-        "run.json",
         "index.md",
         "check_models.log",
         "environment.log",
@@ -2082,15 +2081,11 @@ def test_artifact_schema_version_constants_match_typed_dict_literals() -> None:
     jsonl_literal = typing.get_args(
         typing.get_type_hints(check_models.JsonlMetadataRecord)["format_version"]
     )
-    run_json_literal = typing.get_args(
-        typing.get_type_hints(check_models.RunJsonReportRecord)["schema_version"]
-    )
     history_literal = typing.get_args(
         typing.get_type_hints(check_models.HistoryRunRecord)["format_version"]
     )
 
     assert jsonl_literal == (check_models.JSONL_FORMAT_VERSION,)
-    assert run_json_literal == (check_models.RUN_JSON_SCHEMA_VERSION,)
     assert history_literal == (check_models.HISTORY_FORMAT_VERSION,)
 
 

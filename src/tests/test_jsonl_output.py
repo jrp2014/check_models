@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -76,7 +77,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
-    assert header["format_version"] == "2.0"
+    assert header["format_version"] == "3.0"
     assert header["prompt"] == "test"
     assert header["eval_mode"] == "blind"
     assert header["metadata_exposed_to_prompt"] is False
@@ -267,7 +268,7 @@ def test_jsonl_system_provenance_is_public_safe_while_history_stays_raw(
     assert history["image_path"] == "/private/tmp/source.jpg"
 
 
-def test_save_run_json_report_captures_public_snapshot_contract(
+def test_retained_metadata_captures_public_snapshot_contract(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -308,7 +309,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(
             },
         ),
     )
-    out = tmp_path / "run.json"
+    out = tmp_path / "results.jsonl"
     image_path = tmp_path / "catalogue.jpg"
     Image.new("RGB", (12, 8), "blue").save(image_path)
     context = check_models._build_report_render_context(
@@ -329,24 +330,24 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         },
     )
 
-    check_models.save_run_json_report(
+    check_models.save_jsonl_report(
         [result],
         out,
-        versions={"mlx-vlm": "0.6.3"},
-        prompt="Describe this image briefly.",
+        "Describe this image briefly.",
+        {},
+        library_versions={"mlx-vlm": "0.6.3"},
         total_runtime_seconds=3.0,
         report_context=context,
         image_path=image_path,
         image_source_url="https://example.test/images/catalogue.jpg",
         trust_remote_code=False,
         requested_revision="release-branch",
-        output_paths={
+        artifacts={
             "output_index": "index.md",
             "results_html": "reports/results.html",
             "model_gallery": "reports/model_gallery.md",
             "diagnostics": "reports/diagnostics.md",
             "results_jsonl": "results.jsonl",
-            "run_json": "run.json",
             "log": "check_models.log",
             "environment": "environment.log",
         },
@@ -358,7 +359,8 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         },
     )
 
-    payload = json.loads(out.read_text(encoding="utf-8"))
+    payload, result_rows = _read_jsonl(out)
+    payload = dict(payload)
     # cache_discovery is optional: present only when a local HF cache scan
     # yields entries, so it is validated separately rather than required here.
     discovery = payload.pop("cache_discovery", None)
@@ -366,12 +368,15 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         assert isinstance(discovery, list)
         assert {"repo_id", "selected", "capability_verdict", "skip_reasons"} <= set(discovery[0])
     assert set(payload) == {
-        "schema_version",
-        "generated_at",
+        "_type",
+        "format_version",
+        "timestamp",
+        "system",
         "eval_mode",
         "prompt",
         "prompt_sha256",
         "metadata_exposed_to_prompt",
+        "execution_mode",
         "total_runtime_seconds",
         "counts",
         "artifacts",
@@ -381,11 +386,9 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         "image",
         "generation_settings",
         "trust_remote_code",
-        "model_provenance",
-        "prompt_burden",
         "comparison",
     }
-    assert payload["schema_version"] == "2.0"
+    assert payload["format_version"] == "3.0"
     assert payload["eval_mode"] == "triage"
     assert "semantic_rankings_grounded" not in payload
     assert "selection_basis" not in payload
@@ -404,17 +407,18 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         "model_gallery": "reports/model_gallery.md",
         "diagnostics": "reports/diagnostics.md",
         "results_jsonl": "results.jsonl",
-        "run_json": "run.json",
         "log": "check_models.log",
         "environment": "environment.log",
     }
-    assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
-    assert payload["image"]["name"] == "catalogue.jpg"
-    assert payload["image"]["source_url"] == "https://example.test/images/catalogue.jpg"
-    assert payload["image"]["width"] == 12
-    assert payload["image"]["height"] == 8
-    assert payload["image"]["sha256"]
-    assert payload["image"]["size_bytes"] > 0
+    versions = cast("dict[str, str]", payload["library_versions"])
+    assert versions["mlx-vlm"] == "0.6.3"
+    image = cast("dict[str, object]", payload["image"])
+    assert image["name"] == "catalogue.jpg"
+    assert image["source_url"] == "https://example.test/images/catalogue.jpg"
+    assert image["width"] == 12
+    assert image["height"] == 8
+    assert image["sha256"]
+    assert cast("int", image["size_bytes"]) > 0
     assert str(tmp_path) not in out.read_text(encoding="utf-8")
     assert payload["generation_settings"] == {
         "max_tokens": 500,
@@ -423,13 +427,14 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     }
     assert payload["trust_remote_code"] is False
     assert payload["prompt_sha256"] == check_models._sha256_text("Describe this image briefly.")
-    assert payload["model_provenance"][result.model_name] == {
+    row = result_rows[0]
+    assert row["model_provenance"] == {
         "model": result.model_name,
         "requested_revision": "release-branch",
         "resolved_revision": "snapshot123",
         "snapshot_path": "~/.cache/snapshots/snapshot123",
     }
-    assert payload["prompt_burden"][result.model_name] == {
+    assert row["prompt_burden"] == {
         "total_tokens": 80,
         "text_tokens_est": 12,
         "nontext_tokens_est": 68,
@@ -448,7 +453,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     }
 
 
-def test_run_json_artifact_manifest_includes_summary_only_for_surfaced_results(
+def test_retained_manifest_includes_summary_only_for_surfaced_results(
     tmp_path: Path,
 ) -> None:
     """The optional paste-ready issue artifact should follow the cached assessment."""
@@ -461,16 +466,13 @@ def test_run_json_artifact_manifest_includes_summary_only_for_surfaced_results(
         results=[result],
         prompt="Describe this image.",
     )
-    out = tmp_path / "run.json"
-
-    check_models.save_run_json_report(
+    retained = check_models._build_retained_run(
         [result],
-        out,
-        versions={},
         prompt="Describe this image.",
-        total_runtime_seconds=1.0,
+        system_info={},
         report_context=context,
-        output_paths={"run_json": "run.json"},
+        total_runtime_seconds=1.0,
+        artifacts={"results_jsonl": "results.jsonl"},
         producer={
             "name": "check_models",
             "version": "test",
@@ -479,13 +481,18 @@ def test_run_json_artifact_manifest_includes_summary_only_for_surfaced_results(
         },
     )
 
-    assert json.loads(out.read_text(encoding="utf-8"))["artifacts"] == {
-        "run_issue_summary": "issues/run_summary.md",
-        "run_json": "run.json",
-    }
+    assert retained.metadata["artifacts"] == {"results_jsonl": "results.jsonl"}
+    # The orchestrator's manifest builder adds the conditional summary entry.
+    inputs_manifest = {"results_jsonl": "results.jsonl"}
+    if any(
+        assessment.maintainer_status != "none" or assessment.execution == "indeterminate"
+        for _model, assessment in context.assessments
+    ):
+        inputs_manifest["run_issue_summary"] = "issues/run_summary.md"
+    assert "run_issue_summary" in inputs_manifest
 
 
-def test_run_json_counts_completed_crashed_and_indeterminate_results_consistently(
+def test_metadata_counts_completed_crashed_and_indeterminate_results_consistently(
     tmp_path: Path,
 ) -> None:
     """Run counts should partition attempts while evaluated outcomes remain conclusive."""
@@ -507,16 +514,15 @@ def test_run_json_counts_completed_crashed_and_indeterminate_results_consistentl
     )
     results = [completed, crashed, disconnected]
     context = check_models._build_report_render_context(results=results, prompt="Describe it.")
-    out = tmp_path / "run.json"
+    out = tmp_path / "results.jsonl"
 
-    check_models.save_run_json_report(
+    check_models.save_jsonl_report(
         results,
         out,
-        versions={},
-        prompt="Describe it.",
-        total_runtime_seconds=2.0,
+        "Describe it.",
+        {},
         report_context=context,
-        output_paths={},
+        total_runtime_seconds=2.0,
         producer={
             "name": "check_models",
             "version": "test",
@@ -525,7 +531,8 @@ def test_run_json_counts_completed_crashed_and_indeterminate_results_consistentl
         },
     )
 
-    counts = json.loads(out.read_text(encoding="utf-8"))["counts"]
+    header, _rows = _read_jsonl(out)
+    counts = header["counts"]
     assert counts == {
         "models_attempted": 3,
         "models_evaluated": 2,
@@ -698,7 +705,7 @@ def test_catalog_constraint_details_are_emitted_only_for_a_violation() -> None:
     }
 
 
-def test_jsonl_and_run_json_include_shared_component_provenance(
+def test_metadata_includes_component_and_model_provenance(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -729,31 +736,19 @@ def test_jsonl_and_run_json_include_shared_component_provenance(
     result = PerformanceResult(model_name="org/model", generation=MockGeneration(), success=True)
     context = check_models._build_report_render_context(results=[result], prompt="describe")
     jsonl_path = tmp_path / "results.jsonl"
-    run_path = tmp_path / "run.json"
 
     save_jsonl_report(
         [result],
         jsonl_path,
-        prompt="describe",
-        system_info={},
+        "describe",
+        {},
         library_versions={"mlx-vlm": "0.6.4"},
         requested_revision="release-branch",
         report_context=context,
     )
-    check_models.save_run_json_report(
-        [result],
-        run_path,
-        versions={"mlx-vlm": "0.6.4"},
-        prompt="describe",
-        total_runtime_seconds=1.0,
-        report_context=context,
-        output_paths={},
-    )
 
     header, rows = _read_jsonl(jsonl_path)
-    run_payload = json.loads(run_path.read_text(encoding="utf-8"))
     assert header["component_provenance"] == components
-    assert run_payload["component_provenance"] == components
     assert rows[0]["model_provenance"]["resolved_revision"] == "snapshot123"
     assert rows[0]["model_provenance"]["requested_revision"] == "release-branch"
 
@@ -893,6 +888,7 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
         "timing",
         "model_provenance",
         "prompt_diagnostics",
+        "prompt_burden",
     }
     assert data["_type"] == "result"
     assert data["model"] == "test-model"
@@ -1354,7 +1350,7 @@ def test_jsonl_does_not_back_project_legacy_machine_facts(tmp_path: Path) -> Non
     )
     header, rows = _read_jsonl(output_file)
     row = rows[0]
-    assert header["format_version"] == "2.0"
+    assert header["format_version"] == "3.0"
     assert row["assessment"]["execution"] == "completed"
     assert (
         not {
@@ -1679,6 +1675,9 @@ class TestRuntimeFingerprint:
             system_info={},
             runtime_fingerprint=fingerprint,
             mode_policy=check_models._default_report_mode_policy(),
+            counts=check_models._run_outcome_counts(()),
+            generation_settings={},
+            image=None,
         )
         assert "runtime_fingerprint" in record
         runtime_fingerprint = _require_present(
@@ -1693,6 +1692,9 @@ class TestRuntimeFingerprint:
             prompt="test",
             system_info={},
             mode_policy=check_models._default_report_mode_policy(),
+            counts=check_models._run_outcome_counts(()),
+            generation_settings={},
+            image=None,
         )
         assert "runtime_fingerprint" not in record
 
@@ -1742,7 +1744,7 @@ class TestSchemaVersioning:
         out = tmp_path / "results.jsonl"
         check_models.save_jsonl_report([], out, prompt="test", system_info={})
         header, _ = _read_jsonl(out)
-        assert header["format_version"] == "2.0"
+        assert header["format_version"] == "3.0"
 
     def test_round_trip_metadata_keys(self, tmp_path: Path) -> None:
         """Metadata record round-trips through JSON with expected keys."""
@@ -2052,3 +2054,59 @@ class TestModelBurdenRecord:
             },
         )
         assert "model_burden" not in record
+
+
+def _retained_run_fixture(tmp_path: Path) -> check_models.RetainedRun:
+    """Build one synthetic retained run entirely under tmp_path."""
+    image = tmp_path / "img.jpg"
+    safe_io.write_text_no_follow(image, "not-really-a-jpeg")
+    result = PerformanceResult(
+        model_name="org/m",
+        generation=None,
+        success=False,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={"max_tokens": 32, "temperature": 0.0}
+        ),
+    )
+    return check_models._build_retained_run(
+        [result],
+        prompt="Describe the image.",
+        system_info={"OS": "test"},
+        total_runtime_seconds=1.5,
+        artifacts={"results_jsonl": "results.jsonl"},
+        image_path=image,
+        trust_remote_code=True,
+    )
+
+
+def test_schema_3_metadata_contains_complete_run_context(tmp_path: Path) -> None:
+    """The single retained artifact's header carries the whole run context."""
+    retained = _retained_run_fixture(tmp_path)
+    path = tmp_path / "results.jsonl"
+    check_models._write_retained_run(retained, path)
+
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    header = rows[0]
+    assert header["format_version"] == "3.0"
+    assert header["prompt_sha256"] == hashlib.sha256(header["prompt"].encode("utf-8")).hexdigest()
+    assert header["counts"]["models_attempted"] == len(rows) - 1
+    assert header["producer"]["name"] == "check_models"
+    assert header["image"]["sha256"]
+    assert header["generation_settings"]
+    assert "comparison" in header
+    assert "run.json" not in json.dumps(header)
+
+
+def test_retained_run_round_trips_through_the_single_loader(tmp_path: Path) -> None:
+    """One loader owns decoding and validation for every consumer."""
+    retained = _retained_run_fixture(tmp_path)
+    path = tmp_path / "results.jsonl"
+    check_models._write_retained_run(retained, path)
+
+    loaded = check_models._load_retained_run(path)
+    assert loaded.metadata["format_version"] == "3.0"
+    assert [record["model"] for record in loaded.results] == ["org/m"]
+
+    schema2 = json.dumps({"_type": "metadata", "format_version": "2.0", "prompt": "x"}) + "\n"
+    with pytest.raises(ValueError, match="format_version"):
+        check_models._load_retained_run_text(schema2, "baseline")
