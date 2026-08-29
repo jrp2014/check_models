@@ -31,10 +31,8 @@ def test_error_message_consistency(
     test_args = [
         "check_models.py",
         *args,
-        "--output-log",
-        str(_OUTPUT_DIR / "test_error_consistency.log"),
-        "--output-env",
-        str(_OUTPUT_DIR / "test_error_consistency_env.log"),
+        "--output-dir",
+        str(_OUTPUT_DIR / "test_error_consistency"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:

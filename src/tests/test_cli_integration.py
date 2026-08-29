@@ -18,12 +18,8 @@ _TEST_DIR = Path(__file__).parent
 _SRC_DIR = _TEST_DIR.parent
 _OUTPUT_DIR = _SRC_DIR / "output"
 
-# Test-specific output files (excluded from git via .gitignore)
-_TEST_LOG = _OUTPUT_DIR / "test_cli_integration.log"
-_TEST_HTML = _OUTPUT_DIR / "test_cli_integration.html"
-_TEST_GALLERY_MD = _OUTPUT_DIR / "test_cli_integration_gallery.md"
-_TEST_ENV = _OUTPUT_DIR / "test_cli_integration_environment.log"
-_TEST_JSONL = _OUTPUT_DIR / "test_cli_integration.jsonl"
+# Test-specific output root (excluded from git via .gitignore's test_* rule)
+_TEST_OUTPUT_ROOT = _OUTPUT_DIR / "test_cli_integration"
 
 
 class CLIResult(NamedTuple):
@@ -49,19 +45,8 @@ def _run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> CLIResult:
 
 
 def _get_test_output_args() -> list[str]:
-    """Return CLI arguments for test-specific output files."""
-    return [
-        "--output-log",
-        str(_TEST_LOG),
-        "--output-html",
-        str(_TEST_HTML),
-        "--output-gallery-markdown",
-        str(_TEST_GALLERY_MD),
-        "--output-env",
-        str(_TEST_ENV),
-        "--output-jsonl",
-        str(_TEST_JSONL),
-    ]
+    """Return CLI arguments redirecting the whole retained layout."""
+    return ["--output-dir", str(_TEST_OUTPUT_ROOT)]
 
 
 def test_cli_help_displays(capsys: pytest.CaptureFixture[str]) -> None:
@@ -141,13 +126,11 @@ def test_cli_parser_accumulates_repeated_eos_token_flags() -> None:
     assert args.eos_tokens == ["</think>", r"\n", "<END>"]
 
 
-def test_cli_output_path_defaults_match_typed_specs() -> None:
-    """Output artifact defaults should remain aligned with their CLI specifications."""
+def test_cli_output_dir_default_is_the_canonical_output_root() -> None:
+    """The single output root defaults to src/output."""
     args = check_models._build_cli_parser().parse_args(["--folder", "test-folder"])
 
-    for spec in check_models.OUTPUT_PATH_ARGUMENT_SPECS:
-        destination = spec.flag.removeprefix("--").replace("-", "_")
-        assert getattr(args, destination) == spec.default
+    assert args.output_dir == check_models._SCRIPT_DIR / "output"
 
 
 def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
@@ -213,8 +196,9 @@ def test_cli_accepts_valid_parameters(capsys: pytest.CaptureFixture[str]) -> Non
         word in output or word.lower() in output.lower()
         for word in ["--folder", "--temperature", "usage:"]
     )
-    assert "--output-jsonl" in output
-    assert "--output-gallery-markdown" in output
+    assert "--output-dir" in output
+    assert "--output-jsonl" not in output
+    assert "--output-gallery-markdown" not in output
 
 
 def test_cli_rejects_url_passed_to_image(capsys: pytest.CaptureFixture[str]) -> None:

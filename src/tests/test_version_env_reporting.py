@@ -18,17 +18,16 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 
 
 def test_cli_version_and_env_reporting(tmp_path: Path) -> None:
-    env_log = tmp_path / "test_env_reporting.log"
-    cli_log = tmp_path / "test_env_reporting_cli.log"
+    output_root = tmp_path / "test_env_reporting"
+    derived = check_models.ReportOutputPaths.from_root(output_root)
+    env_log = derived.environment
 
     test_args = [
         "check_models.py",
         "--folder",
         str(tmp_path),
-        "--output-env",
-        str(env_log),
-        "--output-log",
-        str(cli_log),
+        "--output-dir",
+        str(output_root),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit):

@@ -23,10 +23,8 @@ def test_cli_handles_corrupted_image(tmp_path: Path, capsys: pytest.CaptureFixtu
         "check_models.py",
         "--image",
         str(img_path),
-        "--output-log",
-        str(_OUTPUT_DIR / "test_edge_case.log"),
-        "--output-env",
-        str(_OUTPUT_DIR / "test_edge_case_env.log"),
+        "--output-dir",
+        str(_OUTPUT_DIR / "test_edge_case"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
@@ -50,10 +48,8 @@ def test_cli_handles_unsupported_format(tmp_path: Path, capsys: pytest.CaptureFi
         "check_models.py",
         "--image",
         str(txt_path),
-        "--output-log",
-        str(_OUTPUT_DIR / "test_edge_case.log"),
-        "--output-env",
-        str(_OUTPUT_DIR / "test_edge_case_env.log"),
+        "--output-dir",
+        str(_OUTPUT_DIR / "test_edge_case"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:

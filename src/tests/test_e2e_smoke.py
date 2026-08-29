@@ -80,38 +80,14 @@ def _run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> CLIResult:
 
 
 def _get_e2e_output_args(output_dir: Path) -> list[str]:
-    """Return CLI arguments for E2E test-specific output files."""
-    return [
-        "--output-log",
-        str(output_dir / "e2e.log"),
-        "--output-html",
-        str(output_dir / "e2e.html"),
-        "--output-gallery-markdown",
-        str(output_dir / "e2e_gallery.md"),
-        "--output-jsonl",
-        str(output_dir / "e2e.jsonl"),
-        "--output-env",
-        str(output_dir / "e2e_env.log"),
-        "--output-diagnostics",
-        str(output_dir / "e2e_diagnostics.md"),
-    ]
+    """Return the single output-root argument for E2E runs."""
+    return ["--output-dir", str(output_dir)]
 
 
 def test_get_e2e_output_args_redirects_retained_artifacts(tmp_path: Path) -> None:
-    """E2E output helper should redirect every retained configurable artifact."""
+    """E2E output helper redirects the whole retained layout with one flag."""
     output_dir = tmp_path / "output"
-    output_args = _get_e2e_output_args(output_dir)
-    output_map = dict(zip(output_args[::2], output_args[1::2], strict=True))
-
-    assert set(output_map) == {
-        "--output-log",
-        "--output-html",
-        "--output-gallery-markdown",
-        "--output-jsonl",
-        "--output-env",
-        "--output-diagnostics",
-    }
-    assert output_map["--output-gallery-markdown"] == str(output_dir / "e2e_gallery.md")
+    assert _get_e2e_output_args(output_dir) == ["--output-dir", str(output_dir)]
 
 
 @pytest.fixture
@@ -234,15 +210,7 @@ class TestE2ESmoke:
         result = _run_cli(args, capsys)
         assert result.exit_code == 0
 
-        retained_paths = check_models.ReportOutputPaths(
-            index=e2e_output_dir / "index.md",
-            html=e2e_output_dir / "e2e.html",
-            gallery_markdown=e2e_output_dir / "e2e_gallery.md",
-            jsonl=e2e_output_dir / "e2e.jsonl",
-            diagnostics=e2e_output_dir / "e2e_diagnostics.md",
-            log=e2e_output_dir / "e2e.log",
-            environment=e2e_output_dir / "e2e_env.log",
-        )
+        retained_paths = check_models.ReportOutputPaths.from_root(e2e_output_dir)
         for output_path in (
             retained_paths.index,
             retained_paths.html,

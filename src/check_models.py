@@ -1361,6 +1361,21 @@ class ReportOutputPaths:
     log: Path
     environment: Path
 
+    @classmethod
+    def from_root(cls, root: Path) -> Self:
+        """Derive the canonical retained layout from one output root."""
+        root = root.expanduser().resolve()
+        reports = root / "reports"
+        return cls(
+            index=root / DEFAULT_OUTPUT_INDEX.name,
+            html=reports / DEFAULT_HTML_OUTPUT.name,
+            gallery_markdown=reports / DEFAULT_GALLERY_MD_OUTPUT.name,
+            jsonl=root / DEFAULT_JSONL_OUTPUT.name,
+            diagnostics=reports / DEFAULT_DIAGNOSTICS_OUTPUT.name,
+            log=root / DEFAULT_LOG_OUTPUT.name,
+            environment=root / DEFAULT_ENV_OUTPUT.name,
+        )
+
 
 @dataclass(frozen=True)
 class ReportGenerationInputs:
@@ -15531,7 +15546,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # retained log/environment artifacts of a real run would desynchronize
     # them from the run's other tracked outputs.
     if not args.dry_run:
-        log_file: Path = args.output_log.resolve()
+        log_file: Path = _resolve_report_output_paths(args).log
         log_file.parent.mkdir(parents=True, exist_ok=True)
         file_handler: logging.FileHandler = logging.FileHandler(
             log_file,
@@ -15558,7 +15573,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     if not args.dry_run:
         # Recorded on args so finalisation reports the environment log as a
         # current artifact only when this run actually wrote it.
-        args.environment_logged = _dump_environment_to_log(args.output_env)
+        args.environment_logged = _dump_environment_to_log(
+            _resolve_report_output_paths(args).environment
+        )
 
     # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(find_spec("sentence_transformers"))
@@ -20420,15 +20437,7 @@ def generate_run_issue_summary_report(
 
 def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     """Regenerate only the paste-ready issue body from retained run artifacts."""
-    output_paths = ReportOutputPaths(
-        index=output_dir / DEFAULT_OUTPUT_INDEX.name,
-        html=output_dir / "reports" / DEFAULT_HTML_OUTPUT.name,
-        gallery_markdown=output_dir / "reports" / DEFAULT_GALLERY_MD_OUTPUT.name,
-        jsonl=output_dir / DEFAULT_JSONL_OUTPUT.name,
-        diagnostics=output_dir / "reports" / DEFAULT_DIAGNOSTICS_OUTPUT.name,
-        log=output_dir / DEFAULT_LOG_OUTPUT.name,
-        environment=output_dir / DEFAULT_ENV_OUTPUT.name,
-    )
+    output_paths = ReportOutputPaths.from_root(output_dir)
     source = _load_run_issue_summary_source(output_paths)
     crash_models = tuple(
         result["model"]
@@ -20968,7 +20977,7 @@ def _write_environment_failure_diagnostics(
     error_message: str,
 ) -> None:
     """Write a minimal diagnostics report when runtime deps are missing."""
-    diagnostics_path: Path = args.output_diagnostics.resolve()
+    diagnostics_path: Path = _resolve_report_output_paths(args).diagnostics
     diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
     system_info = get_system_characteristics()
     parts = _build_environment_failure_diagnostics(
@@ -20985,17 +20994,8 @@ def _write_environment_failure_diagnostics(
 
 
 def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
-    """Resolve all final report/log output paths once for finalization."""
-    jsonl_path = args.output_jsonl.resolve()
-    return ReportOutputPaths(
-        index=jsonl_path.parent / DEFAULT_OUTPUT_INDEX.name,
-        html=args.output_html.resolve(),
-        gallery_markdown=args.output_gallery_markdown.resolve(),
-        jsonl=jsonl_path,
-        diagnostics=args.output_diagnostics.resolve(),
-        log=args.output_log.resolve(),
-        environment=args.output_env.resolve(),
-    )
+    """Resolve all final report/log output paths once from the output root."""
+    return ReportOutputPaths.from_root(args.output_dir)
 
 
 def _public_artifact_path(path: Path) -> str:
@@ -22017,52 +22017,14 @@ class _ArgumentAdder(Protocol):
         ...
 
 
-@dataclass(frozen=True)
-class OutputPathArgumentSpec:
-    """Declarative definition for a generated output artifact path option."""
-
-    flag: str
-    default: Path
-    help_text: str
-
-
-OUTPUT_PATH_ARGUMENT_SPECS: Final[tuple[OutputPathArgumentSpec, ...]] = (
-    OutputPathArgumentSpec("--output-html", DEFAULT_HTML_OUTPUT, "Output HTML report filename."),
-    OutputPathArgumentSpec(
-        "--output-gallery-markdown",
-        DEFAULT_GALLERY_MD_OUTPUT,
-        "Output GitHub Markdown model gallery filename.",
-    ),
-    OutputPathArgumentSpec("--output-jsonl", DEFAULT_JSONL_OUTPUT, "Output JSONL report filename."),
-    OutputPathArgumentSpec(
-        "--output-log",
-        DEFAULT_LOG_OUTPUT,
-        "Command line output log filename (overwritten each run). "
-        "Use different path for tests/debug runs.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-env",
-        DEFAULT_ENV_OUTPUT,
-        "Environment log filename (pip freeze, conda list for reproducibility).",
-    ),
-    OutputPathArgumentSpec(
-        "--output-diagnostics",
-        DEFAULT_DIAGNOSTICS_OUTPUT,
-        "Diagnostics report filename (Markdown). Generated when failures or harness issues are "
-        "detected. Structured for filing upstream issues against mlx-vlm / mlx / transformers.",
-    ),
-)
-
-
 def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
-    """Register output artifact path arguments on the CLI parser."""
-    for spec in OUTPUT_PATH_ARGUMENT_SPECS:
-        parser.add_argument(
-            spec.flag,
-            type=Path,
-            default=spec.default,
-            help=spec.help_text,
-        )
+    """Register the output-root and comparison arguments on the CLI parser."""
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=_SCRIPT_DIR / "output",
+        help="Root directory for the canonical report, machine-data, issue, and log layout.",
+    )
     parser.add_argument(
         "--compare-with",
         type=str,

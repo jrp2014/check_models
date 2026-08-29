@@ -1325,7 +1325,7 @@ class TestIsolatedExecution:
         args = self._args(test_image)
         restored = check_models._namespace_from_json(check_models._namespace_to_json(args))
         assert restored.image == test_image
-        assert isinstance(restored.output_jsonl, Path)
+        assert isinstance(restored.output_dir, Path)
         assert restored.max_tokens == 5
         assert restored.isolate is True
 

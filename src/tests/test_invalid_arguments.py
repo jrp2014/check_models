@@ -37,10 +37,8 @@ def test_cli_invalid_arguments(
     test_args = [
         "check_models.py",
         *args,
-        "--output-log",
-        str(_OUTPUT_DIR / "test_invalid_args.log"),
-        "--output-env",
-        str(_OUTPUT_DIR / "test_invalid_args_env.log"),
+        "--output-dir",
+        str(_OUTPUT_DIR / "test_invalid_args"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:

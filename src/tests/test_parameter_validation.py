@@ -480,15 +480,26 @@ class TestCliArgumentNormalization:
 
         assert args.eval_mode == "auto"
 
+    def test_output_dir_derives_the_canonical_layout(self, tmp_path: Path) -> None:
+        """One output root derives every retained artifact location."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(["--output-dir", str(tmp_path)])
+        paths = check_models._resolve_report_output_paths(args)
+
+        assert paths.index == tmp_path / "index.md"
+        assert paths.jsonl == tmp_path / "results.jsonl"
+        assert paths.html == tmp_path / "reports" / "results.html"
+        assert paths.gallery_markdown == tmp_path / "reports" / "model_gallery.md"
+        assert paths.diagnostics == tmp_path / "reports" / "diagnostics.md"
+        assert paths.log == tmp_path / "check_models.log"
+        assert paths.environment == tmp_path / "environment.log"
+
     def test_retained_output_defaults(self) -> None:
-        """Parser defaults should expose only the retained configurable artifacts."""
+        """The parser exposes one output root defaulting to src/output."""
         parser = check_models._build_cli_parser()
         args = parser.parse_args([])
 
-        assert args.output_html == check_models.DEFAULT_HTML_OUTPUT
-        assert args.output_gallery_markdown == check_models.DEFAULT_GALLERY_MD_OUTPUT
-        assert args.output_jsonl == check_models.DEFAULT_JSONL_OUTPUT
-        assert args.output_diagnostics == check_models.DEFAULT_DIAGNOSTICS_OUTPUT
+        assert args.output_dir == check_models._SCRIPT_DIR / "output"
 
     @pytest.mark.parametrize(
         "retired_flag",
@@ -500,6 +511,12 @@ class TestCliArgumentNormalization:
             "--output-model-capabilities-json",
             "--output-tsv",
             "--output-run-json",
+            "--output-html",
+            "--output-gallery-markdown",
+            "--output-jsonl",
+            "--output-log",
+            "--output-env",
+            "--output-diagnostics",
         ],
     )
     def test_retired_output_flags_are_rejected(self, retired_flag: str) -> None:
@@ -515,30 +532,12 @@ class TestCliArgumentNormalization:
         self,
         tmp_path: Path,
     ) -> None:
-        """Parser should accept explicit retained artifact destinations."""
+        """The single output root relocates every retained artifact."""
         parser = check_models._build_cli_parser()
-        html = tmp_path / "results.html"
-        gallery = tmp_path / "gallery.md"
-        jsonl = tmp_path / "results.jsonl"
-        diagnostics = tmp_path / "diagnostics.md"
 
-        args = parser.parse_args(
-            [
-                "--output-html",
-                str(html),
-                "--output-gallery-markdown",
-                str(gallery),
-                "--output-jsonl",
-                str(jsonl),
-                "--output-diagnostics",
-                str(diagnostics),
-            ],
-        )
+        args = parser.parse_args(["--output-dir", str(tmp_path)])
 
-        assert args.output_html == html
-        assert args.output_gallery_markdown == gallery
-        assert args.output_jsonl == jsonl
-        assert args.output_diagnostics == diagnostics
+        assert args.output_dir == tmp_path
 
     def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:
         """Auto mode should use metadata-assisted cataloguing when references exist."""
@@ -744,19 +743,12 @@ def test_dry_run_setup_writes_no_log_or_environment_files(
     test_image: Path,
 ) -> None:
     """--dry-run must not overwrite the retained log/environment artifacts."""
-    log_path = tmp_path / "check_models.log"
-    env_path = tmp_path / "environment.log"
+    derived = check_models.ReportOutputPaths.from_root(tmp_path)
+    log_path = derived.log
+    env_path = derived.environment
     parser = check_models._build_cli_parser()
     args = parser.parse_args(
-        [
-            "--dry-run",
-            "--image",
-            str(test_image),
-            "--output-log",
-            str(log_path),
-            "--output-env",
-            str(env_path),
-        ]
+        ["--dry-run", "--image", str(test_image), "--output-dir", str(tmp_path)]
     )
 
     check_models.setup_environment(args)
@@ -764,16 +756,7 @@ def test_dry_run_setup_writes_no_log_or_environment_files(
     assert not log_path.exists()
     assert not env_path.exists()
 
-    args = parser.parse_args(
-        [
-            "--image",
-            str(test_image),
-            "--output-log",
-            str(log_path),
-            "--output-env",
-            str(env_path),
-        ]
-    )
+    args = parser.parse_args(["--image", str(test_image), "--output-dir", str(tmp_path)])
     check_models.setup_environment(args)
     assert log_path.exists()
     assert env_path.exists()

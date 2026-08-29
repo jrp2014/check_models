@@ -1102,19 +1102,13 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Final summary should report configured --output-log/--output-env paths."""
+    """Final summary should report the output root's derived log/env paths."""
     caplog.set_level(logging.INFO)
-    custom_log = tmp_path / "custom.log"
-    custom_env = tmp_path / "custom.env.log"
-    custom_env.write_text("env", encoding="utf-8")
+    derived = check_models.ReportOutputPaths.from_root(tmp_path)
+    derived.environment.write_text("env", encoding="utf-8")
 
     args = argparse.Namespace(
-        output_html=tmp_path / "report.html",
-        output_gallery_markdown=tmp_path / "gallery.md",
-        output_jsonl=tmp_path / "report.jsonl",
-        output_diagnostics=tmp_path / "diagnostics.md",
-        output_log=custom_log,
-        output_env=custom_env,
+        output_dir=tmp_path,
         # This run "wrote" the env log; mere pre-existence no longer counts.
         environment_logged=True,
     )
@@ -1136,10 +1130,10 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     messages = [record.message for record in caplog.records]
     _assert_logged_paths(
         messages,
-        custom_log,
-        custom_env,
-        args.output_gallery_markdown,
-        args.output_diagnostics,
+        derived.log,
+        derived.environment,
+        derived.gallery_markdown,
+        derived.diagnostics,
     )
     _assert_report_artifact_log_order(messages)
 
@@ -1152,12 +1146,7 @@ def test_finalize_execution_separates_each_model_result_block(
     caplog.set_level(logging.INFO)
     args = argparse.Namespace(
         verbose=True,
-        output_html=tmp_path / "report.html",
-        output_gallery_markdown=tmp_path / "gallery.md",
-        output_jsonl=tmp_path / "report.jsonl",
-        output_diagnostics=tmp_path / "diagnostics.md",
-        output_log=tmp_path / "check_models.log",
-        output_env=tmp_path / "environment.log",
+        output_dir=tmp_path,
     )
     results = [
         PerformanceResult(
@@ -1199,12 +1188,7 @@ def test_finalize_execution_separates_each_model_result_block(
 def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     """Report generation should expose one ordered artifact plan for jobs and logs."""
     args = argparse.Namespace(
-        output_html=tmp_path / "report.html",
-        output_gallery_markdown=tmp_path / "gallery.md",
-        output_jsonl=tmp_path / "report.jsonl",
-        output_diagnostics=tmp_path / "diagnostics.md",
-        output_log=tmp_path / "check_models.log",
-        output_env=tmp_path / "environment.log",
+        output_dir=tmp_path,
     )
     inputs = check_models.ReportGenerationInputs(
         results=[],
@@ -1260,12 +1244,7 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
     """Optional presentation failures must leave canonical JSONL valid and report partial."""
     caplog.set_level(logging.INFO)
     args = argparse.Namespace(
-        output_html=tmp_path / "reports/results.html",
-        output_gallery_markdown=tmp_path / "reports/model_gallery.md",
-        output_jsonl=tmp_path / "results.jsonl",
-        output_diagnostics=tmp_path / "reports/diagnostics.md",
-        output_log=tmp_path / "check_models.log",
-        output_env=tmp_path / "environment.log",
+        output_dir=tmp_path,
     )
     result = PerformanceResult(
         model_name="org/model",
@@ -1348,12 +1327,7 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
 def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
     """Generated report path, run-json, and dashboard metadata should share specs."""
     args = argparse.Namespace(
-        output_html=tmp_path / "report.html",
-        output_gallery_markdown=tmp_path / "gallery.md",
-        output_jsonl=tmp_path / "report.jsonl",
-        output_diagnostics=tmp_path / "diagnostics.md",
-        output_log=tmp_path / "check_models.log",
-        output_env=tmp_path / "environment.log",
+        output_dir=tmp_path,
     )
     paths = check_models._resolve_report_output_paths(args)
 
@@ -1439,12 +1413,7 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
 def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: Path) -> None:
     """Current report statuses must not depend on append-only history."""
     args = argparse.Namespace(
-        output_html=tmp_path / "report.html",
-        output_gallery_markdown=tmp_path / "gallery.md",
-        output_jsonl=tmp_path / "report.jsonl",
-        output_diagnostics=tmp_path / "diagnostics.md",
-        output_log=tmp_path / "check_models.log",
-        output_env=tmp_path / "environment.log",
+        output_dir=tmp_path,
     )
     result = PerformanceResult(
         model_name="dummy/model",

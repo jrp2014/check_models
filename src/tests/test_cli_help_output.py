@@ -32,8 +32,9 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     # Check for key sections and argument descriptions
     assert "usage" in output.lower()
     assert "folder" in output.lower()
-    assert "output-html" in output.lower()
-    assert "output-gallery-markdown" in output.lower()
+    assert "output-dir" in output.lower()
+    assert "output-html" not in output.lower()
+    assert "output-gallery-markdown" not in output.lower()
     assert "temperature" in output.lower()
     assert "max-tokens" in output.lower()
     assert "models" in output.lower()
@@ -99,4 +100,4 @@ def test_cli_help_groups_related_flags(capsys: pytest.CaptureFixture[str]) -> No
     assert [output.index(heading) for heading in headings] == sorted(
         output.index(heading) for heading in headings
     )
-    assert output.index("Output Reports:") < output.index("--output-html")
+    assert output.index("Output Reports:") < output.index("--output-dir")
