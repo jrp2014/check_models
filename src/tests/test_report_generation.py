@@ -1485,6 +1485,33 @@ def test_custom_published_index_and_issue_drafts_use_distinct_repo_paths(
     assert issue_path.as_posix() == "src/output/issues/issue_org_model.md"
 
 
+def _all_artifacts(
+    output_paths: check_models.ReportOutputPaths,
+) -> tuple[check_models.ReportArtifact, ...]:
+    """Return the full artifact plan for tests that assume a fully successful run."""
+    inputs = check_models.ReportGenerationInputs(
+        results=[],
+        library_versions={},
+        prompt="p",
+        metadata=None,
+        overall_time=0.0,
+        image_path=None,
+        system_info={},
+        report_context=_build_report_render_context(results=[], prompt="p"),
+        output_paths=output_paths,
+    )
+    return check_models._build_report_artifacts(inputs)
+
+
+def _all_success_outcomes(
+    artifacts: tuple[check_models.ReportArtifact, ...],
+) -> tuple[check_models.ReportArtifactOutcome, ...]:
+    return tuple(
+        check_models.ReportArtifactOutcome(key=a.key, path=a.path, succeeded=True)
+        for a in artifacts
+    )
+
+
 def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     """The tiny index should link current evidence, not history or retired reports."""
     output_dir = tmp_path / "output"
@@ -1500,7 +1527,9 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     )
 
     with patch.object(check_models._LinkStyleState, "value", "relative"):
-        check_models.generate_output_index_report(output_paths.index, output_paths=output_paths)
+        check_models.generate_output_index_report(
+            output_paths.index, artifacts=_all_artifacts(output_paths)
+        )
 
     assert output_paths.index.read_text(encoding="utf-8") == (
         "# Check Models Output Index\n"
@@ -1552,7 +1581,7 @@ def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Pa
     with patch.object(check_models._LinkStyleState, "value", "relative"):
         check_models.generate_output_index_report(
             output_paths.index,
-            output_paths=output_paths,
+            artifacts=_all_artifacts(output_paths),
             issue_reports=issue_reports,
         )
 
@@ -1596,7 +1625,7 @@ def test_output_index_renders_run_dashboard(tmp_path: Path) -> None:
     with patch.object(check_models._LinkStyleState, "value", "relative"):
         check_models.generate_output_index_report(
             output_paths.index,
-            output_paths=output_paths,
+            artifacts=_all_artifacts(output_paths),
             assessments=assessments,
         )
 
@@ -1749,6 +1778,83 @@ def test_unexpected_comparison_error_degrades_to_no_comparison(
 
     assert comparison is None
     assert "Comparison skipped" in caplog.text
+
+
+def test_comparison_rendering_failure_does_not_block_reports(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A crash while displaying the comparison degrades to no comparison."""
+    inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    inputs = replace(inputs, run_args=replace_namespace(inputs.run_args, compare_with="auto"))
+    with (
+        patch.object(
+            check_models,
+            "_compute_run_comparison",
+            return_value=check_models.RunComparison.__new__(check_models.RunComparison),
+        ),
+        patch.object(
+            check_models,
+            "_log_run_comparison",
+            side_effect=KeyError("broken comparison view"),
+        ),
+    ):
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert _report_outcome(outcomes, "jsonl").succeeded is True
+    assert inputs.output_paths.index.is_file()
+    assert "Comparison skipped: unexpected comparison rendering failure" in caplog.text
+
+
+def replace_namespace(args: object, **overrides: object) -> Namespace:
+    """Copy a Namespace with overrides (argparse has no replace helper)."""
+    merged = vars(args).copy()
+    merged.update(overrides)
+    return Namespace(**merged)
+
+
+def test_stale_environment_log_is_not_presented_as_current(tmp_path: Path) -> None:
+    """environment.log outcomes require this run's explicit write signal."""
+    inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    inputs.output_paths.environment.parent.mkdir(parents=True, exist_ok=True)
+    inputs.output_paths.environment.write_text("stale dump from an earlier run", encoding="utf-8")
+
+    outcomes = check_models._generate_reports_and_log_outputs(inputs)
+    assert all(outcome.key != "environment" for outcome in outcomes)
+
+    inputs = replace(inputs, run_args=replace_namespace(inputs.run_args, environment_logged=True))
+    outcomes = check_models._generate_reports_and_log_outputs(inputs)
+    environment = next(outcome for outcome in outcomes if outcome.key == "environment")
+    assert environment.succeeded is True
+
+
+def test_failed_current_artifact_is_omitted_from_navigation(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A stale file surviving a failed renderer is not current and is not linked."""
+    inputs = _report_generation_inputs(tmp_path, result=_make_success("org/model"))
+    inputs.output_paths.html.parent.mkdir(parents=True, exist_ok=True)
+    check_models._write_text_file(inputs.output_paths.html, "stale html")
+
+    with (
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+        patch.object(check_models, "generate_html_report", side_effect=KeyError("html failed")),
+    ):
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    index = inputs.output_paths.index.read_text(encoding="utf-8")
+    assert "results.html" not in index
+    assert "model_gallery.md" in index
+    capsys.readouterr()  # drain orchestration logging before the dashboard
+    check_models._print_reports_dashboard(
+        check_models._build_report_artifacts(inputs),
+        outcomes,
+        history_path=None,
+    )
+    captured = capsys.readouterr()
+    assert "HTML Report" not in captured.err + captured.out
+    assert "Gallery Report" in captured.err + captured.out
 
 
 def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: Path) -> None:
@@ -1927,10 +2033,13 @@ def test_report_dashboard_only_shows_current_successful_run_summary(
     stale_summary = output_paths.index.parent / "issues" / "run_summary.md"
     check_models._write_text_file(stale_summary, "stale\n")
 
-    check_models._print_reports_dashboard(output_paths, run_issue_summary=None)
+    artifacts = _all_artifacts(output_paths)
+    outcomes = _all_success_outcomes(artifacts)
+    check_models._print_reports_dashboard(artifacts, outcomes, run_issue_summary=None)
     without_summary = capsys.readouterr().err
     check_models._print_reports_dashboard(
-        output_paths,
+        artifacts,
+        outcomes,
         run_issue_summary=stale_summary,
     )
     with_summary = capsys.readouterr().err
@@ -2037,7 +2146,7 @@ def _generate_output_artifacts_for_link_style(
         )
         check_models.generate_output_index_report(
             output_paths.index,
-            output_paths=output_paths,
+            artifacts=_all_artifacts(output_paths),
             issue_reports=issue_reports,
         )
 

@@ -18,7 +18,7 @@ Architecture at a glance:
   catalog-contract violations, ...) is declared once with its code, label,
   and usability impact; ``_assess_result`` projects results onto it. There is
   deliberately no semantic scoring — only reproducible mechanical facts.
-- **Artifact fan-out** (``_build_report_artifact_specs`` /
+- **Artifact fan-out** (``_build_report_artifacts`` /
   ``finalize_execution``): one run emits the console dashboard plus
   ``index.md`` (dashboard + links), ``reports/results.html``,
   ``reports/model_gallery.md``, ``reports/diagnostics.md``,
@@ -1402,11 +1402,14 @@ class ReportGenerationInputs:
 
 @dataclass(frozen=True)
 class ReportArtifact:
-    """A generated artifact path plus its optional generation job."""
+    """One retained artifact: identity, presentation, and optional job."""
 
     key: str
+    public_key: str
     label: str
     path: Path
+    dashboard_label: str
+    dashboard_purpose: str
     job: Callable[[], None] | None = None
 
 
@@ -1418,18 +1421,6 @@ class ReportArtifactOutcome:
     path: Path
     succeeded: bool
     error_message: str | None = None
-
-
-@dataclass(frozen=True)
-class ReportArtifactSpec:
-    """Shared metadata for final generated report artifacts."""
-
-    key: str
-    public_key: str
-    label: str
-    path: Path
-    dashboard_label: str
-    dashboard_purpose: str
 
 
 class ChatTemplateKwargs(TypedDict, total=False):
@@ -15456,7 +15447,7 @@ def print_cli_separator() -> None:
     log_rule(width, char="─", style="blue")
 
 
-def _dump_environment_to_log(output_path: Path) -> None:
+def _dump_environment_to_log(output_path: Path) -> bool:
     """Dump complete Python environment to separate file for debugging/reproducibility.
 
     Captures output from pip freeze (and conda list if in conda environment)
@@ -15464,6 +15455,11 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
     Args:
         output_path: Path where the environment log should be written
+
+    Returns:
+        Whether this run actually wrote the log. A pre-existing file from an
+        earlier run must never be presented as a current artifact, so callers
+        record this signal instead of checking ``Path.exists()``.
     """
     try:
         # Detect if we're in a conda environment
@@ -15527,6 +15523,8 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
     except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
         logger.warning("Failed to dump environment info: %s", e)
+        return False
+    return True
 
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
@@ -15577,7 +15575,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     # Dump full environment to log file for reproducibility (after logging setup)
     if not args.dry_run:
-        _dump_environment_to_log(args.output_env)
+        # Recorded on args so finalisation reports the environment log as a
+        # current artifact only when this run actually wrote it.
+        args.environment_logged = _dump_environment_to_log(args.output_env)
 
     # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(find_spec("sentence_transformers"))
@@ -20584,24 +20584,22 @@ def _output_index_dashboard_lines(
 def generate_output_index_report(
     filename: Path,
     *,
-    output_paths: ReportOutputPaths,
+    artifacts: Sequence[ReportArtifact],
     run_issue_summary: Path | None = None,
     issue_reports: Mapping[str, Path] | None = None,
     assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
 ) -> None:
-    """Write a run dashboard plus navigation list for the retained artifacts."""
-    # Labels derive from the actual paths so custom --output-* names stay honest.
+    """Write a run dashboard plus navigation for current-run artifacts only.
+
+    ``artifacts`` must already be filtered to this run's successful outcomes:
+    a file that still exists after a failed renderer is prior-run evidence,
+    not a current artifact, and must not be linked.
+    """
+    # Labels derive from the actual paths so custom output names stay honest.
     links = tuple(
-        (path, path.name)
-        for path in (
-            output_paths.html,
-            output_paths.gallery_markdown,
-            output_paths.diagnostics,
-            output_paths.jsonl,
-            output_paths.run_json,
-            output_paths.log,
-            output_paths.environment,
-        )
+        (artifact.path, artifact.path.name)
+        for artifact in artifacts
+        if artifact.key != "output_index"
     )
     md = ["# Check Models Output Index", ""]
     if assessments is not None:
@@ -21104,34 +21102,74 @@ def _public_artifact_path(path: Path) -> str:
             return _home_relative_report_text(str(path))
 
 
-def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[ReportArtifactSpec, ...]:
-    """Return the exact retained report and machine-artifact contract."""
+def _public_output_artifact_map(inputs: ReportGenerationInputs) -> dict[str, str]:
+    """Return stable artifact paths for run-level JSON metadata."""
+    return {
+        artifact.public_key: _public_artifact_path(artifact.path)
+        for artifact in _build_report_artifacts(inputs)
+    }
+
+
+def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
+    """Build the ordered retained artifact plan — the single artifact source.
+
+    Identity, public manifest key, log label, dashboard presentation, and the
+    generation job live together so the manifest, logs, dashboard, and output
+    index cannot drift apart. Artifacts without a job (diagnostics runs via
+    its dedicated runner; log and environment are produced by the run itself)
+    receive their outcomes from the orchestrator.
+    """
+    output_paths = inputs.output_paths
     return (
-        ReportArtifactSpec(
+        ReportArtifact(
             key="output_index",
             public_key="output_index",
             label="   Output Index:   ",
             path=output_paths.index,
             dashboard_label="Output Index",
             dashboard_purpose="Links to retained run artifacts",
+            job=lambda: generate_output_index_report(
+                output_paths.index,
+                artifacts=(),
+                assessments=inputs.report_context.assessments,
+            ),
         ),
-        ReportArtifactSpec(
+        ReportArtifact(
             key="html",
             public_key="results_html",
             label="   HTML Report:     ",
             path=output_paths.html,
             dashboard_label="HTML Report",
             dashboard_purpose="Standalone gallery and diagnostics",
+            job=lambda: generate_html_report(
+                results=inputs.results,
+                filename=output_paths.html,
+                versions=inputs.library_versions,
+                prompt=inputs.prompt,
+                total_runtime_seconds=inputs.overall_time,
+                image_path=inputs.image_path,
+                report_context=inputs.report_context,
+                run_args=inputs.run_args,
+            ),
         ),
-        ReportArtifactSpec(
+        ReportArtifact(
             key="markdown_gallery",
             public_key="model_gallery",
             label="   Gallery Report:  ",
             path=output_paths.gallery_markdown,
             dashboard_label="Gallery Report",
             dashboard_purpose="Complete per-model evidence",
+            job=lambda: generate_markdown_gallery_report(
+                results=inputs.results,
+                filename=output_paths.gallery_markdown,
+                prompt=inputs.prompt,
+                metadata=inputs.metadata,
+                report_context=inputs.report_context,
+                versions=inputs.library_versions,
+                image_path=inputs.image_path,
+            ),
         ),
-        ReportArtifactSpec(
+        ReportArtifact(
             key="diagnostics",
             public_key="diagnostics",
             label="   Diagnostics:     ",
@@ -21139,109 +21177,69 @@ def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[Repor
             dashboard_label="Diagnostics",
             dashboard_purpose="Current-run maintainer evidence",
         ),
-        ReportArtifactSpec(
+        ReportArtifact(
             key="jsonl",
             public_key="results_jsonl",
             label="   JSONL Report:    ",
             path=output_paths.jsonl,
             dashboard_label="JSONL Data",
             dashboard_purpose="Machine-readable per-model evidence",
+            job=lambda: save_jsonl_report(
+                inputs.results,
+                output_paths.jsonl,
+                prompt=inputs.prompt,
+                system_info=inputs.system_info,
+                library_versions=inputs.library_versions,
+                runtime_fingerprint=inputs.runtime_fingerprint,
+                requested_revision=inputs.model_revision,
+                report_context=inputs.report_context,
+                execution_mode=(
+                    "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
+                ),
+            ),
         ),
-        ReportArtifactSpec(
+        ReportArtifact(
             key="run_json",
             public_key="run_json",
             label="   Run JSON:        ",
             path=output_paths.run_json,
             dashboard_label="Run JSON",
             dashboard_purpose="Run metadata and artifact manifest",
-        ),
-    )
-
-
-def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, str]:
-    """Return stable artifact paths for run-level JSON metadata."""
-    artifacts = {
-        spec.public_key: _public_artifact_path(spec.path)
-        for spec in _build_report_artifact_specs(output_paths)
-    }
-    artifacts.update(
-        {
-            "log": _public_artifact_path(output_paths.log),
-            "environment": _public_artifact_path(output_paths.environment),
-        }
-    )
-    return artifacts
-
-
-def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
-    """Build the ordered retained artifact plan from the shared specifications."""
-    output_paths = inputs.output_paths
-    jobs: dict[str, Callable[[], None] | None] = {
-        "output_index": lambda: generate_output_index_report(
-            output_paths.index,
-            output_paths=output_paths,
-            assessments=inputs.report_context.assessments,
-        ),
-        "html": lambda: generate_html_report(
-            results=inputs.results,
-            filename=output_paths.html,
-            versions=inputs.library_versions,
-            prompt=inputs.prompt,
-            total_runtime_seconds=inputs.overall_time,
-            image_path=inputs.image_path,
-            report_context=inputs.report_context,
-            run_args=inputs.run_args,
-        ),
-        "markdown_gallery": lambda: generate_markdown_gallery_report(
-            results=inputs.results,
-            filename=output_paths.gallery_markdown,
-            prompt=inputs.prompt,
-            metadata=inputs.metadata,
-            report_context=inputs.report_context,
-            versions=inputs.library_versions,
-            image_path=inputs.image_path,
-        ),
-        "diagnostics": None,
-        "jsonl": lambda: save_jsonl_report(
-            inputs.results,
-            output_paths.jsonl,
-            prompt=inputs.prompt,
-            system_info=inputs.system_info,
-            library_versions=inputs.library_versions,
-            runtime_fingerprint=inputs.runtime_fingerprint,
-            requested_revision=inputs.model_revision,
-            report_context=inputs.report_context,
-            execution_mode=(
-                "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
+            job=lambda: save_run_json_report(
+                inputs.results,
+                output_paths.run_json,
+                versions=inputs.library_versions,
+                prompt=inputs.prompt,
+                total_runtime_seconds=inputs.overall_time,
+                report_context=inputs.report_context,
+                output_paths=_public_output_artifact_map(inputs),
+                image_path=inputs.image_path,
+                image_source_url=(
+                    getattr(inputs.run_args, "image_source_url", None)
+                    if inputs.run_args is not None
+                    else None
+                ),
+                trust_remote_code=inputs.trust_remote_code,
+                requested_revision=inputs.model_revision,
+                comparison=inputs.comparison,
             ),
         ),
-        "run_json": lambda: save_run_json_report(
-            inputs.results,
-            output_paths.run_json,
-            versions=inputs.library_versions,
-            prompt=inputs.prompt,
-            total_runtime_seconds=inputs.overall_time,
-            report_context=inputs.report_context,
-            output_paths=_public_output_artifact_map(output_paths),
-            image_path=inputs.image_path,
-            image_source_url=(
-                getattr(inputs.run_args, "image_source_url", None)
-                if inputs.run_args is not None
-                else None
-            ),
-            trust_remote_code=inputs.trust_remote_code,
-            requested_revision=inputs.model_revision,
-            comparison=inputs.comparison,
-        ),
-    }
-    return tuple(
         ReportArtifact(
-            key=spec.key,
-            label=spec.label,
-            path=spec.path,
-            job=jobs[spec.key],
-        )
-        for spec in _build_report_artifact_specs(output_paths)
+            key="log",
+            public_key="log",
+            label="   Log File:",
+            path=output_paths.log,
+            dashboard_label="System Log",
+            dashboard_purpose="Step-by-step CLI trace log",
+        ),
+        ReportArtifact(
+            key="environment",
+            public_key="environment",
+            label="   Environment:",
+            path=output_paths.environment,
+            dashboard_label="Environment Log",
+            dashboard_purpose="Pip freeze & conda env config log",
+        ),
     )
 
 
@@ -21360,7 +21358,6 @@ def _run_diagnostics_artifact(
 
 
 def _log_report_generation_outcomes(
-    inputs: ReportGenerationInputs,
     *,
     artifacts: Sequence[ReportArtifact],
     outcomes: Sequence[ReportArtifactOutcome],
@@ -21381,10 +21378,6 @@ def _log_report_generation_outcomes(
             log_file_path(artifact.path, label=artifact.label)
     if run_issue_summary is not None:
         log_file_path(run_issue_summary, label="   Run Issue:       ")
-
-    log_file_path(inputs.output_paths.log, label="   Log File:")
-    if inputs.output_paths.environment.exists():
-        log_file_path(inputs.output_paths.environment, label="   Environment:")
 
 
 def _compute_run_comparison(inputs: ReportGenerationInputs) -> RunComparison | None:
@@ -21474,10 +21467,17 @@ def _generate_reports_and_log_outputs(
     if jsonl_succeeded and inputs.comparison is None:
         comparison = _compute_run_comparison(inputs)
         if comparison is not None:
+            try:
+                _log_run_comparison(comparison)
+            except Exception:
+                logger.exception("Comparison skipped: unexpected comparison rendering failure.")
+                # A comparison whose view derivation crashes here would crash
+                # the summary renderer too; degrade to no comparison.
+                comparison = None
+        if comparison is not None:
             inputs = replace(inputs, comparison=comparison)
             artifacts = _build_report_artifacts(inputs)
             by_key = {artifact.key: artifact for artifact in artifacts}
-            _log_run_comparison(comparison)
 
     diagnostics_artifacts, diagnostics_succeeded = _run_diagnostics_artifact(inputs, outcomes)
     _log_maintainer_summary(
@@ -21504,19 +21504,8 @@ def _generate_reports_and_log_outputs(
             run_issue_summary=run_issue_summary,
         )
 
-    index_artifact = replace(
-        by_key["output_index"],
-        job=lambda: generate_output_index_report(
-            inputs.output_paths.index,
-            output_paths=inputs.output_paths,
-            run_issue_summary=run_issue_summary,
-            issue_reports=diagnostics_artifacts.issue_reports,
-            assessments=inputs.report_context.assessments,
-        ),
-    )
-    run_artifact(index_artifact)
     for artifact in artifacts:
-        if artifact.key not in {
+        if artifact.job is not None and artifact.key not in {
             "output_index",
             "jsonl",
             "run_json",
@@ -21525,8 +21514,34 @@ def _generate_reports_and_log_outputs(
         }:
             run_artifact(artifact)
 
+    # The run itself produces the operational logs: the file logger owns
+    # check_models.log for the whole run, and environment.log is written by the
+    # earlier environment dump when enabled.
+    outcomes.append(ReportArtifactOutcome(key="log", path=inputs.output_paths.log, succeeded=True))
+    if bool(getattr(inputs.run_args, "environment_logged", False)):
+        outcomes.append(
+            ReportArtifactOutcome(
+                key="environment", path=inputs.output_paths.environment, succeeded=True
+            )
+        )
+
+    # The index runs last so its links are driven by this run's outcomes:
+    # a stale file surviving a failed renderer must not be presented.
+    successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
+    available = tuple(artifact for artifact in artifacts if artifact.key in successful_keys)
+    index_artifact = replace(
+        by_key["output_index"],
+        job=lambda: generate_output_index_report(
+            inputs.output_paths.index,
+            artifacts=available,
+            run_issue_summary=run_issue_summary,
+            issue_reports=diagnostics_artifacts.issue_reports,
+            assessments=inputs.report_context.assessments,
+        ),
+    )
+    run_artifact(index_artifact)
+
     _log_report_generation_outcomes(
-        inputs,
         artifacts=artifacts,
         outcomes=outcomes,
         run_issue_summary=run_issue_summary,
@@ -21620,12 +21635,17 @@ def _run_differential_reruns(
 
 
 def _print_reports_dashboard(
-    output_paths: ReportOutputPaths,
+    artifacts: Sequence[ReportArtifact],
+    outcomes: Sequence[ReportArtifactOutcome],
     history_path: Path | None = None,
     *,
     run_issue_summary: Path | None = None,
 ) -> None:
-    """Print a highly polished, unified console dashboard of all generated artifacts."""
+    """Print the console dashboard for artifacts the current run produced.
+
+    Rows are driven by successful outcomes, never bare file existence, so a
+    stale file surviving a failed renderer is not presented as current.
+    """
     console = _make_rich_console(markup=True, highlight=True)
 
     table = Table(
@@ -21639,14 +21659,16 @@ def _print_reports_dashboard(
     table.add_column("Local Location (Clickable)", style="blue")
 
     def add_row(label: str, purpose: str, path: Path | None) -> None:
-        if path is None or not path.exists():
+        if path is None:
             return
         uri = f"file://{path.resolve()}"
         clickable_link = f"[link={uri}]{uri}[/link]"
         table.add_row(label, purpose, clickable_link)
 
-    for spec in _build_report_artifact_specs(output_paths):
-        add_row(spec.dashboard_label, spec.dashboard_purpose, spec.path)
+    successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
+    for artifact in artifacts:
+        if artifact.key in successful_keys:
+            add_row(artifact.dashboard_label, artifact.dashboard_purpose, artifact.path)
 
     add_row(
         "Run Issue Summary",
@@ -21654,11 +21676,8 @@ def _print_reports_dashboard(
         run_issue_summary,
     )
 
-    if history_path:
+    if history_path and history_path.exists():
         add_row("Run History", "Persistent database of previous runs", history_path)
-
-    add_row("System Log", "Step-by-step CLI trace log", output_paths.log)
-    add_row("Environment Log", "Pip freeze & conda env config log", output_paths.environment)
 
     panel = Panel(
         table,
@@ -21765,24 +21784,23 @@ def finalize_execution(
 
         log_file_path(history_path, label="   History:     ")
 
-        report_outcomes = _generate_reports_and_log_outputs(
-            ReportGenerationInputs(
-                results=results,
-                library_versions=library_versions,
-                prompt=prompt,
-                metadata=metadata,
-                overall_time=overall_time,
-                image_path=image_path,
-                system_info=system_info,
-                report_context=report_context,
-                output_paths=output_paths,
-                run_args=args,
-                history_appended=history_record is not None,
-                model_revision=requested_revision,
-                trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
-                runtime_fingerprint=runtime_fingerprint,
-            ),
+        report_inputs = ReportGenerationInputs(
+            results=results,
+            library_versions=library_versions,
+            prompt=prompt,
+            metadata=metadata,
+            overall_time=overall_time,
+            image_path=image_path,
+            system_info=system_info,
+            report_context=report_context,
+            output_paths=output_paths,
+            run_args=args,
+            history_appended=history_record is not None,
+            model_revision=requested_revision,
+            trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
+            runtime_fingerprint=runtime_fingerprint,
         )
+        report_outcomes = _generate_reports_and_log_outputs(report_inputs)
         run_issue_summary = next(
             (
                 outcome.path
@@ -21794,13 +21812,18 @@ def finalize_execution(
 
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(
-            output_paths=output_paths,
+            _build_report_artifacts(report_inputs),
+            report_outcomes,
             history_path=history_path,
             run_issue_summary=run_issue_summary,
         )
 
-        # Open HTML report in default browser if requested
-        if getattr(args, "open_report", False) and output_paths.html.exists():
+        # Open HTML report in default browser if requested — only when this
+        # run actually produced it; a stale file must not be opened.
+        html_succeeded = any(
+            outcome.key == "html" and outcome.succeeded for outcome in report_outcomes
+        )
+        if getattr(args, "open_report", False) and html_succeeded:
             try:
                 webbrowser.open(output_paths.html.as_uri())
                 logger.info("Automatically opened HTML report: %s", output_paths.html.name)

@@ -1118,6 +1118,8 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=custom_log,
         output_env=custom_env,
+        # This run "wrote" the env log; mere pre-existence no longer counts.
+        environment_logged=True,
     )
     result = PerformanceResult(
         model_name="dummy/model",
@@ -1231,6 +1233,8 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "diagnostics",
         "jsonl",
         "run_json",
+        "log",
+        "environment",
     ]
     assert [artifact.label.strip() for artifact in artifacts] == [
         "Output Index:",
@@ -1239,9 +1243,17 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "Diagnostics:",
         "JSONL Report:",
         "Run JSON:",
+        "Log File:",
+        "Environment:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
-    assert all(artifact.job is not None for artifact in artifacts if artifact.key != "diagnostics")
+    # diagnostics runs via its dedicated runner; log/environment are produced
+    # by the run itself, so only those three carry no generation job.
+    joblessly_produced = {"diagnostics", "log", "environment"}
+    assert all(
+        artifact.job is not None for artifact in artifacts if artifact.key not in joblessly_produced
+    )
+    assert all(artifact.job is None for artifact in artifacts if artifact.key in joblessly_produced)
 
 
 @pytest.mark.parametrize("failing_renderer", ["html", "diagnostics"])
@@ -1354,17 +1366,30 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
     )
     paths = check_models._resolve_report_output_paths(args)
 
-    specs = check_models._build_report_artifact_specs(paths)
+    inputs = check_models.ReportGenerationInputs(
+        results=[],
+        library_versions={},
+        prompt="p",
+        metadata=None,
+        overall_time=0.0,
+        image_path=None,
+        system_info={},
+        report_context=check_models._build_report_render_context(results=[], prompt="p"),
+        output_paths=paths,
+    )
+    artifacts = check_models._build_report_artifacts(inputs)
 
-    assert tuple(spec.key for spec in specs) == (
+    assert tuple(artifact.key for artifact in artifacts) == (
         "output_index",
         "html",
         "markdown_gallery",
         "diagnostics",
         "jsonl",
         "run_json",
+        "log",
+        "environment",
     )
-    public_map = check_models._public_output_artifact_map(paths)
+    public_map = check_models._public_output_artifact_map(inputs)
     assert set(public_map) == {
         "output_index",
         "results_html",
@@ -1392,7 +1417,24 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
     )
 
     with patch.object(check_models._LinkStyleState, "value", "relative"):
-        check_models.generate_output_index_report(paths.index, output_paths=paths)
+        check_models.generate_output_index_report(
+            paths.index,
+            artifacts=check_models._build_report_artifacts(
+                check_models.ReportGenerationInputs(
+                    results=[],
+                    library_versions={},
+                    prompt="p",
+                    metadata=None,
+                    overall_time=0.0,
+                    image_path=None,
+                    system_info={},
+                    report_context=check_models._build_report_render_context(
+                        results=[], prompt="p"
+                    ),
+                    output_paths=paths,
+                )
+            ),
+        )
 
     assert paths.index.read_text(encoding="utf-8").splitlines() == [
         "# Check Models Output Index",
