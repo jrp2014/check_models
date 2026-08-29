@@ -30,13 +30,13 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~22,300 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~22,700 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~15,300 lines across 35 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~22,900 lines across 35 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
-| `src/README.md` | Full CLI docs, all flags, usage examples (~1,400 lines) | Reference for CLI behavior |
+| `src/README.md` | Full CLI docs, all flags, usage examples (~1,600 lines) | Reference for CLI behavior |
 
 ### 3. Navigating `src/check_models.py` (section map)
 
@@ -73,12 +73,18 @@ The file is organized in this order — search for these exact landmark headers 
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
 - **Reports write to** `src/output/reports/` (`results.html`,
   `model_gallery.md`, and `diagnostics.md`) and `src/output/` (`index.md`,
-  `results.jsonl`, `run.json`, `check_models.log`, `environment.log`, and
-  append-only `results.history.jsonl`). Hard actionable crashes additionally
-  create factual issue drafts under `src/output/issues/`.
+  `results.jsonl`, `check_models.log`, `environment.log`, and append-only
+  `results.history.jsonl`); relocate the whole layout with `--output-dir`,
+  the only output-location control. `results.jsonl` (schema 3.0) is the sole
+  current-run machine contract: its metadata header carries the run-level
+  context that `run.json` used to hold. Navigation surfaces (`index.md`,
+  terminal artifact log) list only artifacts whose `ReportArtifactOutcome`
+  succeeded this run — never stale files found on disk. Hard actionable
+  crashes additionally create factual issue drafts under
+  `src/output/issues/`.
 - **Tracked vs local-only outputs**: every run artifact — the human reports
   (`results.html`, `model_gallery.md`), decision artifacts (`index.md`,
-  `diagnostics.md`, `run.json`, `results.jsonl`, `environment.log`,
+  `diagnostics.md`, `results.jsonl`, `environment.log`,
   `issues/`, `reports/assets/`), and the run log (`check_models.log`) — is
   committed each run so it is browsable on GitHub. Only the append-only
   `results.history.jsonl` is gitignored and local-only; no report links to

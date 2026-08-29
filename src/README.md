@@ -95,7 +95,7 @@ python -m check_models --dry-run
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
 | Timeout | Signal‑based (UNIX) manager; configurable per run. |
 | Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
-| Metrics modes | Compact (default) or expanded with `--detailed-metrics`; the flag is ignored unless `--verbose` is also set, and detailed mode includes extra phase timings when available. |
+| Metrics modes | `--verbose` shows the full detailed metrics tree, including phase timings and stop reason when available. |
 
 ## Installation and Environment Setup
 
@@ -217,8 +217,7 @@ python -m check_models \
   --max-tokens 200 \
   --temperature 0.1 \
   --timeout 600 \
-  --output-html ~/reports/vlm_benchmark.html \
-  --output-gallery-markdown ~/reports/vlm_benchmark_gallery.md \
+  --output-dir ~/reports/vlm_benchmark \
   --verbose
 
 # Memory optimization for large models (4-bit KV cache)
@@ -254,17 +253,18 @@ The tool generates a deliberately small artifact set in `output/` by default:
   table previewing every model's actual output, and complete readable output per
   model (an exact-raw copy appears only when it differs from the readable view).
   End-to-end time precedes decode-only throughput.
-- **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
-  schema `2.0` assessments, complete captured evidence, local component installation
-  identity, per-model completion time, exact observation evidence, each model's
-  requested versus resolved cache revision, the complete rendered chat-template
-  prompt, captured upstream console output for successful runs, and the
-  architecture pre-check verdict against the installed mlx-vlm.
-- **Run JSON** (`run.json`): Stable schema `2.0` run-level machine contract with mode,
-  attempted/evaluated/indeterminate counts, component source/install provenance,
+- **JSONL** (`results.jsonl`): The sole schema `3.0` machine contract. The
+  metadata header carries the complete run-level context — prompt plus its
+  SHA-256 digest, execution mode and outcome counts, artifact paths,
   check_models producer version/revision and dirty-worktree state, source-image
-  identity and dimensions,
-  common generation settings, and artifact paths.
+  identity and dimensions, common generation settings, remote-code policy,
+  component install/source provenance, and the baseline comparison — followed
+  by exhaustive per-model rows: assessments, complete captured evidence,
+  per-model completion time, exact observation evidence, per-prompt token
+  burden, each model's requested versus resolved cache revision, the complete
+  rendered chat-template prompt, captured upstream console output for
+  successful runs, and the architecture pre-check verdict against the
+  installed mlx-vlm.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
   report with a triage table, expanded crashes, collapsed complete evidence for
   observations and indeterminate attempts, compact clean-run context, and one
@@ -297,8 +297,9 @@ The tool generates a deliberately small artifact set in `output/` by default:
   inline environment table is limited to runtime-relevant components and links to
   the complete retained `environment.log` inventory.
 
-Regenerate only the compact issue body from an existing retained run, without
-model discovery or inference:
+Regenerate only the compact issue body from an existing retained run — the
+output root containing `results.jsonl` is the only input — without model
+discovery or inference:
 
 ```bash
 PYTHONPATH=src python -c 'from pathlib import Path; from check_models import regenerate_run_issue_summary; print(regenerate_run_issue_summary(Path("src/output")))'
@@ -356,8 +357,8 @@ fenced and preserves tabs and trailing spaces.
 Use `reports/model_gallery.md` to choose models and compare complete readable and
 exact output; paste `issues/run_summary.md` for a compact whole-run issue, and use
 `reports/diagnostics.md` when complete maintainer evidence is needed.
-`check_models.log` retains the full operational trace, while `results.jsonl` and
-`run.json` retain exhaustive machine-readable evidence, provenance, and arguments.
+`check_models.log` retains the full operational trace, while `results.jsonl`
+retains exhaustive machine-readable evidence, provenance, and arguments.
 
 Avoid lint/type suppressions wherever possible. Any unavoidable suppression must
 have a documented purpose and pass the repository suppression audit.
@@ -603,7 +604,7 @@ python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 
 #### Generation Control
 
-- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`1000`; `triage` `200`; deprecated `quality` alias `1000`); an explicit value always wins over the lane default.
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. When omitted, the resolved evaluation lane supplies the default (`1000`; `triage` `200`); an explicit value always wins over the lane default.
 - `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
 
 **Example**:
@@ -1086,9 +1087,9 @@ is secondary data and does not alter current-run assessment or report guidance.
 | `assisted` | Image plus descriptive title, description, or keyword hints | 1000 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
 
 `--eval-mode auto` selects `assisted` when descriptive title, description, or
-keywords are available and `blind` otherwise. `stress` and `quality` remain
-deprecated input aliases for compatibility, not additional lanes: both resolve
-to `assisted` or `blind`; `quality` retains its 1000-token default.
+keywords are available and `blind` otherwise. The retired `stress` and
+`quality` aliases are rejected with an actionable error naming the current
+lanes.
 
 Blind and assisted lanes expose different prompt context. Blind runs exercise
 unaided cataloguing; assisted runs ask a model to verify and improve fallible draft
@@ -1125,14 +1126,8 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `-f`, `--folder` | Path | omitted | Folder to scan (non-recursive); the most recently modified image in that folder is used. If both `--folder` and `--image` are omitted, the most recently modified image in `~/Pictures/Processed` is used. |
 | `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
 | `--image-source-url` | URL | omitted | Public HTTP(S) location of the exact local image used by the run; recorded for issue reproduction only and never downloaded as the inference input. |
-| `--output-html` | Path | `output/reports/results.html` | HTML report output filename. |
-| `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Evidence-only Markdown gallery report filename. |
-| `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
-| `--output-run-json` | Path | `output/run.json` | Run-level JSON metadata filename. |
-| `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
-| `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
-| `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures, harness issues, text-sanity issues, or preflight warnings). |
-| `--compare-with` | str | `auto` | Baseline sweep to diff this run against, as a `comparison` block in `run.json`, a terminal summary, and a "Since the baseline sweep" section in `run_summary.md` (whenever that summary is produced). Runs must be like-for-like — same prompt, image, evaluation lane, and generation settings, checked against the baseline's `run.json` from the same source — otherwise the per-model diff is withheld and the reasons are listed; model revision changes are reported alongside the diff. Contents: per-model execution/usability/observation transitions, byte-identical generated text count, generation tok/s ratios with per-model noise bands from `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs; fixed ±15% when history is thin), and peak-memory moves beyond 0.5 GB and 10%. `auto` uses the retained `results.jsonl` at git `HEAD` when the output path is tracked (the last committed sweep) and silently does nothing otherwise; `none` disables; a path reads that `results.jsonl`; any other value is a git ref for the same repo-relative path. |
+| `--output-dir` | Path | `output/` | Root directory for the canonical artifact layout: `index.md`, `results.jsonl`, `results.history.jsonl`, `check_models.log`, and `environment.log` at the root; `results.html`, `model_gallery.md`, and `diagnostics.md` under `reports/`; conditional issue drafts under `issues/`. |
+| `--compare-with` | str | `auto` | Baseline sweep to diff this run against, as a `comparison` block in the retained `results.jsonl` metadata, a terminal summary, and a "Since the baseline sweep" section in `run_summary.md` (whenever that summary is produced). Runs must be like-for-like — same prompt, image, evaluation lane, and generation settings, checked against the baseline's retained metadata from the same source — otherwise the per-model diff is withheld and the reasons are listed; model revision changes are reported alongside the diff. Contents: per-model execution/usability/observation transitions, byte-identical generated text count, generation tok/s ratios with per-model noise bands from `results.history.jsonl` (Tukey fence over the last 10 same-prompt runs; fixed ±15% when history is thin), and peak-memory moves beyond 0.5 GB and 10%. `auto` uses the retained `results.jsonl` at git `HEAD` when the output path is tracked (the last committed sweep) and silently does nothing otherwise; `none` disables; a path reads that `results.jsonl`; any other value is a git ref for the same repo-relative path. A schema-2 baseline is rejected by the single schema-3 loader: that first comparison is skipped with a logged reason and the next schema-3 run establishes the new baseline. |
 | `--link-style` | str | `github` | Link format for local-navigation Markdown artifacts: `github` uses canonical repository URLs; `relative` uses offline-friendly local paths. Issue-ready cross-file links remain canonical GitHub URLs in either mode so pasted issue text keeps working. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. May be repeated; model lists accumulate across occurrences. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). May be repeated; exclusions accumulate across occurrences. |
@@ -1150,9 +1145,8 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `--auto-thinking-budget` | flag | `True` | When no explicit thinking flags and no `--thinking-mode` are given, cap thinking for models whose chat template leaves a thinking block open (final start marker unmatched — closed blocks and literal mentions are ignored): budget = max-tokens − 200 (skipped when that leaves under 128). Other models are unaffected and the chat template itself is never altered. The effective per-model budget is recorded in prompt diagnostics and native repro commands. Disable with `--no-auto-thinking-budget`. |
 | `--system-telemetry` | flag | snapshot | macOS thermal/memory-pressure telemetry via read-only `pmset -g` / `sysctl -n` probes (sudo-free, no system settings changed). Default: one snapshot probe pair per model taken outside timed inference. Pass `--system-telemetry` for opt-in continuous background sampling (subprocesses overlap timed inference), or `--no-system-telemetry` to disable entirely. Per-probe sample counts are recorded so an unavailable probe is reported as unavailable, never as clean. |
-| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
-| `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. Deprecated `stress`/`quality` inputs resolve as aliases, not separate lanes. |
-| `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200; deprecated `quality` alias 1000); an explicit value always wins over the lane default. |
+| `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. The retired `stress`/`quality` inputs are rejected. |
+| `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200); an explicit value always wins over the lane default. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |
@@ -1290,13 +1284,15 @@ GitHub-compatible evidence artifact with:
 
 Line-delimited JSON for streaming ingestion:
 
-- **Metadata header**: The first record (line 1) contains shared metadata
-  (prompt, system info, timestamp, versions, and component install/source
-  provenance) — JSONL `2.0` format.
-- **Per-model records**: One JSON object per model with schema `2.0` assessment,
+- **Metadata header**: The first record (line 1) carries the complete run-level
+  contract — prompt plus its SHA-256 digest, system info, timestamp, total
+  runtime, outcome counts, artifact paths, producer identity, source-image
+  facts, common generation settings, remote-code policy, versions, component
+  install/source provenance, and the baseline comparison — JSONL `3.0` format.
+- **Per-model records**: One JSON object per model with schema `3.0` assessment,
   exact observation details, actual completion timestamp, complete evidence, raw
   timing/resource facts (including allocator state after cleanup even for crashes),
-  run arguments, error details, and
+  per-prompt token burden, run arguments, error details, and
   requested/resolved model snapshot provenance when locally available.
 
 
@@ -1432,7 +1428,6 @@ check_models/
 │       │   ├── model_gallery.md
 │       │   └── diagnostics.md
 │       ├── results.jsonl
-│       ├── run.json
 │       ├── results.history.jsonl
 │       ├── check_models.log
 │       ├── environment.log
@@ -1450,12 +1445,10 @@ use the `test_` prefix for local validation and do not commit ad-hoc debug outpu
 Validation tests must not rewrite tracked `src/output/` assets; override report
 and log paths to a temp directory or gitignored `test_*` paths so verification
 does not require restoring benchmark snapshots.
-Override configurable artifacts with `--output-html`,
-`--output-gallery-markdown`, `--output-jsonl`, `--output-run-json`,
-`--output-log`, `--output-env`, and `--output-diagnostics`. The tiny `index.md`
-and append-only raw history are derived beside the configured current-run outputs.
-HTML, gallery Markdown, and diagnostics default to `output/reports/`; JSONL, run
-JSON, history, logs, and the index remain in `output/`.
+Relocate the whole layout with `--output-dir`. The tiny `index.md` and
+append-only raw history are derived inside the same root. HTML, gallery
+Markdown, and diagnostics live in `<output-dir>/reports/`; JSONL, history,
+logs, and the index remain at the root.
 
 ## Contributing
 

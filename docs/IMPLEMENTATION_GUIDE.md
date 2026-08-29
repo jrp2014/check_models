@@ -160,12 +160,13 @@ into the report tree.
 ### Evaluation Lane Isolation
 
 The CLI resolves every run to exactly one of `triage`, `blind`, or `assisted`
-before prompt construction. `auto`, plus the deprecated `stress` and `quality`
-compatibility inputs, are selection aliases and must never be persisted as lane
-identities.
+before prompt construction. `auto` is a selection alias and must never be
+persisted as a lane identity; the retired `stress` and `quality` inputs are
+rejected at argument parsing.
 
 The resolved lane and whether metadata was exposed to the prompt must be carried
-through reports, JSONL metadata, run JSON, history, and repro bundles. History
+through reports, the schema-3 `results.jsonl` metadata (the sole current-run
+machine contract), history, and repro bundles. History
 comparisons and capability aggregation must filter on the resolved lane;
 unlabelled legacy rows are retained on disk but excluded from lane rankings.
 This prevents assisted outputs from inflating blind results and keeps triage

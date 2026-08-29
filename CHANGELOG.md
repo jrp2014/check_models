@@ -29,6 +29,22 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Report, diagnostics, summary, and comparison rendering are contained at
+  their orchestration boundaries: an unexpected exception in one renderer
+  degrades that artifact (and logs it) instead of terminating finalisation,
+  and a comparison render crash degrades the comparison to "none" rather
+  than losing the remaining artifacts. `KeyboardInterrupt`/`SystemExit`
+  still propagate.
+- Navigation surfaces (`index.md`, the terminal artifact log) list only
+  artifacts whose generation outcome succeeded this run; a stale file left
+  on disk by an earlier sweep is never presented as current, and
+  `environment.log` is reported from an explicit success signal instead of
+  `Path.exists()`.
+- The whole-run constraint-failure aggregate groups observations by their
+  actual `(min, max)` bounds instead of assuming one fleet-wide range, so
+  mixed-prompt retained artifacts aggregate correctly; medians stay
+  fractional and below-range is separated from above-range.
+
 - The upstream-parity tests no longer import `mlx_vlm` in the pytest
   interpreter: importing any submodule executes the package root, which
   initializes `mlx.core`'s native Metal backend and can abort the whole
@@ -74,6 +90,26 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- The `run.json` artifact and its writer (`save_run_json_report`,
+  `RunJsonReportRecord`, `--output-run-json`): the schema-3 `results.jsonl`
+  metadata header now carries the complete run-level contract. A schema-2
+  retained baseline is rejected by the single loader (no adapter), so the
+  first `--compare-with` against an old sweep is skipped with a logged
+  reason and the next schema-3 run establishes the new baseline.
+- The seven per-artifact output flags (`--output-html`,
+  `--output-gallery-markdown`, `--output-jsonl`, `--output-run-json`,
+  `--output-log`, `--output-env`, `--output-diagnostics`), replaced by the
+  single `--output-dir` root; retired flags are rejected with an actionable
+  error.
+- The retired `stress`/`quality` evaluation-mode aliases (now rejected at
+  parsing), `--detailed-metrics`, and `--open-report`; verbose mode always
+  renders the full detailed metrics tree, and the unreachable compact
+  verbose renderer and legend branch are deleted.
+- Reporting-archaeology tests asserting the absence of long-retired
+  surfaces, replaced by one canonical retired-terms guard across every
+  rendered artifact (test count 903 → 896 before the new schema-3 loader
+  regressions).
+
 - The mlx-vlm stub-generation subsystem is fully retired: mlx-vlm 0.6.16+
   ships a PEP 561 `py.typed` marker on PyPI (from our Blaizzy/mlx-vlm#1985),
   so every dependency in the typed surface now provides its own types.
@@ -85,6 +121,23 @@ Notable changes to this project will be documented in this file.
   guarantee holds by construction.
 
 ### Changed
+
+- Output-quality observation is a single canonical projection
+  (`_quality_observations` + `_completed_assessment`) shared by the main
+  harness and `tools/analyze_output_quality.py`, which now emits the same
+  `assessment` block as the reports and exits non-zero only for unusable
+  output. The legacy per-result quality-issue strings are deleted.
+- `results.jsonl` is schema `3.0` and the sole current-run machine
+  contract: the metadata header adds the prompt SHA-256, total runtime,
+  outcome counts, artifact paths, producer identity, source-image facts,
+  common generation settings, remote-code policy, and the embedded baseline
+  comparison; per-model rows add their prompt-token burden. The single
+  loader validates every required header field (including counts
+  consistency against the loaded rows) and every consumed row field, and
+  summary regeneration rehydrates the retained comparison.
+- `--output-dir` is the only output-location control; the canonical layout
+  (`index.md`, `results.jsonl`, logs at the root; HTML/gallery/diagnostics
+  under `reports/`; conditional `issues/`) is derived from that root.
 
 - Skylos quality findings now gate: `max_quality` drops from 10000 to 0 in
   both the package and root configurations, so "quality passed" means no
