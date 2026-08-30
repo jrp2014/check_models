@@ -1,5 +1,11 @@
 # Check Models Output Index
 
+These models serve many purposes; this run probes exactly one narrow task:
+producing catalogue metadata for a single photograph from the assisted-lane
+prompt and whatever context it supplies — here, camera-recorded capture
+context plus draft descriptive hints previously produced by a more capable
+model. Results say nothing about a model's fitness for other uses.
+
 ## Run at a glance
 
 - Models attempted: 41 (completed 40, crashed 1, indeterminate 0)

@@ -15,7 +15,7 @@ fact from this one image and prompt.
 
 ## Run summary
 
-- *Run timestamp:* 2026-08-30 00:31:37 BST
+- *Run timestamp:* 2026-08-30 01:47:23 BST
 - *Evaluation mode:* assisted
 - *Models attempted:* 41
 - *Completed:* 40
@@ -57,6 +57,32 @@ Keywords:
 
 </details>
 
+## Since the baseline sweep
+
+- *Baseline:* 7299db1d:src/output/results.jsonl
+- *Baseline run timestamp:* 2026-08-30 00:31:37 BST
+- *Baseline check_models:* 0.16.2 @ 4d237a553
+- *Baseline mlx:* 0.32.3.dev20260829+052e77db9 @ 052e77db9
+- *Baseline mlx-vlm:* 0.7.0rc0 @ f5d9533a9
+- *Baseline transformers:* 5.16.1
+- *Baseline python:* 3.14.7
+- *Models compared:* 41
+- *Identical generated text:* 38 of 40 completed in both
+- *Generation tok/s ratio (now/baseline):* 1.022 (range 0.97-1.73, 36 models)
+- *Throughput noise band:* fixed ±15% fallback (insufficient history)
+
+| Model | Execution | Usability | Observation delta |
+| --- | --- | --- | --- |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | completed | usable with caveats | -title/keyword constraints failed |
+
+| Model | Baseline tok/s | Now tok/s | Ratio | Expected band |
+| --- | --- | --- | --- | --- |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | 46.5 | 80.3 | 1.73 | 39.5-53.4 (fallback) |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | 51.8 | 66.2 | 1.28 | 44.0-59.6 (fallback) |
+
+Mechanical diff only: one image, temperature as configured; single-observation
+flips on one model are usually run-to-run variance, broad shifts are not.
+
 ## Model quality at a glance
 
 Every attempted model ranked by current-run usability, with captured resource
@@ -71,47 +97,47 @@ diagnostics report holds maintainer evidence.
 
 | Model | Usability | Total | Gen tok/s | Peak GB | Observed |
 | --- | --- | --- | --- | --- | --- |
-| mlx-community/gemma-4-26b-a4b-it-4bit | usable | 4.06s | 130 tok/s | 16 | none |
-| mlx-community/gemma-4-31b-it-4bit | usable | 8.45s | 25.3 tok/s | 20 | none |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | usable | 2.41s | 203 tok/s | 4.0 | none |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | usable | 5.78s | 66.2 tok/s | 12 | none |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit | usable | 2.82s | 189 tok/s | 6.4 | none |
-| mlx-community/Ornith-1.0-35B-bf16 | usable | 74.88s | 62.9 tok/s | 74 | none |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16 | usable | 29.24s | 85.5 tok/s | 8.4 | none |
-| mlx-community/Qwen3.5-35B-A3B-4bit | usable | 62.50s | 112 tok/s | 24 | none |
-| mlx-community/Qwen3.5-9B-MLX-4bit | usable | 63.34s | 90.5 tok/s | 10 | none |
-| mlx-community/Qwen3.6-27B-mxfp8 | usable | 88.48s | 16.6 tok/s | 33 | none |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable with caveats | 10.66s | 29.6 tok/s | 22 | title/keyword constraints failed |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | 6.08s | 51.8 tok/s | 29 | control tokens visible |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | 6.12s | 46.5 tok/s | 28 | control tokens visible; title/keyword constraints failed |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | usable with caveats | 28.19s | 64.0 tok/s | 60 | title/keyword constraints failed |
-| mlx-community/gemma-3-27b-it-qat-4bit | usable with caveats | 8.30s | 28.4 tok/s | 17 | title/keyword constraints failed |
-| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | 31.26s | 41.0 tok/s | 78 | control tokens visible; title/keyword constraints failed |
-| mlx-community/granite-4.0-3b-vision-4bit | usable with caveats | 2.45s | 170 tok/s | 4.8 | title/keyword constraints failed |
-| mlx-community/InternVL3-8B-bf16 | usable with caveats | 5.89s | 34.4 tok/s | 17 | title/keyword constraints failed |
-| mlx-community/LFM2.5-VL-1.6B-bf16 | usable with caveats | 2.21s | 185 tok/s | 4.0 | title/keyword constraints failed |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable with caveats | 6.96s | 62.3 tok/s | 12 | title/keyword constraints failed |
-| mlx-community/North-Micro-Vision-Instruct-4bit | usable with caveats | 5.61s | 219 tok/s | 3.9 | title/keyword constraints failed |
-| mlx-community/Phi-3.5-vision-instruct-bf16 | usable with caveats | 4.31s | 54.5 tok/s | 9.4 | title/keyword constraints failed |
-| mlx-community/pixtral-12b-8bit | usable with caveats | 6.75s | 39.1 tok/s | 15 | title/keyword constraints failed |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | usable with caveats | 66.13s | 83.3 tok/s | 23 | title/keyword constraints failed |
-| mlx-community/Qwen3.8-27B-4bit | usable with caveats | 82.96s | 28.8 tok/s | 21 | title/keyword constraints failed |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx | usable with caveats | 2.67s | 124 tok/s | 5.5 | title/keyword constraints failed; draft hints copied unchanged |
-| mlx-community/Step-3.7-Flash-oQ2e | usable with caveats | 27.32s | 44.7 tok/s | 70 | title/keyword constraints failed |
-| mlx-community/X-Reasoner-7B-8bit | usable with caveats | 22.78s | 57.4 tok/s | 14 | title/keyword constraints failed |
-| Qwen/Qwen3-VL-2B-Instruct | usable with caveats | 16.55s | 92.9 tok/s | 8.4 | title/keyword constraints failed |
-| jinaai/jina-vlm-mlx | unusable | 4.32s | 138 tok/s | 3.8 | repeated text; stopped early: repeating; title/keyword constraints failed |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | unusable | 1.64s | 472 tok/s | 1.7 | repeated text; stopped early: repeating; title/keyword constraints failed |
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable | 27.61s | 42.0 tok/s | 14 | missing required fields; echoes instructions; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16 | unusable | 1.96s | 344 tok/s | 2.2 | missing required fields |
-| mlx-community/gemma-3n-E4B-it-bf16 | unusable | 3.15s | insufficient sample | 17 | empty response; missing required fields |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | 28.33s | 47.7 tok/s | 13 | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| mlx-community/GLM-4.6V-Flash-mxfp4 | unusable | 10.66s | 80.5 tok/s | 8.4 | repeated text; stopped early: repeating; title/keyword constraints failed |
-| mlx-community/Idefics3-8B-Llama3-bf16 | unusable | 11.34s | 32.2 tok/s | 18 | repeated text; stopped early: repeating; title/keyword constraints failed |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | 225.09s | 4.55 tok/s | 40 | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| mlx-community/MiniCPM-V-4.6-8bit | unusable | 1.87s | 267 tok/s | 3.8 | missing required fields; extra text before Title |
-| mlx-community/Molmo2-8B-4bit | unusable | 16.71s | 70.0 tok/s | 9.0 | repeated text; missing required fields; cut off at token limit |
-| tencent/Youtu-VL-4B-Instruct | not evaluated | 0.99s | - | - | crashed during model_load |
+| mlx-community/gemma-4-26b-a4b-it-4bit | usable | 4.09s | 129 tok/s | 16 | none |
+| mlx-community/gemma-4-31b-it-4bit | usable | 8.29s | 26.1 tok/s | 20 | none |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | usable | 2.51s | 208 tok/s | 4.0 | none |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | usable | 6.06s | 67.7 tok/s | 12 | none |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit | usable | 2.97s | 192 tok/s | 6.4 | none |
+| mlx-community/Ornith-1.0-35B-bf16 | usable | 71.92s | 66.0 tok/s | 74 | none |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | usable | 27.13s | 90.3 tok/s | 8.4 | none |
+| mlx-community/Qwen3.5-35B-A3B-4bit | usable | 57.20s | 111 tok/s | 24 | none |
+| mlx-community/Qwen3.5-9B-MLX-4bit | usable | 57.53s | 91.3 tok/s | 10 | none |
+| mlx-community/Qwen3.6-27B-mxfp8 | usable | 81.61s | 17.5 tok/s | 33 | none |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable with caveats | 10.38s | 30.2 tok/s | 22 | title/keyword constraints failed |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | 5.85s | 66.2 tok/s | 29 | control tokens visible |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | 5.40s | 80.3 tok/s | 28 | control tokens visible |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | usable with caveats | 28.65s | 63.9 tok/s | 60 | title/keyword constraints failed |
+| mlx-community/gemma-3-27b-it-qat-4bit | usable with caveats | 7.86s | 31.4 tok/s | 17 | title/keyword constraints failed |
+| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | 29.52s | 43.5 tok/s | 78 | control tokens visible; title/keyword constraints failed |
+| mlx-community/granite-4.0-3b-vision-4bit | usable with caveats | 2.49s | 171 tok/s | 4.8 | title/keyword constraints failed |
+| mlx-community/InternVL3-8B-bf16 | usable with caveats | 6.00s | 34.3 tok/s | 17 | title/keyword constraints failed |
+| mlx-community/LFM2.5-VL-1.6B-bf16 | usable with caveats | 2.33s | 187 tok/s | 4.0 | title/keyword constraints failed |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable with caveats | 6.92s | 65.2 tok/s | 12 | title/keyword constraints failed |
+| mlx-community/North-Micro-Vision-Instruct-4bit | usable with caveats | 5.34s | 231 tok/s | 3.9 | title/keyword constraints failed |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | usable with caveats | 4.24s | 55.7 tok/s | 9.4 | title/keyword constraints failed |
+| mlx-community/pixtral-12b-8bit | usable with caveats | 6.72s | 39.5 tok/s | 15 | title/keyword constraints failed |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | usable with caveats | 58.84s | 86.8 tok/s | 23 | title/keyword constraints failed |
+| mlx-community/Qwen3.8-27B-4bit | usable with caveats | 77.95s | 30.5 tok/s | 21 | title/keyword constraints failed |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx | usable with caveats | 2.62s | 123 tok/s | 5.5 | title/keyword constraints failed; draft hints copied unchanged |
+| mlx-community/Step-3.7-Flash-oQ2e | usable with caveats | 26.98s | 45.9 tok/s | 70 | title/keyword constraints failed |
+| mlx-community/X-Reasoner-7B-8bit | usable with caveats | 22.10s | 57.8 tok/s | 14 | title/keyword constraints failed |
+| Qwen/Qwen3-VL-2B-Instruct | usable with caveats | 16.28s | 92.3 tok/s | 8.4 | title/keyword constraints failed |
+| jinaai/jina-vlm-mlx | unusable | 4.21s | 138 tok/s | 3.9 | repeated text; stopped early: repeating; title/keyword constraints failed |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | unusable | 1.65s | 470 tok/s | 1.7 | repeated text; stopped early: repeating; title/keyword constraints failed |
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable | 27.35s | 42.5 tok/s | 14 | missing required fields; echoes instructions; cut off at token limit |
+| mlx-community/FastVLM-0.5B-bf16 | unusable | 1.96s | 339 tok/s | 2.2 | missing required fields |
+| mlx-community/gemma-3n-E4B-it-bf16 | unusable | 3.17s | insufficient sample | 17 | empty response; missing required fields |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | 29.01s | 46.5 tok/s | 13 | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| mlx-community/GLM-4.6V-Flash-mxfp4 | unusable | 9.91s | 80.5 tok/s | 8.4 | repeated text; stopped early: repeating; title/keyword constraints failed |
+| mlx-community/Idefics3-8B-Llama3-bf16 | unusable | 11.44s | 32.0 tok/s | 18 | repeated text; stopped early: repeating; title/keyword constraints failed |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | 219.33s | 4.67 tok/s | 40 | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| mlx-community/MiniCPM-V-4.6-8bit | unusable | 1.89s | 271 tok/s | 3.8 | missing required fields; extra text before Title |
+| mlx-community/Molmo2-8B-4bit | unusable | 16.30s | 72.1 tok/s | 9.0 | repeated text; missing required fields; cut off at token limit |
+| tencent/Youtu-VL-4B-Instruct | not evaluated | 1.03s | - | - | crashed during model_load |
 
 ## Constraint-failure breakdown
 
@@ -122,7 +148,7 @@ suggests prompt difficulty rather than individual model faults.
   observed 11)
 - Keyword count: 21 model(s) outside 10-18 (0 below, 21 above; median observed
   21)
-- Duplicate keywords: 11 model(s)
+- Duplicate keywords: 10 model(s)
 
 ## Crashes requiring action
 
@@ -198,8 +224,8 @@ Repeated mechanical observation signatures among results requiring review.
 | Response repeats the same text; Generation was stopped early after sustained repeated output; Title or keywords do not meet requested constraints | 4 |
 | Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit | 1 |
 | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
-| Unrecognised model control tokens remain visible; Title or keywords do not meet requested constraints | 2 |
-| Unrecognised model control tokens remain visible | 1 |
+| Unrecognised model control tokens remain visible | 2 |
+| Unrecognised model control tokens remain visible; Title or keywords do not meet requested constraints | 1 |
 | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
 
 ## Completed attempts requiring review
@@ -214,7 +240,7 @@ Repeated mechanical observation signatures among results requiring review.
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | unusable | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 73 terms (requested 10-18); Duplicate keywords: motorboat, cruising, river, calm water, rustic house, lush foliage, british flag, fenders, wait, boating, cabin cruiser, leisure, nautical | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
 | mlx-community/Molmo2-8B-4bit | unusable | Response repeats the same text; Missing or empty fields: Title, Description, Keywords; Response appears cut off at the token limit | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-molmo2-8b-4bit) |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit) |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | Unrecognised model control tokens remain visible; Duplicate keywords: nautical | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) |
 | mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible; Keyword list has 21 terms (requested 10-18) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
 | mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title has 11 words (requested 5-10); Keyword list has 29 terms (requested 10-18); Duplicate keywords: trees | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
 
@@ -230,8 +256,8 @@ Repeated mechanical observation signatures among results requiring review.
 - *Generation: temperature:* 0.0
 - *Generation: top_p:* 1.0
 - *Trust remote code:* true
-- *check_models version:* 0.16.2
-- *check_models revision:* 4d237a553582888244f2a903f368fa7ca27a99de
+- *check_models version:* 0.16.5
+- *check_models revision:* 7299db1db9c3863984bb90b7ee4129779c30877b
 - *check_models source dirty:* false
 - *mlx-vlm:* 0.7.0rc0
 - *mlx-vlm source revision:* f5d9533a912e3769b21fa646252469149530fc55

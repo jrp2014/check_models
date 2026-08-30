@@ -1,6 +1,12 @@
 # Model Output Gallery
 
-Generated on: 2026-08-30 00:31:37 BST
+Generated on: 2026-08-30 01:47:24 BST
+
+These models serve many purposes; this run probes exactly one narrow task:
+producing catalogue metadata for a single photograph from the assisted-lane
+prompt and whatever context it supplies — here, camera-recorded capture
+context plus draft descriptive hints previously produced by a more capable
+model. Results say nothing about a model's fitness for other uses.
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -18,54 +24,54 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.41s   | 203 tok/s           | 0.57            | 4.0     | 2,619      | 106     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 5.78s   | 66.2 tok/s          | 1.75            | 12      | 2,577      | 157     | none                                                                                                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.82s   | 189 tok/s           | 0.81            | 6.4     | 2,576      | 138     | none                                                                                                                        |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 74.88s  | 62.9 tok/s          | 60.91           | 74      | 16,639     | 112     | none                                                                                                                        |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 29.24s  | 85.5 tok/s          | 17.06           | 8.4     | 16,625     | 903     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 62.50s  | 112 tok/s           | 57.79           | 24      | 16,639     | 150     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 63.34s  | 90.5 tok/s          | 59.80           | 10      | 16,639     | 115     | none                                                                                                                        |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 88.48s  | 16.6 tok/s          | 78.04           | 33      | 16,639     | 106     | none                                                                                                                        |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.06s   | 130 tok/s           | 0.41            | 16      | 579        | 101     | none                                                                                                                        |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.45s   | 25.3 tok/s          | 1.18            | 20      | 579        | 107     | none                                                                                                                        |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.55s  | 92.9 tok/s          | 13.58           | 8.4     | 16,623     | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 10.66s  | 29.6 tok/s          | 2.84            | 22      | 2,044      | 152     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 28.19s  | 64.0 tok/s          | 4.88            | 60      | 1,596      | 711     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 31.26s  | 41.0 tok/s          | 18.46           | 78      | 6,325      | 126     | control tokens visible; title/keyword constraints failed                                                                    |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 5.89s   | 34.4 tok/s          | 0.96            | 17      | 2,605      | 95      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.21s   | 185 tok/s           | 0.42            | 4.0     | 2,627      | 149     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.96s   | 62.3 tok/s          | 1.80            | 12      | 2,577      | 215     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.61s   | 219 tok/s           | 3.33            | 3.9     | 4,039      | 150     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.31s   | 54.5 tok/s          | 0.30            | 9.4     | 1,113      | 143     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 66.13s  | 83.3 tok/s          | 61.88           | 23      | 16,623     | 122     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 82.96s  | 28.8 tok/s          | 75.51           | 21      | 16,639     | 131     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.67s   | 124 tok/s           | 0.39            | 5.5     | 1,411      | 112     | title/keyword constraints failed; draft hints copied unchanged                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 27.32s  | 44.7 tok/s          | 16.56           | 70      | 3,472      | 118     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 22.78s  | 57.4 tok/s          | 18.21           | 14      | 16,634     | 149     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 6.08s   | 51.8 tok/s          | 0.33            | 29      | 575        | 85      | control tokens visible                                                                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 6.12s   | 46.5 tok/s          | 0.33            | 28      | 575        | 85      | control tokens visible; title/keyword constraints failed                                                                    |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 8.30s   | 28.4 tok/s          | 1.10            | 17      | 570        | 127     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable with caveats` | 2.45s   | 170 tok/s           | 0.45            | 4.8     | 1,510      | 118     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.75s   | 39.1 tok/s          | 1.46            | 15      | 2,648      | 125     | title/keyword constraints failed                                                                                            |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `unusable`            | 1.64s   | 472 tok/s           | 0.12            | 1.7     | 2,627      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.32s   | 138 tok/s           | 0.94            | 3.8     | 2,047      | 275     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 27.61s  | 42.0 tok/s          | 1.75            | 14      | 2,739      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.96s   | 344 tok/s           | 0.10            | 2.2     | 314        | 41      | missing required fields                                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 28.33s  | 47.7 tok/s          | 5.25            | 13      | 6,321      | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 10.66s  | 80.5 tok/s          | 6.41            | 8.4     | 6,325      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 11.34s  | 32.2 tok/s          | 1.09            | 18      | 2,603      | 250     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 225.09s | 4.55 tok/s          | 1.28            | 40      | 1,307      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.87s   | 267 tok/s           | 0.35            | 3.8     | 916        | 50      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `unusable`            | 16.71s  | 70.0 tok/s          | 0.88            | 9.0     | 1,504      | 1,000   | repeated text; missing required fields; cut off at token limit                                                              |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 3.15s   | insufficient sample | 0.38            | 17      | 569        | 1       | empty response; missing required fields                                                                                     |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 0.99s   | -                   | -               | -       | -          | -       | none                                                                                                                        |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.51s   | 208 tok/s           | 0.56            | 4.0     | 2,619      | 106     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.06s   | 67.7 tok/s          | 1.92            | 12      | 2,577      | 157     | none                                                                                                                        |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.97s   | 192 tok/s           | 0.79            | 6.4     | 2,576      | 138     | none                                                                                                                        |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 71.92s  | 66.0 tok/s          | 58.85           | 74      | 16,639     | 112     | none                                                                                                                        |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 27.13s  | 90.3 tok/s          | 15.55           | 8.4     | 16,625     | 903     | none                                                                                                                        |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 57.20s  | 111 tok/s           | 52.33           | 24      | 16,639     | 150     | none                                                                                                                        |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 57.53s  | 91.3 tok/s          | 54.03           | 10      | 16,639     | 115     | none                                                                                                                        |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 81.61s  | 17.5 tok/s          | 71.50           | 33      | 16,639     | 106     | none                                                                                                                        |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.09s   | 129 tok/s           | 0.40            | 16      | 579        | 101     | none                                                                                                                        |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 8.29s   | 26.1 tok/s          | 1.11            | 20      | 579        | 107     | none                                                                                                                        |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.28s  | 92.3 tok/s          | 13.37           | 8.4     | 16,623     | 135     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 10.38s  | 30.2 tok/s          | 2.67            | 22      | 2,044      | 152     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 28.65s  | 63.9 tok/s          | 4.44            | 60      | 1,596      | 711     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 29.52s  | 43.5 tok/s          | 17.01           | 78      | 6,325      | 126     | control tokens visible; title/keyword constraints failed                                                                    |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable with caveats` | 6.00s   | 34.3 tok/s          | 0.99            | 17      | 2,605      | 95      | title/keyword constraints failed                                                                                            |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.33s   | 187 tok/s           | 0.41            | 4.0     | 2,627      | 149     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.92s   | 65.2 tok/s          | 1.68            | 12      | 2,577      | 215     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.34s   | 231 tok/s           | 2.99            | 3.9     | 4,039      | 150     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.24s   | 55.7 tok/s          | 0.23            | 9.4     | 1,113      | 143     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 58.84s  | 86.8 tok/s          | 54.70           | 23      | 16,623     | 122     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable with caveats` | 77.95s  | 30.5 tok/s          | 70.68           | 21      | 16,639     | 131     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.62s   | 123 tok/s           | 0.39            | 5.5     | 1,411      | 112     | title/keyword constraints failed; draft hints copied unchanged                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 26.98s  | 45.9 tok/s          | 16.23           | 70      | 3,472      | 118     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 22.10s  | 57.8 tok/s          | 17.49           | 14      | 16,634     | 149     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 5.85s   | 66.2 tok/s          | 0.34            | 29      | 575        | 88      | control tokens visible                                                                                                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable with caveats` | 5.40s   | 80.3 tok/s          | 0.33            | 28      | 575        | 89      | control tokens visible                                                                                                      |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 7.86s   | 31.4 tok/s          | 0.98            | 17      | 570        | 127     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable with caveats` | 2.49s   | 171 tok/s           | 0.45            | 4.8     | 1,510      | 118     | title/keyword constraints failed                                                                                            |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.72s   | 39.5 tok/s          | 1.45            | 15      | 2,648      | 125     | title/keyword constraints failed                                                                                            |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `unusable`            | 1.65s   | 470 tok/s           | 0.13            | 1.7     | 2,627      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.21s   | 138 tok/s           | 0.93            | 3.9     | 2,047      | 275     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 27.35s  | 42.5 tok/s          | 1.72            | 14      | 2,739      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 1.96s   | 339 tok/s           | 0.09            | 2.2     | 314        | 41      | missing required fields                                                                                                     |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.01s  | 46.5 tok/s          | 5.35            | 13      | 6,321      | 1,000   | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 9.91s   | 80.5 tok/s          | 5.61            | 8.4     | 6,325      | 200     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 11.44s  | 32.0 tok/s          | 1.09            | 18      | 2,603      | 250     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 219.33s | 4.67 tok/s          | 1.35            | 40      | 1,307      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.89s   | 271 tok/s           | 0.24            | 3.8     | 916        | 50      | missing required fields; extra text before Title                                                                            |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `unusable`            | 16.30s  | 72.1 tok/s          | 0.73            | 9.0     | 1,504      | 1,000   | repeated text; missing required fields; cut off at token limit                                                              |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 3.17s   | insufficient sample | 0.38            | 17      | 569        | 1       | empty response; missing required fields                                                                                     |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.03s   | -                   | -               | -       | -          | -       | none                                                                                                                        |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 203 tok/s
+Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 208 tok/s
 
-Average clean-completion throughput: 98.0 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 100.0 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 4.0 GB
 
@@ -121,8 +127,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Cruising Motorboat<br>Description: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.<br>Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser,...                 |
 | [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>British motor cruiser 'Wavey Katey II' cruising on a calm river<br><br>Description:<br>A white motor cruiser named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.<br><br>Keywords:<br>Boat, Boat dri... |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | Title:<br>"Wavey Katey II Cruising Along the River"<br><br>Description:<br>A white motor cruiser named "Wavey Katey II" glides through calm waters, its British flag fluttering in the breeze, as it passes a rustic wooden riverside cottage surrounded by lush greenery. The scene captures lei...          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.<br>Keywords: Boat, cabin cruiser, motorboat, ri...           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.<br>Keywords: Boat, motor cruiser, cabin c...           |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway, past a British maritime flag and a rustic wooden cottage.<br>Keywords: Boat, cabin cruiser, motor...           |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | <\|channel>thought<br><channel\|>Title: White motor cruiser Wavey Katey II cruising on a river<br>Description: A white cabin motor cruiser named 'Wavey Katey II' travels along a calm waterway past a rustic wooden riverside cottage and lush green foliage.<br>Keywords: Boat, cabin cruiser,...           |
 | [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Wavey Katey II on River Cruise, August 2026<br><br>Description: Captured on 28th August 2026, the white motor cruiser 'Wavey Katey II' cruises along a calm river, passing a wooden house and trees in bright daylight. A British maritime flag is flown from the stern of the boat....                |
 | [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable_with_caveats` | Title: "Wavey Katey II Cruising Along a Serene Waterway"<br>Description: "A white motor cruiser named 'Wavey Katey II' glides through calm waters, passing by a rustic riverside cottage and lush greenery, under a British maritime flag."<br>Keywords: Boat, Motor cruiser, British flag,...                |
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Motor Cruiser "Wavey Katey II" on Calm River<br><br>Description:<br>The white motor cruiser "Wavey Katey II" cruises along a serene river, displaying a British maritime flag, with a rustic riverside cottage and lush greenery in the background.<br><br>Keywords:<br>Boat, Boat driver, Boat...  |
@@ -227,18 +233,18 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.83s
-- *Generation time:* 1.56s
-- *Total time:* 2.41s
-- *Input validation time:* 5.77e-05
-- *Prompt preparation time:* 0.00984
-- *First-token latency:* 0.566
-- *Cleanup time:* 0.0998
+- *Model load time:* 0.98s
+- *Generation time:* 1.52s
+- *Total time:* 2.51s
+- *Input validation time:* 4.54e-05
+- *Prompt preparation time:* 0.00951
+- *First-token latency:* 0.559
+- *Cleanup time:* 0.0807
 - *Prompt tokens:* 2,619
 - *Generation tokens:* 106
 - *Total tokens:* 2,725
-- *Prompt throughput (raw):* 4,624 tok/s
-- *Generation throughput (raw):* 203 tok/s
+- *Prompt throughput (raw):* 4,686 tok/s
+- *Generation throughput (raw):* 208 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 2.8
 - *Cache memory:* 0.10
@@ -284,18 +290,18 @@ Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottag
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.20s
-- *Generation time:* 4.56s
-- *Total time:* 5.78s
-- *Input validation time:* 7.03e-05
-- *Prompt preparation time:* 0.00754
-- *First-token latency:* 1.75
-- *Cleanup time:* 0.0968
+- *Model load time:* 1.37s
+- *Generation time:* 4.67s
+- *Total time:* 6.06s
+- *Input validation time:* 4.83e-05
+- *Prompt preparation time:* 0.00811
+- *First-token latency:* 1.92
+- *Cleanup time:* 0.0934
 - *Prompt tokens:* 2,577
 - *Generation tokens:* 157
 - *Total tokens:* 2,734
-- *Prompt throughput (raw):* 1,476 tok/s
-- *Generation throughput (raw):* 66.2 tok/s
+- *Prompt throughput (raw):* 1,343 tok/s
+- *Generation throughput (raw):* 67.7 tok/s
 - *Peak memory:* 12
 - *Active memory:* 8.0
 - *Cache memory:* 0.51
@@ -346,18 +352,18 @@ Boat, Yamaha motor cruiser, Wavey Katey II, British maritime flag, motorboat, ca
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 0.81s
-- *Generation time:* 1.99s
-- *Total time:* 2.82s
-- *Input validation time:* 7.7e-05
-- *Prompt preparation time:* 0.00792
-- *First-token latency:* 0.806
-- *Cleanup time:* 0.0959
+- *Model load time:* 1.01s
+- *Generation time:* 1.94s
+- *Total time:* 2.97s
+- *Input validation time:* 4.83e-05
+- *Prompt preparation time:* 0.00789
+- *First-token latency:* 0.786
+- *Cleanup time:* 0.0826
 - *Prompt tokens:* 2,576
 - *Generation tokens:* 138
 - *Total tokens:* 2,714
-- *Prompt throughput (raw):* 3,197 tok/s
-- *Generation throughput (raw):* 189 tok/s
+- *Prompt throughput (raw):* 3,277 tok/s
+- *Generation throughput (raw):* 192 tok/s
 - *Peak memory:* 6.4
 - *Active memory:* 2.8
 - *Cache memory:* 0.35
@@ -408,18 +414,18 @@ British maritime flag, cabin cruiser, calm river cruising, fenders, motor cruise
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 11.24s
-- *Generation time:* 63.62s
-- *Total time:* 74.88s
-- *Input validation time:* 6.48e-05
-- *Prompt preparation time:* 0.0168
-- *First-token latency:* 60.9
-- *Cleanup time:* 0.294
+- *Model load time:* 10.40s
+- *Generation time:* 61.49s
+- *Total time:* 71.92s
+- *Input validation time:* 6.36e-05
+- *Prompt preparation time:* 0.0191
+- *First-token latency:* 58.8
+- *Cleanup time:* 0.261
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 112
 - *Total tokens:* 16,751
-- *Prompt throughput (raw):* 273 tok/s
-- *Generation throughput (raw):* 62.9 tok/s
+- *Prompt throughput (raw):* 283 tok/s
+- *Generation throughput (raw):* 66.0 tok/s
 - *Peak memory:* 74
 - *Active memory:* 70
 - *Cache memory:* 0.89
@@ -466,17 +472,17 @@ Keywords: Boat, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.72s
-- *Generation time:* 28.50s
-- *Total time:* 29.24s
-- *Input validation time:* 6.8e-05
-- *Prompt preparation time:* 0.0124
-- *First-token latency:* 17.1
-- *Cleanup time:* 0.155
+- *Generation time:* 26.40s
+- *Total time:* 27.13s
+- *Input validation time:* 6.27e-05
+- *Prompt preparation time:* 0.0117
+- *First-token latency:* 15.5
+- *Cleanup time:* 0.0975
 - *Prompt tokens:* 16,625
 - *Generation tokens:* 903
 - *Total tokens:* 17,528
-- *Prompt throughput (raw):* 975 tok/s
-- *Generation throughput (raw):* 85.5 tok/s
+- *Prompt throughput (raw):* 1,069 tok/s
+- *Generation throughput (raw):* 90.3 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.7
@@ -549,18 +555,18 @@ Keywords: Boat, Motorboat, Cabin cruiser, Canopy, Flag, River, Riverbank, Foliag
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.51s
-- *Generation time:* 59.96s
-- *Total time:* 62.50s
-- *Input validation time:* 6.4e-05
-- *Prompt preparation time:* 0.0169
-- *First-token latency:* 57.8
-- *Cleanup time:* 0.127
+- *Model load time:* 2.65s
+- *Generation time:* 54.52s
+- *Total time:* 57.20s
+- *Input validation time:* 6.31e-05
+- *Prompt preparation time:* 0.0159
+- *First-token latency:* 52.3
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 150
 - *Total tokens:* 16,789
-- *Prompt throughput (raw):* 288 tok/s
-- *Generation throughput (raw):* 112 tok/s
+- *Prompt throughput (raw):* 318 tok/s
+- *Generation throughput (raw):* 111 tok/s
 - *Peak memory:* 24
 - *Active memory:* 20
 - *Cache memory:* 0.89
@@ -609,17 +615,17 @@ Keywords: Wavey Katey II, motor cruiser, cabin cruiser, British maritime flag, R
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
 - *Model load time:* 1.38s
-- *Generation time:* 61.95s
-- *Total time:* 63.34s
-- *Input validation time:* 5.67e-05
-- *Prompt preparation time:* 0.00196
-- *First-token latency:* 59.8
-- *Cleanup time:* 0.0936
+- *Generation time:* 56.15s
+- *Total time:* 57.53s
+- *Input validation time:* 7.17e-05
+- *Prompt preparation time:* 0.00159
+- *First-token latency:* 54
+- *Cleanup time:* 0.0918
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 115
 - *Total tokens:* 16,754
-- *Prompt throughput (raw):* 278 tok/s
-- *Generation throughput (raw):* 90.5 tok/s
+- *Prompt throughput (raw):* 308 tok/s
+- *Generation throughput (raw):* 91.3 tok/s
 - *Peak memory:* 10
 - *Active memory:* 6.0
 - *Cache memory:* 1.2
@@ -686,18 +692,18 @@ Boat, Cabin cruiser, River, Riverbank, Cottage, Trees, Foliage, Flag, Fender, Ou
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.18s
-- *Generation time:* 85.27s
-- *Total time:* 88.48s
-- *Input validation time:* 7.23e-05
-- *Prompt preparation time:* 0.0165
-- *First-token latency:* 78
-- *Cleanup time:* 0.148
+- *Model load time:* 3.19s
+- *Generation time:* 78.40s
+- *Total time:* 81.61s
+- *Input validation time:* 6.3e-05
+- *Prompt preparation time:* 0.0153
+- *First-token latency:* 71.5
+- *Cleanup time:* 0.15
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 106
 - *Total tokens:* 16,745
-- *Prompt throughput (raw):* 213 tok/s
-- *Generation throughput (raw):* 16.6 tok/s
+- *Prompt throughput (raw):* 233 tok/s
+- *Generation throughput (raw):* 17.5 tok/s
 - *Peak memory:* 33
 - *Active memory:* 29
 - *Cache memory:* 1.9
@@ -748,18 +754,18 @@ Cabin cruiser, Motorboat, River, Cottage, British flag, Fenders, Outboard motor,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.34s
-- *Generation time:* 1.69s
-- *Total time:* 4.06s
-- *Input validation time:* 5.63e-05
-- *Prompt preparation time:* 0.0235
-- *First-token latency:* 0.409
+- *Model load time:* 2.38s
+- *Generation time:* 1.68s
+- *Total time:* 4.09s
+- *Input validation time:* 8.39e-05
+- *Prompt preparation time:* 0.0226
+- *First-token latency:* 0.402
 - *Cleanup time:* 0.121
 - *Prompt tokens:* 579
 - *Generation tokens:* 101
 - *Total tokens:* 680
-- *Prompt throughput (raw):* 1,415 tok/s
-- *Generation throughput (raw):* 130 tok/s
+- *Prompt throughput (raw):* 1,440 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.20
@@ -805,18 +811,18 @@ Keywords: Boat, Cabin cruiser, Cruising, Flag, Foliage, Leisure, Motorboat, Naut
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.54s
-- *Generation time:* 5.90s
-- *Total time:* 8.45s
-- *Input validation time:* 5.39e-05
-- *Prompt preparation time:* 0.00181
-- *First-token latency:* 1.18
-- *Cleanup time:* 0.14
+- *Model load time:* 2.57s
+- *Generation time:* 5.71s
+- *Total time:* 8.29s
+- *Input validation time:* 7.49e-05
+- *Prompt preparation time:* 0.00191
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.139
 - *Prompt tokens:* 579
 - *Generation tokens:* 107
 - *Total tokens:* 686
-- *Prompt throughput (raw):* 492 tok/s
-- *Generation throughput (raw):* 25.3 tok/s
+- *Prompt throughput (raw):* 520 tok/s
+- *Generation throughput (raw):* 26.1 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.76
@@ -864,17 +870,17 @@ Keywords: Boat, Wavey Katey II, cabin cruiser, motorboat, river, riverbank, cott
   keywords: river, trees, passenger
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.67s
-- *Generation time:* 15.87s
-- *Total time:* 16.55s
-- *Input validation time:* 4.72e-05
-- *Prompt preparation time:* 0.00963
-- *First-token latency:* 13.6
-- *Cleanup time:* 0.1
+- *Generation time:* 15.59s
+- *Total time:* 16.28s
+- *Input validation time:* 4.21e-05
+- *Prompt preparation time:* 0.00975
+- *First-token latency:* 13.4
+- *Cleanup time:* 0.083
 - *Prompt tokens:* 16,623
 - *Generation tokens:* 135
 - *Total tokens:* 16,758
-- *Prompt throughput (raw):* 1,225 tok/s
-- *Generation throughput (raw):* 92.9 tok/s
+- *Prompt throughput (raw):* 1,243 tok/s
+- *Generation throughput (raw):* 92.3 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.6
@@ -922,18 +928,18 @@ Keywords: motorboat, Wavey Katey II, British flag, river, riverbank, cottage, fo
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.17s
-- *Generation time:* 8.47s
-- *Total time:* 10.66s
-- *Input validation time:* 7.35e-05
-- *Prompt preparation time:* 0.00854
-- *First-token latency:* 2.84
-- *Cleanup time:* 0.113
+- *Model load time:* 2.20s
+- *Generation time:* 8.17s
+- *Total time:* 10.38s
+- *Input validation time:* 5.81e-05
+- *Prompt preparation time:* 0.00743
+- *First-token latency:* 2.67
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 2,044
 - *Generation tokens:* 152
 - *Total tokens:* 2,196
-- *Prompt throughput (raw):* 720 tok/s
-- *Generation throughput (raw):* 29.6 tok/s
+- *Prompt throughput (raw):* 765 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
 - *Peak memory:* 22
 - *Active memory:* 18
 - *Cache memory:* 0.42
@@ -984,18 +990,18 @@ Boat, Motor cruiser, 'Wavey Katey II', British maritime flag, Calm waterway, Rus
 - *Maintainer status:* none
 - *Observations:* Keyword list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 10.49s
-- *Generation time:* 17.68s
-- *Total time:* 28.19s
-- *Input validation time:* 8.29e-05
-- *Prompt preparation time:* 0.0105
-- *First-token latency:* 4.88
-- *Cleanup time:* 0.233
+- *Model load time:* 11.04s
+- *Generation time:* 17.59s
+- *Total time:* 28.65s
+- *Input validation time:* 6.41e-05
+- *Prompt preparation time:* 0.0128
+- *First-token latency:* 4.44
+- *Cleanup time:* 0.246
 - *Prompt tokens:* 1,596
 - *Generation tokens:* 711
 - *Total tokens:* 2,307
-- *Prompt throughput (raw):* 327 tok/s
-- *Generation throughput (raw):* 64.0 tok/s
+- *Prompt throughput (raw):* 359 tok/s
+- *Generation throughput (raw):* 63.9 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.17
@@ -1105,18 +1111,18 @@ Keywords: Wavey Katey II, boat, motor cruiser, river, wooden house, British flag
 - *Observations:* Unrecognised model control tokens remain visible; Keyword
   list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 9.24s
-- *Generation time:* 22.00s
-- *Total time:* 31.26s
-- *Input validation time:* 4.71e-05
-- *Prompt preparation time:* 0.0115
-- *First-token latency:* 18.5
-- *Cleanup time:* 0.238
+- *Model load time:* 9.14s
+- *Generation time:* 20.37s
+- *Total time:* 29.52s
+- *Input validation time:* 7.16e-05
+- *Prompt preparation time:* 0.00918
+- *First-token latency:* 17
+- *Cleanup time:* 0.255
 - *Prompt tokens:* 6,325
 - *Generation tokens:* 126
 - *Total tokens:* 6,451
-- *Prompt throughput (raw):* 343 tok/s
-- *Generation throughput (raw):* 41.0 tok/s
+- *Prompt throughput (raw):* 372 tok/s
+- *Generation throughput (raw):* 43.5 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1173,18 +1179,18 @@ Keywords: Boat, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.62s
-- *Generation time:* 4.27s
-- *Total time:* 5.89s
-- *Input validation time:* 6.75e-05
-- *Prompt preparation time:* 0.00272
-- *First-token latency:* 0.96
-- *Cleanup time:* 0.108
+- *Model load time:* 1.66s
+- *Generation time:* 4.32s
+- *Total time:* 6.00s
+- *Input validation time:* 6.08e-05
+- *Prompt preparation time:* 0.0029
+- *First-token latency:* 0.99
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 2,605
 - *Generation tokens:* 95
 - *Total tokens:* 2,700
-- *Prompt throughput (raw):* 2,713 tok/s
-- *Generation throughput (raw):* 34.4 tok/s
+- *Prompt throughput (raw):* 2,631 tok/s
+- *Generation throughput (raw):* 34.3 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.21
@@ -1232,18 +1238,18 @@ Keywords: Boat, Wavey Katey II, Cruiser, British flag, Wooden house, Lush greene
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.48s
-- *Generation time:* 1.71s
-- *Total time:* 2.21s
-- *Input validation time:* 5.38e-05
-- *Prompt preparation time:* 0.00505
-- *First-token latency:* 0.422
-- *Cleanup time:* 0.08
+- *Model load time:* 0.65s
+- *Generation time:* 1.66s
+- *Total time:* 2.33s
+- *Input validation time:* 5.89e-05
+- *Prompt preparation time:* 0.00449
+- *First-token latency:* 0.413
+- *Cleanup time:* 0.0791
 - *Prompt tokens:* 2,627
 - *Generation tokens:* 149
 - *Total tokens:* 2,776
-- *Prompt throughput (raw):* 6,228 tok/s
-- *Generation throughput (raw):* 185 tok/s
+- *Prompt throughput (raw):* 6,361 tok/s
+- *Generation throughput (raw):* 187 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 3.2
 - *Cache memory:* 0.08
@@ -1291,18 +1297,18 @@ Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottag
 - *Maintainer status:* none
 - *Observations:* Keyword list has 21 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.25s
-- *Generation time:* 5.70s
-- *Total time:* 6.96s
-- *Input validation time:* 6.55e-05
-- *Prompt preparation time:* 0.000988
-- *First-token latency:* 1.8
-- *Cleanup time:* 0.11
+- *Model load time:* 1.46s
+- *Generation time:* 5.45s
+- *Total time:* 6.92s
+- *Input validation time:* 6.23e-05
+- *Prompt preparation time:* 0.00127
+- *First-token latency:* 1.68
+- *Cleanup time:* 0.0944
 - *Prompt tokens:* 2,577
 - *Generation tokens:* 215
 - *Total tokens:* 2,792
-- *Prompt throughput (raw):* 1,429 tok/s
-- *Generation throughput (raw):* 62.3 tok/s
+- *Prompt throughput (raw):* 1,535 tok/s
+- *Generation throughput (raw):* 65.2 tok/s
 - *Peak memory:* 12
 - *Active memory:* 8.4
 - *Cache memory:* 0.51
@@ -1353,18 +1359,18 @@ Boat, *Wavey Katey II*, Yamaha motor cruiser, British maritime flag, cruising, w
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.87s
-- *Generation time:* 4.72s
-- *Total time:* 5.61s
-- *Input validation time:* 6.78e-05
-- *Prompt preparation time:* 0.005
-- *First-token latency:* 3.33
-- *Cleanup time:* 0.1
+- *Model load time:* 1.02s
+- *Generation time:* 4.31s
+- *Total time:* 5.34s
+- *Input validation time:* 5.2e-05
+- *Prompt preparation time:* 0.00466
+- *First-token latency:* 2.99
+- *Cleanup time:* 0.0864
 - *Prompt tokens:* 4,039
 - *Generation tokens:* 150
 - *Total tokens:* 4,189
-- *Prompt throughput (raw):* 1,214 tok/s
-- *Generation throughput (raw):* 219 tok/s
+- *Prompt throughput (raw):* 1,350 tok/s
+- *Generation throughput (raw):* 231 tok/s
 - *Peak memory:* 3.9
 - *Active memory:* 2.2
 - *Cache memory:* 0.64
@@ -1414,17 +1420,17 @@ Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottag
   keywords: nautical, outboard motor
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Model load time:* 0.96s
-- *Generation time:* 3.34s
-- *Total time:* 4.31s
-- *Input validation time:* 7.23e-05
-- *Prompt preparation time:* 0.00172
-- *First-token latency:* 0.297
-- *Cleanup time:* 0.0912
+- *Generation time:* 3.28s
+- *Total time:* 4.24s
+- *Input validation time:* 6.85e-05
+- *Prompt preparation time:* 0.00184
+- *First-token latency:* 0.228
+- *Cleanup time:* 0.0876
 - *Prompt tokens:* 1,113
 - *Generation tokens:* 143
 - *Total tokens:* 1,256
-- *Prompt throughput (raw):* 3,745 tok/s
-- *Generation throughput (raw):* 54.5 tok/s
+- *Prompt throughput (raw):* 4,875 tok/s
+- *Generation throughput (raw):* 55.7 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
@@ -1473,17 +1479,17 @@ Keywords: Wavey Katey II, motorboat, British flag, calm river, rustic house, lus
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
 - *Model load time:* 1.88s
-- *Generation time:* 64.25s
-- *Total time:* 66.13s
-- *Input validation time:* 6.88e-05
-- *Prompt preparation time:* 0.00144
-- *First-token latency:* 61.9
-- *Cleanup time:* 0.13
+- *Generation time:* 56.95s
+- *Total time:* 58.84s
+- *Input validation time:* 6.23e-05
+- *Prompt preparation time:* 0.0014
+- *First-token latency:* 54.7
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 16,623
 - *Generation tokens:* 122
 - *Total tokens:* 16,745
-- *Prompt throughput (raw):* 269 tok/s
-- *Generation throughput (raw):* 83.3 tok/s
+- *Prompt throughput (raw):* 304 tok/s
+- *Generation throughput (raw):* 86.8 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 2.3
@@ -1529,18 +1535,18 @@ Keywords: motor cruiser, boat, river, cottage, outboard motor, canopy, British f
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.03s
-- *Generation time:* 80.90s
-- *Total time:* 82.96s
-- *Input validation time:* 6.41e-05
-- *Prompt preparation time:* 0.0174
-- *First-token latency:* 75.5
-- *Cleanup time:* 0.128
+- *Model load time:* 2.10s
+- *Generation time:* 75.83s
+- *Total time:* 77.95s
+- *Input validation time:* 7.15e-05
+- *Prompt preparation time:* 0.0176
+- *First-token latency:* 70.7
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 16,639
 - *Generation tokens:* 131
 - *Total tokens:* 16,770
-- *Prompt throughput (raw):* 220 tok/s
-- *Generation throughput (raw):* 28.8 tok/s
+- *Prompt throughput (raw):* 235 tok/s
+- *Generation throughput (raw):* 30.5 tok/s
 - *Peak memory:* 21
 - *Active memory:* 16
 - *Cache memory:* 1.9
@@ -1593,18 +1599,18 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
   terms (requested 10-18); Title, Description and Keywords copy all supplied
   hints unchanged
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.73s
-- *Generation time:* 1.93s
-- *Total time:* 2.67s
-- *Input validation time:* 6.54e-05
-- *Prompt preparation time:* 0.00261
-- *First-token latency:* 0.387
-- *Cleanup time:* 0.0863
+- *Model load time:* 0.69s
+- *Generation time:* 1.92s
+- *Total time:* 2.62s
+- *Input validation time:* 6.66e-05
+- *Prompt preparation time:* 0.00292
+- *First-token latency:* 0.388
+- *Cleanup time:* 0.0896
 - *Prompt tokens:* 1,411
 - *Generation tokens:* 112
 - *Total tokens:* 1,523
-- *Prompt throughput (raw):* 3,644 tok/s
-- *Generation throughput (raw):* 124 tok/s
+- *Prompt throughput (raw):* 3,639 tok/s
+- *Generation throughput (raw):* 123 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
@@ -1651,18 +1657,18 @@ Keywords: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottag
 - *Observations:* Title has 11 words (requested 5-10); Keyword list has 20
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 7.36s
-- *Generation time:* 19.93s
-- *Total time:* 27.32s
-- *Input validation time:* 7.67e-05
-- *Prompt preparation time:* 0.0165
-- *First-token latency:* 16.6
-- *Cleanup time:* 0.245
+- *Model load time:* 7.42s
+- *Generation time:* 19.53s
+- *Total time:* 26.98s
+- *Input validation time:* 7.3e-05
+- *Prompt preparation time:* 0.0167
+- *First-token latency:* 16.2
+- *Cleanup time:* 0.244
 - *Prompt tokens:* 3,472
 - *Generation tokens:* 118
 - *Total tokens:* 3,590
-- *Prompt throughput (raw):* 210 tok/s
-- *Generation throughput (raw):* 44.7 tok/s
+- *Prompt throughput (raw):* 214 tok/s
+- *Generation throughput (raw):* 45.9 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.41
@@ -1714,18 +1720,18 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
 - *Observations:* Keyword list has 25 terms (requested 10-18); Duplicate
   keywords: cabin cruiser
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.14s
-- *Generation time:* 21.63s
-- *Total time:* 22.78s
-- *Input validation time:* 6.79e-05
-- *Prompt preparation time:* 0.0047
-- *First-token latency:* 18.2
-- *Cleanup time:* 0.0997
+- *Model load time:* 1.23s
+- *Generation time:* 20.87s
+- *Total time:* 22.10s
+- *Input validation time:* 7.84e-05
+- *Prompt preparation time:* 0.00436
+- *First-token latency:* 17.5
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 16,634
 - *Generation tokens:* 149
 - *Total tokens:* 16,783
-- *Prompt throughput (raw):* 913 tok/s
-- *Generation throughput (raw):* 57.4 tok/s
+- *Prompt throughput (raw):* 951 tok/s
+- *Generation throughput (raw):* 57.8 tok/s
 - *Peak memory:* 14
 - *Active memory:* 9.5
 - *Cache memory:* 1.4
@@ -1775,18 +1781,18 @@ Keywords: Boat, Wavey Katey II, British flag, motor cruiser, riverside cottage, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.43s
-- *Generation time:* 2.62s
-- *Total time:* 6.08s
-- *Input validation time:* 6.07e-05
-- *Prompt preparation time:* 0.0227
-- *First-token latency:* 0.334
-- *Cleanup time:* 0.149
+- *Model load time:* 3.47s
+- *Generation time:* 2.35s
+- *Total time:* 5.85s
+- *Input validation time:* 7.65e-05
+- *Prompt preparation time:* 0.0236
+- *First-token latency:* 0.336
+- *Cleanup time:* 0.15
 - *Prompt tokens:* 575
-- *Generation tokens:* 85
-- *Total tokens:* 660
-- *Prompt throughput (raw):* 1,722 tok/s
-- *Generation throughput (raw):* 51.8 tok/s
+- *Generation tokens:* 88
+- *Total tokens:* 663
+- *Prompt throughput (raw):* 1,709 tok/s
+- *Generation throughput (raw):* 66.2 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -1813,8 +1819,8 @@ Keywords: Boat, Wavey Katey II, British flag, motor cruiser, riverside cottage, 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
 &lt;channel|&gt;Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.
-Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, maritime flag, fender, railing, canopy, cottage, leisure, riverbank, trees, shrubs
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway, past a British maritime flag and a rustic wooden cottage.
+Keywords: Boat, cabin cruiser, motorboat, river, outboard motor, canopy, flag, fender, railing, riverbank, nautical, leisure, foliage, trees, shrubs, cottage
 </pre>
 
 <details>
@@ -1823,8 +1829,8 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 ```text
 <|channel>thought
 <channel|>Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.
-Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, maritime flag, fender, railing, canopy, cottage, leisure, riverbank, trees, shrubs
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway, past a British maritime flag and a rustic wooden cottage.
+Keywords: Boat, cabin cruiser, motorboat, river, outboard motor, canopy, flag, fender, railing, riverbank, nautical, leisure, foliage, trees, shrubs, cottage
 ```
 
 </details>
@@ -1843,21 +1849,20 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Duplicate
-  keywords: nautical
+- *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Model load time:* 3.30s
-- *Generation time:* 2.81s
-- *Total time:* 6.12s
-- *Input validation time:* 5.12e-05
-- *Prompt preparation time:* 0.0015
-- *First-token latency:* 0.328
-- *Cleanup time:* 0.138
+- *Generation time:* 2.09s
+- *Total time:* 5.40s
+- *Input validation time:* 6.31e-05
+- *Prompt preparation time:* 0.00181
+- *First-token latency:* 0.326
+- *Cleanup time:* 0.141
 - *Prompt tokens:* 575
-- *Generation tokens:* 85
-- *Total tokens:* 660
-- *Prompt throughput (raw):* 1,755 tok/s
-- *Generation throughput (raw):* 46.5 tok/s
+- *Generation tokens:* 89
+- *Total tokens:* 664
+- *Prompt throughput (raw):* 1,766 tok/s
+- *Generation throughput (raw):* 80.3 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -1884,8 +1889,8 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
 &lt;channel|&gt;Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.
-Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, fender, canopy, flag, cottage, foliage, shrubs, trees, leisure, nautical, nautical
+Description: A white cabin motor cruiser named 'Wavey Katey II' travels along a calm waterway past a rustic wooden riverside cottage and lush green foliage.
+Keywords: Boat, cabin cruiser, motorboat, river, riverbank, cruising, outboard motor, canopy, fender, flag, railing, foliage, trees, shrubs, leisure, nautical
 </pre>
 
 <details>
@@ -1894,8 +1899,8 @@ Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, f
 ```text
 <|channel>thought
 <channel|>Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.
-Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, fender, canopy, flag, cottage, foliage, shrubs, trees, leisure, nautical, nautical
+Description: A white cabin motor cruiser named 'Wavey Katey II' travels along a calm waterway past a rustic wooden riverside cottage and lush green foliage.
+Keywords: Boat, cabin cruiser, motorboat, river, riverbank, cruising, outboard motor, canopy, fender, flag, railing, foliage, trees, shrubs, leisure, nautical
 ```
 
 </details>
@@ -1916,18 +1921,18 @@ Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, f
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.26s
-- *Generation time:* 6.02s
-- *Total time:* 8.30s
-- *Input validation time:* 5.47e-05
-- *Prompt preparation time:* 0.0037
-- *First-token latency:* 1.1
-- *Cleanup time:* 0.132
+- *Model load time:* 2.35s
+- *Generation time:* 5.50s
+- *Total time:* 7.86s
+- *Input validation time:* 7.34e-05
+- *Prompt preparation time:* 0.00455
+- *First-token latency:* 0.983
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 570
 - *Generation tokens:* 127
 - *Total tokens:* 697
-- *Prompt throughput (raw):* 519 tok/s
-- *Generation throughput (raw):* 28.4 tok/s
+- *Prompt throughput (raw):* 580 tok/s
+- *Generation throughput (raw):* 31.4 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.43
@@ -1975,18 +1980,18 @@ Keywords: Boat, Motorboat, Cabin cruiser, Cruising, River, Riverbank, Trees, Fol
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: outboard motor
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.62s
-- *Generation time:* 1.82s
-- *Total time:* 2.45s
-- *Input validation time:* 6.55e-05
-- *Prompt preparation time:* 0.0113
-- *First-token latency:* 0.454
-- *Cleanup time:* 0.0921
+- *Model load time:* 0.68s
+- *Generation time:* 1.79s
+- *Total time:* 2.49s
+- *Input validation time:* 5.72e-05
+- *Prompt preparation time:* 0.0103
+- *First-token latency:* 0.446
+- *Cleanup time:* 0.0913
 - *Prompt tokens:* 1,510
 - *Generation tokens:* 118
 - *Total tokens:* 1,628
-- *Prompt throughput (raw):* 3,328 tok/s
-- *Generation throughput (raw):* 170 tok/s
+- *Prompt throughput (raw):* 3,383 tok/s
+- *Generation throughput (raw):* 171 tok/s
 - *Peak memory:* 4.8
 - *Active memory:* 3.0
 - *Cache memory:* 0.25
@@ -2032,18 +2037,18 @@ Keywords: Boat, Motor cruiser, British flag, Cottage, Waterway, Trees, Canopy, O
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.66s
-- *Generation time:* 5.08s
-- *Total time:* 6.75s
-- *Input validation time:* 6.18e-05
+- *Model load time:* 1.67s
+- *Generation time:* 5.05s
+- *Total time:* 6.72s
+- *Input validation time:* 5.87e-05
 - *Prompt preparation time:* 0.00389
-- *First-token latency:* 1.46
-- *Cleanup time:* 0.113
+- *First-token latency:* 1.45
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 2,648
 - *Generation tokens:* 125
 - *Total tokens:* 2,773
-- *Prompt throughput (raw):* 1,816 tok/s
-- *Generation throughput (raw):* 39.1 tok/s
+- *Prompt throughput (raw):* 1,829 tok/s
+- *Generation throughput (raw):* 39.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.50
@@ -2096,18 +2101,18 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
   after sustained repeated output; Keyword list has 42 terms (requested
   10-18); Duplicate keywords: boat fender, boat driver
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.41s
-- *Generation time:* 0.96s
-- *Total time:* 1.64s
-- *Input validation time:* 0.258
-- *Prompt preparation time:* 0.00657
-- *First-token latency:* 0.125
-- *Cleanup time:* 0.0632
+- *Model load time:* 0.43s
+- *Generation time:* 0.95s
+- *Total time:* 1.65s
+- *Input validation time:* 0.256
+- *Prompt preparation time:* 0.00659
+- *First-token latency:* 0.126
+- *Cleanup time:* 0.0625
 - *Prompt tokens:* 2,627
 - *Generation tokens:* 200
 - *Total tokens:* 2,827
-- *Prompt throughput (raw):* 21,065 tok/s
-- *Generation throughput (raw):* 472 tok/s
+- *Prompt throughput (raw):* 20,896 tok/s
+- *Generation throughput (raw):* 470 tok/s
 - *Peak memory:* 1.7
 - *Active memory:* 0.90
 - *Cache memory:* 0.23
@@ -2162,19 +2167,19 @@ Boat, Cruising, River, Riverbank, Foliage, Nautical, Outboard motor, Passenger, 
   motor, passenger, railing, river, riverbank, shrubs, trees, leisure,
   cruising, nautical
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Model load time:* 0.60s
-- *Generation time:* 3.71s
-- *Total time:* 4.32s
-- *Input validation time:* 5.01e-05
-- *Prompt preparation time:* 0.00268
-- *First-token latency:* 0.939
-- *Cleanup time:* 0.0805
+- *Model load time:* 0.57s
+- *Generation time:* 3.63s
+- *Total time:* 4.21s
+- *Input validation time:* 4.36e-05
+- *Prompt preparation time:* 0.00205
+- *First-token latency:* 0.926
+- *Cleanup time:* 0.0728
 - *Prompt tokens:* 2,047
 - *Generation tokens:* 275
 - *Total tokens:* 2,322
-- *Prompt throughput (raw):* 2,180 tok/s
+- *Prompt throughput (raw):* 2,210 tok/s
 - *Generation throughput (raw):* 138 tok/s
-- *Peak memory:* 3.8
+- *Peak memory:* 3.9
 - *Active memory:* 2.1
 - *Cache memory:* 1.2
 - *Model-load active memory:* 2.11
@@ -2226,18 +2231,18 @@ Boat, Wavey Katey II, Motor Cruiser, British Maritime Flag, Calm Waterway, Rusti
   Response repeats the task instructions instead of only returning the
   requested fields; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.59s
-- *Generation time:* 26.01s
-- *Total time:* 27.61s
-- *Input validation time:* 5.4e-05
-- *Prompt preparation time:* 0.0086
-- *First-token latency:* 1.75
-- *Cleanup time:* 0.11
+- *Model load time:* 1.64s
+- *Generation time:* 25.69s
+- *Total time:* 27.35s
+- *Input validation time:* 4.31e-05
+- *Prompt preparation time:* 0.008
+- *First-token latency:* 1.72
+- *Cleanup time:* 0.101
 - *Prompt tokens:* 2,739
 - *Generation tokens:* 1,000
 - *Total tokens:* 3,739
-- *Prompt throughput (raw):* 1,566 tok/s
-- *Generation throughput (raw):* 42.0 tok/s
+- *Prompt throughput (raw):* 1,595 tok/s
+- *Generation throughput (raw):* 42.5 tok/s
 - *Peak memory:* 14
 - *Active memory:* 13
 - *Cache memory:* 0.77
@@ -2301,18 +2306,18 @@ We need to ensure we
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 1.31s
+- *Model load time:* 0.63s
+- *Generation time:* 1.32s
 - *Total time:* 1.96s
-- *Input validation time:* 6.3e-05
-- *Prompt preparation time:* 0.00219
-- *First-token latency:* 0.0983
-- *Cleanup time:* 0.0827
+- *Input validation time:* 6.38e-05
+- *Prompt preparation time:* 0.00214
+- *First-token latency:* 0.0948
+- *Cleanup time:* 0.081
 - *Prompt tokens:* 314
 - *Generation tokens:* 41
 - *Total tokens:* 355
-- *Prompt throughput (raw):* 3,193 tok/s
-- *Generation throughput (raw):* 344 tok/s
+- *Prompt throughput (raw):* 3,312 tok/s
+- *Generation throughput (raw):* 339 tok/s
 - *Peak memory:* 2.2
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
@@ -2359,18 +2364,18 @@ A serene white motor cruiser boat named 'Wavey Katey II' cruises along a calm wa
   Title has 11 words (requested 5-10); Keyword list has 29 terms (requested
   10-18); Duplicate keywords: trees
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.67s
-- *Generation time:* 26.65s
-- *Total time:* 28.33s
-- *Input validation time:* 5.38e-05
-- *Prompt preparation time:* 0.00252
-- *First-token latency:* 5.25
-- *Cleanup time:* 0.103
+- *Model load time:* 1.69s
+- *Generation time:* 27.31s
+- *Total time:* 29.01s
+- *Input validation time:* 4.52e-05
+- *Prompt preparation time:* 0.00271
+- *First-token latency:* 5.35
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 6,321
 - *Generation tokens:* 1,000
 - *Total tokens:* 7,321
-- *Prompt throughput (raw):* 1,204 tok/s
-- *Generation throughput (raw):* 47.7 tok/s
+- *Prompt throughput (raw):* 1,182 tok/s
+- *Generation throughput (raw):* 46.5 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.43
@@ -2497,17 +2502,17 @@ Keywords: Boat, Cabin cruiser, Motorboat, River, Flag, Cottage, Trees, Foliage, 
   after sustained repeated output; Keyword list has 50 terms (requested
   10-18); Duplicate keywords: boat, boat driver, boat fender
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.31s
-- *Generation time:* 9.33s
-- *Total time:* 10.66s
-- *Input validation time:* 7.25e-05
-- *Prompt preparation time:* 0.00933
-- *First-token latency:* 6.41
-- *Cleanup time:* 0.0897
+- *Model load time:* 1.35s
+- *Generation time:* 8.55s
+- *Total time:* 9.91s
+- *Input validation time:* 6.33e-05
+- *Prompt preparation time:* 0.00795
+- *First-token latency:* 5.61
+- *Cleanup time:* 0.0911
 - *Prompt tokens:* 6,325
 - *Generation tokens:* 200
 - *Total tokens:* 6,525
-- *Prompt throughput (raw):* 987 tok/s
+- *Prompt throughput (raw):* 1,127 tok/s
 - *Generation throughput (raw):* 80.5 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
@@ -2557,18 +2562,18 @@ Keywords: Wavey Katey II, motor cruiser, British maritime flag, calm waterway, r
   10-18); Duplicate keywords: boat, waterway, flag, motor, cruiser, maritime,
   british
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.88s
-- *Generation time:* 9.45s
-- *Total time:* 11.34s
-- *Input validation time:* 6.73e-05
-- *Prompt preparation time:* 0.00202
+- *Model load time:* 1.94s
+- *Generation time:* 9.49s
+- *Total time:* 11.44s
+- *Input validation time:* 6.32e-05
+- *Prompt preparation time:* 0.0022
 - *First-token latency:* 1.09
-- *Cleanup time:* 0.106
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 2,603
 - *Generation tokens:* 250
 - *Total tokens:* 2,853
-- *Prompt throughput (raw):* 2,382 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
+- *Prompt throughput (raw):* 2,383 tok/s
+- *Generation throughput (raw):* 32.0 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.83
@@ -2621,18 +2626,18 @@ Keywords: motor cruiser, boat, Wavey Katey II, British maritime flag, calm water
   house, lush foliage, british flag, fenders, wait, boating, cabin cruiser,
   leisure, nautical
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.20s
-- *Generation time:* 221.87s
-- *Total time:* 225.09s
-- *Input validation time:* 5.85e-05
-- *Prompt preparation time:* 0.00376
-- *First-token latency:* 1.28
-- *Cleanup time:* 0.199
+- *Model load time:* 3.27s
+- *Generation time:* 216.04s
+- *Total time:* 219.33s
+- *Input validation time:* 5.53e-05
+- *Prompt preparation time:* 0.00353
+- *First-token latency:* 1.35
+- *Cleanup time:* 0.161
 - *Prompt tokens:* 1,307
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,307
-- *Prompt throughput (raw):* 1,020 tok/s
-- *Generation throughput (raw):* 4.55 tok/s
+- *Prompt throughput (raw):* 969 tok/s
+- *Generation throughput (raw):* 4.67 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
 - *Cache memory:* 5.9
@@ -2750,18 +2755,18 @@ Wait, the hints mention "Boating" and "Leisure" as keywords. Let's check if all 
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.75s
-- *Generation time:* 1.11s
-- *Total time:* 1.87s
-- *Input validation time:* 5.35e-05
-- *Prompt preparation time:* 0.00923
-- *First-token latency:* 0.354
-- *Cleanup time:* 0.0955
+- *Model load time:* 0.88s
+- *Generation time:* 0.99s
+- *Total time:* 1.89s
+- *Input validation time:* 5.94e-05
+- *Prompt preparation time:* 0.0094
+- *First-token latency:* 0.243
+- *Cleanup time:* 0.0925
 - *Prompt tokens:* 916
 - *Generation tokens:* 50
 - *Total tokens:* 966
-- *Prompt throughput (raw):* 2,587 tok/s
-- *Generation throughput (raw):* 267 tok/s
+- *Prompt throughput (raw):* 3,776 tok/s
+- *Generation throughput (raw):* 271 tok/s
 - *Peak memory:* 3.8
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
@@ -2808,18 +2813,18 @@ Keywords: boat, cruiser, waterway, cottage, flag, fenders, canopy, leisure, outb
 - *Observations:* Response repeats the same text; Missing or empty fields:
   Title, Description, Keywords; Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 0.95s
-- *Generation time:* 15.74s
-- *Total time:* 16.71s
-- *Input validation time:* 7.14e-05
-- *Prompt preparation time:* 0.00631
-- *First-token latency:* 0.876
-- *Cleanup time:* 0.104
+- *Model load time:* 1.15s
+- *Generation time:* 15.14s
+- *Total time:* 16.30s
+- *Input validation time:* 5.44e-05
+- *Prompt preparation time:* 0.00596
+- *First-token latency:* 0.734
+- *Cleanup time:* 0.0897
 - *Prompt tokens:* 1,504
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,504
-- *Prompt throughput (raw):* 1,717 tok/s
-- *Generation throughput (raw):* 70.0 tok/s
+- *Prompt throughput (raw):* 2,049 tok/s
+- *Generation throughput (raw):* 72.1 tok/s
 - *Peak memory:* 9.0
 - *Active memory:* 6.5
 - *Cache memory:* 0.40
@@ -2868,18 +2873,18 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
 - *Observations:* No response text was returned; Missing or empty fields:
   Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.28s
-- *Generation time:* 0.85s
-- *Total time:* 3.15s
-- *Input validation time:* 5.75e-05
-- *Prompt preparation time:* 0.00413
-- *First-token latency:* 0.383
-- *Cleanup time:* 0.128
+- *Model load time:* 2.31s
+- *Generation time:* 0.84s
+- *Total time:* 3.17s
+- *Input validation time:* 0.000163
+- *Prompt preparation time:* 0.00427
+- *First-token latency:* 0.376
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 569
 - *Generation tokens:* 1
 - *Total tokens:* 570
-- *Prompt throughput (raw):* 1,484 tok/s
-- *Generation throughput (raw):* 55,429 tok/s
+- *Prompt throughput (raw):* 1,513 tok/s
+- *Generation throughput (raw):* 62,174 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2934,10 +2939,10 @@ empty output
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
-- *Model load time:* 0.99s
+- *Model load time:* 1.03s
 - *Generation time:* -
-- *Total time:* 0.99s
-- *Input validation time:* 5.73e-05
+- *Total time:* 1.03s
+- *Input validation time:* 5.2e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
 - *Cleanup time:* 0.145
@@ -2970,10 +2975,10 @@ empty output
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13547, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13593, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12694, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12726, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3079,7 +3084,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14560, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14606, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3090,7 +3095,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13562, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -3103,12 +3108,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 4053.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2785.16it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[00:31:35] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[01:47:22] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 </details>

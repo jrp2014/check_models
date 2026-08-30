@@ -44,10 +44,10 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13547, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13593, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12694, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12726, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -153,7 +153,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14560, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14606, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -164,7 +164,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13562, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -179,12 +179,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 4053.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2785.16it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[00:31:35] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[01:47:22] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Reproduction inputs
@@ -246,7 +246,7 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.16.2; revision 4d237a553582888244f2a903f368fa7ca27a99de; clean |
+| check_models    | 0.16.5; revision 7299db1db9c3863984bb90b7ee4129779c30877b; clean |
 
 ### Full environment evidence
 

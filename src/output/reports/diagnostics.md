@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD004 MD037 -->
 
+These models serve many purposes; this run probes exactly one narrow task:
+producing catalogue metadata for a single photograph from the assisted-lane
+prompt and whatever context it supplies — here, camera-recorded capture
+context plus draft descriptive hints previously produced by a more capable
+model. Results say nothing about a model's fitness for other uses.
+
 ## Run Summary
 
 Outcome counts
@@ -44,7 +50,7 @@ Observation counts
 | Extra text appears before the Title field                                             | 3     |
 | Response appears cut off at the token limit                                           | 4     |
 | Internal reasoning block appears incomplete                                           | 2     |
-| Title or keywords do not meet requested constraints                                   | 24    |
+| Title or keywords do not meet requested constraints                                   | 23    |
 | Title, Description and Keywords copy all supplied hints unchanged                     | 1     |
 
 ## Triage
@@ -60,7 +66,7 @@ Observation counts
 | [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)   | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
 | [mlx-community/Molmo2-8B-4bit](#diagnostic-mlx-community-molmo2-8b-4bit)                                   | completed | unusable            | observation_needs_reproduction | repeated text; missing required fields; cut off at token limit                                                              |
 | [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)   | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                      |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                                    |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8) | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                      |
 | [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                    | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                                    |
 | [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)              | completed | unusable            | observation_needs_reproduction | extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed                |
 
@@ -110,10 +116,10 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13547, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13593, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12694, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12726, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -219,7 +225,7 @@ ImportError: cannot import name 'DefaultFastImageProcessorKwargs' from 'transfor
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14560, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14606, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -230,7 +236,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13562, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13608, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)
 
@@ -245,12 +251,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 4053.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2785.16it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[00:31:35] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[01:47:22] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Completed Runs with Observations
@@ -698,7 +704,7 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
 - *Quantization:* 8-bit, group 64, affine
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (27.99 GB vs 27.97 GB on disk)
-- *Generation tokens:* 85
+- *Generation tokens:* 88
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -710,8 +716,8 @@ Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruisin
 ```text
 <|channel>thought
 <channel|>Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden house and lush green foliage.
-Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, maritime flag, fender, railing, canopy, cottage, leisure, riverbank, trees, shrubs
+Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway, past a British maritime flag and a rustic wooden cottage.
+Keywords: Boat, cabin cruiser, motorboat, river, outboard motor, canopy, flag, fender, railing, riverbank, nautical, leisure, foliage, trees, shrubs, cottage
 ```
 
 </details>
@@ -719,7 +725,7 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — usable_with_caveats — control tokens visible</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
@@ -728,15 +734,10 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token, catalog_constraint_violation
+- *Observations:* unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Unexpected special tokens:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
 - *Thinking trace markers:* ["&lt;|channel&gt;thought", "&lt;channel|&gt;"]
-- *Title word count:* 10
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 16
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["nautical"]
 - *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -751,7 +752,7 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 - *Quantization:* 8-bit, group 32, mxfp8
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (27.21 GB vs 27.20 GB on disk)
-- *Generation tokens:* 85
+- *Generation tokens:* 89
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -763,8 +764,8 @@ Keywords: Boat, cabin cruiser, motorboat, river, cruising, outboard motor, marit
 ```text
 <|channel>thought
 <channel|>Title: White motor cruiser Wavey Katey II cruising on a river
-Description: A white cabin motor cruiser named Wavey Katey II cruises along a calm waterway past a rustic wooden riverside cottage and lush foliage.
-Keywords: Boat, motor cruiser, cabin cruiser, river, cruising, outboard motor, fender, canopy, flag, cottage, foliage, shrubs, trees, leisure, nautical, nautical
+Description: A white cabin motor cruiser named 'Wavey Katey II' travels along a calm waterway past a rustic wooden riverside cottage and lush green foliage.
+Keywords: Boat, cabin cruiser, motorboat, river, riverbank, cruising, outboard motor, canopy, fender, flag, railing, foliage, trees, shrubs, leisure, nautical
 ```
 
 </details>
@@ -962,16 +963,16 @@ is in the model gallery.
 
 | Model                                             | Runtime identity                                    | Performance                                                                                |
 |---------------------------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------|
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed   | 579 prompt / 101 generated; 130 tok/s; 16 GB peak; cleanup 0.012/0.0 GB active/cache       |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed   | 579 prompt / 107 generated; 25.3 tok/s; 20 GB peak; cleanup 0.0126/0.0 GB active/cache     |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit             | rev 12c5ae493041; Lfm2VlProcessor; stop completed   | 2619 prompt / 106 generated; 203 tok/s; 4.0 GB peak; cleanup 0.00436/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed | 2577 prompt / 157 generated; 66.2 tok/s; 12 GB peak; cleanup 0.00515/0.0 GB active/cache   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed | 2576 prompt / 138 generated; 189 tok/s; 6.4 GB peak; cleanup 0.00567/0.0 GB active/cache   |
-| mlx-community/Ornith-1.0-35B-bf16                 | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed  | 16639 prompt / 112 generated; 62.9 tok/s; 74 GB peak; cleanup 0.00701/0.0 GB active/cache  |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed  | 16625 prompt / 903 generated; 85.5 tok/s; 8.4 GB peak; cleanup 0.00739/0.0 GB active/cache |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16639 prompt / 150 generated; 112 tok/s; 24 GB peak; cleanup 0.00821/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16639 prompt / 115 generated; 90.5 tok/s; 10 GB peak; cleanup 0.00873/0.0 GB active/cache  |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed  | 16639 prompt / 106 generated; 16.6 tok/s; 33 GB peak; cleanup 0.00924/0.0 GB active/cache  |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed   | 579 prompt / 101 generated; 129 tok/s; 16 GB peak; cleanup 0.012/0.0 GB active/cache       |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed   | 579 prompt / 107 generated; 26.1 tok/s; 20 GB peak; cleanup 0.0126/0.0 GB active/cache     |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit             | rev 12c5ae493041; Lfm2VlProcessor; stop completed   | 2619 prompt / 106 generated; 208 tok/s; 4.0 GB peak; cleanup 0.00436/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed | 2577 prompt / 157 generated; 67.7 tok/s; 12 GB peak; cleanup 0.00515/0.0 GB active/cache   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed | 2576 prompt / 138 generated; 192 tok/s; 6.4 GB peak; cleanup 0.00567/0.0 GB active/cache   |
+| mlx-community/Ornith-1.0-35B-bf16                 | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed  | 16639 prompt / 112 generated; 66.0 tok/s; 74 GB peak; cleanup 0.00701/0.0 GB active/cache  |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed  | 16625 prompt / 903 generated; 90.3 tok/s; 8.4 GB peak; cleanup 0.00739/0.0 GB active/cache |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed  | 16639 prompt / 150 generated; 111 tok/s; 24 GB peak; cleanup 0.00821/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed  | 16639 prompt / 115 generated; 91.3 tok/s; 10 GB peak; cleanup 0.00873/0.0 GB active/cache  |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed  | 16639 prompt / 106 generated; 17.5 tok/s; 33 GB peak; cleanup 0.00924/0.0 GB active/cache  |
 
 </details>
 
