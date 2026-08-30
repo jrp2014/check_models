@@ -29,6 +29,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `run_summary.md` now explains itself to a first-time reader: an opening
+  paragraph states the narrow objective under test (catalogue metadata for
+  one photograph, in the assisted lane aided by camera capture context and
+  draft hints from a more capable model — not general model quality), the
+  exact prompt is embedded collapsed at run level, and the at-a-glance
+  section defines the usability vocabulary and the Total / Gen tok/s /
+  Peak GB columns.
 - Verbose sweeps stream generated text live again: the repetition guard now
   echoes each retained (non-draft) chunk to stdout as it arrives, restoring
   the ergonomics lost when guarded generation replaced upstream

@@ -1,5 +1,18 @@
 # mlx-vlm compatibility findings across 41 cached vision-language models
 
+**What this run measures.** These models serve many purposes; this run probes
+exactly one narrow task: producing catalogue metadata for a single photograph,
+using whatever context the prompt supplies — in this assisted lane,
+camera-recorded capture context plus draft descriptive hints previously
+produced by a more capable model. check_models gave every locally cached MLX
+vision-language model the same image and the same assisted-lane prompt
+(reproduced below), through mlx-vlm's generation pipeline, and recorded
+mechanical facts about each attempt: whether it ran, whether the output
+supplied the requested Title/Description/Keywords structure within the ranges
+the prompt states, and its speed and memory. There is no semantic quality
+scoring; every observation is a reproducible mechanical fact from this one
+image and prompt, and says nothing about a model's fitness for other uses.
+
 ## Run summary
 
 - *Run timestamp:* 2026-08-30 00:31:37 BST
@@ -16,11 +29,45 @@
 Observations are mechanical facts from one image, not general model-quality
 judgements.
 
+<details>
+<summary>Exact prompt sent to every model</summary>
+
+```text
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-28 16:17:42 UTC+01:00
+
+Descriptive hints:
+- Description hint: A white motor cruiser boat named 'Wavey Katey II' cruises along a calm waterway, flying a British maritime flag, past a rustic wooden riverside house and lush green trees.
+- Keyword hints: Boat, Boat driver, Boat fender, Boating, Cabin cruiser, Canopy, Cottage, Cruising, Flag, Foliage, Leisure, Motorboat, Nautical, Outboard motor, Passenger, Railing, River, Riverbank, Shrubs, Trees
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+```
+
+</details>
+
 ## Model quality at a glance
 
 Every attempted model ranked by current-run usability, with captured resource
-facts. Usability reflects this single image and prompt only; the model gallery
-holds full outputs and the diagnostics report holds maintainer evidence.
+facts. Usability reflects this single image and prompt only: *usable* means
+the output followed the prompt's requested structure; *usable with caveats*
+means repairable deviations (constraint misses, visible control tokens);
+*unusable* means mechanically broken output (repetition, missing sections,
+truncation); *not evaluated* means the attempt crashed. Total is end-to-end
+wall time including model load, Gen tok/s is decode-only throughput, and Peak
+GB is peak MLX memory. The model gallery holds full outputs and the
+diagnostics report holds maintainer evidence.
 
 | Model | Usability | Total | Gen tok/s | Peak GB | Observed |
 | --- | --- | --- | --- | --- | --- |

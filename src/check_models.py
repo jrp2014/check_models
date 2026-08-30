@@ -20334,8 +20334,14 @@ def _run_issue_summary_quality_section(
         (
             ReportParagraph(
                 "Every attempted model ranked by current-run usability, with captured "
-                "resource facts. Usability reflects this single image and prompt only; "
-                "the model gallery holds full outputs and the diagnostics report holds "
+                "resource facts. Usability reflects this single image and prompt only: "
+                "*usable* means the output followed the prompt's requested structure; "
+                "*usable with caveats* means repairable deviations (constraint misses, "
+                "visible control tokens); *unusable* means mechanically broken output "
+                "(repetition, missing sections, truncation); *not evaluated* means the "
+                "attempt crashed. Total is end-to-end wall time including model load, "
+                "Gen tok/s is decode-only throughput, and Peak GB is peak MLX memory. "
+                "The model gallery holds full outputs and the diagnostics report holds "
                 "maintainer evidence."
             ),
             ReportTable(
@@ -20621,7 +20627,29 @@ def generate_run_issue_summary_report(
         "# mlx-vlm compatibility findings across "
         f"{len(source.results)} cached vision-language models"
     )
+    eval_mode = str(source.metadata.get("eval_mode", "unknown"))
+    assistance_clause = (
+        " — in this assisted lane, camera-recorded capture context plus draft "
+        "descriptive hints previously produced by a more capable model"
+        if eval_mode == "assisted"
+        else ""
+    )
     blocks: list[ReportBlock] = [
+        ReportParagraph(
+            "**What this run measures.** These models serve many purposes; this "
+            "run probes exactly one narrow task: producing catalogue metadata "
+            "for a single photograph, using whatever context the prompt "
+            f"supplies{assistance_clause}. check_models gave every locally "
+            "cached MLX vision-language model the same image and the same "
+            f"{eval_mode}-lane prompt (reproduced below), through mlx-vlm's "
+            "generation pipeline, and recorded mechanical facts about each "
+            "attempt: whether it ran, whether the output supplied the requested "
+            "Title/Description/Keywords structure within the ranges the prompt "
+            "states, and its speed and memory. There is no semantic quality "
+            "scoring; every observation is a reproducible mechanical fact from "
+            "this one image and prompt, and says nothing about a model's "
+            "fitness for other uses."
+        ),
         ReportSection(
             "Run summary",
             (
@@ -20648,6 +20676,10 @@ def generate_run_issue_summary_report(
                 ReportParagraph(
                     "Observations are mechanical facts from one image, not general model-quality "
                     "judgements."
+                ),
+                ReportDetails(
+                    "Exact prompt sent to every model",
+                    (ReportCodeBlock(source.metadata["prompt"]),),
                 ),
             ),
         ),
