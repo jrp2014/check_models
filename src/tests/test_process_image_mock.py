@@ -1690,6 +1690,51 @@ class TestRepetitionGuard:
 
         assert capsys.readouterr().out == ""
 
+    def test_wrapper_applies_processor_clean_output_hook(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The joined text passes through the processor's clean_output hook.
+
+        Upstream generate() applies it (e.g. diffusion_gemma strips leaked
+        channel scaffolding); the guard must match or stream-based results
+        report artifacts plain mlx-vlm users never see.
+        """
+
+        class _CleaningProcessor(_FakeProcessor):
+            def clean_output(self, text: str) -> str:
+                return text.replace("<|channel>final<channel|>", "").lstrip()
+
+        chunks = self._chunks(["<|channel>final<channel|>", "Title: Clean"])
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
+
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_CleaningProcessor(),
+            prompt="p",
+            image="i.jpg",
+        )
+
+        assert result.text == "Title: Clean"
+
+    def test_wrapper_echo_skips_already_printed_chunks(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Chunks upstream marks text_already_printed are retained, not re-echoed."""
+        chunks = self._chunks(["shown ", "again"])
+        chunks[1].text_already_printed = True
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
+
+        result = check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+            verbose=True,
+        )
+
+        assert result.text == "shown again"
+        assert capsys.readouterr().out == "shown \n"
+
     def test_empty_stream_returns_empty_result_like_upstream(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

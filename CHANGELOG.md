@@ -29,6 +29,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The repetition guard mirrors two upstream `generate()` behaviours added
+  for diffusion_gemma (mlx-vlm #2101): the joined text passes through the
+  processor's optional `clean_output` hook (stripping leaked
+  `<|channel>` scaffolding that plain mlx-vlm users no longer see), and
+  the verbose echo skips chunks upstream marks `text_already_printed`.
+  Without the hook, stream-based results would report artifacts as
+  maintainer observations that upstream's own path already removes.
 - Every report surface now opens with one canonical scope statement
   (`_run_objective_statement`): the run probes exactly one narrow task —
   catalogue metadata for a single photograph (in the assisted lane, aided

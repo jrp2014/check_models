@@ -13438,9 +13438,11 @@ def _generate_with_repetition_guard(
 
     Upstream ``stream_generate`` does not echo text the way
     ``generate(verbose=True)`` did, so under ``verbose`` the guard streams
-    each retained (non-draft) chunk to stdout as it arrives — inside the
-    tee capture, so the live console and the retained upstream capture both
-    keep the text.
+    each retained (non-draft, not-already-printed) chunk to stdout as it
+    arrives — inside the tee capture, so the live console and the retained
+    upstream capture both keep the text. Like upstream ``generate()``, the
+    joined text passes through the processor's optional ``clean_output``
+    hook before being returned.
     """
     tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
     stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
@@ -13465,7 +13467,7 @@ def _generate_with_repetition_guard(
             # so they are neither echoed nor retained.
             continue
         pieces.append(chunk.text)
-        if echo is not None and chunk.text:
+        if echo is not None and chunk.text and not getattr(chunk, "text_already_printed", False):
             echo.write(chunk.text)
             echo.flush()
         chunk_count += 1
@@ -13491,6 +13493,12 @@ def _generate_with_repetition_guard(
             ),
         )
     text = "".join(pieces)
+    # Upstream generate() applies the processor's optional clean_output hook
+    # to the joined text (e.g. diffusion_gemma strips leaked channel
+    # scaffolding); mirror it so stream_generate-based results match.
+    clean_output = getattr(processor, "clean_output", None)
+    if callable(clean_output) and isinstance(cleaned := clean_output(text), str):
+        text = cleaned
     finish_reason = "repetition_abort" if aborted else getattr(last, "finish_reason", None)
     if is_dataclass(last) and not isinstance(last, type):
         return replace(last, text=text, finish_reason=finish_reason)
