@@ -29,6 +29,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Every report surface now opens with one canonical scope statement
+  (`_run_objective_statement`): the run probes exactly one narrow task —
+  catalogue metadata for a single photograph (in the assisted lane, aided
+  by camera capture context and draft hints from a more capable model) —
+  and says nothing about fitness for other uses. Shared verbatim by
+  run_summary.md, the model gallery, diagnostics.md, results.html, and
+  index.md so the framing cannot drift between surfaces.
 - `run_summary.md` now explains itself to a first-time reader: an opening
   paragraph states the narrow objective under test (catalogue metadata for
   one photograph, in the assisted lane aided by camera capture context and

@@ -8395,6 +8395,28 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     )
 
 
+def _run_objective_statement(eval_mode: str | None) -> str:
+    """One canonical scope statement shared verbatim by every report surface.
+
+    The models under test serve many purposes; every surface must say up
+    front which single narrow objective this run measured so readers do not
+    mistake mechanical findings for general model quality.
+    """
+    assistance = (
+        " — here, camera-recorded capture context plus draft descriptive "
+        "hints previously produced by a more capable model"
+        if eval_mode == "assisted"
+        else ""
+    )
+    lane = f"the {eval_mode}-lane prompt" if eval_mode else "one shared prompt"
+    return (
+        "These models serve many purposes; this run probes exactly one narrow "
+        "task: producing catalogue metadata for a single photograph from "
+        f"{lane} and whatever context it supplies{assistance}. "
+        "Results say nothing about a model's fitness for other uses."
+    )
+
+
 def _gallery_chooser_explanation() -> str:
     """Return the metric caveat shared verbatim by both chooser formats."""
     return (
@@ -10016,6 +10038,7 @@ def generate_diagnostics_report(
         *partitions.indeterminate,
     )
     blocks = (
+        ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
         *_diagnostics_evidence_blocks(report_context, run_args=run_args),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
@@ -10488,6 +10511,13 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 '<a href="#maintainer-diagnostics">Maintainer diagnostics</a>'
                 '<a href="#provenance">Provenance</a></nav>'
             ),
+            "<p>"
+            + html.escape(
+                _run_objective_statement(
+                    getattr(getattr(report_context, "mode_policy", None), "eval_mode", None)
+                )
+            )
+            + "</p>",
             _html_embedded_image(image_path),
             _html_runtime_facts(report_context.result_set.results, total_runtime_seconds),
             _html_gallery_chooser(report_context),
@@ -10620,6 +10650,8 @@ def generate_markdown_gallery_report(
     md.append("# Model Output Gallery")
     md.append("")
     md.append(f"Generated on: {local_now_str()}")
+    md.append("")
+    md.extend(_wrap_markdown_text(_run_objective_statement(report_context.mode_policy.eval_mode)))
     md.append("")
     md.extend(
         _wrap_markdown_text(
@@ -20628,27 +20660,18 @@ def generate_run_issue_summary_report(
         f"{len(source.results)} cached vision-language models"
     )
     eval_mode = str(source.metadata.get("eval_mode", "unknown"))
-    assistance_clause = (
-        " — in this assisted lane, camera-recorded capture context plus draft "
-        "descriptive hints previously produced by a more capable model"
-        if eval_mode == "assisted"
-        else ""
-    )
     blocks: list[ReportBlock] = [
         ReportParagraph(
-            "**What this run measures.** These models serve many purposes; this "
-            "run probes exactly one narrow task: producing catalogue metadata "
-            "for a single photograph, using whatever context the prompt "
-            f"supplies{assistance_clause}. check_models gave every locally "
-            "cached MLX vision-language model the same image and the same "
-            f"{eval_mode}-lane prompt (reproduced below), through mlx-vlm's "
-            "generation pipeline, and recorded mechanical facts about each "
-            "attempt: whether it ran, whether the output supplied the requested "
-            "Title/Description/Keywords structure within the ranges the prompt "
-            "states, and its speed and memory. There is no semantic quality "
-            "scoring; every observation is a reproducible mechanical fact from "
-            "this one image and prompt, and says nothing about a model's "
-            "fitness for other uses."
+            "**What this run measures.** "
+            + _run_objective_statement(eval_mode)
+            + " check_models gave every locally cached MLX vision-language "
+            "model the same image and the same prompt (reproduced below), "
+            "through mlx-vlm's generation pipeline, and recorded mechanical "
+            "facts about each attempt: whether it ran, whether the output "
+            "supplied the requested Title/Description/Keywords structure "
+            "within the ranges the prompt states, and its speed and memory. "
+            "There is no semantic quality scoring; every observation is a "
+            "reproducible mechanical fact from this one image and prompt."
         ),
         ReportSection(
             "Run summary",
@@ -20828,6 +20851,7 @@ def generate_output_index_report(
     run_issue_summary: Path | None = None,
     issue_reports: Mapping[str, Path] | None = None,
     assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
+    eval_mode: str | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -20842,6 +20866,7 @@ def generate_output_index_report(
         if artifact.key != "output_index"
     )
     md = ["# Check Models Output Index", ""]
+    md.extend((*_wrap_markdown_text(_run_objective_statement(eval_mode)), ""))
     if assessments is not None:
         md.extend(_output_index_dashboard_lines(assessments))
     if run_issue_summary is not None:
@@ -21354,6 +21379,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 output_paths.index,
                 artifacts=(),
                 assessments=inputs.report_context.assessments,
+                eval_mode=inputs.report_context.mode_policy.eval_mode,
             ),
         ),
         ReportArtifact(
@@ -21785,6 +21811,7 @@ def _generate_reports_and_log_outputs(
             run_issue_summary=run_issue_summary,
             issue_reports=diagnostics_artifacts.issue_reports,
             assessments=inputs.report_context.assessments,
+            eval_mode=inputs.report_context.mode_policy.eval_mode,
         ),
     )
     run_artifact(index_artifact)

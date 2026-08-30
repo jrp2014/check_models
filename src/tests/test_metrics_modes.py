@@ -1397,8 +1397,11 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
             ),
         )
 
+    objective_lines = check_models._wrap_markdown_text(check_models._run_objective_statement(None))
     assert paths.index.read_text(encoding="utf-8").splitlines() == [
         "# Check Models Output Index",
+        "",
+        *objective_lines,
         "",
         "- [results.html](reports/results.html)",
         "- [model_gallery.md](reports/model_gallery.md)",

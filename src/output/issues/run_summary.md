@@ -1,17 +1,17 @@
 # mlx-vlm compatibility findings across 41 cached vision-language models
 
 **What this run measures.** These models serve many purposes; this run probes
-exactly one narrow task: producing catalogue metadata for a single photograph,
-using whatever context the prompt supplies — in this assisted lane,
+exactly one narrow task: producing catalogue metadata for a single photograph
+from the assisted-lane prompt and whatever context it supplies — here,
 camera-recorded capture context plus draft descriptive hints previously
-produced by a more capable model. check_models gave every locally cached MLX
-vision-language model the same image and the same assisted-lane prompt
-(reproduced below), through mlx-vlm's generation pipeline, and recorded
-mechanical facts about each attempt: whether it ran, whether the output
-supplied the requested Title/Description/Keywords structure within the ranges
-the prompt states, and its speed and memory. There is no semantic quality
-scoring; every observation is a reproducible mechanical fact from this one
-image and prompt, and says nothing about a model's fitness for other uses.
+produced by a more capable model. Results say nothing about a model's fitness
+for other uses. check_models gave every locally cached MLX vision-language
+model the same image and the same prompt (reproduced below), through mlx-vlm's
+generation pipeline, and recorded mechanical facts about each attempt: whether
+it ran, whether the output supplied the requested Title/Description/Keywords
+structure within the ranges the prompt states, and its speed and memory. There
+is no semantic quality scoring; every observation is a reproducible mechanical
+fact from this one image and prompt.
 
 ## Run summary
 

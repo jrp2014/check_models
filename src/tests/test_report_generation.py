@@ -1146,7 +1146,7 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
     content = summary.read_text(encoding="utf-8")
     assert "**What this run measures.**" in content
     assert "exactly one narrow task" in " ".join(content.split())
-    assert "says nothing about a model's fitness for other uses" in " ".join(content.split())
+    assert "say nothing about a model's fitness for other uses" in " ".join(content.split())
     assert "Exact prompt sent to every model" in content
     assert "full prompt that must not be copied" in content
     assert "*usable with caveats* means repairable deviations" in " ".join(content.split())
@@ -1808,8 +1808,14 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
             output_paths.index, artifacts=_all_artifacts(output_paths)
         )
 
+    objective_lines = "".join(
+        f"{line}\n"
+        for line in check_models._wrap_markdown_text(check_models._run_objective_statement(None))
+    )
     assert output_paths.index.read_text(encoding="utf-8") == (
         "# Check Models Output Index\n"
+        "\n"
+        f"{objective_lines}"
         "\n"
         "- [results.html](reports/results.html)\n"
         "- [model_gallery.md](reports/model_gallery.md)\n"
