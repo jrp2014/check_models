@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Tests for eight live functions no test had exercised (`_model_burden_rows`,
+  `_diagnostics_environment_section`, `_write_environment_failure_diagnostics`,
+  `filter_and_format_tags`, `pretty_print_exif`, `_decode_iptc_keywords`,
+  `_append_markdown_section`, `_parse_processor_kwargs_arg`).
 - Streaming repetition guard: generation now runs through a thin accumulator
   over upstream `stream_generate` (reproducing `generate()` semantics — joined
   chunk text, final-chunk metrics) that stops decoding once the output tail is
@@ -219,6 +223,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The test suite runs in parallel (`pytest -n auto`) from `make test`,
+  `make test-cov`, and both gate invocations — pytest-xdist was already a
+  dev dependency that nothing used; wall clock drops from ~61 s to ~34 s
+  locally. A suite-wide `MLX_VLM_WIDTH` pin in `conftest.py` makes console
+  rendering deterministic: under xdist a worker's stdout is a pipe, the
+  width fallback was narrower, and two working-set assertions failed on
+  truncated tree rows.
 - `_run_model_isolated` takes the already-built `ProcessImageParams` from
   `_run_one_model` instead of re-threading the same eight keyword
   arguments through a third signature.
