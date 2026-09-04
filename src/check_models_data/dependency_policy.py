@@ -35,23 +35,7 @@ UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
     "transformers": "5.14.0",
 }
 
-# mlx-vlm required mlx-lm only through the 0.6.13 release; from 0.6.14 (main
-# commit 738e4406, "Porting twenty four MLX-LM models") the ported code is
-# vendored and mlx-lm is no longer a dependency. Applied only when the
-# installed mlx-vlm predates that version, so a documented minimal install
-# never sees a false "mlx-lm is missing" warning.
-UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM: Final[str] = "0.31.3"
-UPSTREAM_MLX_VLM_FIRST_VERSION_WITHOUT_MLX_LM: Final[str] = "0.6.14"
-
-UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.31.2",
-    "transformers": "5.7.0",
-}
-
 PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS: Final[dict[str, str]] = {
-    # Ecosystem provenance only: no direct import; upstream mlx-vlm dropped
-    # its own mlx-lm dependency (738e4406). Recorded in reports when present.
-    "mlx-lm": ">=0.31.3",
     "psutil": ">=5.9.0",
     "tokenizers": "<0.24.0,>=0.22.0",
     "einops": ">=0.6.0",

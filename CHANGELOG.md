@@ -213,6 +213,13 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- `mlx-lm` is gone from the project entirely: nothing imports it and
+  mlx-vlm has not depended on it since 0.6.14, so the `extras` entry, the
+  legacy mlx-vlm < 0.6.14 floor logic and its policy constants, the report
+  version rows, the error-attribution and traceback markers, the mypy
+  override, and the local-build/verify/clean stages in `update.sh`,
+  `setup_conda_env.sh`, `probe_python_next.sh` and `clean_builds.sh` no
+  longer mention it. A sibling `mlx-lm` checkout is simply ignored.
 - Tooling cruft found in the maintainability review: `bugtest.py` and
   `update.sh`'s Metal-regression reminder (the M5 NAX matmul regression it
   probed for is long fixed, and the runtime smoke already catches a broken

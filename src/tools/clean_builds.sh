@@ -59,7 +59,7 @@ PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 SCRIPTS_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Repositories to clean (in order)
-MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm" "mlx-data")
+MLX_REPOS=("mlx" "mlx-vlm" "mlx-data")
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🧹 MLX Build Artifact Cleanup"

@@ -25,14 +25,14 @@
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
-#   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to check_models/),
+#   If mlx and mlx-vlm directories exist at ../../ (sibling to check_models/),
 #   the script will automatically:
 #   1. Run git pull in each repository (an unchanged, clean repo whose editable
 #      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides)
 #   2. Install requirements.txt (if present) for additional dependencies
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
-#   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
-#   4. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
+#   3. Install packages in dependency order: mlx → mlx-vlm
+#   4. Verify editable install origins for mlx and mlx-vlm
 #   5. Skip PyPI MLX updates for these packages
 #   6. Reinstall check_models from pyproject.toml to reconcile shared deps
 #   7. Run the local MLX runtime smoke if a local mlx build was installed
@@ -596,7 +596,7 @@ clean_local_mlx_builds() {
 	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 	local PARENT_DIR
 	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm")
+	local MLX_REPOS=("mlx" "mlx-vlm")
 	
 	echo "[update.sh] Cleaning build artifacts from local MLX repositories..."
 	
@@ -770,8 +770,8 @@ update_local_mlx_repos() {
 	
 	echo "[update.sh] Checking for local MLX development repositories..."
 	
-	# Define repositories in dependency order: mlx first (base), then mlx-lm, then mlx-vlm
-	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm")
+	# Define repositories in dependency order: mlx first (base), then mlx-vlm
+	local MLX_REPOS=("mlx" "mlx-vlm")
 	local -a REPO_NAMES=()
 	local -a REPO_PATHS=()
 	local -a REPO_SKIP=()
@@ -791,7 +791,7 @@ update_local_mlx_repos() {
 	
 	if [[ ${#REPO_NAMES[@]} -eq 0 ]]; then
 		echo "[update.sh] No local MLX development repositories found"
-		echo "[update.sh] (Looked for mlx-lm, mlx-vlm, mlx directories with .git at $PARENT_DIR)"
+		echo "[update.sh] (Looked for mlx and mlx-vlm directories with .git at $PARENT_DIR)"
 		cd "$ORIGINAL_DIR"
 		return 0
 	fi
@@ -884,7 +884,7 @@ update_local_mlx_repos() {
 	echo "✓ All repositories verified"
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4: Build and install packages in dependency order (mlx → mlx-lm → mlx-vlm)
+	# Stage 4: Build and install packages in dependency order (mlx → mlx-vlm)
 	echo ""
 	echo "Stage 4: Building and installing MLX packages in dependency order..."
 	for idx in "${!REPO_NAMES[@]}"; do
@@ -1005,15 +1005,15 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4b: Verify editable origins for mlx/mlx-lm/mlx-vlm.
+	# Stage 4b: Verify editable origins for mlx/mlx-vlm.
 	# These packages often use release-style version strings even for local builds,
 	# so location metadata is a more reliable signal than version text.
 	echo ""
-	echo "Stage 4b: Verifying editable install origins for mlx/mlx-lm/mlx-vlm..."
+	echo "Stage 4b: Verifying editable install origins for mlx/mlx-vlm..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		case "${REPO_NAMES[idx]}" in
-			mlx|mlx-lm|mlx-vlm)
+			mlx|mlx-vlm)
 				if ! verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"; then
 					echo "❌ Local build verification failed for ${REPO_NAMES[idx]}"
 					echo "   The environment is in a mixed state (a later install replaced the"
@@ -1056,7 +1056,7 @@ local_mlx_repos_present() {
 	local parent_dir
 	parent_dir="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 	local repo
-	for repo in mlx mlx-lm mlx-vlm; do
+	for repo in mlx mlx-vlm; do
 		[[ -d "$parent_dir/$repo/.git" ]] && return 0
 	done
 	return 1
@@ -1079,15 +1079,13 @@ else
 		echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
 	fi
 
-	# mlx-lm / mlx-vlm local builds can keep release-like version strings, so
-	# also preserve when pip metadata marks them as editable installs.
-	for pkg in mlx-lm mlx-vlm; do
-		EDITABLE_LOC="$(get_editable_project_location "$pkg")"
-		if [[ -n "$EDITABLE_LOC" ]]; then
-			SKIP_MLX_PYPI=1
-			echo "[update.sh] Detected editable $pkg install at $EDITABLE_LOC — preserving..."
-		fi
-	done
+	# mlx-vlm local builds can keep release-like version strings, so also
+	# preserve when pip metadata marks it as an editable install.
+	EDITABLE_LOC="$(get_editable_project_location mlx-vlm)"
+	if [[ -n "$EDITABLE_LOC" ]]; then
+		SKIP_MLX_PYPI=1
+		echo "[update.sh] Detected editable mlx-vlm install at $EDITABLE_LOC — preserving..."
+	fi
 fi
 
 # Update MLX from PyPI if not skipped
@@ -1116,7 +1114,7 @@ else
 	echo "[update.sh] Updating MLX packages from PyPI to latest..."
 	# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
 	# mlx-metal is the Metal GPU backend - must be explicitly installed
-	pip_install mlx mlx-metal mlx-lm mlx-vlm
+	pip_install mlx mlx-metal mlx-vlm
 fi
 
 reconcile_project_environment_from_pyproject
@@ -1135,9 +1133,6 @@ echo ""
 echo "[update.sh] Verifying critical packages..."
 IMPORT_TO_PIP_PACKAGE() {
 	case "$1" in
-		mlx_lm)
-			printf '%s\n' "mlx-lm"
-			;;
 		mlx_vlm)
 			printf '%s\n' "mlx-vlm"
 			;;
@@ -1181,7 +1176,7 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 	exit 1
 else
 	rm -rf "$IMPORT_CHECK_DIR"
-	echo "✓ All critical packages verified (mlx, mlx_lm, mlx_vlm)"
+	echo "✓ All critical packages verified (mlx, mlx_vlm)"
 fi
 
 

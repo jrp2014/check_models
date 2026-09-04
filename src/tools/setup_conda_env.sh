@@ -261,7 +261,6 @@ verify_installation() {
     log_info "Checking key packages..."
     python -c "
 import mlx.core as mx
-import mlx_lm
 import mlx_vlm
 from PIL import Image
 from importlib import metadata
@@ -307,7 +306,6 @@ if mlx_is_editable:
 if mlx_metal_version is not None:
     print(f'✓ MLX-Metal version: {mlx_metal_version}')
     print(f'✓ MLX metallib: {metallib_path}')
-print(f'✓ MLX-LM version: {mlx_lm.__version__}')
 "
 
     if command -v cmake &> /dev/null; then

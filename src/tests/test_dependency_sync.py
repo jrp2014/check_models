@@ -111,7 +111,6 @@ MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->"
 
 IMPORT_NAME_BY_REQUIREMENT = {
     "huggingface-hub": "huggingface_hub",
-    "mlx-lm": "mlx_lm",
     "mlx-vlm": "mlx_vlm",
     "pillow": "PIL",
     "pyyaml": "yaml",
@@ -248,12 +247,8 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
         f"huggingface-hub[typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
         in runtime_deps
     )
-    # mlx-lm is optional ecosystem provenance (no direct import; upstream
-    # mlx-vlm dropped it), so it lives in extras rather than the runtime set.
-    assert not any(dep.startswith("mlx-lm>=") for dep in runtime_deps)
-    assert (
-        f"mlx-lm{dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS['mlx-lm']}" in extras_deps
-    )
+    # mlx-lm is neither imported nor required by mlx-vlm any more: nowhere.
+    assert not any(dep.startswith("mlx-lm") for dep in runtime_deps + extras_deps)
 
 
 def _normalized_requirement_names(requirements: Iterable[str]) -> set[str]:
@@ -280,8 +275,6 @@ def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
     """The project floor tracks the released mlx-vlm stack (0.6.16, first py.typed)."""
     assert dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS["transformers"] == "5.14.0"
     assert dependency_policy.UPSTREAM_MLX_VLM_MINIMUMS["transformers"] == "5.14.0"
-    # mlx-lm's own, lower floor remains a separate upstream fact.
-    assert dependency_policy.UPSTREAM_MLX_LM_MINIMUMS["transformers"] == "5.7.0"
 
 
 def test_dependency_policy_does_not_cap_transformers() -> None:
@@ -341,8 +334,6 @@ def test_mypy_uses_generated_typings_without_gating_stub_internals() -> None:
         for override in overrides
         if set(override.get("module", []))
         & {
-            "mlx_lm",
-            "mlx_lm.*",
             "mlx_vlm",
             "mlx_vlm.*",
             "tokenizers",
@@ -1344,7 +1335,6 @@ def test_update_script_import_repair_hint_uses_distribution_names() -> None:
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
 
     assert "IMPORT_TO_PIP_PACKAGE" in update_script
-    assert "printf '%s\\n' \"mlx-lm\"" in update_script
     assert "printf '%s\\n' \"mlx-vlm\"" in update_script
     assert "REPAIR_PKGS" in update_script
     assert 'REPAIR_PKGS+=("$(IMPORT_TO_PIP_PACKAGE "$pkg")")' in update_script
@@ -1496,7 +1486,7 @@ def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
     assert 'pip_install_tool "setuptools>=80,<82"' in update_script
 
     local_update_pos = main_flow.index("update_local_mlx_repos")
-    pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-lm mlx-vlm")
+    pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-vlm")
     reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
     local_smoke_pos = main_flow.index("run_local_mlx_backend_smoke")
     critical_check_pos = main_flow.index("[update.sh] Verifying critical packages")

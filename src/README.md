@@ -141,7 +141,7 @@ running them from `src/`. From the repository root, prefer `make install`,
 Install the core runtime or add optional model coverage as needed:
 
 ```bash
-# Runtime only (includes mlx and mlx-vlm; mlx-lm is an optional extra)
+# Runtime only (includes mlx and mlx-vlm)
 pip install -e .
 
 # Add optional extras and torch-backed loaders for broader model coverage
@@ -888,7 +888,6 @@ Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
-| Ecosystem provenance (version recorded in reports; not imported, not required by mlx-vlm ≥ 0.6.14) | `mlx-lm>=0.31.3` | `extras` | `pip install -e "src/[extras]"` |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
 | Fast tokenizer backends | `tokenizers>=0.22.0,<0.23.0` | `extras` | `pip install -e "src/[extras]"` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
@@ -932,7 +931,7 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[typing]>=1.10.1" "mlx>=0.32.1" 
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `mlx-lm` (ecosystem provenance only — not imported directly, and no longer required by mlx-vlm itself), `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`. The tokenizer specs follow the `transformers>=5.14.0` compatibility floor:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`. The tokenizer specs follow the `transformers>=5.14.0` compatibility floor:
 
 ```bash
 pip install -e ".[extras,torch]"  # recommended for the widest optional feature/model coverage
@@ -965,7 +964,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `mlx-lm` is optional ecosystem provenance (recorded in reports when installed; never imported directly, and no longer a dependency of mlx-vlm itself). The `extras` group adds mlx-lm, psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.14.0` compatibility floor. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
+> The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.14.0` compatibility floor. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
 
 > [!NOTE]
 > Project policy requires `transformers>=5.14.0` and validates the live
@@ -980,7 +979,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 
 > [!NOTE]
 > The `tools/update.sh` helper is for local MLX ecosystem development when
-> sibling `mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It builds
+> sibling `mlx` and `mlx-vlm` repositories are present. It builds
 > `mlx` with upstream's editable dev install (`pip install -e ".[dev]"`), checks
 > the local Xcode/SDK/Metal toolchain before building, logs the `mlx.metallib`
 > backend artifact, reinstalls this project from `pyproject.toml` after MLX

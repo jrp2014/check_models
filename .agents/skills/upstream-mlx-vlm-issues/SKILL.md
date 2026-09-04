@@ -94,7 +94,7 @@ existing artifacts rather than paraphrasing away exact errors.
 ### Environment
 
 - MLX-VLM:
-- mlx / mlx-lm:
+- mlx:
 - Python:
 - OS / macOS:
 - Hardware / MLX device:

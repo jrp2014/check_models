@@ -93,7 +93,7 @@ else
 fi
 if "$PY" - <<'PY'
 import importlib, sys
-mods = ("mlx.core", "mlx_lm", "mlx_vlm", "transformers", "tokenizers", "PIL", "numpy", "huggingface_hub")
+mods = ("mlx.core", "mlx_vlm", "transformers", "tokenizers", "PIL", "numpy", "huggingface_hub")
 failed = []
 for m in mods:
     try:

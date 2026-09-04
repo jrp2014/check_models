@@ -382,7 +382,7 @@ Your PR must:
 
 The project organizes dependencies into groups:
 
-- **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-lm, mlx-vlm, Pillow, etc.)
+- **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-vlm, Pillow, etc.)
 - **Extras**: Optional enhancements (psutil, tokenizers, einops, num2words, sentencepiece);
   tokenizers and sentencepiece specs track the Transformers compatibility window
 - **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio, timm);
@@ -494,8 +494,8 @@ bash tools/update.sh
 - `MLX_LOCAL_BUILD_SMOKE_EXPECTED`: Override the expected deterministic output
   substring (`Hello! How can I help you today?`).
 
-`tools/update.sh` (what `make update` runs) auto-detects sibling `mlx`,
-`mlx-lm`, and `mlx-vlm` repositories and follows upstream MLX editable dev
+`tools/update.sh` (what `make update` runs) auto-detects sibling `mlx`
+and `mlx-vlm` repositories and follows upstream MLX editable dev
 install guidance for `mlx`; without local repos it falls back to PyPI updates.
 Use `make update-quick` for a lightweight in-env refresh only.
 
@@ -562,7 +562,7 @@ make clean              # Remove __pycache__, build/, dist/, test caches
 make clean-all          # Deep clean
 
 # Clean local MLX development repositories
-make clean-mlx          # Remove build artifacts from mlx, mlx-lm, mlx-vlm, mlx-data
+make clean-mlx          # Remove build artifacts from mlx, mlx-vlm, mlx-data
 
 # Preview what would be cleaned (dry run)
 make clean-mlx-dry-run

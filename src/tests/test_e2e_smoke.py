@@ -135,7 +135,7 @@ def _check_model_cached(model_id: str) -> bool:
 
 def _check_runtime_dependencies_ready() -> bool:
     """Check whether core runtime deps are currently usable for real inference."""
-    required_runtime = {"mlx", "mlx-vlm", "mlx-lm"}
+    required_runtime = {"mlx", "mlx-vlm"}
     return all(dep not in check_models.MISSING_DEPENDENCIES for dep in required_runtime)
 
 
@@ -148,7 +148,7 @@ pytestmark = [
 
 @pytest.mark.skipif(
     not _check_runtime_dependencies_ready(),
-    reason="runtime deps unavailable (requires working mlx + mlx-vlm + mlx-lm)",
+    reason="runtime deps unavailable (requires working mlx + mlx-vlm)",
 )
 class TestE2ESmoke:
     """End-to-end smoke tests that run actual model inference."""

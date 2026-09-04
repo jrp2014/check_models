@@ -1023,7 +1023,6 @@ The MLX stack floors are also mirrored in
 diagnostics report the same requirements that packaging installs. When
 `mlx-vlm` raises an upstream dependency floor, update the policy module,
 `src/pyproject.toml`, and regenerated README install snippets together.
-(`mlx-lm` is optional ecosystem provenance in `extras`, not a runtime floor.)
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
 `mlx`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[typing]`, `numpy`, `packaging`, `rich`, `PyYAML`

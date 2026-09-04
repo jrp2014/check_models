@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
-version = "0.16.13"
+version = "0.16.14"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -61,9 +61,6 @@ packages = ["check_models_data"]
 [project.optional-dependencies]
 # Optional dependencies grouped by use case.
 extras = [
-    # Ecosystem provenance: not imported directly and no longer required by
-    # mlx-vlm itself; kept installable so reports can record its version.
-    "mlx-lm>=0.31.3",
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
     # Fast tokenizer backends; stay on the 0.22.x line until 0.23.x is validated.
@@ -329,7 +326,7 @@ follow_imports = "skip"
 # against stub signatures.  Missing stubs remain non-fatal, and generated-stub
 # internals are not treated as this project's strictness debt.
 [[tool.mypy.overrides]]
-module = ["mlx_lm", "mlx_lm.*", "mlx_vlm", "mlx_vlm.*"]
+module = ["mlx_vlm", "mlx_vlm.*"]
 ignore_missing_imports = true
 ignore_errors = true
 follow_imports = "normal"

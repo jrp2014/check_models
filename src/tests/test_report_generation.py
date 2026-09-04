@@ -100,7 +100,6 @@ def _stub_versions() -> dict[str, str | None]:
         "mlx": "0.1",
         "mlx-metal": None,
         "mlx-vlm": "0.1",
-        "mlx-lm": None,
         "huggingface-hub": "0.1",
         "transformers": "4.0",
         "tokenizers": "0.1",

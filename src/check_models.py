@@ -139,9 +139,6 @@ from rich.tree import Tree
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
-    UPSTREAM_MLX_LM_MINIMUMS,
-    UPSTREAM_MLX_VLM_FIRST_VERSION_WITHOUT_MLX_LM,
-    UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM,
     UPSTREAM_MLX_VLM_MINIMUMS,
 )
 
@@ -827,16 +824,6 @@ if mlx_vlm_probe_error is None:
         MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 else:
     MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
-
-# mlx-lm is ecosystem provenance, not a runtime requirement: this project has
-# no direct mlx_lm import, and upstream mlx-vlm dropped its own mlx-lm
-# dependency in 738e4406 (vendored the ported models). Its version is still
-# recorded in reports when present, but its absence must not abort a run.
-try:
-    version("mlx-lm")
-except PackageNotFoundError:
-    logger.debug("mlx-lm distribution not installed; recording provenance as unavailable")
-
 
 # =============================================================================
 # SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS
@@ -4953,7 +4940,6 @@ def get_library_versions() -> LibraryVersionDict:
         "mlx": _none_if_na(mlx_ver),
         "mlx-metal": _none_if_na(_get_version("mlx-metal")),
         "mlx-vlm": _none_if_na(mlx_vlm_ver),
-        "mlx-lm": _none_if_na(_get_version("mlx-lm")),
         "mlx-audio": _none_if_na(_get_version("mlx-audio")),
         "huggingface-hub": _none_if_na(_get_version("huggingface-hub", hf_version)),
         "transformers": _none_if_na(_get_version("transformers")),
@@ -5248,21 +5234,9 @@ def _collect_upstream_requirements(
 
     mlx_vlm_version = versions.get("mlx-vlm")
     if mlx_vlm_version:
-        # mlx-vlm 0.6.13 release requirements.txt specifies:
-        #   mlx>=0.32.0, transformers>=5.14.0 (+ mlx-lm>=0.31.3, see below)
+        # Upstream mlx-vlm's own floors (its requirements.txt).
         for package_name, minimum_version in UPSTREAM_MLX_VLM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-vlm")
-        # mlx-lm was an mlx-vlm dependency only before 0.6.14 (738e4406
-        # vendored the ported models). Applying it unconditionally produced a
-        # false "mlx-lm is missing" warning on the documented minimal install.
-        if not _is_version_at_least(mlx_vlm_version, UPSTREAM_MLX_VLM_FIRST_VERSION_WITHOUT_MLX_LM):
-            _record_requirement("mlx-lm", UPSTREAM_MLX_VLM_LEGACY_MLX_LM_MINIMUM, "mlx-vlm")
-
-    if versions.get("mlx-lm"):
-        # mlx-lm setup.py currently specifies:
-        #   mlx>=0.31.2, transformers>=5.7.0
-        for package_name, minimum_version in UPSTREAM_MLX_LM_MINIMUMS.items():
-            _record_requirement(package_name, minimum_version, "mlx-lm")
 
     return requirements
 
@@ -7883,7 +7857,6 @@ GALLERY_STAMP_LIBRARY_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
     "mlx-metal",
-    "mlx-lm",
     "transformers",
     "tokenizers",
     "huggingface-hub",
@@ -8554,7 +8527,6 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
     "mlx-metal",
-    "mlx-lm",
     "mlx-audio",
     "transformers",
     "tokenizers",
@@ -8565,7 +8537,6 @@ _ISSUE_RELEVANT_LIB_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
     "mlx-metal",
-    "mlx-lm",
     "transformers",
     "tokenizers",
     "huggingface-hub",
@@ -12190,7 +12161,6 @@ _STAGE_CODE_MAP: Final[dict[str, str]] = {
 _PACKAGE_CODE_MAP: Final[dict[str, str]] = {
     "mlx": "MLX",
     "mlx-vlm": "MLX_VLM",
-    "mlx-lm": "MLX_LM",
     "transformers": "TRANSFORMERS",
     "model-repo-code": "MODEL_REPO_CODE",
     "huggingface-hub": "HUGGINGFACE_HUB",
@@ -12581,13 +12551,6 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
             ],
         ),
         (
-            "mlx-lm",
-            [
-                "mlx_lm/",
-                "mlx-lm/",
-            ],
-        ),
-        (
             "transformers",
             [
                 "transformers/",
@@ -12644,7 +12607,6 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
                 "transformers",
                 "huggingface-hub",
                 "model-config",
-                "mlx-lm",
                 "mlx",
                 "mlx-vlm",
             )
