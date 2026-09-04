@@ -139,7 +139,6 @@ ignore = [
     "SKY-Q802", # I/A/D module metrics are advisory for CLI/tool modules.
     "SKY-Q803", # Zone-of-pain module metrics are advisory for policy constants.
     "SKY-R104", # Package-local scans run below the repo-level pre-commit config.
-    "SKY-L021", # Diff-based security-regression heuristic misfires in worktree pre-push hooks and on retained logs; the full-mode --danger gate covers real regressions.
 ]
 
 [tool.skylos.gate]
