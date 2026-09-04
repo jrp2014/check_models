@@ -198,6 +198,19 @@ def folder_with_single_image(tmp_path: Path) -> Path:
     return folder
 
 
+@pytest.fixture(autouse=True)
+def _pin_render_width(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Pin the rendering width every test sees.
+
+    Console rendering derives its width from the terminal; under pytest-xdist
+    a worker's stdout is a pipe and the fallback is narrower than in a serial
+    run, which silently truncated tree rows and broke exact-string assertions.
+    ``MLX_VLM_WIDTH`` is the harness's own override, so this keeps every
+    rendering test deterministic regardless of how the suite is invoked.
+    """
+    monkeypatch.setenv("MLX_VLM_WIDTH", "120")
+
+
 # =============================================================================
 # ENVIRONMENT DETECTION FIXTURES
 # =============================================================================

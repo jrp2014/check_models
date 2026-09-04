@@ -589,3 +589,37 @@ def test_error_text_escapes_underscore_emphasis_markers() -> None:
 def test_formatter_owned_markdown_emphasis_uses_repo_style() -> None:
     """Generated labels should satisfy the repository's asterisk emphasis rule."""
     assert check_models._markdown_emphasis("Execution:") == "*Execution:*"
+
+
+def test_append_markdown_section_honours_explicit_heading_and_verbatim_lines() -> None:
+    """Explicit ``###`` titles set the level; structural lines pass through unwrapped."""
+    parts: list[str] = []
+    long_prose = "word " * 30
+    check_models._append_markdown_section(
+        parts,
+        title="### Nested title",
+        body_lines=[
+            long_prose.strip(),
+            "",
+            "- bullet stays",
+            "| a | b |",
+            "1. numbered",
+            "```",
+            "code",
+            "```",
+        ],
+    )
+    text = "\n".join(parts)
+
+    assert "### Nested title" in text
+    assert "- bullet stays" in text
+    assert "| a | b |" in text
+    assert "1. numbered" in text
+    assert all(len(line) <= 80 for line in parts if line.startswith("word"))
+    assert parts[-1] == ""
+
+
+def test_append_markdown_section_defaults_to_level_two_without_body() -> None:
+    parts: list[str] = []
+    check_models._append_markdown_section(parts, title="Plain title")
+    assert "## Plain title" in "\n".join(parts)

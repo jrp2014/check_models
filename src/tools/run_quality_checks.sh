@@ -110,7 +110,7 @@ fi
 
 if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="
-    "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"
+    "$QUALITY_PYTHON" -m pytest -q -n auto -m "not slow and not e2e"
 
     # Markdown linting runs from the repo root
     cd "$(quality_repo_root)"
@@ -130,7 +130,7 @@ if [ "$QUALITY_MODE" = "fast" ]; then
 fi
 
 echo "=== Pytest ==="
-"$QUALITY_PYTHON" -m pytest -v
+"$QUALITY_PYTHON" -m pytest -v -n auto
 
 echo "=== ShellCheck ==="
 shell_scripts=()

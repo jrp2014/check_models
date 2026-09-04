@@ -885,3 +885,23 @@ class TestAutoThinkingBudget:
 
         assert kwargs["thinking_start_token"] == "◁think▷"
         assert kwargs["thinking_end_token"] == "◁/think▷"
+
+
+class TestProcessorKwargsArgument:
+    """``--processor-kwargs`` must be a JSON object with string keys."""
+
+    def test_valid_object_parses(self) -> None:
+        """A JSON object round-trips with its nested values intact."""
+        assert check_models._parse_processor_kwargs_arg('{"max_pixels": 1024, "a": [1]}') == {
+            "max_pixels": 1024,
+            "a": [1],
+        }
+
+    @pytest.mark.parametrize(
+        ("value", "match"),
+        [("{not json", "valid JSON"), ("[1, 2]", "JSON object"), ('"text"', "JSON object")],
+    )
+    def test_invalid_values_raise_argument_errors(self, value: str, match: str) -> None:
+        """Malformed JSON and non-object documents are argparse errors."""
+        with pytest.raises(argparse.ArgumentTypeError, match=match):
+            check_models._parse_processor_kwargs_arg(value)

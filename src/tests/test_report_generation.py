@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import base64
 import html
 import io
@@ -6436,3 +6437,82 @@ def test_comparison_surfaces_render_from_one_view(
     ratio_cell = view.flag_rows[0][3]
     assert ratio_cell in rendered
     assert ratio_cell in logged
+
+
+def test_model_burden_rows_render_every_source_labelled_fact() -> None:
+    """Every retained burden fact becomes a labelled diagnostics row, facts only."""
+    result = PerformanceResult(
+        model_name="org/m",
+        generation=None,
+        success=True,
+        model_burden=check_models.ModelBurdenFacts(
+            weight_bytes=4_000_000_000,
+            parameter_count=7_000_000_000,
+            parameter_count_source="config",
+            quantization_bits=4,
+            quantization_group_size=64,
+            quantization_mode="affine",
+            context_length=32_768,
+            context_length_source="text_config.max_position_embeddings",
+        ),
+        runtime_diagnostics=check_models.RuntimeDiagnostics(model_load_active_memory_gb=6.0),
+    )
+
+    rows = dict(check_models._model_burden_rows(result))
+
+    assert rows["Checkpoint weights (GB)"] == "4.00"
+    assert rows["Parameter count"] == "7.00B (config)"
+    assert rows["Quantization"] == "4-bit, group 64, affine"
+    assert rows["Declared context length"] == "32,768 (text_config.max_position_embeddings)"
+    assert rows["Load active memory vs checkpoint"] == "1.50x (6.00 GB vs 4.00 GB on disk)"
+
+
+def test_model_burden_rows_are_empty_without_burden_facts() -> None:
+    result = PerformanceResult(model_name="org/m", generation=None, success=True)
+    assert check_models._model_burden_rows(result) == ()
+
+
+def test_diagnostics_environment_section_lists_components_and_provenance() -> None:
+    """The footer environment table names the tracked libraries and system keys."""
+    parts = check_models._diagnostics_environment_section(
+        versions={"mlx-vlm": "0.7.0", "mlx": "0.32.3", "transformers": "5.16.1"},
+        system_info={"Python Version": "3.14.7", "OS": "Darwin 25.6.0"},
+    )
+    text = "\n".join(parts)
+    # Table cells are column-aligned; compare with collapsed whitespace.
+    rows = [" ".join(line.split()) for line in parts]
+
+    assert "## Environment" in text
+    assert "| mlx-vlm | 0.7.0 |" in rows
+    assert "| Python Version | 3.14.7 |" in rows
+    assert any("provenance" in row for row in rows)  # installed-distribution rows follow
+
+
+def test_write_environment_failure_diagnostics_writes_report(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A missing-runtime failure still leaves a diagnostics report on disk."""
+    args = argparse.Namespace(output_dir=tmp_path / "out")
+    caplog.set_level(logging.INFO)
+
+    check_models._write_environment_failure_diagnostics(
+        args=args, library_versions={"mlx": "0.32.3"}, error_message="mlx_vlm is not importable"
+    )
+
+    diagnostics = check_models.ReportOutputPaths.from_root(args.output_dir).diagnostics
+    assert "mlx_vlm is not importable" in diagnostics.read_text(encoding="utf-8")
+    assert "Diagnostics:" in "\n".join(record.message for record in caplog.records)
+
+
+def test_write_environment_failure_diagnostics_contains_write_errors(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    args = argparse.Namespace(output_dir=tmp_path / "out")
+    caplog.set_level(logging.ERROR)
+
+    with patch.object(check_models, "_write_text_file", side_effect=OSError("disk full")):
+        check_models._write_environment_failure_diagnostics(
+            args=args, library_versions={}, error_message="boom"
+        )
+
+    assert "Failed to write environment diagnostics report" in caplog.text

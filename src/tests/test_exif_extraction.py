@@ -1,6 +1,7 @@
 """Tests for EXIF extraction utilities."""
 
 import io
+import logging
 from pathlib import Path
 from typing import Any, Self
 
@@ -441,3 +442,55 @@ def test_build_prompt_date_only_uses_authoritative_context() -> None:
     meta: dict[str, str | None] = {"date": "2025-01-01"}
     prompt = _build_cataloguing_prompt(meta)
     assert "Context: Authoritative context:" in prompt
+
+
+def test_filter_and_format_tags_keeps_important_and_skips_nested_values() -> None:
+    """GPSInfo and other dict values are skipped; important tags are flagged."""
+    exif: check_models.ExifDict = {
+        "ImageDescription": "A mill",
+        "GPSInfo": {1: "N"},
+        "MakerNote": {"nested": 1},
+        "ZZZUnimportantTag": "value",
+    }
+
+    important_only = check_models.filter_and_format_tags(exif)
+    assert important_only == [("ImageDescription", "A mill", True)]
+
+    everything = check_models.filter_and_format_tags(exif, show_all=True)
+    assert ("ZZZUnimportantTag", "value", False) in everything
+    assert all(tag not in ("GPSInfo", "MakerNote") for tag, _, _ in everything)
+
+
+def test_pretty_print_exif_renders_table_or_explains_absence(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO)
+
+    check_models.pretty_print_exif({})
+    assert "No EXIF data available." in caplog.text
+
+    caplog.clear()
+    check_models.pretty_print_exif({"ZZZUnimportantTag": "value"}, show_all=False)
+    assert "No relevant EXIF tags found" in caplog.text
+
+    caplog.clear()
+    check_models.pretty_print_exif({"ImageDescription": "Winchester City Mill"}, title="Summary")
+    text = caplog.text
+    assert "Summary" in text
+    assert "ImageDescription" in text
+    assert "Winchester City Mill" in text
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (b"boat, river", ["boat, river"]),
+        ([b"boat", " river ", b"", "  "], ["boat", "river"]),
+        (None, []),
+        ("not a list", []),
+    ],
+)
+def test_decode_iptc_keywords_normalises_bytes_and_strings(
+    raw: object, expected: list[str]
+) -> None:
+    assert check_models._decode_iptc_keywords(raw) == expected
