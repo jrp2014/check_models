@@ -156,6 +156,17 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- Dead code and rolled-our-own utilities found in a maintainability
+  review: `ResultSet.get_fields` / `_get_available_fields` (never used by
+  the harness), the `_version_components` fallback (PEP 440 parsing via
+  `packaging` already sorts dev, rc, and local versions; an unparseable
+  installed version now simply fails the floor check), and the optional
+  `wcwidth` dependency — terminal display width now comes from
+  `rich.cells.cell_len`, since `rich` is already a hard dependency.
+- Unused dependency declarations: `pydantic` (no consumer anywhere in the
+  tree), `types-tqdm` (no `tqdm`), and the `torch` extra on
+  `huggingface-hub`, which pulled `torch` into the base install and
+  silently defeated the opt-in `torch` group.
 - The `run.json` artifact and its writer (`save_run_json_report`,
   `RunJsonReportRecord`, `--output-run-json`): the schema-3 `results.jsonl`
   metadata header now carries the complete run-level contract. A schema-2
@@ -192,6 +203,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `_run_model_isolated` takes the already-built `ProcessImageParams` from
+  `_run_one_model` instead of re-threading the same eight keyword
+  arguments through a third signature.
 - Output-quality observation is a single canonical projection
   (`_quality_observations` + `_completed_assessment`) shared by the main
   harness and `tools/analyze_output_quality.py`, which now emits the same

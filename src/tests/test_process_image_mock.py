@@ -1388,7 +1388,10 @@ class TestIsolatedExecution:
 
         with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
             result = check_models._run_model_isolated(
-                args, model_identifier="org/crasher", image_path=test_image, prompt="p"
+                args,
+                check_models._process_image_params_from_args(
+                    args, model_identifier="org/crasher", image_path=test_image, prompt="p"
+                ),
             )
 
         assert result.success is False
@@ -1418,7 +1421,10 @@ class TestIsolatedExecution:
 
         with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
             result = check_models._run_model_isolated(
-                args, model_identifier="org/ok", image_path=test_image, prompt="p"
+                args,
+                check_models._process_image_params_from_args(
+                    args, model_identifier="org/ok", image_path=test_image, prompt="p"
+                ),
             )
         assert result.success is True
         assert result.generation is not None
@@ -1438,7 +1444,10 @@ class TestIsolatedExecution:
 
         with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
             result = check_models._run_model_isolated(
-                args, model_identifier="org/hang", image_path=test_image, prompt="p"
+                args,
+                check_models._process_image_params_from_args(
+                    args, model_identifier="org/hang", image_path=test_image, prompt="p"
+                ),
             )
         assert result.success is False
         assert result.failure_phase == "model_load"
@@ -1453,8 +1462,10 @@ class TestIsolatedExecution:
         first = check_models.PerformanceResult(model_name="org/m", success=False, generation=None)
         seen: list[dict[str, object]] = []
 
-        def _fake_isolated(_args: object, **kwargs: object) -> check_models.PerformanceResult:
-            seen.append(kwargs)
+        def _fake_isolated(
+            _args: object, params: check_models.ProcessImageParams
+        ) -> check_models.PerformanceResult:
+            seen.append({"prompt": params.prompt, "max_tokens": params.max_tokens})
             return check_models.PerformanceResult(
                 model_name="org/m", success=True, generation=_FakeGenerationResult(text="rerun ok")
             )
@@ -1513,7 +1524,10 @@ class TestIsolatedExecution:
 
         with patch.object(check_models.subprocess, "run", side_effect=_fake_run):
             result = check_models._run_model_isolated(
-                args, model_identifier="org/coldstart", image_path=test_image, prompt="p"
+                args,
+                check_models._process_image_params_from_args(
+                    args, model_identifier="org/coldstart", image_path=test_image, prompt="p"
+                ),
             )
         assert result.error_type == "IsolatedWorkerTimeoutError"
         assert check_models._is_download_timeout_failure(result) is True

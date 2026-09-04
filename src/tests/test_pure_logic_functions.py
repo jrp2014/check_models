@@ -538,7 +538,7 @@ class TestPreparePrompt:
 
 
 class TestDisplayWidthUtilities:
-    """Tests for wcwidth-aware terminal width helpers."""
+    """Tests for display-width-aware terminal helpers."""
 
     def test_display_width_ignores_ansi_escape_sequences(self, mod: types.ModuleType) -> None:
         """ANSI color wrappers should not count toward rendered width."""
@@ -556,13 +556,9 @@ class TestDisplayWidthUtilities:
         assert mod._display_width(padded) == 4
         assert mod._display_width(centered) == 5
 
-    def test_display_width_uses_wcwidth_when_available(self, mod: types.ModuleType) -> None:
-        """When wcwidth is importable, a full-width glyph should occupy two columns."""
-        width = mod._display_width("界")
-        if mod.wcwidth_wcswidth is None:
-            assert width == 1
-        else:
-            assert width == 2
+    def test_display_width_counts_wide_glyphs_as_two_columns(self, mod: types.ModuleType) -> None:
+        """A full-width glyph occupies two terminal cells (rich.cells.cell_len)."""
+        assert mod._display_width("界") == 2
 
 
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
@@ -1103,6 +1099,8 @@ class TestPreflightDependencyDiagnostics:
         assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.4")
         assert mod._is_version_at_least("5.7.0+local", "5.7.0")
         assert not mod._is_version_at_least("5.7.0rc1", "5.7.0")
+        # An unparseable installed version can never be shown to satisfy a floor.
+        assert not mod._is_version_at_least("not-a-version", "1.0")
 
     def test_collect_upstream_requirements_tracks_strictest_floor(
         self,
@@ -1283,39 +1281,6 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         assert "generation_tokens" in issues[0]
         assert "total_tokens" in issues[0]
         assert "prompt_tps" in issues[0]
-
-    def test_get_available_fields_excludes_raw_generation_payloads(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Summary field discovery should hide raw token/logprob payloads."""
-
-        @dataclass
-        class _GenerationResultLike:
-            text: str = "hello"
-            token: object | None = object()
-            logprobs: object | None = object()
-            prompt_tokens: int = 8
-            generation_tokens: int = 4
-            total_tokens: int = 12
-            prompt_tps: float = 16.0
-            generation_tps: float = 8.0
-            peak_memory: float = 1.0
-
-        fields = mod._get_available_fields(
-            [
-                mod.PerformanceResult(
-                    model_name="model",
-                    generation=_GenerationResultLike(),
-                    success=True,
-                )
-            ]
-        )
-
-        assert "token" not in fields
-        assert "logprobs" not in fields
-        assert "total_tokens" in fields
-        assert "prompt_tps" in fields
 
     def test_validate_model_artifact_layout_demotes_legacy_snapshot_notes(
         self,

@@ -245,7 +245,7 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     assert f"mlx-vlm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}" in runtime_deps
     assert f"transformers{dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC}" in runtime_deps
     assert (
-        f"huggingface-hub[torch,typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
+        f"huggingface-hub[typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
         in runtime_deps
     )
     # mlx-lm is optional ecosystem provenance (no direct import; upstream
@@ -433,17 +433,6 @@ def test_root_skylos_config_mirrors_package_quality_policy() -> None:
     for key in SKYLOS_MONOLITH_QUALITY_LIMITS:
         assert root_config[key] == package_config[key]
     assert root_config["gate"] == package_config["gate"]
-
-
-def test_pydantic_is_managed_as_a_dev_dependency() -> None:
-    """Keep pydantic in the managed dev dependency set and setup fallback."""
-    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
-    dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
-
-    assert "pydantic>=2.0.0" in dev_deps
-
-    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
-    assert '"pydantic>=2.0.0"' in setup_script
 
 
 def test_ruff_uses_current_floor_and_all_stable_rules() -> None:

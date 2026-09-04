@@ -128,6 +128,7 @@ from huggingface_hub.errors import HFValidationError
 from packaging.version import InvalidVersion, Version
 from rich import box
 from rich.bar import Bar
+from rich.cells import cell_len
 from rich.console import Console, ConsoleRenderable
 from rich.logging import RichHandler
 from rich.panel import Panel
@@ -154,16 +155,6 @@ except ImportError:  # pragma: no cover - optional
 else:
     psutil = _psutil_runtime
 
-# Optional dependency: wcwidth for accurate terminal display-width calculations.
-# Without wcwidth, wide Unicode glyphs may be slightly misaligned; we fall back
-# to codepoint length to keep output functional.
-wcwidth_wcswidth: Callable[[str], int] | None
-try:
-    from wcwidth import wcswidth as _wcwidth_wcswidth
-except ImportError:  # pragma: no cover - optional
-    wcwidth_wcswidth = None
-else:
-    wcwidth_wcswidth = cast("Callable[[str], int]", _wcwidth_wcswidth)
 
 if TYPE_CHECKING:
     from mlx import nn
@@ -2998,7 +2989,6 @@ class ResultSet:
         mutation after construction.
         """
         self._results = _sort_results_by_time(list(results))
-        self._fields: list[str] | None = None
         self._successful: list[PerformanceResult] | None = None
         self._failed: list[PerformanceResult] | None = None
 
@@ -3021,12 +3011,6 @@ class ResultSet:
         if self._failed is None:
             self._failed = [r for r in self._results if not r.success]
         return self._failed
-
-    def get_fields(self) -> list[str]:
-        """Return cached list of metric field names (generation + timing)."""
-        if self._fields is None:
-            self._fields = _get_available_fields(self._results)
-        return self._fields
 
     # Dunder conveniences --------------------------------------------
     def __len__(self) -> int:  # pragma: no cover - trivial
@@ -3208,12 +3192,8 @@ def _strip_ansi(text: str) -> str:
 
 def _display_width(text: str) -> int:
     """Return terminal display width with Unicode-aware fallback behavior."""
-    sanitized = _strip_ansi(text)
-    if wcwidth_wcswidth is None:
-        return len(sanitized)
-    width = wcwidth_wcswidth(sanitized)
-    # wcwidth returns -1 for indeterminate width; fall back to codepoint length.
-    return len(sanitized) if width < 0 else width
+    width: int = cell_len(_strip_ansi(text))
+    return width
 
 
 def _display_align(text: str, width: int, *, alignment: Literal["left", "center"]) -> str:
@@ -5230,25 +5210,13 @@ def _get_mlx_backend_artifact_info() -> dict[str, str]:
     return info
 
 
-def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]:
-    """Convert a version string to fallback numeric components.
-
-    This is used only when PEP 440 parsing fails; prefer ``packaging.version``
-    for normal comparisons so dev, rc, and local editable versions sort
-    correctly.
-    """
-    numbers = [int(part) for part in re.findall(r"\d+", version_text)]
-    if len(numbers) < width:
-        numbers.extend([0] * (width - len(numbers)))
-    return tuple(numbers[:width])
-
-
 def _is_version_at_least(installed: str, minimum: str) -> bool:
     """Return whether ``installed`` satisfies ``minimum`` using PEP 440 semantics."""
     try:
         is_at_least: bool = Version(installed) >= Version(minimum)
     except InvalidVersion:
-        return _version_components(installed) >= _version_components(minimum)
+        # An unparseable installed version cannot be shown to satisfy the floor.
+        return False
     else:
         return is_at_least
 
@@ -5539,26 +5507,6 @@ def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]
     issues.extend(_detect_runtime_api_drift_issues())
 
     return issues
-
-
-def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
-    """Return ordered list of metric field names present across results.
-
-    We skip heavy / long fields (``text``, ``token``, ``logprobs``) to keep
-    summary tables concise. Timing fields from ``PerformanceResult`` are
-    appended explicitly so they appear in a predictable order if present.
-    """
-    # Determine GenerationResult fields while excluding raw text/token payloads.
-    gen_fields: list[str] = []
-    for r in results:
-        if r.generation is not None and is_dataclass(r.generation):
-            gen_fields = [
-                f.name for f in fields(r.generation) if f.name not in ("text", "token", "logprobs")
-            ]
-            break
-
-    # Combine with PerformanceResult timing fields
-    return gen_fields + PERFORMANCE_TIMING_FIELDS
 
 
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
@@ -14366,17 +14314,7 @@ def _performance_result_from_json(payload: Mapping[str, JsonLike]) -> Performanc
     return result
 
 
-def _run_model_isolated(
-    args: argparse.Namespace,
-    *,
-    model_identifier: str,
-    image_path: Path,
-    prompt: str,
-    max_tokens: int | None = None,
-    temperature: float | None = None,
-    timeout: float | None = None,
-    verbose: bool | None = None,
-) -> PerformanceResult:
+def _run_model_isolated(args: argparse.Namespace, params: ProcessImageParams) -> PerformanceResult:
     """Run one model in a fresh child interpreter and return its PerformanceResult.
 
     A child that dies natively (segfault, abort, ``PyThreadState_Get``) becomes a
@@ -14385,16 +14323,6 @@ def _run_model_isolated(
     reports the phase it reached through a progress file so the crash is
     attributed to ``model_load`` / ``decode`` / ... rather than "unknown".
     """
-    params = _process_image_params_from_args(
-        args,
-        model_identifier=model_identifier,
-        image_path=image_path,
-        prompt=prompt,
-        max_tokens=max_tokens,
-        temperature=temperature,
-        timeout=timeout,
-        verbose=verbose,
-    )
     deadline_s = params.timeout + _ISOLATION_TIMEOUT_GRACE_SECONDS
     with tempfile.TemporaryDirectory(prefix="check_models_worker_") as tmp:
         tmp_dir = Path(tmp)
@@ -14404,14 +14332,14 @@ def _run_model_isolated(
         stderr_path = tmp_dir / "stderr.txt"
         spec = {
             "args": _namespace_to_json(args),
-            "model_identifier": model_identifier,
-            "image_path": str(image_path),
-            "prompt": prompt,
+            "params.model_identifier": params.model_identifier,
+            "params.image_path": str(params.image_path),
+            "params.prompt": params.prompt,
             "overrides": {
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "timeout": timeout,
-                "verbose": verbose,
+                "params.max_tokens": params.max_tokens,
+                "params.temperature": params.temperature,
+                "params.timeout": params.timeout,
+                "params.verbose": params.verbose,
             },
         }
         _write_text_file(spec_path, json.dumps(spec))
@@ -14442,12 +14370,12 @@ def _run_model_isolated(
                 returncode = completed.returncode
         stderr_text = _read_text_tail(stderr_path, _ISOLATED_STDERR_TAIL_CHARS)
         if stderr_text.strip():
-            logger.debug("[isolated worker stderr] %s\n%s", model_identifier, stderr_text)
+            logger.debug("[isolated worker stderr] %s\n%s", params.model_identifier, stderr_text)
         current_phase = _read_text_tail(phase_path, 200).strip() or "unknown"
         if timed_out:
             return _isolated_failure_result(
                 params,
-                IsolatedWorkerTimeoutError(model_identifier, deadline_s, current_phase),
+                IsolatedWorkerTimeoutError(params.model_identifier, deadline_s, current_phase),
                 stderr_text=stderr_text,
                 current_phase=current_phase,
                 start=start,
@@ -14468,7 +14396,7 @@ def _run_model_isolated(
             )
         return _isolated_failure_result(
             params,
-            IsolatedWorkerCrashError(model_identifier, returncode, detail),
+            IsolatedWorkerCrashError(params.model_identifier, returncode, detail),
             stderr_text=stderr_text,
             current_phase=current_phase,
             start=start,
@@ -16613,17 +16541,6 @@ def _run_one_model(
     Every model execution — first pass and differential reruns alike — goes
     through here so the selected crash boundary applies uniformly.
     """
-    if getattr(args, "isolate", False):
-        return _run_model_isolated(
-            args,
-            model_identifier=model_identifier,
-            image_path=image_path,
-            prompt=prompt,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            timeout=timeout,
-            verbose=verbose,
-        )
     params = _process_image_params_from_args(
         args,
         model_identifier=model_identifier,
@@ -16634,6 +16551,8 @@ def _run_one_model(
         timeout=timeout,
         verbose=verbose,
     )
+    if getattr(args, "isolate", False):
+        return _run_model_isolated(args, params)
     return process_image_with_model(params)
 
 
