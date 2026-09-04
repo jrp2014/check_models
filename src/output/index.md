@@ -8,10 +8,10 @@ model. Results say nothing about a model's fitness for other uses.
 
 ## Run at a glance
 
-- Run duration: 48m 18s
-- Models attempted: 42 (completed 41, crashed 1, indeterminate 0)
-- Usability: usable 15, usable with caveats 18, unusable 8, not evaluated 1
-- Top observations: Response repeats the same text (2), Unrecognised model control tokens remain visible (1), Required fields are missing or empty (5), Response repeats the task instructions instead of only returning the requested fields (2), Extra text appears before the Title field (4)
+- Run duration: 10m 36s
+- Models attempted: 32 (completed 32, crashed 0, indeterminate 0)
+- Usability: usable 13, usable with caveats 19, unusable 0, not evaluated 0
+- Top observations: Unrecognised model control tokens remain visible (2), Conversation-role control tokens remain visible (1), Title or keywords do not meet requested constraints (16)
 
 ## Start here
 
@@ -25,7 +25,3 @@ model. Results say nothing about a model's fitness for other uses.
 - [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl)
 - [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)
 - [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log)
-
-## Issue drafts
-
-- [tencent/Youtu-VL-4B-Instruct](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_tencent_Youtu-VL-4B-Instruct.md)
