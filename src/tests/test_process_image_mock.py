@@ -1661,6 +1661,45 @@ class TestRepetitionGuard:
         )
         assert result.text == "real answer"
 
+    def test_isolated_spec_round_trips_through_the_real_child_parser(self, tmp_path: Path) -> None:
+        """The parent's spec writer and the child's spec parser must agree on keys.
+
+        Every other isolation test mocks the subprocess and never runs the
+        child parser; a key drift between the two sides fails every isolated
+        model with KeyError before inference, so this exercises both for real.
+        """
+        image = tmp_path / "img.jpg"
+        image.write_bytes(b"not-a-jpeg")
+        args = check_models._build_cli_parser().parse_args(
+            ["--image", str(image), "--models", "org/m", "--isolate", "--verbose"]
+        )
+        params = check_models._process_image_params_from_args(
+            args,
+            model_identifier="org/m",
+            image_path=image,
+            prompt="describe",
+            max_tokens=32,
+            temperature=0.25,
+            timeout=12.5,
+            verbose=False,
+        )
+
+        spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
+        restored = check_models._isolated_params_from_spec(
+            spec, check_models._namespace_from_json(spec["args"])
+        )
+
+        for field in (
+            "model_identifier",
+            "image_path",
+            "prompt",
+            "max_tokens",
+            "temperature",
+            "timeout",
+            "verbose",
+        ):
+            assert getattr(restored, field) == getattr(params, field), field
+
     def test_wrapper_echoes_stream_live_under_verbose(
         self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
     ) -> None:

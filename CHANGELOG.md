@@ -33,6 +33,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `--isolate` works again: the parent wrote the child spec with keys such
+  as `params.model_identifier` (a mechanical rename had rewritten the JSON
+  key strings too) while the child still read `model_identifier`, so every
+  isolated model failed with `KeyError` before inference. The spec writer
+  and the child parser are now adjacent functions with a round-trip test
+  that runs both for real; the existing isolation tests mock the subprocess
+  and could not see the drift.
 - The pre-push quality gate no longer misfires from a linked git worktree.
   Git exports `GIT_DIR` into hook processes; with `GIT_WORK_TREE` unset,
   git then treats the current directory as the work tree, so every

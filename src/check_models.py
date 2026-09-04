@@ -14319,6 +14319,56 @@ def _performance_result_from_json(payload: Mapping[str, JsonLike]) -> Performanc
     return result
 
 
+def _isolated_worker_spec(
+    args: argparse.Namespace, params: ProcessImageParams
+) -> dict[str, JsonLike]:
+    """Serialise one model request for a child interpreter.
+
+    ``_isolated_params_from_spec`` is the exact inverse; the two are kept
+    adjacent and round-trip tested because a key that drifts between them
+    fails every isolated model before inference starts.
+    """
+    return {
+        "args": _namespace_to_json(args),
+        "model_identifier": params.model_identifier,
+        "image_path": str(params.image_path),
+        "prompt": params.prompt,
+        "overrides": {
+            "max_tokens": params.max_tokens,
+            "temperature": params.temperature,
+            "timeout": params.timeout,
+            "verbose": params.verbose,
+        },
+    }
+
+
+def _isolated_params_from_spec(
+    spec: Mapping[str, JsonLike], args: argparse.Namespace
+) -> ProcessImageParams:
+    """Rebuild the child's ``ProcessImageParams`` from ``_isolated_worker_spec`` output."""
+    overrides = cast("Mapping[str, JsonLike]", spec.get("overrides") or {})
+    max_tokens = overrides.get("max_tokens")
+    temperature = overrides.get("temperature")
+    timeout = overrides.get("timeout")
+    verbose = overrides.get("verbose")
+    return _process_image_params_from_args(
+        args,
+        model_identifier=str(spec["model_identifier"]),
+        image_path=Path(str(spec["image_path"])),
+        prompt=str(spec["prompt"]),
+        max_tokens=max_tokens
+        if isinstance(max_tokens, int) and not isinstance(max_tokens, bool)
+        else None,
+        temperature=float(temperature)
+        if isinstance(temperature, (int, float)) and not isinstance(temperature, bool)
+        else None,
+        timeout=float(timeout)
+        if isinstance(timeout, (int, float)) and not isinstance(timeout, bool)
+        else None,
+        verbose=verbose if isinstance(verbose, bool) else None,
+    )
+
+
 def _run_model_isolated(args: argparse.Namespace, params: ProcessImageParams) -> PerformanceResult:
     """Run one model in a fresh child interpreter and return its PerformanceResult.
 
@@ -14335,19 +14385,7 @@ def _run_model_isolated(args: argparse.Namespace, params: ProcessImageParams) ->
         result_path = tmp_dir / "result.json"
         phase_path = tmp_dir / "phase.txt"
         stderr_path = tmp_dir / "stderr.txt"
-        spec = {
-            "args": _namespace_to_json(args),
-            "params.model_identifier": params.model_identifier,
-            "params.image_path": str(params.image_path),
-            "params.prompt": params.prompt,
-            "overrides": {
-                "params.max_tokens": params.max_tokens,
-                "params.temperature": params.temperature,
-                "params.timeout": params.timeout,
-                "params.verbose": params.verbose,
-            },
-        }
-        _write_text_file(spec_path, json.dumps(spec))
+        _write_text_file(spec_path, json.dumps(_isolated_worker_spec(args, params)))
         command = [
             sys.executable,
             str(Path(__file__).resolve()),
@@ -14478,22 +14516,7 @@ def _run_isolated_worker(spec_path: Path) -> int:
         _record_phase("decode")
         os.abort()
     load_quality_config(getattr(args, "quality_config", None))
-    overrides = spec.get("overrides") or {}
-    max_tokens = overrides.get("max_tokens")
-    temperature = overrides.get("temperature")
-    timeout = overrides.get("timeout")
-    verbose = overrides.get("verbose")
-    params = _process_image_params_from_args(
-        args,
-        model_identifier=str(spec["model_identifier"]),
-        image_path=Path(str(spec["image_path"])),
-        prompt=str(spec["prompt"]),
-        max_tokens=max_tokens if isinstance(max_tokens, int) else None,
-        temperature=float(temperature) if isinstance(temperature, (int, float)) else None,
-        timeout=float(timeout) if isinstance(timeout, (int, float)) else None,
-        verbose=verbose if isinstance(verbose, bool) else None,
-    )
-    result = process_image_with_model(params)
+    result = process_image_with_model(_isolated_params_from_spec(spec, args))
     _write_text_file(result_path, json.dumps(_performance_result_to_json(result)))
     return 0
 
