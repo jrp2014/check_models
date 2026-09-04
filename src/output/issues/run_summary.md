@@ -15,16 +15,16 @@ fact from this one image and prompt.
 
 ## Run summary
 
-- *Run timestamp:* 2026-08-30 22:59:15 BST
+- *Run timestamp:* 2026-09-04 13:16:45 BST
 - *Evaluation mode:* assisted
 - *Models attempted:* 42
-- *Completed:* 40
-- *Crashed:* 2
+- *Completed:* 41
+- *Crashed:* 1
 - *Indeterminate:* 0
-- *Crashes requiring action:* 2
-- *Other results requiring review:* 7
-- *Hit the token cap:* 3
-- *Stopped early for repetition:* 2
+- *Crashes requiring action:* 1
+- *Other results requiring review:* 5
+- *Hit the token cap:* 4
+- *Stopped early for repetition:* 0
 
 Observations are mechanical facts from one image, not general model-quality
 judgements.
@@ -38,13 +38,11 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-- GPS: 55.951722°N, 3.201417°W
+- Capture date/time: 2026-08-31 15:02:20 UTC+01:00
 
 Descriptive hints:
-- Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- Description hint: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland, while pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
-- Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+- Description hint: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
 
 Write:
 - a concrete 5-10-word title;
@@ -62,15 +60,15 @@ Keywords:
 ## Since the baseline sweep
 
 **Not directly comparable** — the per-model diff is withheld because the runs
-differ in: prompt differs; image differs (sha256 b31874639694… →
-a843ca79cc4b…). Treat any difference against this baseline as a change of
+differ in: prompt differs; image differs (sha256 a843ca79cc4b… →
+168b4850b142…). Treat any difference against this baseline as a change of
 inputs, not a change of model or runtime behaviour.
 
-- *Baseline:* 082cb805:src/output/results.jsonl
-- *Baseline run timestamp:* 2026-08-30 01:47:23 BST
-- *Baseline check_models:* 0.16.5 @ 7299db1db
-- *Baseline mlx:* 0.32.3.dev20260829+052e77db9 @ 052e77db9
-- *Baseline mlx-vlm:* 0.7.0rc0 @ f5d9533a9
+- *Baseline:* 8b5e2e71:src/output/results.jsonl
+- *Baseline run timestamp:* 2026-08-30 22:59:15 BST
+- *Baseline check_models:* 0.16.6 @ 082cb8056
+- *Baseline mlx:* 0.32.3.dev20260830+37c26e575 @ 37c26e575
+- *Baseline mlx-vlm:* 0.7.0rc0 @ b09914835
 - *Baseline transformers:* 5.16.1
 - *Baseline python:* 3.14.7
 
@@ -88,125 +86,61 @@ diagnostics report holds maintainer evidence.
 
 | Model | Usability | Total | Gen tok/s | Peak GB | Observed |
 | --- | --- | --- | --- | --- | --- |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable | 6.16s | 46.6 tok/s | 28 | none |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | usable | 18.61s | 62.8 tok/s | 60 | none |
-| mlx-community/gemma-3-27b-it-qat-4bit | usable | 7.89s | 31.5 tok/s | 17 | none |
-| mlx-community/gemma-4-26b-a4b-it-4bit | usable | 4.04s | 128 tok/s | 16 | none |
-| mlx-community/gemma-4-31b-it-4bit | usable | 7.65s | 26.3 tok/s | 20 | none |
-| mlx-community/InternVL3-8B-bf16 | usable | 5.94s | 34.3 tok/s | 17 | none |
-| mlx-community/LFM2.5-VL-1.6B-bf16 | usable | 2.31s | 184 tok/s | 4.0 | none |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | usable | 2.39s | 211 tok/s | 4.0 | none |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit | usable | 3.19s | 189 tok/s | 7.8 | none |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit | usable | 5.27s | 106 tok/s | 25 | none |
-| mlx-community/Phi-3.5-vision-instruct-bf16 | usable | 4.43s | 56.5 tok/s | 9.4 | none |
-| mlx-community/pixtral-12b-8bit | usable | 6.16s | 39.6 tok/s | 16 | none |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | usable | 51.82s | 86.5 tok/s | 23 | none |
-| mlx-community/Qwen3.5-35B-A3B-4bit | usable | 54.11s | 111 tok/s | 24 | none |
-| mlx-community/Qwen3.5-9B-MLX-4bit | usable | 54.88s | 91.7 tok/s | 10.0 | none |
-| mlx-community/Qwen3.6-27B-mxfp8 | usable | 79.30s | 17.6 tok/s | 33 | none |
-| mlx-community/Qwen3.8-27B-4bit | usable | 75.26s | 30.7 tok/s | 21 | none |
-| mlx-community/Step-3.7-Flash-oQ2e | usable | 22.50s | 46.5 tok/s | 70 | none |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | usable with caveats | 1.73s | 480 tok/s | 1.9 | title/keyword constraints failed |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable with caveats | 9.29s | 30.4 tok/s | 23 | title/keyword constraints failed |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable with caveats | 5.78s | 61.3 tok/s | 29 | title/keyword constraints failed |
-| mlx-community/GLM-4.6V-Flash-mxfp4 | usable with caveats | 8.97s | 80.1 tok/s | 8.4 | title/keyword constraints failed |
-| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | 20.04s | 43.8 tok/s | 78 | control tokens visible; title/keyword constraints failed |
-| mlx-community/granite-4.0-3b-vision-4bit | usable with caveats | 2.21s | 171 tok/s | 4.7 | title/keyword constraints failed |
-| mlx-community/Idefics3-8B-Llama3-bf16 | usable with caveats | 8.59s | 32.2 tok/s | 18 | title/keyword constraints failed |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | usable with caveats | 166.01s | 4.67 tok/s | 40 | role tokens visible |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | usable with caveats | 6.22s | 67.2 tok/s | 13 | title/keyword constraints failed |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable with caveats | 6.82s | 64.7 tok/s | 13 | title/keyword constraints failed |
-| mlx-community/Molmo2-8B-4bit | usable with caveats | 4.39s | 72.7 tok/s | 9.1 | title/keyword constraints failed |
-| mlx-community/North-Micro-Vision-Instruct-4bit | usable with caveats | 5.20s | 233 tok/s | 3.9 | title/keyword constraints failed |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16 | usable with caveats | 24.81s | 92.6 tok/s | 8.4 | title/keyword constraints failed |
-| Qwen/Qwen3-VL-2B-Instruct | usable with caveats | 16.08s | 92.2 tok/s | 8.4 | title/keyword constraints failed |
-| jinaai/jina-vlm-mlx | unusable | 4.64s | 138 tok/s | 3.7 | repeated text; stopped early: repeating; title/keyword constraints failed |
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable | 28.08s | 42.1 tok/s | 15 | missing required fields; echoes instructions; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16 | unusable | 2.42s | 352 tok/s | 2.2 | missing required fields; extra text before Title |
-| mlx-community/gemma-3n-E4B-it-bf16 | unusable | 3.26s | insufficient sample | 17 | empty response; missing required fields |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | 29.30s | 46.6 tok/s | 13 | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| mlx-community/MiniCPM-V-4.6-8bit | unusable | 1.98s | 273 tok/s | 3.8 | missing required fields; extra text before Title |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx | unusable | 3.44s | 124 tok/s | 5.5 | repeated text; stopped early: repeating; missing required fields |
-| mlx-community/X-Reasoner-7B-8bit | unusable | 36.59s | 55.6 tok/s | 13 | repeated text; cut off at token limit; title/keyword constraints failed |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | not evaluated | 0.50s | - | - | crashed during model_load |
-| tencent/Youtu-VL-4B-Instruct | not evaluated | 1.17s | - | - | crashed during model_load |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit | usable | 6.31s | 57.7 tok/s | 29 | none |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | usable | 5.92s | 57.1 tok/s | 28 | none |
+| mlx-community/gemma-4-26b-a4b-it-4bit | usable | 4.44s | 129 tok/s | 16 | none |
+| mlx-community/gemma-4-31b-it-4bit | usable | 7.79s | 26.0 tok/s | 20 | none |
+| mlx-community/granite-4.0-3b-vision-4bit | usable | 2.60s | 177 tok/s | 4.7 | none |
+| mlx-community/Idefics3-8B-Llama3-bf16 | usable | 8.83s | 32.5 tok/s | 18 | none |
+| mlx-community/InternVL3-8B-bf16 | usable | 6.28s | 34.1 tok/s | 17 | none |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit | usable | 2.42s | 210 tok/s | 4.0 | none |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | usable | 6.72s | 67.1 tok/s | 13 | none |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit | usable | 3.34s | 190 tok/s | 7.8 | none |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit | usable | 51.00s | 25.3 tok/s | 25 | none |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | usable | 29.13s | 89.9 tok/s | 8.4 | none |
+| mlx-community/Qwen3.5-35B-A3B-4bit | usable | 59.29s | 110 tok/s | 24 | none |
+| mlx-community/Qwen3.6-27B-mxfp8 | usable | 79.22s | 18.2 tok/s | 33 | none |
+| mlx-community/Qwen3.8-27B-4bit | usable | 78.18s | 29.6 tok/s | 21 | none |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16 | usable with caveats | 1.65s | 482 tok/s | 1.9 | title/keyword constraints failed |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable with caveats | 10.29s | 29.8 tok/s | 23 | title/keyword constraints failed |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | usable with caveats | 24.39s | 62.9 tok/s | 60 | title/keyword constraints failed |
+| mlx-community/gemma-3-27b-it-qat-4bit | usable with caveats | 8.01s | 31.5 tok/s | 17 | title/keyword constraints failed |
+| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | 29.19s | 40.0 tok/s | 78 | control tokens visible |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | usable with caveats | 158.31s | 4.67 tok/s | 40 | role tokens visible |
+| mlx-community/LFM2.5-VL-1.6B-bf16 | usable with caveats | 2.22s | 186 tok/s | 4.0 | title/keyword constraints failed |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | usable with caveats | 6.86s | 64.7 tok/s | 13 | title/keyword constraints failed |
+| mlx-community/Molmo2-8B-4bit | usable with caveats | 4.80s | 72.9 tok/s | 8.1 | title/keyword constraints failed |
+| mlx-community/North-Micro-Vision-Instruct-4bit | usable with caveats | 5.64s | 231 tok/s | 3.9 | title/keyword constraints failed |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit | usable with caveats | 5.40s | 107 tok/s | 24 | title/keyword constraints failed |
+| mlx-community/Phi-3.5-vision-instruct-bf16 | usable with caveats | 4.26s | 56.3 tok/s | 9.5 | title/keyword constraints failed |
+| mlx-community/pixtral-12b-8bit | usable with caveats | 6.95s | 39.4 tok/s | 16 | title/keyword constraints failed |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | usable with caveats | 60.90s | 86.8 tok/s | 23 | title/keyword constraints failed |
+| mlx-community/Qwen3.5-9B-MLX-4bit | usable with caveats | 58.53s | 91.6 tok/s | 10.0 | title/keyword constraints failed |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx | usable with caveats | 2.66s | 125 tok/s | 5.4 | title/keyword constraints failed |
+| mlx-community/Step-3.7-Flash-oQ2e | usable with caveats | 28.98s | 45.4 tok/s | 70 | title/keyword constraints failed |
+| mlx-community/X-Reasoner-7B-8bit | usable with caveats | 21.72s | 58.4 tok/s | 13 | title/keyword constraints failed |
+| jinaai/jina-vlm-mlx | unusable | 4.81s | 139 tok/s | 3.7 | missing required fields |
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX | unusable | 28.45s | 41.5 tok/s | 15 | missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| mlx-community/FastVLM-0.5B-bf16 | unusable | 2.64s | 358 tok/s | 2.2 | missing required fields |
+| mlx-community/gemma-3n-E4B-it-bf16 | unusable | 7.37s | 48.9 tok/s | 17 | missing required fields; extra text before Title |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | 29.58s | 45.7 tok/s | 13 | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| mlx-community/GLM-4.6V-Flash-mxfp4 | unusable | 22.30s | 73.1 tok/s | 8.4 | repeated text; cut off at token limit; title/keyword constraints failed |
+| mlx-community/MiniCPM-V-4.6-8bit | unusable | 2.11s | 289 tok/s | 3.3 | missing required fields; extra text before Title |
+| Qwen/Qwen3-VL-2B-Instruct | unusable | 25.96s | 93.0 tok/s | 8.4 | repeated text; cut off at token limit; title/keyword constraints failed |
+| tencent/Youtu-VL-4B-Instruct | not evaluated | 1.03s | - | - | crashed during model_load |
 
 ## Constraint-failure breakdown
 
 How the fleet failed the catalogue constraints — a skew toward one constraint
 suggests prompt difficulty rather than individual model faults.
 
-- Title length: 7 model(s) outside 5-10 words (7 below, 0 above; median
+- Title length: 7 model(s) outside 5-10 words (6 below, 1 above; median
   observed 4)
-- Keyword count: 8 model(s) outside 10-18 (0 below, 8 above; median observed
+- Keyword count: 16 model(s) outside 10-18 (0 below, 16 above; median observed
   20)
-- Duplicate keywords: 8 model(s)
+- Duplicate keywords: 5 model(s)
 
 ## Crashes requiring action
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-- *Execution / usability:* crashed / not evaluated
-- *Phase:* model_load
-- *Stage:* Model Error
-- *Resolved revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-
-Root exception chain
-
-```text
-ValueError: Received 1460 parameters not in model; families: embed_tokens, layers, norm; representative parameters: embed_tokens.biases, embed_tokens.scales, embed_tokens.weight.
-caused by: ValueError: Model loading failed: Received 1460 parameters not in model; families: embed_tokens, layers, norm; representative parameters: embed_tokens.biases, embed_tokens.scales, embed_tokens.weight.
-```
-
-#### Reproduction inputs
-
-- *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 43,299,212 bytes
-- *Image SHA-256:* a843ca79cc4b147bd543f362fdd35173cc6793bdf5c739fe4ec9a2a95de92d76
-
-<details>
-<summary>Exact prompt</summary>
-
-```text
-Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-- GPS: 55.951722°N, 3.201417°W
-
-Descriptive hints:
-- Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- Description hint: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland, while pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
-- Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:
-```
-
-</details>
-
-The crash occurred during model load, before image decoding, so the exact
-input image is not required: substitute any local image for the placeholder
-path and run one native mlx-vlm process.
-
-```bash
-python -m mlx_vlm.generate --model mlx-community/Muse-Glimmer-30B-OptiQ-4bit --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision b4a74fa6001f1eca3b23eeeb702ffad2773a218f --trust-remote-code
-```
-
-| Evidence | Link |
-| --- | --- |
-| Full diagnostics | [model evidence](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit) |
-| Detailed issue draft | [crash draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Muse-Glimmer-30B-OptiQ-4bit.md) |
 
 ### tencent/Youtu-VL-4B-Instruct
 
@@ -225,9 +159,9 @@ caused by: ValueError: Model loading failed: cannot import name 'DefaultFastImag
 #### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 43,299,212 bytes
-- *Image SHA-256:* a843ca79cc4b147bd543f362fdd35173cc6793bdf5c739fe4ec9a2a95de92d76
+- *Image dimensions:* 6,656 x 9,984 pixels
+- *Image size:* 66,295,254 bytes
+- *Image SHA-256:* 168b4850b1427394bbe84a99ffd05533ffaf7e995e4213d9ce2d36c959e70c7b
 
 <details>
 <summary>Exact prompt</summary>
@@ -238,13 +172,11 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-- GPS: 55.951722°N, 3.201417°W
+- Capture date/time: 2026-08-31 15:02:20 UTC+01:00
 
 Descriptive hints:
-- Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- Description hint: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland, while pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
-- Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+- Description hint: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
 
 Write:
 - a concrete 5-10-word title;
@@ -278,45 +210,40 @@ Repeated mechanical observation signatures among results requiring review.
 
 | Observed result | Models |
 | --- | --- |
-| No response text was returned; Required fields are missing or empty | 1 |
-| Response repeats the same text; Generation was stopped early after sustained repeated output; Required fields are missing or empty | 1 |
-| Response repeats the same text; Generation was stopped early after sustained repeated output; Title or keywords do not meet requested constraints | 1 |
-| Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
-| Response repeats the same text; Response appears cut off at the token limit; Title or keywords do not meet requested constraints | 1 |
-| Unrecognised model control tokens remain visible; Title or keywords do not meet requested constraints | 1 |
+| Response repeats the same text; Response appears cut off at the token limit; Title or keywords do not meet requested constraints | 2 |
+| Unrecognised model control tokens remain visible | 1 |
+| Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Title or keywords do not meet requested constraints | 1 |
 | Conversation-role control tokens remain visible | 1 |
 
 ## Completed attempts requiring review
 
 | Model | Usability | Observed result | Evidence |
 | --- | --- | --- | --- |
-| mlx-community/gemma-3n-E4B-it-bf16 | unusable | No response text was returned; Missing or empty fields: Title, Description, Keywords | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-gemma-3n-e4b-it-bf16) |
-| jinaai/jina-vlm-mlx | unusable | Response repeats the same text; Generation was stopped early after sustained repeated output; Keyword list has 49 terms (requested 10-18); Duplicate keywords: european city centre renewal project, european city centre redevelopment project, european city centre transformation project | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-jinaai-jina-vlm-mlx) |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 53 terms (requested 10-18); Duplicate keywords: princes street, construction site, scaffolding, pedestrians, overcast, boots pharmacy, construction fence, crane, city centre, scotland, europe, roadworks, modern architecture, fence, civil engineering | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx | unusable | Response repeats the same text; Generation was stopped early after sustained repeated output; Missing or empty fields: Title, Description, Keywords | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx) |
-| mlx-community/X-Reasoner-7B-8bit | unusable | Response repeats the same text; Response appears cut off at the token limit; Title has 4 words (requested 5-10); Keyword list has 308 terms (requested 10-18); Duplicate keywords: scaffolding, construction site, construction equipment, construction progress, building maintenance, construction safety, building renovation, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-x-reasoner-7b-8bit) |
-| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible; Title has 4 words (requested 5-10) | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
+| mlx-community/GLM-4.6V-Flash-mxfp4 | unusable | Response repeats the same text; Response appears cut off at the token limit; Title has 3 words (requested 5-10); Keyword list has 230 terms (requested 10-18); Duplicate keywords: hampshire, england, rapids, arched doorway, tourist attraction, historic watermill, diamond paned windows, weathered roof tiles, red brick chimney, stone archway over river, mossy stone wall, green ivy, traditional english mill architecture, historic watermill on river itchen, winchester, national trust property, scenic riverfront, historic mill with water flow, traditional english architecture, stone and brick building | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-flash-mxfp4) |
+| Qwen/Qwen3-VL-2B-Instruct | unusable | Response repeats the same text; Response appears cut off at the token limit; Title has 4 words (requested 5-10); Keyword list has 327 terms (requested 10-18); Duplicate keywords: national trust, pedestrians, riverbank, stone wall, brick building, blue sky, chimney, clay tiles, elderly woman, girls, rapids, scenery, sitting, people, river | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-qwen-qwen3-vl-2b-instruct) |
+| mlx-community/GLM-4.6V-nvfp4 | usable with caveats | Unrecognised model control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-46v-nvfp4) |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit | unusable | Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Keyword list has 42 terms (requested 10-18); Duplicate keywords: blue sky, chimney, clay tiles, elderly woman, girls, hampshire, mill, national trust, pedestrians, people, river itchen, riverbank, scenery, sitting | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-glm-41v-9b-thinking-8bit) |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | usable with caveats | Conversation-role control tokens remain visible | [diagnostics](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) |
 
 ## Clean completions
 
-18 clean completions (`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/LFM2.5-VL-3B-OptiQ-4bit`, `mlx-community/Ministral-3-3B-Instruct-2512-4bit`, `mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`, `mlx-community/Phi-3.5-vision-instruct-bf16`, `mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/Qwen3.8-27B-4bit`, `mlx-community/Step-3.7-Flash-oQ2e`, `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`, `mlx-community/gemma-3-27b-it-qat-4bit`, `mlx-community/gemma-4-26b-a4b-it-4bit`, `mlx-community/gemma-4-31b-it-4bit`, `mlx-community/pixtral-12b-8bit`); 15 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
+15 clean completions (`mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/LFM2.5-VL-3B-OptiQ-4bit`, `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`, `mlx-community/Ministral-3-3B-Instruct-2512-4bit`, `mlx-community/Muse-Glimmer-30B-OptiQ-4bit`, `mlx-community/Qwen3-VL-2B-Thinking-bf16`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/Qwen3.8-27B-4bit`, `mlx-community/diffusiongemma-26B-A4B-it-8bit`, `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`, `mlx-community/gemma-4-26b-a4b-it-4bit`, `mlx-community/gemma-4-31b-it-4bit`, `mlx-community/granite-4.0-3b-vision-4bit`); 21 more completed with prompt-compliance observations only (not maintainer issues). See the [full model gallery](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md).
 
 ## Run context
 
-- *Image:* JPEG, 9,984 x 6,656 pixels, 43,299,212 bytes
+- *Image:* JPEG, 6,656 x 9,984 pixels, 66,295,254 bytes
 - *Generation: max_tokens:* 1000
 - *Generation: prefill_step_size:* 2048
 - *Generation: temperature:* 0.0
 - *Generation: top_p:* 1.0
 - *Trust remote code:* true
 - *check_models version:* 0.16.6
-- *check_models revision:* 082cb805666ca30ed48f5b7c35252fe92f945ef1
+- *check_models revision:* 8b5e2e71c028719b337e145cf62b723bf319129b
 - *check_models source dirty:* false
 - *mlx-vlm:* 0.7.0rc0
-- *mlx-vlm source revision:* b0991483509f50058b2db773b672177763a79c4e
-- *mlx:* 0.32.3.dev20260830+37c26e575
-- *mlx source revision:* 37c26e5755da637255d57ea34b4879196a485301
+- *mlx-vlm source revision:* 5c9b5f52adfeab35b5ece0bb2d6e4d44541d9e32
+- *mlx:* 0.32.3.dev20260904+b6368984b
+- *mlx source revision:* b6368984b8e02a3fb3ee7986846c0fb85e1fccf7
 - *transformers:* 5.16.1
 - *macOS Version:* 26.6.2
 - *GPU/Chip:* Apple M5 Max

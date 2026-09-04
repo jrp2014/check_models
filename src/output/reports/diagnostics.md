@@ -16,3095 +16,53 @@ Outcome counts
 |---------------------|-------|
 | Attempted           | 42    |
 | Conclusive outcomes | 42    |
-| Completed           | 40    |
-| Crashed             | 2     |
+| Completed           | 41    |
+| Crashed             | 1     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 2     |
-| none                           | 33    |
-| observation needs reproduction | 7     |
+| actionable failure             | 1     |
+| none                           | 36    |
+| observation needs reproduction | 5     |
 
 Usability counts
 
 | Usability           | Count |
 |---------------------|-------|
-| not evaluated       | 2     |
+| not evaluated       | 1     |
 | unusable            | 8     |
-| usable              | 18    |
-| usable with caveats | 14    |
+| usable              | 15    |
+| usable with caveats | 18    |
 
 Observation counts
 
 | Observation                                                                           | Count |
 |---------------------------------------------------------------------------------------|-------|
-| No response text was returned                                                         | 1     |
-| Response repeats the same text                                                        | 4     |
-| Generation was stopped early after sustained repeated output                          | 2     |
+| Response repeats the same text                                                        | 2     |
 | Unrecognised model control tokens remain visible                                      | 1     |
 | Required fields are missing or empty                                                  | 5     |
-| Response repeats the task instructions instead of only returning the requested fields | 1     |
-| Extra text appears before the Title field                                             | 3     |
-| Response appears cut off at the token limit                                           | 3     |
+| Response repeats the task instructions instead of only returning the requested fields | 2     |
+| Extra text appears before the Title field                                             | 4     |
+| Response appears cut off at the token limit                                           | 4     |
 | Internal reasoning block appears incomplete                                           | 1     |
 | Conversation-role control tokens remain visible                                       | 1     |
-| Title or keywords do not meet requested constraints                                   | 16    |
+| Title or keywords do not meet requested constraints                                   | 19    |
 
 ## Triage
 
-| Model                                                                                                    | Execution | Usability           | Maintainer status              | Observations                                                                                                                |
-|----------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)       | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                        |
-| [tencent/Youtu-VL-4B-Instruct](#diagnostic-tencent-youtu-vl-4b-instruct)                                 | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                        |
-| [mlx-community/gemma-3n-E4B-it-bf16](#diagnostic-mlx-community-gemma-3n-e4b-it-bf16)                     | completed | unusable            | observation_needs_reproduction | empty response; missing required fields                                                                                     |
-| [jinaai/jina-vlm-mlx](#diagnostic-jinaai-jina-vlm-mlx)                                                   | completed | unusable            | observation_needs_reproduction | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)            | completed | unusable            | observation_needs_reproduction | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)          | completed | unusable            | observation_needs_reproduction | repeated text; stopped early: repeating; missing required fields                                                            |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                         | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                  | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible; title/keyword constraints failed                                                                    |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                                         |
+| Model                                                                                                    | Execution | Usability           | Maintainer status              | Observations                                                                                                                      |
+|----------------------------------------------------------------------------------------------------------|-----------|---------------------|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| [tencent/Youtu-VL-4B-Instruct](#diagnostic-tencent-youtu-vl-4b-instruct)                                 | crashed   | not_evaluated       | actionable_failure             | none                                                                                                                              |
+| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                      | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [Qwen/Qwen3-VL-2B-Instruct](#diagnostic-qwen-qwen3-vl-2b-instruct)                                       | completed | unusable            | observation_needs_reproduction | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                  | completed | usable_with_caveats | observation_needs_reproduction | control tokens visible                                                                                                            |
+| [mlx-community/GLM-4.1V-9B-Thinking-8bit](#diagnostic-mlx-community-glm-41v-9b-thinking-8bit)            | completed | unusable            | observation_needs_reproduction | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16) | completed | usable_with_caveats | observation_needs_reproduction | role tokens visible                                                                                                               |
 
 ## Crashes requiring action
-
-<a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-#### Root exception and chain
-
-```text
-builtins.ValueError: Received 1460 parameters not in model; families: embed_tokens, layers, norm; representative parameters: embed_tokens.biases, embed_tokens.scales, embed_tokens.weight.
-builtins.ValueError: Model loading failed: Received 1460 parameters not in model; families: embed_tokens, layers, norm; representative parameters: embed_tokens.biases, embed_tokens.scales, embed_tokens.weight.
-```
-
-#### Execution and provenance
-
-- *Execution:* crashed
-- *Usability:* not_evaluated
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Phase:* model_load
-- *Stage:* Model Error
-- *Package:* mlx-vlm
-- *Error type:* ValueError
-- *Error message:* Model loading failed: Received 1460 parameters not in
-  model; families: embed_tokens, layers, norm; representative parameters:
-  embed_tokens.biases, embed_tokens.scales, embed_tokens.weight.
-- *Root error type:* ValueError
-- *Root error message:* Received 1460 parameters not in model; families:
-  embed_tokens, layers, norm; representative parameters: embed_tokens.biases,
-  embed_tokens.scales, embed_tokens.weight.
-- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.005981284
-- *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 23.85
-- *Parameter count:* 30.00B (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-<details>
-<summary>Complete traceback</summary>
-
-```text
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13601, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12726, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1282, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1147, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
-    raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
-    )
-ValueError: Received 1460 parameters not in model: 
-embed_tokens.biases,
-embed_tokens.scales,
-embed_tokens.weight,
-layers.0.input_layernorm.weight,
-layers.0.mlp.down_proj.biases,
-layers.0.mlp.down_proj.scales,
-layers.0.mlp.down_proj.weight,
-layers.0.mlp.gate_proj.biases,
-layers.0.mlp.gate_proj.scales,
-layers.0.mlp.gate_proj.weight,
-layers.0.mlp.up_proj.biases,
-layers.0.mlp.up_proj.scales,
-layers.0.mlp.up_proj.weight,
-layers.0.post_attention_layernorm.weight,
-layers.0.post_feedforward_layernorm.weight,
-layers.0.pre_feedforward_layernorm.weight,
-layers.0.self_attn.gate_proj.biases,
-layers.0.self_attn.gate_proj.scales,
-layers.0.self_attn.gate_proj.weight,
-layers.0.self_attn.k_proj.biases,
-layers.0.self_attn.k_proj.scales,
-layers.0.self_attn.k_proj.weight,
-layers.0.self_attn.o_proj.biases,
-layers.0.self_attn.o_proj.scales,
-layers.0.self_attn.o_proj.weight,
-layers.0.self_attn.q_proj.biases,
-layers.0.self_attn.q_proj.scales,
-layers.0.self_attn.q_proj.weight,
-layers.0.self_attn.v_proj.biases,
-layers.0.self_attn.v_proj.scales,
-layers.0.self_attn.v_proj.weight,
-layers.1.input_layernorm.weight,
-layers.1.mlp.down_proj.biases,
-layers.1.mlp.down_proj.scales,
-layers.1.mlp.down_proj.weight,
-layers.1.mlp.gate_proj.biases,
-layers.1.mlp.gate_proj.scales,
-layers.1.mlp.gate_proj.weight,
-layers.1.mlp.up_proj.biases,
-layers.1.mlp.up_proj.scales,
-layers.1.mlp.up_proj.weight,
-layers.1.post_attention_layernorm.weight,
-layers.1.post_feedforward_layernorm.weight,
-layers.1.pre_feedforward_layernorm.weight,
-layers.1.self_attn.gate_proj.biases,
-layers.1.self_attn.gate_proj.scales,
-layers.1.self_attn.gate_proj.weight,
-layers.1.self_attn.k_proj.biases,
-layers.1.self_attn.k_proj.scales,
-layers.1.self_attn.k_proj.weight,
-layers.1.self_attn.o_proj.biases,
-layers.1.self_attn.o_proj.scales,
-layers.1.self_attn.o_proj.weight,
-layers.1.self_attn.q_proj.biases,
-layers.1.self_attn.q_proj.scales,
-layers.1.self_attn.q_proj.weight,
-layers.1.self_attn.v_proj.biases,
-layers.1.self_attn.v_proj.scales,
-layers.1.self_attn.v_proj.weight,
-layers.10.input_layernorm.weight,
-layers.10.mlp.down_proj.biases,
-layers.10.mlp.down_proj.scales,
-layers.10.mlp.down_proj.weight,
-layers.10.mlp.gate_proj.biases,
-layers.10.mlp.gate_proj.scales,
-layers.10.mlp.gate_proj.weight,
-layers.10.mlp.up_proj.biases,
-layers.10.mlp.up_proj.scales,
-layers.10.mlp.up_proj.weight,
-layers.10.post_attention_layernorm.weight,
-layers.10.post_feedforward_layernorm.weight,
-layers.10.pre_feedforward_layernorm.weight,
-layers.10.self_attn.gate_proj.biases,
-layers.10.self_attn.gate_proj.scales,
-layers.10.self_attn.gate_proj.weight,
-layers.10.self_attn.k_proj.biases,
-layers.10.self_attn.k_proj.scales,
-layers.10.self_attn.k_proj.weight,
-layers.10.self_attn.o_proj.biases,
-layers.10.self_attn.o_proj.scales,
-layers.10.self_attn.o_proj.weight,
-layers.10.self_attn.q_proj.biases,
-layers.10.self_attn.q_proj.scales,
-layers.10.self_attn.q_proj.weight,
-layers.10.self_attn.v_proj.biases,
-layers.10.self_attn.v_proj.scales,
-layers.10.self_attn.v_proj.weight,
-layers.11.input_layernorm.weight,
-layers.11.mlp.down_proj.biases,
-layers.11.mlp.down_proj.scales,
-layers.11.mlp.down_proj.weight,
-layers.11.mlp.gate_proj.biases,
-layers.11.mlp.gate_proj.scales,
-layers.11.mlp.gate_proj.weight,
-layers.11.mlp.up_proj.biases,
-layers.11.mlp.up_proj.scales,
-layers.11.mlp.up_proj.weight,
-layers.11.post_attention_layernorm.weight,
-layers.11.post_feedforward_layernorm.weight,
-layers.11.pre_feedforward_layernorm.weight,
-layers.11.self_attn.gate_proj.biases,
-layers.11.self_attn.gate_proj.scales,
-layers.11.self_attn.gate_proj.weight,
-layers.11.self_attn.k_proj.biases,
-layers.11.self_attn.k_proj.scales,
-layers.11.self_attn.k_proj.weight,
-layers.11.self_attn.o_proj.biases,
-layers.11.self_attn.o_proj.scales,
-layers.11.self_attn.o_proj.weight,
-layers.11.self_attn.q_proj.biases,
-layers.11.self_attn.q_proj.scales,
-layers.11.self_attn.q_proj.weight,
-layers.11.self_attn.v_proj.biases,
-layers.11.self_attn.v_proj.scales,
-layers.11.self_attn.v_proj.weight,
-layers.12.input_layernorm.weight,
-layers.12.mlp.down_proj.biases,
-layers.12.mlp.down_proj.scales,
-layers.12.mlp.down_proj.weight,
-layers.12.mlp.gate_proj.biases,
-layers.12.mlp.gate_proj.scales,
-layers.12.mlp.gate_proj.weight,
-layers.12.mlp.up_proj.biases,
-layers.12.mlp.up_proj.scales,
-layers.12.mlp.up_proj.weight,
-layers.12.post_attention_layernorm.weight,
-layers.12.post_feedforward_layernorm.weight,
-layers.12.pre_feedforward_layernorm.weight,
-layers.12.self_attn.gate_proj.biases,
-layers.12.self_attn.gate_proj.scales,
-layers.12.self_attn.gate_proj.weight,
-layers.12.self_attn.k_proj.biases,
-layers.12.self_attn.k_proj.scales,
-layers.12.self_attn.k_proj.weight,
-layers.12.self_attn.o_proj.biases,
-layers.12.self_attn.o_proj.scales,
-layers.12.self_attn.o_proj.weight,
-layers.12.self_attn.q_proj.biases,
-layers.12.self_attn.q_proj.scales,
-layers.12.self_attn.q_proj.weight,
-layers.12.self_attn.v_proj.biases,
-layers.12.self_attn.v_proj.scales,
-layers.12.self_attn.v_proj.weight,
-layers.13.input_layernorm.weight,
-layers.13.mlp.down_proj.biases,
-layers.13.mlp.down_proj.scales,
-layers.13.mlp.down_proj.weight,
-layers.13.mlp.gate_proj.biases,
-layers.13.mlp.gate_proj.scales,
-layers.13.mlp.gate_proj.weight,
-layers.13.mlp.up_proj.biases,
-layers.13.mlp.up_proj.scales,
-layers.13.mlp.up_proj.weight,
-layers.13.post_attention_layernorm.weight,
-layers.13.post_feedforward_layernorm.weight,
-layers.13.pre_feedforward_layernorm.weight,
-layers.13.self_attn.gate_proj.biases,
-layers.13.self_attn.gate_proj.scales,
-layers.13.self_attn.gate_proj.weight,
-layers.13.self_attn.k_proj.biases,
-layers.13.self_attn.k_proj.scales,
-layers.13.self_attn.k_proj.weight,
-layers.13.self_attn.o_proj.biases,
-layers.13.self_attn.o_proj.scales,
-layers.13.self_attn.o_proj.weight,
-layers.13.self_attn.q_proj.biases,
-layers.13.self_attn.q_proj.scales,
-layers.13.self_attn.q_proj.weight,
-layers.13.self_attn.v_proj.biases,
-layers.13.self_attn.v_proj.scales,
-layers.13.self_attn.v_proj.weight,
-layers.14.input_layernorm.weight,
-layers.14.mlp.down_proj.biases,
-layers.14.mlp.down_proj.scales,
-layers.14.mlp.down_proj.weight,
-layers.14.mlp.gate_proj.biases,
-layers.14.mlp.gate_proj.scales,
-layers.14.mlp.gate_proj.weight,
-layers.14.mlp.up_proj.biases,
-layers.14.mlp.up_proj.scales,
-layers.14.mlp.up_proj.weight,
-layers.14.post_attention_layernorm.weight,
-layers.14.post_feedforward_layernorm.weight,
-layers.14.pre_feedforward_layernorm.weight,
-layers.14.self_attn.gate_proj.biases,
-layers.14.self_attn.gate_proj.scales,
-layers.14.self_attn.gate_proj.weight,
-layers.14.self_attn.k_proj.biases,
-layers.14.self_attn.k_proj.scales,
-layers.14.self_attn.k_proj.weight,
-layers.14.self_attn.o_proj.biases,
-layers.14.self_attn.o_proj.scales,
-layers.14.self_attn.o_proj.weight,
-layers.14.self_attn.q_proj.biases,
-layers.14.self_attn.q_proj.scales,
-layers.14.self_attn.q_proj.weight,
-layers.14.self_attn.v_proj.biases,
-layers.14.self_attn.v_proj.scales,
-layers.14.self_attn.v_proj.weight,
-layers.15.input_layernorm.weight,
-layers.15.mlp.down_proj.biases,
-layers.15.mlp.down_proj.scales,
-layers.15.mlp.down_proj.weight,
-layers.15.mlp.gate_proj.biases,
-layers.15.mlp.gate_proj.scales,
-layers.15.mlp.gate_proj.weight,
-layers.15.mlp.up_proj.biases,
-layers.15.mlp.up_proj.scales,
-layers.15.mlp.up_proj.weight,
-layers.15.post_attention_layernorm.weight,
-layers.15.post_feedforward_layernorm.weight,
-layers.15.pre_feedforward_layernorm.weight,
-layers.15.self_attn.gate_proj.biases,
-layers.15.self_attn.gate_proj.scales,
-layers.15.self_attn.gate_proj.weight,
-layers.15.self_attn.k_proj.biases,
-layers.15.self_attn.k_proj.scales,
-layers.15.self_attn.k_proj.weight,
-layers.15.self_attn.o_proj.biases,
-layers.15.self_attn.o_proj.scales,
-layers.15.self_attn.o_proj.weight,
-layers.15.self_attn.q_proj.biases,
-layers.15.self_attn.q_proj.scales,
-layers.15.self_attn.q_proj.weight,
-layers.15.self_attn.v_proj.biases,
-layers.15.self_attn.v_proj.scales,
-layers.15.self_attn.v_proj.weight,
-layers.16.input_layernorm.weight,
-layers.16.mlp.down_proj.biases,
-layers.16.mlp.down_proj.scales,
-layers.16.mlp.down_proj.weight,
-layers.16.mlp.gate_proj.biases,
-layers.16.mlp.gate_proj.scales,
-layers.16.mlp.gate_proj.weight,
-layers.16.mlp.up_proj.biases,
-layers.16.mlp.up_proj.scales,
-layers.16.mlp.up_proj.weight,
-layers.16.post_attention_layernorm.weight,
-layers.16.post_feedforward_layernorm.weight,
-layers.16.pre_feedforward_layernorm.weight,
-layers.16.self_attn.gate_proj.biases,
-layers.16.self_attn.gate_proj.scales,
-layers.16.self_attn.gate_proj.weight,
-layers.16.self_attn.k_proj.biases,
-layers.16.self_attn.k_proj.scales,
-layers.16.self_attn.k_proj.weight,
-layers.16.self_attn.o_proj.biases,
-layers.16.self_attn.o_proj.scales,
-layers.16.self_attn.o_proj.weight,
-layers.16.self_attn.q_proj.biases,
-layers.16.self_attn.q_proj.scales,
-layers.16.self_attn.q_proj.weight,
-layers.16.self_attn.v_proj.biases,
-layers.16.self_attn.v_proj.scales,
-layers.16.self_attn.v_proj.weight,
-layers.17.input_layernorm.weight,
-layers.17.mlp.down_proj.biases,
-layers.17.mlp.down_proj.scales,
-layers.17.mlp.down_proj.weight,
-layers.17.mlp.gate_proj.biases,
-layers.17.mlp.gate_proj.scales,
-layers.17.mlp.gate_proj.weight,
-layers.17.mlp.up_proj.biases,
-layers.17.mlp.up_proj.scales,
-layers.17.mlp.up_proj.weight,
-layers.17.post_attention_layernorm.weight,
-layers.17.post_feedforward_layernorm.weight,
-layers.17.pre_feedforward_layernorm.weight,
-layers.17.self_attn.gate_proj.biases,
-layers.17.self_attn.gate_proj.scales,
-layers.17.self_attn.gate_proj.weight,
-layers.17.self_attn.k_proj.biases,
-layers.17.self_attn.k_proj.scales,
-layers.17.self_attn.k_proj.weight,
-layers.17.self_attn.o_proj.biases,
-layers.17.self_attn.o_proj.scales,
-layers.17.self_attn.o_proj.weight,
-layers.17.self_attn.q_proj.biases,
-layers.17.self_attn.q_proj.scales,
-layers.17.self_attn.q_proj.weight,
-layers.17.self_attn.v_proj.biases,
-layers.17.self_attn.v_proj.scales,
-layers.17.self_attn.v_proj.weight,
-layers.18.input_layernorm.weight,
-layers.18.mlp.down_proj.biases,
-layers.18.mlp.down_proj.scales,
-layers.18.mlp.down_proj.weight,
-layers.18.mlp.gate_proj.biases,
-layers.18.mlp.gate_proj.scales,
-layers.18.mlp.gate_proj.weight,
-layers.18.mlp.up_proj.biases,
-layers.18.mlp.up_proj.scales,
-layers.18.mlp.up_proj.weight,
-layers.18.post_attention_layernorm.weight,
-layers.18.post_feedforward_layernorm.weight,
-layers.18.pre_feedforward_layernorm.weight,
-layers.18.self_attn.gate_proj.biases,
-layers.18.self_attn.gate_proj.scales,
-layers.18.self_attn.gate_proj.weight,
-layers.18.self_attn.k_proj.biases,
-layers.18.self_attn.k_proj.scales,
-layers.18.self_attn.k_proj.weight,
-layers.18.self_attn.o_proj.biases,
-layers.18.self_attn.o_proj.scales,
-layers.18.self_attn.o_proj.weight,
-layers.18.self_attn.q_proj.biases,
-layers.18.self_attn.q_proj.scales,
-layers.18.self_attn.q_proj.weight,
-layers.18.self_attn.v_proj.biases,
-layers.18.self_attn.v_proj.scales,
-layers.18.self_attn.v_proj.weight,
-layers.19.input_layernorm.weight,
-layers.19.mlp.down_proj.biases,
-layers.19.mlp.down_proj.scales,
-layers.19.mlp.down_proj.weight,
-layers.19.mlp.gate_proj.biases,
-layers.19.mlp.gate_proj.scales,
-layers.19.mlp.gate_proj.weight,
-layers.19.mlp.up_proj.biases,
-layers.19.mlp.up_proj.scales,
-layers.19.mlp.up_proj.weight,
-layers.19.post_attention_layernorm.weight,
-layers.19.post_feedforward_layernorm.weight,
-layers.19.pre_feedforward_layernorm.weight,
-layers.19.self_attn.gate_proj.biases,
-layers.19.self_attn.gate_proj.scales,
-layers.19.self_attn.gate_proj.weight,
-layers.19.self_attn.k_proj.biases,
-layers.19.self_attn.k_proj.scales,
-layers.19.self_attn.k_proj.weight,
-layers.19.self_attn.o_proj.biases,
-layers.19.self_attn.o_proj.scales,
-layers.19.self_attn.o_proj.weight,
-layers.19.self_attn.q_proj.biases,
-layers.19.self_attn.q_proj.scales,
-layers.19.self_attn.q_proj.weight,
-layers.19.self_attn.v_proj.biases,
-layers.19.self_attn.v_proj.scales,
-layers.19.self_attn.v_proj.weight,
-layers.2.input_layernorm.weight,
-layers.2.mlp.down_proj.biases,
-layers.2.mlp.down_proj.scales,
-layers.2.mlp.down_proj.weight,
-layers.2.mlp.gate_proj.biases,
-layers.2.mlp.gate_proj.scales,
-layers.2.mlp.gate_proj.weight,
-layers.2.mlp.up_proj.biases,
-layers.2.mlp.up_proj.scales,
-layers.2.mlp.up_proj.weight,
-layers.2.post_attention_layernorm.weight,
-layers.2.post_feedforward_layernorm.weight,
-layers.2.pre_feedforward_layernorm.weight,
-layers.2.self_attn.gate_proj.biases,
-layers.2.self_attn.gate_proj.scales,
-layers.2.self_attn.gate_proj.weight,
-layers.2.self_attn.k_proj.biases,
-layers.2.self_attn.k_proj.scales,
-layers.2.self_attn.k_proj.weight,
-layers.2.self_attn.o_proj.biases,
-layers.2.self_attn.o_proj.scales,
-layers.2.self_attn.o_proj.weight,
-layers.2.self_attn.q_proj.biases,
-layers.2.self_attn.q_proj.scales,
-layers.2.self_attn.q_proj.weight,
-layers.2.self_attn.v_proj.biases,
-layers.2.self_attn.v_proj.scales,
-layers.2.self_attn.v_proj.weight,
-layers.20.input_layernorm.weight,
-layers.20.mlp.down_proj.biases,
-layers.20.mlp.down_proj.scales,
-layers.20.mlp.down_proj.weight,
-layers.20.mlp.gate_proj.biases,
-layers.20.mlp.gate_proj.scales,
-layers.20.mlp.gate_proj.weight,
-layers.20.mlp.up_proj.biases,
-layers.20.mlp.up_proj.scales,
-layers.20.mlp.up_proj.weight,
-layers.20.post_attention_layernorm.weight,
-layers.20.post_feedforward_layernorm.weight,
-layers.20.pre_feedforward_layernorm.weight,
-layers.20.self_attn.gate_proj.biases,
-layers.20.self_attn.gate_proj.scales,
-layers.20.self_attn.gate_proj.weight,
-layers.20.self_attn.k_proj.biases,
-layers.20.self_attn.k_proj.scales,
-layers.20.self_attn.k_proj.weight,
-layers.20.self_attn.o_proj.biases,
-layers.20.self_attn.o_proj.scales,
-layers.20.self_attn.o_proj.weight,
-layers.20.self_attn.q_proj.biases,
-layers.20.self_attn.q_proj.scales,
-layers.20.self_attn.q_proj.weight,
-layers.20.self_attn.v_proj.biases,
-layers.20.self_attn.v_proj.scales,
-layers.20.self_attn.v_proj.weight,
-layers.21.input_layernorm.weight,
-layers.21.mlp.down_proj.biases,
-layers.21.mlp.down_proj.scales,
-layers.21.mlp.down_proj.weight,
-layers.21.mlp.gate_proj.biases,
-layers.21.mlp.gate_proj.scales,
-layers.21.mlp.gate_proj.weight,
-layers.21.mlp.up_proj.biases,
-layers.21.mlp.up_proj.scales,
-layers.21.mlp.up_proj.weight,
-layers.21.post_attention_layernorm.weight,
-layers.21.post_feedforward_layernorm.weight,
-layers.21.pre_feedforward_layernorm.weight,
-layers.21.self_attn.gate_proj.biases,
-layers.21.self_attn.gate_proj.scales,
-layers.21.self_attn.gate_proj.weight,
-layers.21.self_attn.k_proj.biases,
-layers.21.self_attn.k_proj.scales,
-layers.21.self_attn.k_proj.weight,
-layers.21.self_attn.o_proj.biases,
-layers.21.self_attn.o_proj.scales,
-layers.21.self_attn.o_proj.weight,
-layers.21.self_attn.q_proj.biases,
-layers.21.self_attn.q_proj.scales,
-layers.21.self_attn.q_proj.weight,
-layers.21.self_attn.v_proj.biases,
-layers.21.self_attn.v_proj.scales,
-layers.21.self_attn.v_proj.weight,
-layers.22.input_layernorm.weight,
-layers.22.mlp.down_proj.biases,
-layers.22.mlp.down_proj.scales,
-layers.22.mlp.down_proj.weight,
-layers.22.mlp.gate_proj.biases,
-layers.22.mlp.gate_proj.scales,
-layers.22.mlp.gate_proj.weight,
-layers.22.mlp.up_proj.biases,
-layers.22.mlp.up_proj.scales,
-layers.22.mlp.up_proj.weight,
-layers.22.post_attention_layernorm.weight,
-layers.22.post_feedforward_layernorm.weight,
-layers.22.pre_feedforward_layernorm.weight,
-layers.22.self_attn.gate_proj.biases,
-layers.22.self_attn.gate_proj.scales,
-layers.22.self_attn.gate_proj.weight,
-layers.22.self_attn.k_proj.biases,
-layers.22.self_attn.k_proj.scales,
-layers.22.self_attn.k_proj.weight,
-layers.22.self_attn.o_proj.biases,
-layers.22.self_attn.o_proj.scales,
-layers.22.self_attn.o_proj.weight,
-layers.22.self_attn.q_proj.biases,
-layers.22.self_attn.q_proj.scales,
-layers.22.self_attn.q_proj.weight,
-layers.22.self_attn.v_proj.biases,
-layers.22.self_attn.v_proj.scales,
-layers.22.self_attn.v_proj.weight,
-layers.23.input_layernorm.weight,
-layers.23.mlp.down_proj.biases,
-layers.23.mlp.down_proj.scales,
-layers.23.mlp.down_proj.weight,
-layers.23.mlp.gate_proj.biases,
-layers.23.mlp.gate_proj.scales,
-layers.23.mlp.gate_proj.weight,
-layers.23.mlp.up_proj.biases,
-layers.23.mlp.up_proj.scales,
-layers.23.mlp.up_proj.weight,
-layers.23.post_attention_layernorm.weight,
-layers.23.post_feedforward_layernorm.weight,
-layers.23.pre_feedforward_layernorm.weight,
-layers.23.self_attn.gate_proj.biases,
-layers.23.self_attn.gate_proj.scales,
-layers.23.self_attn.gate_proj.weight,
-layers.23.self_attn.k_proj.biases,
-layers.23.self_attn.k_proj.scales,
-layers.23.self_attn.k_proj.weight,
-layers.23.self_attn.o_proj.biases,
-layers.23.self_attn.o_proj.scales,
-layers.23.self_attn.o_proj.weight,
-layers.23.self_attn.q_proj.biases,
-layers.23.self_attn.q_proj.scales,
-layers.23.self_attn.q_proj.weight,
-layers.23.self_attn.v_proj.biases,
-layers.23.self_attn.v_proj.scales,
-layers.23.self_attn.v_proj.weight,
-layers.24.input_layernorm.weight,
-layers.24.mlp.down_proj.biases,
-layers.24.mlp.down_proj.scales,
-layers.24.mlp.down_proj.weight,
-layers.24.mlp.gate_proj.biases,
-layers.24.mlp.gate_proj.scales,
-layers.24.mlp.gate_proj.weight,
-layers.24.mlp.up_proj.biases,
-layers.24.mlp.up_proj.scales,
-layers.24.mlp.up_proj.weight,
-layers.24.post_attention_layernorm.weight,
-layers.24.post_feedforward_layernorm.weight,
-layers.24.pre_feedforward_layernorm.weight,
-layers.24.self_attn.gate_proj.biases,
-layers.24.self_attn.gate_proj.scales,
-layers.24.self_attn.gate_proj.weight,
-layers.24.self_attn.k_proj.biases,
-layers.24.self_attn.k_proj.scales,
-layers.24.self_attn.k_proj.weight,
-layers.24.self_attn.o_proj.biases,
-layers.24.self_attn.o_proj.scales,
-layers.24.self_attn.o_proj.weight,
-layers.24.self_attn.q_proj.biases,
-layers.24.self_attn.q_proj.scales,
-layers.24.self_attn.q_proj.weight,
-layers.24.self_attn.v_proj.biases,
-layers.24.self_attn.v_proj.scales,
-layers.24.self_attn.v_proj.weight,
-layers.25.input_layernorm.weight,
-layers.25.mlp.down_proj.biases,
-layers.25.mlp.down_proj.scales,
-layers.25.mlp.down_proj.weight,
-layers.25.mlp.gate_proj.biases,
-layers.25.mlp.gate_proj.scales,
-layers.25.mlp.gate_proj.weight,
-layers.25.mlp.up_proj.biases,
-layers.25.mlp.up_proj.scales,
-layers.25.mlp.up_proj.weight,
-layers.25.post_attention_layernorm.weight,
-layers.25.post_feedforward_layernorm.weight,
-layers.25.pre_feedforward_layernorm.weight,
-layers.25.self_attn.gate_proj.biases,
-layers.25.self_attn.gate_proj.scales,
-layers.25.self_attn.gate_proj.weight,
-layers.25.self_attn.k_proj.biases,
-layers.25.self_attn.k_proj.scales,
-layers.25.self_attn.k_proj.weight,
-layers.25.self_attn.o_proj.biases,
-layers.25.self_attn.o_proj.scales,
-layers.25.self_attn.o_proj.weight,
-layers.25.self_attn.q_proj.biases,
-layers.25.self_attn.q_proj.scales,
-layers.25.self_attn.q_proj.weight,
-layers.25.self_attn.v_proj.biases,
-layers.25.self_attn.v_proj.scales,
-layers.25.self_attn.v_proj.weight,
-layers.26.input_layernorm.weight,
-layers.26.mlp.down_proj.biases,
-layers.26.mlp.down_proj.scales,
-layers.26.mlp.down_proj.weight,
-layers.26.mlp.gate_proj.biases,
-layers.26.mlp.gate_proj.scales,
-layers.26.mlp.gate_proj.weight,
-layers.26.mlp.up_proj.biases,
-layers.26.mlp.up_proj.scales,
-layers.26.mlp.up_proj.weight,
-layers.26.post_attention_layernorm.weight,
-layers.26.post_feedforward_layernorm.weight,
-layers.26.pre_feedforward_layernorm.weight,
-layers.26.self_attn.gate_proj.biases,
-layers.26.self_attn.gate_proj.scales,
-layers.26.self_attn.gate_proj.weight,
-layers.26.self_attn.k_proj.biases,
-layers.26.self_attn.k_proj.scales,
-layers.26.self_attn.k_proj.weight,
-layers.26.self_attn.o_proj.biases,
-layers.26.self_attn.o_proj.scales,
-layers.26.self_attn.o_proj.weight,
-layers.26.self_attn.q_proj.biases,
-layers.26.self_attn.q_proj.scales,
-layers.26.self_attn.q_proj.weight,
-layers.26.self_attn.v_proj.biases,
-layers.26.self_attn.v_proj.scales,
-layers.26.self_attn.v_proj.weight,
-layers.27.input_layernorm.weight,
-layers.27.mlp.down_proj.biases,
-layers.27.mlp.down_proj.scales,
-layers.27.mlp.down_proj.weight,
-layers.27.mlp.gate_proj.biases,
-layers.27.mlp.gate_proj.scales,
-layers.27.mlp.gate_proj.weight,
-layers.27.mlp.up_proj.biases,
-layers.27.mlp.up_proj.scales,
-layers.27.mlp.up_proj.weight,
-layers.27.post_attention_layernorm.weight,
-layers.27.post_feedforward_layernorm.weight,
-layers.27.pre_feedforward_layernorm.weight,
-layers.27.self_attn.gate_proj.biases,
-layers.27.self_attn.gate_proj.scales,
-layers.27.self_attn.gate_proj.weight,
-layers.27.self_attn.k_proj.biases,
-layers.27.self_attn.k_proj.scales,
-layers.27.self_attn.k_proj.weight,
-layers.27.self_attn.o_proj.biases,
-layers.27.self_attn.o_proj.scales,
-layers.27.self_attn.o_proj.weight,
-layers.27.self_attn.q_proj.biases,
-layers.27.self_attn.q_proj.scales,
-layers.27.self_attn.q_proj.weight,
-layers.27.self_attn.v_proj.biases,
-layers.27.self_attn.v_proj.scales,
-layers.27.self_attn.v_proj.weight,
-layers.28.input_layernorm.weight,
-layers.28.mlp.down_proj.biases,
-layers.28.mlp.down_proj.scales,
-layers.28.mlp.down_proj.weight,
-layers.28.mlp.gate_proj.biases,
-layers.28.mlp.gate_proj.scales,
-layers.28.mlp.gate_proj.weight,
-layers.28.mlp.up_proj.biases,
-layers.28.mlp.up_proj.scales,
-layers.28.mlp.up_proj.weight,
-layers.28.post_attention_layernorm.weight,
-layers.28.post_feedforward_layernorm.weight,
-layers.28.pre_feedforward_layernorm.weight,
-layers.28.self_attn.gate_proj.biases,
-layers.28.self_attn.gate_proj.scales,
-layers.28.self_attn.gate_proj.weight,
-layers.28.self_attn.k_proj.biases,
-layers.28.self_attn.k_proj.scales,
-layers.28.self_attn.k_proj.weight,
-layers.28.self_attn.o_proj.biases,
-layers.28.self_attn.o_proj.scales,
-layers.28.self_attn.o_proj.weight,
-layers.28.self_attn.q_proj.biases,
-layers.28.self_attn.q_proj.scales,
-layers.28.self_attn.q_proj.weight,
-layers.28.self_attn.v_proj.biases,
-layers.28.self_attn.v_proj.scales,
-layers.28.self_attn.v_proj.weight,
-layers.29.input_layernorm.weight,
-layers.29.mlp.down_proj.biases,
-layers.29.mlp.down_proj.scales,
-layers.29.mlp.down_proj.weight,
-layers.29.mlp.gate_proj.biases,
-layers.29.mlp.gate_proj.scales,
-layers.29.mlp.gate_proj.weight,
-layers.29.mlp.up_proj.biases,
-layers.29.mlp.up_proj.scales,
-layers.29.mlp.up_proj.weight,
-layers.29.post_attention_layernorm.weight,
-layers.29.post_feedforward_layernorm.weight,
-layers.29.pre_feedforward_layernorm.weight,
-layers.29.self_attn.gate_proj.biases,
-layers.29.self_attn.gate_proj.scales,
-layers.29.self_attn.gate_proj.weight,
-layers.29.self_attn.k_proj.biases,
-layers.29.self_attn.k_proj.scales,
-layers.29.self_attn.k_proj.weight,
-layers.29.self_attn.o_proj.biases,
-layers.29.self_attn.o_proj.scales,
-layers.29.self_attn.o_proj.weight,
-layers.29.self_attn.q_proj.biases,
-layers.29.self_attn.q_proj.scales,
-layers.29.self_attn.q_proj.weight,
-layers.29.self_attn.v_proj.biases,
-layers.29.self_attn.v_proj.scales,
-layers.29.self_attn.v_proj.weight,
-layers.3.input_layernorm.weight,
-layers.3.mlp.down_proj.biases,
-layers.3.mlp.down_proj.scales,
-layers.3.mlp.down_proj.weight,
-layers.3.mlp.gate_proj.biases,
-layers.3.mlp.gate_proj.scales,
-layers.3.mlp.gate_proj.weight,
-layers.3.mlp.up_proj.biases,
-layers.3.mlp.up_proj.scales,
-layers.3.mlp.up_proj.weight,
-layers.3.post_attention_layernorm.weight,
-layers.3.post_feedforward_layernorm.weight,
-layers.3.pre_feedforward_layernorm.weight,
-layers.3.self_attn.gate_proj.biases,
-layers.3.self_attn.gate_proj.scales,
-layers.3.self_attn.gate_proj.weight,
-layers.3.self_attn.k_proj.biases,
-layers.3.self_attn.k_proj.scales,
-layers.3.self_attn.k_proj.weight,
-layers.3.self_attn.o_proj.biases,
-layers.3.self_attn.o_proj.scales,
-layers.3.self_attn.o_proj.weight,
-layers.3.self_attn.q_proj.biases,
-layers.3.self_attn.q_proj.scales,
-layers.3.self_attn.q_proj.weight,
-layers.3.self_attn.v_proj.biases,
-layers.3.self_attn.v_proj.scales,
-layers.3.self_attn.v_proj.weight,
-layers.30.input_layernorm.weight,
-layers.30.mlp.down_proj.biases,
-layers.30.mlp.down_proj.scales,
-layers.30.mlp.down_proj.weight,
-layers.30.mlp.gate_proj.biases,
-layers.30.mlp.gate_proj.scales,
-layers.30.mlp.gate_proj.weight,
-layers.30.mlp.up_proj.biases,
-layers.30.mlp.up_proj.scales,
-layers.30.mlp.up_proj.weight,
-layers.30.post_attention_layernorm.weight,
-layers.30.post_feedforward_layernorm.weight,
-layers.30.pre_feedforward_layernorm.weight,
-layers.30.self_attn.gate_proj.biases,
-layers.30.self_attn.gate_proj.scales,
-layers.30.self_attn.gate_proj.weight,
-layers.30.self_attn.k_proj.biases,
-layers.30.self_attn.k_proj.scales,
-layers.30.self_attn.k_proj.weight,
-layers.30.self_attn.o_proj.biases,
-layers.30.self_attn.o_proj.scales,
-layers.30.self_attn.o_proj.weight,
-layers.30.self_attn.q_proj.biases,
-layers.30.self_attn.q_proj.scales,
-layers.30.self_attn.q_proj.weight,
-layers.30.self_attn.v_proj.biases,
-layers.30.self_attn.v_proj.scales,
-layers.30.self_attn.v_proj.weight,
-layers.31.input_layernorm.weight,
-layers.31.mlp.down_proj.biases,
-layers.31.mlp.down_proj.scales,
-layers.31.mlp.down_proj.weight,
-layers.31.mlp.gate_proj.biases,
-layers.31.mlp.gate_proj.scales,
-layers.31.mlp.gate_proj.weight,
-layers.31.mlp.up_proj.biases,
-layers.31.mlp.up_proj.scales,
-layers.31.mlp.up_proj.weight,
-layers.31.post_attention_layernorm.weight,
-layers.31.post_feedforward_layernorm.weight,
-layers.31.pre_feedforward_layernorm.weight,
-layers.31.self_attn.gate_proj.biases,
-layers.31.self_attn.gate_proj.scales,
-layers.31.self_attn.gate_proj.weight,
-layers.31.self_attn.k_proj.biases,
-layers.31.self_attn.k_proj.scales,
-layers.31.self_attn.k_proj.weight,
-layers.31.self_attn.o_proj.biases,
-layers.31.self_attn.o_proj.scales,
-layers.31.self_attn.o_proj.weight,
-layers.31.self_attn.q_proj.biases,
-layers.31.self_attn.q_proj.scales,
-layers.31.self_attn.q_proj.weight,
-layers.31.self_attn.v_proj.biases,
-layers.31.self_attn.v_proj.scales,
-layers.31.self_attn.v_proj.weight,
-layers.32.input_layernorm.weight,
-layers.32.mlp.down_proj.biases,
-layers.32.mlp.down_proj.scales,
-layers.32.mlp.down_proj.weight,
-layers.32.mlp.gate_proj.biases,
-layers.32.mlp.gate_proj.scales,
-layers.32.mlp.gate_proj.weight,
-layers.32.mlp.up_proj.biases,
-layers.32.mlp.up_proj.scales,
-layers.32.mlp.up_proj.weight,
-layers.32.post_attention_layernorm.weight,
-layers.32.post_feedforward_layernorm.weight,
-layers.32.pre_feedforward_layernorm.weight,
-layers.32.self_attn.gate_proj.biases,
-layers.32.self_attn.gate_proj.scales,
-layers.32.self_attn.gate_proj.weight,
-layers.32.self_attn.k_proj.biases,
-layers.32.self_attn.k_proj.scales,
-layers.32.self_attn.k_proj.weight,
-layers.32.self_attn.o_proj.biases,
-layers.32.self_attn.o_proj.scales,
-layers.32.self_attn.o_proj.weight,
-layers.32.self_attn.q_proj.biases,
-layers.32.self_attn.q_proj.scales,
-layers.32.self_attn.q_proj.weight,
-layers.32.self_attn.v_proj.biases,
-layers.32.self_attn.v_proj.scales,
-layers.32.self_attn.v_proj.weight,
-layers.33.input_layernorm.weight,
-layers.33.mlp.down_proj.biases,
-layers.33.mlp.down_proj.scales,
-layers.33.mlp.down_proj.weight,
-layers.33.mlp.gate_proj.biases,
-layers.33.mlp.gate_proj.scales,
-layers.33.mlp.gate_proj.weight,
-layers.33.mlp.up_proj.biases,
-layers.33.mlp.up_proj.scales,
-layers.33.mlp.up_proj.weight,
-layers.33.post_attention_layernorm.weight,
-layers.33.post_feedforward_layernorm.weight,
-layers.33.pre_feedforward_layernorm.weight,
-layers.33.self_attn.gate_proj.biases,
-layers.33.self_attn.gate_proj.scales,
-layers.33.self_attn.gate_proj.weight,
-layers.33.self_attn.k_proj.biases,
-layers.33.self_attn.k_proj.scales,
-layers.33.self_attn.k_proj.weight,
-layers.33.self_attn.o_proj.biases,
-layers.33.self_attn.o_proj.scales,
-layers.33.self_attn.o_proj.weight,
-layers.33.self_attn.q_proj.biases,
-layers.33.self_attn.q_proj.scales,
-layers.33.self_attn.q_proj.weight,
-layers.33.self_attn.v_proj.biases,
-layers.33.self_attn.v_proj.scales,
-layers.33.self_attn.v_proj.weight,
-layers.34.input_layernorm.weight,
-layers.34.mlp.down_proj.biases,
-layers.34.mlp.down_proj.scales,
-layers.34.mlp.down_proj.weight,
-layers.34.mlp.gate_proj.biases,
-layers.34.mlp.gate_proj.scales,
-layers.34.mlp.gate_proj.weight,
-layers.34.mlp.up_proj.biases,
-layers.34.mlp.up_proj.scales,
-layers.34.mlp.up_proj.weight,
-layers.34.post_attention_layernorm.weight,
-layers.34.post_feedforward_layernorm.weight,
-layers.34.pre_feedforward_layernorm.weight,
-layers.34.self_attn.gate_proj.biases,
-layers.34.self_attn.gate_proj.scales,
-layers.34.self_attn.gate_proj.weight,
-layers.34.self_attn.k_proj.biases,
-layers.34.self_attn.k_proj.scales,
-layers.34.self_attn.k_proj.weight,
-layers.34.self_attn.o_proj.biases,
-layers.34.self_attn.o_proj.scales,
-layers.34.self_attn.o_proj.weight,
-layers.34.self_attn.q_proj.biases,
-layers.34.self_attn.q_proj.scales,
-layers.34.self_attn.q_proj.weight,
-layers.34.self_attn.v_proj.biases,
-layers.34.self_attn.v_proj.scales,
-layers.34.self_attn.v_proj.weight,
-layers.35.input_layernorm.weight,
-layers.35.mlp.down_proj.biases,
-layers.35.mlp.down_proj.scales,
-layers.35.mlp.down_proj.weight,
-layers.35.mlp.gate_proj.biases,
-layers.35.mlp.gate_proj.scales,
-layers.35.mlp.gate_proj.weight,
-layers.35.mlp.up_proj.biases,
-layers.35.mlp.up_proj.scales,
-layers.35.mlp.up_proj.weight,
-layers.35.post_attention_layernorm.weight,
-layers.35.post_feedforward_layernorm.weight,
-layers.35.pre_feedforward_layernorm.weight,
-layers.35.self_attn.gate_proj.biases,
-layers.35.self_attn.gate_proj.scales,
-layers.35.self_attn.gate_proj.weight,
-layers.35.self_attn.k_proj.biases,
-layers.35.self_attn.k_proj.scales,
-layers.35.self_attn.k_proj.weight,
-layers.35.self_attn.o_proj.biases,
-layers.35.self_attn.o_proj.scales,
-layers.35.self_attn.o_proj.weight,
-layers.35.self_attn.q_proj.biases,
-layers.35.self_attn.q_proj.scales,
-layers.35.self_attn.q_proj.weight,
-layers.35.self_attn.v_proj.biases,
-layers.35.self_attn.v_proj.scales,
-layers.35.self_attn.v_proj.weight,
-layers.36.input_layernorm.weight,
-layers.36.mlp.down_proj.biases,
-layers.36.mlp.down_proj.scales,
-layers.36.mlp.down_proj.weight,
-layers.36.mlp.gate_proj.biases,
-layers.36.mlp.gate_proj.scales,
-layers.36.mlp.gate_proj.weight,
-layers.36.mlp.up_proj.biases,
-layers.36.mlp.up_proj.scales,
-layers.36.mlp.up_proj.weight,
-layers.36.post_attention_layernorm.weight,
-layers.36.post_feedforward_layernorm.weight,
-layers.36.pre_feedforward_layernorm.weight,
-layers.36.self_attn.gate_proj.biases,
-layers.36.self_attn.gate_proj.scales,
-layers.36.self_attn.gate_proj.weight,
-layers.36.self_attn.k_proj.biases,
-layers.36.self_attn.k_proj.scales,
-layers.36.self_attn.k_proj.weight,
-layers.36.self_attn.o_proj.biases,
-layers.36.self_attn.o_proj.scales,
-layers.36.self_attn.o_proj.weight,
-layers.36.self_attn.q_proj.biases,
-layers.36.self_attn.q_proj.scales,
-layers.36.self_attn.q_proj.weight,
-layers.36.self_attn.v_proj.biases,
-layers.36.self_attn.v_proj.scales,
-layers.36.self_attn.v_proj.weight,
-layers.37.input_layernorm.weight,
-layers.37.mlp.down_proj.biases,
-layers.37.mlp.down_proj.scales,
-layers.37.mlp.down_proj.weight,
-layers.37.mlp.gate_proj.biases,
-layers.37.mlp.gate_proj.scales,
-layers.37.mlp.gate_proj.weight,
-layers.37.mlp.up_proj.biases,
-layers.37.mlp.up_proj.scales,
-layers.37.mlp.up_proj.weight,
-layers.37.post_attention_layernorm.weight,
-layers.37.post_feedforward_layernorm.weight,
-layers.37.pre_feedforward_layernorm.weight,
-layers.37.self_attn.gate_proj.biases,
-layers.37.self_attn.gate_proj.scales,
-layers.37.self_attn.gate_proj.weight,
-layers.37.self_attn.k_proj.biases,
-layers.37.self_attn.k_proj.scales,
-layers.37.self_attn.k_proj.weight,
-layers.37.self_attn.o_proj.biases,
-layers.37.self_attn.o_proj.scales,
-layers.37.self_attn.o_proj.weight,
-layers.37.self_attn.q_proj.biases,
-layers.37.self_attn.q_proj.scales,
-layers.37.self_attn.q_proj.weight,
-layers.37.self_attn.v_proj.biases,
-layers.37.self_attn.v_proj.scales,
-layers.37.self_attn.v_proj.weight,
-layers.38.input_layernorm.weight,
-layers.38.mlp.down_proj.biases,
-layers.38.mlp.down_proj.scales,
-layers.38.mlp.down_proj.weight,
-layers.38.mlp.gate_proj.biases,
-layers.38.mlp.gate_proj.scales,
-layers.38.mlp.gate_proj.weight,
-layers.38.mlp.up_proj.biases,
-layers.38.mlp.up_proj.scales,
-layers.38.mlp.up_proj.weight,
-layers.38.post_attention_layernorm.weight,
-layers.38.post_feedforward_layernorm.weight,
-layers.38.pre_feedforward_layernorm.weight,
-layers.38.self_attn.gate_proj.biases,
-layers.38.self_attn.gate_proj.scales,
-layers.38.self_attn.gate_proj.weight,
-layers.38.self_attn.k_proj.biases,
-layers.38.self_attn.k_proj.scales,
-layers.38.self_attn.k_proj.weight,
-layers.38.self_attn.o_proj.biases,
-layers.38.self_attn.o_proj.scales,
-layers.38.self_attn.o_proj.weight,
-layers.38.self_attn.q_proj.biases,
-layers.38.self_attn.q_proj.scales,
-layers.38.self_attn.q_proj.weight,
-layers.38.self_attn.v_proj.biases,
-layers.38.self_attn.v_proj.scales,
-layers.38.self_attn.v_proj.weight,
-layers.39.input_layernorm.weight,
-layers.39.mlp.down_proj.biases,
-layers.39.mlp.down_proj.scales,
-layers.39.mlp.down_proj.weight,
-layers.39.mlp.gate_proj.biases,
-layers.39.mlp.gate_proj.scales,
-layers.39.mlp.gate_proj.weight,
-layers.39.mlp.up_proj.biases,
-layers.39.mlp.up_proj.scales,
-layers.39.mlp.up_proj.weight,
-layers.39.post_attention_layernorm.weight,
-layers.39.post_feedforward_layernorm.weight,
-layers.39.pre_feedforward_layernorm.weight,
-layers.39.self_attn.gate_proj.biases,
-layers.39.self_attn.gate_proj.scales,
-layers.39.self_attn.gate_proj.weight,
-layers.39.self_attn.k_proj.biases,
-layers.39.self_attn.k_proj.scales,
-layers.39.self_attn.k_proj.weight,
-layers.39.self_attn.o_proj.biases,
-layers.39.self_attn.o_proj.scales,
-layers.39.self_attn.o_proj.weight,
-layers.39.self_attn.q_proj.biases,
-layers.39.self_attn.q_proj.scales,
-layers.39.self_attn.q_proj.weight,
-layers.39.self_attn.v_proj.biases,
-layers.39.self_attn.v_proj.scales,
-layers.39.self_attn.v_proj.weight,
-layers.4.input_layernorm.weight,
-layers.4.mlp.down_proj.biases,
-layers.4.mlp.down_proj.scales,
-layers.4.mlp.down_proj.weight,
-layers.4.mlp.gate_proj.biases,
-layers.4.mlp.gate_proj.scales,
-layers.4.mlp.gate_proj.weight,
-layers.4.mlp.up_proj.biases,
-layers.4.mlp.up_proj.scales,
-layers.4.mlp.up_proj.weight,
-layers.4.post_attention_layernorm.weight,
-layers.4.post_feedforward_layernorm.weight,
-layers.4.pre_feedforward_layernorm.weight,
-layers.4.self_attn.gate_proj.biases,
-layers.4.self_attn.gate_proj.scales,
-layers.4.self_attn.gate_proj.weight,
-layers.4.self_attn.k_proj.biases,
-layers.4.self_attn.k_proj.scales,
-layers.4.self_attn.k_proj.weight,
-layers.4.self_attn.o_proj.biases,
-layers.4.self_attn.o_proj.scales,
-layers.4.self_attn.o_proj.weight,
-layers.4.self_attn.q_proj.biases,
-layers.4.self_attn.q_proj.scales,
-layers.4.self_attn.q_proj.weight,
-layers.4.self_attn.v_proj.biases,
-layers.4.self_attn.v_proj.scales,
-layers.4.self_attn.v_proj.weight,
-layers.40.input_layernorm.weight,
-layers.40.mlp.down_proj.biases,
-layers.40.mlp.down_proj.scales,
-layers.40.mlp.down_proj.weight,
-layers.40.mlp.gate_proj.biases,
-layers.40.mlp.gate_proj.scales,
-layers.40.mlp.gate_proj.weight,
-layers.40.mlp.up_proj.biases,
-layers.40.mlp.up_proj.scales,
-layers.40.mlp.up_proj.weight,
-layers.40.post_attention_layernorm.weight,
-layers.40.post_feedforward_layernorm.weight,
-layers.40.pre_feedforward_layernorm.weight,
-layers.40.self_attn.gate_proj.biases,
-layers.40.self_attn.gate_proj.scales,
-layers.40.self_attn.gate_proj.weight,
-layers.40.self_attn.k_proj.biases,
-layers.40.self_attn.k_proj.scales,
-layers.40.self_attn.k_proj.weight,
-layers.40.self_attn.o_proj.biases,
-layers.40.self_attn.o_proj.scales,
-layers.40.self_attn.o_proj.weight,
-layers.40.self_attn.q_proj.biases,
-layers.40.self_attn.q_proj.scales,
-layers.40.self_attn.q_proj.weight,
-layers.40.self_attn.v_proj.biases,
-layers.40.self_attn.v_proj.scales,
-layers.40.self_attn.v_proj.weight,
-layers.41.input_layernorm.weight,
-layers.41.mlp.down_proj.biases,
-layers.41.mlp.down_proj.scales,
-layers.41.mlp.down_proj.weight,
-layers.41.mlp.gate_proj.biases,
-layers.41.mlp.gate_proj.scales,
-layers.41.mlp.gate_proj.weight,
-layers.41.mlp.up_proj.biases,
-layers.41.mlp.up_proj.scales,
-layers.41.mlp.up_proj.weight,
-layers.41.post_attention_layernorm.weight,
-layers.41.post_feedforward_layernorm.weight,
-layers.41.pre_feedforward_layernorm.weight,
-layers.41.self_attn.gate_proj.biases,
-layers.41.self_attn.gate_proj.scales,
-layers.41.self_attn.gate_proj.weight,
-layers.41.self_attn.k_proj.biases,
-layers.41.self_attn.k_proj.scales,
-layers.41.self_attn.k_proj.weight,
-layers.41.self_attn.o_proj.biases,
-layers.41.self_attn.o_proj.scales,
-layers.41.self_attn.o_proj.weight,
-layers.41.self_attn.q_proj.biases,
-layers.41.self_attn.q_proj.scales,
-layers.41.self_attn.q_proj.weight,
-layers.41.self_attn.v_proj.biases,
-layers.41.self_attn.v_proj.scales,
-layers.41.self_attn.v_proj.weight,
-layers.42.input_layernorm.weight,
-layers.42.mlp.down_proj.biases,
-layers.42.mlp.down_proj.scales,
-layers.42.mlp.down_proj.weight,
-layers.42.mlp.gate_proj.biases,
-layers.42.mlp.gate_proj.scales,
-layers.42.mlp.gate_proj.weight,
-layers.42.mlp.up_proj.biases,
-layers.42.mlp.up_proj.scales,
-layers.42.mlp.up_proj.weight,
-layers.42.post_attention_layernorm.weight,
-layers.42.post_feedforward_layernorm.weight,
-layers.42.pre_feedforward_layernorm.weight,
-layers.42.self_attn.gate_proj.biases,
-layers.42.self_attn.gate_proj.scales,
-layers.42.self_attn.gate_proj.weight,
-layers.42.self_attn.k_proj.biases,
-layers.42.self_attn.k_proj.scales,
-layers.42.self_attn.k_proj.weight,
-layers.42.self_attn.o_proj.biases,
-layers.42.self_attn.o_proj.scales,
-layers.42.self_attn.o_proj.weight,
-layers.42.self_attn.q_proj.biases,
-layers.42.self_attn.q_proj.scales,
-layers.42.self_attn.q_proj.weight,
-layers.42.self_attn.v_proj.biases,
-layers.42.self_attn.v_proj.scales,
-layers.42.self_attn.v_proj.weight,
-layers.43.input_layernorm.weight,
-layers.43.mlp.down_proj.biases,
-layers.43.mlp.down_proj.scales,
-layers.43.mlp.down_proj.weight,
-layers.43.mlp.gate_proj.biases,
-layers.43.mlp.gate_proj.scales,
-layers.43.mlp.gate_proj.weight,
-layers.43.mlp.up_proj.biases,
-layers.43.mlp.up_proj.scales,
-layers.43.mlp.up_proj.weight,
-layers.43.post_attention_layernorm.weight,
-layers.43.post_feedforward_layernorm.weight,
-layers.43.pre_feedforward_layernorm.weight,
-layers.43.self_attn.gate_proj.biases,
-layers.43.self_attn.gate_proj.scales,
-layers.43.self_attn.gate_proj.weight,
-layers.43.self_attn.k_proj.biases,
-layers.43.self_attn.k_proj.scales,
-layers.43.self_attn.k_proj.weight,
-layers.43.self_attn.o_proj.biases,
-layers.43.self_attn.o_proj.scales,
-layers.43.self_attn.o_proj.weight,
-layers.43.self_attn.q_proj.biases,
-layers.43.self_attn.q_proj.scales,
-layers.43.self_attn.q_proj.weight,
-layers.43.self_attn.v_proj.biases,
-layers.43.self_attn.v_proj.scales,
-layers.43.self_attn.v_proj.weight,
-layers.44.input_layernorm.weight,
-layers.44.mlp.down_proj.biases,
-layers.44.mlp.down_proj.scales,
-layers.44.mlp.down_proj.weight,
-layers.44.mlp.gate_proj.biases,
-layers.44.mlp.gate_proj.scales,
-layers.44.mlp.gate_proj.weight,
-layers.44.mlp.up_proj.biases,
-layers.44.mlp.up_proj.scales,
-layers.44.mlp.up_proj.weight,
-layers.44.post_attention_layernorm.weight,
-layers.44.post_feedforward_layernorm.weight,
-layers.44.pre_feedforward_layernorm.weight,
-layers.44.self_attn.gate_proj.biases,
-layers.44.self_attn.gate_proj.scales,
-layers.44.self_attn.gate_proj.weight,
-layers.44.self_attn.k_proj.biases,
-layers.44.self_attn.k_proj.scales,
-layers.44.self_attn.k_proj.weight,
-layers.44.self_attn.o_proj.biases,
-layers.44.self_attn.o_proj.scales,
-layers.44.self_attn.o_proj.weight,
-layers.44.self_attn.q_proj.biases,
-layers.44.self_attn.q_proj.scales,
-layers.44.self_attn.q_proj.weight,
-layers.44.self_attn.v_proj.biases,
-layers.44.self_attn.v_proj.scales,
-layers.44.self_attn.v_proj.weight,
-layers.45.input_layernorm.weight,
-layers.45.mlp.down_proj.biases,
-layers.45.mlp.down_proj.scales,
-layers.45.mlp.down_proj.weight,
-layers.45.mlp.gate_proj.biases,
-layers.45.mlp.gate_proj.scales,
-layers.45.mlp.gate_proj.weight,
-layers.45.mlp.up_proj.biases,
-layers.45.mlp.up_proj.scales,
-layers.45.mlp.up_proj.weight,
-layers.45.post_attention_layernorm.weight,
-layers.45.post_feedforward_layernorm.weight,
-layers.45.pre_feedforward_layernorm.weight,
-layers.45.self_attn.gate_proj.biases,
-layers.45.self_attn.gate_proj.scales,
-layers.45.self_attn.gate_proj.weight,
-layers.45.self_attn.k_proj.biases,
-layers.45.self_attn.k_proj.scales,
-layers.45.self_attn.k_proj.weight,
-layers.45.self_attn.o_proj.biases,
-layers.45.self_attn.o_proj.scales,
-layers.45.self_attn.o_proj.weight,
-layers.45.self_attn.q_proj.biases,
-layers.45.self_attn.q_proj.scales,
-layers.45.self_attn.q_proj.weight,
-layers.45.self_attn.v_proj.biases,
-layers.45.self_attn.v_proj.scales,
-layers.45.self_attn.v_proj.weight,
-layers.46.input_layernorm.weight,
-layers.46.mlp.down_proj.biases,
-layers.46.mlp.down_proj.scales,
-layers.46.mlp.down_proj.weight,
-layers.46.mlp.gate_proj.biases,
-layers.46.mlp.gate_proj.scales,
-layers.46.mlp.gate_proj.weight,
-layers.46.mlp.up_proj.biases,
-layers.46.mlp.up_proj.scales,
-layers.46.mlp.up_proj.weight,
-layers.46.post_attention_layernorm.weight,
-layers.46.post_feedforward_layernorm.weight,
-layers.46.pre_feedforward_layernorm.weight,
-layers.46.self_attn.gate_proj.biases,
-layers.46.self_attn.gate_proj.scales,
-layers.46.self_attn.gate_proj.weight,
-layers.46.self_attn.k_proj.biases,
-layers.46.self_attn.k_proj.scales,
-layers.46.self_attn.k_proj.weight,
-layers.46.self_attn.o_proj.biases,
-layers.46.self_attn.o_proj.scales,
-layers.46.self_attn.o_proj.weight,
-layers.46.self_attn.q_proj.biases,
-layers.46.self_attn.q_proj.scales,
-layers.46.self_attn.q_proj.weight,
-layers.46.self_attn.v_proj.biases,
-layers.46.self_attn.v_proj.scales,
-layers.46.self_attn.v_proj.weight,
-layers.47.input_layernorm.weight,
-layers.47.mlp.down_proj.biases,
-layers.47.mlp.down_proj.scales,
-layers.47.mlp.down_proj.weight,
-layers.47.mlp.gate_proj.biases,
-layers.47.mlp.gate_proj.scales,
-layers.47.mlp.gate_proj.weight,
-layers.47.mlp.up_proj.biases,
-layers.47.mlp.up_proj.scales,
-layers.47.mlp.up_proj.weight,
-layers.47.post_attention_layernorm.weight,
-layers.47.post_feedforward_layernorm.weight,
-layers.47.pre_feedforward_layernorm.weight,
-layers.47.self_attn.gate_proj.biases,
-layers.47.self_attn.gate_proj.scales,
-layers.47.self_attn.gate_proj.weight,
-layers.47.self_attn.k_proj.biases,
-layers.47.self_attn.k_proj.scales,
-layers.47.self_attn.k_proj.weight,
-layers.47.self_attn.o_proj.biases,
-layers.47.self_attn.o_proj.scales,
-layers.47.self_attn.o_proj.weight,
-layers.47.self_attn.q_proj.biases,
-layers.47.self_attn.q_proj.scales,
-layers.47.self_attn.q_proj.weight,
-layers.47.self_attn.v_proj.biases,
-layers.47.self_attn.v_proj.scales,
-layers.47.self_attn.v_proj.weight,
-layers.48.input_layernorm.weight,
-layers.48.mlp.down_proj.biases,
-layers.48.mlp.down_proj.scales,
-layers.48.mlp.down_proj.weight,
-layers.48.mlp.gate_proj.biases,
-layers.48.mlp.gate_proj.scales,
-layers.48.mlp.gate_proj.weight,
-layers.48.mlp.up_proj.biases,
-layers.48.mlp.up_proj.scales,
-layers.48.mlp.up_proj.weight,
-layers.48.post_attention_layernorm.weight,
-layers.48.post_feedforward_layernorm.weight,
-layers.48.pre_feedforward_layernorm.weight,
-layers.48.self_attn.gate_proj.biases,
-layers.48.self_attn.gate_proj.scales,
-layers.48.self_attn.gate_proj.weight,
-layers.48.self_attn.k_proj.biases,
-layers.48.self_attn.k_proj.scales,
-layers.48.self_attn.k_proj.weight,
-layers.48.self_attn.o_proj.biases,
-layers.48.self_attn.o_proj.scales,
-layers.48.self_attn.o_proj.weight,
-layers.48.self_attn.q_proj.biases,
-layers.48.self_attn.q_proj.scales,
-layers.48.self_attn.q_proj.weight,
-layers.48.self_attn.v_proj.biases,
-layers.48.self_attn.v_proj.scales,
-layers.48.self_attn.v_proj.weight,
-layers.49.input_layernorm.weight,
-layers.49.mlp.down_proj.biases,
-layers.49.mlp.down_proj.scales,
-layers.49.mlp.down_proj.weight,
-layers.49.mlp.gate_proj.biases,
-layers.49.mlp.gate_proj.scales,
-layers.49.mlp.gate_proj.weight,
-layers.49.mlp.up_proj.biases,
-layers.49.mlp.up_proj.scales,
-layers.49.mlp.up_proj.weight,
-layers.49.post_attention_layernorm.weight,
-layers.49.post_feedforward_layernorm.weight,
-layers.49.pre_feedforward_layernorm.weight,
-layers.49.self_attn.gate_proj.biases,
-layers.49.self_attn.gate_proj.scales,
-layers.49.self_attn.gate_proj.weight,
-layers.49.self_attn.k_proj.biases,
-layers.49.self_attn.k_proj.scales,
-layers.49.self_attn.k_proj.weight,
-layers.49.self_attn.o_proj.biases,
-layers.49.self_attn.o_proj.scales,
-layers.49.self_attn.o_proj.weight,
-layers.49.self_attn.q_proj.biases,
-layers.49.self_attn.q_proj.scales,
-layers.49.self_attn.q_proj.weight,
-layers.49.self_attn.v_proj.biases,
-layers.49.self_attn.v_proj.scales,
-layers.49.self_attn.v_proj.weight,
-layers.5.input_layernorm.weight,
-layers.5.mlp.down_proj.biases,
-layers.5.mlp.down_proj.scales,
-layers.5.mlp.down_proj.weight,
-layers.5.mlp.gate_proj.biases,
-layers.5.mlp.gate_proj.scales,
-layers.5.mlp.gate_proj.weight,
-layers.5.mlp.up_proj.biases,
-layers.5.mlp.up_proj.scales,
-layers.5.mlp.up_proj.weight,
-layers.5.post_attention_layernorm.weight,
-layers.5.post_feedforward_layernorm.weight,
-layers.5.pre_feedforward_layernorm.weight,
-layers.5.self_attn.gate_proj.biases,
-layers.5.self_attn.gate_proj.scales,
-layers.5.self_attn.gate_proj.weight,
-layers.5.self_attn.k_proj.biases,
-layers.5.self_attn.k_proj.scales,
-layers.5.self_attn.k_proj.weight,
-layers.5.self_attn.o_proj.biases,
-layers.5.self_attn.o_proj.scales,
-layers.5.self_attn.o_proj.weight,
-layers.5.self_attn.q_proj.biases,
-layers.5.self_attn.q_proj.scales,
-layers.5.self_attn.q_proj.weight,
-layers.5.self_attn.v_proj.biases,
-layers.5.self_attn.v_proj.scales,
-layers.5.self_attn.v_proj.weight,
-layers.50.input_layernorm.weight,
-layers.50.mlp.down_proj.biases,
-layers.50.mlp.down_proj.scales,
-layers.50.mlp.down_proj.weight,
-layers.50.mlp.gate_proj.biases,
-layers.50.mlp.gate_proj.scales,
-layers.50.mlp.gate_proj.weight,
-layers.50.mlp.up_proj.biases,
-layers.50.mlp.up_proj.scales,
-layers.50.mlp.up_proj.weight,
-layers.50.post_attention_layernorm.weight,
-layers.50.post_feedforward_layernorm.weight,
-layers.50.pre_feedforward_layernorm.weight,
-layers.50.self_attn.gate_proj.biases,
-layers.50.self_attn.gate_proj.scales,
-layers.50.self_attn.gate_proj.weight,
-layers.50.self_attn.k_proj.biases,
-layers.50.self_attn.k_proj.scales,
-layers.50.self_attn.k_proj.weight,
-layers.50.self_attn.o_proj.biases,
-layers.50.self_attn.o_proj.scales,
-layers.50.self_attn.o_proj.weight,
-layers.50.self_attn.q_proj.biases,
-layers.50.self_attn.q_proj.scales,
-layers.50.self_attn.q_proj.weight,
-layers.50.self_attn.v_proj.biases,
-layers.50.self_attn.v_proj.scales,
-layers.50.self_attn.v_proj.weight,
-layers.51.input_layernorm.weight,
-layers.51.mlp.down_proj.biases,
-layers.51.mlp.down_proj.scales,
-layers.51.mlp.down_proj.weight,
-layers.51.mlp.gate_proj.biases,
-layers.51.mlp.gate_proj.scales,
-layers.51.mlp.gate_proj.weight,
-layers.51.mlp.up_proj.biases,
-layers.51.mlp.up_proj.scales,
-layers.51.mlp.up_proj.weight,
-layers.51.post_attention_layernorm.weight,
-layers.51.post_feedforward_layernorm.weight,
-layers.51.pre_feedforward_layernorm.weight,
-layers.51.self_attn.gate_proj.biases,
-layers.51.self_attn.gate_proj.scales,
-layers.51.self_attn.gate_proj.weight,
-layers.51.self_attn.k_proj.biases,
-layers.51.self_attn.k_proj.scales,
-layers.51.self_attn.k_proj.weight,
-layers.51.self_attn.o_proj.biases,
-layers.51.self_attn.o_proj.scales,
-layers.51.self_attn.o_proj.weight,
-layers.51.self_attn.q_proj.biases,
-layers.51.self_attn.q_proj.scales,
-layers.51.self_attn.q_proj.weight,
-layers.51.self_attn.v_proj.biases,
-layers.51.self_attn.v_proj.scales,
-layers.51.self_attn.v_proj.weight,
-layers.6.input_layernorm.weight,
-layers.6.mlp.down_proj.biases,
-layers.6.mlp.down_proj.scales,
-layers.6.mlp.down_proj.weight,
-layers.6.mlp.gate_proj.biases,
-layers.6.mlp.gate_proj.scales,
-layers.6.mlp.gate_proj.weight,
-layers.6.mlp.up_proj.biases,
-layers.6.mlp.up_proj.scales,
-layers.6.mlp.up_proj.weight,
-layers.6.post_attention_layernorm.weight,
-layers.6.post_feedforward_layernorm.weight,
-layers.6.pre_feedforward_layernorm.weight,
-layers.6.self_attn.gate_proj.biases,
-layers.6.self_attn.gate_proj.scales,
-layers.6.self_attn.gate_proj.weight,
-layers.6.self_attn.k_proj.biases,
-layers.6.self_attn.k_proj.scales,
-layers.6.self_attn.k_proj.weight,
-layers.6.self_attn.o_proj.biases,
-layers.6.self_attn.o_proj.scales,
-layers.6.self_attn.o_proj.weight,
-layers.6.self_attn.q_proj.biases,
-layers.6.self_attn.q_proj.scales,
-layers.6.self_attn.q_proj.weight,
-layers.6.self_attn.v_proj.biases,
-layers.6.self_attn.v_proj.scales,
-layers.6.self_attn.v_proj.weight,
-layers.7.input_layernorm.weight,
-layers.7.mlp.down_proj.biases,
-layers.7.mlp.down_proj.scales,
-layers.7.mlp.down_proj.weight,
-layers.7.mlp.gate_proj.biases,
-layers.7.mlp.gate_proj.scales,
-layers.7.mlp.gate_proj.weight,
-layers.7.mlp.up_proj.biases,
-layers.7.mlp.up_proj.scales,
-layers.7.mlp.up_proj.weight,
-layers.7.post_attention_layernorm.weight,
-layers.7.post_feedforward_layernorm.weight,
-layers.7.pre_feedforward_layernorm.weight,
-layers.7.self_attn.gate_proj.biases,
-layers.7.self_attn.gate_proj.scales,
-layers.7.self_attn.gate_proj.weight,
-layers.7.self_attn.k_proj.biases,
-layers.7.self_attn.k_proj.scales,
-layers.7.self_attn.k_proj.weight,
-layers.7.self_attn.o_proj.biases,
-layers.7.self_attn.o_proj.scales,
-layers.7.self_attn.o_proj.weight,
-layers.7.self_attn.q_proj.biases,
-layers.7.self_attn.q_proj.scales,
-layers.7.self_attn.q_proj.weight,
-layers.7.self_attn.v_proj.biases,
-layers.7.self_attn.v_proj.scales,
-layers.7.self_attn.v_proj.weight,
-layers.8.input_layernorm.weight,
-layers.8.mlp.down_proj.biases,
-layers.8.mlp.down_proj.scales,
-layers.8.mlp.down_proj.weight,
-layers.8.mlp.gate_proj.biases,
-layers.8.mlp.gate_proj.scales,
-layers.8.mlp.gate_proj.weight,
-layers.8.mlp.up_proj.biases,
-layers.8.mlp.up_proj.scales,
-layers.8.mlp.up_proj.weight,
-layers.8.post_attention_layernorm.weight,
-layers.8.post_feedforward_layernorm.weight,
-layers.8.pre_feedforward_layernorm.weight,
-layers.8.self_attn.gate_proj.biases,
-layers.8.self_attn.gate_proj.scales,
-layers.8.self_attn.gate_proj.weight,
-layers.8.self_attn.k_proj.biases,
-layers.8.self_attn.k_proj.scales,
-layers.8.self_attn.k_proj.weight,
-layers.8.self_attn.o_proj.biases,
-layers.8.self_attn.o_proj.scales,
-layers.8.self_attn.o_proj.weight,
-layers.8.self_attn.q_proj.biases,
-layers.8.self_attn.q_proj.scales,
-layers.8.self_attn.q_proj.weight,
-layers.8.self_attn.v_proj.biases,
-layers.8.self_attn.v_proj.scales,
-layers.8.self_attn.v_proj.weight,
-layers.9.input_layernorm.weight,
-layers.9.mlp.down_proj.biases,
-layers.9.mlp.down_proj.scales,
-layers.9.mlp.down_proj.weight,
-layers.9.mlp.gate_proj.biases,
-layers.9.mlp.gate_proj.scales,
-layers.9.mlp.gate_proj.weight,
-layers.9.mlp.up_proj.biases,
-layers.9.mlp.up_proj.scales,
-layers.9.mlp.up_proj.weight,
-layers.9.post_attention_layernorm.weight,
-layers.9.post_feedforward_layernorm.weight,
-layers.9.pre_feedforward_layernorm.weight,
-layers.9.self_attn.gate_proj.biases,
-layers.9.self_attn.gate_proj.scales,
-layers.9.self_attn.gate_proj.weight,
-layers.9.self_attn.k_proj.biases,
-layers.9.self_attn.k_proj.scales,
-layers.9.self_attn.k_proj.weight,
-layers.9.self_attn.o_proj.biases,
-layers.9.self_attn.o_proj.scales,
-layers.9.self_attn.o_proj.weight,
-layers.9.self_attn.q_proj.biases,
-layers.9.self_attn.q_proj.scales,
-layers.9.self_attn.q_proj.weight,
-layers.9.self_attn.v_proj.biases,
-layers.9.self_attn.v_proj.scales,
-layers.9.self_attn.v_proj.weight,
-norm.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14614, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13616, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 1460 parameters not in model: 
-embed_tokens.biases,
-embed_tokens.scales,
-embed_tokens.weight,
-layers.0.input_layernorm.weight,
-layers.0.mlp.down_proj.biases,
-layers.0.mlp.down_proj.scales,
-layers.0.mlp.down_proj.weight,
-layers.0.mlp.gate_proj.biases,
-layers.0.mlp.gate_proj.scales,
-layers.0.mlp.gate_proj.weight,
-layers.0.mlp.up_proj.biases,
-layers.0.mlp.up_proj.scales,
-layers.0.mlp.up_proj.weight,
-layers.0.post_attention_layernorm.weight,
-layers.0.post_feedforward_layernorm.weight,
-layers.0.pre_feedforward_layernorm.weight,
-layers.0.self_attn.gate_proj.biases,
-layers.0.self_attn.gate_proj.scales,
-layers.0.self_attn.gate_proj.weight,
-layers.0.self_attn.k_proj.biases,
-layers.0.self_attn.k_proj.scales,
-layers.0.self_attn.k_proj.weight,
-layers.0.self_attn.o_proj.biases,
-layers.0.self_attn.o_proj.scales,
-layers.0.self_attn.o_proj.weight,
-layers.0.self_attn.q_proj.biases,
-layers.0.self_attn.q_proj.scales,
-layers.0.self_attn.q_proj.weight,
-layers.0.self_attn.v_proj.biases,
-layers.0.self_attn.v_proj.scales,
-layers.0.self_attn.v_proj.weight,
-layers.1.input_layernorm.weight,
-layers.1.mlp.down_proj.biases,
-layers.1.mlp.down_proj.scales,
-layers.1.mlp.down_proj.weight,
-layers.1.mlp.gate_proj.biases,
-layers.1.mlp.gate_proj.scales,
-layers.1.mlp.gate_proj.weight,
-layers.1.mlp.up_proj.biases,
-layers.1.mlp.up_proj.scales,
-layers.1.mlp.up_proj.weight,
-layers.1.post_attention_layernorm.weight,
-layers.1.post_feedforward_layernorm.weight,
-layers.1.pre_feedforward_layernorm.weight,
-layers.1.self_attn.gate_proj.biases,
-layers.1.self_attn.gate_proj.scales,
-layers.1.self_attn.gate_proj.weight,
-layers.1.self_attn.k_proj.biases,
-layers.1.self_attn.k_proj.scales,
-layers.1.self_attn.k_proj.weight,
-layers.1.self_attn.o_proj.biases,
-layers.1.self_attn.o_proj.scales,
-layers.1.self_attn.o_proj.weight,
-layers.1.self_attn.q_proj.biases,
-layers.1.self_attn.q_proj.scales,
-layers.1.self_attn.q_proj.weight,
-layers.1.self_attn.v_proj.biases,
-layers.1.self_attn.v_proj.scales,
-layers.1.self_attn.v_proj.weight,
-layers.10.input_layernorm.weight,
-layers.10.mlp.down_proj.biases,
-layers.10.mlp.down_proj.scales,
-layers.10.mlp.down_proj.weight,
-layers.10.mlp.gate_proj.biases,
-layers.10.mlp.gate_proj.scales,
-layers.10.mlp.gate_proj.weight,
-layers.10.mlp.up_proj.biases,
-layers.10.mlp.up_proj.scales,
-layers.10.mlp.up_proj.weight,
-layers.10.post_attention_layernorm.weight,
-layers.10.post_feedforward_layernorm.weight,
-layers.10.pre_feedforward_layernorm.weight,
-layers.10.self_attn.gate_proj.biases,
-layers.10.self_attn.gate_proj.scales,
-layers.10.self_attn.gate_proj.weight,
-layers.10.self_attn.k_proj.biases,
-layers.10.self_attn.k_proj.scales,
-layers.10.self_attn.k_proj.weight,
-layers.10.self_attn.o_proj.biases,
-layers.10.self_attn.o_proj.scales,
-layers.10.self_attn.o_proj.weight,
-layers.10.self_attn.q_proj.biases,
-layers.10.self_attn.q_proj.scales,
-layers.10.self_attn.q_proj.weight,
-layers.10.self_attn.v_proj.biases,
-layers.10.self_attn.v_proj.scales,
-layers.10.self_attn.v_proj.weight,
-layers.11.input_layernorm.weight,
-layers.11.mlp.down_proj.biases,
-layers.11.mlp.down_proj.scales,
-layers.11.mlp.down_proj.weight,
-layers.11.mlp.gate_proj.biases,
-layers.11.mlp.gate_proj.scales,
-layers.11.mlp.gate_proj.weight,
-layers.11.mlp.up_proj.biases,
-layers.11.mlp.up_proj.scales,
-layers.11.mlp.up_proj.weight,
-layers.11.post_attention_layernorm.weight,
-layers.11.post_feedforward_layernorm.weight,
-layers.11.pre_feedforward_layernorm.weight,
-layers.11.self_attn.gate_proj.biases,
-layers.11.self_attn.gate_proj.scales,
-layers.11.self_attn.gate_proj.weight,
-layers.11.self_attn.k_proj.biases,
-layers.11.self_attn.k_proj.scales,
-layers.11.self_attn.k_proj.weight,
-layers.11.self_attn.o_proj.biases,
-layers.11.self_attn.o_proj.scales,
-layers.11.self_attn.o_proj.weight,
-layers.11.self_attn.q_proj.biases,
-layers.11.self_attn.q_proj.scales,
-layers.11.self_attn.q_proj.weight,
-layers.11.self_attn.v_proj.biases,
-layers.11.self_attn.v_proj.scales,
-layers.11.self_attn.v_proj.weight,
-layers.12.input_layernorm.weight,
-layers.12.mlp.down_proj.biases,
-layers.12.mlp.down_proj.scales,
-layers.12.mlp.down_proj.weight,
-layers.12.mlp.gate_proj.biases,
-layers.12.mlp.gate_proj.scales,
-layers.12.mlp.gate_proj.weight,
-layers.12.mlp.up_proj.biases,
-layers.12.mlp.up_proj.scales,
-layers.12.mlp.up_proj.weight,
-layers.12.post_attention_layernorm.weight,
-layers.12.post_feedforward_layernorm.weight,
-layers.12.pre_feedforward_layernorm.weight,
-layers.12.self_attn.gate_proj.biases,
-layers.12.self_attn.gate_proj.scales,
-layers.12.self_attn.gate_proj.weight,
-layers.12.self_attn.k_proj.biases,
-layers.12.self_attn.k_proj.scales,
-layers.12.self_attn.k_proj.weight,
-layers.12.self_attn.o_proj.biases,
-layers.12.self_attn.o_proj.scales,
-layers.12.self_attn.o_proj.weight,
-layers.12.self_attn.q_proj.biases,
-layers.12.self_attn.q_proj.scales,
-layers.12.self_attn.q_proj.weight,
-layers.12.self_attn.v_proj.biases,
-layers.12.self_attn.v_proj.scales,
-layers.12.self_attn.v_proj.weight,
-layers.13.input_layernorm.weight,
-layers.13.mlp.down_proj.biases,
-layers.13.mlp.down_proj.scales,
-layers.13.mlp.down_proj.weight,
-layers.13.mlp.gate_proj.biases,
-layers.13.mlp.gate_proj.scales,
-layers.13.mlp.gate_proj.weight,
-layers.13.mlp.up_proj.biases,
-layers.13.mlp.up_proj.scales,
-layers.13.mlp.up_proj.weight,
-layers.13.post_attention_layernorm.weight,
-layers.13.post_feedforward_layernorm.weight,
-layers.13.pre_feedforward_layernorm.weight,
-layers.13.self_attn.gate_proj.biases,
-layers.13.self_attn.gate_proj.scales,
-layers.13.self_attn.gate_proj.weight,
-layers.13.self_attn.k_proj.biases,
-layers.13.self_attn.k_proj.scales,
-layers.13.self_attn.k_proj.weight,
-layers.13.self_attn.o_proj.biases,
-layers.13.self_attn.o_proj.scales,
-layers.13.self_attn.o_proj.weight,
-layers.13.self_attn.q_proj.biases,
-layers.13.self_attn.q_proj.scales,
-layers.13.self_attn.q_proj.weight,
-layers.13.self_attn.v_proj.biases,
-layers.13.self_attn.v_proj.scales,
-layers.13.self_attn.v_proj.weight,
-layers.14.input_layernorm.weight,
-layers.14.mlp.down_proj.biases,
-layers.14.mlp.down_proj.scales,
-layers.14.mlp.down_proj.weight,
-layers.14.mlp.gate_proj.biases,
-layers.14.mlp.gate_proj.scales,
-layers.14.mlp.gate_proj.weight,
-layers.14.mlp.up_proj.biases,
-layers.14.mlp.up_proj.scales,
-layers.14.mlp.up_proj.weight,
-layers.14.post_attention_layernorm.weight,
-layers.14.post_feedforward_layernorm.weight,
-layers.14.pre_feedforward_layernorm.weight,
-layers.14.self_attn.gate_proj.biases,
-layers.14.self_attn.gate_proj.scales,
-layers.14.self_attn.gate_proj.weight,
-layers.14.self_attn.k_proj.biases,
-layers.14.self_attn.k_proj.scales,
-layers.14.self_attn.k_proj.weight,
-layers.14.self_attn.o_proj.biases,
-layers.14.self_attn.o_proj.scales,
-layers.14.self_attn.o_proj.weight,
-layers.14.self_attn.q_proj.biases,
-layers.14.self_attn.q_proj.scales,
-layers.14.self_attn.q_proj.weight,
-layers.14.self_attn.v_proj.biases,
-layers.14.self_attn.v_proj.scales,
-layers.14.self_attn.v_proj.weight,
-layers.15.input_layernorm.weight,
-layers.15.mlp.down_proj.biases,
-layers.15.mlp.down_proj.scales,
-layers.15.mlp.down_proj.weight,
-layers.15.mlp.gate_proj.biases,
-layers.15.mlp.gate_proj.scales,
-layers.15.mlp.gate_proj.weight,
-layers.15.mlp.up_proj.biases,
-layers.15.mlp.up_proj.scales,
-layers.15.mlp.up_proj.weight,
-layers.15.post_attention_layernorm.weight,
-layers.15.post_feedforward_layernorm.weight,
-layers.15.pre_feedforward_layernorm.weight,
-layers.15.self_attn.gate_proj.biases,
-layers.15.self_attn.gate_proj.scales,
-layers.15.self_attn.gate_proj.weight,
-layers.15.self_attn.k_proj.biases,
-layers.15.self_attn.k_proj.scales,
-layers.15.self_attn.k_proj.weight,
-layers.15.self_attn.o_proj.biases,
-layers.15.self_attn.o_proj.scales,
-layers.15.self_attn.o_proj.weight,
-layers.15.self_attn.q_proj.biases,
-layers.15.self_attn.q_proj.scales,
-layers.15.self_attn.q_proj.weight,
-layers.15.self_attn.v_proj.biases,
-layers.15.self_attn.v_proj.scales,
-layers.15.self_attn.v_proj.weight,
-layers.16.input_layernorm.weight,
-layers.16.mlp.down_proj.biases,
-layers.16.mlp.down_proj.scales,
-layers.16.mlp.down_proj.weight,
-layers.16.mlp.gate_proj.biases,
-layers.16.mlp.gate_proj.scales,
-layers.16.mlp.gate_proj.weight,
-layers.16.mlp.up_proj.biases,
-layers.16.mlp.up_proj.scales,
-layers.16.mlp.up_proj.weight,
-layers.16.post_attention_layernorm.weight,
-layers.16.post_feedforward_layernorm.weight,
-layers.16.pre_feedforward_layernorm.weight,
-layers.16.self_attn.gate_proj.biases,
-layers.16.self_attn.gate_proj.scales,
-layers.16.self_attn.gate_proj.weight,
-layers.16.self_attn.k_proj.biases,
-layers.16.self_attn.k_proj.scales,
-layers.16.self_attn.k_proj.weight,
-layers.16.self_attn.o_proj.biases,
-layers.16.self_attn.o_proj.scales,
-layers.16.self_attn.o_proj.weight,
-layers.16.self_attn.q_proj.biases,
-layers.16.self_attn.q_proj.scales,
-layers.16.self_attn.q_proj.weight,
-layers.16.self_attn.v_proj.biases,
-layers.16.self_attn.v_proj.scales,
-layers.16.self_attn.v_proj.weight,
-layers.17.input_layernorm.weight,
-layers.17.mlp.down_proj.biases,
-layers.17.mlp.down_proj.scales,
-layers.17.mlp.down_proj.weight,
-layers.17.mlp.gate_proj.biases,
-layers.17.mlp.gate_proj.scales,
-layers.17.mlp.gate_proj.weight,
-layers.17.mlp.up_proj.biases,
-layers.17.mlp.up_proj.scales,
-layers.17.mlp.up_proj.weight,
-layers.17.post_attention_layernorm.weight,
-layers.17.post_feedforward_layernorm.weight,
-layers.17.pre_feedforward_layernorm.weight,
-layers.17.self_attn.gate_proj.biases,
-layers.17.self_attn.gate_proj.scales,
-layers.17.self_attn.gate_proj.weight,
-layers.17.self_attn.k_proj.biases,
-layers.17.self_attn.k_proj.scales,
-layers.17.self_attn.k_proj.weight,
-layers.17.self_attn.o_proj.biases,
-layers.17.self_attn.o_proj.scales,
-layers.17.self_attn.o_proj.weight,
-layers.17.self_attn.q_proj.biases,
-layers.17.self_attn.q_proj.scales,
-layers.17.self_attn.q_proj.weight,
-layers.17.self_attn.v_proj.biases,
-layers.17.self_attn.v_proj.scales,
-layers.17.self_attn.v_proj.weight,
-layers.18.input_layernorm.weight,
-layers.18.mlp.down_proj.biases,
-layers.18.mlp.down_proj.scales,
-layers.18.mlp.down_proj.weight,
-layers.18.mlp.gate_proj.biases,
-layers.18.mlp.gate_proj.scales,
-layers.18.mlp.gate_proj.weight,
-layers.18.mlp.up_proj.biases,
-layers.18.mlp.up_proj.scales,
-layers.18.mlp.up_proj.weight,
-layers.18.post_attention_layernorm.weight,
-layers.18.post_feedforward_layernorm.weight,
-layers.18.pre_feedforward_layernorm.weight,
-layers.18.self_attn.gate_proj.biases,
-layers.18.self_attn.gate_proj.scales,
-layers.18.self_attn.gate_proj.weight,
-layers.18.self_attn.k_proj.biases,
-layers.18.self_attn.k_proj.scales,
-layers.18.self_attn.k_proj.weight,
-layers.18.self_attn.o_proj.biases,
-layers.18.self_attn.o_proj.scales,
-layers.18.self_attn.o_proj.weight,
-layers.18.self_attn.q_proj.biases,
-layers.18.self_attn.q_proj.scales,
-layers.18.self_attn.q_proj.weight,
-layers.18.self_attn.v_proj.biases,
-layers.18.self_attn.v_proj.scales,
-layers.18.self_attn.v_proj.weight,
-layers.19.input_layernorm.weight,
-layers.19.mlp.down_proj.biases,
-layers.19.mlp.down_proj.scales,
-layers.19.mlp.down_proj.weight,
-layers.19.mlp.gate_proj.biases,
-layers.19.mlp.gate_proj.scales,
-layers.19.mlp.gate_proj.weight,
-layers.19.mlp.up_proj.biases,
-layers.19.mlp.up_proj.scales,
-layers.19.mlp.up_proj.weight,
-layers.19.post_attention_layernorm.weight,
-layers.19.post_feedforward_layernorm.weight,
-layers.19.pre_feedforward_layernorm.weight,
-layers.19.self_attn.gate_proj.biases,
-layers.19.self_attn.gate_proj.scales,
-layers.19.self_attn.gate_proj.weight,
-layers.19.self_attn.k_proj.biases,
-layers.19.self_attn.k_proj.scales,
-layers.19.self_attn.k_proj.weight,
-layers.19.self_attn.o_proj.biases,
-layers.19.self_attn.o_proj.scales,
-layers.19.self_attn.o_proj.weight,
-layers.19.self_attn.q_proj.biases,
-layers.19.self_attn.q_proj.scales,
-layers.19.self_attn.q_proj.weight,
-layers.19.self_attn.v_proj.biases,
-layers.19.self_attn.v_proj.scales,
-layers.19.self_attn.v_proj.weight,
-layers.2.input_layernorm.weight,
-layers.2.mlp.down_proj.biases,
-layers.2.mlp.down_proj.scales,
-layers.2.mlp.down_proj.weight,
-layers.2.mlp.gate_proj.biases,
-layers.2.mlp.gate_proj.scales,
-layers.2.mlp.gate_proj.weight,
-layers.2.mlp.up_proj.biases,
-layers.2.mlp.up_proj.scales,
-layers.2.mlp.up_proj.weight,
-layers.2.post_attention_layernorm.weight,
-layers.2.post_feedforward_layernorm.weight,
-layers.2.pre_feedforward_layernorm.weight,
-layers.2.self_attn.gate_proj.biases,
-layers.2.self_attn.gate_proj.scales,
-layers.2.self_attn.gate_proj.weight,
-layers.2.self_attn.k_proj.biases,
-layers.2.self_attn.k_proj.scales,
-layers.2.self_attn.k_proj.weight,
-layers.2.self_attn.o_proj.biases,
-layers.2.self_attn.o_proj.scales,
-layers.2.self_attn.o_proj.weight,
-layers.2.self_attn.q_proj.biases,
-layers.2.self_attn.q_proj.scales,
-layers.2.self_attn.q_proj.weight,
-layers.2.self_attn.v_proj.biases,
-layers.2.self_attn.v_proj.scales,
-layers.2.self_attn.v_proj.weight,
-layers.20.input_layernorm.weight,
-layers.20.mlp.down_proj.biases,
-layers.20.mlp.down_proj.scales,
-layers.20.mlp.down_proj.weight,
-layers.20.mlp.gate_proj.biases,
-layers.20.mlp.gate_proj.scales,
-layers.20.mlp.gate_proj.weight,
-layers.20.mlp.up_proj.biases,
-layers.20.mlp.up_proj.scales,
-layers.20.mlp.up_proj.weight,
-layers.20.post_attention_layernorm.weight,
-layers.20.post_feedforward_layernorm.weight,
-layers.20.pre_feedforward_layernorm.weight,
-layers.20.self_attn.gate_proj.biases,
-layers.20.self_attn.gate_proj.scales,
-layers.20.self_attn.gate_proj.weight,
-layers.20.self_attn.k_proj.biases,
-layers.20.self_attn.k_proj.scales,
-layers.20.self_attn.k_proj.weight,
-layers.20.self_attn.o_proj.biases,
-layers.20.self_attn.o_proj.scales,
-layers.20.self_attn.o_proj.weight,
-layers.20.self_attn.q_proj.biases,
-layers.20.self_attn.q_proj.scales,
-layers.20.self_attn.q_proj.weight,
-layers.20.self_attn.v_proj.biases,
-layers.20.self_attn.v_proj.scales,
-layers.20.self_attn.v_proj.weight,
-layers.21.input_layernorm.weight,
-layers.21.mlp.down_proj.biases,
-layers.21.mlp.down_proj.scales,
-layers.21.mlp.down_proj.weight,
-layers.21.mlp.gate_proj.biases,
-layers.21.mlp.gate_proj.scales,
-layers.21.mlp.gate_proj.weight,
-layers.21.mlp.up_proj.biases,
-layers.21.mlp.up_proj.scales,
-layers.21.mlp.up_proj.weight,
-layers.21.post_attention_layernorm.weight,
-layers.21.post_feedforward_layernorm.weight,
-layers.21.pre_feedforward_layernorm.weight,
-layers.21.self_attn.gate_proj.biases,
-layers.21.self_attn.gate_proj.scales,
-layers.21.self_attn.gate_proj.weight,
-layers.21.self_attn.k_proj.biases,
-layers.21.self_attn.k_proj.scales,
-layers.21.self_attn.k_proj.weight,
-layers.21.self_attn.o_proj.biases,
-layers.21.self_attn.o_proj.scales,
-layers.21.self_attn.o_proj.weight,
-layers.21.self_attn.q_proj.biases,
-layers.21.self_attn.q_proj.scales,
-layers.21.self_attn.q_proj.weight,
-layers.21.self_attn.v_proj.biases,
-layers.21.self_attn.v_proj.scales,
-layers.21.self_attn.v_proj.weight,
-layers.22.input_layernorm.weight,
-layers.22.mlp.down_proj.biases,
-layers.22.mlp.down_proj.scales,
-layers.22.mlp.down_proj.weight,
-layers.22.mlp.gate_proj.biases,
-layers.22.mlp.gate_proj.scales,
-layers.22.mlp.gate_proj.weight,
-layers.22.mlp.up_proj.biases,
-layers.22.mlp.up_proj.scales,
-layers.22.mlp.up_proj.weight,
-layers.22.post_attention_layernorm.weight,
-layers.22.post_feedforward_layernorm.weight,
-layers.22.pre_feedforward_layernorm.weight,
-layers.22.self_attn.gate_proj.biases,
-layers.22.self_attn.gate_proj.scales,
-layers.22.self_attn.gate_proj.weight,
-layers.22.self_attn.k_proj.biases,
-layers.22.self_attn.k_proj.scales,
-layers.22.self_attn.k_proj.weight,
-layers.22.self_attn.o_proj.biases,
-layers.22.self_attn.o_proj.scales,
-layers.22.self_attn.o_proj.weight,
-layers.22.self_attn.q_proj.biases,
-layers.22.self_attn.q_proj.scales,
-layers.22.self_attn.q_proj.weight,
-layers.22.self_attn.v_proj.biases,
-layers.22.self_attn.v_proj.scales,
-layers.22.self_attn.v_proj.weight,
-layers.23.input_layernorm.weight,
-layers.23.mlp.down_proj.biases,
-layers.23.mlp.down_proj.scales,
-layers.23.mlp.down_proj.weight,
-layers.23.mlp.gate_proj.biases,
-layers.23.mlp.gate_proj.scales,
-layers.23.mlp.gate_proj.weight,
-layers.23.mlp.up_proj.biases,
-layers.23.mlp.up_proj.scales,
-layers.23.mlp.up_proj.weight,
-layers.23.post_attention_layernorm.weight,
-layers.23.post_feedforward_layernorm.weight,
-layers.23.pre_feedforward_layernorm.weight,
-layers.23.self_attn.gate_proj.biases,
-layers.23.self_attn.gate_proj.scales,
-layers.23.self_attn.gate_proj.weight,
-layers.23.self_attn.k_proj.biases,
-layers.23.self_attn.k_proj.scales,
-layers.23.self_attn.k_proj.weight,
-layers.23.self_attn.o_proj.biases,
-layers.23.self_attn.o_proj.scales,
-layers.23.self_attn.o_proj.weight,
-layers.23.self_attn.q_proj.biases,
-layers.23.self_attn.q_proj.scales,
-layers.23.self_attn.q_proj.weight,
-layers.23.self_attn.v_proj.biases,
-layers.23.self_attn.v_proj.scales,
-layers.23.self_attn.v_proj.weight,
-layers.24.input_layernorm.weight,
-layers.24.mlp.down_proj.biases,
-layers.24.mlp.down_proj.scales,
-layers.24.mlp.down_proj.weight,
-layers.24.mlp.gate_proj.biases,
-layers.24.mlp.gate_proj.scales,
-layers.24.mlp.gate_proj.weight,
-layers.24.mlp.up_proj.biases,
-layers.24.mlp.up_proj.scales,
-layers.24.mlp.up_proj.weight,
-layers.24.post_attention_layernorm.weight,
-layers.24.post_feedforward_layernorm.weight,
-layers.24.pre_feedforward_layernorm.weight,
-layers.24.self_attn.gate_proj.biases,
-layers.24.self_attn.gate_proj.scales,
-layers.24.self_attn.gate_proj.weight,
-layers.24.self_attn.k_proj.biases,
-layers.24.self_attn.k_proj.scales,
-layers.24.self_attn.k_proj.weight,
-layers.24.self_attn.o_proj.biases,
-layers.24.self_attn.o_proj.scales,
-layers.24.self_attn.o_proj.weight,
-layers.24.self_attn.q_proj.biases,
-layers.24.self_attn.q_proj.scales,
-layers.24.self_attn.q_proj.weight,
-layers.24.self_attn.v_proj.biases,
-layers.24.self_attn.v_proj.scales,
-layers.24.self_attn.v_proj.weight,
-layers.25.input_layernorm.weight,
-layers.25.mlp.down_proj.biases,
-layers.25.mlp.down_proj.scales,
-layers.25.mlp.down_proj.weight,
-layers.25.mlp.gate_proj.biases,
-layers.25.mlp.gate_proj.scales,
-layers.25.mlp.gate_proj.weight,
-layers.25.mlp.up_proj.biases,
-layers.25.mlp.up_proj.scales,
-layers.25.mlp.up_proj.weight,
-layers.25.post_attention_layernorm.weight,
-layers.25.post_feedforward_layernorm.weight,
-layers.25.pre_feedforward_layernorm.weight,
-layers.25.self_attn.gate_proj.biases,
-layers.25.self_attn.gate_proj.scales,
-layers.25.self_attn.gate_proj.weight,
-layers.25.self_attn.k_proj.biases,
-layers.25.self_attn.k_proj.scales,
-layers.25.self_attn.k_proj.weight,
-layers.25.self_attn.o_proj.biases,
-layers.25.self_attn.o_proj.scales,
-layers.25.self_attn.o_proj.weight,
-layers.25.self_attn.q_proj.biases,
-layers.25.self_attn.q_proj.scales,
-layers.25.self_attn.q_proj.weight,
-layers.25.self_attn.v_proj.biases,
-layers.25.self_attn.v_proj.scales,
-layers.25.self_attn.v_proj.weight,
-layers.26.input_layernorm.weight,
-layers.26.mlp.down_proj.biases,
-layers.26.mlp.down_proj.scales,
-layers.26.mlp.down_proj.weight,
-layers.26.mlp.gate_proj.biases,
-layers.26.mlp.gate_proj.scales,
-layers.26.mlp.gate_proj.weight,
-layers.26.mlp.up_proj.biases,
-layers.26.mlp.up_proj.scales,
-layers.26.mlp.up_proj.weight,
-layers.26.post_attention_layernorm.weight,
-layers.26.post_feedforward_layernorm.weight,
-layers.26.pre_feedforward_layernorm.weight,
-layers.26.self_attn.gate_proj.biases,
-layers.26.self_attn.gate_proj.scales,
-layers.26.self_attn.gate_proj.weight,
-layers.26.self_attn.k_proj.biases,
-layers.26.self_attn.k_proj.scales,
-layers.26.self_attn.k_proj.weight,
-layers.26.self_attn.o_proj.biases,
-layers.26.self_attn.o_proj.scales,
-layers.26.self_attn.o_proj.weight,
-layers.26.self_attn.q_proj.biases,
-layers.26.self_attn.q_proj.scales,
-layers.26.self_attn.q_proj.weight,
-layers.26.self_attn.v_proj.biases,
-layers.26.self_attn.v_proj.scales,
-layers.26.self_attn.v_proj.weight,
-layers.27.input_layernorm.weight,
-layers.27.mlp.down_proj.biases,
-layers.27.mlp.down_proj.scales,
-layers.27.mlp.down_proj.weight,
-layers.27.mlp.gate_proj.biases,
-layers.27.mlp.gate_proj.scales,
-layers.27.mlp.gate_proj.weight,
-layers.27.mlp.up_proj.biases,
-layers.27.mlp.up_proj.scales,
-layers.27.mlp.up_proj.weight,
-layers.27.post_attention_layernorm.weight,
-layers.27.post_feedforward_layernorm.weight,
-layers.27.pre_feedforward_layernorm.weight,
-layers.27.self_attn.gate_proj.biases,
-layers.27.self_attn.gate_proj.scales,
-layers.27.self_attn.gate_proj.weight,
-layers.27.self_attn.k_proj.biases,
-layers.27.self_attn.k_proj.scales,
-layers.27.self_attn.k_proj.weight,
-layers.27.self_attn.o_proj.biases,
-layers.27.self_attn.o_proj.scales,
-layers.27.self_attn.o_proj.weight,
-layers.27.self_attn.q_proj.biases,
-layers.27.self_attn.q_proj.scales,
-layers.27.self_attn.q_proj.weight,
-layers.27.self_attn.v_proj.biases,
-layers.27.self_attn.v_proj.scales,
-layers.27.self_attn.v_proj.weight,
-layers.28.input_layernorm.weight,
-layers.28.mlp.down_proj.biases,
-layers.28.mlp.down_proj.scales,
-layers.28.mlp.down_proj.weight,
-layers.28.mlp.gate_proj.biases,
-layers.28.mlp.gate_proj.scales,
-layers.28.mlp.gate_proj.weight,
-layers.28.mlp.up_proj.biases,
-layers.28.mlp.up_proj.scales,
-layers.28.mlp.up_proj.weight,
-layers.28.post_attention_layernorm.weight,
-layers.28.post_feedforward_layernorm.weight,
-layers.28.pre_feedforward_layernorm.weight,
-layers.28.self_attn.gate_proj.biases,
-layers.28.self_attn.gate_proj.scales,
-layers.28.self_attn.gate_proj.weight,
-layers.28.self_attn.k_proj.biases,
-layers.28.self_attn.k_proj.scales,
-layers.28.self_attn.k_proj.weight,
-layers.28.self_attn.o_proj.biases,
-layers.28.self_attn.o_proj.scales,
-layers.28.self_attn.o_proj.weight,
-layers.28.self_attn.q_proj.biases,
-layers.28.self_attn.q_proj.scales,
-layers.28.self_attn.q_proj.weight,
-layers.28.self_attn.v_proj.biases,
-layers.28.self_attn.v_proj.scales,
-layers.28.self_attn.v_proj.weight,
-layers.29.input_layernorm.weight,
-layers.29.mlp.down_proj.biases,
-layers.29.mlp.down_proj.scales,
-layers.29.mlp.down_proj.weight,
-layers.29.mlp.gate_proj.biases,
-layers.29.mlp.gate_proj.scales,
-layers.29.mlp.gate_proj.weight,
-layers.29.mlp.up_proj.biases,
-layers.29.mlp.up_proj.scales,
-layers.29.mlp.up_proj.weight,
-layers.29.post_attention_layernorm.weight,
-layers.29.post_feedforward_layernorm.weight,
-layers.29.pre_feedforward_layernorm.weight,
-layers.29.self_attn.gate_proj.biases,
-layers.29.self_attn.gate_proj.scales,
-layers.29.self_attn.gate_proj.weight,
-layers.29.self_attn.k_proj.biases,
-layers.29.self_attn.k_proj.scales,
-layers.29.self_attn.k_proj.weight,
-layers.29.self_attn.o_proj.biases,
-layers.29.self_attn.o_proj.scales,
-layers.29.self_attn.o_proj.weight,
-layers.29.self_attn.q_proj.biases,
-layers.29.self_attn.q_proj.scales,
-layers.29.self_attn.q_proj.weight,
-layers.29.self_attn.v_proj.biases,
-layers.29.self_attn.v_proj.scales,
-layers.29.self_attn.v_proj.weight,
-layers.3.input_layernorm.weight,
-layers.3.mlp.down_proj.biases,
-layers.3.mlp.down_proj.scales,
-layers.3.mlp.down_proj.weight,
-layers.3.mlp.gate_proj.biases,
-layers.3.mlp.gate_proj.scales,
-layers.3.mlp.gate_proj.weight,
-layers.3.mlp.up_proj.biases,
-layers.3.mlp.up_proj.scales,
-layers.3.mlp.up_proj.weight,
-layers.3.post_attention_layernorm.weight,
-layers.3.post_feedforward_layernorm.weight,
-layers.3.pre_feedforward_layernorm.weight,
-layers.3.self_attn.gate_proj.biases,
-layers.3.self_attn.gate_proj.scales,
-layers.3.self_attn.gate_proj.weight,
-layers.3.self_attn.k_proj.biases,
-layers.3.self_attn.k_proj.scales,
-layers.3.self_attn.k_proj.weight,
-layers.3.self_attn.o_proj.biases,
-layers.3.self_attn.o_proj.scales,
-layers.3.self_attn.o_proj.weight,
-layers.3.self_attn.q_proj.biases,
-layers.3.self_attn.q_proj.scales,
-layers.3.self_attn.q_proj.weight,
-layers.3.self_attn.v_proj.biases,
-layers.3.self_attn.v_proj.scales,
-layers.3.self_attn.v_proj.weight,
-layers.30.input_layernorm.weight,
-layers.30.mlp.down_proj.biases,
-layers.30.mlp.down_proj.scales,
-layers.30.mlp.down_proj.weight,
-layers.30.mlp.gate_proj.biases,
-layers.30.mlp.gate_proj.scales,
-layers.30.mlp.gate_proj.weight,
-layers.30.mlp.up_proj.biases,
-layers.30.mlp.up_proj.scales,
-layers.30.mlp.up_proj.weight,
-layers.30.post_attention_layernorm.weight,
-layers.30.post_feedforward_layernorm.weight,
-layers.30.pre_feedforward_layernorm.weight,
-layers.30.self_attn.gate_proj.biases,
-layers.30.self_attn.gate_proj.scales,
-layers.30.self_attn.gate_proj.weight,
-layers.30.self_attn.k_proj.biases,
-layers.30.self_attn.k_proj.scales,
-layers.30.self_attn.k_proj.weight,
-layers.30.self_attn.o_proj.biases,
-layers.30.self_attn.o_proj.scales,
-layers.30.self_attn.o_proj.weight,
-layers.30.self_attn.q_proj.biases,
-layers.30.self_attn.q_proj.scales,
-layers.30.self_attn.q_proj.weight,
-layers.30.self_attn.v_proj.biases,
-layers.30.self_attn.v_proj.scales,
-layers.30.self_attn.v_proj.weight,
-layers.31.input_layernorm.weight,
-layers.31.mlp.down_proj.biases,
-layers.31.mlp.down_proj.scales,
-layers.31.mlp.down_proj.weight,
-layers.31.mlp.gate_proj.biases,
-layers.31.mlp.gate_proj.scales,
-layers.31.mlp.gate_proj.weight,
-layers.31.mlp.up_proj.biases,
-layers.31.mlp.up_proj.scales,
-layers.31.mlp.up_proj.weight,
-layers.31.post_attention_layernorm.weight,
-layers.31.post_feedforward_layernorm.weight,
-layers.31.pre_feedforward_layernorm.weight,
-layers.31.self_attn.gate_proj.biases,
-layers.31.self_attn.gate_proj.scales,
-layers.31.self_attn.gate_proj.weight,
-layers.31.self_attn.k_proj.biases,
-layers.31.self_attn.k_proj.scales,
-layers.31.self_attn.k_proj.weight,
-layers.31.self_attn.o_proj.biases,
-layers.31.self_attn.o_proj.scales,
-layers.31.self_attn.o_proj.weight,
-layers.31.self_attn.q_proj.biases,
-layers.31.self_attn.q_proj.scales,
-layers.31.self_attn.q_proj.weight,
-layers.31.self_attn.v_proj.biases,
-layers.31.self_attn.v_proj.scales,
-layers.31.self_attn.v_proj.weight,
-layers.32.input_layernorm.weight,
-layers.32.mlp.down_proj.biases,
-layers.32.mlp.down_proj.scales,
-layers.32.mlp.down_proj.weight,
-layers.32.mlp.gate_proj.biases,
-layers.32.mlp.gate_proj.scales,
-layers.32.mlp.gate_proj.weight,
-layers.32.mlp.up_proj.biases,
-layers.32.mlp.up_proj.scales,
-layers.32.mlp.up_proj.weight,
-layers.32.post_attention_layernorm.weight,
-layers.32.post_feedforward_layernorm.weight,
-layers.32.pre_feedforward_layernorm.weight,
-layers.32.self_attn.gate_proj.biases,
-layers.32.self_attn.gate_proj.scales,
-layers.32.self_attn.gate_proj.weight,
-layers.32.self_attn.k_proj.biases,
-layers.32.self_attn.k_proj.scales,
-layers.32.self_attn.k_proj.weight,
-layers.32.self_attn.o_proj.biases,
-layers.32.self_attn.o_proj.scales,
-layers.32.self_attn.o_proj.weight,
-layers.32.self_attn.q_proj.biases,
-layers.32.self_attn.q_proj.scales,
-layers.32.self_attn.q_proj.weight,
-layers.32.self_attn.v_proj.biases,
-layers.32.self_attn.v_proj.scales,
-layers.32.self_attn.v_proj.weight,
-layers.33.input_layernorm.weight,
-layers.33.mlp.down_proj.biases,
-layers.33.mlp.down_proj.scales,
-layers.33.mlp.down_proj.weight,
-layers.33.mlp.gate_proj.biases,
-layers.33.mlp.gate_proj.scales,
-layers.33.mlp.gate_proj.weight,
-layers.33.mlp.up_proj.biases,
-layers.33.mlp.up_proj.scales,
-layers.33.mlp.up_proj.weight,
-layers.33.post_attention_layernorm.weight,
-layers.33.post_feedforward_layernorm.weight,
-layers.33.pre_feedforward_layernorm.weight,
-layers.33.self_attn.gate_proj.biases,
-layers.33.self_attn.gate_proj.scales,
-layers.33.self_attn.gate_proj.weight,
-layers.33.self_attn.k_proj.biases,
-layers.33.self_attn.k_proj.scales,
-layers.33.self_attn.k_proj.weight,
-layers.33.self_attn.o_proj.biases,
-layers.33.self_attn.o_proj.scales,
-layers.33.self_attn.o_proj.weight,
-layers.33.self_attn.q_proj.biases,
-layers.33.self_attn.q_proj.scales,
-layers.33.self_attn.q_proj.weight,
-layers.33.self_attn.v_proj.biases,
-layers.33.self_attn.v_proj.scales,
-layers.33.self_attn.v_proj.weight,
-layers.34.input_layernorm.weight,
-layers.34.mlp.down_proj.biases,
-layers.34.mlp.down_proj.scales,
-layers.34.mlp.down_proj.weight,
-layers.34.mlp.gate_proj.biases,
-layers.34.mlp.gate_proj.scales,
-layers.34.mlp.gate_proj.weight,
-layers.34.mlp.up_proj.biases,
-layers.34.mlp.up_proj.scales,
-layers.34.mlp.up_proj.weight,
-layers.34.post_attention_layernorm.weight,
-layers.34.post_feedforward_layernorm.weight,
-layers.34.pre_feedforward_layernorm.weight,
-layers.34.self_attn.gate_proj.biases,
-layers.34.self_attn.gate_proj.scales,
-layers.34.self_attn.gate_proj.weight,
-layers.34.self_attn.k_proj.biases,
-layers.34.self_attn.k_proj.scales,
-layers.34.self_attn.k_proj.weight,
-layers.34.self_attn.o_proj.biases,
-layers.34.self_attn.o_proj.scales,
-layers.34.self_attn.o_proj.weight,
-layers.34.self_attn.q_proj.biases,
-layers.34.self_attn.q_proj.scales,
-layers.34.self_attn.q_proj.weight,
-layers.34.self_attn.v_proj.biases,
-layers.34.self_attn.v_proj.scales,
-layers.34.self_attn.v_proj.weight,
-layers.35.input_layernorm.weight,
-layers.35.mlp.down_proj.biases,
-layers.35.mlp.down_proj.scales,
-layers.35.mlp.down_proj.weight,
-layers.35.mlp.gate_proj.biases,
-layers.35.mlp.gate_proj.scales,
-layers.35.mlp.gate_proj.weight,
-layers.35.mlp.up_proj.biases,
-layers.35.mlp.up_proj.scales,
-layers.35.mlp.up_proj.weight,
-layers.35.post_attention_layernorm.weight,
-layers.35.post_feedforward_layernorm.weight,
-layers.35.pre_feedforward_layernorm.weight,
-layers.35.self_attn.gate_proj.biases,
-layers.35.self_attn.gate_proj.scales,
-layers.35.self_attn.gate_proj.weight,
-layers.35.self_attn.k_proj.biases,
-layers.35.self_attn.k_proj.scales,
-layers.35.self_attn.k_proj.weight,
-layers.35.self_attn.o_proj.biases,
-layers.35.self_attn.o_proj.scales,
-layers.35.self_attn.o_proj.weight,
-layers.35.self_attn.q_proj.biases,
-layers.35.self_attn.q_proj.scales,
-layers.35.self_attn.q_proj.weight,
-layers.35.self_attn.v_proj.biases,
-layers.35.self_attn.v_proj.scales,
-layers.35.self_attn.v_proj.weight,
-layers.36.input_layernorm.weight,
-layers.36.mlp.down_proj.biases,
-layers.36.mlp.down_proj.scales,
-layers.36.mlp.down_proj.weight,
-layers.36.mlp.gate_proj.biases,
-layers.36.mlp.gate_proj.scales,
-layers.36.mlp.gate_proj.weight,
-layers.36.mlp.up_proj.biases,
-layers.36.mlp.up_proj.scales,
-layers.36.mlp.up_proj.weight,
-layers.36.post_attention_layernorm.weight,
-layers.36.post_feedforward_layernorm.weight,
-layers.36.pre_feedforward_layernorm.weight,
-layers.36.self_attn.gate_proj.biases,
-layers.36.self_attn.gate_proj.scales,
-layers.36.self_attn.gate_proj.weight,
-layers.36.self_attn.k_proj.biases,
-layers.36.self_attn.k_proj.scales,
-layers.36.self_attn.k_proj.weight,
-layers.36.self_attn.o_proj.biases,
-layers.36.self_attn.o_proj.scales,
-layers.36.self_attn.o_proj.weight,
-layers.36.self_attn.q_proj.biases,
-layers.36.self_attn.q_proj.scales,
-layers.36.self_attn.q_proj.weight,
-layers.36.self_attn.v_proj.biases,
-layers.36.self_attn.v_proj.scales,
-layers.36.self_attn.v_proj.weight,
-layers.37.input_layernorm.weight,
-layers.37.mlp.down_proj.biases,
-layers.37.mlp.down_proj.scales,
-layers.37.mlp.down_proj.weight,
-layers.37.mlp.gate_proj.biases,
-layers.37.mlp.gate_proj.scales,
-layers.37.mlp.gate_proj.weight,
-layers.37.mlp.up_proj.biases,
-layers.37.mlp.up_proj.scales,
-layers.37.mlp.up_proj.weight,
-layers.37.post_attention_layernorm.weight,
-layers.37.post_feedforward_layernorm.weight,
-layers.37.pre_feedforward_layernorm.weight,
-layers.37.self_attn.gate_proj.biases,
-layers.37.self_attn.gate_proj.scales,
-layers.37.self_attn.gate_proj.weight,
-layers.37.self_attn.k_proj.biases,
-layers.37.self_attn.k_proj.scales,
-layers.37.self_attn.k_proj.weight,
-layers.37.self_attn.o_proj.biases,
-layers.37.self_attn.o_proj.scales,
-layers.37.self_attn.o_proj.weight,
-layers.37.self_attn.q_proj.biases,
-layers.37.self_attn.q_proj.scales,
-layers.37.self_attn.q_proj.weight,
-layers.37.self_attn.v_proj.biases,
-layers.37.self_attn.v_proj.scales,
-layers.37.self_attn.v_proj.weight,
-layers.38.input_layernorm.weight,
-layers.38.mlp.down_proj.biases,
-layers.38.mlp.down_proj.scales,
-layers.38.mlp.down_proj.weight,
-layers.38.mlp.gate_proj.biases,
-layers.38.mlp.gate_proj.scales,
-layers.38.mlp.gate_proj.weight,
-layers.38.mlp.up_proj.biases,
-layers.38.mlp.up_proj.scales,
-layers.38.mlp.up_proj.weight,
-layers.38.post_attention_layernorm.weight,
-layers.38.post_feedforward_layernorm.weight,
-layers.38.pre_feedforward_layernorm.weight,
-layers.38.self_attn.gate_proj.biases,
-layers.38.self_attn.gate_proj.scales,
-layers.38.self_attn.gate_proj.weight,
-layers.38.self_attn.k_proj.biases,
-layers.38.self_attn.k_proj.scales,
-layers.38.self_attn.k_proj.weight,
-layers.38.self_attn.o_proj.biases,
-layers.38.self_attn.o_proj.scales,
-layers.38.self_attn.o_proj.weight,
-layers.38.self_attn.q_proj.biases,
-layers.38.self_attn.q_proj.scales,
-layers.38.self_attn.q_proj.weight,
-layers.38.self_attn.v_proj.biases,
-layers.38.self_attn.v_proj.scales,
-layers.38.self_attn.v_proj.weight,
-layers.39.input_layernorm.weight,
-layers.39.mlp.down_proj.biases,
-layers.39.mlp.down_proj.scales,
-layers.39.mlp.down_proj.weight,
-layers.39.mlp.gate_proj.biases,
-layers.39.mlp.gate_proj.scales,
-layers.39.mlp.gate_proj.weight,
-layers.39.mlp.up_proj.biases,
-layers.39.mlp.up_proj.scales,
-layers.39.mlp.up_proj.weight,
-layers.39.post_attention_layernorm.weight,
-layers.39.post_feedforward_layernorm.weight,
-layers.39.pre_feedforward_layernorm.weight,
-layers.39.self_attn.gate_proj.biases,
-layers.39.self_attn.gate_proj.scales,
-layers.39.self_attn.gate_proj.weight,
-layers.39.self_attn.k_proj.biases,
-layers.39.self_attn.k_proj.scales,
-layers.39.self_attn.k_proj.weight,
-layers.39.self_attn.o_proj.biases,
-layers.39.self_attn.o_proj.scales,
-layers.39.self_attn.o_proj.weight,
-layers.39.self_attn.q_proj.biases,
-layers.39.self_attn.q_proj.scales,
-layers.39.self_attn.q_proj.weight,
-layers.39.self_attn.v_proj.biases,
-layers.39.self_attn.v_proj.scales,
-layers.39.self_attn.v_proj.weight,
-layers.4.input_layernorm.weight,
-layers.4.mlp.down_proj.biases,
-layers.4.mlp.down_proj.scales,
-layers.4.mlp.down_proj.weight,
-layers.4.mlp.gate_proj.biases,
-layers.4.mlp.gate_proj.scales,
-layers.4.mlp.gate_proj.weight,
-layers.4.mlp.up_proj.biases,
-layers.4.mlp.up_proj.scales,
-layers.4.mlp.up_proj.weight,
-layers.4.post_attention_layernorm.weight,
-layers.4.post_feedforward_layernorm.weight,
-layers.4.pre_feedforward_layernorm.weight,
-layers.4.self_attn.gate_proj.biases,
-layers.4.self_attn.gate_proj.scales,
-layers.4.self_attn.gate_proj.weight,
-layers.4.self_attn.k_proj.biases,
-layers.4.self_attn.k_proj.scales,
-layers.4.self_attn.k_proj.weight,
-layers.4.self_attn.o_proj.biases,
-layers.4.self_attn.o_proj.scales,
-layers.4.self_attn.o_proj.weight,
-layers.4.self_attn.q_proj.biases,
-layers.4.self_attn.q_proj.scales,
-layers.4.self_attn.q_proj.weight,
-layers.4.self_attn.v_proj.biases,
-layers.4.self_attn.v_proj.scales,
-layers.4.self_attn.v_proj.weight,
-layers.40.input_layernorm.weight,
-layers.40.mlp.down_proj.biases,
-layers.40.mlp.down_proj.scales,
-layers.40.mlp.down_proj.weight,
-layers.40.mlp.gate_proj.biases,
-layers.40.mlp.gate_proj.scales,
-layers.40.mlp.gate_proj.weight,
-layers.40.mlp.up_proj.biases,
-layers.40.mlp.up_proj.scales,
-layers.40.mlp.up_proj.weight,
-layers.40.post_attention_layernorm.weight,
-layers.40.post_feedforward_layernorm.weight,
-layers.40.pre_feedforward_layernorm.weight,
-layers.40.self_attn.gate_proj.biases,
-layers.40.self_attn.gate_proj.scales,
-layers.40.self_attn.gate_proj.weight,
-layers.40.self_attn.k_proj.biases,
-layers.40.self_attn.k_proj.scales,
-layers.40.self_attn.k_proj.weight,
-layers.40.self_attn.o_proj.biases,
-layers.40.self_attn.o_proj.scales,
-layers.40.self_attn.o_proj.weight,
-layers.40.self_attn.q_proj.biases,
-layers.40.self_attn.q_proj.scales,
-layers.40.self_attn.q_proj.weight,
-layers.40.self_attn.v_proj.biases,
-layers.40.self_attn.v_proj.scales,
-layers.40.self_attn.v_proj.weight,
-layers.41.input_layernorm.weight,
-layers.41.mlp.down_proj.biases,
-layers.41.mlp.down_proj.scales,
-layers.41.mlp.down_proj.weight,
-layers.41.mlp.gate_proj.biases,
-layers.41.mlp.gate_proj.scales,
-layers.41.mlp.gate_proj.weight,
-layers.41.mlp.up_proj.biases,
-layers.41.mlp.up_proj.scales,
-layers.41.mlp.up_proj.weight,
-layers.41.post_attention_layernorm.weight,
-layers.41.post_feedforward_layernorm.weight,
-layers.41.pre_feedforward_layernorm.weight,
-layers.41.self_attn.gate_proj.biases,
-layers.41.self_attn.gate_proj.scales,
-layers.41.self_attn.gate_proj.weight,
-layers.41.self_attn.k_proj.biases,
-layers.41.self_attn.k_proj.scales,
-layers.41.self_attn.k_proj.weight,
-layers.41.self_attn.o_proj.biases,
-layers.41.self_attn.o_proj.scales,
-layers.41.self_attn.o_proj.weight,
-layers.41.self_attn.q_proj.biases,
-layers.41.self_attn.q_proj.scales,
-layers.41.self_attn.q_proj.weight,
-layers.41.self_attn.v_proj.biases,
-layers.41.self_attn.v_proj.scales,
-layers.41.self_attn.v_proj.weight,
-layers.42.input_layernorm.weight,
-layers.42.mlp.down_proj.biases,
-layers.42.mlp.down_proj.scales,
-layers.42.mlp.down_proj.weight,
-layers.42.mlp.gate_proj.biases,
-layers.42.mlp.gate_proj.scales,
-layers.42.mlp.gate_proj.weight,
-layers.42.mlp.up_proj.biases,
-layers.42.mlp.up_proj.scales,
-layers.42.mlp.up_proj.weight,
-layers.42.post_attention_layernorm.weight,
-layers.42.post_feedforward_layernorm.weight,
-layers.42.pre_feedforward_layernorm.weight,
-layers.42.self_attn.gate_proj.biases,
-layers.42.self_attn.gate_proj.scales,
-layers.42.self_attn.gate_proj.weight,
-layers.42.self_attn.k_proj.biases,
-layers.42.self_attn.k_proj.scales,
-layers.42.self_attn.k_proj.weight,
-layers.42.self_attn.o_proj.biases,
-layers.42.self_attn.o_proj.scales,
-layers.42.self_attn.o_proj.weight,
-layers.42.self_attn.q_proj.biases,
-layers.42.self_attn.q_proj.scales,
-layers.42.self_attn.q_proj.weight,
-layers.42.self_attn.v_proj.biases,
-layers.42.self_attn.v_proj.scales,
-layers.42.self_attn.v_proj.weight,
-layers.43.input_layernorm.weight,
-layers.43.mlp.down_proj.biases,
-layers.43.mlp.down_proj.scales,
-layers.43.mlp.down_proj.weight,
-layers.43.mlp.gate_proj.biases,
-layers.43.mlp.gate_proj.scales,
-layers.43.mlp.gate_proj.weight,
-layers.43.mlp.up_proj.biases,
-layers.43.mlp.up_proj.scales,
-layers.43.mlp.up_proj.weight,
-layers.43.post_attention_layernorm.weight,
-layers.43.post_feedforward_layernorm.weight,
-layers.43.pre_feedforward_layernorm.weight,
-layers.43.self_attn.gate_proj.biases,
-layers.43.self_attn.gate_proj.scales,
-layers.43.self_attn.gate_proj.weight,
-layers.43.self_attn.k_proj.biases,
-layers.43.self_attn.k_proj.scales,
-layers.43.self_attn.k_proj.weight,
-layers.43.self_attn.o_proj.biases,
-layers.43.self_attn.o_proj.scales,
-layers.43.self_attn.o_proj.weight,
-layers.43.self_attn.q_proj.biases,
-layers.43.self_attn.q_proj.scales,
-layers.43.self_attn.q_proj.weight,
-layers.43.self_attn.v_proj.biases,
-layers.43.self_attn.v_proj.scales,
-layers.43.self_attn.v_proj.weight,
-layers.44.input_layernorm.weight,
-layers.44.mlp.down_proj.biases,
-layers.44.mlp.down_proj.scales,
-layers.44.mlp.down_proj.weight,
-layers.44.mlp.gate_proj.biases,
-layers.44.mlp.gate_proj.scales,
-layers.44.mlp.gate_proj.weight,
-layers.44.mlp.up_proj.biases,
-layers.44.mlp.up_proj.scales,
-layers.44.mlp.up_proj.weight,
-layers.44.post_attention_layernorm.weight,
-layers.44.post_feedforward_layernorm.weight,
-layers.44.pre_feedforward_layernorm.weight,
-layers.44.self_attn.gate_proj.biases,
-layers.44.self_attn.gate_proj.scales,
-layers.44.self_attn.gate_proj.weight,
-layers.44.self_attn.k_proj.biases,
-layers.44.self_attn.k_proj.scales,
-layers.44.self_attn.k_proj.weight,
-layers.44.self_attn.o_proj.biases,
-layers.44.self_attn.o_proj.scales,
-layers.44.self_attn.o_proj.weight,
-layers.44.self_attn.q_proj.biases,
-layers.44.self_attn.q_proj.scales,
-layers.44.self_attn.q_proj.weight,
-layers.44.self_attn.v_proj.biases,
-layers.44.self_attn.v_proj.scales,
-layers.44.self_attn.v_proj.weight,
-layers.45.input_layernorm.weight,
-layers.45.mlp.down_proj.biases,
-layers.45.mlp.down_proj.scales,
-layers.45.mlp.down_proj.weight,
-layers.45.mlp.gate_proj.biases,
-layers.45.mlp.gate_proj.scales,
-layers.45.mlp.gate_proj.weight,
-layers.45.mlp.up_proj.biases,
-layers.45.mlp.up_proj.scales,
-layers.45.mlp.up_proj.weight,
-layers.45.post_attention_layernorm.weight,
-layers.45.post_feedforward_layernorm.weight,
-layers.45.pre_feedforward_layernorm.weight,
-layers.45.self_attn.gate_proj.biases,
-layers.45.self_attn.gate_proj.scales,
-layers.45.self_attn.gate_proj.weight,
-layers.45.self_attn.k_proj.biases,
-layers.45.self_attn.k_proj.scales,
-layers.45.self_attn.k_proj.weight,
-layers.45.self_attn.o_proj.biases,
-layers.45.self_attn.o_proj.scales,
-layers.45.self_attn.o_proj.weight,
-layers.45.self_attn.q_proj.biases,
-layers.45.self_attn.q_proj.scales,
-layers.45.self_attn.q_proj.weight,
-layers.45.self_attn.v_proj.biases,
-layers.45.self_attn.v_proj.scales,
-layers.45.self_attn.v_proj.weight,
-layers.46.input_layernorm.weight,
-layers.46.mlp.down_proj.biases,
-layers.46.mlp.down_proj.scales,
-layers.46.mlp.down_proj.weight,
-layers.46.mlp.gate_proj.biases,
-layers.46.mlp.gate_proj.scales,
-layers.46.mlp.gate_proj.weight,
-layers.46.mlp.up_proj.biases,
-layers.46.mlp.up_proj.scales,
-layers.46.mlp.up_proj.weight,
-layers.46.post_attention_layernorm.weight,
-layers.46.post_feedforward_layernorm.weight,
-layers.46.pre_feedforward_layernorm.weight,
-layers.46.self_attn.gate_proj.biases,
-layers.46.self_attn.gate_proj.scales,
-layers.46.self_attn.gate_proj.weight,
-layers.46.self_attn.k_proj.biases,
-layers.46.self_attn.k_proj.scales,
-layers.46.self_attn.k_proj.weight,
-layers.46.self_attn.o_proj.biases,
-layers.46.self_attn.o_proj.scales,
-layers.46.self_attn.o_proj.weight,
-layers.46.self_attn.q_proj.biases,
-layers.46.self_attn.q_proj.scales,
-layers.46.self_attn.q_proj.weight,
-layers.46.self_attn.v_proj.biases,
-layers.46.self_attn.v_proj.scales,
-layers.46.self_attn.v_proj.weight,
-layers.47.input_layernorm.weight,
-layers.47.mlp.down_proj.biases,
-layers.47.mlp.down_proj.scales,
-layers.47.mlp.down_proj.weight,
-layers.47.mlp.gate_proj.biases,
-layers.47.mlp.gate_proj.scales,
-layers.47.mlp.gate_proj.weight,
-layers.47.mlp.up_proj.biases,
-layers.47.mlp.up_proj.scales,
-layers.47.mlp.up_proj.weight,
-layers.47.post_attention_layernorm.weight,
-layers.47.post_feedforward_layernorm.weight,
-layers.47.pre_feedforward_layernorm.weight,
-layers.47.self_attn.gate_proj.biases,
-layers.47.self_attn.gate_proj.scales,
-layers.47.self_attn.gate_proj.weight,
-layers.47.self_attn.k_proj.biases,
-layers.47.self_attn.k_proj.scales,
-layers.47.self_attn.k_proj.weight,
-layers.47.self_attn.o_proj.biases,
-layers.47.self_attn.o_proj.scales,
-layers.47.self_attn.o_proj.weight,
-layers.47.self_attn.q_proj.biases,
-layers.47.self_attn.q_proj.scales,
-layers.47.self_attn.q_proj.weight,
-layers.47.self_attn.v_proj.biases,
-layers.47.self_attn.v_proj.scales,
-layers.47.self_attn.v_proj.weight,
-layers.48.input_layernorm.weight,
-layers.48.mlp.down_proj.biases,
-layers.48.mlp.down_proj.scales,
-layers.48.mlp.down_proj.weight,
-layers.48.mlp.gate_proj.biases,
-layers.48.mlp.gate_proj.scales,
-layers.48.mlp.gate_proj.weight,
-layers.48.mlp.up_proj.biases,
-layers.48.mlp.up_proj.scales,
-layers.48.mlp.up_proj.weight,
-layers.48.post_attention_layernorm.weight,
-layers.48.post_feedforward_layernorm.weight,
-layers.48.pre_feedforward_layernorm.weight,
-layers.48.self_attn.gate_proj.biases,
-layers.48.self_attn.gate_proj.scales,
-layers.48.self_attn.gate_proj.weight,
-layers.48.self_attn.k_proj.biases,
-layers.48.self_attn.k_proj.scales,
-layers.48.self_attn.k_proj.weight,
-layers.48.self_attn.o_proj.biases,
-layers.48.self_attn.o_proj.scales,
-layers.48.self_attn.o_proj.weight,
-layers.48.self_attn.q_proj.biases,
-layers.48.self_attn.q_proj.scales,
-layers.48.self_attn.q_proj.weight,
-layers.48.self_attn.v_proj.biases,
-layers.48.self_attn.v_proj.scales,
-layers.48.self_attn.v_proj.weight,
-layers.49.input_layernorm.weight,
-layers.49.mlp.down_proj.biases,
-layers.49.mlp.down_proj.scales,
-layers.49.mlp.down_proj.weight,
-layers.49.mlp.gate_proj.biases,
-layers.49.mlp.gate_proj.scales,
-layers.49.mlp.gate_proj.weight,
-layers.49.mlp.up_proj.biases,
-layers.49.mlp.up_proj.scales,
-layers.49.mlp.up_proj.weight,
-layers.49.post_attention_layernorm.weight,
-layers.49.post_feedforward_layernorm.weight,
-layers.49.pre_feedforward_layernorm.weight,
-layers.49.self_attn.gate_proj.biases,
-layers.49.self_attn.gate_proj.scales,
-layers.49.self_attn.gate_proj.weight,
-layers.49.self_attn.k_proj.biases,
-layers.49.self_attn.k_proj.scales,
-layers.49.self_attn.k_proj.weight,
-layers.49.self_attn.o_proj.biases,
-layers.49.self_attn.o_proj.scales,
-layers.49.self_attn.o_proj.weight,
-layers.49.self_attn.q_proj.biases,
-layers.49.self_attn.q_proj.scales,
-layers.49.self_attn.q_proj.weight,
-layers.49.self_attn.v_proj.biases,
-layers.49.self_attn.v_proj.scales,
-layers.49.self_attn.v_proj.weight,
-layers.5.input_layernorm.weight,
-layers.5.mlp.down_proj.biases,
-layers.5.mlp.down_proj.scales,
-layers.5.mlp.down_proj.weight,
-layers.5.mlp.gate_proj.biases,
-layers.5.mlp.gate_proj.scales,
-layers.5.mlp.gate_proj.weight,
-layers.5.mlp.up_proj.biases,
-layers.5.mlp.up_proj.scales,
-layers.5.mlp.up_proj.weight,
-layers.5.post_attention_layernorm.weight,
-layers.5.post_feedforward_layernorm.weight,
-layers.5.pre_feedforward_layernorm.weight,
-layers.5.self_attn.gate_proj.biases,
-layers.5.self_attn.gate_proj.scales,
-layers.5.self_attn.gate_proj.weight,
-layers.5.self_attn.k_proj.biases,
-layers.5.self_attn.k_proj.scales,
-layers.5.self_attn.k_proj.weight,
-layers.5.self_attn.o_proj.biases,
-layers.5.self_attn.o_proj.scales,
-layers.5.self_attn.o_proj.weight,
-layers.5.self_attn.q_proj.biases,
-layers.5.self_attn.q_proj.scales,
-layers.5.self_attn.q_proj.weight,
-layers.5.self_attn.v_proj.biases,
-layers.5.self_attn.v_proj.scales,
-layers.5.self_attn.v_proj.weight,
-layers.50.input_layernorm.weight,
-layers.50.mlp.down_proj.biases,
-layers.50.mlp.down_proj.scales,
-layers.50.mlp.down_proj.weight,
-layers.50.mlp.gate_proj.biases,
-layers.50.mlp.gate_proj.scales,
-layers.50.mlp.gate_proj.weight,
-layers.50.mlp.up_proj.biases,
-layers.50.mlp.up_proj.scales,
-layers.50.mlp.up_proj.weight,
-layers.50.post_attention_layernorm.weight,
-layers.50.post_feedforward_layernorm.weight,
-layers.50.pre_feedforward_layernorm.weight,
-layers.50.self_attn.gate_proj.biases,
-layers.50.self_attn.gate_proj.scales,
-layers.50.self_attn.gate_proj.weight,
-layers.50.self_attn.k_proj.biases,
-layers.50.self_attn.k_proj.scales,
-layers.50.self_attn.k_proj.weight,
-layers.50.self_attn.o_proj.biases,
-layers.50.self_attn.o_proj.scales,
-layers.50.self_attn.o_proj.weight,
-layers.50.self_attn.q_proj.biases,
-layers.50.self_attn.q_proj.scales,
-layers.50.self_attn.q_proj.weight,
-layers.50.self_attn.v_proj.biases,
-layers.50.self_attn.v_proj.scales,
-layers.50.self_attn.v_proj.weight,
-layers.51.input_layernorm.weight,
-layers.51.mlp.down_proj.biases,
-layers.51.mlp.down_proj.scales,
-layers.51.mlp.down_proj.weight,
-layers.51.mlp.gate_proj.biases,
-layers.51.mlp.gate_proj.scales,
-layers.51.mlp.gate_proj.weight,
-layers.51.mlp.up_proj.biases,
-layers.51.mlp.up_proj.scales,
-layers.51.mlp.up_proj.weight,
-layers.51.post_attention_layernorm.weight,
-layers.51.post_feedforward_layernorm.weight,
-layers.51.pre_feedforward_layernorm.weight,
-layers.51.self_attn.gate_proj.biases,
-layers.51.self_attn.gate_proj.scales,
-layers.51.self_attn.gate_proj.weight,
-layers.51.self_attn.k_proj.biases,
-layers.51.self_attn.k_proj.scales,
-layers.51.self_attn.k_proj.weight,
-layers.51.self_attn.o_proj.biases,
-layers.51.self_attn.o_proj.scales,
-layers.51.self_attn.o_proj.weight,
-layers.51.self_attn.q_proj.biases,
-layers.51.self_attn.q_proj.scales,
-layers.51.self_attn.q_proj.weight,
-layers.51.self_attn.v_proj.biases,
-layers.51.self_attn.v_proj.scales,
-layers.51.self_attn.v_proj.weight,
-layers.6.input_layernorm.weight,
-layers.6.mlp.down_proj.biases,
-layers.6.mlp.down_proj.scales,
-layers.6.mlp.down_proj.weight,
-layers.6.mlp.gate_proj.biases,
-layers.6.mlp.gate_proj.scales,
-layers.6.mlp.gate_proj.weight,
-layers.6.mlp.up_proj.biases,
-layers.6.mlp.up_proj.scales,
-layers.6.mlp.up_proj.weight,
-layers.6.post_attention_layernorm.weight,
-layers.6.post_feedforward_layernorm.weight,
-layers.6.pre_feedforward_layernorm.weight,
-layers.6.self_attn.gate_proj.biases,
-layers.6.self_attn.gate_proj.scales,
-layers.6.self_attn.gate_proj.weight,
-layers.6.self_attn.k_proj.biases,
-layers.6.self_attn.k_proj.scales,
-layers.6.self_attn.k_proj.weight,
-layers.6.self_attn.o_proj.biases,
-layers.6.self_attn.o_proj.scales,
-layers.6.self_attn.o_proj.weight,
-layers.6.self_attn.q_proj.biases,
-layers.6.self_attn.q_proj.scales,
-layers.6.self_attn.q_proj.weight,
-layers.6.self_attn.v_proj.biases,
-layers.6.self_attn.v_proj.scales,
-layers.6.self_attn.v_proj.weight,
-layers.7.input_layernorm.weight,
-layers.7.mlp.down_proj.biases,
-layers.7.mlp.down_proj.scales,
-layers.7.mlp.down_proj.weight,
-layers.7.mlp.gate_proj.biases,
-layers.7.mlp.gate_proj.scales,
-layers.7.mlp.gate_proj.weight,
-layers.7.mlp.up_proj.biases,
-layers.7.mlp.up_proj.scales,
-layers.7.mlp.up_proj.weight,
-layers.7.post_attention_layernorm.weight,
-layers.7.post_feedforward_layernorm.weight,
-layers.7.pre_feedforward_layernorm.weight,
-layers.7.self_attn.gate_proj.biases,
-layers.7.self_attn.gate_proj.scales,
-layers.7.self_attn.gate_proj.weight,
-layers.7.self_attn.k_proj.biases,
-layers.7.self_attn.k_proj.scales,
-layers.7.self_attn.k_proj.weight,
-layers.7.self_attn.o_proj.biases,
-layers.7.self_attn.o_proj.scales,
-layers.7.self_attn.o_proj.weight,
-layers.7.self_attn.q_proj.biases,
-layers.7.self_attn.q_proj.scales,
-layers.7.self_attn.q_proj.weight,
-layers.7.self_attn.v_proj.biases,
-layers.7.self_attn.v_proj.scales,
-layers.7.self_attn.v_proj.weight,
-layers.8.input_layernorm.weight,
-layers.8.mlp.down_proj.biases,
-layers.8.mlp.down_proj.scales,
-layers.8.mlp.down_proj.weight,
-layers.8.mlp.gate_proj.biases,
-layers.8.mlp.gate_proj.scales,
-layers.8.mlp.gate_proj.weight,
-layers.8.mlp.up_proj.biases,
-layers.8.mlp.up_proj.scales,
-layers.8.mlp.up_proj.weight,
-layers.8.post_attention_layernorm.weight,
-layers.8.post_feedforward_layernorm.weight,
-layers.8.pre_feedforward_layernorm.weight,
-layers.8.self_attn.gate_proj.biases,
-layers.8.self_attn.gate_proj.scales,
-layers.8.self_attn.gate_proj.weight,
-layers.8.self_attn.k_proj.biases,
-layers.8.self_attn.k_proj.scales,
-layers.8.self_attn.k_proj.weight,
-layers.8.self_attn.o_proj.biases,
-layers.8.self_attn.o_proj.scales,
-layers.8.self_attn.o_proj.weight,
-layers.8.self_attn.q_proj.biases,
-layers.8.self_attn.q_proj.scales,
-layers.8.self_attn.q_proj.weight,
-layers.8.self_attn.v_proj.biases,
-layers.8.self_attn.v_proj.scales,
-layers.8.self_attn.v_proj.weight,
-layers.9.input_layernorm.weight,
-layers.9.mlp.down_proj.biases,
-layers.9.mlp.down_proj.scales,
-layers.9.mlp.down_proj.weight,
-layers.9.mlp.gate_proj.biases,
-layers.9.mlp.gate_proj.scales,
-layers.9.mlp.gate_proj.weight,
-layers.9.mlp.up_proj.biases,
-layers.9.mlp.up_proj.scales,
-layers.9.mlp.up_proj.weight,
-layers.9.post_attention_layernorm.weight,
-layers.9.post_feedforward_layernorm.weight,
-layers.9.pre_feedforward_layernorm.weight,
-layers.9.self_attn.gate_proj.biases,
-layers.9.self_attn.gate_proj.scales,
-layers.9.self_attn.gate_proj.weight,
-layers.9.self_attn.k_proj.biases,
-layers.9.self_attn.k_proj.scales,
-layers.9.self_attn.k_proj.weight,
-layers.9.self_attn.o_proj.biases,
-layers.9.self_attn.o_proj.scales,
-layers.9.self_attn.o_proj.weight,
-layers.9.self_attn.q_proj.biases,
-layers.9.self_attn.q_proj.scales,
-layers.9.self_attn.q_proj.weight,
-layers.9.self_attn.v_proj.biases,
-layers.9.self_attn.v_proj.scales,
-layers.9.self_attn.v_proj.weight,
-norm.weight.
-
-```
-
-</details>
-
-#### Captured stdout/stderr
-
-```text
-=== STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2893.24it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[22:51:27] DEBUG    HF Cache Info for mlx-community/Muse-Glimmer-30B-OptiQ-4bit: size=22770.3 MB, files=15
-```
 
 <a id="diagnostic-tencent-youtu-vl-4b-instruct"></a>
 
@@ -3136,7 +94,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
   from 'transformers.image_processing_utils_fast' (unknown location)
 - *Resolved model revision:* 8d30a0e49662a1d628a472b12df264dbcd768753
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.013059306
+- *Post-cleanup active memory (GB):* 0.013436274
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 10.68
 - *Parameter count:* 4.00B (name-estimate)
@@ -3173,25 +131,25 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1292, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1298, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1437, in load_processor
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1443, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -3206,21 +164,21 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -3285,97 +243,59 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2703.52it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:59:14] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-gemma-3n-e4b-it-bf16"></a>
+<a id="diagnostic-mlx-community-glm-46v-flash-mxfp4"></a>
 
 <details>
-<summary>mlx-community/gemma-3n-E4B-it-bf16 — unusable — empty response; missing required fields</summary>
+<summary>mlx-community/GLM-4.6V-Flash-mxfp4 — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
 
-### mlx-community/gemma-3n-E4B-it-bf16
+### mlx-community/GLM-4.6V-Flash-mxfp4
 
 #### Execution and provenance
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* empty_output, missing_requested_sections
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.011519166
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 625
-- *Prompt composition:* 625 = 367 text/template (tokenizer-exact) + 258
-  non-text (41%, image/audio expansion)
-- *Checkpoint weights (GB):* 15.70
-- *Parameter count:* 4.00B (name-estimate)
-- *Declared context length:* 32,768 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (15.71 GB vs 15.70 GB on disk)
-- *Generation tokens:* 1
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-(empty)
-```
-
-</details>
-
-<a id="diagnostic-jinaai-jina-vlm-mlx"></a>
-
-<details>
-<summary>jinaai/jina-vlm-mlx — unusable — repeated text; stopped early: repeating; title/keyword constraints failed</summary>
-
-### jinaai/jina-vlm-mlx
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort,
+- *Observations:* repeated_output, token_cap_truncation,
   catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Repeated fragment:* phrase: "project, european city centre..."
-- *Title word count:* 7
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Repeated fragment:* keyword: "hampshire"
+- *Title word count:* 3
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 49
+- *Keyword count:* 230
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["european city centre renewal project", "european
-  city centre redevelopment project", "european city centre transformation
-  project"]
-- *Resolved model revision:* a987631a01dc554a787d87a45fb01fb48f8aaca4
-- *Processor class:* mlx_vlm.models.jina_vlm.processing_jinavlm.JinaVLMProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Post-cleanup active memory (GB):* 0.000754728
+- *Duplicate keywords:* ["hampshire", "england", "rapids", "arched doorway",
+  "tourist attraction", "historic watermill", "diamond paned windows",
+  "weathered roof tiles", "red brick chimney", "stone archway over river",
+  "mossy stone wall", "green ivy", "traditional english mill architecture",
+  "historic watermill on river itchen", "winchester", "national trust
+  property", "scenic riverfront", "historic mill with water flow",
+  "traditional english architecture", "stone and brick building"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.002425904
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2101
-- *Prompt composition:* 2,101 = 358 text/template (tokenizer-exact) + 1,743
-  non-text (83%, image/audio expansion)
-- *Checkpoint weights (GB):* 2.11
-- *Quantization:* 4-bit, group 64
-- *Declared context length:* 40,960 (text_config.max_sequence_length)
-- *Load active memory vs checkpoint:* 1.00x (2.11 GB vs 2.11 GB on disk)
-- *Generation tokens:* 300
-- *Configured EOS token ID:* 151643
+- *Prompt tokens:* 6430
+- *Prompt composition:* 6,430 = 287 text/template (tokenizer-exact) + 6,143
+  non-text (96%, image/audio expansion)
+- *Checkpoint weights (GB):* 6.78
+- *Quantization:* 4-bit, group 32, mxfp4
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (6.78 GB vs 6.78 GB on disk)
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151329
 - *Configured EOS token:* &lt;|endoftext|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
@@ -3384,12 +304,113 @@ Reconstruction complete: |          |  0.00B /  0.00B
 #### Complete output
 
 ```text
-Title:
-City Centre, Edinburgh, Scotland, UK, GBR, Europe
-Description:
-A bustling city centre scene in Edinburgh, Scotland, UK, under an overcast sky. Pedestrians walk by temporary construction fences, while a building undergoes major renovation and redevelopment along Princes Street. A Boots pharmacy is visible beneath the scaffolding, and a crane stands ready for the next phase of the project.
-Keywords:
-Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site, Crane, Boots pharmacy, Overcast sky, Pedestrians, Roadworks, Scaffolding, Modern Architecture, Objects, Temporary construction fence, Road construction, Pedestrian walkway, Urban landscape, Construction equipment, City development, European cityscape, Overcast weather, City centre atmosphere, Edinburgh urban renewal, Scotland's architectural transformation, European city centre, European urban landscape, European city centre scene, European city centre development, European city centre renovation, European city centre redevelopment, European city centre transformation, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project,
+Title: Winchester City Mill
+Description: The historic Winchester City Mill, an ancient watermill over the River Itchen, is shown with visitors walking along the pathway and an elderly woman sitting nearby.
+Keywords: Winchester City Mill, River Itchen, watermill, historic building, pedestrians, elderly woman, stone wall, clay tiles, blue sky, chimney, Hampshire, England, National Trust, riverbank, scenery, rapids, sitting, walking, pathway, water, brick building, arched doorway, window with diamond panes, outdoor lamp, greenery, moss, stone bridge, flowing water, reflection, cloudy sky, historic architecture, traditional building, riverfront, tourist attraction, English countryside, historic mill, water-powered mill, river crossing, stone archway, brick chimney, tiled roof, weathered stone, mossy stone, water flow, rapids, riverbank scenery, historic watermill, traditional English mill, riverfront historic building, stone and brick architecture, water-powered historic mill, river Itchen watermill, Winchester historic mill, National Trust managed historic site, traditional English watermill, historic riverfront architecture, stone bridge over river, water flow over weir, historic mill building with arched doorway, diamond-paned windows, brick and stone construction, weathered roof tiles, red brick chimney, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill
+```
+
+</details>
+
+<a id="diagnostic-qwen-qwen3-vl-2b-instruct"></a>
+
+<details>
+<summary>Qwen/Qwen3-VL-2B-Instruct — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
+
+### Qwen/Qwen3-VL-2B-Instruct
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* repeated_output, token_cap_truncation,
+  catalog_constraint_violation
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Repeated fragment:* keyword: "national trust"
+- *Title word count:* 4
+- *Requested title word range:* [5, 10]
+- *Keyword count:* 327
+- *Requested keyword count range:* [10, 18]
+- *Duplicate keywords:* ["national trust", "pedestrians", "riverbank", "stone
+  wall", "brick building", "blue sky", "chimney", "clay tiles", "elderly
+  woman", "girls", "rapids", "scenery", "sitting", "people", "river"]
+- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
+- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
+- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.000443432
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 16520
+- *Prompt composition:* 16,520 = 297 text/template (tokenizer-exact) + 16,223
+  non-text (98%, image/audio expansion)
+- *Checkpoint weights (GB):* 4.26
+- *Parameter count:* 2.00B (name-estimate)
+- *Declared context length:* 262,144 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (4.26 GB vs 4.26 GB on disk)
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+Title: River Itchen, Hampshire, England
+
+Description: A historic watermill in Hampshire, England, with a stone wall and brick building, is situated over the River Itchen. Pedestrians walk along a bridge, and an elderly woman sits on a bench in front of the mill. The scene is set under a blue sky with white clouds, and the river flows with rapids near the bridge.
+
+Keywords: River Itchen, Hampshire, England, Mill, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
+
+<details>
+<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible</summary>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* unexpected_special_token
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
+  "&lt;|end_of_box|&gt;"]
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.002737212
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 6430
+- *Prompt composition:* 6,430 = 287 text/template (tokenizer-exact) + 6,143
+  non-text (96%, image/audio expansion)
+- *Checkpoint weights (GB):* 61.86
+- *Quantization:* 4-bit, group 16, nvfp4
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (61.86 GB vs 61.86 GB on disk)
+- *Generation tokens:* 108
+- *Configured EOS token ID:* 151329
+- *Configured EOS token:* &lt;|endoftext|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+<|begin_of_box|>Title: Historic Winchester City Mill by River Itchen
+
+Description: Two girls walk along the pathway in front of the historic Winchester City Mill, a brick and stone watermill with clay tiles, situated over the River Itchen in Hampshire, England, under a blue sky with white clouds.
+
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, brick, stone, clay tiles, chimney, blue sky, girls, pedestrians, elderly woman, National Trust, riverbank, scenery, sitting, rapids<|end_of_box|>
 ```
 
 </details>
@@ -3397,7 +418,7 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 <a id="diagnostic-mlx-community-glm-41v-9b-thinking-8bit"></a>
 
 <details>
-<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed</summary>
+<summary>mlx-community/GLM-4.1V-9B-Thinking-8bit — unusable — echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed</summary>
 
 ### mlx-community/GLM-4.1V-9B-Thinking-8bit
 
@@ -3406,53 +427,69 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
+- *Observations:* token_cap_truncation, prompt_instruction_echo,
   unexpected_catalog_preamble, thinking_trace_incomplete,
   catalog_constraint_violation
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Repeated fragment:* keyword: "princes street"
+- *Echoed instruction fragments:* ["retain details supported by the image
+  correct conflicts"]
 - *Unexpected text before Title:* &lt;think&gt;Got it, let's tackle this task
-  step by step. First, the title needs to be 5-10 words. Looking at the image,
-  the main elements are scaffolding, Princes Street, Edinburgh, construction,
-  etc. So maybe "Edinburgh Princes Street Construction Site" or something
-  similar. Wait, need to keep it concise. Let's go with "Edinburgh Princes
-  Street Renovation Site".  Then the description: need to combine context
-  (date/time, location) with main visible subject (scaffolding, building
-  renovation), setting (city centre, Princes Street), action (pedestrians
-  walking), lighting (overcast sky), distinctive details (Boots pharmacy,
-  crane). So something like "On 2026-08-18, scaffolding covers a building
-  under renovation along Edinburgh's Princes Street, with pedestrians passing
-  construction fences near a Boots pharmacy beneath an overcast sky."
-  Keywords need to be 10-18 unique, comma-separated. Let's list the hints and
-  add visible details. From hints: City Centre, Civil engineering,
-  Construction fence, Construction site, Crane, Edinburgh, Europe, Fence,
-  Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes
-  Street, Roadworks, Scaffolding, Scotland. Also, Boots pharmacy is visible,
-  so add "Boots Pharmacy" maybe. Let's check the hints and image. The image
-  has scaffolding, construction site, crane, pedestrians, Princes Street,
-  Edinburgh, overcast sky, construction fence, Boots pharmacy. So keywords
-  would include those. Let's make sure they are unique.  Now, let's structure
-  each part:
+  step by step. First, the title needs to be 5-10 words, concrete. The image
+  shows a historic mill by a river with people, so maybe "Winchester City Mill
+  by River Itchen".  Next, the description: need to combine context (capture
+  date, location) with main subject (mill), setting (river, historic), action
+  (visitors walk, relax), lighting (blue sky), distinctive details (brick,
+  stone, water). So something like "Historic Winchester City Mill by River
+  Itchen with visitors on a pathway, under a blue sky, showcasing brick and
+  stone architecture." Wait, need to make sure it's 1-2 sentences. Let's check
+  the context: capture date is 2026-08-31, location is Winchester, Hampshire,
+  England, mill, people walking, sitting, river. So description: "Visitors
+  walk and relax near the historic Winchester City Mill, a brick and stone
+  structure over the River Itchen, under a bright blue sky."  Then keywords:
+  need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but
+  maybe not visible, but context says National Trust? Wait, the hints include
+  National Trust, so maybe include. Also, the elements: arch, blue sky,
+  chimney, clay tiles, elderly woman, girls, Hampshire, mill, National Trust,
+  pedestrians, people, river Itchen, riverbank, scenery, sitting, stone wall.
+  Let's list them: "Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls,
+  Hampshire, Mill, National Trust, Pedestrians, People, River Itchen,
+  Riverbank, Scenery, Sitting, Stone wall" – that's 16, which is within 10-18.
+  Wait, let's check each part. Title: "Winchester City Mill by River Itchen"
+  (7 words, concrete). Description: "Visitors walk and relax near the historic
+  Winchester City Mill, a brick and stone structure over the River Itchen,
+  under a bright blue sky, with distinctive architectural features like a
+  chimney and stone arches." Wait, need to make sure it's 1-2 sentences. Let's
+  make it concise. "Visitors walk and relax near the historic Winchester City
+  Mill, a brick and stone structure over the River Itchen, under a bright blue
+  sky." That's one sentence. Then keywords: combine all relevant hints. Let's
+  list all hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay
+  tiles, Elderly woman, Girls, England, Hampshire, Mill, National Trust,
+  Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting,
+  Stone wall. Remove duplicates: England is already in Hampshire, so keep
+  Hampshire. Remove Adobe Stock/Any Vision if not visible, but context says
+  "National Trust" is a hint, so include. So keywords: Arch, Blue sky,
+  Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust,
+  Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall.
+  That's 16, which is good.  Now, let's finalize each section:
 - *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 10
+- *Title word count:* 9
 - *Requested title word range:* [5, 10]
-- *Keyword count:* 53
+- *Keyword count:* 42
 - *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["princes street", "construction site", "scaffolding",
-  "pedestrians", "overcast", "boots pharmacy", "construction fence", "crane",
-  "city centre", "scotland", "europe", "roadworks", "modern architecture",
-  "fence", "civil engineering"]
-- *Token-cap degradation evidence:* ["repetitive_tail",
-  "incomplete_thinking_trace", "dangling_markdown"]
+- *Duplicate keywords:* ["blue sky", "chimney", "clay tiles", "elderly woman",
+  "girls", "hampshire", "mill", "national trust", "pedestrians", "people",
+  "river itchen", "riverbank", "scenery", "sitting"]
+- *Token-cap degradation evidence:* ["incomplete_thinking_trace",
+  "abrupt_tail"]
 - *Resolved model revision:* 9677807f106500eb7690391c27645d59f6855cfb
 - *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
 - *Post-cleanup active memory (GB):* 0.002114608
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6480
-- *Prompt composition:* 6,480 = 337 text/template (tokenizer-exact) + 6,143
-  non-text (95%, image/audio expansion)
+- *Prompt tokens:* 6426
+- *Prompt composition:* 6,426 = 283 text/template (tokenizer-exact) + 6,143
+  non-text (96%, image/audio expansion)
 - *Checkpoint weights (GB):* 11.77
 - *Parameter count:* 9.00B (name-estimate)
 - *Quantization:* 8-bit, group 64, affine
@@ -3468,193 +505,23 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 #### Complete output
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words. Looking at the image, the main elements are scaffolding, Princes Street, Edinburgh, construction, etc. So maybe "Edinburgh Princes Street Construction Site" or something similar. Wait, need to keep it concise. Let's go with "Edinburgh Princes Street Renovation Site".
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows a historic mill by a river with people, so maybe "Winchester City Mill by River Itchen". 
 
-Then the description: need to combine context (date/time, location) with main visible subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), distinctive details (Boots pharmacy, crane). So something like "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians passing construction fences near a Boots pharmacy beneath an overcast sky."
+Next, the description: need to combine context (capture date, location) with main subject (mill), setting (river, historic), action (visitors walk, relax), lighting (blue sky), distinctive details (brick, stone, water). So something like "Historic Winchester City Mill by River Itchen with visitors on a pathway, under a blue sky, showcasing brick and stone architecture." Wait, need to make sure it's 1-2 sentences. Let's check the context: capture date is 2026-08-31, location is Winchester, Hampshire, England, mill, people walking, sitting, river. So description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." 
 
-Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. From hints: City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Also, Boots pharmacy is visible, so add "Boots Pharmacy" maybe. Let's check the hints and image. The image has scaffolding, construction site, crane, pedestrians, Princes Street, Edinburgh, overcast sky, construction fence, Boots pharmacy. So keywords would include those. Let's make sure they are unique.
+Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not visible, but context says National Trust? Wait, the hints include National Trust, so maybe include. Also, the elements: arch, blue sky, chimney, clay tiles, elderly woman, girls, Hampshire, mill, National Trust, pedestrians, people, river Itchen, riverbank, scenery, sitting, stone wall. Let's list them: "Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall" – that's 16, which is within 10-18. 
 
-Now, let's structure each part:
+Wait, let's check each part. Title: "Winchester City Mill by River Itchen" (7 words, concrete). Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky, with distinctive architectural features like a chimney and stone arches." Wait, need to make sure it's 1-2 sentences. Let's make it concise. "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." That's one sentence. Then keywords: combine all relevant hints. Let's list all hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, England, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. Remove duplicates: England is already in Hampshire, so keep Hampshire. Remove Adobe Stock/Any Vision if not visible, but context says "National Trust" is a hint, so include. So keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall. That's 16, which is good. 
 
-Title: Need 5-10 words. Let's do "Edinburgh Princes Street Construction Renovation".
+Now, let's finalize each section:
 
-Description: Combine context (date/time, location) with main subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), details (Boots pharmacy, crane). So: "On 2026-08-18, scaffolding surrounds a building undergoing renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy under an overcast sky."
+Title: "Winchester City Mill by River Itchen" (5 words, concrete)
 
-Keywords: Let's list them: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. Wait, need to count. Let's check the hints and image. The hints include City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Add Boots Pharmacy as a visible detail. So keywords: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. That's 17, which is within 10-18. Let's make sure they are unique.
+Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." (1 sentence, combines context and visible details)
 
-Now, check each part:
+Keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall (comma-separated, unique, 16 words)
 
-Title: "Edinburgh Princes Street Construction Renovation" (7 words, within 5-10)
-
-Description: "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy beneath an overcast sky." (2 sentences, factual, combines context and visible details)
-
-Keywords: "Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky" (17 keywords, unique, covers context and visible details)
-
-Wait, need to make sure the description is 1-2 sentences. Let's adjust. "On 2026-08-18, scaffolding covers a building undergoing major renovation along Edinburgh's Princes Street, with pedestrians walking past temporary construction fences near a Boots pharmacy under an overcast sky." That's one sentence, maybe. Or two. Let's do two sentences for clarity. "On 2026-08-18, extensive scaffolding covers the facade of a building undergoing major renovation along Edinburgh's Princes Street. Pedestrians walk past temporary construction fences near a Boots pharmacy under an overcast sky." That's two sentences, factual.
-
-Keywords need to be comma-separated, unique. Let's list again, ensuring no duplicates. From hints and image:
-
-- Edinburgh (location)
-- Princes Street (street)
-- Construction site (main subject)
-- Scaffolding (visible detail)
-- Pedestrians (action)
-- Overcast (lighting)
--
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-<details>
-<summary>mlx-community/SmolVLM2-2.2B-Instruct-mlx — unusable — repeated text; stopped early: repeating; missing required fields</summary>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort,
-  missing_requested_sections
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Missing sections:* ["title", "description", "keywords"]
-- *Repeated fragment:* phrase: "edinburgh, scotland, edinburgh..."
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Processor class:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* repetition_abort
-- *Post-cleanup active memory (GB):* 0.0098643
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1461
-- *Prompt composition:* 1,461 = 379 text/template (tokenizer-exact) + 1,082
-  non-text (74%, image/audio expansion)
-- *Checkpoint weights (GB):* 4.49
-- *Parameter count:* 2.20B (name-estimate)
-- *Declared context length:* 8,192 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (4.50 GB vs 4.49 GB on disk)
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 49279
-- *Configured EOS token:* &lt;end_of_utterance&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
- Edinburgh, Scotland, UK, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
-
-<details>
-<summary>mlx-community/X-Reasoner-7B-8bit — unusable — repeated text; cut off at token limit; title/keyword constraints failed</summary>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation,
-  catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Repeated fragment:* keyword: "construction progress"
-- *Title word count:* 4
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 308
-- *Requested keyword count range:* [10, 18]
-- *Duplicate keywords:* ["scaffolding", "construction site", "construction
-  equipment", "construction progress", "building maintenance", "construction
-  safety", "building renovation", "building restoration", "commercial
-  building", "construction activity", "pedestrian walkway", "construction site
-  signage", "building exterior", "construction materials", "building facade"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "abrupt_tail"]
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.010437776
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16592
-- *Prompt composition:* 16,592 = 369 text/template (tokenizer-exact) + 16,223
-  non-text (98%, image/audio expansion)
-- *Checkpoint weights (GB):* 9.45
-- *Parameter count:* 7.00B (name-estimate)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 128,000 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (9.46 GB vs 9.45 GB on disk)
-- *Generation tokens:* 1000
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: Edinburgh Princes Street Construction
-
-Description: A Boots pharmacy on Princes Street in Edinburgh, Scotland, remains open as pedestrians walk past a major renovation site with extensive scaffolding and a construction crane under an overcast sky.
-
-Keywords: Edinburgh, Princes Street, Boots, pharmacy, construction, scaffolding, renovation, pedestrians, overcast, Scotland, Europe, roadworks, modern architecture, civil engineering, fence, crane, building, facelift, urban development, retail, retail store, safety barriers, city centre, scaffolding, construction site, roadwork, pedestrian activity, commercial area, urban renewal, scaffolding, construction equipment, building facades, retail space, public access, safety signage, construction progress, urban landscape, city infrastructure, building maintenance, commercial district, retail environment, construction safety, building renovation, public space, urban planning, construction industry, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — usable_with_caveats — control tokens visible; title/keyword constraints failed</summary>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* unexpected_special_token, catalog_constraint_violation
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
-  "&lt;|end_of_box|&gt;"]
-- *Title word count:* 4
-- *Requested title word range:* [5, 10]
-- *Keyword count:* 17
-- *Requested keyword count range:* [10, 18]
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002737212
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 6484
-- *Prompt composition:* 6,484 = 341 text/template (tokenizer-exact) + 6,143
-  non-text (95%, image/audio expansion)
-- *Checkpoint weights (GB):* 61.86
-- *Quantization:* 4-bit, group 16, nvfp4
-- *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (61.86 GB vs 61.86 GB on disk)
-- *Generation tokens:* 100
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<|begin_of_box|>Title: Princes Street Construction, Edinburgh
-Description: A construction site with extensive scaffolding and a crane on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians passing a Boots pharmacy and temporary fences.
-Keywords: Princes Street, Edinburgh, Scotland, Construction site, Scaffolding, Crane, Boots pharmacy, Pedestrians, Construction fence, Overcast sky, City Centre, Roadworks, Civil engineering, Modern Architecture, Fence, Europe, GBR<|end_of_box|>
+Wait, check if "Rapids" is visible? The water has some movement, maybe rapids? The description hint says "Rapids" but the image might have water flow. But the description hint says "Rapids" as a hint, but maybe the image shows water flow. But the user says "retain details supported by the image, correct conflicts, and add important visible details." The image has water flowing under the mill, so maybe "Rapids" is a detail. But let's check the hints again. The hints include "Rapids" as a keyword. So maybe include "Rapids" if visible. The water under the mill has some movement, so maybe "Rapids" is a detail. So add "Rapids" to keywords. Then keywords would be Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Rapids, Scenery, Sitting, Stone wall. That's 
 ```
 
 </details>
@@ -3681,14 +548,14 @@ Keywords: Princes Street, Edinburgh, Scotland, Construction site, Scaffolding, C
 - *Stop reason:* completed
 - *Post-cleanup active memory (GB):* 0.003966048
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1356
-- *Prompt composition:* 1,356 = 343 text/template (tokenizer-exact) + 1,013
-  non-text (75%, image/audio expansion)
+- *Prompt tokens:* 1307
+- *Prompt composition:* 1,307 = 294 text/template (tokenizer-exact) + 1,013
+  non-text (78%, image/audio expansion)
 - *Checkpoint weights (GB):* 32.82
 - *Parameter count:* 3.00B (name-estimate)
 - *Declared context length:* 131,072 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (32.82 GB vs 32.82 GB on disk)
-- *Generation tokens:* 750
+- *Generation tokens:* 710
 - *Configured EOS token ID:* 163594
 - *Configured EOS token:* [EOS]
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -3698,15 +565,11 @@ Keywords: Princes Street, Edinburgh, Scotland, Construction site, Scaffolding, C
 #### Complete output
 
 ```text
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the given context and image. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. 
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The capture date/time is 2026-08-31 15:02:20 UTC+01:00, but I shouldn't claim it's visible. The descriptive hints mention Winchester City Mill, River Itchen, Hampshire, England, people walking, stone wall, chimney, etc. The image shows a historic brick building with a tiled roof, a bridge over a river, people walking, and the river flowing. 
 
-Starting with the title: The image shows scaffolding on a building in Edinburgh, Scotland, with pedestrians and a Boots pharmacy. The title should be concise. Maybe "Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street" – that's 8 words.
-
-For the description: It needs to combine context, main subject, setting, action, lighting, and details. The scene is a building under renovation with scaffolding, pedestrians, Boots pharmacy, overcast sky. So something like "Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky."
-
-Keywords: Let's list visible elements. Scaffolding, Edinburgh, Scotland, UK, construction, pedestrians, Boots pharmacy, Princes Street, overcast sky, crane, construction site, roadworks. That's 10 keywords. Need to check if they cover all key points. Maybe add "Civil engineering" and "Modern Architecture" as per the hints. Wait, the hints include those. So include those. Let me count: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture. That's 11. Maybe add "Fence" from the hints. So 12. Check if all hints are covered. The hints mention "Construction fence" and "Fence" so include those. Now 14. Maybe "Fence" is part of the construction site. Hmm, but the image shows temporary fencing. So include "Fence" as a keyword. Now 14. Let me check again. The hints also have "10 Best (structured)" but that's probably a category. The keywords should be unique and relevant. Final list: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence. That's 12. Maybe add "Construction fence" as a separate keyword? But the image shows a fence, so maybe "Fence" is enough. Alternatively, "Construction fence" is in the hints. Let me check the hints again. The hints include "Construction fence" and "Fence". So include both? But the user said 10-18 unique keywords. Let's see: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence. That's 13. Maybe that's okay. Alternatively, combine "Construction fence" into "Fence" if it's redundant. But the hints mention both, so better to include both. Wait, the hints say "Construction fence" and "Fence" are separate. So include both. So 13 keywords. Let me check the count. Yes, that's 13. Okay.◁/think▷Title: Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street  
-Description: Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky.  
-Keywords: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence<|im_assistant|>
+For the title, something concise like "Winchester City Mill and River Itchen Scene" works. The description should combine the context and visible elements: "Historic Winchester City Mill by River Itchen with people walking on a stone bridge, brick building, and flowing water." Keywords need to be 10-18 unique terms. Let's list what's visible: Winchester City Mill, River Itchen, England, Hampshire, stone bridge, brick building, tiled roof, chimney, pedestrians, elderly woman, girls, blue sky, Adobe Stock, National Trust, Rapids, Scenery. Wait, the hints mention "Elderly woman" and "Girls" but in the image, there are two women, one might be elderly. Also, "Adobe Stock" and "National Trust" are hints but maybe not visible. Check the image: the building is a National Trust property, so include that. "Adobe Stock" might be a watermark, but the user said not to claim visible details. So maybe omit that. So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust. That's 10 keywords. Let me check the hints again. The hints include "Clay tiles" but the roof is tiled, so "Tiled roof" is better. "Rapids" might not be visible, the water is flowing but not necessarily rapids. Maybe remove that. "Elderly woman" and "Girls" – the image has two people, one might be elderly. So include "Elderly woman" and "Girls". So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me adjust. Maybe "Riverbank" instead of "Scenery". Wait, the hints have "Scenery" as a keyword. So include that. Let me finalize: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Okay.◁/think▷Title: Winchester City Mill and River Itchen Scene  
+Description: Historic Winchester City Mill by River Itchen with people walking on a stone bridge, featuring a brick building, tiled roof, and flowing water under a blue sky.  
+Keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls<|im_assistant|>
 ```
 
 </details>
@@ -3721,49 +584,52 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                                 | Usability           | Observations                                                         |
-|-------------------------------------------------------|---------------------|----------------------------------------------------------------------|
-| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; cut off at token limit |
-| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields; extra text before Title                     |
-| mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                     |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/diffusiongemma-26B-A4B-it-8bit          | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/GLM-4.6V-Flash-mxfp4                    | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/granite-4.0-3b-vision-4bit              | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Molmo2-8B-4bit                          | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/North-Micro-Vision-Instruct-4bit        | usable_with_caveats | title/keyword constraints failed                                     |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | usable_with_caveats | title/keyword constraints failed                                     |
-| Qwen/Qwen3-VL-2B-Instruct                             | usable_with_caveats | title/keyword constraints failed                                     |
+| Model                                                 | Usability           | Observations                                                                                  |
+|-------------------------------------------------------|---------------------|-----------------------------------------------------------------------------------------------|
+| jinaai/jina-vlm-mlx                                   | unusable            | missing required fields                                                                       |
+| mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX         | unusable            | missing required fields; echoes instructions; extra text before Title; cut off at token limit |
+| mlx-community/FastVLM-0.5B-bf16                       | unusable            | missing required fields                                                                       |
+| mlx-community/gemma-3n-E4B-it-bf16                    | unusable            | missing required fields; extra text before Title                                              |
+| mlx-community/MiniCPM-V-4.6-8bit                      | unusable            | missing required fields; extra text before Title                                              |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16      | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Molmo2-8B-4bit                          | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/North-Micro-Vision-Instruct-4bit        | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/pixtral-12b-8bit                        | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/Step-3.7-Flash-oQ2e                     | usable_with_caveats | title/keyword constraints failed                                                              |
+| mlx-community/X-Reasoner-7B-8bit                      | usable_with_caveats | title/keyword constraints failed                                                              |
 
 ## Clean Completion Context
 
 <details>
 <summary>Clean completions</summary>
 
-| Model                                            | Runtime identity                                           | Performance                                                                                 |
-|--------------------------------------------------|------------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 627 prompt / 85 generated; 46.6 tok/s; 28 GB peak; cleanup 0.0104/0.0 GB active/cache       |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | rev 32dae5c38006; Ernie4_5_VLProcessor; stop completed     | 1669 prompt / 706 generated; 62.8 tok/s; 60 GB peak; cleanup 0.00149/0.0 GB active/cache    |
-| mlx-community/gemma-3-27b-it-qat-4bit            | rev fc4e000f32af; Gemma3Processor; stop completed          | 626 prompt / 126 generated; 31.5 tok/s; 17 GB peak; cleanup 0.011/0.0 GB active/cache       |
-| mlx-community/gemma-4-26b-a4b-it-4bit            | rev 0d77464eeb23; Gemma4Processor; stop completed          | 631 prompt / 87 generated; 128 tok/s; 16 GB peak; cleanup 0.012/0.0 GB active/cache         |
-| mlx-community/gemma-4-31b-it-4bit                | rev 696d436c4047; Gemma4Processor; stop completed          | 631 prompt / 89 generated; 26.3 tok/s; 20 GB peak; cleanup 0.0126/0.0 GB active/cache       |
-| mlx-community/InternVL3-8B-bf16                  | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2147 prompt / 94 generated; 34.3 tok/s; 17 GB peak; cleanup 0.00331/0.0 GB active/cache     |
-| mlx-community/LFM2.5-VL-1.6B-bf16                | rev 16a710cf8afc; Lfm2VlProcessor; stop completed          | 2150 prompt / 142 generated; 184 tok/s; 4.0 GB peak; cleanup 0.0041/0.0 GB active/cache     |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit            | rev 12c5ae493041; Lfm2VlProcessor; stop completed          | 2141 prompt / 90 generated; 211 tok/s; 4.0 GB peak; cleanup 0.00436/0.0 GB active/cache     |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit  | rev a962dcb09eee; Mistral3Processor; stop completed        | 2958 prompt / 123 generated; 189 tok/s; 7.8 GB peak; cleanup 0.00567/0.0 GB active/cache    |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit      | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed         | 1323 prompt / 129 generated; 106 tok/s; 25 GB peak; cleanup 0.00701/0.0 GB active/cache     |
-| mlx-community/Phi-3.5-vision-instruct-bf16       | rev d8da684308c2; Phi3VProcessor; stop completed           | 1174 prompt / 150 generated; 56.5 tok/s; 9.4 GB peak; cleanup 0.00708/0.0 GB active/cache   |
-| mlx-community/pixtral-12b-8bit                   | rev 79e24b66302d; PixtralProcessor; stop completed         | 3149 prompt / 91 generated; 39.6 tok/s; 16 GB peak; cleanup 0.0131/0.0 GB active/cache      |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit     | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16581 prompt / 113 generated; 86.5 tok/s; 23 GB peak; cleanup 0.0077/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-35B-A3B-4bit               | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16597 prompt / 134 generated; 111 tok/s; 24 GB peak; cleanup 0.00821/0.0 GB active/cache    |
-| mlx-community/Qwen3.5-9B-MLX-4bit                | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16597 prompt / 103 generated; 91.7 tok/s; 10.0 GB peak; cleanup 0.00873/0.0 GB active/cache |
-| mlx-community/Qwen3.6-27B-mxfp8                  | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed         | 16597 prompt / 110 generated; 17.6 tok/s; 33 GB peak; cleanup 0.00924/0.0 GB active/cache   |
-| mlx-community/Qwen3.8-27B-4bit                   | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16597 prompt / 115 generated; 30.7 tok/s; 21 GB peak; cleanup 0.00975/0.0 GB active/cache   |
-| mlx-community/Step-3.7-Flash-oQ2e                | rev 3dacb46f724a; Step3VLProcessor; stop completed         | 3525 prompt / 102 generated; 46.5 tok/s; 70 GB peak; cleanup 0.0101/0.0 GB active/cache     |
+| Model                                             | Runtime identity                                           | Performance                                                                                |
+|---------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| mlx-community/diffusiongemma-26B-A4B-it-8bit      | rev 7b95e3887078; DiffusionGemma4Processor; stop completed | 570 prompt / 85 generated; 57.7 tok/s; 29 GB peak; cleanup 0.0108/0.0 GB active/cache      |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8     | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 570 prompt / 85 generated; 57.1 tok/s; 28 GB peak; cleanup 0.0108/0.0 GB active/cache      |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed          | 574 prompt / 105 generated; 129 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache      |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed          | 574 prompt / 90 generated; 26.0 tok/s; 20 GB peak; cleanup 0.013/0.0 GB active/cache       |
+| mlx-community/granite-4.0-3b-vision-4bit          | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1371 prompt / 88 generated; 177 tok/s; 4.7 GB peak; cleanup 0.0132/0.0 GB active/cache     |
+| mlx-community/Idefics3-8B-Llama3-bf16             | rev 8c2a30c48864; Idefics3Processor; stop completed        | 2597 prompt / 162 generated; 32.5 tok/s; 18 GB peak; cleanup 0.003/0.0 GB active/cache     |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2086 prompt / 88 generated; 34.1 tok/s; 17 GB peak; cleanup 0.00331/0.0 GB active/cache    |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit             | rev 12c5ae493041; Lfm2VlProcessor; stop completed          | 2086 prompt / 83 generated; 210 tok/s; 4.0 GB peak; cleanup 0.00436/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed        | 2918 prompt / 180 generated; 67.1 tok/s; 13 GB peak; cleanup 0.00513/0.0 GB active/cache   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed        | 2917 prompt / 139 generated; 190 tok/s; 7.8 GB peak; cleanup 0.00565/0.0 GB active/cache   |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit         | rev b4a74fa6001f; MuseGlimmerProcessor; stop completed     | 4388 prompt / 992 generated; 25.3 tok/s; 25 GB peak; cleanup 0.00637/0.0 GB active/cache   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16522 prompt / 907 generated; 89.9 tok/s; 8.4 GB peak; cleanup 0.00778/0.0 GB active/cache |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16536 prompt / 143 generated; 110 tok/s; 24 GB peak; cleanup 0.0086/0.0 GB active/cache    |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed         | 16536 prompt / 139 generated; 18.2 tok/s; 33 GB peak; cleanup 0.00964/0.0 GB active/cache  |
+| mlx-community/Qwen3.8-27B-4bit                    | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16536 prompt / 131 generated; 29.6 tok/s; 21 GB peak; cleanup 0.0101/0.0 GB active/cache   |
 
 </details>
 
@@ -3772,9 +638,9 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 43,299,212 bytes
-- *Image SHA-256:* a843ca79cc4b147bd543f362fdd35173cc6793bdf5c739fe4ec9a2a95de92d76
+- *Image dimensions:* 6,656 x 9,984 pixels
+- *Image size:* 66,295,254 bytes
+- *Image SHA-256:* 168b4850b1427394bbe84a99ffd05533ffaf7e995e4213d9ce2d36c959e70c7b
 
 <details>
 <summary>Exact prompt</summary>
@@ -3785,13 +651,11 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-- GPS: 55.951722°N, 3.201417°W
+- Capture date/time: 2026-08-31 15:02:20 UTC+01:00
 
 Descriptive hints:
-- Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- Description hint: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland, while pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
-- Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+- Description hint: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
 
 Write:
 - a concrete 5-10-word title;
@@ -3814,14 +678,11 @@ original image before filing.
 
 | Model                                        | Resolved revision                        |
 |----------------------------------------------|------------------------------------------|
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit    | b4a74fa6001f1eca3b23eeeb702ffad2773a218f |
 | tencent/Youtu-VL-4B-Instruct                 | 8d30a0e49662a1d628a472b12df264dbcd768753 |
-| mlx-community/gemma-3n-E4B-it-bf16           | d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a |
-| jinaai/jina-vlm-mlx                          | a987631a01dc554a787d87a45fb01fb48f8aaca4 |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit      | 9677807f106500eb7690391c27645d59f6855cfb |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx     | 844516024a1c4400d34489b89ee067d794e432ed |
-| mlx-community/X-Reasoner-7B-8bit             | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
+| mlx-community/GLM-4.6V-Flash-mxfp4           | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
+| Qwen/Qwen3-VL-2B-Instruct                    | 89644892e4d85e24eaac8bacfd4f463576704203 |
 | mlx-community/GLM-4.6V-nvfp4                 | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit      | 9677807f106500eb7690391c27645d59f6855cfb |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
 
 ### Components and system
@@ -3829,15 +690,15 @@ original image before filing.
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.0rc0                                                                                                                                        |
-| mlx-vlm source revision    | b0991483509f50058b2db773b672177763a79c4e                                                                                                        |
-| mlx                        | 0.32.3.dev20260830+37c26e575                                                                                                                    |
-| mlx source revision        | 37c26e5755da637255d57ea34b4879196a485301                                                                                                        |
+| mlx-vlm source revision    | 5c9b5f52adfeab35b5ece0bb2d6e4d44541d9e32                                                                                                        |
+| mlx                        | 0.32.3.dev20260904+b6368984b                                                                                                                    |
+| mlx source revision        | b6368984b8e02a3fb3ee7986846c0fb85e1fccf7                                                                                                        |
 | mlx-lm                     | 0.32.0                                                                                                                                          |
-| mlx-lm source revision     | 77c33b14373ac70d7abd6f82af15962852adadbb                                                                                                        |
-| mlx-audio                  | 0.5.0                                                                                                                                           |
+| mlx-lm source revision     | 4343e96fa72e0ed458d02d08e2d220a1b22061cb                                                                                                        |
+| mlx-audio                  | 0.5.1                                                                                                                                           |
 | transformers               | 5.16.1                                                                                                                                          |
-| tokenizers                 | 0.23.1                                                                                                                                          |
-| huggingface-hub            | 1.29.0                                                                                                                                          |
+| tokenizers                 | 0.23.2                                                                                                                                          |
+| huggingface-hub            | 1.30.0                                                                                                                                          |
 | Python Version             | 3.14.7                                                                                                                                          |
 | OS                         | Darwin 25.6.0                                                                                                                                   |
 | macOS Version              | 26.6.2                                                                                                                                          |
@@ -3861,7 +722,7 @@ original image before filing.
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (182,433,408 bytes, sha256=612fa3487b6372fdf8e64e4f30f98a8403ca3f1e5ba118be7a94bfbd9fc3335c) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,958,288 bytes, sha256=185d06df3f27ab755327d9beffe31170343ba098fd05b923a7b3bc08a0d7b2a4)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (182,474,576 bytes, sha256=42ffcb402b5e7c7023c96051d078f0101c582b70aed3cf61cc70e394bd6e036c) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,958,976 bytes, sha256=c134b2fe7fa611db39c82cf3a3358114c5e390334ea9e4ddc7c973f414f57c98)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

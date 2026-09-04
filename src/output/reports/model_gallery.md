@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-30 22:59:16 BST
+Generated on: 2026-09-04 13:16:46 BST
 
 These models serve many purposes; this run probes exactly one narrow task:
 producing catalogue metadata for a single photograph from the assisted-lane
@@ -22,57 +22,57 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable`              | 18.61s  | 62.8 tok/s          | 1.35            | 60      | 1,669      | 706     | none                                                                                                                        |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.94s   | 34.3 tok/s          | 0.82            | 17      | 2,147      | 94      | none                                                                                                                        |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 2.31s   | 184 tok/s           | 0.34            | 4.0     | 2,150      | 142     | none                                                                                                                        |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.39s   | 211 tok/s           | 0.46            | 4.0     | 2,141      | 90      | none                                                                                                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.19s   | 189 tok/s           | 0.96            | 7.8     | 2,958      | 123     | none                                                                                                                        |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable`              | 5.27s   | 106 tok/s           | 0.79            | 25      | 1,323      | 129     | none                                                                                                                        |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 4.43s   | 56.5 tok/s          | 0.26            | 9.4     | 1,174      | 150     | none                                                                                                                        |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | 51.82s  | 86.5 tok/s          | 47.65           | 23      | 16,581     | 113     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 54.11s  | 111 tok/s           | 49.37           | 24      | 16,597     | 134     | none                                                                                                                        |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 54.88s  | 91.7 tok/s          | 51.34           | 10.0    | 16,597     | 103     | none                                                                                                                        |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 79.30s  | 17.6 tok/s          | 68.97           | 33      | 16,597     | 110     | none                                                                                                                        |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 75.26s  | 30.7 tok/s          | 68.43           | 21      | 16,597     | 115     | none                                                                                                                        |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 22.50s  | 46.5 tok/s          | 13.90           | 70      | 3,525      | 102     | none                                                                                                                        |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | 6.16s   | 46.6 tok/s          | 0.33            | 28      | 627        | 85      | none                                                                                                                        |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 7.89s   | 31.5 tok/s          | 1.02            | 17      | 626        | 126     | none                                                                                                                        |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.04s   | 128 tok/s           | 0.41            | 16      | 631        | 87      | none                                                                                                                        |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.65s   | 26.3 tok/s          | 1.12            | 20      | 631        | 89      | none                                                                                                                        |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 6.16s   | 39.6 tok/s          | 1.70            | 16      | 3,149      | 91      | none                                                                                                                        |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable with caveats` | 1.73s   | 480 tok/s           | 0.12            | 1.9     | 2,150      | 118     | title/keyword constraints failed                                                                                            |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable with caveats` | 16.08s  | 92.2 tok/s          | 13.24           | 8.4     | 16,581     | 121     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 9.29s   | 30.4 tok/s          | 3.17            | 23      | 2,426      | 102     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable with caveats` | 8.97s   | 80.1 tok/s          | 5.78            | 8.4     | 6,484      | 99      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 20.04s  | 43.8 tok/s          | 11.54           | 78      | 6,484      | 100     | control tokens visible; title/keyword constraints failed                                                                    |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable with caveats` | 8.59s   | 32.2 tok/s          | 1.10            | 18      | 2,646      | 156     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 166.01s | 4.67 tok/s          | 1.26            | 40      | 1,356      | 750     | role tokens visible                                                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable with caveats` | 6.22s   | 67.2 tok/s          | 1.97            | 13      | 2,959      | 146     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.82s   | 64.7 tok/s          | 2.02            | 13      | 2,959      | 179     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable with caveats` | 4.39s   | 72.7 tok/s          | 0.75            | 9.1     | 1,558      | 135     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.20s   | 233 tok/s           | 3.05            | 3.9     | 4,118      | 77      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable with caveats` | 24.81s  | 92.6 tok/s          | 13.29           | 8.4     | 16,583     | 902     | title/keyword constraints failed                                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable with caveats` | 5.78s   | 61.3 tok/s          | 0.34            | 29      | 627        | 83      | title/keyword constraints failed                                                                                            |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable with caveats` | 2.21s   | 171 tok/s           | 0.40            | 4.7     | 1,411      | 66      | title/keyword constraints failed                                                                                            |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.64s   | 138 tok/s           | 0.96            | 3.7     | 2,101      | 300     | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.08s  | 42.1 tok/s          | 1.98            | 15      | 3,240      | 1,000   | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.42s   | 352 tok/s           | 0.10            | 2.2     | 368        | 169     | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.30s  | 46.6 tok/s          | 5.51            | 13      | 6,480      | 1,000   | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.98s   | 273 tok/s           | 0.25            | 3.8     | 966        | 46      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `unusable`            | 3.44s   | 124 tok/s           | 0.39            | 5.5     | 1,461      | 200     | repeated text; stopped early: repeating; missing required fields                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | 36.59s  | 55.6 tok/s          | 16.57           | 13      | 16,592     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 3.26s   | insufficient sample | 0.40            | 17      | 625        | 1       | empty response; missing required fields                                                                                     |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `not evaluated`       | 0.50s   | -                   | -               | -       | -          | -       | none                                                                                                                        |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.17s   | -                   | -               | -       | -          | -       | none                                                                                                                        |
+| Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 8.83s   | 32.5 tok/s | 1.11            | 18      | 2,597      | 162     | none                                                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.28s   | 34.1 tok/s | 1.33            | 17      | 2,086      | 88      | none                                                                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.42s   | 210 tok/s  | 0.46            | 4.0     | 2,086      | 83      | none                                                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.72s   | 67.1 tok/s | 1.99            | 13      | 2,918      | 180     | none                                                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.34s   | 190 tok/s  | 0.98            | 7.8     | 2,917      | 139     | none                                                                                                                              |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `usable`              | 51.00s  | 25.3 tok/s | 8.12            | 25      | 4,388      | 992     | none                                                                                                                              |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 29.13s  | 89.9 tok/s | 17.23           | 8.4     | 16,522     | 907     | none                                                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 59.29s  | 110 tok/s  | 54.38           | 24      | 16,536     | 143     | none                                                                                                                              |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 79.22s  | 18.2 tok/s | 67.21           | 33      | 16,536     | 139     | none                                                                                                                              |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 78.18s  | 29.6 tok/s | 70.58           | 21      | 16,536     | 131     | none                                                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | 6.31s   | 57.7 tok/s | 0.61            | 29      | 570        | 85      | none                                                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | 5.92s   | 57.1 tok/s | 0.32            | 28      | 570        | 85      | none                                                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.44s   | 129 tok/s  | 0.44            | 16      | 574        | 105     | none                                                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.79s   | 26.0 tok/s | 1.07            | 20      | 574        | 90      | none                                                                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.60s   | 177 tok/s  | 0.52            | 4.7     | 1,371      | 88      | none                                                                                                                              |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable with caveats` | 1.65s   | 482 tok/s  | 0.12            | 1.9     | 2,094      | 76      | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 10.29s  | 29.8 tok/s | 3.38            | 23      | 2,385      | 119     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 24.39s  | 62.9 tok/s | 4.50            | 60      | 1,605      | 583     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 29.19s  | 40.0 tok/s | 17.60           | 78      | 6,430      | 108     | control tokens visible                                                                                                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 158.31s | 4.67 tok/s | 2.06            | 40      | 1,307      | 710     | role tokens visible                                                                                                               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.22s   | 186 tok/s  | 0.34            | 4.0     | 2,094      | 119     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.86s   | 64.7 tok/s | 2.00            | 13      | 2,918      | 180     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable with caveats` | 4.80s   | 72.9 tok/s | 1.15            | 8.1     | 1,516      | 132     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.64s   | 231 tok/s  | 3.06            | 3.9     | 4,062      | 152     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable with caveats` | 5.40s   | 107 tok/s  | 0.81            | 24      | 1,262      | 135     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.26s   | 56.3 tok/s | 0.41            | 9.5     | 1,103      | 128     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 60.90s  | 86.8 tok/s | 56.38           | 23      | 16,520     | 133     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 58.53s  | 91.6 tok/s | 54.61           | 10.0    | 16,536     | 132     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.66s   | 125 tok/s  | 0.40            | 5.4     | 1,401      | 84      | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 28.98s  | 45.4 tok/s | 17.31           | 70      | 3,464      | 114     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 21.72s  | 58.4 tok/s | 17.23           | 13      | 16,531     | 136     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 8.01s   | 31.5 tok/s | 1.00            | 17      | 569        | 128     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.95s   | 39.4 tok/s | 1.88            | 16      | 3,111      | 110     | title/keyword constraints failed                                                                                                  |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.96s  | 93.0 tok/s | 13.56           | 8.4     | 16,520     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.81s   | 139 tok/s  | 1.15            | 3.7     | 2,050      | 294     | missing required fields                                                                                                           |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.45s  | 41.5 tok/s | 2.12            | 15      | 3,202      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.64s   | 358 tok/s  | 0.21            | 2.2     | 307        | 155     | missing required fields                                                                                                           |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.58s  | 45.7 tok/s | 5.38            | 13      | 6,426      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 22.30s  | 73.1 tok/s | 6.62            | 8.4     | 6,430      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.11s   | 289 tok/s  | 0.25            | 3.3     | 907        | 70      | missing required fields; extra text before Title                                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 7.37s   | 48.9 tok/s | 0.90            | 17      | 568        | 167     | missing required fields; extra text before Title                                                                                  |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.03s   | -          | -               | -       | -          | -       | none                                                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 211 tok/s
+Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 210 tok/s
 
-Average clean-completion throughput: 83.3 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 83.5 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 4.0 GB
 
@@ -80,18 +80,17 @@ Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-3B-OptiQ-4b
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                  | Usability       | Observations                                                                                                                |
-|--------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------|
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                    | `unusable`      | repeated text; stopped early: repeating; title/keyword constraints failed                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx) | `unusable`      | missing required fields; echoes instructions; cut off at token limit                                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                             | `unusable`      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)             | `unusable`      | repeated text; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                           | `unusable`      | missing required fields; extra text before Title                                                                            |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)           | `unusable`      | repeated text; stopped early: repeating; missing required fields                                                            |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                          | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                     |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                      | `unusable`      | empty response; missing required fields                                                                                     |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)        | `not evaluated` | none                                                                                                                        |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                  | `not evaluated` | none                                                                                                                        |
+| Model                                                                                                  | Usability       | Observations                                                                                                                      |
+|--------------------------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                        | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                    | `unusable`      | missing required fields                                                                                                           |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx) | `unusable`      | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                             | `unusable`      | missing required fields                                                                                                           |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)             | `unusable`      | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                       | `unusable`      | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                           | `unusable`      | missing required fields; extra text before Title                                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                      | `unusable`      | missing required fields; extra text before Title                                                                                  |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                  | `not evaluated` | none                                                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -100,60 +99,60 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                   |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable`              | Alright, let's get to work. I've got the image and the hints, and I need to generate some metadata. First, the title. It needs to be concise, descriptive, and accurate. "Scaffolding on Princes Street, Edinburgh" is a good start, but I can do better. "Extensive Scaffolding on E...                         |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | Title: Edinburgh City Centre Princes Street<br>Description: Extensive scaffolding covers a building under renovation on Princes Street, with pedestrians walking past a Boots pharmacy under an overcast sky.<br>Keywords: Edinburgh, City Centre, Princes Street, Scaffolding, Renovation,...                   |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | Title: "Edinburgh's Urban Renewal: Scaffolding and Construction on Princes Street"<br><br>Description: A bustling city centre in Edinburgh, Scotland, is undergoing significant redevelopment. Extensive scaffolding covers a building along Princes Street, indicating major renovation an...                   |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | Title: Edinburgh Princes Street Construction Site<br>Description: Extensive scaffolding covers a building undergoing renovation along Princes Street, with pedestrians walking past temporary fences and a Boots pharmacy under an overcast sky.<br>Keywords: Edinburgh, Scotland, UK, Euro...                   |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>**Princes Street Construction: Edinburgh’s Facade in Renewal**<br><br>Description:<br>A major renovation under scaffolding transforms a historic building in Edinburgh’s bustling city centre along Princes Street, with cranes and protective barriers visible under an overcast sky....              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable`              | Title:<br>Scaffolding Covers Building Renovation on Princes Street, Edinburgh<br><br>Description:<br>Extensive scaffolding envelops the facade of a building undergoing major redevelopment along Princes Street in Edinburgh's city centre, beside a Boots pharmacy beneath an overcast sky. Ped...             |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | Title: Edinburgh's Princes Street Undergoing Major Renovation<br><br>Description: Pedestrians stroll past a building undergoing extensive renovation on Princes Street in Edinburgh, with scaffolding and construction fences visible.<br><br>Keywords: Edinburgh, Princes Street, renovation, sc...             |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable`              | Title: Extensive scaffolding on Princes Street, Edinburgh<br>Description: A wide shot captures a building under major renovation on Princes Street in Edinburgh, Scotland, its facade entirely covered by scaffolding. Pedestrians walk along the pavement past a Boots pharmacy and tem...                      |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Princes Street Building Renovation with Scaffolding<br><br>Description: An extensive construction site on Princes Street in Edinburgh features a multi-story building fully encased in scaffolding and protective sheeting, situated next to a Boots pharmacy under an overcast sky....                   |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | Title:<br>Scaffolding-covered building under renovation on Princes Street, Edinburgh<br><br>Description:<br>Extensive scaffolding envelops a historic building undergoing redevelopment along Princes Street in Edinburgh, with pedestrians walking past temporary fencing and a Boots pharmacy u...             |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Edinburgh Princes Street Construction and Boots Pharmacy<br><br>Description:<br>Extensive scaffolding covers a building undergoing major renovation on Princes Street in Edinburgh, situated next to a Boots pharmacy. Pedestrians walk past temporary construction fences and a yellow...             |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | Title:<br>Scaffolding on Princes Street, Edinburgh, Scotland<br><br>Description:<br>A large building on Princes Street in Edinburgh is covered in extensive scaffolding and green safety netting, indicating major renovation works. Pedestrians walk past a Boots pharmacy and temporary constru...             |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | Title:<br>Edinburgh City Centre Scaffolding and Construction Works<br><br>Description:<br>Extensive scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, with pedestrians walking past temporary construction fences and a Boots pharmacy under an ov...             |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | Title: Building Renovation on Princes Street, Edinburgh City Centre<br>Description: Extensive scaffolding and a crane cover a building undergoing renovation along Princes Street in Edinburgh while pedestrians walk past a Boots pharmacy under an overcast sky.<br>Keywords: Edinburgh,...                    |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | Title: Princes Street Building Renovation, Edinburgh<br><br>Description: Captured on 18th August 2026, this view shows extensive scaffolding covering a building undergoing renovation on Princes Street, Edinburgh, with pedestrians passing a Boots pharmacy under an overcast sky. A yel...                   |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: Scaffolding on building on Princes Street, Edinburgh<br>Description: Extensive scaffolding covers a building undergoing renovation on Princes Street in Edinburgh under an overcast sky. Pedestrians walk past construction fences and a Boots pharmacy on the street level.<br>Keyw...                   |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Construction and Scaffolding on Princes Street, Edinburgh<br>Description: Extensive scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, under an overcast sky. Pedestrians walk past construction fences and a Boots pharmacy storef...                      |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | Title:<br>Princes Street Redevelopment, Edinburgh, Scotland<br><br>Description:<br>Scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, with pedestrians walking past under an overcast sky.<br><br>Keywords:<br>Princes Street, Edinburgh, Scotland, Scaffold...    |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | Title:<br>City Centre, Edinburgh, Scotland, UK, GBR, Europe<br><br>Description:<br>A bustling city street scene in Edinburgh, Scotland, featuring a construction site on Princes Street with scaffolding and a Boots pharmacy. Pedestrians walk along the sidewalk, and a crane is visible in the...             |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable_with_caveats` | Title:<br>Edinburgh Princes Street Construction<br><br>Description:<br>Extensive scaffolding covers a building undergoing renovation on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians walking past a Boots pharmacy and construction fences. A yellow crane is v...             |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Edinburgh Princes Street Construction<br><br>Description:<br>Extensive scaffolding covers a building undergoing major renovation along Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians walking past temporary construction fences and a Boots pharmacy....              |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | Title: Princes Street Renovation, Edinburgh<br>Description: The image shows a construction site on Princes Street in Edinburgh, Scotland, with extensive scaffolding covering a building under renovation. Pedestrians walk past temporary construction fences, and a Boots pharmacy is...                       |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Princes Street Construction, Edinburgh<br>Description: A construction site with extensive scaffolding and a crane on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians passing a Boots pharmacy and temporary fences.<br>Keywords: Prin...                 |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | Title: Extensive Scaffolding on Princes Street Building Renovation<br><br>Description: A building on Princes Street in Edinburgh, Scotland, is undergoing significant renovation and redevelopment, as evidenced by the extensive scaffolding covering its facade. Pedestrians are seen wal...                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the given context and image. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.<br><br>Starting with the title: The image shows scaffolding on a build...                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable_with_caveats` | Title:<br>**Princes Street, Edinburgh – Major Building Renovation Underway**<br><br>Description:<br>A large multi-storey building on Princes Street, Edinburgh, is undergoing extensive renovation with full scaffolding coverage, while construction fences and a yellow crane are visible. Pede...             |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Princes Street, Edinburgh: Scaffolding &amp; Renovation*<br><br>**Description:**<br>On **18 August 2026** in Edinburgh’s city centre (GPS: **55.951722°N, 3.201417°W**), extensive scaffolding envelops a multi-storey building under major renovation along **Princes Street**. Pedes...         |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable_with_caveats` | Title: Princes Street Renovation: Scaffolding and Boots Pharmacy<br><br>Description: The image captures a bustling scene in Edinburgh's city centre, featuring extensive scaffolding on a building undergoing major renovation. A Boots pharmacy is visible beneath the scaffolding, while...                    |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable_with_caveats` | Title: Edinburgh City Centre Renovation<br><br>Description: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland. Pedestrians walk past temporary construction fences and a Boots pharmacy benea...                   |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable_with_caveats` | Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The context says it's Princes Street in Edinburgh, Scotland. The main subject is scaffolding on a building, renovation. So maybe "Edinburgh Princes Street Renovation Scaffolding" but let's check w...                         |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | Title: Scaffolding on Princes Street in Edinburgh City Centre<br>Description: Extensive scaffolding covers the facade of a building undergoing renovation along Princes Street in Edinburgh, while pedestrians walk past construction fences and a Boots pharmacy.<br>Keywords: Edinburgh,...                    |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable_with_caveats` | Title: Edinburgh City Centre Renovation<br>Description: Scaffolding and construction activity on a building along Princes Street, Edinburgh, with pedestrians navigating temporary barriers.<br>Keywords: Edinburgh, Princes Street, Construction, Scaffolding, Overcast, Pedestrians, Boot...                   |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | Title:<br>City Centre, Edinburgh, Scotland, UK, GBR, Europe<br>Description:<br>A bustling city centre scene in Edinburgh, Scotland, UK, under an overcast sky. Pedestrians walk by temporary construction fences, while a building undergoes major renovation and redevelopment along Princes...                 |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>The user wants British-English catalogue metadata from the image and supplied context. They want:<br><br>- a concrete 5-10-word title (so 5-10 words)<br>- a 1-2-sentence factual description combining relevant context with the main visible subject, setting,...              |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A concrete 5-10-word title: "City Centre Renovation in Edinburgh, Scotland, UK, GBR, Europe"<br>Description: The image captures a bustling city street in Edinburgh, Scotland, featuring extensive scaffolding covering the facade of a building undergoing major renovation and redevel...                      |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words. Looking at the image, the main elements are scaffolding, Princes Street, Edinburgh, construction, etc. So maybe "Edinburgh Princes Street Construction Site" or something similar. Wait,...                   |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Urban construction with scaffolding on city buildings.<br><br>Keywords: urban construction, scaffolding, city buildings, Princes Street, Edinburgh, construction fence, crane, overcast sky, pedestrians, modern architecture, civil engineering, Europe                                                         |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `unusable`            | Edinburgh, Scotland, UK, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland,...                          |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `unusable`            | Title: Edinburgh Princes Street Construction<br><br>Description: A Boots pharmacy on Princes Street in Edinburgh, Scotland, remains open as pedestrians walk past a major renovation site with extensive scaffolding and a construction crane under an overcast sky.<br><br>Keywords: Edinburgh,...              |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | empty output                                                                                                                                                                                                                                                                                                     |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `not_evaluated`       | Model loading failed: Received 1460 parameters not in model:<br>embed_tokens.biases,<br>embed_tokens.scales,<br>embed_tokens.weight,<br>layers.0.input_layernorm.weight,<br>layers.0.mlp.down_proj.biases,<br>layers.0.mlp.down_proj.scales,<br>layers.0.mlp.down_proj.weight,<br>layers.0.mlp.gate_proj.bias... |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not_evaluated`       | Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)                                                                                                                                                                    |
+| Model                                                                                                                   | Usability             | Output preview                                                                                                                                                                                                                                                                                                |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | Title: Winchester City Mill and River Itchen in Hampshire, England.<br>Description: The historic Winchester City Mill, situated over the River Itchen in Winchester, Hampshire, England, is a popular tourist attraction. The mill features a distinctive red brick exterior with a stee...                   |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | Title: Historic Mill by River Itchen<br>Description: Pedestrians walk and relax near the historic Winchester City Mill, featuring a charming stone bridge and clay-tiled roof under a blue sky.<br>Keywords: Winchester City Mill, historic watermill, River Itchen, Hampshire, England, Na...                |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | Title: Historic Mill Over River Itchen<br><br>Description: Visitors walk along a pathway beside the historic Winchester City Mill, an ancient watermill with distinctive clay tiles and chimneys, set against a blue sky with clouds.<br><br>Keywords: National Trust, Hampshire, England, Mill,...           |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | Title:<br>**Winchester City Mill: Historic Watermill by the River Itchen**<br><br>Description:<br>A group of visitors, including two women walking along the riverside path, explore the historic **Winchester City Mill**, a National Trust-listed watermill with a distinctive **stone and bric...          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | Title:<br>Historic Winchester Watermill by the River Itchen<br><br>Description:<br>A picturesque scene captures the Winchester City Mill, a traditional brick-and-stone watermill with clay-tiled roofs, flowing over the River Itchen under bright blue skies. Visitors stroll along the riversi...          |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `usable`              | Title:<br>Historic Winchester City Mill Over River Itchen<br><br>Description:<br>Captured on 31 August 2026, the historic Winchester City Mill, a brick and flint watermill with a clay-tile roof and chimney, stands over the River Itchen in Winchester, Hampshire, England. Two girls walk alo...          |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a historic watermill, so "Winchester City Mill, River Itchen, Hampshire" is key. Let's make it concise: "Winchester City Mill, River Itchen, Hampshire, England"<br><br>Next, the descript...                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Historic Watermill Over River Itchen<br><br>Description: Captured on August 31, 2026, this image depicts the historic Winchester City Mill, an ancient structure featuring a weathered clay-tiled roof and flint-and-brick walls, situated over the River Itchen in Hampshire. Under...                |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Winchester City Mill on the River Itchen<br><br>Description:<br>Visitors walk along the bridge and an elderly woman sits with a walker in front of the historic Winchester City Mill, a brick and stone watermill situated over the River Itchen in Hampshire, England. The scene is ca...          |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | Title:<br>Winchester City Mill Spanning the River Itchen<br><br>Description:<br>The historic Winchester City Mill, a brick and stone structure with a clay-tiled roof, stands over the River Itchen in Hampshire, England. Pedestrians walk along the bridge pathway in front of the building whi...          |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | Title: Historic Winchester City Mill over River Itchen<br>Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill on the River Itchen under a cloudy sky.<br>Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, arch...                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | Title: Historic Winchester City Mill on River Itchen<br>Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill situated over the rapids of the River Itchen.<br>Keywords: Winchester, Hampshire, England, River Itchen, Mill, National T...                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: People walking by historic Winchester City Mill<br>Description: Two women walk along a stone pathway in front of the historic brick and flint Winchester City Mill over the River Itchen. The scene captures the ancient watermill's tiled roof and stone architecture under a br...                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Visitors at the historic Winchester City Mill, Hampshire<br>Description: Visitors walk along a pathway and relax in front of the ancient Winchester City Mill, situated over the River Itchen in Hampshire, England, under a bright blue sky.<br>Keywords: Winchester City Mill, Riv...                |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | Title: "Historic Mill by the River Itchen"<br>Description: "Visitors stroll along the pathway in front of the historic Winchester City Mill, enjoying the serene setting by the River Itchen."<br>Keywords: Historic Mill, Winchester City Mill, River Itchen, Pedestrians, Elderly woman,...                 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | Title:<br>Historic Winchester City Mill<br><br>Description:<br>A historic stone-built watermill stands over the River Itchen in Winchester, England, with visitors walking along a stone bridge and enjoying the scenic view.<br><br>Keywords:<br>Historic, watermill, Winchester, England, River Itchen,...  |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | Title:<br>Visitors at Winchester City Mill<br><br>Description:<br>Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a blue sky.<br><br>Keywords:<br>Winchester City Mi... |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable_with_caveats` | Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. It needs to be concise and descriptive. "Hampshire Riverbank with Strollers" is a good start, but I can do better. "Strollers on the Riverbank near Winchester" is...                      |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable_with_caveats` | <\|begin_of_box\|>Title: Historic Winchester City Mill by River Itchen<br><br>Description: Two girls walk along the pathway in front of the historic Winchester City Mill, a brick and stone watermill with clay tiles, situated over the River Itchen in Hampshire, England, under a blue sk...              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | ◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The capture date/time is 2026-08-31 15:02:20 UTC+01:00, but I shouldn't claim it's visible. The descriptive hints mention Winchester City M...                      |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable_with_caveats` | Title: Historic Winchester City Mill<br><br>Description: Visitors stroll along the pathway and relax in front of the ancient Winchester City Mill, an iconic watermill situated over the River Itchen in Winchester, Hampshire, England. The mill's red brick structure and clay tile roof...                 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable_with_caveats` | **Title:**<br>*Winchester City Mill: Riverside Pedestrians &amp; Historic Charm*<br><br>**Description:**<br>A vibrant scene captures visitors strolling and relaxing beside the iconic **Winchester City Mill** on **August 31, 2026 (UTC+01:00)**, its ancient stone arches framing a rushing **Rive...      |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable_with_caveats` | Title: Historic Mill and River Scene with Pedestrians<br><br>Description: The image captures a historic watermill in Winchester, Hampshire, England, with a stone wall and clay-tiled roof. Two women walk along a pathway above the River Itchen, while an elderly woman sits nearby. The...                 |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable_with_caveats` | Title: Historic Winchester City Mill<br><br>Description: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England. The mill features a distinctive brick and stone fa...                |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable_with_caveats` | Title: Visitors at Winchester City Mill Over River Itchen<br><br>Description: People stroll along the stone bridge and relax in front of the historic Winchester City Mill, an ancient watermill built over the River Itchen. The brick and flake-stone structure with its weathered clay-t...                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable_with_caveats` | Title: Historic Winchester City Mill Overlooking River Itchen<br><br>Description: The historic Winchester City Mill, a National Trust property, stands majestically over the River Itchen in Hampshire, England. Visitors are seen enjoying the scenic view and the historic architecture o...                |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable_with_caveats` | Title: Historic mill by the River Itchen with pedestrians<br><br>Description: On a bright day with a blue sky and scattered clouds, pedestrians walk along a stone bridge over the River Itchen in Winchester, Hampshire, England. The scene features the historic Winchester City Mill, a...                 |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable_with_caveats` | Title:<br>Visitors walk across bridge beside historic Winchester City Mill on River Itchen.<br><br>Description:<br>On a bright day in late August 2026, pedestrians stroll along a stone bridge adjacent to the ancient Winchester City Mill, a National Trust-listed watermill perched over the...           |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | Title: Winchester City Mill<br>Description: A historic watermill situated over the River Itchen in Winchester, Hampshire, England.<br>Keywords: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians,...                 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable_with_caveats` | Title:<br>Winchester City Mill Over the River Itchen<br><br>Description:<br>Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a bright blue sky with white cl...          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable_with_caveats` | Title:<br>Winchester City Mill: A Historic Watermill<br><br>Description:<br>Visitors stroll along the pathway beneath a historic brick mill over the River Itchen, with an elderly woman relaxing on the stone wall, under a bright blue sky. The mill's weathered clay-tiled roof and stone chim...          |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable_with_caveats` | Title: Winchester City Mill, Hampshire: People on the Pathway<br><br>Description: Captured on 31st August 2026, this image shows Winchester City Mill, a historic brick and stone building spanning the River Itchen; pedestrians walk along the pathway in bright daylight, with rapids vi...                |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable_with_caveats` | Title:<br>Historic Winchester Mill on River Itchen, Hampshire<br><br>Description:<br>Two individuals walk along the pathway in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a bright blue sky.<br><br>Keywo...    |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | Title: River Itchen, Hampshire, England<br><br>Description: A historic watermill in Hampshire, England, with a stone wall and brick building, is situated over the River Itchen. Pedestrians walk along a bridge, and an elderly woman sits on a bench in front of the mill. The scene is s...                |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | Title:<br>Historic Winchester City Mill<br><br>Description:<br>The historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, is captured in this image. Pedestrians walk along the pathway, relaxing in front of the mill, which is a...          |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | Here are my reasoning steps:<br>We need to produce British-English catalogue metadata from the image and supplied context. The image shows a historic watermill (Winchester City Mill) over a river (River Itchen). The building is a brick and stone structure with a tiled roof, a chi...                   |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | A tranquil scene captures visitors enjoying a walk along the historic Winchester City Mill, a picturesque watermill nestled by the River Itchen in Winchester, Hampshire, England. The image, taken on 2026-08-31 15:02:20 UTC+01:00, showcases the blend of natural and architectura...                      |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | &lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows a historic mill by a river with people, so maybe "Winchester City Mill by River Itchen".<br><br>Next, the description: need to combine context (capture date, locati...          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | Title: Winchester City Mill<br>Description: The historic Winchester City Mill, an ancient watermill over the River Itchen, is shown with visitors walking along the pathway and an elderly woman sitting nearby.<br>Keywords: Winchester City Mill, River Itchen, watermill, historic build...                |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | Visitors walk near historic mill over river under bright sky.<br>Lighting is sunny with clear blue skies above the old building.<br><br>Keywords: historic mill, river Itchen, stone bridge, brick building, blue sky, pedestrians, elderly woman, girls, England, Hampshire, watermill, stone...             |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | A picturesque scene unfolds at the historic Winchester City Mill, a charming watermill nestled along the River Itchen in Winchester, Hampshire, England. The mill's weathered brick and stone facade, topped with a terracotta tiled roof, exudes a sense of timelessness. Two pedest...                      |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not_evaluated`       | Model loading failed: cannot import name 'DefaultFastImageProcessorKwargs' from 'transformers.image_processing_utils_fast' (unknown location)                                                                                                                                                                 |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.7.0rc0`
-- `mlx`: `0.32.3.dev20260830+37c26e575`
+- `mlx`: `0.32.3.dev20260904+b6368984b`
 - `mlx-lm`: `0.32.0`
 - `transformers`: `5.16.1`
-- `tokenizers`: `0.23.1`
-- `huggingface-hub`: `1.29.0`
+- `tokenizers`: `0.23.2`
+- `huggingface-hub`: `1.30.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 25.6.0
 - *macOS Version:* 26.6.2
@@ -166,26 +165,22 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 ## Image Metadata
 
-- *Title:* , City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- *Description:* Extensive scaffolding covers the facade of a building
-  undergoing major renovation and redevelopment along Princes Street in
-  Edinburgh, Scotland, while pedestrians walk past temporary construction
-  fences and a Boots pharmacy beneath an overcast sky.
-- *Keywords:* 10 Best (structured), Adobe Stock, Any Vision, City Centre,
-  Civil engineering, Construction fence, Construction site, Crane, Edinburgh,
-  Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky,
-  Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland, Traffic Cone,
-  Tree branch, UK, United Kingdom, Urban architecture, architecture, building
-  exterior, building renovation, city architecture, city life, city street,
-  cityscape, cloudy sky, construction, construction work, daytime,
-  engineering, european architecture, facade, great britain, historic
-  building, infrastructure, maintenance, mobile crane, outdoor, redevelopment,
-  renovation, restoration, safety barrier, sidewalk, stone building, street,
-  street light, streetscape, tram tracks, tramway, urban development, urban
-  landscape, urban regeneration, urban street, walking
-- *Date:* 2026-08-18 17:46:05 UTC+01:00
-- *Time:* 17:46:05
-- *GPS:* 55.951722°N, 3.201417°W
+- *Description:* Visitors walk along the pathway and relax in front of the
+  historic Winchester City Mill, an ancient watermill situated over the River
+  Itchen in Winchester, Hampshire, England.
+- *Keywords:* Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles,
+  Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians,
+  People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall,
+  Strolling, Tiled Roof, Trees, United Kingdom, Water, Waterway, Wheelchair,
+  Winchester, Winchester City Mill, architecture, brick architecture, brick
+  building, brick wall, bridge, british, checkerboard wall, culture, cumulus
+  clouds, day, english heritage, exterior, facade, flint, flowing water,
+  foliage, footbridge, great britain, heritage, historic building, history,
+  landmark, lantern, medieval, old, outdoors, quaint, railing, river, scenic,
+  senior, sluice, stone bridge, stream, summer, tourism, tourist attraction,
+  traditional, travel destination, vintage, walking, watermill
+- *Date:* 2026-08-31 15:02:20 UTC+01:00
+- *Time:* 15:02:20
 
 ## Prompt
 
@@ -201,19 +196,16 @@ The first 280 characters of each model's actual output (or failure evidence for 
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-> &#45; GPS: 55.951722°N, 3.201417°W
+> &#45; Capture date/time: 2026-08-31 15:02:20 UTC+01:00
 >
 > &#8203;Descriptive hints:
-> &#45; Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-> &#45; Description hint: Extensive scaffolding covers the facade of a building
-> undergoing major renovation and redevelopment along Princes Street in
-> Edinburgh, Scotland, while pedestrians walk past temporary construction
-> fences and a Boots pharmacy beneath an overcast sky.
-> &#45; Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre,
-> Civil engineering, Construction fence, Construction site, Crane, Edinburgh,
-> Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky,
-> Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+> &#45; Description hint: Visitors walk along the pathway and relax in front of
+> the historic Winchester City Mill, an ancient watermill situated over the
+> River Itchen in Winchester, Hampshire, England.
+> &#45; Keyword hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay
+> tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust,
+> Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting,
+> Stone wall
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -232,101 +224,58 @@ The first 280 characters of each model's actual output (or failure evidence for 
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+### mlx-community/Idefics3-8B-Llama3-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 5.13s
-- *Generation time:* 13.47s
-- *Total time:* 18.61s
-- *Input validation time:* 6.29e-05
-- *Prompt preparation time:* 0.00961
-- *First-token latency:* 1.35
-- *Cleanup time:* 0.212
-- *Prompt tokens:* 1,669
-- *Generation tokens:* 706
-- *Total tokens:* 2,375
-- *Prompt throughput (raw):* 1,233 tok/s
-- *Generation throughput (raw):* 62.8 tok/s
-- *Peak memory:* 60
-- *Active memory:* 59
-- *Cache memory:* 0.17
-- *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00149
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 1.90s
+- *Generation time:* 6.92s
+- *Total time:* 8.83s
+- *Input validation time:* 6.5e-05
+- *Prompt preparation time:* 0.00233
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 2,597
+- *Generation tokens:* 162
+- *Total tokens:* 2,759
+- *Prompt throughput (raw):* 2,339 tok/s
+- *Generation throughput (raw):* 32.5 tok/s
+- *Peak memory:* 18
+- *Active memory:* 17
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.003
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1707
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1328
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get to work. I've got the image and the hints, and I need to generate some metadata. First, the title. It needs to be concise, descriptive, and accurate. "Scaffolding on Princes Street, Edinburgh" is a good start, but I can do better. "Extensive Scaffolding on Edinburgh's Princes Street" is more evocative. I'll go with that.
-
-Now, the description. I need to weave in the context and the hints. The image shows a major construction site on Princes Street in Edinburgh. The key elements are the scaffolding, the overcast sky, the pedestrians, and the Boots pharmacy. I'll start with the location and the main subject, then add the details. "On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky." That's a solid, factual description.
-
-Finally, the keywords. I need to cover the location, the subject, the details, and the context. I'll start with the obvious: Edinburgh, Princes Street, Scotland, UK, Europe. Then the key elements: scaffolding, construction, building, street, pedestrians, Boots, pharmacy, overcast sky, and the date. I'll add some more general terms like city centre, modern architecture, and roadworks. I'll make sure they are all comma-separated and unique.
-
-Let's see... "Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18". Perfect. That should be a good, comprehensive set of keywords.
-
-Okay, final check. Title: "Extensive Scaffolding on Edinburgh's Princes Street." Description: "On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky." Keywords: "Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18".
-
-All done. Ready to output.
-&lt;/think&gt;
-
-Title: Extensive Scaffolding on Edinburgh's Princes Street
-
-Description: On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky.
-
-Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18
+ Title: Winchester City Mill and River Itchen in Hampshire, England.
+Description: The historic Winchester City Mill, situated over the River Itchen in Winchester, Hampshire, England, is a popular tourist attraction. The mill features a distinctive red brick exterior with a steeply pitched roof and a prominent chimney. In the foreground, two girls are walking along a pathway that crosses over the river, with a small waterfall below. The mill is surrounded by lush greenery and offers a picturesque view of the river and the surrounding countryside. The sky above is partly cloudy, with patches of blue sky visible.
+Keywords: Winchester City Mill, Hampshire, England, River Itchen, historic mill, red brick, steeply pitched roof, prominent chimney, pathway, waterfall, lush greenery, picturesque view, partly cloudy sky.
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get to work. I've got the image and the hints, and I need to generate some metadata. First, the title. It needs to be concise, descriptive, and accurate. "Scaffolding on Princes Street, Edinburgh" is a good start, but I can do better. "Extensive Scaffolding on Edinburgh's Princes Street" is more evocative. I'll go with that.
-
-Now, the description. I need to weave in the context and the hints. The image shows a major construction site on Princes Street in Edinburgh. The key elements are the scaffolding, the overcast sky, the pedestrians, and the Boots pharmacy. I'll start with the location and the main subject, then add the details. "On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky." That's a solid, factual description.
-
-Finally, the keywords. I need to cover the location, the subject, the details, and the context. I'll start with the obvious: Edinburgh, Princes Street, Scotland, UK, Europe. Then the key elements: scaffolding, construction, building, street, pedestrians, Boots, pharmacy, overcast sky, and the date. I'll add some more general terms like city centre, modern architecture, and roadworks. I'll make sure they are all comma-separated and unique.
-
-Let's see... "Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18". Perfect. That should be a good, comprehensive set of keywords.
-
-Okay, final check. Title: "Extensive Scaffolding on Edinburgh's Princes Street." Description: "On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky." Keywords: "Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18".
-
-All done. Ready to output.
-</think>
-
-Title: Extensive Scaffolding on Edinburgh's Princes Street
-
-Description: On a grey day in August 2026, extensive scaffolding covers the facade of a building undergoing renovation on Princes Street in Edinburgh. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath the overcast sky.
-
-Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construction, Building, Street, Pedestrians, Boots, Pharmacy, Overcast Sky, City Centre, Modern Architecture, Roadworks, 2026-08-18
-```
-
-</details>
 
 </details>
 
@@ -344,18 +293,18 @@ Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construc
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.76s
-- *Generation time:* 4.17s
-- *Total time:* 5.94s
-- *Input validation time:* 0.000113
-- *Prompt preparation time:* 0.00262
-- *First-token latency:* 0.815
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 2,147
-- *Generation tokens:* 94
-- *Total tokens:* 2,241
-- *Prompt throughput (raw):* 2,633 tok/s
-- *Generation throughput (raw):* 34.3 tok/s
+- *Model load time:* 1.63s
+- *Generation time:* 4.64s
+- *Total time:* 6.28s
+- *Input validation time:* 5.69e-05
+- *Prompt preparation time:* 0.00289
+- *First-token latency:* 1.33
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 2,086
+- *Generation tokens:* 88
+- *Total tokens:* 2,174
+- *Prompt throughput (raw):* 1,564 tok/s
+- *Generation throughput (raw):* 34.1 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.17
@@ -364,7 +313,7 @@ Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construc
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1522
+- *Rendered prompt characters:* 1296
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -380,68 +329,9 @@ Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, Scaffolding, Construc
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Edinburgh City Centre Princes Street
-Description: Extensive scaffolding covers a building under renovation on Princes Street, with pedestrians walking past a Boots pharmacy under an overcast sky.
-Keywords: Edinburgh, City Centre, Princes Street, Scaffolding, Renovation, Construction Site, Boots Pharmacy, Pedestrians, Overcast Sky, Modern Architecture, Roadworks, Scaffolding Fences, Civil Engineering, Pedestrian Walkway, Urban Development
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
-
-### mlx-community/LFM2.5-VL-1.6B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.68s
-- *Generation time:* 1.62s
-- *Total time:* 2.31s
-- *Input validation time:* 7.11e-05
-- *Prompt preparation time:* 0.00481
-- *First-token latency:* 0.335
-- *Cleanup time:* 0.0741
-- *Prompt tokens:* 2,150
-- *Generation tokens:* 142
-- *Total tokens:* 2,292
-- *Prompt throughput (raw):* 6,410 tok/s
-- *Generation throughput (raw):* 184 tok/s
-- *Peak memory:* 4.0
-- *Active memory:* 3.2
-- *Cache memory:* 0.06
-- *Model-load active memory:* 3.2
-- *Post-cleanup active memory:* 0.0041
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1568
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: "Edinburgh's Urban Renewal: Scaffolding and Construction on Princes Street"
-
-Description: A bustling city centre in Edinburgh, Scotland, is undergoing significant redevelopment. Extensive scaffolding covers a building along Princes Street, indicating major renovation and redevelopment work. Pedestrians walk past temporary construction fences, while a Boots pharmacy remains open beneath the construction site. The overcast sky adds a moody atmosphere to the scene.
-
-Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Urban Renewal, City Centre, Pedestrians, Overcast Sky, Construction Fence, Boots Pharmacy, Civil Engineering
+Title: Historic Mill by River Itchen
+Description: Pedestrians walk and relax near the historic Winchester City Mill, featuring a charming stone bridge and clay-tiled roof under a blue sky.
+Keywords: Winchester City Mill, historic watermill, River Itchen, Hampshire, England, National Trust, clay tiles, stone bridge, blue sky, pedestrians, relaxation, stone wall, riverbank, scenic, chimney, elderly woman, girls
 </pre>
 
 </details>
@@ -460,18 +350,18 @@ Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Urban 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.97s
-- *Generation time:* 1.41s
-- *Total time:* 2.39s
-- *Input validation time:* 5.26e-05
-- *Prompt preparation time:* 0.00899
-- *First-token latency:* 0.463
-- *Cleanup time:* 0.0781
-- *Prompt tokens:* 2,141
-- *Generation tokens:* 90
-- *Total tokens:* 2,231
-- *Prompt throughput (raw):* 4,619 tok/s
-- *Generation throughput (raw):* 211 tok/s
+- *Model load time:* 0.93s
+- *Generation time:* 1.48s
+- *Total time:* 2.42s
+- *Input validation time:* 5.35e-05
+- *Prompt preparation time:* 0.00895
+- *First-token latency:* 0.46
+- *Cleanup time:* 0.081
+- *Prompt tokens:* 2,086
+- *Generation tokens:* 83
+- *Total tokens:* 2,169
+- *Prompt throughput (raw):* 4,533 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 2.8
 - *Cache memory:* 0.08
@@ -480,7 +370,7 @@ Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Urban 
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1568
+- *Rendered prompt characters:* 1342
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -496,9 +386,73 @@ Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Urban 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Edinburgh Princes Street Construction Site
-Description: Extensive scaffolding covers a building undergoing renovation along Princes Street, with pedestrians walking past temporary fences and a Boots pharmacy under an overcast sky.
-Keywords: Edinburgh, Scotland, UK, Europe, City Centre, Civil engineering, Construction fence, Construction site, Crane, Overcast, Pedestrians, Princes Street, Roadworks, Scaffolding, Modern Architecture
+Title: Historic Mill Over River Itchen
+
+Description: Visitors walk along a pathway beside the historic Winchester City Mill, an ancient watermill with distinctive clay tiles and chimneys, set against a blue sky with clouds.
+
+Keywords: National Trust, Hampshire, England, Mill, River Itchen, Pedestrians, People, Rapids, Riverbank, Scenery, Sitting, Adobe Stock, Any Vision
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 1.40s
+- *Generation time:* 5.31s
+- *Total time:* 6.72s
+- *Input validation time:* 5.72e-05
+- *Prompt preparation time:* 0.00768
+- *First-token latency:* 1.99
+- *Cleanup time:* 0.0932
+- *Prompt tokens:* 2,918
+- *Generation tokens:* 180
+- *Total tokens:* 3,098
+- *Prompt throughput (raw):* 1,467 tok/s
+- *Generation throughput (raw):* 67.1 tok/s
+- *Peak memory:* 13
+- *Active memory:* 8.0
+- *Cache memory:* 0.60
+- *Model-load active memory:* 8.01
+- *Post-cleanup active memory:* 0.00513
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 3729
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+**Winchester City Mill: Historic Watermill by the River Itchen**
+
+Description:
+A group of visitors, including two women walking along the riverside path, explore the historic **Winchester City Mill**, a National Trust-listed watermill with a distinctive **stone and brick facade** and **clay-tiled roof**, set against the flowing **River Itchen** under a bright **blue-sky backdrop** with scattered clouds. The mill’s **stone arch bridge** and **rapid water flow** enhance the scenic charm, captured on a clear summer afternoon.
+
+Keywords:
+Winchester City Mill, River Itchen, National Trust, historic watermill, stone bridge, clay-tiled roof, brick and stone facade, riverside path, pedestrians, scenic riverbank, blue sky, England, Hampshire, summer landscape, elderly visitors, leisure walk, architectural heritage
 </pre>
 
 </details>
@@ -517,27 +471,27 @@ Keywords: Edinburgh, Scotland, UK, Europe, City Centre, Civil engineering, Const
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.03s
-- *Generation time:* 2.15s
-- *Total time:* 3.19s
-- *Input validation time:* 4.66e-05
-- *Prompt preparation time:* 0.00753
-- *First-token latency:* 0.96
-- *Cleanup time:* 0.0808
-- *Prompt tokens:* 2,958
-- *Generation tokens:* 123
-- *Total tokens:* 3,081
-- *Prompt throughput (raw):* 3,082 tok/s
-- *Generation throughput (raw):* 189 tok/s
+- *Model load time:* 0.98s
+- *Generation time:* 2.35s
+- *Total time:* 3.34s
+- *Input validation time:* 5.23e-05
+- *Prompt preparation time:* 0.00723
+- *First-token latency:* 0.976
+- *Cleanup time:* 0.0831
+- *Prompt tokens:* 2,917
+- *Generation tokens:* 139
+- *Total tokens:* 3,056
+- *Prompt throughput (raw):* 2,989 tok/s
+- *Generation throughput (raw):* 190 tok/s
 - *Peak memory:* 7.8
 - *Active memory:* 2.8
-- *Cache memory:* 0.41
+- *Cache memory:* 0.38
 - *Model-load active memory:* 2.75
-- *Post-cleanup active memory:* 0.00567
+- *Post-cleanup active memory:* 0.00565
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3954
+- *Rendered prompt characters:* 3728
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -554,192 +508,168 @@ Keywords: Edinburgh, Scotland, UK, Europe, City Centre, Civil engineering, Const
 
 <pre class="model-output-readable">
 Title:
-**Princes Street Construction: Edinburgh’s Facade in Renewal**
+Historic Winchester Watermill by the River Itchen
 
 Description:
-A major renovation under scaffolding transforms a historic building in Edinburgh’s bustling city centre along Princes Street, with cranes and protective barriers visible under an overcast sky. Pedestrians navigate the temporary roadworks, including a Boots pharmacy and construction fences.
+A picturesque scene captures the Winchester City Mill, a traditional brick-and-stone watermill with clay-tiled roofs, flowing over the River Itchen under bright blue skies. Visitors stroll along the riverside path, with a stone bridge and waterfall adding charm to the quaint, well-preserved setting.
 
 Keywords:
-Princes Street construction site, Edinburgh urban renewal, scaffolding facade, historic building restoration, cranes at work, Boots pharmacy under construction, temporary pedestrian paths, overcast cityscape, construction safety barriers, roadworks in city centre.
+Winchester City Mill, brick-and-stone structure, clay tiles, River Itchen, stone bridge, flowing water, blue sky, historic watermill, pathway, traditional architecture, Hampshire, England, National Trust heritage, scenic riverside, visitors walking, waterfall rapids
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-ornith-15-35b-a3b-optiq-4bit"></a>
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
-### mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit</summary>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.62s
-- *Generation time:* 2.63s
-- *Total time:* 5.27s
-- *Input validation time:* 5.5e-05
-- *Prompt preparation time:* 0.0185
-- *First-token latency:* 0.793
-- *Cleanup time:* 0.127
-- *Prompt tokens:* 1,323
-- *Generation tokens:* 129
-- *Total tokens:* 1,452
-- *Prompt throughput (raw):* 1,669 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 2.93s
+- *Generation time:* 48.04s
+- *Total time:* 51.00s
+- *Input validation time:* 5.04e-05
+- *Prompt preparation time:* 0.0203
+- *First-token latency:* 8.12
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 4,388
+- *Generation tokens:* 992
+- *Total tokens:* 5,380
+- *Prompt throughput (raw):* 540 tok/s
+- *Generation throughput (raw):* 25.3 tok/s
 - *Peak memory:* 25
-- *Active memory:* 23
-- *Cache memory:* 0.14
-- *Model-load active memory:* 23.1
-- *Post-cleanup active memory:* 0.00701
+- *Active memory:* 24
+- *Cache memory:* 0.30
+- *Model-load active memory:* 23.9
+- *Post-cleanup active memory:* 0.00637
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1608
+- *Rendered prompt characters:* 1529
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
+- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/b4a74fa6001f1eca3b23eeeb702ffad2773a218f
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
 Title:
-Scaffolding Covers Building Renovation on Princes Street, Edinburgh
+Historic Winchester City Mill Over River Itchen
 
 Description:
-Extensive scaffolding envelops the facade of a building undergoing major redevelopment along Princes Street in Edinburgh's city centre, beside a Boots pharmacy beneath an overcast sky. Pedestrians walk past temporary construction fencing and roadworks while a yellow crane operates in the distance.
+Captured on 31 August 2026, the historic Winchester City Mill, a brick and flint watermill with a clay-tile roof and chimney, stands over the River Itchen in Winchester, Hampshire, England. Two girls walk along the riverside walkway beside the mill’s arched water outlets and stone lower storey, while an elderly woman sits on the patio under a partly cloudy blue sky.
 
 Keywords:
-Edinburgh, Princes Street, Scotland, City Centre, Scaffolding, Construction site, Construction fence, Roadworks, Crane, Pedestrians, Boots, Pharmacy, Overcast sky, Modern architecture, Renovation, Urban street, United Kingdom
+Winchester City Mill, River Itchen, Hampshire, England, historic watermill, brick and flint facade, clay tile roof, chimney, arched water outlet, rapids, riverbank, pedestrians, girls walking, elderly woman sitting, partly cloudy sky, National Trust
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
-### mlx-community/Phi-3.5-vision-instruct-bf16
+### mlx-community/Qwen3-VL-2B-Thinking-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 1.00s
-- *Generation time:* 3.42s
-- *Total time:* 4.43s
-- *Input validation time:* 6.08e-05
-- *Prompt preparation time:* 0.00166
-- *First-token latency:* 0.255
-- *Cleanup time:* 0.0905
-- *Prompt tokens:* 1,174
-- *Generation tokens:* 150
-- *Total tokens:* 1,324
-- *Prompt throughput (raw):* 4,604 tok/s
-- *Generation throughput (raw):* 56.5 tok/s
-- *Peak memory:* 9.4
-- *Active memory:* 8.3
-- *Cache memory:* 0.62
-- *Model-load active memory:* 8.3
-- *Post-cleanup active memory:* 0.00708
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.74s
+- *Generation time:* 28.37s
+- *Total time:* 29.13s
+- *Input validation time:* 5.02e-05
+- *Prompt preparation time:* 0.012
+- *First-token latency:* 17.2
+- *Cleanup time:* 0.0991
+- *Prompt tokens:* 16,522
+- *Generation tokens:* 907
+- *Total tokens:* 17,429
+- *Prompt throughput (raw):* 959 tok/s
+- *Generation throughput (raw):* 89.9 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.7
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.00778
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1538
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Edinburgh's Princes Street Undergoing Major Renovation
-
-Description: Pedestrians stroll past a building undergoing extensive renovation on Princes Street in Edinburgh, with scaffolding and construction fences visible.
-
-Keywords: Edinburgh, Princes Street, renovation, scaffolding, construction, pedestrians, overcast sky, Boots pharmacy, civil engineering, modern architecture, roadworks, European city centre, GBR, 2026, 17:46:05 UTC+01:00, 55.951722°N, 3.201417°W
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
-
-### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.93s
-- *Generation time:* 49.87s
-- *Total time:* 51.82s
-- *Input validation time:* 6.16e-05
-- *Prompt preparation time:* 0.00154
-- *First-token latency:* 47.6
-- *Cleanup time:* 0.144
-- *Prompt tokens:* 16,581
-- *Generation tokens:* 113
-- *Total tokens:* 16,694
-- *Prompt throughput (raw):* 348 tok/s
-- *Generation throughput (raw):* 86.5 tok/s
-- *Peak memory:* 23
-- *Active memory:* 18
-- *Cache memory:* 2.3
-- *Model-load active memory:* 18.3
-- *Post-cleanup active memory:* 0.0077
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1589
+- *Rendered prompt characters:* 1371
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
+- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Extensive scaffolding on Princes Street, Edinburgh
-Description: A wide shot captures a building under major renovation on Princes Street in Edinburgh, Scotland, its facade entirely covered by scaffolding. Pedestrians walk along the pavement past a Boots pharmacy and temporary construction fencing under an overcast sky.
-Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, construction site, scaffolding, construction fence, roadworks, crane, modern architecture, civil engineering, overcast sky, pedestrians, building renovation, city centre, objects, Boots pharmacy
+Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a historic watermill, so "Winchester City Mill, River Itchen, Hampshire" is key. Let's make it concise: "Winchester City Mill, River Itchen, Hampshire, England"
+
+Next, the description. It has to combine context with visible subject, setting, action, lighting, details. The context is capture date, but we don't need to include that. The main subject is the mill, people walking, the river, the historic building. The lighting is bright, blue sky. Distinctive details: brick and stone walls, chimney, people (elderly woman, girls), river rapids. So: "Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill."
+
+Wait, check the context: the description hint says "Visitors walk along the pathway and relax in front of the historic Winchester City Mill..." So the description should include that. Let's adjust: "Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill, where an elderly woman sits and girls stroll."
+
+Now keywords. Need 10-18 unique, comma-separated. From context: England, Hampshire, Mill, National Trust (since it's a historic site, likely National Trust), River Itchen, Winchester City Mill, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. Let's list them: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. Wait, check if all are visible. The image has a chimney (yes, the red brick chimney), brick and stone walls (yes), blue sky (yes), river rapids (yes), riverbank (yes), scenery (yes), elderly woman (yes), girls (yes), National Trust (since it's a historic site, likely managed by National Trust), Winchester City Mill (yes). Let's make sure they are unique. Let's count: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. That's 15. Let's check if any are redundant. "People" is included, "Pedestrians" is a subset. "Scenery" is okay. "Riverbank" is visible. "Chimney" is there. "Brick wall" and "Stone wall" are both present. "Blue sky" is visible. "Rapids" are the river's flow. "National Trust" is a key context. "Winchester City Mill" is the main subject. "Elderly woman" and "Girls" are visible. Let's check if all are in the image. The image has the mill, people walking, elderly woman sitting, girls walking, chimney, brick and stone walls, blue sky, river rapids. So the keywords should include those. Let's list them: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. That's 15. Let's check if any are missing. The context says "National Trust" is a keyword hint, so we should include that. The description mentions "historic Winchester City Mill", so "Winchester City Mill" is a keyword
+&lt;/think&gt;
+
+Title: Winchester City Mill, River Itchen, Hampshire, England
+
+Description: Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill, where an elderly woman sits and girls stroll.
+
+Keywords: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The image shows a historic watermill, so "Winchester City Mill, River Itchen, Hampshire" is key. Let's make it concise: "Winchester City Mill, River Itchen, Hampshire, England"
+
+Next, the description. It has to combine context with visible subject, setting, action, lighting, details. The context is capture date, but we don't need to include that. The main subject is the mill, people walking, the river, the historic building. The lighting is bright, blue sky. Distinctive details: brick and stone walls, chimney, people (elderly woman, girls), river rapids. So: "Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill."
+
+Wait, check the context: the description hint says "Visitors walk along the pathway and relax in front of the historic Winchester City Mill..." So the description should include that. Let's adjust: "Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill, where an elderly woman sits and girls stroll."
+
+Now keywords. Need 10-18 unique, comma-separated. From context: England, Hampshire, Mill, National Trust (since it's a historic site, likely National Trust), River Itchen, Winchester City Mill, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. Let's list them: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. Wait, check if all are visible. The image has a chimney (yes, the red brick chimney), brick and stone walls (yes), blue sky (yes), river rapids (yes), riverbank (yes), scenery (yes), elderly woman (yes), girls (yes), National Trust (since it's a historic site, likely managed by National Trust), Winchester City Mill (yes). Let's make sure they are unique. Let's count: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. That's 15. Let's check if any are redundant. "People" is included, "Pedestrians" is a subset. "Scenery" is okay. "Riverbank" is visible. "Chimney" is there. "Brick wall" and "Stone wall" are both present. "Blue sky" is visible. "Rapids" are the river's flow. "National Trust" is a key context. "Winchester City Mill" is the main subject. "Elderly woman" and "Girls" are visible. Let's check if all are in the image. The image has the mill, people walking, elderly woman sitting, girls walking, chimney, brick and stone walls, blue sky, river rapids. So the keywords should include those. Let's list them: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls. That's 15. Let's check if any are missing. The context says "National Trust" is a keyword hint, so we should include that. The description mentions "historic Winchester City Mill", so "Winchester City Mill" is a keyword
+</think>
+
+Title: Winchester City Mill, River Itchen, Hampshire, England
+
+Description: Visitors walk along the historic Winchester City Mill's pathway, with blue sky, brick and stone walls, and river rapids flowing beneath the mill, where an elderly woman sits and girls stroll.
+
+Keywords: England, Hampshire, Winchester City Mill, National Trust, River Itchen, Pedestrians, People, Stone wall, Brick wall, Chimney, Blue sky, Rapids, Riverbank, Scenery, Elderly woman, Girls
+```
+
+</details>
 
 </details>
 
@@ -757,27 +687,27 @@ Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, construction site, sc
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.57s
-- *Generation time:* 51.52s
-- *Total time:* 54.11s
-- *Input validation time:* 7.34e-05
-- *Prompt preparation time:* 0.0174
-- *First-token latency:* 49.4
-- *Cleanup time:* 0.128
-- *Prompt tokens:* 16,597
-- *Generation tokens:* 134
-- *Total tokens:* 16,731
-- *Prompt throughput (raw):* 336 tok/s
-- *Generation throughput (raw):* 111 tok/s
+- *Model load time:* 2.53s
+- *Generation time:* 56.73s
+- *Total time:* 59.29s
+- *Input validation time:* 6.6e-05
+- *Prompt preparation time:* 0.0162
+- *First-token latency:* 54.4
+- *Cleanup time:* 0.124
+- *Prompt tokens:* 16,536
+- *Generation tokens:* 143
+- *Total tokens:* 16,679
+- *Prompt throughput (raw):* 304 tok/s
+- *Generation throughput (raw):* 110 tok/s
 - *Peak memory:* 24
 - *Active memory:* 20
 - *Cache memory:* 0.89
 - *Model-load active memory:* 20.4
-- *Post-cleanup active memory:* 0.00821
+- *Post-cleanup active memory:* 0.0086
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1608
+- *Rendered prompt characters:* 1382
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -793,90 +723,12 @@ Keywords: Edinburgh, Princes Street, Scotland, UK, Europe, construction site, sc
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Princes Street Building Renovation with Scaffolding
+Title: Historic Watermill Over River Itchen
 
-Description: An extensive construction site on Princes Street in Edinburgh features a multi-story building fully encased in scaffolding and protective sheeting, situated next to a Boots pharmacy under an overcast sky. Pedestrians walk along the sidewalk past temporary fencing and roadworks, while a yellow crane is visible in the background.
+Description: Captured on August 31, 2026, this image depicts the historic Winchester City Mill, an ancient structure featuring a weathered clay-tiled roof and flint-and-brick walls, situated over the River Itchen in Hampshire. Under a bright blue sky with scattered clouds, pedestrians cross a stone bridge in the foreground while an elderly woman sits nearby.
 
-Keywords: Edinburgh, Princes Street, Scaffolding, Construction site, Roadworks, Boots pharmacy, Pedestrians, Overcast sky, Crane, Civil engineering, City Centre, Scotland, UK, Modern architecture, Fence, Objects, Europe, 2026
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, Clay tiles, Flint wall, Stone bridge, Blue sky, Clouds, Pedestrians, Elderly woman, Watermill, National Trust, Scenery, Architecture, Riverbank, Rapids, People
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-### mlx-community/Qwen3.5-9B-MLX-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.47s
-- *Generation time:* 53.40s
-- *Total time:* 54.88s
-- *Input validation time:* 6.91e-05
-- *Prompt preparation time:* 0.00166
-- *First-token latency:* 51.3
-- *Cleanup time:* 0.0935
-- *Prompt tokens:* 16,597
-- *Generation tokens:* 103
-- *Total tokens:* 16,700
-- *Prompt throughput (raw):* 323 tok/s
-- *Generation throughput (raw):* 91.7 tok/s
-- *Peak memory:* 10.0
-- *Active memory:* 6.0
-- *Cache memory:* 1.2
-- *Model-load active memory:* 5.96
-- *Post-cleanup active memory:* 0.00873
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1608
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Scaffolding-covered building under renovation on Princes Street, Edinburgh
-
-Description:
-Extensive scaffolding envelops a historic building undergoing redevelopment along Princes Street in Edinburgh, with pedestrians walking past temporary fencing and a Boots pharmacy under an overcast sky.
-
-Keywords:
-Princes Street, Edinburgh, Scotland, UK, scaffolding, construction site, roadworks, Boots pharmacy, pedestrians, overcast sky, modern architecture, civil engineering, temporary fence, crane, historic building, urban renewal
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title:  
-Scaffolding-covered building under renovation on Princes Street, Edinburgh
-
-Description:  
-Extensive scaffolding envelops a historic building undergoing redevelopment along Princes Street in Edinburgh, with pedestrians walking past temporary fencing and a Boots pharmacy under an overcast sky.
-
-Keywords:  
-Princes Street, Edinburgh, Scotland, UK, scaffolding, construction site, roadworks, Boots pharmacy, pedestrians, overcast sky, modern architecture, civil engineering, temporary fence, crane, historic building, urban renewal
-```
-
-</details>
 
 </details>
 
@@ -894,27 +746,27 @@ Princes Street, Edinburgh, Scotland, UK, scaffolding, construction site, roadwor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.13s
-- *Generation time:* 76.15s
-- *Total time:* 79.30s
-- *Input validation time:* 7.39e-05
-- *Prompt preparation time:* 0.0174
-- *First-token latency:* 69
-- *Cleanup time:* 0.146
-- *Prompt tokens:* 16,597
-- *Generation tokens:* 110
-- *Total tokens:* 16,707
-- *Prompt throughput (raw):* 241 tok/s
-- *Generation throughput (raw):* 17.6 tok/s
+- *Model load time:* 3.29s
+- *Generation time:* 75.90s
+- *Total time:* 79.22s
+- *Input validation time:* 8.33e-05
+- *Prompt preparation time:* 0.0157
+- *First-token latency:* 67.2
+- *Cleanup time:* 0.149
+- *Prompt tokens:* 16,536
+- *Generation tokens:* 139
+- *Total tokens:* 16,675
+- *Prompt throughput (raw):* 246 tok/s
+- *Generation throughput (raw):* 18.2 tok/s
 - *Peak memory:* 33
 - *Active memory:* 29
 - *Cache memory:* 1.9
 - *Model-load active memory:* 28.7
-- *Post-cleanup active memory:* 0.00924
+- *Post-cleanup active memory:* 0.00964
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1608
+- *Rendered prompt characters:* 1382
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -931,13 +783,13 @@ Princes Street, Edinburgh, Scotland, UK, scaffolding, construction site, roadwor
 
 <pre class="model-output-readable">
 Title:
-Edinburgh Princes Street Construction and Boots Pharmacy
+Winchester City Mill on the River Itchen
 
 Description:
-Extensive scaffolding covers a building undergoing major renovation on Princes Street in Edinburgh, situated next to a Boots pharmacy. Pedestrians walk past temporary construction fences and a yellow crane under an overcast sky.
+Visitors walk along the bridge and an elderly woman sits with a walker in front of the historic Winchester City Mill, a brick and stone watermill situated over the River Itchen in Hampshire, England. The scene is captured under a blue sky with white clouds, highlighting the building's clay tile roof and the rushing water below.
 
 Keywords:
-Edinburgh, Princes Street, Scotland, Construction, Scaffolding, Boots, Pharmacy, Renovation, Crane, Pedestrians, City Centre, Overcast, Roadworks, Urban, Architecture, Development, Street Scene, UK
+Winchester City Mill, River Itchen, Hampshire, England, Watermill, Bridge, Pedestrians, Elderly woman, Brick building, Stone wall, Rapids, Blue sky, Chimney, Clay tiles, Scenery, National Trust, Walking, Riverbank
 </pre>
 
 </details>
@@ -956,27 +808,27 @@ Edinburgh, Princes Street, Scotland, Construction, Scaffolding, Boots, Pharmacy,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.13s
-- *Generation time:* 73.10s
-- *Total time:* 75.26s
-- *Input validation time:* 7.26e-05
-- *Prompt preparation time:* 0.0186
-- *First-token latency:* 68.4
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 16,597
-- *Generation tokens:* 115
-- *Total tokens:* 16,712
-- *Prompt throughput (raw):* 243 tok/s
-- *Generation throughput (raw):* 30.7 tok/s
+- *Model load time:* 2.08s
+- *Generation time:* 76.08s
+- *Total time:* 78.18s
+- *Input validation time:* 7.19e-05
+- *Prompt preparation time:* 0.0174
+- *First-token latency:* 70.6
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 16,536
+- *Generation tokens:* 131
+- *Total tokens:* 16,667
+- *Prompt throughput (raw):* 234 tok/s
+- *Generation throughput (raw):* 29.6 tok/s
 - *Peak memory:* 21
 - *Active memory:* 16
 - *Cache memory:* 1.9
 - *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.00975
+- *Post-cleanup active memory:* 0.0101
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1608
+- *Rendered prompt characters:* 1382
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -993,75 +845,70 @@ Edinburgh, Princes Street, Scotland, Construction, Scaffolding, Boots, Pharmacy,
 
 <pre class="model-output-readable">
 Title:
-Scaffolding on Princes Street, Edinburgh, Scotland
+Winchester City Mill Spanning the River Itchen
 
 Description:
-A large building on Princes Street in Edinburgh is covered in extensive scaffolding and green safety netting, indicating major renovation works. Pedestrians walk past a Boots pharmacy and temporary construction fencing along the street under an overcast sky.
+The historic Winchester City Mill, a brick and stone structure with a clay-tiled roof, stands over the River Itchen in Hampshire, England. Pedestrians walk along the bridge pathway in front of the building while an elderly woman sits nearby, set against a backdrop of blue sky and white clouds.
 
 Keywords:
-Scaffolding, Construction, Edinburgh, Princes Street, Renovation, Boots, Pharmacy, Pedestrians, Overcast, City Centre, Scotland, Roadworks, Urban, Architecture, Fencing, Crane, Street Scene
+Winchester City Mill, River Itchen, Hampshire, England, Watermill, Brick building, Clay tiles, Stone bridge, Pedestrians, Elderly woman, Blue sky, Clouds, Historic architecture, Water, Scenery, National Trust
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-step-37-flash-oq2e"></a>
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
-### mlx-community/Step-3.7-Flash-oQ2e
+### mlx-community/diffusiongemma-26B-A4B-it-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 5.60s
-- *Generation time:* 16.88s
-- *Total time:* 22.50s
-- *Input validation time:* 6.21e-05
-- *Prompt preparation time:* 0.0158
-- *First-token latency:* 13.9
-- *Cleanup time:* 0.24
-- *Prompt tokens:* 3,525
-- *Generation tokens:* 102
-- *Total tokens:* 3,627
-- *Prompt throughput (raw):* 254 tok/s
-- *Generation throughput (raw):* 46.5 tok/s
-- *Peak memory:* 70
-- *Active memory:* 63
-- *Cache memory:* 0.41
-- *Model-load active memory:* 63
-- *Post-cleanup active memory:* 0.0101
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.34s
+- *Generation time:* 2.94s
+- *Total time:* 6.31s
+- *Input validation time:* 6.64e-05
+- *Prompt preparation time:* 0.023
+- *First-token latency:* 0.608
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 570
+- *Generation tokens:* 85
+- *Total tokens:* 655
+- *Prompt throughput (raw):* 937 tok/s
+- *Generation throughput (raw):* 57.7 tok/s
+- *Peak memory:* 29
+- *Active memory:* 28
+- *Cache memory:* 0.01
+- *Model-load active memory:* 28
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1595
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1317
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
+- *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Edinburgh City Centre Scaffolding and Construction Works
-
-Description:
-Extensive scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, with pedestrians walking past temporary construction fences and a Boots pharmacy under an overcast sky.
-
-Keywords:
-Edinburgh, Princes Street, Scaffolding, Construction site, Boots pharmacy, Overcast sky, Pedestrians, Roadworks, City Centre, Scotland, UK, Europe, Civil engineering, Construction fence, Crane, Modern architecture, Temporary signage
+Title: Historic Winchester City Mill over River Itchen
+Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill on the River Itchen under a cloudy sky.
+Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, architecture, brick, stone, clay tiles, chimney, pedestrians, rapids, river, bridge, scenery, National Trust
 </pre>
 
 </details>
@@ -1080,27 +927,27 @@ Edinburgh, Princes Street, Scaffolding, Construction site, Boots pharmacy, Overc
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.25s
-- *Generation time:* 2.89s
-- *Total time:* 6.16s
-- *Input validation time:* 5.53e-05
-- *Prompt preparation time:* 0.00112
-- *First-token latency:* 0.331
-- *Cleanup time:* 0.162
-- *Prompt tokens:* 627
+- *Model load time:* 3.23s
+- *Generation time:* 2.68s
+- *Total time:* 5.92s
+- *Input validation time:* 6.36e-05
+- *Prompt preparation time:* 0.00159
+- *First-token latency:* 0.324
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 570
 - *Generation tokens:* 85
-- *Total tokens:* 712
-- *Prompt throughput (raw):* 1,894 tok/s
-- *Generation throughput (raw):* 46.6 tok/s
+- *Total tokens:* 655
+- *Prompt throughput (raw):* 1,761 tok/s
+- *Generation throughput (raw):* 57.1 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
 - *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0104
+- *Post-cleanup active memory:* 0.0108
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1543
+- *Rendered prompt characters:* 1317
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1116,68 +963,9 @@ Edinburgh, Princes Street, Scaffolding, Construction site, Boots pharmacy, Overc
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Building Renovation on Princes Street, Edinburgh City Centre
-Description: Extensive scaffolding and a crane cover a building undergoing renovation along Princes Street in Edinburgh while pedestrians walk past a Boots pharmacy under an overcast sky.
-Keywords: Edinburgh, Scotland, Princes Street, City Centre, construction, scaffolding, crane, renovation, architecture, pedestrians, pharmacy, urban, overcast, civil engineering, roadworks, Europe
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.29s
-- *Generation time:* 5.58s
-- *Total time:* 7.89s
-- *Input validation time:* 6.3e-05
-- *Prompt preparation time:* 0.00459
-- *First-token latency:* 1.02
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 626
-- *Generation tokens:* 126
-- *Total tokens:* 752
-- *Prompt throughput (raw):* 611 tok/s
-- *Generation throughput (raw):* 31.5 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.46
-- *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.011
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1572
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Princes Street Building Renovation, Edinburgh
-
-Description: Captured on 18th August 2026, this view shows extensive scaffolding covering a building undergoing renovation on Princes Street, Edinburgh, with pedestrians passing a Boots pharmacy under an overcast sky. A yellow crane is visible amidst the construction site, and temporary fencing secures the area.
-
-Keywords: Edinburgh, Princes Street, Scotland, Renovation, Construction, Scaffolding, Crane, Boots, Pedestrians, Roadworks, Civil engineering, Overcast Sky, Modern Architecture, Building, Facade, Construction fence, City Centre, 2026
+Title: Historic Winchester City Mill on River Itchen
+Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill situated over the rapids of the River Itchen.
+Keywords: Winchester, Hampshire, England, River Itchen, Mill, National Trust, historic, brick, stone, clay tiles, chimney, pedestrians, rapids, bridge, architecture, scenery, outdoors
 </pre>
 
 </details>
@@ -1196,27 +984,27 @@ Keywords: Edinburgh, Princes Street, Scotland, Renovation, Construction, Scaffol
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.35s
-- *Generation time:* 1.66s
-- *Total time:* 4.04s
-- *Input validation time:* 6.16e-05
-- *Prompt preparation time:* 0.023
-- *First-token latency:* 0.407
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 631
-- *Generation tokens:* 87
-- *Total tokens:* 718
-- *Prompt throughput (raw):* 1,549 tok/s
-- *Generation throughput (raw):* 128 tok/s
+- *Model load time:* 2.46s
+- *Generation time:* 1.95s
+- *Total time:* 4.44s
+- *Input validation time:* 7.95e-05
+- *Prompt preparation time:* 0.0242
+- *First-token latency:* 0.44
+- *Cleanup time:* 0.123
+- *Prompt tokens:* 574
+- *Generation tokens:* 105
+- *Total tokens:* 679
+- *Prompt throughput (raw):* 1,304 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
-- *Cache memory:* 0.21
+- *Cache memory:* 0.20
 - *Model-load active memory:* 15.4
-- *Post-cleanup active memory:* 0.012
+- *Post-cleanup active memory:* 0.0124
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1571
+- *Rendered prompt characters:* 1345
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1232,9 +1020,9 @@ Keywords: Edinburgh, Princes Street, Scotland, Renovation, Construction, Scaffol
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Scaffolding on building on Princes Street, Edinburgh
-Description: Extensive scaffolding covers a building undergoing renovation on Princes Street in Edinburgh under an overcast sky. Pedestrians walk past construction fences and a Boots pharmacy on the street level.
-Keywords: Edinburgh, Scotland, Princes Street, scaffolding, construction, renovation, urban, city centre, pedestrians, Boots, pharmacy, architecture, overcast sky, street scene, Europe, UK
+Title: People walking by historic Winchester City Mill
+Description: Two women walk along a stone pathway in front of the historic brick and flint Winchester City Mill over the River Itchen. The scene captures the ancient watermill's tiled roof and stone architecture under a bright, cloudy sky.
+Keywords: Winchester, River Itchen, Hampshire, England, historic mill, watermill, stone wall, clay tiles, pedestrians, riverbank, architecture, brickwork, blue sky, scenic, National Trust, river, stone bridge
 </pre>
 
 </details>
@@ -1253,27 +1041,27 @@ Keywords: Edinburgh, Scotland, Princes Street, scaffolding, construction, renova
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.57s
-- *Generation time:* 5.07s
-- *Total time:* 7.65s
-- *Input validation time:* 5.81e-05
-- *Prompt preparation time:* 0.00175
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.142
-- *Prompt tokens:* 631
-- *Generation tokens:* 89
-- *Total tokens:* 720
-- *Prompt throughput (raw):* 563 tok/s
-- *Generation throughput (raw):* 26.3 tok/s
+- *Model load time:* 2.54s
+- *Generation time:* 5.24s
+- *Total time:* 7.79s
+- *Input validation time:* 7.58e-05
+- *Prompt preparation time:* 0.00158
+- *First-token latency:* 1.07
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 574
+- *Generation tokens:* 90
+- *Total tokens:* 664
+- *Prompt throughput (raw):* 536 tok/s
+- *Generation throughput (raw):* 26.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
-- *Cache memory:* 0.81
+- *Cache memory:* 0.76
 - *Model-load active memory:* 18.4
-- *Post-cleanup active memory:* 0.0126
+- *Post-cleanup active memory:* 0.013
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1571
+- *Rendered prompt characters:* 1345
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1289,71 +1077,66 @@ Keywords: Edinburgh, Scotland, Princes Street, scaffolding, construction, renova
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Construction and Scaffolding on Princes Street, Edinburgh
-Description: Extensive scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, under an overcast sky. Pedestrians walk past construction fences and a Boots pharmacy storefront.
-Keywords: Edinburgh, Scotland, Princes Street, construction site, scaffolding, crane, Boots pharmacy, pedestrians, roadworks, city centre, overcast sky, civil engineering, urban redevelopment, Europe, UK
+Title: Visitors at the historic Winchester City Mill, Hampshire
+Description: Visitors walk along a pathway and relax in front of the ancient Winchester City Mill, situated over the River Itchen in Hampshire, England, under a bright blue sky.
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, National Trust, historic building, riverbank, pedestrians, clay tiles, stone wall, arch, river, scenery, summer
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
+<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
 
-### mlx-community/pixtral-12b-8bit
+### mlx-community/granite-4.0-3b-vision-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
+<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.64s
-- *Generation time:* 4.51s
-- *Total time:* 6.16s
-- *Input validation time:* 5.93e-05
-- *Prompt preparation time:* 0.00371
-- *First-token latency:* 1.7
-- *Cleanup time:* 0.105
-- *Prompt tokens:* 3,149
-- *Generation tokens:* 91
-- *Total tokens:* 3,240
-- *Prompt throughput (raw):* 1,850 tok/s
-- *Generation throughput (raw):* 39.6 tok/s
-- *Peak memory:* 16
-- *Active memory:* 13
-- *Cache memory:* 0.59
-- *Model-load active memory:* 13.5
-- *Post-cleanup active memory:* 0.0131
+- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
+- *Model load time:* 0.66s
+- *Generation time:* 1.93s
+- *Total time:* 2.60s
+- *Input validation time:* 6.05e-05
+- *Prompt preparation time:* 0.0104
+- *First-token latency:* 0.52
+- *Cleanup time:* 0.0914
+- *Prompt tokens:* 1,371
+- *Generation tokens:* 88
+- *Total tokens:* 1,459
+- *Prompt throughput (raw):* 2,639 tok/s
+- *Generation throughput (raw):* 177 tok/s
+- *Peak memory:* 4.7
+- *Active memory:* 3.0
+- *Cache memory:* 0.22
+- *Model-load active memory:* 3.03
+- *Post-cleanup active memory:* 0.0132
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1517
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1515
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+- *EOS token:* <\|end_of_text\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Princes Street Redevelopment, Edinburgh, Scotland
-
-Description:
-Scaffolding covers a building undergoing renovation along Princes Street in Edinburgh, Scotland, with pedestrians walking past under an overcast sky.
-
-Keywords:
-Princes Street, Edinburgh, Scotland, Scaffolding, Construction, Renovation, Pedestrians, Overcast, Boots Pharmacy, Civil Engineering, Roadworks, Crane, Modern Architecture, Fence, City Centre, Europe
+Title: "Historic Mill by the River Itchen"
+Description: "Visitors stroll along the pathway in front of the historic Winchester City Mill, enjoying the serene setting by the River Itchen."
+Keywords: Historic Mill, Winchester City Mill, River Itchen, Pedestrians, Elderly woman, Girls, Stone wall, Chimney, Blue sky, Rapids, Scenery, National Trust, Adobe Stock, Any Vision
 </pre>
 
 </details>
@@ -1370,20 +1153,21 @@ Princes Street, Edinburgh, Scotland, Scaffolding, Construction, Renovation, Pede
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: edinburgh, scotland
+- *Observations:* Title has 4 words (requested 5-10); Duplicate keywords:
+  bridge
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.56s
-- *Generation time:* 0.84s
-- *Total time:* 1.73s
-- *Input validation time:* 0.319
-- *Prompt preparation time:* 0.00673
-- *First-token latency:* 0.121
-- *Cleanup time:* 0.0626
-- *Prompt tokens:* 2,150
-- *Generation tokens:* 118
-- *Total tokens:* 2,268
-- *Prompt throughput (raw):* 17,807 tok/s
-- *Generation throughput (raw):* 480 tok/s
+- *Model load time:* 0.37s
+- *Generation time:* 0.85s
+- *Total time:* 1.65s
+- *Input validation time:* 0.417
+- *Prompt preparation time:* 0.00683
+- *First-token latency:* 0.118
+- *Cleanup time:* 0.0637
+- *Prompt tokens:* 2,094
+- *Generation tokens:* 76
+- *Total tokens:* 2,170
+- *Prompt throughput (raw):* 17,814 tok/s
+- *Generation throughput (raw):* 482 tok/s
 - *Peak memory:* 1.9
 - *Active memory:* 0.90
 - *Cache memory:* 0.08
@@ -1392,7 +1176,7 @@ Princes Street, Edinburgh, Scotland, Scaffolding, Construction, Renovation, Pede
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1568
+- *Rendered prompt characters:* 1342
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1409,75 +1193,13 @@ Princes Street, Edinburgh, Scotland, Scaffolding, Construction, Renovation, Pede
 
 <pre class="model-output-readable">
 Title:
-City Centre, Edinburgh, Scotland, UK, GBR, Europe
+Historic Winchester City Mill
 
 Description:
-A bustling city street scene in Edinburgh, Scotland, featuring a construction site on Princes Street with scaffolding and a Boots pharmacy. Pedestrians walk along the sidewalk, and a crane is visible in the background.
+A historic stone-built watermill stands over the River Itchen in Winchester, England, with visitors walking along a stone bridge and enjoying the scenic view.
 
 Keywords:
-City Centre, Edinburgh, Scotland, UK, GBR, Europe, Construction site, Boots pharmacy, Edinburgh, Scotland, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Modern Architecture
-</pre>
-
-</details>
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### Qwen/Qwen3-VL-2B-Instruct
-
-<details>
-<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10); Keyword list has 19
-  terms (requested 10-18); Duplicate keywords: scaffolding, roadworks
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.69s
-- *Generation time:* 15.37s
-- *Total time:* 16.08s
-- *Input validation time:* 4.62e-05
-- *Prompt preparation time:* 0.00999
-- *First-token latency:* 13.2
-- *Cleanup time:* 0.0855
-- *Prompt tokens:* 16,581
-- *Generation tokens:* 121
-- *Total tokens:* 16,702
-- *Prompt throughput (raw):* 1,252 tok/s
-- *Generation throughput (raw):* 92.2 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 4.3
-- *Cache memory:* 2.6
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.000443
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1589
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Edinburgh Princes Street Construction
-
-Description:
-Extensive scaffolding covers a building undergoing renovation on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians walking past a Boots pharmacy and construction fences. A yellow crane is visible near the site, and the scene is marked by modern and historic architecture.
-
-Keywords: Edinburgh, Princes Street, construction, scaffolding, crane, overcast, pedestrians, Boots pharmacy, roadworks, modern architecture, city centre, Scotland, European city, civil engineering, construction site, fence, roadworks, scaffolding, overcast sky
+Historic, watermill, Winchester, England, River Itchen, bridge, visitors, stone, bridge, people, scenic, architecture, natural beauty
 </pre>
 
 </details>
@@ -1494,20 +1216,20 @@ Keywords: Edinburgh, Princes Street, construction, scaffolding, crane, overcast,
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
+- *Observations:* Keyword list has 23 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.19s
-- *Generation time:* 7.08s
-- *Total time:* 9.29s
-- *Input validation time:* 5.46e-05
-- *Prompt preparation time:* 0.00815
-- *First-token latency:* 3.17
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 2,426
-- *Generation tokens:* 102
-- *Total tokens:* 2,528
-- *Prompt throughput (raw):* 765 tok/s
-- *Generation throughput (raw):* 30.4 tok/s
+- *Model load time:* 2.23s
+- *Generation time:* 8.05s
+- *Total time:* 10.29s
+- *Input validation time:* 6.12e-05
+- *Prompt preparation time:* 0.00784
+- *First-token latency:* 3.38
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 2,385
+- *Generation tokens:* 119
+- *Total tokens:* 2,504
+- *Prompt throughput (raw):* 706 tok/s
+- *Generation throughput (raw):* 29.8 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 0.47
@@ -1516,7 +1238,7 @@ Keywords: Edinburgh, Princes Street, construction, scaffolding, crane, overcast,
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1517
+- *Rendered prompt characters:* 1291
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1533,71 +1255,119 @@ Keywords: Edinburgh, Princes Street, construction, scaffolding, crane, overcast,
 
 <pre class="model-output-readable">
 Title:
-Edinburgh Princes Street Construction
+Visitors at Winchester City Mill
 
 Description:
-Extensive scaffolding covers a building undergoing major renovation along Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians walking past temporary construction fences and a Boots pharmacy.
+Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a blue sky.
 
 Keywords:
-Edinburgh, Princes Street, construction, scaffolding, renovation, overcast sky, pedestrians, Boots pharmacy, temporary fences, urban development, city centre, Scotland, UK, Europe, modern architecture, civil engineering, roadworks, crane
+Winchester City Mill, River Itchen, Hampshire, England, watermill, historic building, brick and stone architecture, blue sky, visitors, pathway, riverbank, rapids, chimney, clay tiles, stone wall, National Trust, scenic view, pedestrians, people, girls, elderly woman, sitting, relaxing
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
-### mlx-community/GLM-4.6V-Flash-mxfp4
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.41s
-- *Generation time:* 7.55s
-- *Total time:* 8.97s
-- *Input validation time:* 6.51e-05
-- *Prompt preparation time:* 0.00916
-- *First-token latency:* 5.78
-- *Cleanup time:* 0.0879
-- *Prompt tokens:* 6,484
-- *Generation tokens:* 99
-- *Total tokens:* 6,583
-- *Prompt throughput (raw):* 1,123 tok/s
-- *Generation throughput (raw):* 80.1 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 6.8
-- *Cache memory:* 0.46
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00243
+- *Observations:* Keyword list has 24 terms (requested 10-18); Duplicate
+  keywords: riverbank, national trust
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 8.18s
+- *Generation time:* 16.20s
+- *Total time:* 24.39s
+- *Input validation time:* 6.26e-05
+- *Prompt preparation time:* 0.0109
+- *First-token latency:* 4.5
+- *Cleanup time:* 0.231
+- *Prompt tokens:* 1,605
+- *Generation tokens:* 583
+- *Total tokens:* 2,188
+- *Prompt throughput (raw):* 356 tok/s
+- *Generation throughput (raw):* 62.9 tok/s
+- *Peak memory:* 60
+- *Active memory:* 59
+- *Cache memory:* 0.15
+- *Model-load active memory:* 58.8
+- *Post-cleanup active memory:* 0.00149
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1598
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1481
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
+  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Princes Street Renovation, Edinburgh
-Description: The image shows a construction site on Princes Street in Edinburgh, Scotland, with extensive scaffolding covering a building under renovation. Pedestrians walk past temporary construction fences, and a Boots pharmacy is visible beneath an overcast sky.
-Keywords: Princes Street renovation, Edinburgh construction site, scaffolding, temporary construction fences, Boots pharmacy, overcast sky, pedestrians, civil engineering, roadworks, Scotland, Europe, city centre.
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. It needs to be concise and descriptive. "Hampshire Riverbank with Strollers" is a good start, but I can do better. "Strollers on the Riverbank near Winchester" is more specific, and I'll go with that.
+
+Now, the description. I need to weave together the context and the visual elements. The image shows a historic stone house, a river, and people walking. The context mentions the Winchester City Mill and the River Itchen. I'll start with the setting: "A historic stone house and riverbank scene..." Then, I'll add the people and the mill. "A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill." That's a solid, factual description.
+
+Finally, the keywords. I need to cover the key elements. I'll start with the obvious: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, and the mill. I'll add some more general terms like "scenery," "walkway," "water," and "bridge" to broaden the searchability. I'll also include "National Trust" and "Adobe Stock" as they are in the hints. I'll make sure to avoid anything that isn't clearly visible. I'll refine the list to make sure it's between 10 and 18 keywords.
+
+Okay, here's the final output:
+
+Title: Strollers on the Riverbank near Winchester
+
+Description: A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill.
+
+Keywords: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, mill, National Trust, scenery, walkway, water, bridge, National Trust, Adobe Stock, blue sky, chimney, clay tiles, rapids, riverbank, stone wall, people.
+&lt;/think&gt;
+
+Title: Strollers on the Riverbank near Winchester
+
+Description: A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill.
+
+Keywords: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, mill, National Trust, scenery, walkway, water, bridge, National Trust, Adobe Stock, blue sky, chimney, clay tiles, rapids, riverbank, stone wall, people.
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. I've got the image and the hints, and I need to craft some metadata. First, the title. It needs to be concise and descriptive. "Hampshire Riverbank with Strollers" is a good start, but I can do better. "Strollers on the Riverbank near Winchester" is more specific, and I'll go with that.
+
+Now, the description. I need to weave together the context and the visual elements. The image shows a historic stone house, a river, and people walking. The context mentions the Winchester City Mill and the River Itchen. I'll start with the setting: "A historic stone house and riverbank scene..." Then, I'll add the people and the mill. "A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill." That's a solid, factual description.
+
+Finally, the keywords. I need to cover the key elements. I'll start with the obvious: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, and the mill. I'll add some more general terms like "scenery," "walkway," "water," and "bridge" to broaden the searchability. I'll also include "National Trust" and "Adobe Stock" as they are in the hints. I'll make sure to avoid anything that isn't clearly visible. I'll refine the list to make sure it's between 10 and 18 keywords.
+
+Okay, here's the final output:
+
+Title: Strollers on the Riverbank near Winchester
+
+Description: A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill.
+
+Keywords: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, mill, National Trust, scenery, walkway, water, bridge, National Trust, Adobe Stock, blue sky, chimney, clay tiles, rapids, riverbank, stone wall, people.
+</think>
+
+Title: Strollers on the Riverbank near Winchester
+
+Description: A historic stone house and riverbank scene with people walking along a path near the River Itchen and the Winchester City Mill.
+
+Keywords: Hampshire, England, River Itchen, Winchester, stone house, riverbank, strollers, elderly woman, girls, mill, National Trust, scenery, walkway, water, bridge, National Trust, Adobe Stock, blue sky, chimney, clay tiles, rapids, riverbank, stone wall, people.
+```
+
+</details>
 
 </details>
 
@@ -1613,21 +1383,20 @@ Keywords: Princes Street renovation, Edinburgh construction site, scaffolding, t
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Title has
-  4 words (requested 5-10)
+- *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 5.65s
-- *Generation time:* 14.37s
-- *Total time:* 20.04s
-- *Input validation time:* 6.09e-05
-- *Prompt preparation time:* 0.0123
-- *First-token latency:* 11.5
-- *Cleanup time:* 0.251
-- *Prompt tokens:* 6,484
-- *Generation tokens:* 100
-- *Total tokens:* 6,584
-- *Prompt throughput (raw):* 562 tok/s
-- *Generation throughput (raw):* 43.8 tok/s
+- *Model load time:* 8.15s
+- *Generation time:* 21.01s
+- *Total time:* 29.19s
+- *Input validation time:* 5.61e-05
+- *Prompt preparation time:* 0.0112
+- *First-token latency:* 17.6
+- *Cleanup time:* 0.244
+- *Prompt tokens:* 6,430
+- *Generation tokens:* 108
+- *Total tokens:* 6,538
+- *Prompt throughput (raw):* 365 tok/s
+- *Generation throughput (raw):* 40.0 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1636,7 +1405,7 @@ Keywords: Princes Street renovation, Edinburgh construction site, scaffolding, t
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1598
+- *Rendered prompt characters:* 1372
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1652,81 +1421,25 @@ Keywords: Princes Street renovation, Edinburgh construction site, scaffolding, t
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|begin_of_box|&gt;Title: Princes Street Construction, Edinburgh
-Description: A construction site with extensive scaffolding and a crane on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians passing a Boots pharmacy and temporary fences.
-Keywords: Princes Street, Edinburgh, Scotland, Construction site, Scaffolding, Crane, Boots pharmacy, Pedestrians, Construction fence, Overcast sky, City Centre, Roadworks, Civil engineering, Modern Architecture, Fence, Europe, GBR&lt;|end_of_box|&gt;
+&lt;|begin_of_box|&gt;Title: Historic Winchester City Mill by River Itchen
+
+Description: Two girls walk along the pathway in front of the historic Winchester City Mill, a brick and stone watermill with clay tiles, situated over the River Itchen in Hampshire, England, under a blue sky with white clouds.
+
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, brick, stone, clay tiles, chimney, blue sky, girls, pedestrians, elderly woman, National Trust, riverbank, scenery, sitting, rapids&lt;|end_of_box|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|begin_of_box|>Title: Princes Street Construction, Edinburgh
-Description: A construction site with extensive scaffolding and a crane on Princes Street in Edinburgh, Scotland, under an overcast sky, with pedestrians passing a Boots pharmacy and temporary fences.
-Keywords: Princes Street, Edinburgh, Scotland, Construction site, Scaffolding, Crane, Boots pharmacy, Pedestrians, Construction fence, Overcast sky, City Centre, Roadworks, Civil engineering, Modern Architecture, Fence, Europe, GBR<|end_of_box|>
+<|begin_of_box|>Title: Historic Winchester City Mill by River Itchen
+
+Description: Two girls walk along the pathway in front of the historic Winchester City Mill, a brick and stone watermill with clay tiles, situated over the River Itchen in Hampshire, England, under a blue sky with white clouds.
+
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, brick, stone, clay tiles, chimney, blue sky, girls, pedestrians, elderly woman, National Trust, riverbank, scenery, sitting, rapids<|end_of_box|>
 ```
 
 </details>
-
-</details>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18); Duplicate
-  keywords: scotland, renovation, city centre
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.91s
-- *Generation time:* 6.67s
-- *Total time:* 8.59s
-- *Input validation time:* 5.22e-05
-- *Prompt preparation time:* 0.00221
-- *First-token latency:* 1.1
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 2,646
-- *Generation tokens:* 156
-- *Total tokens:* 2,802
-- *Prompt throughput (raw):* 2,398 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
-- *Peak memory:* 18
-- *Active memory:* 17
-- *Cache memory:* 0.43
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.003
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1554
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Extensive Scaffolding on Princes Street Building Renovation
-
-Description: A building on Princes Street in Edinburgh, Scotland, is undergoing significant renovation and redevelopment, as evidenced by the extensive scaffolding covering its facade. Pedestrians are seen walking past temporary construction fences and a Boots pharmacy beneath an overcast sky. The building's modern architecture is partially obscured by the scaffolding, which is a common sight in city centers where construction and development are ongoing.
-
-Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Renovation, Modern Architecture, Boots Pharmacy, City Centre, Overcast Sky, Pedestrians, Construction Fences, Building Facade, Renovation, Development, City Centre, Scotland, Europe, GBR, UK.
-</pre>
 
 </details>
 
@@ -1744,27 +1457,27 @@ Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Renova
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.24s
-- *Generation time:* 162.75s
-- *Total time:* 166.01s
-- *Input validation time:* 5.2e-05
-- *Prompt preparation time:* 0.00414
-- *First-token latency:* 1.26
-- *Cleanup time:* 0.19
-- *Prompt tokens:* 1,356
-- *Generation tokens:* 750
-- *Total tokens:* 2,106
-- *Prompt throughput (raw):* 1,077 tok/s
+- *Model load time:* 3.26s
+- *Generation time:* 155.04s
+- *Total time:* 158.31s
+- *Input validation time:* 4.74e-05
+- *Prompt preparation time:* 0.00351
+- *First-token latency:* 2.06
+- *Cleanup time:* 0.155
+- *Prompt tokens:* 1,307
+- *Generation tokens:* 710
+- *Total tokens:* 2,017
+- *Prompt throughput (raw):* 636 tok/s
 - *Generation throughput (raw):* 4.67 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
-- *Cache memory:* 5.8
+- *Cache memory:* 5.6
 - *Model-load active memory:* 32.8
 - *Post-cleanup active memory:* 0.00397
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1704
+- *Rendered prompt characters:* 1478
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1780,30 +1493,22 @@ Keywords: Edinburgh, Scotland, Princes Street, Scaffolding, Construction, Renova
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the given context and image. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords.
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The capture date/time is 2026-08-31 15:02:20 UTC+01:00, but I shouldn't claim it's visible. The descriptive hints mention Winchester City Mill, River Itchen, Hampshire, England, people walking, stone wall, chimney, etc. The image shows a historic brick building with a tiled roof, a bridge over a river, people walking, and the river flowing.
 
-Starting with the title: The image shows scaffolding on a building in Edinburgh, Scotland, with pedestrians and a Boots pharmacy. The title should be concise. Maybe "Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street" – that's 8 words.
-
-For the description: It needs to combine context, main subject, setting, action, lighting, and details. The scene is a building under renovation with scaffolding, pedestrians, Boots pharmacy, overcast sky. So something like "Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky."
-
-Keywords: Let's list visible elements. Scaffolding, Edinburgh, Scotland, UK, construction, pedestrians, Boots pharmacy, Princes Street, overcast sky, crane, construction site, roadworks. That's 10 keywords. Need to check if they cover all key points. Maybe add "Civil engineering" and "Modern Architecture" as per the hints. Wait, the hints include those. So include those. Let me count: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture. That's 11. Maybe add "Fence" from the hints. So 12. Check if all hints are covered. The hints mention "Construction fence" and "Fence" so include those. Now 14. Maybe "Fence" is part of the construction site. Hmm, but the image shows temporary fencing. So include "Fence" as a keyword. Now 14. Let me check again. The hints also have "10 Best (structured)" but that's probably a category. The keywords should be unique and relevant. Final list: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence. That's 12. Maybe add "Construction fence" as a separate keyword? But the image shows a fence, so maybe "Fence" is enough. Alternatively, "Construction fence" is in the hints. Let me check the hints again. The hints include "Construction fence" and "Fence". So include both? But the user said 10-18 unique keywords. Let's see: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence. That's 13. Maybe that's okay. Alternatively, combine "Construction fence" into "Fence" if it's redundant. But the hints mention both, so better to include both. Wait, the hints say "Construction fence" and "Fence" are separate. So include both. So 13 keywords. Let me check the count. Yes, that's 13. Okay.◁/think▷Title: Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street
-Description: Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky.
-Keywords: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence&lt;|im_assistant|&gt;
+For the title, something concise like "Winchester City Mill and River Itchen Scene" works. The description should combine the context and visible elements: "Historic Winchester City Mill by River Itchen with people walking on a stone bridge, brick building, and flowing water." Keywords need to be 10-18 unique terms. Let's list what's visible: Winchester City Mill, River Itchen, England, Hampshire, stone bridge, brick building, tiled roof, chimney, pedestrians, elderly woman, girls, blue sky, Adobe Stock, National Trust, Rapids, Scenery. Wait, the hints mention "Elderly woman" and "Girls" but in the image, there are two women, one might be elderly. Also, "Adobe Stock" and "National Trust" are hints but maybe not visible. Check the image: the building is a National Trust property, so include that. "Adobe Stock" might be a watermark, but the user said not to claim visible details. So maybe omit that. So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust. That's 10 keywords. Let me check the hints again. The hints include "Clay tiles" but the roof is tiled, so "Tiled roof" is better. "Rapids" might not be visible, the water is flowing but not necessarily rapids. Maybe remove that. "Elderly woman" and "Girls" – the image has two people, one might be elderly. So include "Elderly woman" and "Girls". So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me adjust. Maybe "Riverbank" instead of "Scenery". Wait, the hints have "Scenery" as a keyword. So include that. Let me finalize: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Okay.◁/think▷Title: Winchester City Mill and River Itchen Scene
+Description: Historic Winchester City Mill by River Itchen with people walking on a stone bridge, featuring a brick building, tiled roof, and flowing water under a blue sky.
+Keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls&lt;|im_assistant|&gt;
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the given context and image. The user wants a 5-10 word title, a 1-2 sentence description, and 10-18 keywords. 
+◁think▷Okay, let's tackle this. First, I need to create a British-English catalogue metadata based on the image and the provided context. The capture date/time is 2026-08-31 15:02:20 UTC+01:00, but I shouldn't claim it's visible. The descriptive hints mention Winchester City Mill, River Itchen, Hampshire, England, people walking, stone wall, chimney, etc. The image shows a historic brick building with a tiled roof, a bridge over a river, people walking, and the river flowing. 
 
-Starting with the title: The image shows scaffolding on a building in Edinburgh, Scotland, with pedestrians and a Boots pharmacy. The title should be concise. Maybe "Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street" – that's 8 words.
-
-For the description: It needs to combine context, main subject, setting, action, lighting, and details. The scene is a building under renovation with scaffolding, pedestrians, Boots pharmacy, overcast sky. So something like "Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky."
-
-Keywords: Let's list visible elements. Scaffolding, Edinburgh, Scotland, UK, construction, pedestrians, Boots pharmacy, Princes Street, overcast sky, crane, construction site, roadworks. That's 10 keywords. Need to check if they cover all key points. Maybe add "Civil engineering" and "Modern Architecture" as per the hints. Wait, the hints include those. So include those. Let me count: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture. That's 11. Maybe add "Fence" from the hints. So 12. Check if all hints are covered. The hints mention "Construction fence" and "Fence" so include those. Now 14. Maybe "Fence" is part of the construction site. Hmm, but the image shows temporary fencing. So include "Fence" as a keyword. Now 14. Let me check again. The hints also have "10 Best (structured)" but that's probably a category. The keywords should be unique and relevant. Final list: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence. That's 12. Maybe add "Construction fence" as a separate keyword? But the image shows a fence, so maybe "Fence" is enough. Alternatively, "Construction fence" is in the hints. Let me check the hints again. The hints include "Construction fence" and "Fence". So include both? But the user said 10-18 unique keywords. Let's see: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence. That's 13. Maybe that's okay. Alternatively, combine "Construction fence" into "Fence" if it's redundant. But the hints mention both, so better to include both. Wait, the hints say "Construction fence" and "Fence" are separate. So include both. So 13 keywords. Let me check the count. Yes, that's 13. Okay.◁/think▷Title: Edinburgh Construction Scaffolding and Pedestrian Activity on Princes Street  
-Description: Major building renovation with extensive scaffolding on Princes Street in Edinburgh, Scotland, featuring pedestrians, a Boots pharmacy, and an overcast sky.  
-Keywords: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction site, Crane, Pedestrians, Princes Street, Roadworks, Boots pharmacy, Overcast sky, Modern Architecture, Fence, Construction fence<|im_assistant|>
+For the title, something concise like "Winchester City Mill and River Itchen Scene" works. The description should combine the context and visible elements: "Historic Winchester City Mill by River Itchen with people walking on a stone bridge, brick building, and flowing water." Keywords need to be 10-18 unique terms. Let's list what's visible: Winchester City Mill, River Itchen, England, Hampshire, stone bridge, brick building, tiled roof, chimney, pedestrians, elderly woman, girls, blue sky, Adobe Stock, National Trust, Rapids, Scenery. Wait, the hints mention "Elderly woman" and "Girls" but in the image, there are two women, one might be elderly. Also, "Adobe Stock" and "National Trust" are hints but maybe not visible. Check the image: the building is a National Trust property, so include that. "Adobe Stock" might be a watermark, but the user said not to claim visible details. So maybe omit that. So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust. That's 10 keywords. Let me check the hints again. The hints include "Clay tiles" but the roof is tiled, so "Tiled roof" is better. "Rapids" might not be visible, the water is flowing but not necessarily rapids. Maybe remove that. "Elderly woman" and "Girls" – the image has two people, one might be elderly. So include "Elderly woman" and "Girls". So keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Maybe too many? Wait, the user said 10-18, so 12 is okay. Let me adjust. Maybe "Riverbank" instead of "Scenery". Wait, the hints have "Scenery" as a keyword. So include that. Let me finalize: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls. That's 12. Okay.◁/think▷Title: Winchester City Mill and River Itchen Scene  
+Description: Historic Winchester City Mill by River Itchen with people walking on a stone bridge, featuring a brick building, tiled roof, and flowing water under a blue sky.  
+Keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, Brick building, Tiled roof, Chimney, Pedestrians, Riverbank, Scenery, National Trust, Elderly woman, Girls<|im_assistant|>
 ```
 
 </details>
@@ -1812,62 +1517,59 @@ Keywords: Scaffolding, Edinburgh, Scotland, UK, Civil engineering, Construction 
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
-### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+### mlx-community/LFM2.5-VL-1.6B-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 19 terms (requested 10-18)
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.49s
-- *Generation time:* 4.71s
-- *Total time:* 6.22s
-- *Input validation time:* 5.29e-05
-- *Prompt preparation time:* 0.00743
-- *First-token latency:* 1.97
-- *Cleanup time:* 0.0918
-- *Prompt tokens:* 2,959
-- *Generation tokens:* 146
-- *Total tokens:* 3,105
-- *Prompt throughput (raw):* 1,500 tok/s
-- *Generation throughput (raw):* 67.2 tok/s
-- *Peak memory:* 13
-- *Active memory:* 8.0
-- *Cache memory:* 0.60
-- *Model-load active memory:* 8.01
-- *Post-cleanup active memory:* 0.00515
+- *Observations:* Title has 4 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.62s
+- *Generation time:* 1.59s
+- *Total time:* 2.22s
+- *Input validation time:* 6.59e-05
+- *Prompt preparation time:* 0.00399
+- *First-token latency:* 0.337
+- *Cleanup time:* 0.0798
+- *Prompt tokens:* 2,094
+- *Generation tokens:* 119
+- *Total tokens:* 2,213
+- *Prompt throughput (raw):* 6,219 tok/s
+- *Generation throughput (raw):* 186 tok/s
+- *Peak memory:* 4.0
+- *Active memory:* 3.2
+- *Cache memory:* 0.06
+- *Model-load active memory:* 3.2
+- *Post-cleanup active memory:* 0.0041
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3955
-- *Image placeholders:* 0
+- *Rendered prompt characters:* 1342
+- *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 7c992876448fc5426841a85c6eb951b056fe38d2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-mxfp4/snapshots/7c992876448fc5426841a85c6eb951b056fe38d2
+- *Resolved model revision:* 16a710cf8afca206ff16a95a4ad6fe657f876ce1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-1.6B-bf16/snapshots/16a710cf8afca206ff16a95a4ad6fe657f876ce1
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+- *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-**Princes Street, Edinburgh – Major Building Renovation Underway**
+Title: Historic Winchester City Mill
 
-Description:
-A large multi-storey building on Princes Street, Edinburgh, is undergoing extensive renovation with full scaffolding coverage, while construction fences and a yellow crane are visible. Pedestrians walk past the site, including a Boots pharmacy, under an overcast sky on 18 August 2026.
+Description: Visitors stroll along the pathway and relax in front of the ancient Winchester City Mill, an iconic watermill situated over the River Itchen in Winchester, Hampshire, England. The mill's red brick structure and clay tile roof stand out against the blue sky, while the stone wall and water rapids add to the picturesque scenery.
 
-Keywords:
-Princes Street, Edinburgh, Scotland, UK, GBR, Europe, construction site, scaffolding, renovation, crane, temporary fences, Boots pharmacy, city centre, overcast sky, pedestrian activity, civil engineering, modern architecture, roadworks, 2026-08-18
+Keywords: Winchester City Mill, historic watermill, River Itchen, Hampshire, England, stone wall, clay tiles, blue sky, visitors, mill, water rapids, scenery, pedestrians
 </pre>
 
 </details>
@@ -1884,29 +1586,29 @@ Princes Street, Edinburgh, Scotland, UK, GBR, Europe, construction site, scaffol
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.50s
-- *Generation time:* 5.31s
-- *Total time:* 6.82s
-- *Input validation time:* 5.31e-05
-- *Prompt preparation time:* 0.000893
-- *First-token latency:* 2.02
-- *Cleanup time:* 0.0943
-- *Prompt tokens:* 2,959
-- *Generation tokens:* 179
-- *Total tokens:* 3,138
-- *Prompt throughput (raw):* 1,464 tok/s
+- *Model load time:* 1.42s
+- *Generation time:* 5.42s
+- *Total time:* 6.86s
+- *Input validation time:* 5.3e-05
+- *Prompt preparation time:* 0.00139
+- *First-token latency:* 2
+- *Cleanup time:* 0.0946
+- *Prompt tokens:* 2,918
+- *Generation tokens:* 180
+- *Total tokens:* 3,098
+- *Prompt throughput (raw):* 1,456 tok/s
 - *Generation throughput (raw):* 64.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.4
 - *Cache memory:* 0.60
 - *Model-load active memory:* 8.43
-- *Post-cleanup active memory:* 0.00541
+- *Post-cleanup active memory:* 0.00539
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3955
+- *Rendered prompt characters:* 3729
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -1923,13 +1625,13 @@ Princes Street, Edinburgh, Scotland, UK, GBR, Europe, construction site, scaffol
 
 <pre class="model-output-readable">
 **Title:**
-*Princes Street, Edinburgh: Scaffolding &amp; Renovation*
+*Winchester City Mill: Riverside Pedestrians &amp; Historic Charm*
 
 **Description:**
-On **18 August 2026** in Edinburgh’s city centre (GPS: **55.951722°N, 3.201417°W**), extensive scaffolding envelops a multi-storey building under major renovation along **Princes Street**. Pedestrians pass temporary construction barriers, including a **Boots Pharmacy**, under an overcast sky, while a crane and debris netting highlight ongoing civil engineering work.
+A vibrant scene captures visitors strolling and relaxing beside the iconic **Winchester City Mill** on **August 31, 2026 (UTC+01:00)**, its ancient stone arches framing a rushing **River Itchen** under a bright blue sky. Distinctive features include clay-tiled roofs, a chimney, elderly pedestrians, and scenic riverbank details.
 
 **Keywords:**
-Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, construction site, renovation, civil engineering, crane, construction fence, temporary barriers, Boots Pharmacy, city centre, overcast sky, pedestrians, roadworks, modern architecture, debris netting, urban development
+Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic watermill, pedestrians, elderly visitors, riverbank, rushing rapids, clay-tiled roof, stone arches, blue sky, scenic pathway, 2026-08-31, riverside charm, traditional architecture, pedestrian bridge, scenic relaxation
 </pre>
 
 <details>
@@ -1937,13 +1639,13 @@ Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, construction site
 
 ```text
 **Title:**
-*Princes Street, Edinburgh: Scaffolding & Renovation*
+*Winchester City Mill: Riverside Pedestrians & Historic Charm*
 
 **Description:**
-On **18 August 2026** in Edinburgh’s city centre (GPS: **55.951722°N, 3.201417°W**), extensive scaffolding envelops a multi-storey building under major renovation along **Princes Street**. Pedestrians pass temporary construction barriers, including a **Boots Pharmacy**, under an overcast sky, while a crane and debris netting highlight ongoing civil engineering work.
+A vibrant scene captures visitors strolling and relaxing beside the iconic **Winchester City Mill** on **August 31, 2026 (UTC+01:00)**, its ancient stone arches framing a rushing **River Itchen** under a bright blue sky. Distinctive features include clay-tiled roofs, a chimney, elderly pedestrians, and scenic riverbank details.
 
 **Keywords:**
-Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, construction site, renovation, civil engineering, crane, construction fence, temporary barriers, Boots Pharmacy, city centre, overcast sky, pedestrians, roadworks, modern architecture, debris netting, urban development
+Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic watermill, pedestrians, elderly visitors, riverbank, rushing rapids, clay-tiled roof, stone arches, blue sky, scenic pathway, 2026-08-31, riverside charm, traditional architecture, pedestrian bridge, scenic relaxation
 ```
 
 </details>
@@ -1964,27 +1666,27 @@ Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, construction site
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.10s
-- *Generation time:* 3.27s
-- *Total time:* 4.39s
-- *Input validation time:* 4.36e-05
-- *Prompt preparation time:* 0.00619
-- *First-token latency:* 0.747
-- *Cleanup time:* 0.0865
-- *Prompt tokens:* 1,558
-- *Generation tokens:* 135
-- *Total tokens:* 1,693
-- *Prompt throughput (raw):* 2,086 tok/s
-- *Generation throughput (raw):* 72.7 tok/s
-- *Peak memory:* 9.1
+- *Model load time:* 1.06s
+- *Generation time:* 3.73s
+- *Total time:* 4.80s
+- *Input validation time:* 4.73e-05
+- *Prompt preparation time:* 0.00575
+- *First-token latency:* 1.15
+- *Cleanup time:* 0.0876
+- *Prompt tokens:* 1,516
+- *Generation tokens:* 132
+- *Total tokens:* 1,648
+- *Prompt throughput (raw):* 1,320 tok/s
+- *Generation throughput (raw):* 72.9 tok/s
+- *Peak memory:* 8.1
 - *Active memory:* 6.5
 - *Cache memory:* 0.31
 - *Model-load active memory:* 6.45
-- *Post-cleanup active memory:* 0.00598
+- *Post-cleanup active memory:* 0.00596
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1555
+- *Rendered prompt characters:* 1329
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2000,11 +1702,11 @@ Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, construction site
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Princes Street Renovation: Scaffolding and Boots Pharmacy
+Title: Historic Mill and River Scene with Pedestrians
 
-Description: The image captures a bustling scene in Edinburgh's city centre, featuring extensive scaffolding on a building undergoing major renovation. A Boots pharmacy is visible beneath the scaffolding, while pedestrians navigate the area under an overcast sky. The scene is set along Princes Street, with temporary construction fences and roadworks evident.
+Description: The image captures a historic watermill in Winchester, Hampshire, England, with a stone wall and clay-tiled roof. Two women walk along a pathway above the River Itchen, while an elderly woman sits nearby. The scene is set against a blue sky with white clouds, and the National Trust building is visible in the background.
 
-Keywords: Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, renovation, Boots pharmacy, overcast sky, pedestrians, city centre, construction site, roadworks, modern architecture, civil engineering, urban development, temporary fencing, street scene, architectural transformation
+Keywords: Winchester, Hampshire, England, watermill, stone wall, clay tiles, river, Itchen, pedestrians, elderly woman, women, National Trust, blue sky, clouds, historic building, scenic view, riverbank, sitting area, historic architecture
 </pre>
 
 </details>
@@ -2021,29 +1723,30 @@ Keywords: Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, renovat
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
+- *Observations:* Title has 4 words (requested 5-10); Keyword list has 20
+  terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.05s
-- *Generation time:* 4.14s
-- *Total time:* 5.20s
-- *Input validation time:* 5.28e-05
-- *Prompt preparation time:* 0.00432
-- *First-token latency:* 3.05
-- *Cleanup time:* 0.0888
-- *Prompt tokens:* 4,118
-- *Generation tokens:* 77
-- *Total tokens:* 4,195
-- *Prompt throughput (raw):* 1,351 tok/s
-- *Generation throughput (raw):* 233 tok/s
+- *Model load time:* 1.00s
+- *Generation time:* 4.62s
+- *Total time:* 5.64s
+- *Input validation time:* 6.97e-05
+- *Prompt preparation time:* 0.00482
+- *First-token latency:* 3.06
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 4,062
+- *Generation tokens:* 152
+- *Total tokens:* 4,214
+- *Prompt throughput (raw):* 1,327 tok/s
+- *Generation throughput (raw):* 231 tok/s
 - *Peak memory:* 3.9
 - *Active memory:* 2.2
 - *Cache memory:* 0.64
 - *Model-load active memory:* 2.18
-- *Post-cleanup active memory:* 0.00651
+- *Post-cleanup active memory:* 0.0069
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1648
+- *Rendered prompt characters:* 1422
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2059,159 +1762,264 @@ Keywords: Princes Street, Edinburgh, Scotland, GBR, Europe, scaffolding, renovat
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Edinburgh City Centre Renovation
+Title: Historic Winchester City Mill
 
-Description: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
+Description: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England. The mill features a distinctive brick and stone facade with a prominent chimney and clay-tiled roof. A concrete bridge spans the River Itchen, connecting the mill to the surrounding area. Pedestrians enjoy the scenic riverside setting, with lush greenery visible in the background.
 
-Keywords: Edinburgh, City Centre, Construction, Scaffolding, Princes Street, Boots, Overcast, Pedestrians, Roadworks, Europe
+Keywords: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+<a id="model-mlx-community-ornith-15-35b-a3b-optiq-4bit"></a>
 
-### mlx-community/Qwen3-VL-2B-Thinking-bf16
+### mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
+<summary>Complete evidence: mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: scaffolding, scotland
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.85s
-- *Generation time:* 23.94s
-- *Total time:* 24.81s
-- *Input validation time:* 6.28e-05
-- *Prompt preparation time:* 0.012
-- *First-token latency:* 13.3
-- *Cleanup time:* 0.0963
-- *Prompt tokens:* 16,583
-- *Generation tokens:* 902
-- *Total tokens:* 17,485
-- *Prompt throughput (raw):* 1,248 tok/s
-- *Generation throughput (raw):* 92.6 tok/s
-- *Peak memory:* 8.4
-- *Active memory:* 4.3
-- *Cache memory:* 2.7
-- *Model-load active memory:* 4.26
-- *Post-cleanup active memory:* 0.00739
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
+- *Model load time:* 2.57s
+- *Generation time:* 2.80s
+- *Total time:* 5.40s
+- *Input validation time:* 5.94e-05
+- *Prompt preparation time:* 0.0169
+- *First-token latency:* 0.814
+- *Cleanup time:* 0.136
+- *Prompt tokens:* 1,262
+- *Generation tokens:* 135
+- *Total tokens:* 1,397
+- *Prompt throughput (raw):* 1,549 tok/s
+- *Generation throughput (raw):* 107 tok/s
+- *Peak memory:* 24
+- *Active memory:* 23
+- *Cache memory:* 0.14
+- *Model-load active memory:* 23.1
+- *Post-cleanup active memory:* 0.00741
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1597
+- *Rendered prompt characters:* 1382
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-2B-Thinking-bf16/snapshots/c325e5ea14c215bb08fa0d668c81fa2581f9050b
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "temperature": 0.0, "thinking_budget": 800,
-  "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 1.0}
+- *Resolved model revision:* 5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The context says it's Princes Street in Edinburgh, Scotland. The main subject is scaffolding on a building, renovation. So maybe "Edinburgh Princes Street Renovation Scaffolding" but let's check word count. "Edinburgh Princes Street Renovation with Scaffolding" – that's 10 words. Wait, "Princes Street Renovation Scaffolding" is 7, but maybe "Edinburgh Princes Street Renovation Scaffolding" is 10. Let's confirm.
+Title: Visitors at Winchester City Mill Over River Itchen
 
-Next, the description. Needs 1-2 sentences. Context: capture date/time, GPS, but we don't claim those. The main visible subject: scaffolding on a building (the one with the Boots pharmacy), pedestrians, construction fences, Boots pharmacy, overcast sky. So: "Overcast sky illuminates Edinburgh's Princes Street during renovation, where scaffolding covers a building with a Boots pharmacy and pedestrians walk past temporary construction fences."
+Description: People stroll along the stone bridge and relax in front of the historic Winchester City Mill, an ancient watermill built over the River Itchen. The brick and flake-stone structure with its weathered clay-tiled roof stands under a bright blue sky with scattered clouds, while water rushes through the arches beneath the walkway.
 
-Wait, the description should combine context with main visible subject, setting, action, lighting, distinctive details. Let's see: "Overcast sky, Edinburgh's Princes Street, scaffolding covers a building under renovation, with Boots pharmacy and pedestrians walking past construction fences."
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, clay tiles, chimney, stone bridge, arch, pedestrians, people, elderly woman, girls, sitting, Rapids, riverbank, blue sky, scenery, National Trust, historic building
+</pre>
 
-Now keywords: need 10-18 unique, comma-separated. From context: City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. But need to pick relevant ones. Let's check the image: scaffolding, crane (yellow crane), Boots pharmacy, pedestrians, overcast sky, Princes Street, Edinburgh, Scotland, construction fence, roadworks (since it's a construction site), scaffolding, modern architecture (the building with the facade), overcast sky. Let's list:
+</details>
 
-1. Edinburgh
-2. Princes Street
-3. Scaffolding
-4. Construction site
-5. Crane
-6. Overcast Sky
-7. Pedestrians
-8. Boots Pharmacy
-9. Roadworks
-10. Modern Architecture
-11. Construction fence
-12. Civil engineering
-13. Europe
-14. Scotland
-15. City Centre
-16. Roadworks (wait, roadworks is a bit redundant, but maybe)
+---
 
-Wait, the context says "Roadworks" is a keyword hint. Let's check the hints: "Roadworks" is in the keyword hints. So include that. Also, "Scaffolding" is there. Let's make sure to have 10-18. Let's list:
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
 
-Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Overcast Sky, Pedestrians, Boots Pharmacy, Roadworks, Modern Architecture, Construction fence, Civil engineering, Europe, Scotland, City Centre, Roadworks (wait, no, roadworks is already there). Wait, the hints include "Roadworks" as a keyword hint. Let's check the list:
+### mlx-community/Phi-3.5-vision-instruct-bf16
 
-Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+<details>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
 
-So we need to pick from these, but the description should include visible details. Let's see: the image has scaffolding, crane (yellow), Boots pharmacy, pedestrians, overcast sky, Princes Street, Edinburgh, Scotland, construction fence, roadworks (since it's a construction site), scaffolding, modern architecture (the building with the facade), overcast sky.
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.96s
+- *Generation time:* 3.29s
+- *Total time:* 4.26s
+- *Input validation time:* 6.22e-05
+- *Prompt preparation time:* 0.00247
+- *First-token latency:* 0.415
+- *Cleanup time:* 0.0922
+- *Prompt tokens:* 1,103
+- *Generation tokens:* 128
+- *Total tokens:* 1,231
+- *Prompt throughput (raw):* 2,660 tok/s
+- *Generation throughput (raw):* 56.3 tok/s
+- *Peak memory:* 9.5
+- *Active memory:* 8.3
+- *Cache memory:* 0.52
+- *Model-load active memory:* 8.3
+- *Post-cleanup active memory:* 0.00747
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1312
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
 
-So the keywords should be:
+*Readable output:*
 
-Ed
-&lt;/think&gt;
+<pre class="model-output-readable">
+Title: Historic Winchester City Mill Overlooking River Itchen
 
-Title: Edinburgh Princes Street Renovation Scaffolding
+Description: The historic Winchester City Mill, a National Trust property, stands majestically over the River Itchen in Hampshire, England. Visitors are seen enjoying the scenic view and the historic architecture of the mill.
 
-Description: Overcast sky illuminates Edinburgh's Princes Street during renovation, where scaffolding covers a building with a Boots pharmacy and pedestrians walk past temporary construction fences.
+Keywords: Historic, Winchester, City Mill, National Trust, River Itchen, Hampshire, England, Elderly woman, Girls, Pedestrians, Stone wall, Chimney, Clay tiles, Blue sky, Scenery, Rapids, Riverbank, Sitting, Ancient
+</pre>
 
-Keywords: Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Overcast Sky, Pedestrians, Boots Pharmacy, Roadworks, Modern Architecture, Construction fence, Civil engineering, Europe, Scotland, City Centre, Scaffolding, Scotland
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Model load time:* 1.89s
+- *Generation time:* 58.99s
+- *Total time:* 60.90s
+- *Input validation time:* 6.48e-05
+- *Prompt preparation time:* 0.00134
+- *First-token latency:* 56.4
+- *Cleanup time:* 0.132
+- *Prompt tokens:* 16,520
+- *Generation tokens:* 133
+- *Total tokens:* 16,653
+- *Prompt throughput (raw):* 293 tok/s
+- *Generation throughput (raw):* 86.8 tok/s
+- *Peak memory:* 23
+- *Active memory:* 18
+- *Cache memory:* 2.3
+- *Model-load active memory:* 18.3
+- *Post-cleanup active memory:* 0.00809
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1363
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Historic mill by the River Itchen with pedestrians
+
+Description: On a bright day with a blue sky and scattered clouds, pedestrians walk along a stone bridge over the River Itchen in Winchester, Hampshire, England. The scene features the historic Winchester City Mill, a brick and stone building with a tiled roof and distinctive chimneys, where an elderly woman sits on a bench.
+
+Keywords: Winchester City Mill, River Itchen, Hampshire, England, historic mill, brick building, tiled roof, stone bridge, pedestrians, elderly woman, walking, blue sky, clouds, water, rapids, chimney, diamond-paned windows, stone wall, National Trust
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+
+### mlx-community/Qwen3.5-9B-MLX-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Title has 12 words (requested 5-10)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.40s
+- *Generation time:* 57.12s
+- *Total time:* 58.53s
+- *Input validation time:* 6.28e-05
+- *Prompt preparation time:* 0.0019
+- *First-token latency:* 54.6
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 16,536
+- *Generation tokens:* 132
+- *Total tokens:* 16,668
+- *Prompt throughput (raw):* 303 tok/s
+- *Generation throughput (raw):* 91.6 tok/s
+- *Peak memory:* 10.0
+- *Active memory:* 6.0
+- *Cache memory:* 1.2
+- *Model-load active memory:* 5.96
+- *Post-cleanup active memory:* 0.00913
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1382
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.5-9B-MLX-4bit/snapshots/938d8919941c6e7efd3c7150eff7fe9d12afa631
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Visitors walk across bridge beside historic Winchester City Mill on River Itchen.
+
+Description:
+On a bright day in late August 2026, pedestrians stroll along a stone bridge adjacent to the ancient Winchester City Mill, a National Trust-listed watermill perched over the River Itchen in Hampshire, England, with rushing rapids visible below and a partly cloudy blue sky above.
+
+Keywords:
+Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic mill, stone bridge, pedestrians, elderly woman, girls, rapids, clay tiles, brickwork, chimney, stone wall, blue sky
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Got it, let's tackle this step by step. First, the title needs to be 5-10 words. The context says it's Princes Street in Edinburgh, Scotland. The main subject is scaffolding on a building, renovation. So maybe "Edinburgh Princes Street Renovation Scaffolding" but let's check word count. "Edinburgh Princes Street Renovation with Scaffolding" – that's 10 words. Wait, "Princes Street Renovation Scaffolding" is 7, but maybe "Edinburgh Princes Street Renovation Scaffolding" is 10. Let's confirm.
+Title:  
+Visitors walk across bridge beside historic Winchester City Mill on River Itchen.
 
-Next, the description. Needs 1-2 sentences. Context: capture date/time, GPS, but we don't claim those. The main visible subject: scaffolding on a building (the one with the Boots pharmacy), pedestrians, construction fences, Boots pharmacy, overcast sky. So: "Overcast sky illuminates Edinburgh's Princes Street during renovation, where scaffolding covers a building with a Boots pharmacy and pedestrians walk past temporary construction fences."
+Description:  
+On a bright day in late August 2026, pedestrians stroll along a stone bridge adjacent to the ancient Winchester City Mill, a National Trust-listed watermill perched over the River Itchen in Hampshire, England, with rushing rapids visible below and a partly cloudy blue sky above.
 
-Wait, the description should combine context with main visible subject, setting, action, lighting, distinctive details. Let's see: "Overcast sky, Edinburgh's Princes Street, scaffolding covers a building under renovation, with Boots pharmacy and pedestrians walking past construction fences."
-
-Now keywords: need 10-18 unique, comma-separated. From context: City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. But need to pick relevant ones. Let's check the image: scaffolding, crane (yellow crane), Boots pharmacy, pedestrians, overcast sky, Princes Street, Edinburgh, Scotland, construction fence, roadworks (since it's a construction site), scaffolding, modern architecture (the building with the facade), overcast sky. Let's list:
-
-1. Edinburgh
-2. Princes Street
-3. Scaffolding
-4. Construction site
-5. Crane
-6. Overcast Sky
-7. Pedestrians
-8. Boots Pharmacy
-9. Roadworks
-10. Modern Architecture
-11. Construction fence
-12. Civil engineering
-13. Europe
-14. Scotland
-15. City Centre
-16. Roadworks (wait, roadworks is a bit redundant, but maybe)
-
-Wait, the context says "Roadworks" is a keyword hint. Let's check the hints: "Roadworks" is in the keyword hints. So include that. Also, "Scaffolding" is there. Let's make sure to have 10-18. Let's list:
-
-Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Overcast Sky, Pedestrians, Boots Pharmacy, Roadworks, Modern Architecture, Construction fence, Civil engineering, Europe, Scotland, City Centre, Roadworks (wait, no, roadworks is already there). Wait, the hints include "Roadworks" as a keyword hint. Let's check the list:
-
-Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
-
-So we need to pick from these, but the description should include visible details. Let's see: the image has scaffolding, crane (yellow), Boots pharmacy, pedestrians, overcast sky, Princes Street, Edinburgh, Scotland, construction fence, roadworks (since it's a construction site), scaffolding, modern architecture (the building with the facade), overcast sky.
-
-So the keywords should be:
-
-Ed
-</think>
-
-Title: Edinburgh Princes Street Renovation Scaffolding
-
-Description: Overcast sky illuminates Edinburgh's Princes Street during renovation, where scaffolding covers a building with a Boots pharmacy and pedestrians walk past temporary construction fences.
-
-Keywords: Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Overcast Sky, Pedestrians, Boots Pharmacy, Roadworks, Modern Architecture, Construction fence, Civil engineering, Europe, Scotland, City Centre, Scaffolding, Scotland
+Keywords:  
+Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic mill, stone bridge, pedestrians, elderly woman, girls, rapids, clay tiles, brickwork, chimney, stone wall, blue sky
 ```
 
 </details>
@@ -2220,47 +2028,228 @@ Keywords: Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Over
 
 ---
 
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
-### mlx-community/diffusiongemma-26B-A4B-it-8bit
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
 <details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: urban
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.33s
-- *Generation time:* 2.42s
-- *Total time:* 5.78s
-- *Input validation time:* 5.97e-05
-- *Prompt preparation time:* 0.0239
-- *First-token latency:* 0.341
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 627
-- *Generation tokens:* 83
-- *Total tokens:* 710
-- *Prompt throughput (raw):* 1,839 tok/s
-- *Generation throughput (raw):* 61.3 tok/s
-- *Peak memory:* 29
-- *Active memory:* 28
-- *Cache memory:* 0.01
-- *Model-load active memory:* 28
-- *Post-cleanup active memory:* 0.0104
+- *Observations:* Title has 3 words (requested 5-10); Keyword list has 20
+  terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.70s
+- *Generation time:* 1.95s
+- *Total time:* 2.66s
+- *Input validation time:* 5.75e-05
+- *Prompt preparation time:* 0.00263
+- *First-token latency:* 0.396
+- *Cleanup time:* 0.0908
+- *Prompt tokens:* 1,401
+- *Generation tokens:* 84
+- *Total tokens:* 1,485
+- *Prompt throughput (raw):* 3,542 tok/s
+- *Generation throughput (raw):* 125 tok/s
+- *Peak memory:* 5.4
+- *Active memory:* 4.5
+- *Cache memory:* 0.35
+- *Model-load active memory:* 4.5
+- *Post-cleanup active memory:* 0.0103
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1543
+- *Rendered prompt characters:* 1323
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Winchester City Mill
+Description: A historic watermill situated over the River Itchen in Winchester, Hampshire, England.
+Keywords: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq2e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ2e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 20 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 8.17s
+- *Generation time:* 20.79s
+- *Total time:* 28.98s
+- *Input validation time:* 6.05e-05
+- *Prompt preparation time:* 0.0203
+- *First-token latency:* 17.3
+- *Cleanup time:* 0.266
+- *Prompt tokens:* 3,464
+- *Generation tokens:* 114
+- *Total tokens:* 3,578
+- *Prompt throughput (raw):* 200 tok/s
+- *Generation throughput (raw):* 45.4 tok/s
+- *Peak memory:* 70
+- *Active memory:* 63
+- *Cache memory:* 0.39
+- *Model-load active memory:* 63
+- *Post-cleanup active memory:* 0.0105
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1369
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ2e/snapshots/3dacb46f724ac89725bcd922fb779c7ed1499fe7
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Winchester City Mill Over the River Itchen
+
+Description:
+Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a bright blue sky with white clouds.
+
+Keywords:
+Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 23 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.16s
+- *Generation time:* 20.55s
+- *Total time:* 21.72s
+- *Input validation time:* 6.71e-05
+- *Prompt preparation time:* 0.0048
+- *First-token latency:* 17.2
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 16,531
+- *Generation tokens:* 136
+- *Total tokens:* 16,667
+- *Prompt throughput (raw):* 959 tok/s
+- *Generation throughput (raw):* 58.4 tok/s
+- *Peak memory:* 13
+- *Active memory:* 9.5
+- *Cache memory:* 1.4
+- *Model-load active memory:* 9.46
+- *Post-cleanup active memory:* 0.0108
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1421
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Winchester City Mill: A Historic Watermill
+
+Description:
+Visitors stroll along the pathway beneath a historic brick mill over the River Itchen, with an elderly woman relaxing on the stone wall, under a bright blue sky. The mill's weathered clay-tiled roof and stone chimney stand out against the vibrant surroundings.
+
+Keywords: Winchester City Mill, Hampshire, England, River Itchen, Watermill, Historic, Brick, Clay tiles, Chimney, Stone wall, Elderly woman, Girls, Pedestrians, Rapids, Blue sky, National Trust, Scenery, Riverbank, Pathway, Mill building, Traditional architecture, Historical site, Riverside setting.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* none
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.25s
+- *Generation time:* 5.74s
+- *Total time:* 8.01s
+- *Input validation time:* 6.12e-05
+- *Prompt preparation time:* 0.0043
+- *First-token latency:* 1
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 569
+- *Generation tokens:* 128
+- *Total tokens:* 697
+- *Prompt throughput (raw):* 567 tok/s
+- *Generation throughput (raw):* 31.5 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.1
+- *Post-cleanup active memory:* 0.0114
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1346
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
@@ -2268,66 +2257,136 @@ Keywords: Edinburgh, Princes Street, Scaffolding, Construction site, Crane, Over
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Scaffolding on Princes Street in Edinburgh City Centre
-Description: Extensive scaffolding covers the facade of a building undergoing renovation along Princes Street in Edinburgh, while pedestrians walk past construction fences and a Boots pharmacy.
-Keywords: Edinburgh, Scotland, Princes Street, city centre, construction, scaffolding, renovation, urban, architecture, urban, overcast, pedestrians, crane, pharmacy, Boots, Europe
+Title: Winchester City Mill, Hampshire: People on the Pathway
+
+Description: Captured on 31st August 2026, this image shows Winchester City Mill, a historic brick and stone building spanning the River Itchen; pedestrians walk along the pathway in bright daylight, with rapids visible below. The mill features a distinctive red clay tiled roof and chimney.
+
+Keywords: Winchester City Mill, Hampshire, England, River Itchen, Watermill, Historic building, Brickwork, Stone wall, Arch, Pathway, Pedestrians, People, Rapids, Riverbank, Clay tiles, Chimney, Blue sky, Exterior, August
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-granite-40-3b-vision-4bit"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### mlx-community/granite-4.0-3b-vision-4bit
+### mlx-community/pixtral-12b-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/granite-4.0-3b-vision-4bit</summary>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
 
 - *Execution:* completed
 - *Usability:* usable_with_caveats
 - *Maintainer status:* none
-- *Observations:* Title has 4 words (requested 5-10)
-- *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.63s
-- *Generation time:* 1.56s
-- *Total time:* 2.21s
-- *Input validation time:* 6.82e-05
-- *Prompt preparation time:* 0.0104
-- *First-token latency:* 0.401
-- *Cleanup time:* 0.0888
-- *Prompt tokens:* 1,411
-- *Generation tokens:* 66
-- *Total tokens:* 1,477
-- *Prompt throughput (raw):* 3,515 tok/s
-- *Generation throughput (raw):* 171 tok/s
-- *Peak memory:* 4.7
-- *Active memory:* 3.0
-- *Cache memory:* 0.22
-- *Model-load active memory:* 3.03
-- *Post-cleanup active memory:* 0.0128
+- *Observations:* Keyword list has 19 terms (requested 10-18)
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.65s
+- *Generation time:* 5.29s
+- *Total time:* 6.95s
+- *Input validation time:* 5.12e-05
+- *Prompt preparation time:* 0.0034
+- *First-token latency:* 1.88
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 3,111
+- *Generation tokens:* 110
+- *Total tokens:* 3,221
+- *Prompt throughput (raw):* 1,651 tok/s
+- *Generation throughput (raw):* 39.4 tok/s
+- *Peak memory:* 16
+- *Active memory:* 13
+- *Cache memory:* 0.59
+- *Model-load active memory:* 13.5
+- *Post-cleanup active memory:* 0.0134
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1741
-- *Image placeholders:* 1
+- *Rendered prompt characters:* 1291
+- *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 70fe1d89f42c71b5635cd945ed304bed438fa1e3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-4.0-3b-vision-4bit/snapshots/70fe1d89f42c71b5635cd945ed304bed438fa1e3
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+- *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Edinburgh City Centre Renovation
-Description: Scaffolding and construction activity on a building along Princes Street, Edinburgh, with pedestrians navigating temporary barriers.
-Keywords: Edinburgh, Princes Street, Construction, Scaffolding, Overcast, Pedestrians, Boots Pharmacy, Roadworks, Civil Engineering, Modern Architecture
+Title:
+Historic Winchester Mill on River Itchen, Hampshire
+
+Description:
+Two individuals walk along the pathway in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, under a bright blue sky.
+
+Keywords:
+Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
+</pre>
+
+</details>
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### Qwen/Qwen3-VL-2B-Instruct
+
+<details>
+<summary>Complete evidence: Qwen/Qwen3-VL-2B-Instruct</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 4 words (requested 5-10); Keyword list has 327
+  terms (requested 10-18); Duplicate keywords: national trust, pedestrians,
+  riverbank, stone wall, brick building, blue sky, chimney, clay tiles,
+  elderly woman, girls, rapids, scenery, sitting, people, river
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
+- *Model load time:* 0.67s
+- *Generation time:* 25.27s
+- *Total time:* 25.96s
+- *Input validation time:* 5.59e-05
+- *Prompt preparation time:* 0.00974
+- *First-token latency:* 13.6
+- *Cleanup time:* 0.0844
+- *Prompt tokens:* 16,520
+- *Generation tokens:* 1,000
+- *Total tokens:* 17,520
+- *Prompt throughput (raw):* 1,218 tok/s
+- *Generation throughput (raw):* 93.0 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 4.3
+- *Cache memory:* 2.4
+- *Model-load active memory:* 4.26
+- *Post-cleanup active memory:* 0.000443
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1363
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 89644892e4d85e24eaac8bacfd4f463576704203
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: River Itchen, Hampshire, England
+
+Description: A historic watermill in Hampshire, England, with a stone wall and brick building, is situated over the River Itchen. Pedestrians walk along a bridge, and an elderly woman sits on a bench in front of the mill. The scene is set under a blue sky with white clouds, and the river flows with rapids near the bridge.
+
+Keywords: River Itchen, Hampshire, England, Mill, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Rapids, Scenery, Sitting, People, River, National Trust, Pedestrians, Riverbank, Stone wall, Brick building, Blue sky, Chimney, Clay tiles
 </pre>
 
 </details>
@@ -2343,34 +2402,30 @@ Keywords: Edinburgh, Princes Street, Construction, Scaffolding, Overcast, Pedest
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Keyword list has 49 terms (requested
-  10-18); Duplicate keywords: european city centre renewal project, european
-  city centre redevelopment project, european city centre transformation
-  project
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Model load time:* 0.67s
-- *Generation time:* 3.97s
-- *Total time:* 4.64s
-- *Input validation time:* 5.77e-05
-- *Prompt preparation time:* 0.00204
-- *First-token latency:* 0.96
-- *Cleanup time:* 0.0752
-- *Prompt tokens:* 2,101
-- *Generation tokens:* 300
-- *Total tokens:* 2,401
-- *Prompt throughput (raw):* 2,188 tok/s
-- *Generation throughput (raw):* 138 tok/s
+- *Model load time:* 0.57s
+- *Generation time:* 4.23s
+- *Total time:* 4.81s
+- *Input validation time:* 4.94e-05
+- *Prompt preparation time:* 0.00207
+- *First-token latency:* 1.15
+- *Cleanup time:* 0.0756
+- *Prompt tokens:* 2,050
+- *Generation tokens:* 294
+- *Total tokens:* 2,344
+- *Prompt throughput (raw):* 1,788 tok/s
+- *Generation throughput (raw):* 139 tok/s
 - *Peak memory:* 3.7
 - *Active memory:* 2.1
-- *Cache memory:* 0.95
+- *Cache memory:* 0.33
 - *Model-load active memory:* 2.11
 - *Post-cleanup active memory:* 0.000755
 - *Post-cleanup cache memory:* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1529
+- *Rendered prompt characters:* 1303
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2387,11 +2442,10 @@ Keywords: Edinburgh, Princes Street, Construction, Scaffolding, Overcast, Pedest
 
 <pre class="model-output-readable">
 Title:
-City Centre, Edinburgh, Scotland, UK, GBR, Europe
+Historic Winchester City Mill
+
 Description:
-A bustling city centre scene in Edinburgh, Scotland, UK, under an overcast sky. Pedestrians walk by temporary construction fences, while a building undergoes major renovation and redevelopment along Princes Street. A Boots pharmacy is visible beneath the scaffolding, and a crane stands ready for the next phase of the project.
-Keywords:
-Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site, Crane, Boots pharmacy, Overcast sky, Pedestrians, Roadworks, Scaffolding, Modern Architecture, Objects, Temporary construction fence, Road construction, Pedestrian walkway, Urban landscape, Construction equipment, City development, European cityscape, Overcast weather, City centre atmosphere, Edinburgh urban renewal, Scotland's architectural transformation, European city centre, European urban landscape, European city centre scene, European city centre development, European city centre renovation, European city centre redevelopment, European city centre transformation, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project, European city centre redevelopment project, European city centre transformation project, European city centre renewal project,
+The historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England, is captured in this image. Pedestrians walk along the pathway, relaxing in front of the mill, which is adorned with Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. The mill is constructed with Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. The scene is set under a Blue sky, with the mill's chimney and clay tiles adding to its historic charm. Pedestrians walk along the pathway, relaxing in front of the mill, which is adorned with Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. The scene is set under a Blue sky, with the mill's chimney and clay tiles adding to its historic charm.
 </pre>
 
 </details>
@@ -2408,22 +2462,23 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Description, Keywords;
+- *Observations:* Missing or empty fields: Description, Keywords, Title;
   Response repeats the task instructions instead of only returning the
-  requested fields; Response appears cut off at the token limit
+  requested fields; Extra text appears before the Title field; Response
+  appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.83s
-- *Generation time:* 26.23s
-- *Total time:* 28.08s
-- *Input validation time:* 5.14e-05
-- *Prompt preparation time:* 0.00795
-- *First-token latency:* 1.98
-- *Cleanup time:* 0.0968
-- *Prompt tokens:* 3,240
+- *Model load time:* 1.57s
+- *Generation time:* 26.86s
+- *Total time:* 28.45s
+- *Input validation time:* 5.19e-05
+- *Prompt preparation time:* 0.00802
+- *First-token latency:* 2.12
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 3,202
 - *Generation tokens:* 1,000
-- *Total tokens:* 4,240
-- *Prompt throughput (raw):* 1,635 tok/s
-- *Generation throughput (raw):* 42.1 tok/s
+- *Total tokens:* 4,202
+- *Prompt throughput (raw):* 1,507 tok/s
+- *Generation throughput (raw):* 41.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.87
@@ -2432,7 +2487,7 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1891
+- *Rendered prompt characters:* 1665
 - *Image placeholders:* 0
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2449,33 +2504,21 @@ Princes Street, Edinburgh, Scotland, UK, Europe, City Centre, Construction site,
 
 <pre class="model-output-readable">
 Here are my reasoning steps:
-The user wants British-English catalogue metadata from the image and supplied context. They want:
+We need to produce British-English catalogue metadata from the image and supplied context. The image shows a historic watermill (Winchester City Mill) over a river (River Itchen). The building is a brick and stone structure with a tiled roof, a chimney, windows with lattice, a stone wall, a bridge over the water, a pathway with people walking, a woman in a blue dress, a man with a camera, some people sitting on a bench. The river has rapids. The sky is partly cloudy with blue sky. The location is Winchester, Hampshire, England. The building is likely a National Trust property. The date/time is 2026-08-31 15:02:20 UTC+01:00. The description should combine relevant context with main visible subject, setting, action, lighting, distinctive details. Title: 5-10 words. Description: 1-2 sentences. Keywords: 10-18 unique, comma-separated.
 
-- a concrete 5-10-word title (so 5-10 words)
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+We need to ensure British English. Use "mill", "river", "chimney", "clay tiles", "stone wall", "pedestrians", "elderly woman", "girls", "rapids", "scenery", "sitting", "National Trust", "Winchester City Mill", "River Itchen", "Hampshire", "England", "Adobe Stock", "Any Vision". Also "arch"? There's an arch of the bridge. "Blue sky". "Stone wall". "Clay tiles". "Chimney". "Pedestrians". "People". "Riverbank". "Scenery". "Sitting". "National Trust". "Winchester". "Hampshire". "England". "River Itchen". "Rapids". "Bridge". "Pathway". "Elderly woman". "Girls". "Adobe Stock". "Any Vision". "Arch". "Blue sky". "Chimney". "Clay tiles". "Elderly woman". "England". "Girls". "Hampshire". "Mill". "National Trust". "Pedestrians". "People". "Rapids". "River Itchen". "Riverbank". "Scenery". "Sitting". "Stone wall". That's many. Need 10-18 unique keywords. We'll pick 14.
 
-We need to produce exactly three sections: Title:, Description:, Keywords:.
+Now the description: "Visitors stroll along a stone pathway beside the historic Winchester City Mill, a 16th‑century watermill with a red‑clay tiled roof and a brick‑and‑stone façade, while an elderly woman in a blue dress walks past and a couple sit on a bench under a bright, partly‑cloudy sky." That's one sentence. Could add second sentence about the river rapids. "The River Itchen flows beneath a stone bridge, its rapids visible in the foreground, framing the mill’s historic setting." That's two sentences.
 
-We must treat capture date/time and GPS as authoritative facts, but not claim they are visible. So we can incorporate date/time and location in description if needed. The description should be 1-2 sentences, factual, combining relevant context with main visible subject, setting, action, lighting, distinctive details.
+Title: "Winchester City Mill by River Itchen". That's 5 words. Or "Historic Winchester City Mill on River Itchen". That's 7 words. Title must be 5-10 words. We'll do "Historic Winchester City Mill on River Itchen". That's 7 words.
 
-We need to ensure British English spelling (e.g., "behaviour", "organisation", "programme", etc.) but not necessarily needed.
+Now keywords: we need 10-18 unique, comma-separated. Let's list: Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic watermill, red clay tiles, chimney, stone wall, stone bridge, rapids, pedestrians, elderly woman, blue sky, pathway, sitting, Adobe Stock, Any Vision. That's 18. Ensure each is unique. Let's count: 1 Winchester City Mill, 2 River Itchen, 3 Hampshire, 4 England, 5 National Trust, 6 historic watermill, 7 red clay tiles, 8 chimney, 9 stone wall, 10 stone bridge, 11 rapids, 12 pedestrians, 13 elderly woman, 14 blue sky, 15 pathway, 16 sitting, 17 Adobe Stock, 18 Any Vision. That's 18, within range.
 
-We need to incorporate the visible details: scaffolding covering a building undergoing major renovation, construction fences, a Boots pharmacy, overcast sky, a crane, pedestrians, street sign "Princes Street", etc.
+Make sure we follow the format: Title: line, Description: line(s), Keywords: line. No extra text.
 
-We need to incorporate the context: location is City Centre, Edinburgh, Scotland, UK, Europe. The date/time is 2026-08-18 17:46:05 UTC+01:00. GPS coordinates: 55.951722°N, 3.201417°W.
+Now check for any conflicts: The hint says "Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England." The image shows a stone wall and a bridge, a pathway, people walking, a woman in blue, a couple sitting. So description matches.
 
-We need to produce a title of 5-10 words. Something like "Princes Street Construction Site, Edinburgh". That's 5 words? Let's count: "Princes" (1) "Street" (2) "Construction" (3) "Site," (4) "Edinburgh" (5). That's 5 words. Could also be "Edinburgh Princes Street Renovation 2026". That's 5 words? "Edinburgh" (1) "Princes" (2) "Street" (3) "Renovation" (4) "2026" (5). That's 5 words. Or "Edinburgh Princes Street Building Under Scaffolding". That's 6 words? "Edinburgh" (1) "Princes" (2) "Street" (3) "Building" (4) "Under" (5) "Scaffolding" (6). That's 6 words. That works.
-
-We need to ensure it's 5-10 words. Let's pick "Edinburgh Princes Street Building Under Scaffolding". That's 6 words.
-
-Now description: 1-2 sentences. Should mention date/time? Possibly incorporate date/time: "Captured on 18 August 2026 at 17:46 UTC+01:00, the image shows extensive scaffolding covering a building undergoing major renovation on Princes Street in Edinburgh's city centre, with pedestrians walking past construction fences and a Boots pharmacy beneath an overcast sky." That's one sentence. Could be two sentences: "Captured on 18 August 2026 at 17:46 UTC+01:00, the image shows extensive scaffolding covering a building undergoing major renovation on Princes Street in Edinburgh's city centre. Pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky." That's two sentences. That's fine.
-
-Now keywords: 10-18 unique, comma-separated. Should include: Edinburgh, Scotland, United Kingdom, Europe, Princes Street, construction site, scaffolding, renovation, building, crane, construction fence, temporary fencing, Boots pharmacy, pedestrians, overcast sky, city centre, modern architecture, civil engineering, roadworks, 2026, August, 17:46, UTC+01:00, GPS coordinates, etc. But we need 10-18 unique keywords. Let's pick 14 maybe.
-
-Potential keywords: Edinburgh, Scotland, United Kingdom, Europe, Princes Street, construction site, scaffolding, renovation, building, crane, construction fence, temporary fencing, Boots pharmacy, pedestrians, overcast sky, city centre, modern architecture, civil engineering, roadworks, 2026.
-
-But we need 10-18 unique, comma-separated. Let's count: Edinburgh (1), Scotland (2), United Kingdom (3), Europe (4), Princes Street (5), construction site (6), scaffolding (7), renovation (8), building (9), crane (10), construction fence (11), temporary fencing (12), Boots pharmacy (
+The hint includes "Girls". The image does not show girls explicitly, but there is
 </pre>
 
 </details>
@@ -2492,31 +2535,30 @@ But we need 10-18 unique, comma-separated. Let's count: Edinburgh (1), Scotland 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* none
-- *Observations:* Missing or empty fields: Title, Keywords; Extra text appears
-  before the Title field
+- *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.73s
-- *Generation time:* 1.67s
-- *Total time:* 2.42s
-- *Input validation time:* 6.11e-05
-- *Prompt preparation time:* 0.00246
-- *First-token latency:* 0.0972
-- *Cleanup time:* 0.0816
-- *Prompt tokens:* 368
-- *Generation tokens:* 169
-- *Total tokens:* 537
-- *Prompt throughput (raw):* 3,788 tok/s
-- *Generation throughput (raw):* 352 tok/s
+- *Model load time:* 0.65s
+- *Generation time:* 1.97s
+- *Total time:* 2.64s
+- *Input validation time:* 6.04e-05
+- *Prompt preparation time:* 0.00221
+- *First-token latency:* 0.215
+- *Cleanup time:* 0.0791
+- *Prompt tokens:* 307
+- *Generation tokens:* 155
+- *Total tokens:* 462
+- *Prompt throughput (raw):* 1,429 tok/s
+- *Generation throughput (raw):* 358 tok/s
 - *Peak memory:* 2.2
 - *Active memory:* 1.2
-- *Cache memory:* 0.04
+- *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
 - *Post-cleanup active memory:* 0.0018
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1612
+- *Rendered prompt characters:* 1386
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2532,8 +2574,7 @@ But we need 10-18 unique, comma-separated. Let's count: Edinburgh (1), Scotland 
 *Readable output:*
 
 <pre class="model-output-readable">
-A concrete 5-10-word title: "City Centre Renovation in Edinburgh, Scotland, UK, GBR, Europe"
-Description: The image captures a bustling city street in Edinburgh, Scotland, featuring extensive scaffolding covering the facade of a building undergoing major renovation and redevelopment along Princes Street. The scene is set under an overcast sky, with pedestrians walking past temporary construction fences and a Boots pharmacy beneath an overcast sky. The image also includes a crane and a fence, highlighting the ongoing construction work. The photo was taken on 2026-08-18 at 17:46:05 UTC+01:00, with a GPS coordinates of 55.951722°N, 3.201417°W.
+A tranquil scene captures visitors enjoying a walk along the historic Winchester City Mill, a picturesque watermill nestled by the River Itchen in Winchester, Hampshire, England. The image, taken on 2026-08-31 15:02:20 UTC+01:00, showcases the blend of natural and architectural beauty, with the mill's distinctive red clay tiles and the surrounding lush greenery. The river's gentle flow and the clear blue sky above add to the serene atmosphere, while the presence of visitors highlights the mill's role as a popular tourist attraction. The image, sourced from Adobe Stock, captures the essence of this iconic landmark, offering a glimpse into the rich history and cultural significance of the Winchester City Mill.
 </pre>
 
 </details>
@@ -2550,26 +2591,26 @@ Description: The image captures a bustling city street in Edinburgh, Scotland, f
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Extra text appears before
-  the Title field; Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete; Keyword list has 53 terms (requested
-  10-18); Duplicate keywords: princes street, construction site, scaffolding,
-  pedestrians, overcast, boots pharmacy, construction fence, crane, city
-  centre, scotland, europe, roadworks, modern architecture, fence, civil
-  engineering
+- *Observations:* Response repeats the task instructions instead of only
+  returning the requested fields; Extra text appears before the Title field;
+  Response appears cut off at the token limit; Internal reasoning block
+  appears incomplete; Keyword list has 42 terms (requested 10-18); Duplicate
+  keywords: blue sky, chimney, clay tiles, elderly woman, girls, hampshire,
+  mill, national trust, pedestrians, people, river itchen, riverbank, scenery,
+  sitting
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.79s
-- *Generation time:* 27.50s
-- *Total time:* 29.30s
-- *Input validation time:* 5.41e-05
-- *Prompt preparation time:* 0.00255
-- *First-token latency:* 5.51
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 6,480
+- *Model load time:* 1.68s
+- *Generation time:* 27.88s
+- *Total time:* 29.58s
+- *Input validation time:* 7.25e-05
+- *Prompt preparation time:* 0.00276
+- *First-token latency:* 5.38
+- *Cleanup time:* 0.101
+- *Prompt tokens:* 6,426
 - *Generation tokens:* 1,000
-- *Total tokens:* 7,480
-- *Prompt throughput (raw):* 1,177 tok/s
-- *Generation throughput (raw):* 46.6 tok/s
+- *Total tokens:* 7,426
+- *Prompt throughput (raw):* 1,195 tok/s
+- *Generation throughput (raw):* 45.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.44
@@ -2578,7 +2619,7 @@ Description: The image captures a bustling city street in Edinburgh, Scotland, f
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1574
+- *Rendered prompt characters:* 1348
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2594,81 +2635,114 @@ Description: The image captures a bustling city street in Edinburgh, Scotland, f
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words. Looking at the image, the main elements are scaffolding, Princes Street, Edinburgh, construction, etc. So maybe "Edinburgh Princes Street Construction Site" or something similar. Wait, need to keep it concise. Let's go with "Edinburgh Princes Street Renovation Site".
+&lt;think&gt;Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows a historic mill by a river with people, so maybe "Winchester City Mill by River Itchen".
 
-Then the description: need to combine context (date/time, location) with main visible subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), distinctive details (Boots pharmacy, crane). So something like "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians passing construction fences near a Boots pharmacy beneath an overcast sky."
+Next, the description: need to combine context (capture date, location) with main subject (mill), setting (river, historic), action (visitors walk, relax), lighting (blue sky), distinctive details (brick, stone, water). So something like "Historic Winchester City Mill by River Itchen with visitors on a pathway, under a blue sky, showcasing brick and stone architecture." Wait, need to make sure it's 1-2 sentences. Let's check the context: capture date is 2026-08-31, location is Winchester, Hampshire, England, mill, people walking, sitting, river. So description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky."
 
-Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. From hints: City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Also, Boots pharmacy is visible, so add "Boots Pharmacy" maybe. Let's check the hints and image. The image has scaffolding, construction site, crane, pedestrians, Princes Street, Edinburgh, overcast sky, construction fence, Boots pharmacy. So keywords would include those. Let's make sure they are unique.
+Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not visible, but context says National Trust? Wait, the hints include National Trust, so maybe include. Also, the elements: arch, blue sky, chimney, clay tiles, elderly woman, girls, Hampshire, mill, National Trust, pedestrians, people, river Itchen, riverbank, scenery, sitting, stone wall. Let's list them: "Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall" – that's 16, which is within 10-18.
 
-Now, let's structure each part:
+Wait, let's check each part. Title: "Winchester City Mill by River Itchen" (7 words, concrete). Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky, with distinctive architectural features like a chimney and stone arches." Wait, need to make sure it's 1-2 sentences. Let's make it concise. "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." That's one sentence. Then keywords: combine all relevant hints. Let's list all hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, England, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. Remove duplicates: England is already in Hampshire, so keep Hampshire. Remove Adobe Stock/Any Vision if not visible, but context says "National Trust" is a hint, so include. So keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall. That's 16, which is good.
 
-Title: Need 5-10 words. Let's do "Edinburgh Princes Street Construction Renovation".
+Now, let's finalize each section:
 
-Description: Combine context (date/time, location) with main subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), details (Boots pharmacy, crane). So: "On 2026-08-18, scaffolding surrounds a building undergoing renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy under an overcast sky."
+Title: "Winchester City Mill by River Itchen" (5 words, concrete)
 
-Keywords: Let's list them: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. Wait, need to count. Let's check the hints and image. The hints include City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Add Boots Pharmacy as a visible detail. So keywords: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. That's 17, which is within 10-18. Let's make sure they are unique.
+Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." (1 sentence, combines context and visible details)
 
-Now, check each part:
+Keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall (comma-separated, unique, 16 words)
 
-Title: "Edinburgh Princes Street Construction Renovation" (7 words, within 5-10)
-
-Description: "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy beneath an overcast sky." (2 sentences, factual, combines context and visible details)
-
-Keywords: "Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky" (17 keywords, unique, covers context and visible details)
-
-Wait, need to make sure the description is 1-2 sentences. Let's adjust. "On 2026-08-18, scaffolding covers a building undergoing major renovation along Edinburgh's Princes Street, with pedestrians walking past temporary construction fences near a Boots pharmacy under an overcast sky." That's one sentence, maybe. Or two. Let's do two sentences for clarity. "On 2026-08-18, extensive scaffolding covers the facade of a building undergoing major renovation along Edinburgh's Princes Street. Pedestrians walk past temporary construction fences near a Boots pharmacy under an overcast sky." That's two sentences, factual.
-
-Keywords need to be comma-separated, unique. Let's list again, ensuring no duplicates. From hints and image:
-
-- Edinburgh (location)
-- Princes Street (street)
-- Construction site (main subject)
-- Scaffolding (visible detail)
-- Pedestrians (action)
-- Overcast (lighting)
--
+Wait, check if "Rapids" is visible? The water has some movement, maybe rapids? The description hint says "Rapids" but the image might have water flow. But the description hint says "Rapids" as a hint, but maybe the image shows water flow. But the user says "retain details supported by the image, correct conflicts, and add important visible details." The image has water flowing under the mill, so maybe "Rapids" is a detail. But let's check the hints again. The hints include "Rapids" as a keyword. So maybe include "Rapids" if visible. The water under the mill has some movement, so maybe "Rapids" is a detail. So add "Rapids" to keywords. Then keywords would be Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Rapids, Scenery, Sitting, Stone wall. That's
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words. Looking at the image, the main elements are scaffolding, Princes Street, Edinburgh, construction, etc. So maybe "Edinburgh Princes Street Construction Site" or something similar. Wait, need to keep it concise. Let's go with "Edinburgh Princes Street Renovation Site".
+<think>Got it, let's tackle this task step by step. First, the title needs to be 5-10 words, concrete. The image shows a historic mill by a river with people, so maybe "Winchester City Mill by River Itchen". 
 
-Then the description: need to combine context (date/time, location) with main visible subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), distinctive details (Boots pharmacy, crane). So something like "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians passing construction fences near a Boots pharmacy beneath an overcast sky."
+Next, the description: need to combine context (capture date, location) with main subject (mill), setting (river, historic), action (visitors walk, relax), lighting (blue sky), distinctive details (brick, stone, water). So something like "Historic Winchester City Mill by River Itchen with visitors on a pathway, under a blue sky, showcasing brick and stone architecture." Wait, need to make sure it's 1-2 sentences. Let's check the context: capture date is 2026-08-31, location is Winchester, Hampshire, England, mill, people walking, sitting, river. So description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." 
 
-Keywords need to be 10-18 unique, comma-separated. Let's list the hints and add visible details. From hints: City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Also, Boots pharmacy is visible, so add "Boots Pharmacy" maybe. Let's check the hints and image. The image has scaffolding, construction site, crane, pedestrians, Princes Street, Edinburgh, overcast sky, construction fence, Boots pharmacy. So keywords would include those. Let's make sure they are unique.
+Then keywords: need 10-18 unique, comma-separated. From hints: Adobe Stock, Any Vision (but maybe not visible, but context says National Trust? Wait, the hints include National Trust, so maybe include. Also, the elements: arch, blue sky, chimney, clay tiles, elderly woman, girls, Hampshire, mill, National Trust, pedestrians, people, river Itchen, riverbank, scenery, sitting, stone wall. Let's list them: "Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall" – that's 16, which is within 10-18. 
 
-Now, let's structure each part:
+Wait, let's check each part. Title: "Winchester City Mill by River Itchen" (7 words, concrete). Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky, with distinctive architectural features like a chimney and stone arches." Wait, need to make sure it's 1-2 sentences. Let's make it concise. "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." That's one sentence. Then keywords: combine all relevant hints. Let's list all hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, England, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall. Remove duplicates: England is already in Hampshire, so keep Hampshire. Remove Adobe Stock/Any Vision if not visible, but context says "National Trust" is a hint, so include. So keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall. That's 16, which is good. 
 
-Title: Need 5-10 words. Let's do "Edinburgh Princes Street Construction Renovation".
+Now, let's finalize each section:
 
-Description: Combine context (date/time, location) with main subject (scaffolding, building renovation), setting (city centre, Princes Street), action (pedestrians walking), lighting (overcast sky), details (Boots pharmacy, crane). So: "On 2026-08-18, scaffolding surrounds a building undergoing renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy under an overcast sky."
+Title: "Winchester City Mill by River Itchen" (5 words, concrete)
 
-Keywords: Let's list them: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. Wait, need to count. Let's check the hints and image. The hints include City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland. Add Boots Pharmacy as a visible detail. So keywords: Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky. That's 17, which is within 10-18. Let's make sure they are unique.
+Description: "Visitors walk and relax near the historic Winchester City Mill, a brick and stone structure over the River Itchen, under a bright blue sky." (1 sentence, combines context and visible details)
 
-Now, check each part:
+Keywords: Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall (comma-separated, unique, 16 words)
 
-Title: "Edinburgh Princes Street Construction Renovation" (7 words, within 5-10)
-
-Description: "On 2026-08-18, scaffolding covers a building under renovation along Edinburgh's Princes Street, with pedestrians walking past construction barriers near a Boots pharmacy beneath an overcast sky." (2 sentences, factual, combines context and visible details)
-
-Keywords: "Edinburgh, Princes Street, Construction site, Scaffolding, Pedestrians, Overcast, Boots Pharmacy, Construction fence, Crane, City Centre, Scotland, Europe, Roadworks, Modern Architecture, Fence, Civil engineering, Overcast Sky" (17 keywords, unique, covers context and visible details)
-
-Wait, need to make sure the description is 1-2 sentences. Let's adjust. "On 2026-08-18, scaffolding covers a building undergoing major renovation along Edinburgh's Princes Street, with pedestrians walking past temporary construction fences near a Boots pharmacy under an overcast sky." That's one sentence, maybe. Or two. Let's do two sentences for clarity. "On 2026-08-18, extensive scaffolding covers the facade of a building undergoing major renovation along Edinburgh's Princes Street. Pedestrians walk past temporary construction fences near a Boots pharmacy under an overcast sky." That's two sentences, factual.
-
-Keywords need to be comma-separated, unique. Let's list again, ensuring no duplicates. From hints and image:
-
-- Edinburgh (location)
-- Princes Street (street)
-- Construction site (main subject)
-- Scaffolding (visible detail)
-- Pedestrians (action)
-- Overcast (lighting)
--
+Wait, check if "Rapids" is visible? The water has some movement, maybe rapids? The description hint says "Rapids" but the image might have water flow. But the description hint says "Rapids" as a hint, but maybe the image shows water flow. But the user says "retain details supported by the image, correct conflicts, and add important visible details." The image has water flowing under the mill, so maybe "Rapids" is a detail. But let's check the hints again. The hints include "Rapids" as a keyword. So maybe include "Rapids" if visible. The water under the mill has some movement, so maybe "Rapids" is a detail. So add "Rapids" to keywords. Then keywords would be Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Girls, Hampshire, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Rapids, Scenery, Sitting, Stone wall. That's 
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### mlx-community/GLM-4.6V-Flash-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit; Title has 3 words (requested 5-10); Keyword list has 230
+  terms (requested 10-18); Duplicate keywords: hampshire, england, rapids,
+  arched doorway, tourist attraction, historic watermill, diamond paned
+  windows, weathered roof tiles, red brick chimney, stone archway over river,
+  mossy stone wall, green ivy, traditional english mill architecture, historic
+  watermill on river itchen, winchester, national trust property, scenic
+  riverfront, historic mill with water flow, traditional english architecture,
+  stone and brick building
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.36s
+- *Generation time:* 20.93s
+- *Total time:* 22.30s
+- *Input validation time:* 6.25e-05
+- *Prompt preparation time:* 0.00794
+- *First-token latency:* 6.62
+- *Cleanup time:* 0.0884
+- *Prompt tokens:* 6,430
+- *Generation tokens:* 1,000
+- *Total tokens:* 7,430
+- *Prompt throughput (raw):* 971 tok/s
+- *Generation throughput (raw):* 73.1 tok/s
+- *Peak memory:* 8.4
+- *Active memory:* 6.8
+- *Cache memory:* 0.45
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00243
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1372
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Winchester City Mill
+Description: The historic Winchester City Mill, an ancient watermill over the River Itchen, is shown with visitors walking along the pathway and an elderly woman sitting nearby.
+Keywords: Winchester City Mill, River Itchen, watermill, historic building, pedestrians, elderly woman, stone wall, clay tiles, blue sky, chimney, Hampshire, England, National Trust, riverbank, scenery, rapids, sitting, walking, pathway, water, brick building, arched doorway, window with diamond panes, outdoor lamp, greenery, moss, stone bridge, flowing water, reflection, cloudy sky, historic architecture, traditional building, riverfront, tourist attraction, English countryside, historic mill, water-powered mill, river crossing, stone archway, brick chimney, tiled roof, weathered stone, mossy stone, water flow, rapids, riverbank scenery, historic watermill, traditional English mill, riverfront historic building, stone and brick architecture, water-powered historic mill, river Itchen watermill, Winchester historic mill, National Trust managed historic site, traditional English watermill, historic riverfront architecture, stone bridge over river, water flow over weir, historic mill building with arched doorway, diamond-paned windows, brick and stone construction, weathered roof tiles, red brick chimney, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill on River Itchen, Winchester, Hampshire, England, National Trust property, tourist attraction, scenic riverfront, historic mill with water flow, traditional English architecture, stone and brick building, arched doorway, diamond-paned windows, red brick chimney, weathered roof tiles, stone archway over river, mossy stone wall, green ivy, traditional English mill architecture, historic watermill
+</pre>
 
 </details>
 
@@ -2687,27 +2761,27 @@ Keywords need to be comma-separated, unique. Let's list again, ensuring no dupli
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.89s
-- *Generation time:* 1.08s
-- *Total time:* 1.98s
-- *Input validation time:* 4.76e-05
-- *Prompt preparation time:* 0.00929
-- *First-token latency:* 0.25
-- *Cleanup time:* 0.0913
-- *Prompt tokens:* 966
-- *Generation tokens:* 46
-- *Total tokens:* 1,012
-- *Prompt throughput (raw):* 3,861 tok/s
-- *Generation throughput (raw):* 273 tok/s
-- *Peak memory:* 3.8
+- *Model load time:* 0.84s
+- *Generation time:* 1.25s
+- *Total time:* 2.11s
+- *Input validation time:* 5.3e-05
+- *Prompt preparation time:* 0.00935
+- *First-token latency:* 0.251
+- *Cleanup time:* 0.0929
+- *Prompt tokens:* 907
+- *Generation tokens:* 70
+- *Total tokens:* 977
+- *Prompt throughput (raw):* 3,611 tok/s
+- *Generation throughput (raw):* 289 tok/s
+- *Peak memory:* 3.3
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
 - *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00488
+- *Post-cleanup active memory:* 0.00487
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1585
+- *Rendered prompt characters:* 1359
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2723,132 +2797,23 @@ Keywords need to be comma-separated, unique. Let's list again, ensuring no dupli
 *Readable output:*
 
 <pre class="model-output-readable">
-Urban construction with scaffolding on city buildings.
+Visitors walk near historic mill over river under bright sky.
+Lighting is sunny with clear blue skies above the old building.
 
-Keywords: urban construction, scaffolding, city buildings, Princes Street, Edinburgh, construction fence, crane, overcast sky, pedestrians, modern architecture, civil engineering, Europe
+Keywords: historic mill, river Itchen, stone bridge, brick building, blue sky, pedestrians, elderly woman, girls, England, Hampshire, watermill, stone wall, Rapids, Scenery, National Trust
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
 <details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+<summary>Exact raw output</summary>
 
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Missing or empty fields: Title,
-  Description, Keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.72s
-- *Generation time:* 2.71s
-- *Total time:* 3.44s
-- *Input validation time:* 5.96e-05
-- *Prompt preparation time:* 0.00296
-- *First-token latency:* 0.387
-- *Cleanup time:* 0.0866
-- *Prompt tokens:* 1,461
-- *Generation tokens:* 200
-- *Total tokens:* 1,661
-- *Prompt throughput (raw):* 3,771 tok/s
-- *Generation throughput (raw):* 124 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.72
-- *Model-load active memory:* 4.5
-- *Post-cleanup active memory:* 0.00986
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1549
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
+```text
+Visitors walk near historic mill over river under bright sky.  
+Lighting is sunny with clear blue skies above the old building.
 
-*Readable output:*
-
-<pre class="model-output-readable">
- Edinburgh, Scotland, UK, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland, Edinburgh, Scotland,
-</pre>
+Keywords: historic mill, river Itchen, stone bridge, brick building, blue sky, pedestrians, elderly woman, girls, England, Hampshire, watermill, stone wall, Rapids, Scenery, National Trust
+```
 
 </details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Title has 4 words (requested 5-10); Keyword list has 308
-  terms (requested 10-18); Duplicate keywords: scaffolding, construction site,
-  construction equipment, construction progress, building maintenance,
-  construction safety, building renovation, building restoration, commercial
-  building, construction activity, pedestrian walkway, construction site
-  signage, building exterior, construction materials, building facade
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.15s
-- *Generation time:* 35.42s
-- *Total time:* 36.59s
-- *Input validation time:* 9.05e-05
-- *Prompt preparation time:* 0.00426
-- *First-token latency:* 16.6
-- *Cleanup time:* 0.0979
-- *Prompt tokens:* 16,592
-- *Generation tokens:* 1,000
-- *Total tokens:* 17,592
-- *Prompt throughput (raw):* 1,001 tok/s
-- *Generation throughput (raw):* 55.6 tok/s
-- *Peak memory:* 13
-- *Active memory:* 9.5
-- *Cache memory:* 1.3
-- *Model-load active memory:* 9.46
-- *Post-cleanup active memory:* 0.0104
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1647
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Edinburgh Princes Street Construction
-
-Description: A Boots pharmacy on Princes Street in Edinburgh, Scotland, remains open as pedestrians walk past a major renovation site with extensive scaffolding and a construction crane under an overcast sky.
-
-Keywords: Edinburgh, Princes Street, Boots, pharmacy, construction, scaffolding, renovation, pedestrians, overcast, Scotland, Europe, roadworks, modern architecture, civil engineering, fence, crane, building, facelift, urban development, retail, retail store, safety barriers, city centre, scaffolding, construction site, roadwork, pedestrian activity, commercial area, urban renewal, scaffolding, construction equipment, building facades, retail space, public access, safety signage, construction progress, urban landscape, city infrastructure, building maintenance, commercial district, retail environment, construction safety, building renovation, public space, urban planning, construction industry, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation, construction equipment, construction site, building maintenance, construction safety, building restoration, commercial building, construction activity, pedestrian walkway, construction site signage, building exterior, construction materials, building facade, construction progress, building renovation
-</pre>
 
 </details>
 
@@ -2863,31 +2828,31 @@ Keywords: Edinburgh, Princes Street, Boots, pharmacy, construction, scaffolding,
 
 - *Execution:* completed
 - *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* No response text was returned; Missing or empty fields:
-  Title, Description, Keywords
+- *Maintainer status:* none
+- *Observations:* Missing or empty fields: Title, Description; Extra text
+  appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.29s
-- *Generation time:* 0.95s
-- *Total time:* 3.26s
-- *Input validation time:* 4.85e-05
-- *Prompt preparation time:* 0.00426
-- *First-token latency:* 0.396
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 625
-- *Generation tokens:* 1
-- *Total tokens:* 626
-- *Prompt throughput (raw):* 1,578 tok/s
-- *Generation throughput (raw):* 56,208 tok/s
+- *Model load time:* 2.31s
+- *Generation time:* 4.97s
+- *Total time:* 7.37s
+- *Input validation time:* 6.33e-05
+- *Prompt preparation time:* 0.00417
+- *First-token latency:* 0.896
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 568
+- *Generation tokens:* 167
+- *Total tokens:* 735
+- *Prompt throughput (raw):* 634 tok/s
+- *Generation throughput (raw):* 48.9 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
 - *Model-load active memory:* 15.7
-- *Post-cleanup active memory:* 0.0115
+- *Post-cleanup active memory:* 0.0119
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1574
+- *Rendered prompt characters:* 1348
 - *Image placeholders:* 1
 - *Processed image:* not captured
 - *Image patch count:* not captured
@@ -2900,3062 +2865,13 @@ Keywords: Edinburgh, Princes Street, Boots, pharmacy, construction, scaffolding,
   "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
 
-#### Complete generated output
+*Readable output:*
 
-empty output
+<pre class="model-output-readable">
+A picturesque scene unfolds at the historic Winchester City Mill, a charming watermill nestled along the River Itchen in Winchester, Hampshire, England. The mill's weathered brick and stone facade, topped with a terracotta tiled roof, exudes a sense of timelessness. Two pedestrians stroll along a stone walkway in front of the mill, adding a touch of life to the tranquil setting. The river flows gently beneath the walkway, its waters reflecting the clear blue sky dotted with fluffy white clouds. The scene is bathed in natural daylight, highlighting the mill's architectural details and the surrounding greenery.
 
-</details>
-
----
-
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
-
-- *Execution:* crashed
-- *Usability:* not_evaluated
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Received 1460 parameters not in
-  model:
-  <br>embed_tokens.biases,<br>embed_tokens.scales,<br>embed_tokens.weight,<br>layers.0.input_layernorm.weight,<br>layers.0.mlp.down_proj.biases,<br>layers.0.mlp.down_proj.scales,<br>layers.0.mlp.down_proj.weight,<br>layers.0.mlp.gate_proj.biases,<br>layers.0.mlp.gate_proj.scales,<br>layers.0.mlp.gate_proj.weight,<br>layers.0.mlp.up_proj.biases,<br>layers.0.mlp.up_proj.scales,<br>layers.0.mlp.up_proj.weight,<br>layers.0.post_attention_layernorm.weight,<br>layers.0.post_feedforward_layernorm.weight,<br>layers.0.pre_feedforward_layernorm.weight,<br>layers.0.self_attn.gate_proj.biases,<br>layers.0.self_attn.gate_proj.scales,<br>layers.0.self_attn.gate_proj.weight,<br>layers.0.self_attn.k_proj.biases,<br>layers.0.self_attn.k_proj.scales,<br>layers.0.self_attn.k_proj.weight,<br>layers.0.self_attn.o_proj.biases,<br>layers.0.self_attn.o_proj.scales,<br>layers.0.self_attn.o_proj.weight,<br>layers.0.self_attn.q_proj.biases,<br>layers.0.self_attn.q_proj.scales,<br>layers.0.self_attn.q_proj.weight,<br>layers.0.self_attn.v_proj.biases,<br>layers.0.self_attn.v_proj.scales,<br>layers.0.self_attn.v_proj.weight,<br>layers.1.input_layernorm.weight,<br>layers.1.mlp.down_proj.biases,<br>layers.1.mlp.down_proj.scales,<br>layers.1.mlp.down_proj.weight,<br>layers.1.mlp.gate_proj.biases,<br>layers.1.mlp.gate_proj.scales,<br>layers.1.mlp.gate_proj.weight,<br>layers.1.mlp.up_proj.biases,<br>layers.1.mlp.up_proj.scales,<br>layers.1.mlp.up_proj.weight,<br>layers.1.post_attention_layernorm.weight,<br>layers.1.post_feedforward_layernorm.weight,<br>layers.1.pre_feedforward_layernorm.weight,<br>layers.1.self_attn.gate_proj.biases,<br>layers.1.self_attn.gate_proj.scales,<br>layers.1.self_attn.gate_proj.weight,<br>layers.1.self_attn.k_proj.biases,<br>layers.1.self_attn.k_proj.scales,<br>layers.1.self_attn.k_proj.weight,<br>layers.1.self_attn.o_proj.biases,<br>layers.1.self_attn.o_proj.scales,<br>layers.1.self_attn.o_proj.weight,<br>layers.1.self_attn.q_proj.biases,<br>layers.1.self_attn.q_proj.scales,<br>layers.1.self_attn.q_proj.weight,<br>layers.1.self_attn.v_proj.biases,<br>layers.1.self_attn.v_proj.scales,<br>layers.1.self_attn.v_proj.weight,<br>layers.10.input_layernorm.weight,<br>layers.10.mlp.down_proj.biases,<br>layers.10.mlp.down_proj.scales,<br>layers.10.mlp.down_proj.weight,<br>layers.10.mlp.gate_proj.biases,<br>layers.10.mlp.gate_proj.scales,<br>layers.10.mlp.gate_proj.weight,<br>layers.10.mlp.up_proj.biases,<br>layers.10.mlp.up_proj.scales,<br>layers.10.mlp.up_proj.weight,<br>layers.10.post_attention_layernorm.weight,<br>layers.10.post_feedforward_layernorm.weight,<br>layers.10.pre_feedforward_layernorm.weight,<br>layers.10.self_attn.gate_proj.biases,<br>layers.10.self_attn.gate_proj.scales,<br>layers.10.self_attn.gate_proj.weight,<br>layers.10.self_attn.k_proj.biases,<br>layers.10.self_attn.k_proj.scales,<br>layers.10.self_attn.k_proj.weight,<br>layers.10.self_attn.o_proj.biases,<br>layers.10.self_attn.o_proj.scales,<br>layers.10.self_attn.o_proj.weight,<br>layers.10.self_attn.q_proj.biases,<br>layers.10.self_attn.q_proj.scales,<br>layers.10.self_attn.q_proj.weight,<br>layers.10.self_attn.v_proj.biases,<br>layers.10.self_attn.v_proj.scales,<br>layers.10.self_attn.v_proj.weight,<br>layers.11.input_layernorm.weight,<br>layers.11.mlp.down_proj.biases,<br>layers.11.mlp.down_proj.scales,<br>layers.11.mlp.down_proj.weight,<br>layers.11.mlp.gate_proj.biases,<br>layers.11.mlp.gate_proj.scales,<br>layers.11.mlp.gate_proj.weight,<br>layers.11.mlp.up_proj.biases,<br>layers.11.mlp.up_proj.scales,<br>layers.11.mlp.up_proj.weight,<br>layers.11.post_attention_layernorm.weight,<br>layers.11.post_feedforward_layernorm.weight,<br>layers.11.pre_feedforward_layernorm.weight,<br>layers.11.self_attn.gate_proj.biases,<br>layers.11.self_attn.gate_proj.scales,<br>layers.11.self_attn.gate_proj.weight,<br>layers.11.self_attn.k_proj.biases,<br>layers.11.self_attn.k_proj.scales,<br>layers.11.self_attn.k_proj.weight,<br>layers.11.self_attn.o_proj.biases,<br>layers.11.self_attn.o_proj.scales,<br>layers.11.self_attn.o_proj.weight,<br>layers.11.self_attn.q_proj.biases,<br>layers.11.self_attn.q_proj.scales,<br>layers.11.self_attn.q_proj.weight,<br>layers.11.self_attn.v_proj.biases,<br>layers.11.self_attn.v_proj.scales,<br>layers.11.self_attn.v_proj.weight,<br>layers.12.input_layernorm.weight,<br>layers.12.mlp.down_proj.biases,<br>layers.12.mlp.down_proj.scales,<br>layers.12.mlp.down_proj.weight,<br>layers.12.mlp.gate_proj.biases,<br>layers.12.mlp.gate_proj.scales,<br>layers.12.mlp.gate_proj.weight,<br>layers.12.mlp.up_proj.biases,<br>layers.12.mlp.up_proj.scales,<br>layers.12.mlp.up_proj.weight,<br>layers.12.post_attention_layernorm.weight,<br>layers.12.post_feedforward_layernorm.weight,<br>layers.12.pre_feedforward_layernorm.weight,<br>layers.12.self_attn.gate_proj.biases,<br>layers.12.self_attn.gate_proj.scales,<br>layers.12.self_attn.gate_proj.weight,<br>layers.12.self_attn.k_proj.biases,<br>layers.12.self_attn.k_proj.scales,<br>layers.12.self_attn.k_proj.weight,<br>layers.12.self_attn.o_proj.biases,<br>layers.12.self_attn.o_proj.scales,<br>layers.12.self_attn.o_proj.weight,<br>layers.12.self_attn.q_proj.biases,<br>layers.12.self_attn.q_proj.scales,<br>layers.12.self_attn.q_proj.weight,<br>layers.12.self_attn.v_proj.biases,<br>layers.12.self_attn.v_proj.scales,<br>layers.12.self_attn.v_proj.weight,<br>layers.13.input_layernorm.weight,<br>layers.13.mlp.down_proj.biases,<br>layers.13.mlp.down_proj.scales,<br>layers.13.mlp.down_proj.weight,<br>layers.13.mlp.gate_proj.biases,<br>layers.13.mlp.gate_proj.scales,<br>layers.13.mlp.gate_proj.weight,<br>layers.13.mlp.up_proj.biases,<br>layers.13.mlp.up_proj.scales,<br>layers.13.mlp.up_proj.weight,<br>layers.13.post_attention_layernorm.weight,<br>layers.13.post_feedforward_layernorm.weight,<br>layers.13.pre_feedforward_layernorm.weight,<br>layers.13.self_attn.gate_proj.biases,<br>layers.13.self_attn.gate_proj.scales,<br>layers.13.self_attn.gate_proj.weight,<br>layers.13.self_attn.k_proj.biases,<br>layers.13.self_attn.k_proj.scales,<br>layers.13.self_attn.k_proj.weight,<br>layers.13.self_attn.o_proj.biases,<br>layers.13.self_attn.o_proj.scales,<br>layers.13.self_attn.o_proj.weight,<br>layers.13.self_attn.q_proj.biases,<br>layers.13.self_attn.q_proj.scales,<br>layers.13.self_attn.q_proj.weight,<br>layers.13.self_attn.v_proj.biases,<br>layers.13.self_attn.v_proj.scales,<br>layers.13.self_attn.v_proj.weight,<br>layers.14.input_layernorm.weight,<br>layers.14.mlp.down_proj.biases,<br>layers.14.mlp.down_proj.scales,<br>layers.14.mlp.down_proj.weight,<br>layers.14.mlp.gate_proj.biases,<br>layers.14.mlp.gate_proj.scales,<br>layers.14.mlp.gate_proj.weight,<br>layers.14.mlp.up_proj.biases,<br>layers.14.mlp.up_proj.scales,<br>layers.14.mlp.up_proj.weight,<br>layers.14.post_attention_layernorm.weight,<br>layers.14.post_feedforward_layernorm.weight,<br>layers.14.pre_feedforward_layernorm.weight,<br>layers.14.self_attn.gate_proj.biases,<br>layers.14.self_attn.gate_proj.scales,<br>layers.14.self_attn.gate_proj.weight,<br>layers.14.self_attn.k_proj.biases,<br>layers.14.self_attn.k_proj.scales,<br>layers.14.self_attn.k_proj.weight,<br>layers.14.self_attn.o_proj.biases,<br>layers.14.self_attn.o_proj.scales,<br>layers.14.self_attn.o_proj.weight,<br>layers.14.self_attn.q_proj.biases,<br>layers.14.self_attn.q_proj.scales,<br>layers.14.self_attn.q_proj.weight,<br>layers.14.self_attn.v_proj.biases,<br>layers.14.self_attn.v_proj.scales,<br>layers.14.self_attn.v_proj.weight,<br>layers.15.input_layernorm.weight,<br>layers.15.mlp.down_proj.biases,<br>layers.15.mlp.down_proj.scales,<br>layers.15.mlp.down_proj.weight,<br>layers.15.mlp.gate_proj.biases,<br>layers.15.mlp.gate_proj.scales,<br>layers.15.mlp.gate_proj.weight,<br>layers.15.mlp.up_proj.biases,<br>layers.15.mlp.up_proj.scales,<br>layers.15.mlp.up_proj.weight,<br>layers.15.post_attention_layernorm.weight,<br>layers.15.post_feedforward_layernorm.weight,<br>layers.15.pre_feedforward_layernorm.weight,<br>layers.15.self_attn.gate_proj.biases,<br>layers.15.self_attn.gate_proj.scales,<br>layers.15.self_attn.gate_proj.weight,<br>layers.15.self_attn.k_proj.biases,<br>layers.15.self_attn.k_proj.scales,<br>layers.15.self_attn.k_proj.weight,<br>layers.15.self_attn.o_proj.biases,<br>layers.15.self_attn.o_proj.scales,<br>layers.15.self_attn.o_proj.weight,<br>layers.15.self_attn.q_proj.biases,<br>layers.15.self_attn.q_proj.scales,<br>layers.15.self_attn.q_proj.weight,<br>layers.15.self_attn.v_proj.biases,<br>layers.15.self_attn.v_proj.scales,<br>layers.15.self_attn.v_proj.weight,<br>layers.16.input_layernorm.weight,<br>layers.16.mlp.down_proj.biases,<br>layers.16.mlp.down_proj.scales,<br>layers.16.mlp.down_proj.weight,<br>layers.16.mlp.gate_proj.biases,<br>layers.16.mlp.gate_proj.scales,<br>layers.16.mlp.gate_proj.weight,<br>layers.16.mlp.up_proj.biases,<br>layers.16.mlp.up_proj.scales,<br>layers.16.mlp.up_proj.weight,<br>layers.16.post_attention_layernorm.weight,<br>layers.16.post_feedforward_layernorm.weight,<br>layers.16.pre_feedforward_layernorm.weight,<br>layers.16.self_attn.gate_proj.biases,<br>layers.16.self_attn.gate_proj.scales,<br>layers.16.self_attn.gate_proj.weight,<br>layers.16.self_attn.k_proj.biases,<br>layers.16.self_attn.k_proj.scales,<br>layers.16.self_attn.k_proj.weight,<br>layers.16.self_attn.o_proj.biases,<br>layers.16.self_attn.o_proj.scales,<br>layers.16.self_attn.o_proj.weight,<br>layers.16.self_attn.q_proj.biases,<br>layers.16.self_attn.q_proj.scales,<br>layers.16.self_attn.q_proj.weight,<br>layers.16.self_attn.v_proj.biases,<br>layers.16.self_attn.v_proj.scales,<br>layers.16.self_attn.v_proj.weight,<br>layers.17.input_layernorm.weight,<br>layers.17.mlp.down_proj.biases,<br>layers.17.mlp.down_proj.scales,<br>layers.17.mlp.down_proj.weight,<br>layers.17.mlp.gate_proj.biases,<br>layers.17.mlp.gate_proj.scales,<br>layers.17.mlp.gate_proj.weight,<br>layers.17.mlp.up_proj.biases,<br>layers.17.mlp.up_proj.scales,<br>layers.17.mlp.up_proj.weight,<br>layers.17.post_attention_layernorm.weight,<br>layers.17.post_feedforward_layernorm.weight,<br>layers.17.pre_feedforward_layernorm.weight,<br>layers.17.self_attn.gate_proj.biases,<br>layers.17.self_attn.gate_proj.scales,<br>layers.17.self_attn.gate_proj.weight,<br>layers.17.self_attn.k_proj.biases,<br>layers.17.self_attn.k_proj.scales,<br>layers.17.self_attn.k_proj.weight,<br>layers.17.self_attn.o_proj.biases,<br>layers.17.self_attn.o_proj.scales,<br>layers.17.self_attn.o_proj.weight,<br>layers.17.self_attn.q_proj.biases,<br>layers.17.self_attn.q_proj.scales,<br>layers.17.self_attn.q_proj.weight,<br>layers.17.self_attn.v_proj.biases,<br>layers.17.self_attn.v_proj.scales,<br>layers.17.self_attn.v_proj.weight,<br>layers.18.input_layernorm.weight,<br>layers.18.mlp.down_proj.biases,<br>layers.18.mlp.down_proj.scales,<br>layers.18.mlp.down_proj.weight,<br>layers.18.mlp.gate_proj.biases,<br>layers.18.mlp.gate_proj.scales,<br>layers.18.mlp.gate_proj.weight,<br>layers.18.mlp.up_proj.biases,<br>layers.18.mlp.up_proj.scales,<br>layers.18.mlp.up_proj.weight,<br>layers.18.post_attention_layernorm.weight,<br>layers.18.post_feedforward_layernorm.weight,<br>layers.18.pre_feedforward_layernorm.weight,<br>layers.18.self_attn.gate_proj.biases,<br>layers.18.self_attn.gate_proj.scales,<br>layers.18.self_attn.gate_proj.weight,<br>layers.18.self_attn.k_proj.biases,<br>layers.18.self_attn.k_proj.scales,<br>layers.18.self_attn.k_proj.weight,<br>layers.18.self_attn.o_proj.biases,<br>layers.18.self_attn.o_proj.scales,<br>layers.18.self_attn.o_proj.weight,<br>layers.18.self_attn.q_proj.biases,<br>layers.18.self_attn.q_proj.scales,<br>layers.18.self_attn.q_proj.weight,<br>layers.18.self_attn.v_proj.biases,<br>layers.18.self_attn.v_proj.scales,<br>layers.18.self_attn.v_proj.weight,<br>layers.19.input_layernorm.weight,<br>layers.19.mlp.down_proj.biases,<br>layers.19.mlp.down_proj.scales,<br>layers.19.mlp.down_proj.weight,<br>layers.19.mlp.gate_proj.biases,<br>layers.19.mlp.gate_proj.scales,<br>layers.19.mlp.gate_proj.weight,<br>layers.19.mlp.up_proj.biases,<br>layers.19.mlp.up_proj.scales,<br>layers.19.mlp.up_proj.weight,<br>layers.19.post_attention_layernorm.weight,<br>layers.19.post_feedforward_layernorm.weight,<br>layers.19.pre_feedforward_layernorm.weight,<br>layers.19.self_attn.gate_proj.biases,<br>layers.19.self_attn.gate_proj.scales,<br>layers.19.self_attn.gate_proj.weight,<br>layers.19.self_attn.k_proj.biases,<br>layers.19.self_attn.k_proj.scales,<br>layers.19.self_attn.k_proj.weight,<br>layers.19.self_attn.o_proj.biases,<br>layers.19.self_attn.o_proj.scales,<br>layers.19.self_attn.o_proj.weight,<br>layers.19.self_attn.q_proj.biases,<br>layers.19.self_attn.q_proj.scales,<br>layers.19.self_attn.q_proj.weight,<br>layers.19.self_attn.v_proj.biases,<br>layers.19.self_attn.v_proj.scales,<br>layers.19.self_attn.v_proj.weight,<br>layers.2.input_layernorm.weight,<br>layers.2.mlp.down_proj.biases,<br>layers.2.mlp.down_proj.scales,<br>layers.2.mlp.down_proj.weight,<br>layers.2.mlp.gate_proj.biases,<br>layers.2.mlp.gate_proj.scales,<br>layers.2.mlp.gate_proj.weight,<br>layers.2.mlp.up_proj.biases,<br>layers.2.mlp.up_proj.scales,<br>layers.2.mlp.up_proj.weight,<br>layers.2.post_attention_layernorm.weight,<br>layers.2.post_feedforward_layernorm.weight,<br>layers.2.pre_feedforward_layernorm.weight,<br>layers.2.self_attn.gate_proj.biases,<br>layers.2.self_attn.gate_proj.scales,<br>layers.2.self_attn.gate_proj.weight,<br>layers.2.self_attn.k_proj.biases,<br>layers.2.self_attn.k_proj.scales,<br>layers.2.self_attn.k_proj.weight,<br>layers.2.self_attn.o_proj.biases,<br>layers.2.self_attn.o_proj.scales,<br>layers.2.self_attn.o_proj.weight,<br>layers.2.self_attn.q_proj.biases,<br>layers.2.self_attn.q_proj.scales,<br>layers.2.self_attn.q_proj.weight,<br>layers.2.self_attn.v_proj.biases,<br>layers.2.self_attn.v_proj.scales,<br>layers.2.self_attn.v_proj.weight,<br>layers.20.input_layernorm.weight,<br>layers.20.mlp.down_proj.biases,<br>layers.20.mlp.down_proj.scales,<br>layers.20.mlp.down_proj.weight,<br>layers.20.mlp.gate_proj.biases,<br>layers.20.mlp.gate_proj.scales,<br>layers.20.mlp.gate_proj.weight,<br>layers.20.mlp.up_proj.biases,<br>layers.20.mlp.up_proj.scales,<br>layers.20.mlp.up_proj.weight,<br>layers.20.post_attention_layernorm.weight,<br>layers.20.post_feedforward_layernorm.weight,<br>layers.20.pre_feedforward_layernorm.weight,<br>layers.20.self_attn.gate_proj.biases,<br>layers.20.self_attn.gate_proj.scales,<br>layers.20.self_attn.gate_proj.weight,<br>layers.20.self_attn.k_proj.biases,<br>layers.20.self_attn.k_proj.scales,<br>layers.20.self_attn.k_proj.weight,<br>layers.20.self_attn.o_proj.biases,<br>layers.20.self_attn.o_proj.scales,<br>layers.20.self_attn.o_proj.weight,<br>layers.20.self_attn.q_proj.biases,<br>layers.20.self_attn.q_proj.scales,<br>layers.20.self_attn.q_proj.weight,<br>layers.20.self_attn.v_proj.biases,<br>layers.20.self_attn.v_proj.scales,<br>layers.20.self_attn.v_proj.weight,<br>layers.21.input_layernorm.weight,<br>layers.21.mlp.down_proj.biases,<br>layers.21.mlp.down_proj.scales,<br>layers.21.mlp.down_proj.weight,<br>layers.21.mlp.gate_proj.biases,<br>layers.21.mlp.gate_proj.scales,<br>layers.21.mlp.gate_proj.weight,<br>layers.21.mlp.up_proj.biases,<br>layers.21.mlp.up_proj.scales,<br>layers.21.mlp.up_proj.weight,<br>layers.21.post_attention_layernorm.weight,<br>layers.21.post_feedforward_layernorm.weight,<br>layers.21.pre_feedforward_layernorm.weight,<br>layers.21.self_attn.gate_proj.biases,<br>layers.21.self_attn.gate_proj.scales,<br>layers.21.self_attn.gate_proj.weight,<br>layers.21.self_attn.k_proj.biases,<br>layers.21.self_attn.k_proj.scales,<br>layers.21.self_attn.k_proj.weight,<br>layers.21.self_attn.o_proj.biases,<br>layers.21.self_attn.o_proj.scales,<br>layers.21.self_attn.o_proj.weight,<br>layers.21.self_attn.q_proj.biases,<br>layers.21.self_attn.q_proj.scales,<br>layers.21.self_attn.q_proj.weight,<br>layers.21.self_attn.v_proj.biases,<br>layers.21.self_attn.v_proj.scales,<br>layers.21.self_attn.v_proj.weight,<br>layers.22.input_layernorm.weight,<br>layers.22.mlp.down_proj.biases,<br>layers.22.mlp.down_proj.scales,<br>layers.22.mlp.down_proj.weight,<br>layers.22.mlp.gate_proj.biases,<br>layers.22.mlp.gate_proj.scales,<br>layers.22.mlp.gate_proj.weight,<br>layers.22.mlp.up_proj.biases,<br>layers.22.mlp.up_proj.scales,<br>layers.22.mlp.up_proj.weight,<br>layers.22.post_attention_layernorm.weight,<br>layers.22.post_feedforward_layernorm.weight,<br>layers.22.pre_feedforward_layernorm.weight,<br>layers.22.self_attn.gate_proj.biases,<br>layers.22.self_attn.gate_proj.scales,<br>layers.22.self_attn.gate_proj.weight,<br>layers.22.self_attn.k_proj.biases,<br>layers.22.self_attn.k_proj.scales,<br>layers.22.self_attn.k_proj.weight,<br>layers.22.self_attn.o_proj.biases,<br>layers.22.self_attn.o_proj.scales,<br>layers.22.self_attn.o_proj.weight,<br>layers.22.self_attn.q_proj.biases,<br>layers.22.self_attn.q_proj.scales,<br>layers.22.self_attn.q_proj.weight,<br>layers.22.self_attn.v_proj.biases,<br>layers.22.self_attn.v_proj.scales,<br>layers.22.self_attn.v_proj.weight,<br>layers.23.input_layernorm.weight,<br>layers.23.mlp.down_proj.biases,<br>layers.23.mlp.down_proj.scales,<br>layers.23.mlp.down_proj.weight,<br>layers.23.mlp.gate_proj.biases,<br>layers.23.mlp.gate_proj.scales,<br>layers.23.mlp.gate_proj.weight,<br>layers.23.mlp.up_proj.biases,<br>layers.23.mlp.up_proj.scales,<br>layers.23.mlp.up_proj.weight,<br>layers.23.post_attention_layernorm.weight,<br>layers.23.post_feedforward_layernorm.weight,<br>layers.23.pre_feedforward_layernorm.weight,<br>layers.23.self_attn.gate_proj.biases,<br>layers.23.self_attn.gate_proj.scales,<br>layers.23.self_attn.gate_proj.weight,<br>layers.23.self_attn.k_proj.biases,<br>layers.23.self_attn.k_proj.scales,<br>layers.23.self_attn.k_proj.weight,<br>layers.23.self_attn.o_proj.biases,<br>layers.23.self_attn.o_proj.scales,<br>layers.23.self_attn.o_proj.weight,<br>layers.23.self_attn.q_proj.biases,<br>layers.23.self_attn.q_proj.scales,<br>layers.23.self_attn.q_proj.weight,<br>layers.23.self_attn.v_proj.biases,<br>layers.23.self_attn.v_proj.scales,<br>layers.23.self_attn.v_proj.weight,<br>layers.24.input_layernorm.weight,<br>layers.24.mlp.down_proj.biases,<br>layers.24.mlp.down_proj.scales,<br>layers.24.mlp.down_proj.weight,<br>layers.24.mlp.gate_proj.biases,<br>layers.24.mlp.gate_proj.scales,<br>layers.24.mlp.gate_proj.weight,<br>layers.24.mlp.up_proj.biases,<br>layers.24.mlp.up_proj.scales,<br>layers.24.mlp.up_proj.weight,<br>layers.24.post_attention_layernorm.weight,<br>layers.24.post_feedforward_layernorm.weight,<br>layers.24.pre_feedforward_layernorm.weight,<br>layers.24.self_attn.gate_proj.biases,<br>layers.24.self_attn.gate_proj.scales,<br>layers.24.self_attn.gate_proj.weight,<br>layers.24.self_attn.k_proj.biases,<br>layers.24.self_attn.k_proj.scales,<br>layers.24.self_attn.k_proj.weight,<br>layers.24.self_attn.o_proj.biases,<br>layers.24.self_attn.o_proj.scales,<br>layers.24.self_attn.o_proj.weight,<br>layers.24.self_attn.q_proj.biases,<br>layers.24.self_attn.q_proj.scales,<br>layers.24.self_attn.q_proj.weight,<br>layers.24.self_attn.v_proj.biases,<br>layers.24.self_attn.v_proj.scales,<br>layers.24.self_attn.v_proj.weight,<br>layers.25.input_layernorm.weight,<br>layers.25.mlp.down_proj.biases,<br>layers.25.mlp.down_proj.scales,<br>layers.25.mlp.down_proj.weight,<br>layers.25.mlp.gate_proj.biases,<br>layers.25.mlp.gate_proj.scales,<br>layers.25.mlp.gate_proj.weight,<br>layers.25.mlp.up_proj.biases,<br>layers.25.mlp.up_proj.scales,<br>layers.25.mlp.up_proj.weight,<br>layers.25.post_attention_layernorm.weight,<br>layers.25.post_feedforward_layernorm.weight,<br>layers.25.pre_feedforward_layernorm.weight,<br>layers.25.self_attn.gate_proj.biases,<br>layers.25.self_attn.gate_proj.scales,<br>layers.25.self_attn.gate_proj.weight,<br>layers.25.self_attn.k_proj.biases,<br>layers.25.self_attn.k_proj.scales,<br>layers.25.self_attn.k_proj.weight,<br>layers.25.self_attn.o_proj.biases,<br>layers.25.self_attn.o_proj.scales,<br>layers.25.self_attn.o_proj.weight,<br>layers.25.self_attn.q_proj.biases,<br>layers.25.self_attn.q_proj.scales,<br>layers.25.self_attn.q_proj.weight,<br>layers.25.self_attn.v_proj.biases,<br>layers.25.self_attn.v_proj.scales,<br>layers.25.self_attn.v_proj.weight,<br>layers.26.input_layernorm.weight,<br>layers.26.mlp.down_proj.biases,<br>layers.26.mlp.down_proj.scales,<br>layers.26.mlp.down_proj.weight,<br>layers.26.mlp.gate_proj.biases,<br>layers.26.mlp.gate_proj.scales,<br>layers.26.mlp.gate_proj.weight,<br>layers.26.mlp.up_proj.biases,<br>layers.26.mlp.up_proj.scales,<br>layers.26.mlp.up_proj.weight,<br>layers.26.post_attention_layernorm.weight,<br>layers.26.post_feedforward_layernorm.weight,<br>layers.26.pre_feedforward_layernorm.weight,<br>layers.26.self_attn.gate_proj.biases,<br>layers.26.self_attn.gate_proj.scales,<br>layers.26.self_attn.gate_proj.weight,<br>layers.26.self_attn.k_proj.biases,<br>layers.26.self_attn.k_proj.scales,<br>layers.26.self_attn.k_proj.weight,<br>layers.26.self_attn.o_proj.biases,<br>layers.26.self_attn.o_proj.scales,<br>layers.26.self_attn.o_proj.weight,<br>layers.26.self_attn.q_proj.biases,<br>layers.26.self_attn.q_proj.scales,<br>layers.26.self_attn.q_proj.weight,<br>layers.26.self_attn.v_proj.biases,<br>layers.26.self_attn.v_proj.scales,<br>layers.26.self_attn.v_proj.weight,<br>layers.27.input_layernorm.weight,<br>layers.27.mlp.down_proj.biases,<br>layers.27.mlp.down_proj.scales,<br>layers.27.mlp.down_proj.weight,<br>layers.27.mlp.gate_proj.biases,<br>layers.27.mlp.gate_proj.scales,<br>layers.27.mlp.gate_proj.weight,<br>layers.27.mlp.up_proj.biases,<br>layers.27.mlp.up_proj.scales,<br>layers.27.mlp.up_proj.weight,<br>layers.27.post_attention_layernorm.weight,<br>layers.27.post_feedforward_layernorm.weight,<br>layers.27.pre_feedforward_layernorm.weight,<br>layers.27.self_attn.gate_proj.biases,<br>layers.27.self_attn.gate_proj.scales,<br>layers.27.self_attn.gate_proj.weight,<br>layers.27.self_attn.k_proj.biases,<br>layers.27.self_attn.k_proj.scales,<br>layers.27.self_attn.k_proj.weight,<br>layers.27.self_attn.o_proj.biases,<br>layers.27.self_attn.o_proj.scales,<br>layers.27.self_attn.o_proj.weight,<br>layers.27.self_attn.q_proj.biases,<br>layers.27.self_attn.q_proj.scales,<br>layers.27.self_attn.q_proj.weight,<br>layers.27.self_attn.v_proj.biases,<br>layers.27.self_attn.v_proj.scales,<br>layers.27.self_attn.v_proj.weight,<br>layers.28.input_layernorm.weight,<br>layers.28.mlp.down_proj.biases,<br>layers.28.mlp.down_proj.scales,<br>layers.28.mlp.down_proj.weight,<br>layers.28.mlp.gate_proj.biases,<br>layers.28.mlp.gate_proj.scales,<br>layers.28.mlp.gate_proj.weight,<br>layers.28.mlp.up_proj.biases,<br>layers.28.mlp.up_proj.scales,<br>layers.28.mlp.up_proj.weight,<br>layers.28.post_attention_layernorm.weight,<br>layers.28.post_feedforward_layernorm.weight,<br>layers.28.pre_feedforward_layernorm.weight,<br>layers.28.self_attn.gate_proj.biases,<br>layers.28.self_attn.gate_proj.scales,<br>layers.28.self_attn.gate_proj.weight,<br>layers.28.self_attn.k_proj.biases,<br>layers.28.self_attn.k_proj.scales,<br>layers.28.self_attn.k_proj.weight,<br>layers.28.self_attn.o_proj.biases,<br>layers.28.self_attn.o_proj.scales,<br>layers.28.self_attn.o_proj.weight,<br>layers.28.self_attn.q_proj.biases,<br>layers.28.self_attn.q_proj.scales,<br>layers.28.self_attn.q_proj.weight,<br>layers.28.self_attn.v_proj.biases,<br>layers.28.self_attn.v_proj.scales,<br>layers.28.self_attn.v_proj.weight,<br>layers.29.input_layernorm.weight,<br>layers.29.mlp.down_proj.biases,<br>layers.29.mlp.down_proj.scales,<br>layers.29.mlp.down_proj.weight,<br>layers.29.mlp.gate_proj.biases,<br>layers.29.mlp.gate_proj.scales,<br>layers.29.mlp.gate_proj.weight,<br>layers.29.mlp.up_proj.biases,<br>layers.29.mlp.up_proj.scales,<br>layers.29.mlp.up_proj.weight,<br>layers.29.post_attention_layernorm.weight,<br>layers.29.post_feedforward_layernorm.weight,<br>layers.29.pre_feedforward_layernorm.weight,<br>layers.29.self_attn.gate_proj.biases,<br>layers.29.self_attn.gate_proj.scales,<br>layers.29.self_attn.gate_proj.weight,<br>layers.29.self_attn.k_proj.biases,<br>layers.29.self_attn.k_proj.scales,<br>layers.29.self_attn.k_proj.weight,<br>layers.29.self_attn.o_proj.biases,<br>layers.29.self_attn.o_proj.scales,<br>layers.29.self_attn.o_proj.weight,<br>layers.29.self_attn.q_proj.biases,<br>layers.29.self_attn.q_proj.scales,<br>layers.29.self_attn.q_proj.weight,<br>layers.29.self_attn.v_proj.biases,<br>layers.29.self_attn.v_proj.scales,<br>layers.29.self_attn.v_proj.weight,<br>layers.3.input_layernorm.weight,<br>layers.3.mlp.down_proj.biases,<br>layers.3.mlp.down_proj.scales,<br>layers.3.mlp.down_proj.weight,<br>layers.3.mlp.gate_proj.biases,<br>layers.3.mlp.gate_proj.scales,<br>layers.3.mlp.gate_proj.weight,<br>layers.3.mlp.up_proj.biases,<br>layers.3.mlp.up_proj.scales,<br>layers.3.mlp.up_proj.weight,<br>layers.3.post_attention_layernorm.weight,<br>layers.3.post_feedforward_layernorm.weight,<br>layers.3.pre_feedforward_layernorm.weight,<br>layers.3.self_attn.gate_proj.biases,<br>layers.3.self_attn.gate_proj.scales,<br>layers.3.self_attn.gate_proj.weight,<br>layers.3.self_attn.k_proj.biases,<br>layers.3.self_attn.k_proj.scales,<br>layers.3.self_attn.k_proj.weight,<br>layers.3.self_attn.o_proj.biases,<br>layers.3.self_attn.o_proj.scales,<br>layers.3.self_attn.o_proj.weight,<br>layers.3.self_attn.q_proj.biases,<br>layers.3.self_attn.q_proj.scales,<br>layers.3.self_attn.q_proj.weight,<br>layers.3.self_attn.v_proj.biases,<br>layers.3.self_attn.v_proj.scales,<br>layers.3.self_attn.v_proj.weight,<br>layers.30.input_layernorm.weight,<br>layers.30.mlp.down_proj.biases,<br>layers.30.mlp.down_proj.scales,<br>layers.30.mlp.down_proj.weight,<br>layers.30.mlp.gate_proj.biases,<br>layers.30.mlp.gate_proj.scales,<br>layers.30.mlp.gate_proj.weight,<br>layers.30.mlp.up_proj.biases,<br>layers.30.mlp.up_proj.scales,<br>layers.30.mlp.up_proj.weight,<br>layers.30.post_attention_layernorm.weight,<br>layers.30.post_feedforward_layernorm.weight,<br>layers.30.pre_feedforward_layernorm.weight,<br>layers.30.self_attn.gate_proj.biases,<br>layers.30.self_attn.gate_proj.scales,<br>layers.30.self_attn.gate_proj.weight,<br>layers.30.self_attn.k_proj.biases,<br>layers.30.self_attn.k_proj.scales,<br>layers.30.self_attn.k_proj.weight,<br>layers.30.self_attn.o_proj.biases,<br>layers.30.self_attn.o_proj.scales,<br>layers.30.self_attn.o_proj.weight,<br>layers.30.self_attn.q_proj.biases,<br>layers.30.self_attn.q_proj.scales,<br>layers.30.self_attn.q_proj.weight,<br>layers.30.self_attn.v_proj.biases,<br>layers.30.self_attn.v_proj.scales,<br>layers.30.self_attn.v_proj.weight,<br>layers.31.input_layernorm.weight,<br>layers.31.mlp.down_proj.biases,<br>layers.31.mlp.down_proj.scales,<br>layers.31.mlp.down_proj.weight,<br>layers.31.mlp.gate_proj.biases,<br>layers.31.mlp.gate_proj.scales,<br>layers.31.mlp.gate_proj.weight,<br>layers.31.mlp.up_proj.biases,<br>layers.31.mlp.up_proj.scales,<br>layers.31.mlp.up_proj.weight,<br>layers.31.post_attention_layernorm.weight,<br>layers.31.post_feedforward_layernorm.weight,<br>layers.31.pre_feedforward_layernorm.weight,<br>layers.31.self_attn.gate_proj.biases,<br>layers.31.self_attn.gate_proj.scales,<br>layers.31.self_attn.gate_proj.weight,<br>layers.31.self_attn.k_proj.biases,<br>layers.31.self_attn.k_proj.scales,<br>layers.31.self_attn.k_proj.weight,<br>layers.31.self_attn.o_proj.biases,<br>layers.31.self_attn.o_proj.scales,<br>layers.31.self_attn.o_proj.weight,<br>layers.31.self_attn.q_proj.biases,<br>layers.31.self_attn.q_proj.scales,<br>layers.31.self_attn.q_proj.weight,<br>layers.31.self_attn.v_proj.biases,<br>layers.31.self_attn.v_proj.scales,<br>layers.31.self_attn.v_proj.weight,<br>layers.32.input_layernorm.weight,<br>layers.32.mlp.down_proj.biases,<br>layers.32.mlp.down_proj.scales,<br>layers.32.mlp.down_proj.weight,<br>layers.32.mlp.gate_proj.biases,<br>layers.32.mlp.gate_proj.scales,<br>layers.32.mlp.gate_proj.weight,<br>layers.32.mlp.up_proj.biases,<br>layers.32.mlp.up_proj.scales,<br>layers.32.mlp.up_proj.weight,<br>layers.32.post_attention_layernorm.weight,<br>layers.32.post_feedforward_layernorm.weight,<br>layers.32.pre_feedforward_layernorm.weight,<br>layers.32.self_attn.gate_proj.biases,<br>layers.32.self_attn.gate_proj.scales,<br>layers.32.self_attn.gate_proj.weight,<br>layers.32.self_attn.k_proj.biases,<br>layers.32.self_attn.k_proj.scales,<br>layers.32.self_attn.k_proj.weight,<br>layers.32.self_attn.o_proj.biases,<br>layers.32.self_attn.o_proj.scales,<br>layers.32.self_attn.o_proj.weight,<br>layers.32.self_attn.q_proj.biases,<br>layers.32.self_attn.q_proj.scales,<br>layers.32.self_attn.q_proj.weight,<br>layers.32.self_attn.v_proj.biases,<br>layers.32.self_attn.v_proj.scales,<br>layers.32.self_attn.v_proj.weight,<br>layers.33.input_layernorm.weight,<br>layers.33.mlp.down_proj.biases,<br>layers.33.mlp.down_proj.scales,<br>layers.33.mlp.down_proj.weight,<br>layers.33.mlp.gate_proj.biases,<br>layers.33.mlp.gate_proj.scales,<br>layers.33.mlp.gate_proj.weight,<br>layers.33.mlp.up_proj.biases,<br>layers.33.mlp.up_proj.scales,<br>layers.33.mlp.up_proj.weight,<br>layers.33.post_attention_layernorm.weight,<br>layers.33.post_feedforward_layernorm.weight,<br>layers.33.pre_feedforward_layernorm.weight,<br>layers.33.self_attn.gate_proj.biases,<br>layers.33.self_attn.gate_proj.scales,<br>layers.33.self_attn.gate_proj.weight,<br>layers.33.self_attn.k_proj.biases,<br>layers.33.self_attn.k_proj.scales,<br>layers.33.self_attn.k_proj.weight,<br>layers.33.self_attn.o_proj.biases,<br>layers.33.self_attn.o_proj.scales,<br>layers.33.self_attn.o_proj.weight,<br>layers.33.self_attn.q_proj.biases,<br>layers.33.self_attn.q_proj.scales,<br>layers.33.self_attn.q_proj.weight,<br>layers.33.self_attn.v_proj.biases,<br>layers.33.self_attn.v_proj.scales,<br>layers.33.self_attn.v_proj.weight,<br>layers.34.input_layernorm.weight,<br>layers.34.mlp.down_proj.biases,<br>layers.34.mlp.down_proj.scales,<br>layers.34.mlp.down_proj.weight,<br>layers.34.mlp.gate_proj.biases,<br>layers.34.mlp.gate_proj.scales,<br>layers.34.mlp.gate_proj.weight,<br>layers.34.mlp.up_proj.biases,<br>layers.34.mlp.up_proj.scales,<br>layers.34.mlp.up_proj.weight,<br>layers.34.post_attention_layernorm.weight,<br>layers.34.post_feedforward_layernorm.weight,<br>layers.34.pre_feedforward_layernorm.weight,<br>layers.34.self_attn.gate_proj.biases,<br>layers.34.self_attn.gate_proj.scales,<br>layers.34.self_attn.gate_proj.weight,<br>layers.34.self_attn.k_proj.biases,<br>layers.34.self_attn.k_proj.scales,<br>layers.34.self_attn.k_proj.weight,<br>layers.34.self_attn.o_proj.biases,<br>layers.34.self_attn.o_proj.scales,<br>layers.34.self_attn.o_proj.weight,<br>layers.34.self_attn.q_proj.biases,<br>layers.34.self_attn.q_proj.scales,<br>layers.34.self_attn.q_proj.weight,<br>layers.34.self_attn.v_proj.biases,<br>layers.34.self_attn.v_proj.scales,<br>layers.34.self_attn.v_proj.weight,<br>layers.35.input_layernorm.weight,<br>layers.35.mlp.down_proj.biases,<br>layers.35.mlp.down_proj.scales,<br>layers.35.mlp.down_proj.weight,<br>layers.35.mlp.gate_proj.biases,<br>layers.35.mlp.gate_proj.scales,<br>layers.35.mlp.gate_proj.weight,<br>layers.35.mlp.up_proj.biases,<br>layers.35.mlp.up_proj.scales,<br>layers.35.mlp.up_proj.weight,<br>layers.35.post_attention_layernorm.weight,<br>layers.35.post_feedforward_layernorm.weight,<br>layers.35.pre_feedforward_layernorm.weight,<br>layers.35.self_attn.gate_proj.biases,<br>layers.35.self_attn.gate_proj.scales,<br>layers.35.self_attn.gate_proj.weight,<br>layers.35.self_attn.k_proj.biases,<br>layers.35.self_attn.k_proj.scales,<br>layers.35.self_attn.k_proj.weight,<br>layers.35.self_attn.o_proj.biases,<br>layers.35.self_attn.o_proj.scales,<br>layers.35.self_attn.o_proj.weight,<br>layers.35.self_attn.q_proj.biases,<br>layers.35.self_attn.q_proj.scales,<br>layers.35.self_attn.q_proj.weight,<br>layers.35.self_attn.v_proj.biases,<br>layers.35.self_attn.v_proj.scales,<br>layers.35.self_attn.v_proj.weight,<br>layers.36.input_layernorm.weight,<br>layers.36.mlp.down_proj.biases,<br>layers.36.mlp.down_proj.scales,<br>layers.36.mlp.down_proj.weight,<br>layers.36.mlp.gate_proj.biases,<br>layers.36.mlp.gate_proj.scales,<br>layers.36.mlp.gate_proj.weight,<br>layers.36.mlp.up_proj.biases,<br>layers.36.mlp.up_proj.scales,<br>layers.36.mlp.up_proj.weight,<br>layers.36.post_attention_layernorm.weight,<br>layers.36.post_feedforward_layernorm.weight,<br>layers.36.pre_feedforward_layernorm.weight,<br>layers.36.self_attn.gate_proj.biases,<br>layers.36.self_attn.gate_proj.scales,<br>layers.36.self_attn.gate_proj.weight,<br>layers.36.self_attn.k_proj.biases,<br>layers.36.self_attn.k_proj.scales,<br>layers.36.self_attn.k_proj.weight,<br>layers.36.self_attn.o_proj.biases,<br>layers.36.self_attn.o_proj.scales,<br>layers.36.self_attn.o_proj.weight,<br>layers.36.self_attn.q_proj.biases,<br>layers.36.self_attn.q_proj.scales,<br>layers.36.self_attn.q_proj.weight,<br>layers.36.self_attn.v_proj.biases,<br>layers.36.self_attn.v_proj.scales,<br>layers.36.self_attn.v_proj.weight,<br>layers.37.input_layernorm.weight,<br>layers.37.mlp.down_proj.biases,<br>layers.37.mlp.down_proj.scales,<br>layers.37.mlp.down_proj.weight,<br>layers.37.mlp.gate_proj.biases,<br>layers.37.mlp.gate_proj.scales,<br>layers.37.mlp.gate_proj.weight,<br>layers.37.mlp.up_proj.biases,<br>layers.37.mlp.up_proj.scales,<br>layers.37.mlp.up_proj.weight,<br>layers.37.post_attention_layernorm.weight,<br>layers.37.post_feedforward_layernorm.weight,<br>layers.37.pre_feedforward_layernorm.weight,<br>layers.37.self_attn.gate_proj.biases,<br>layers.37.self_attn.gate_proj.scales,<br>layers.37.self_attn.gate_proj.weight,<br>layers.37.self_attn.k_proj.biases,<br>layers.37.self_attn.k_proj.scales,<br>layers.37.self_attn.k_proj.weight,<br>layers.37.self_attn.o_proj.biases,<br>layers.37.self_attn.o_proj.scales,<br>layers.37.self_attn.o_proj.weight,<br>layers.37.self_attn.q_proj.biases,<br>layers.37.self_attn.q_proj.scales,<br>layers.37.self_attn.q_proj.weight,<br>layers.37.self_attn.v_proj.biases,<br>layers.37.self_attn.v_proj.scales,<br>layers.37.self_attn.v_proj.weight,<br>layers.38.input_layernorm.weight,<br>layers.38.mlp.down_proj.biases,<br>layers.38.mlp.down_proj.scales,<br>layers.38.mlp.down_proj.weight,<br>layers.38.mlp.gate_proj.biases,<br>layers.38.mlp.gate_proj.scales,<br>layers.38.mlp.gate_proj.weight,<br>layers.38.mlp.up_proj.biases,<br>layers.38.mlp.up_proj.scales,<br>layers.38.mlp.up_proj.weight,<br>layers.38.post_attention_layernorm.weight,<br>layers.38.post_feedforward_layernorm.weight,<br>layers.38.pre_feedforward_layernorm.weight,<br>layers.38.self_attn.gate_proj.biases,<br>layers.38.self_attn.gate_proj.scales,<br>layers.38.self_attn.gate_proj.weight,<br>layers.38.self_attn.k_proj.biases,<br>layers.38.self_attn.k_proj.scales,<br>layers.38.self_attn.k_proj.weight,<br>layers.38.self_attn.o_proj.biases,<br>layers.38.self_attn.o_proj.scales,<br>layers.38.self_attn.o_proj.weight,<br>layers.38.self_attn.q_proj.biases,<br>layers.38.self_attn.q_proj.scales,<br>layers.38.self_attn.q_proj.weight,<br>layers.38.self_attn.v_proj.biases,<br>layers.38.self_attn.v_proj.scales,<br>layers.38.self_attn.v_proj.weight,<br>layers.39.input_layernorm.weight,<br>layers.39.mlp.down_proj.biases,<br>layers.39.mlp.down_proj.scales,<br>layers.39.mlp.down_proj.weight,<br>layers.39.mlp.gate_proj.biases,<br>layers.39.mlp.gate_proj.scales,<br>layers.39.mlp.gate_proj.weight,<br>layers.39.mlp.up_proj.biases,<br>layers.39.mlp.up_proj.scales,<br>layers.39.mlp.up_proj.weight,<br>layers.39.post_attention_layernorm.weight,<br>layers.39.post_feedforward_layernorm.weight,<br>layers.39.pre_feedforward_layernorm.weight,<br>layers.39.self_attn.gate_proj.biases,<br>layers.39.self_attn.gate_proj.scales,<br>layers.39.self_attn.gate_proj.weight,<br>layers.39.self_attn.k_proj.biases,<br>layers.39.self_attn.k_proj.scales,<br>layers.39.self_attn.k_proj.weight,<br>layers.39.self_attn.o_proj.biases,<br>layers.39.self_attn.o_proj.scales,<br>layers.39.self_attn.o_proj.weight,<br>layers.39.self_attn.q_proj.biases,<br>layers.39.self_attn.q_proj.scales,<br>layers.39.self_attn.q_proj.weight,<br>layers.39.self_attn.v_proj.biases,<br>layers.39.self_attn.v_proj.scales,<br>layers.39.self_attn.v_proj.weight,<br>layers.4.input_layernorm.weight,<br>layers.4.mlp.down_proj.biases,<br>layers.4.mlp.down_proj.scales,<br>layers.4.mlp.down_proj.weight,<br>layers.4.mlp.gate_proj.biases,<br>layers.4.mlp.gate_proj.scales,<br>layers.4.mlp.gate_proj.weight,<br>layers.4.mlp.up_proj.biases,<br>layers.4.mlp.up_proj.scales,<br>layers.4.mlp.up_proj.weight,<br>layers.4.post_attention_layernorm.weight,<br>layers.4.post_feedforward_layernorm.weight,<br>layers.4.pre_feedforward_layernorm.weight,<br>layers.4.self_attn.gate_proj.biases,<br>layers.4.self_attn.gate_proj.scales,<br>layers.4.self_attn.gate_proj.weight,<br>layers.4.self_attn.k_proj.biases,<br>layers.4.self_attn.k_proj.scales,<br>layers.4.self_attn.k_proj.weight,<br>layers.4.self_attn.o_proj.biases,<br>layers.4.self_attn.o_proj.scales,<br>layers.4.self_attn.o_proj.weight,<br>layers.4.self_attn.q_proj.biases,<br>layers.4.self_attn.q_proj.scales,<br>layers.4.self_attn.q_proj.weight,<br>layers.4.self_attn.v_proj.biases,<br>layers.4.self_attn.v_proj.scales,<br>layers.4.self_attn.v_proj.weight,<br>layers.40.input_layernorm.weight,<br>layers.40.mlp.down_proj.biases,<br>layers.40.mlp.down_proj.scales,<br>layers.40.mlp.down_proj.weight,<br>layers.40.mlp.gate_proj.biases,<br>layers.40.mlp.gate_proj.scales,<br>layers.40.mlp.gate_proj.weight,<br>layers.40.mlp.up_proj.biases,<br>layers.40.mlp.up_proj.scales,<br>layers.40.mlp.up_proj.weight,<br>layers.40.post_attention_layernorm.weight,<br>layers.40.post_feedforward_layernorm.weight,<br>layers.40.pre_feedforward_layernorm.weight,<br>layers.40.self_attn.gate_proj.biases,<br>layers.40.self_attn.gate_proj.scales,<br>layers.40.self_attn.gate_proj.weight,<br>layers.40.self_attn.k_proj.biases,<br>layers.40.self_attn.k_proj.scales,<br>layers.40.self_attn.k_proj.weight,<br>layers.40.self_attn.o_proj.biases,<br>layers.40.self_attn.o_proj.scales,<br>layers.40.self_attn.o_proj.weight,<br>layers.40.self_attn.q_proj.biases,<br>layers.40.self_attn.q_proj.scales,<br>layers.40.self_attn.q_proj.weight,<br>layers.40.self_attn.v_proj.biases,<br>layers.40.self_attn.v_proj.scales,<br>layers.40.self_attn.v_proj.weight,<br>layers.41.input_layernorm.weight,<br>layers.41.mlp.down_proj.biases,<br>layers.41.mlp.down_proj.scales,<br>layers.41.mlp.down_proj.weight,<br>layers.41.mlp.gate_proj.biases,<br>layers.41.mlp.gate_proj.scales,<br>layers.41.mlp.gate_proj.weight,<br>layers.41.mlp.up_proj.biases,<br>layers.41.mlp.up_proj.scales,<br>layers.41.mlp.up_proj.weight,<br>layers.41.post_attention_layernorm.weight,<br>layers.41.post_feedforward_layernorm.weight,<br>layers.41.pre_feedforward_layernorm.weight,<br>layers.41.self_attn.gate_proj.biases,<br>layers.41.self_attn.gate_proj.scales,<br>layers.41.self_attn.gate_proj.weight,<br>layers.41.self_attn.k_proj.biases,<br>layers.41.self_attn.k_proj.scales,<br>layers.41.self_attn.k_proj.weight,<br>layers.41.self_attn.o_proj.biases,<br>layers.41.self_attn.o_proj.scales,<br>layers.41.self_attn.o_proj.weight,<br>layers.41.self_attn.q_proj.biases,<br>layers.41.self_attn.q_proj.scales,<br>layers.41.self_attn.q_proj.weight,<br>layers.41.self_attn.v_proj.biases,<br>layers.41.self_attn.v_proj.scales,<br>layers.41.self_attn.v_proj.weight,<br>layers.42.input_layernorm.weight,<br>layers.42.mlp.down_proj.biases,<br>layers.42.mlp.down_proj.scales,<br>layers.42.mlp.down_proj.weight,<br>layers.42.mlp.gate_proj.biases,<br>layers.42.mlp.gate_proj.scales,<br>layers.42.mlp.gate_proj.weight,<br>layers.42.mlp.up_proj.biases,<br>layers.42.mlp.up_proj.scales,<br>layers.42.mlp.up_proj.weight,<br>layers.42.post_attention_layernorm.weight,<br>layers.42.post_feedforward_layernorm.weight,<br>layers.42.pre_feedforward_layernorm.weight,<br>layers.42.self_attn.gate_proj.biases,<br>layers.42.self_attn.gate_proj.scales,<br>layers.42.self_attn.gate_proj.weight,<br>layers.42.self_attn.k_proj.biases,<br>layers.42.self_attn.k_proj.scales,<br>layers.42.self_attn.k_proj.weight,<br>layers.42.self_attn.o_proj.biases,<br>layers.42.self_attn.o_proj.scales,<br>layers.42.self_attn.o_proj.weight,<br>layers.42.self_attn.q_proj.biases,<br>layers.42.self_attn.q_proj.scales,<br>layers.42.self_attn.q_proj.weight,<br>layers.42.self_attn.v_proj.biases,<br>layers.42.self_attn.v_proj.scales,<br>layers.42.self_attn.v_proj.weight,<br>layers.43.input_layernorm.weight,<br>layers.43.mlp.down_proj.biases,<br>layers.43.mlp.down_proj.scales,<br>layers.43.mlp.down_proj.weight,<br>layers.43.mlp.gate_proj.biases,<br>layers.43.mlp.gate_proj.scales,<br>layers.43.mlp.gate_proj.weight,<br>layers.43.mlp.up_proj.biases,<br>layers.43.mlp.up_proj.scales,<br>layers.43.mlp.up_proj.weight,<br>layers.43.post_attention_layernorm.weight,<br>layers.43.post_feedforward_layernorm.weight,<br>layers.43.pre_feedforward_layernorm.weight,<br>layers.43.self_attn.gate_proj.biases,<br>layers.43.self_attn.gate_proj.scales,<br>layers.43.self_attn.gate_proj.weight,<br>layers.43.self_attn.k_proj.biases,<br>layers.43.self_attn.k_proj.scales,<br>layers.43.self_attn.k_proj.weight,<br>layers.43.self_attn.o_proj.biases,<br>layers.43.self_attn.o_proj.scales,<br>layers.43.self_attn.o_proj.weight,<br>layers.43.self_attn.q_proj.biases,<br>layers.43.self_attn.q_proj.scales,<br>layers.43.self_attn.q_proj.weight,<br>layers.43.self_attn.v_proj.biases,<br>layers.43.self_attn.v_proj.scales,<br>layers.43.self_attn.v_proj.weight,<br>layers.44.input_layernorm.weight,<br>layers.44.mlp.down_proj.biases,<br>layers.44.mlp.down_proj.scales,<br>layers.44.mlp.down_proj.weight,<br>layers.44.mlp.gate_proj.biases,<br>layers.44.mlp.gate_proj.scales,<br>layers.44.mlp.gate_proj.weight,<br>layers.44.mlp.up_proj.biases,<br>layers.44.mlp.up_proj.scales,<br>layers.44.mlp.up_proj.weight,<br>layers.44.post_attention_layernorm.weight,<br>layers.44.post_feedforward_layernorm.weight,<br>layers.44.pre_feedforward_layernorm.weight,<br>layers.44.self_attn.gate_proj.biases,<br>layers.44.self_attn.gate_proj.scales,<br>layers.44.self_attn.gate_proj.weight,<br>layers.44.self_attn.k_proj.biases,<br>layers.44.self_attn.k_proj.scales,<br>layers.44.self_attn.k_proj.weight,<br>layers.44.self_attn.o_proj.biases,<br>layers.44.self_attn.o_proj.scales,<br>layers.44.self_attn.o_proj.weight,<br>layers.44.self_attn.q_proj.biases,<br>layers.44.self_attn.q_proj.scales,<br>layers.44.self_attn.q_proj.weight,<br>layers.44.self_attn.v_proj.biases,<br>layers.44.self_attn.v_proj.scales,<br>layers.44.self_attn.v_proj.weight,<br>layers.45.input_layernorm.weight,<br>layers.45.mlp.down_proj.biases,<br>layers.45.mlp.down_proj.scales,<br>layers.45.mlp.down_proj.weight,<br>layers.45.mlp.gate_proj.biases,<br>layers.45.mlp.gate_proj.scales,<br>layers.45.mlp.gate_proj.weight,<br>layers.45.mlp.up_proj.biases,<br>layers.45.mlp.up_proj.scales,<br>layers.45.mlp.up_proj.weight,<br>layers.45.post_attention_layernorm.weight,<br>layers.45.post_feedforward_layernorm.weight,<br>layers.45.pre_feedforward_layernorm.weight,<br>layers.45.self_attn.gate_proj.biases,<br>layers.45.self_attn.gate_proj.scales,<br>layers.45.self_attn.gate_proj.weight,<br>layers.45.self_attn.k_proj.biases,<br>layers.45.self_attn.k_proj.scales,<br>layers.45.self_attn.k_proj.weight,<br>layers.45.self_attn.o_proj.biases,<br>layers.45.self_attn.o_proj.scales,<br>layers.45.self_attn.o_proj.weight,<br>layers.45.self_attn.q_proj.biases,<br>layers.45.self_attn.q_proj.scales,<br>layers.45.self_attn.q_proj.weight,<br>layers.45.self_attn.v_proj.biases,<br>layers.45.self_attn.v_proj.scales,<br>layers.45.self_attn.v_proj.weight,<br>layers.46.input_layernorm.weight,<br>layers.46.mlp.down_proj.biases,<br>layers.46.mlp.down_proj.scales,<br>layers.46.mlp.down_proj.weight,<br>layers.46.mlp.gate_proj.biases,<br>layers.46.mlp.gate_proj.scales,<br>layers.46.mlp.gate_proj.weight,<br>layers.46.mlp.up_proj.biases,<br>layers.46.mlp.up_proj.scales,<br>layers.46.mlp.up_proj.weight,<br>layers.46.post_attention_layernorm.weight,<br>layers.46.post_feedforward_layernorm.weight,<br>layers.46.pre_feedforward_layernorm.weight,<br>layers.46.self_attn.gate_proj.biases,<br>layers.46.self_attn.gate_proj.scales,<br>layers.46.self_attn.gate_proj.weight,<br>layers.46.self_attn.k_proj.biases,<br>layers.46.self_attn.k_proj.scales,<br>layers.46.self_attn.k_proj.weight,<br>layers.46.self_attn.o_proj.biases,<br>layers.46.self_attn.o_proj.scales,<br>layers.46.self_attn.o_proj.weight,<br>layers.46.self_attn.q_proj.biases,<br>layers.46.self_attn.q_proj.scales,<br>layers.46.self_attn.q_proj.weight,<br>layers.46.self_attn.v_proj.biases,<br>layers.46.self_attn.v_proj.scales,<br>layers.46.self_attn.v_proj.weight,<br>layers.47.input_layernorm.weight,<br>layers.47.mlp.down_proj.biases,<br>layers.47.mlp.down_proj.scales,<br>layers.47.mlp.down_proj.weight,<br>layers.47.mlp.gate_proj.biases,<br>layers.47.mlp.gate_proj.scales,<br>layers.47.mlp.gate_proj.weight,<br>layers.47.mlp.up_proj.biases,<br>layers.47.mlp.up_proj.scales,<br>layers.47.mlp.up_proj.weight,<br>layers.47.post_attention_layernorm.weight,<br>layers.47.post_feedforward_layernorm.weight,<br>layers.47.pre_feedforward_layernorm.weight,<br>layers.47.self_attn.gate_proj.biases,<br>layers.47.self_attn.gate_proj.scales,<br>layers.47.self_attn.gate_proj.weight,<br>layers.47.self_attn.k_proj.biases,<br>layers.47.self_attn.k_proj.scales,<br>layers.47.self_attn.k_proj.weight,<br>layers.47.self_attn.o_proj.biases,<br>layers.47.self_attn.o_proj.scales,<br>layers.47.self_attn.o_proj.weight,<br>layers.47.self_attn.q_proj.biases,<br>layers.47.self_attn.q_proj.scales,<br>layers.47.self_attn.q_proj.weight,<br>layers.47.self_attn.v_proj.biases,<br>layers.47.self_attn.v_proj.scales,<br>layers.47.self_attn.v_proj.weight,<br>layers.48.input_layernorm.weight,<br>layers.48.mlp.down_proj.biases,<br>layers.48.mlp.down_proj.scales,<br>layers.48.mlp.down_proj.weight,<br>layers.48.mlp.gate_proj.biases,<br>layers.48.mlp.gate_proj.scales,<br>layers.48.mlp.gate_proj.weight,<br>layers.48.mlp.up_proj.biases,<br>layers.48.mlp.up_proj.scales,<br>layers.48.mlp.up_proj.weight,<br>layers.48.post_attention_layernorm.weight,<br>layers.48.post_feedforward_layernorm.weight,<br>layers.48.pre_feedforward_layernorm.weight,<br>layers.48.self_attn.gate_proj.biases,<br>layers.48.self_attn.gate_proj.scales,<br>layers.48.self_attn.gate_proj.weight,<br>layers.48.self_attn.k_proj.biases,<br>layers.48.self_attn.k_proj.scales,<br>layers.48.self_attn.k_proj.weight,<br>layers.48.self_attn.o_proj.biases,<br>layers.48.self_attn.o_proj.scales,<br>layers.48.self_attn.o_proj.weight,<br>layers.48.self_attn.q_proj.biases,<br>layers.48.self_attn.q_proj.scales,<br>layers.48.self_attn.q_proj.weight,<br>layers.48.self_attn.v_proj.biases,<br>layers.48.self_attn.v_proj.scales,<br>layers.48.self_attn.v_proj.weight,<br>layers.49.input_layernorm.weight,<br>layers.49.mlp.down_proj.biases,<br>layers.49.mlp.down_proj.scales,<br>layers.49.mlp.down_proj.weight,<br>layers.49.mlp.gate_proj.biases,<br>layers.49.mlp.gate_proj.scales,<br>layers.49.mlp.gate_proj.weight,<br>layers.49.mlp.up_proj.biases,<br>layers.49.mlp.up_proj.scales,<br>layers.49.mlp.up_proj.weight,<br>layers.49.post_attention_layernorm.weight,<br>layers.49.post_feedforward_layernorm.weight,<br>layers.49.pre_feedforward_layernorm.weight,<br>layers.49.self_attn.gate_proj.biases,<br>layers.49.self_attn.gate_proj.scales,<br>layers.49.self_attn.gate_proj.weight,<br>layers.49.self_attn.k_proj.biases,<br>layers.49.self_attn.k_proj.scales,<br>layers.49.self_attn.k_proj.weight,<br>layers.49.self_attn.o_proj.biases,<br>layers.49.self_attn.o_proj.scales,<br>layers.49.self_attn.o_proj.weight,<br>layers.49.self_attn.q_proj.biases,<br>layers.49.self_attn.q_proj.scales,<br>layers.49.self_attn.q_proj.weight,<br>layers.49.self_attn.v_proj.biases,<br>layers.49.self_attn.v_proj.scales,<br>layers.49.self_attn.v_proj.weight,<br>layers.5.input_layernorm.weight,<br>layers.5.mlp.down_proj.biases,<br>layers.5.mlp.down_proj.scales,<br>layers.5.mlp.down_proj.weight,<br>layers.5.mlp.gate_proj.biases,<br>layers.5.mlp.gate_proj.scales,<br>layers.5.mlp.gate_proj.weight,<br>layers.5.mlp.up_proj.biases,<br>layers.5.mlp.up_proj.scales,<br>layers.5.mlp.up_proj.weight,<br>layers.5.post_attention_layernorm.weight,<br>layers.5.post_feedforward_layernorm.weight,<br>layers.5.pre_feedforward_layernorm.weight,<br>layers.5.self_attn.gate_proj.biases,<br>layers.5.self_attn.gate_proj.scales,<br>layers.5.self_attn.gate_proj.weight,<br>layers.5.self_attn.k_proj.biases,<br>layers.5.self_attn.k_proj.scales,<br>layers.5.self_attn.k_proj.weight,<br>layers.5.self_attn.o_proj.biases,<br>layers.5.self_attn.o_proj.scales,<br>layers.5.self_attn.o_proj.weight,<br>layers.5.self_attn.q_proj.biases,<br>layers.5.self_attn.q_proj.scales,<br>layers.5.self_attn.q_proj.weight,<br>layers.5.self_attn.v_proj.biases,<br>layers.5.self_attn.v_proj.scales,<br>layers.5.self_attn.v_proj.weight,<br>layers.50.input_layernorm.weight,<br>layers.50.mlp.down_proj.biases,<br>layers.50.mlp.down_proj.scales,<br>layers.50.mlp.down_proj.weight,<br>layers.50.mlp.gate_proj.biases,<br>layers.50.mlp.gate_proj.scales,<br>layers.50.mlp.gate_proj.weight,<br>layers.50.mlp.up_proj.biases,<br>layers.50.mlp.up_proj.scales,<br>layers.50.mlp.up_proj.weight,<br>layers.50.post_attention_layernorm.weight,<br>layers.50.post_feedforward_layernorm.weight,<br>layers.50.pre_feedforward_layernorm.weight,<br>layers.50.self_attn.gate_proj.biases,<br>layers.50.self_attn.gate_proj.scales,<br>layers.50.self_attn.gate_proj.weight,<br>layers.50.self_attn.k_proj.biases,<br>layers.50.self_attn.k_proj.scales,<br>layers.50.self_attn.k_proj.weight,<br>layers.50.self_attn.o_proj.biases,<br>layers.50.self_attn.o_proj.scales,<br>layers.50.self_attn.o_proj.weight,<br>layers.50.self_attn.q_proj.biases,<br>layers.50.self_attn.q_proj.scales,<br>layers.50.self_attn.q_proj.weight,<br>layers.50.self_attn.v_proj.biases,<br>layers.50.self_attn.v_proj.scales,<br>layers.50.self_attn.v_proj.weight,<br>layers.51.input_layernorm.weight,<br>layers.51.mlp.down_proj.biases,<br>layers.51.mlp.down_proj.scales,<br>layers.51.mlp.down_proj.weight,<br>layers.51.mlp.gate_proj.biases,<br>layers.51.mlp.gate_proj.scales,<br>layers.51.mlp.gate_proj.weight,<br>layers.51.mlp.up_proj.biases,<br>layers.51.mlp.up_proj.scales,<br>layers.51.mlp.up_proj.weight,<br>layers.51.post_attention_layernorm.weight,<br>layers.51.post_feedforward_layernorm.weight,<br>layers.51.pre_feedforward_layernorm.weight,<br>layers.51.self_attn.gate_proj.biases,<br>layers.51.self_attn.gate_proj.scales,<br>layers.51.self_attn.gate_proj.weight,<br>layers.51.self_attn.k_proj.biases,<br>layers.51.self_attn.k_proj.scales,<br>layers.51.self_attn.k_proj.weight,<br>layers.51.self_attn.o_proj.biases,<br>layers.51.self_attn.o_proj.scales,<br>layers.51.self_attn.o_proj.weight,<br>layers.51.self_attn.q_proj.biases,<br>layers.51.self_attn.q_proj.scales,<br>layers.51.self_attn.q_proj.weight,<br>layers.51.self_attn.v_proj.biases,<br>layers.51.self_attn.v_proj.scales,<br>layers.51.self_attn.v_proj.weight,<br>layers.6.input_layernorm.weight,<br>layers.6.mlp.down_proj.biases,<br>layers.6.mlp.down_proj.scales,<br>layers.6.mlp.down_proj.weight,<br>layers.6.mlp.gate_proj.biases,<br>layers.6.mlp.gate_proj.scales,<br>layers.6.mlp.gate_proj.weight,<br>layers.6.mlp.up_proj.biases,<br>layers.6.mlp.up_proj.scales,<br>layers.6.mlp.up_proj.weight,<br>layers.6.post_attention_layernorm.weight,<br>layers.6.post_feedforward_layernorm.weight,<br>layers.6.pre_feedforward_layernorm.weight,<br>layers.6.self_attn.gate_proj.biases,<br>layers.6.self_attn.gate_proj.scales,<br>layers.6.self_attn.gate_proj.weight,<br>layers.6.self_attn.k_proj.biases,<br>layers.6.self_attn.k_proj.scales,<br>layers.6.self_attn.k_proj.weight,<br>layers.6.self_attn.o_proj.biases,<br>layers.6.self_attn.o_proj.scales,<br>layers.6.self_attn.o_proj.weight,<br>layers.6.self_attn.q_proj.biases,<br>layers.6.self_attn.q_proj.scales,<br>layers.6.self_attn.q_proj.weight,<br>layers.6.self_attn.v_proj.biases,<br>layers.6.self_attn.v_proj.scales,<br>layers.6.self_attn.v_proj.weight,<br>layers.7.input_layernorm.weight,<br>layers.7.mlp.down_proj.biases,<br>layers.7.mlp.down_proj.scales,<br>layers.7.mlp.down_proj.weight,<br>layers.7.mlp.gate_proj.biases,<br>layers.7.mlp.gate_proj.scales,<br>layers.7.mlp.gate_proj.weight,<br>layers.7.mlp.up_proj.biases,<br>layers.7.mlp.up_proj.scales,<br>layers.7.mlp.up_proj.weight,<br>layers.7.post_attention_layernorm.weight,<br>layers.7.post_feedforward_layernorm.weight,<br>layers.7.pre_feedforward_layernorm.weight,<br>layers.7.self_attn.gate_proj.biases,<br>layers.7.self_attn.gate_proj.scales,<br>layers.7.self_attn.gate_proj.weight,<br>layers.7.self_attn.k_proj.biases,<br>layers.7.self_attn.k_proj.scales,<br>layers.7.self_attn.k_proj.weight,<br>layers.7.self_attn.o_proj.biases,<br>layers.7.self_attn.o_proj.scales,<br>layers.7.self_attn.o_proj.weight,<br>layers.7.self_attn.q_proj.biases,<br>layers.7.self_attn.q_proj.scales,<br>layers.7.self_attn.q_proj.weight,<br>layers.7.self_attn.v_proj.biases,<br>layers.7.self_attn.v_proj.scales,<br>layers.7.self_attn.v_proj.weight,<br>layers.8.input_layernorm.weight,<br>layers.8.mlp.down_proj.biases,<br>layers.8.mlp.down_proj.scales,<br>layers.8.mlp.down_proj.weight,<br>layers.8.mlp.gate_proj.biases,<br>layers.8.mlp.gate_proj.scales,<br>layers.8.mlp.gate_proj.weight,<br>layers.8.mlp.up_proj.biases,<br>layers.8.mlp.up_proj.scales,<br>layers.8.mlp.up_proj.weight,<br>layers.8.post_attention_layernorm.weight,<br>layers.8.post_feedforward_layernorm.weight,<br>layers.8.pre_feedforward_layernorm.weight,<br>layers.8.self_attn.gate_proj.biases,<br>layers.8.self_attn.gate_proj.scales,<br>layers.8.self_attn.gate_proj.weight,<br>layers.8.self_attn.k_proj.biases,<br>layers.8.self_attn.k_proj.scales,<br>layers.8.self_attn.k_proj.weight,<br>layers.8.self_attn.o_proj.biases,<br>layers.8.self_attn.o_proj.scales,<br>layers.8.self_attn.o_proj.weight,<br>layers.8.self_attn.q_proj.biases,<br>layers.8.self_attn.q_proj.scales,<br>layers.8.self_attn.q_proj.weight,<br>layers.8.self_attn.v_proj.biases,<br>layers.8.self_attn.v_proj.scales,<br>layers.8.self_attn.v_proj.weight,<br>layers.9.input_layernorm.weight,<br>layers.9.mlp.down_proj.biases,<br>layers.9.mlp.down_proj.scales,<br>layers.9.mlp.down_proj.weight,<br>layers.9.mlp.gate_proj.biases,<br>layers.9.mlp.gate_proj.scales,<br>layers.9.mlp.gate_proj.weight,<br>layers.9.mlp.up_proj.biases,<br>layers.9.mlp.up_proj.scales,<br>layers.9.mlp.up_proj.weight,<br>layers.9.post_attention_layernorm.weight,<br>layers.9.post_feedforward_layernorm.weight,<br>layers.9.pre_feedforward_layernorm.weight,<br>layers.9.self_attn.gate_proj.biases,<br>layers.9.self_attn.gate_proj.scales,<br>layers.9.self_attn.gate_proj.weight,<br>layers.9.self_attn.k_proj.biases,<br>layers.9.self_attn.k_proj.scales,<br>layers.9.self_attn.k_proj.weight,<br>layers.9.self_attn.o_proj.biases,<br>layers.9.self_attn.o_proj.scales,<br>layers.9.self_attn.o_proj.weight,<br>layers.9.self_attn.q_proj.biases,<br>layers.9.self_attn.q_proj.scales,<br>layers.9.self_attn.q_proj.weight,<br>layers.9.self_attn.v_proj.biases,<br>layers.9.self_attn.v_proj.scales,<br>layers.9.self_attn.v_proj.weight,<br>norm.weight.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* Received 1460 parameters not in model:
-  <br>embed_tokens.biases,<br>embed_tokens.scales,<br>embed_tokens.weight,<br>layers.0.input_layernorm.weight,<br>layers.0.mlp.down_proj.biases,<br>layers.0.mlp.down_proj.scales,<br>layers.0.mlp.down_proj.weight,<br>layers.0.mlp.gate_proj.biases,<br>layers.0.mlp.gate_proj.scales,<br>layers.0.mlp.gate_proj.weight,<br>layers.0.mlp.up_proj.biases,<br>layers.0.mlp.up_proj.scales,<br>layers.0.mlp.up_proj.weight,<br>layers.0.post_attention_layernorm.weight,<br>layers.0.post_feedforward_layernorm.weight,<br>layers.0.pre_feedforward_layernorm.weight,<br>layers.0.self_attn.gate_proj.biases,<br>layers.0.self_attn.gate_proj.scales,<br>layers.0.self_attn.gate_proj.weight,<br>layers.0.self_attn.k_proj.biases,<br>layers.0.self_attn.k_proj.scales,<br>layers.0.self_attn.k_proj.weight,<br>layers.0.self_attn.o_proj.biases,<br>layers.0.self_attn.o_proj.scales,<br>layers.0.self_attn.o_proj.weight,<br>layers.0.self_attn.q_proj.biases,<br>layers.0.self_attn.q_proj.scales,<br>layers.0.self_attn.q_proj.weight,<br>layers.0.self_attn.v_proj.biases,<br>layers.0.self_attn.v_proj.scales,<br>layers.0.self_attn.v_proj.weight,<br>layers.1.input_layernorm.weight,<br>layers.1.mlp.down_proj.biases,<br>layers.1.mlp.down_proj.scales,<br>layers.1.mlp.down_proj.weight,<br>layers.1.mlp.gate_proj.biases,<br>layers.1.mlp.gate_proj.scales,<br>layers.1.mlp.gate_proj.weight,<br>layers.1.mlp.up_proj.biases,<br>layers.1.mlp.up_proj.scales,<br>layers.1.mlp.up_proj.weight,<br>layers.1.post_attention_layernorm.weight,<br>layers.1.post_feedforward_layernorm.weight,<br>layers.1.pre_feedforward_layernorm.weight,<br>layers.1.self_attn.gate_proj.biases,<br>layers.1.self_attn.gate_proj.scales,<br>layers.1.self_attn.gate_proj.weight,<br>layers.1.self_attn.k_proj.biases,<br>layers.1.self_attn.k_proj.scales,<br>layers.1.self_attn.k_proj.weight,<br>layers.1.self_attn.o_proj.biases,<br>layers.1.self_attn.o_proj.scales,<br>layers.1.self_attn.o_proj.weight,<br>layers.1.self_attn.q_proj.biases,<br>layers.1.self_attn.q_proj.scales,<br>layers.1.self_attn.q_proj.weight,<br>layers.1.self_attn.v_proj.biases,<br>layers.1.self_attn.v_proj.scales,<br>layers.1.self_attn.v_proj.weight,<br>layers.10.input_layernorm.weight,<br>layers.10.mlp.down_proj.biases,<br>layers.10.mlp.down_proj.scales,<br>layers.10.mlp.down_proj.weight,<br>layers.10.mlp.gate_proj.biases,<br>layers.10.mlp.gate_proj.scales,<br>layers.10.mlp.gate_proj.weight,<br>layers.10.mlp.up_proj.biases,<br>layers.10.mlp.up_proj.scales,<br>layers.10.mlp.up_proj.weight,<br>layers.10.post_attention_layernorm.weight,<br>layers.10.post_feedforward_layernorm.weight,<br>layers.10.pre_feedforward_layernorm.weight,<br>layers.10.self_attn.gate_proj.biases,<br>layers.10.self_attn.gate_proj.scales,<br>layers.10.self_attn.gate_proj.weight,<br>layers.10.self_attn.k_proj.biases,<br>layers.10.self_attn.k_proj.scales,<br>layers.10.self_attn.k_proj.weight,<br>layers.10.self_attn.o_proj.biases,<br>layers.10.self_attn.o_proj.scales,<br>layers.10.self_attn.o_proj.weight,<br>layers.10.self_attn.q_proj.biases,<br>layers.10.self_attn.q_proj.scales,<br>layers.10.self_attn.q_proj.weight,<br>layers.10.self_attn.v_proj.biases,<br>layers.10.self_attn.v_proj.scales,<br>layers.10.self_attn.v_proj.weight,<br>layers.11.input_layernorm.weight,<br>layers.11.mlp.down_proj.biases,<br>layers.11.mlp.down_proj.scales,<br>layers.11.mlp.down_proj.weight,<br>layers.11.mlp.gate_proj.biases,<br>layers.11.mlp.gate_proj.scales,<br>layers.11.mlp.gate_proj.weight,<br>layers.11.mlp.up_proj.biases,<br>layers.11.mlp.up_proj.scales,<br>layers.11.mlp.up_proj.weight,<br>layers.11.post_attention_layernorm.weight,<br>layers.11.post_feedforward_layernorm.weight,<br>layers.11.pre_feedforward_layernorm.weight,<br>layers.11.self_attn.gate_proj.biases,<br>layers.11.self_attn.gate_proj.scales,<br>layers.11.self_attn.gate_proj.weight,<br>layers.11.self_attn.k_proj.biases,<br>layers.11.self_attn.k_proj.scales,<br>layers.11.self_attn.k_proj.weight,<br>layers.11.self_attn.o_proj.biases,<br>layers.11.self_attn.o_proj.scales,<br>layers.11.self_attn.o_proj.weight,<br>layers.11.self_attn.q_proj.biases,<br>layers.11.self_attn.q_proj.scales,<br>layers.11.self_attn.q_proj.weight,<br>layers.11.self_attn.v_proj.biases,<br>layers.11.self_attn.v_proj.scales,<br>layers.11.self_attn.v_proj.weight,<br>layers.12.input_layernorm.weight,<br>layers.12.mlp.down_proj.biases,<br>layers.12.mlp.down_proj.scales,<br>layers.12.mlp.down_proj.weight,<br>layers.12.mlp.gate_proj.biases,<br>layers.12.mlp.gate_proj.scales,<br>layers.12.mlp.gate_proj.weight,<br>layers.12.mlp.up_proj.biases,<br>layers.12.mlp.up_proj.scales,<br>layers.12.mlp.up_proj.weight,<br>layers.12.post_attention_layernorm.weight,<br>layers.12.post_feedforward_layernorm.weight,<br>layers.12.pre_feedforward_layernorm.weight,<br>layers.12.self_attn.gate_proj.biases,<br>layers.12.self_attn.gate_proj.scales,<br>layers.12.self_attn.gate_proj.weight,<br>layers.12.self_attn.k_proj.biases,<br>layers.12.self_attn.k_proj.scales,<br>layers.12.self_attn.k_proj.weight,<br>layers.12.self_attn.o_proj.biases,<br>layers.12.self_attn.o_proj.scales,<br>layers.12.self_attn.o_proj.weight,<br>layers.12.self_attn.q_proj.biases,<br>layers.12.self_attn.q_proj.scales,<br>layers.12.self_attn.q_proj.weight,<br>layers.12.self_attn.v_proj.biases,<br>layers.12.self_attn.v_proj.scales,<br>layers.12.self_attn.v_proj.weight,<br>layers.13.input_layernorm.weight,<br>layers.13.mlp.down_proj.biases,<br>layers.13.mlp.down_proj.scales,<br>layers.13.mlp.down_proj.weight,<br>layers.13.mlp.gate_proj.biases,<br>layers.13.mlp.gate_proj.scales,<br>layers.13.mlp.gate_proj.weight,<br>layers.13.mlp.up_proj.biases,<br>layers.13.mlp.up_proj.scales,<br>layers.13.mlp.up_proj.weight,<br>layers.13.post_attention_layernorm.weight,<br>layers.13.post_feedforward_layernorm.weight,<br>layers.13.pre_feedforward_layernorm.weight,<br>layers.13.self_attn.gate_proj.biases,<br>layers.13.self_attn.gate_proj.scales,<br>layers.13.self_attn.gate_proj.weight,<br>layers.13.self_attn.k_proj.biases,<br>layers.13.self_attn.k_proj.scales,<br>layers.13.self_attn.k_proj.weight,<br>layers.13.self_attn.o_proj.biases,<br>layers.13.self_attn.o_proj.scales,<br>layers.13.self_attn.o_proj.weight,<br>layers.13.self_attn.q_proj.biases,<br>layers.13.self_attn.q_proj.scales,<br>layers.13.self_attn.q_proj.weight,<br>layers.13.self_attn.v_proj.biases,<br>layers.13.self_attn.v_proj.scales,<br>layers.13.self_attn.v_proj.weight,<br>layers.14.input_layernorm.weight,<br>layers.14.mlp.down_proj.biases,<br>layers.14.mlp.down_proj.scales,<br>layers.14.mlp.down_proj.weight,<br>layers.14.mlp.gate_proj.biases,<br>layers.14.mlp.gate_proj.scales,<br>layers.14.mlp.gate_proj.weight,<br>layers.14.mlp.up_proj.biases,<br>layers.14.mlp.up_proj.scales,<br>layers.14.mlp.up_proj.weight,<br>layers.14.post_attention_layernorm.weight,<br>layers.14.post_feedforward_layernorm.weight,<br>layers.14.pre_feedforward_layernorm.weight,<br>layers.14.self_attn.gate_proj.biases,<br>layers.14.self_attn.gate_proj.scales,<br>layers.14.self_attn.gate_proj.weight,<br>layers.14.self_attn.k_proj.biases,<br>layers.14.self_attn.k_proj.scales,<br>layers.14.self_attn.k_proj.weight,<br>layers.14.self_attn.o_proj.biases,<br>layers.14.self_attn.o_proj.scales,<br>layers.14.self_attn.o_proj.weight,<br>layers.14.self_attn.q_proj.biases,<br>layers.14.self_attn.q_proj.scales,<br>layers.14.self_attn.q_proj.weight,<br>layers.14.self_attn.v_proj.biases,<br>layers.14.self_attn.v_proj.scales,<br>layers.14.self_attn.v_proj.weight,<br>layers.15.input_layernorm.weight,<br>layers.15.mlp.down_proj.biases,<br>layers.15.mlp.down_proj.scales,<br>layers.15.mlp.down_proj.weight,<br>layers.15.mlp.gate_proj.biases,<br>layers.15.mlp.gate_proj.scales,<br>layers.15.mlp.gate_proj.weight,<br>layers.15.mlp.up_proj.biases,<br>layers.15.mlp.up_proj.scales,<br>layers.15.mlp.up_proj.weight,<br>layers.15.post_attention_layernorm.weight,<br>layers.15.post_feedforward_layernorm.weight,<br>layers.15.pre_feedforward_layernorm.weight,<br>layers.15.self_attn.gate_proj.biases,<br>layers.15.self_attn.gate_proj.scales,<br>layers.15.self_attn.gate_proj.weight,<br>layers.15.self_attn.k_proj.biases,<br>layers.15.self_attn.k_proj.scales,<br>layers.15.self_attn.k_proj.weight,<br>layers.15.self_attn.o_proj.biases,<br>layers.15.self_attn.o_proj.scales,<br>layers.15.self_attn.o_proj.weight,<br>layers.15.self_attn.q_proj.biases,<br>layers.15.self_attn.q_proj.scales,<br>layers.15.self_attn.q_proj.weight,<br>layers.15.self_attn.v_proj.biases,<br>layers.15.self_attn.v_proj.scales,<br>layers.15.self_attn.v_proj.weight,<br>layers.16.input_layernorm.weight,<br>layers.16.mlp.down_proj.biases,<br>layers.16.mlp.down_proj.scales,<br>layers.16.mlp.down_proj.weight,<br>layers.16.mlp.gate_proj.biases,<br>layers.16.mlp.gate_proj.scales,<br>layers.16.mlp.gate_proj.weight,<br>layers.16.mlp.up_proj.biases,<br>layers.16.mlp.up_proj.scales,<br>layers.16.mlp.up_proj.weight,<br>layers.16.post_attention_layernorm.weight,<br>layers.16.post_feedforward_layernorm.weight,<br>layers.16.pre_feedforward_layernorm.weight,<br>layers.16.self_attn.gate_proj.biases,<br>layers.16.self_attn.gate_proj.scales,<br>layers.16.self_attn.gate_proj.weight,<br>layers.16.self_attn.k_proj.biases,<br>layers.16.self_attn.k_proj.scales,<br>layers.16.self_attn.k_proj.weight,<br>layers.16.self_attn.o_proj.biases,<br>layers.16.self_attn.o_proj.scales,<br>layers.16.self_attn.o_proj.weight,<br>layers.16.self_attn.q_proj.biases,<br>layers.16.self_attn.q_proj.scales,<br>layers.16.self_attn.q_proj.weight,<br>layers.16.self_attn.v_proj.biases,<br>layers.16.self_attn.v_proj.scales,<br>layers.16.self_attn.v_proj.weight,<br>layers.17.input_layernorm.weight,<br>layers.17.mlp.down_proj.biases,<br>layers.17.mlp.down_proj.scales,<br>layers.17.mlp.down_proj.weight,<br>layers.17.mlp.gate_proj.biases,<br>layers.17.mlp.gate_proj.scales,<br>layers.17.mlp.gate_proj.weight,<br>layers.17.mlp.up_proj.biases,<br>layers.17.mlp.up_proj.scales,<br>layers.17.mlp.up_proj.weight,<br>layers.17.post_attention_layernorm.weight,<br>layers.17.post_feedforward_layernorm.weight,<br>layers.17.pre_feedforward_layernorm.weight,<br>layers.17.self_attn.gate_proj.biases,<br>layers.17.self_attn.gate_proj.scales,<br>layers.17.self_attn.gate_proj.weight,<br>layers.17.self_attn.k_proj.biases,<br>layers.17.self_attn.k_proj.scales,<br>layers.17.self_attn.k_proj.weight,<br>layers.17.self_attn.o_proj.biases,<br>layers.17.self_attn.o_proj.scales,<br>layers.17.self_attn.o_proj.weight,<br>layers.17.self_attn.q_proj.biases,<br>layers.17.self_attn.q_proj.scales,<br>layers.17.self_attn.q_proj.weight,<br>layers.17.self_attn.v_proj.biases,<br>layers.17.self_attn.v_proj.scales,<br>layers.17.self_attn.v_proj.weight,<br>layers.18.input_layernorm.weight,<br>layers.18.mlp.down_proj.biases,<br>layers.18.mlp.down_proj.scales,<br>layers.18.mlp.down_proj.weight,<br>layers.18.mlp.gate_proj.biases,<br>layers.18.mlp.gate_proj.scales,<br>layers.18.mlp.gate_proj.weight,<br>layers.18.mlp.up_proj.biases,<br>layers.18.mlp.up_proj.scales,<br>layers.18.mlp.up_proj.weight,<br>layers.18.post_attention_layernorm.weight,<br>layers.18.post_feedforward_layernorm.weight,<br>layers.18.pre_feedforward_layernorm.weight,<br>layers.18.self_attn.gate_proj.biases,<br>layers.18.self_attn.gate_proj.scales,<br>layers.18.self_attn.gate_proj.weight,<br>layers.18.self_attn.k_proj.biases,<br>layers.18.self_attn.k_proj.scales,<br>layers.18.self_attn.k_proj.weight,<br>layers.18.self_attn.o_proj.biases,<br>layers.18.self_attn.o_proj.scales,<br>layers.18.self_attn.o_proj.weight,<br>layers.18.self_attn.q_proj.biases,<br>layers.18.self_attn.q_proj.scales,<br>layers.18.self_attn.q_proj.weight,<br>layers.18.self_attn.v_proj.biases,<br>layers.18.self_attn.v_proj.scales,<br>layers.18.self_attn.v_proj.weight,<br>layers.19.input_layernorm.weight,<br>layers.19.mlp.down_proj.biases,<br>layers.19.mlp.down_proj.scales,<br>layers.19.mlp.down_proj.weight,<br>layers.19.mlp.gate_proj.biases,<br>layers.19.mlp.gate_proj.scales,<br>layers.19.mlp.gate_proj.weight,<br>layers.19.mlp.up_proj.biases,<br>layers.19.mlp.up_proj.scales,<br>layers.19.mlp.up_proj.weight,<br>layers.19.post_attention_layernorm.weight,<br>layers.19.post_feedforward_layernorm.weight,<br>layers.19.pre_feedforward_layernorm.weight,<br>layers.19.self_attn.gate_proj.biases,<br>layers.19.self_attn.gate_proj.scales,<br>layers.19.self_attn.gate_proj.weight,<br>layers.19.self_attn.k_proj.biases,<br>layers.19.self_attn.k_proj.scales,<br>layers.19.self_attn.k_proj.weight,<br>layers.19.self_attn.o_proj.biases,<br>layers.19.self_attn.o_proj.scales,<br>layers.19.self_attn.o_proj.weight,<br>layers.19.self_attn.q_proj.biases,<br>layers.19.self_attn.q_proj.scales,<br>layers.19.self_attn.q_proj.weight,<br>layers.19.self_attn.v_proj.biases,<br>layers.19.self_attn.v_proj.scales,<br>layers.19.self_attn.v_proj.weight,<br>layers.2.input_layernorm.weight,<br>layers.2.mlp.down_proj.biases,<br>layers.2.mlp.down_proj.scales,<br>layers.2.mlp.down_proj.weight,<br>layers.2.mlp.gate_proj.biases,<br>layers.2.mlp.gate_proj.scales,<br>layers.2.mlp.gate_proj.weight,<br>layers.2.mlp.up_proj.biases,<br>layers.2.mlp.up_proj.scales,<br>layers.2.mlp.up_proj.weight,<br>layers.2.post_attention_layernorm.weight,<br>layers.2.post_feedforward_layernorm.weight,<br>layers.2.pre_feedforward_layernorm.weight,<br>layers.2.self_attn.gate_proj.biases,<br>layers.2.self_attn.gate_proj.scales,<br>layers.2.self_attn.gate_proj.weight,<br>layers.2.self_attn.k_proj.biases,<br>layers.2.self_attn.k_proj.scales,<br>layers.2.self_attn.k_proj.weight,<br>layers.2.self_attn.o_proj.biases,<br>layers.2.self_attn.o_proj.scales,<br>layers.2.self_attn.o_proj.weight,<br>layers.2.self_attn.q_proj.biases,<br>layers.2.self_attn.q_proj.scales,<br>layers.2.self_attn.q_proj.weight,<br>layers.2.self_attn.v_proj.biases,<br>layers.2.self_attn.v_proj.scales,<br>layers.2.self_attn.v_proj.weight,<br>layers.20.input_layernorm.weight,<br>layers.20.mlp.down_proj.biases,<br>layers.20.mlp.down_proj.scales,<br>layers.20.mlp.down_proj.weight,<br>layers.20.mlp.gate_proj.biases,<br>layers.20.mlp.gate_proj.scales,<br>layers.20.mlp.gate_proj.weight,<br>layers.20.mlp.up_proj.biases,<br>layers.20.mlp.up_proj.scales,<br>layers.20.mlp.up_proj.weight,<br>layers.20.post_attention_layernorm.weight,<br>layers.20.post_feedforward_layernorm.weight,<br>layers.20.pre_feedforward_layernorm.weight,<br>layers.20.self_attn.gate_proj.biases,<br>layers.20.self_attn.gate_proj.scales,<br>layers.20.self_attn.gate_proj.weight,<br>layers.20.self_attn.k_proj.biases,<br>layers.20.self_attn.k_proj.scales,<br>layers.20.self_attn.k_proj.weight,<br>layers.20.self_attn.o_proj.biases,<br>layers.20.self_attn.o_proj.scales,<br>layers.20.self_attn.o_proj.weight,<br>layers.20.self_attn.q_proj.biases,<br>layers.20.self_attn.q_proj.scales,<br>layers.20.self_attn.q_proj.weight,<br>layers.20.self_attn.v_proj.biases,<br>layers.20.self_attn.v_proj.scales,<br>layers.20.self_attn.v_proj.weight,<br>layers.21.input_layernorm.weight,<br>layers.21.mlp.down_proj.biases,<br>layers.21.mlp.down_proj.scales,<br>layers.21.mlp.down_proj.weight,<br>layers.21.mlp.gate_proj.biases,<br>layers.21.mlp.gate_proj.scales,<br>layers.21.mlp.gate_proj.weight,<br>layers.21.mlp.up_proj.biases,<br>layers.21.mlp.up_proj.scales,<br>layers.21.mlp.up_proj.weight,<br>layers.21.post_attention_layernorm.weight,<br>layers.21.post_feedforward_layernorm.weight,<br>layers.21.pre_feedforward_layernorm.weight,<br>layers.21.self_attn.gate_proj.biases,<br>layers.21.self_attn.gate_proj.scales,<br>layers.21.self_attn.gate_proj.weight,<br>layers.21.self_attn.k_proj.biases,<br>layers.21.self_attn.k_proj.scales,<br>layers.21.self_attn.k_proj.weight,<br>layers.21.self_attn.o_proj.biases,<br>layers.21.self_attn.o_proj.scales,<br>layers.21.self_attn.o_proj.weight,<br>layers.21.self_attn.q_proj.biases,<br>layers.21.self_attn.q_proj.scales,<br>layers.21.self_attn.q_proj.weight,<br>layers.21.self_attn.v_proj.biases,<br>layers.21.self_attn.v_proj.scales,<br>layers.21.self_attn.v_proj.weight,<br>layers.22.input_layernorm.weight,<br>layers.22.mlp.down_proj.biases,<br>layers.22.mlp.down_proj.scales,<br>layers.22.mlp.down_proj.weight,<br>layers.22.mlp.gate_proj.biases,<br>layers.22.mlp.gate_proj.scales,<br>layers.22.mlp.gate_proj.weight,<br>layers.22.mlp.up_proj.biases,<br>layers.22.mlp.up_proj.scales,<br>layers.22.mlp.up_proj.weight,<br>layers.22.post_attention_layernorm.weight,<br>layers.22.post_feedforward_layernorm.weight,<br>layers.22.pre_feedforward_layernorm.weight,<br>layers.22.self_attn.gate_proj.biases,<br>layers.22.self_attn.gate_proj.scales,<br>layers.22.self_attn.gate_proj.weight,<br>layers.22.self_attn.k_proj.biases,<br>layers.22.self_attn.k_proj.scales,<br>layers.22.self_attn.k_proj.weight,<br>layers.22.self_attn.o_proj.biases,<br>layers.22.self_attn.o_proj.scales,<br>layers.22.self_attn.o_proj.weight,<br>layers.22.self_attn.q_proj.biases,<br>layers.22.self_attn.q_proj.scales,<br>layers.22.self_attn.q_proj.weight,<br>layers.22.self_attn.v_proj.biases,<br>layers.22.self_attn.v_proj.scales,<br>layers.22.self_attn.v_proj.weight,<br>layers.23.input_layernorm.weight,<br>layers.23.mlp.down_proj.biases,<br>layers.23.mlp.down_proj.scales,<br>layers.23.mlp.down_proj.weight,<br>layers.23.mlp.gate_proj.biases,<br>layers.23.mlp.gate_proj.scales,<br>layers.23.mlp.gate_proj.weight,<br>layers.23.mlp.up_proj.biases,<br>layers.23.mlp.up_proj.scales,<br>layers.23.mlp.up_proj.weight,<br>layers.23.post_attention_layernorm.weight,<br>layers.23.post_feedforward_layernorm.weight,<br>layers.23.pre_feedforward_layernorm.weight,<br>layers.23.self_attn.gate_proj.biases,<br>layers.23.self_attn.gate_proj.scales,<br>layers.23.self_attn.gate_proj.weight,<br>layers.23.self_attn.k_proj.biases,<br>layers.23.self_attn.k_proj.scales,<br>layers.23.self_attn.k_proj.weight,<br>layers.23.self_attn.o_proj.biases,<br>layers.23.self_attn.o_proj.scales,<br>layers.23.self_attn.o_proj.weight,<br>layers.23.self_attn.q_proj.biases,<br>layers.23.self_attn.q_proj.scales,<br>layers.23.self_attn.q_proj.weight,<br>layers.23.self_attn.v_proj.biases,<br>layers.23.self_attn.v_proj.scales,<br>layers.23.self_attn.v_proj.weight,<br>layers.24.input_layernorm.weight,<br>layers.24.mlp.down_proj.biases,<br>layers.24.mlp.down_proj.scales,<br>layers.24.mlp.down_proj.weight,<br>layers.24.mlp.gate_proj.biases,<br>layers.24.mlp.gate_proj.scales,<br>layers.24.mlp.gate_proj.weight,<br>layers.24.mlp.up_proj.biases,<br>layers.24.mlp.up_proj.scales,<br>layers.24.mlp.up_proj.weight,<br>layers.24.post_attention_layernorm.weight,<br>layers.24.post_feedforward_layernorm.weight,<br>layers.24.pre_feedforward_layernorm.weight,<br>layers.24.self_attn.gate_proj.biases,<br>layers.24.self_attn.gate_proj.scales,<br>layers.24.self_attn.gate_proj.weight,<br>layers.24.self_attn.k_proj.biases,<br>layers.24.self_attn.k_proj.scales,<br>layers.24.self_attn.k_proj.weight,<br>layers.24.self_attn.o_proj.biases,<br>layers.24.self_attn.o_proj.scales,<br>layers.24.self_attn.o_proj.weight,<br>layers.24.self_attn.q_proj.biases,<br>layers.24.self_attn.q_proj.scales,<br>layers.24.self_attn.q_proj.weight,<br>layers.24.self_attn.v_proj.biases,<br>layers.24.self_attn.v_proj.scales,<br>layers.24.self_attn.v_proj.weight,<br>layers.25.input_layernorm.weight,<br>layers.25.mlp.down_proj.biases,<br>layers.25.mlp.down_proj.scales,<br>layers.25.mlp.down_proj.weight,<br>layers.25.mlp.gate_proj.biases,<br>layers.25.mlp.gate_proj.scales,<br>layers.25.mlp.gate_proj.weight,<br>layers.25.mlp.up_proj.biases,<br>layers.25.mlp.up_proj.scales,<br>layers.25.mlp.up_proj.weight,<br>layers.25.post_attention_layernorm.weight,<br>layers.25.post_feedforward_layernorm.weight,<br>layers.25.pre_feedforward_layernorm.weight,<br>layers.25.self_attn.gate_proj.biases,<br>layers.25.self_attn.gate_proj.scales,<br>layers.25.self_attn.gate_proj.weight,<br>layers.25.self_attn.k_proj.biases,<br>layers.25.self_attn.k_proj.scales,<br>layers.25.self_attn.k_proj.weight,<br>layers.25.self_attn.o_proj.biases,<br>layers.25.self_attn.o_proj.scales,<br>layers.25.self_attn.o_proj.weight,<br>layers.25.self_attn.q_proj.biases,<br>layers.25.self_attn.q_proj.scales,<br>layers.25.self_attn.q_proj.weight,<br>layers.25.self_attn.v_proj.biases,<br>layers.25.self_attn.v_proj.scales,<br>layers.25.self_attn.v_proj.weight,<br>layers.26.input_layernorm.weight,<br>layers.26.mlp.down_proj.biases,<br>layers.26.mlp.down_proj.scales,<br>layers.26.mlp.down_proj.weight,<br>layers.26.mlp.gate_proj.biases,<br>layers.26.mlp.gate_proj.scales,<br>layers.26.mlp.gate_proj.weight,<br>layers.26.mlp.up_proj.biases,<br>layers.26.mlp.up_proj.scales,<br>layers.26.mlp.up_proj.weight,<br>layers.26.post_attention_layernorm.weight,<br>layers.26.post_feedforward_layernorm.weight,<br>layers.26.pre_feedforward_layernorm.weight,<br>layers.26.self_attn.gate_proj.biases,<br>layers.26.self_attn.gate_proj.scales,<br>layers.26.self_attn.gate_proj.weight,<br>layers.26.self_attn.k_proj.biases,<br>layers.26.self_attn.k_proj.scales,<br>layers.26.self_attn.k_proj.weight,<br>layers.26.self_attn.o_proj.biases,<br>layers.26.self_attn.o_proj.scales,<br>layers.26.self_attn.o_proj.weight,<br>layers.26.self_attn.q_proj.biases,<br>layers.26.self_attn.q_proj.scales,<br>layers.26.self_attn.q_proj.weight,<br>layers.26.self_attn.v_proj.biases,<br>layers.26.self_attn.v_proj.scales,<br>layers.26.self_attn.v_proj.weight,<br>layers.27.input_layernorm.weight,<br>layers.27.mlp.down_proj.biases,<br>layers.27.mlp.down_proj.scales,<br>layers.27.mlp.down_proj.weight,<br>layers.27.mlp.gate_proj.biases,<br>layers.27.mlp.gate_proj.scales,<br>layers.27.mlp.gate_proj.weight,<br>layers.27.mlp.up_proj.biases,<br>layers.27.mlp.up_proj.scales,<br>layers.27.mlp.up_proj.weight,<br>layers.27.post_attention_layernorm.weight,<br>layers.27.post_feedforward_layernorm.weight,<br>layers.27.pre_feedforward_layernorm.weight,<br>layers.27.self_attn.gate_proj.biases,<br>layers.27.self_attn.gate_proj.scales,<br>layers.27.self_attn.gate_proj.weight,<br>layers.27.self_attn.k_proj.biases,<br>layers.27.self_attn.k_proj.scales,<br>layers.27.self_attn.k_proj.weight,<br>layers.27.self_attn.o_proj.biases,<br>layers.27.self_attn.o_proj.scales,<br>layers.27.self_attn.o_proj.weight,<br>layers.27.self_attn.q_proj.biases,<br>layers.27.self_attn.q_proj.scales,<br>layers.27.self_attn.q_proj.weight,<br>layers.27.self_attn.v_proj.biases,<br>layers.27.self_attn.v_proj.scales,<br>layers.27.self_attn.v_proj.weight,<br>layers.28.input_layernorm.weight,<br>layers.28.mlp.down_proj.biases,<br>layers.28.mlp.down_proj.scales,<br>layers.28.mlp.down_proj.weight,<br>layers.28.mlp.gate_proj.biases,<br>layers.28.mlp.gate_proj.scales,<br>layers.28.mlp.gate_proj.weight,<br>layers.28.mlp.up_proj.biases,<br>layers.28.mlp.up_proj.scales,<br>layers.28.mlp.up_proj.weight,<br>layers.28.post_attention_layernorm.weight,<br>layers.28.post_feedforward_layernorm.weight,<br>layers.28.pre_feedforward_layernorm.weight,<br>layers.28.self_attn.gate_proj.biases,<br>layers.28.self_attn.gate_proj.scales,<br>layers.28.self_attn.gate_proj.weight,<br>layers.28.self_attn.k_proj.biases,<br>layers.28.self_attn.k_proj.scales,<br>layers.28.self_attn.k_proj.weight,<br>layers.28.self_attn.o_proj.biases,<br>layers.28.self_attn.o_proj.scales,<br>layers.28.self_attn.o_proj.weight,<br>layers.28.self_attn.q_proj.biases,<br>layers.28.self_attn.q_proj.scales,<br>layers.28.self_attn.q_proj.weight,<br>layers.28.self_attn.v_proj.biases,<br>layers.28.self_attn.v_proj.scales,<br>layers.28.self_attn.v_proj.weight,<br>layers.29.input_layernorm.weight,<br>layers.29.mlp.down_proj.biases,<br>layers.29.mlp.down_proj.scales,<br>layers.29.mlp.down_proj.weight,<br>layers.29.mlp.gate_proj.biases,<br>layers.29.mlp.gate_proj.scales,<br>layers.29.mlp.gate_proj.weight,<br>layers.29.mlp.up_proj.biases,<br>layers.29.mlp.up_proj.scales,<br>layers.29.mlp.up_proj.weight,<br>layers.29.post_attention_layernorm.weight,<br>layers.29.post_feedforward_layernorm.weight,<br>layers.29.pre_feedforward_layernorm.weight,<br>layers.29.self_attn.gate_proj.biases,<br>layers.29.self_attn.gate_proj.scales,<br>layers.29.self_attn.gate_proj.weight,<br>layers.29.self_attn.k_proj.biases,<br>layers.29.self_attn.k_proj.scales,<br>layers.29.self_attn.k_proj.weight,<br>layers.29.self_attn.o_proj.biases,<br>layers.29.self_attn.o_proj.scales,<br>layers.29.self_attn.o_proj.weight,<br>layers.29.self_attn.q_proj.biases,<br>layers.29.self_attn.q_proj.scales,<br>layers.29.self_attn.q_proj.weight,<br>layers.29.self_attn.v_proj.biases,<br>layers.29.self_attn.v_proj.scales,<br>layers.29.self_attn.v_proj.weight,<br>layers.3.input_layernorm.weight,<br>layers.3.mlp.down_proj.biases,<br>layers.3.mlp.down_proj.scales,<br>layers.3.mlp.down_proj.weight,<br>layers.3.mlp.gate_proj.biases,<br>layers.3.mlp.gate_proj.scales,<br>layers.3.mlp.gate_proj.weight,<br>layers.3.mlp.up_proj.biases,<br>layers.3.mlp.up_proj.scales,<br>layers.3.mlp.up_proj.weight,<br>layers.3.post_attention_layernorm.weight,<br>layers.3.post_feedforward_layernorm.weight,<br>layers.3.pre_feedforward_layernorm.weight,<br>layers.3.self_attn.gate_proj.biases,<br>layers.3.self_attn.gate_proj.scales,<br>layers.3.self_attn.gate_proj.weight,<br>layers.3.self_attn.k_proj.biases,<br>layers.3.self_attn.k_proj.scales,<br>layers.3.self_attn.k_proj.weight,<br>layers.3.self_attn.o_proj.biases,<br>layers.3.self_attn.o_proj.scales,<br>layers.3.self_attn.o_proj.weight,<br>layers.3.self_attn.q_proj.biases,<br>layers.3.self_attn.q_proj.scales,<br>layers.3.self_attn.q_proj.weight,<br>layers.3.self_attn.v_proj.biases,<br>layers.3.self_attn.v_proj.scales,<br>layers.3.self_attn.v_proj.weight,<br>layers.30.input_layernorm.weight,<br>layers.30.mlp.down_proj.biases,<br>layers.30.mlp.down_proj.scales,<br>layers.30.mlp.down_proj.weight,<br>layers.30.mlp.gate_proj.biases,<br>layers.30.mlp.gate_proj.scales,<br>layers.30.mlp.gate_proj.weight,<br>layers.30.mlp.up_proj.biases,<br>layers.30.mlp.up_proj.scales,<br>layers.30.mlp.up_proj.weight,<br>layers.30.post_attention_layernorm.weight,<br>layers.30.post_feedforward_layernorm.weight,<br>layers.30.pre_feedforward_layernorm.weight,<br>layers.30.self_attn.gate_proj.biases,<br>layers.30.self_attn.gate_proj.scales,<br>layers.30.self_attn.gate_proj.weight,<br>layers.30.self_attn.k_proj.biases,<br>layers.30.self_attn.k_proj.scales,<br>layers.30.self_attn.k_proj.weight,<br>layers.30.self_attn.o_proj.biases,<br>layers.30.self_attn.o_proj.scales,<br>layers.30.self_attn.o_proj.weight,<br>layers.30.self_attn.q_proj.biases,<br>layers.30.self_attn.q_proj.scales,<br>layers.30.self_attn.q_proj.weight,<br>layers.30.self_attn.v_proj.biases,<br>layers.30.self_attn.v_proj.scales,<br>layers.30.self_attn.v_proj.weight,<br>layers.31.input_layernorm.weight,<br>layers.31.mlp.down_proj.biases,<br>layers.31.mlp.down_proj.scales,<br>layers.31.mlp.down_proj.weight,<br>layers.31.mlp.gate_proj.biases,<br>layers.31.mlp.gate_proj.scales,<br>layers.31.mlp.gate_proj.weight,<br>layers.31.mlp.up_proj.biases,<br>layers.31.mlp.up_proj.scales,<br>layers.31.mlp.up_proj.weight,<br>layers.31.post_attention_layernorm.weight,<br>layers.31.post_feedforward_layernorm.weight,<br>layers.31.pre_feedforward_layernorm.weight,<br>layers.31.self_attn.gate_proj.biases,<br>layers.31.self_attn.gate_proj.scales,<br>layers.31.self_attn.gate_proj.weight,<br>layers.31.self_attn.k_proj.biases,<br>layers.31.self_attn.k_proj.scales,<br>layers.31.self_attn.k_proj.weight,<br>layers.31.self_attn.o_proj.biases,<br>layers.31.self_attn.o_proj.scales,<br>layers.31.self_attn.o_proj.weight,<br>layers.31.self_attn.q_proj.biases,<br>layers.31.self_attn.q_proj.scales,<br>layers.31.self_attn.q_proj.weight,<br>layers.31.self_attn.v_proj.biases,<br>layers.31.self_attn.v_proj.scales,<br>layers.31.self_attn.v_proj.weight,<br>layers.32.input_layernorm.weight,<br>layers.32.mlp.down_proj.biases,<br>layers.32.mlp.down_proj.scales,<br>layers.32.mlp.down_proj.weight,<br>layers.32.mlp.gate_proj.biases,<br>layers.32.mlp.gate_proj.scales,<br>layers.32.mlp.gate_proj.weight,<br>layers.32.mlp.up_proj.biases,<br>layers.32.mlp.up_proj.scales,<br>layers.32.mlp.up_proj.weight,<br>layers.32.post_attention_layernorm.weight,<br>layers.32.post_feedforward_layernorm.weight,<br>layers.32.pre_feedforward_layernorm.weight,<br>layers.32.self_attn.gate_proj.biases,<br>layers.32.self_attn.gate_proj.scales,<br>layers.32.self_attn.gate_proj.weight,<br>layers.32.self_attn.k_proj.biases,<br>layers.32.self_attn.k_proj.scales,<br>layers.32.self_attn.k_proj.weight,<br>layers.32.self_attn.o_proj.biases,<br>layers.32.self_attn.o_proj.scales,<br>layers.32.self_attn.o_proj.weight,<br>layers.32.self_attn.q_proj.biases,<br>layers.32.self_attn.q_proj.scales,<br>layers.32.self_attn.q_proj.weight,<br>layers.32.self_attn.v_proj.biases,<br>layers.32.self_attn.v_proj.scales,<br>layers.32.self_attn.v_proj.weight,<br>layers.33.input_layernorm.weight,<br>layers.33.mlp.down_proj.biases,<br>layers.33.mlp.down_proj.scales,<br>layers.33.mlp.down_proj.weight,<br>layers.33.mlp.gate_proj.biases,<br>layers.33.mlp.gate_proj.scales,<br>layers.33.mlp.gate_proj.weight,<br>layers.33.mlp.up_proj.biases,<br>layers.33.mlp.up_proj.scales,<br>layers.33.mlp.up_proj.weight,<br>layers.33.post_attention_layernorm.weight,<br>layers.33.post_feedforward_layernorm.weight,<br>layers.33.pre_feedforward_layernorm.weight,<br>layers.33.self_attn.gate_proj.biases,<br>layers.33.self_attn.gate_proj.scales,<br>layers.33.self_attn.gate_proj.weight,<br>layers.33.self_attn.k_proj.biases,<br>layers.33.self_attn.k_proj.scales,<br>layers.33.self_attn.k_proj.weight,<br>layers.33.self_attn.o_proj.biases,<br>layers.33.self_attn.o_proj.scales,<br>layers.33.self_attn.o_proj.weight,<br>layers.33.self_attn.q_proj.biases,<br>layers.33.self_attn.q_proj.scales,<br>layers.33.self_attn.q_proj.weight,<br>layers.33.self_attn.v_proj.biases,<br>layers.33.self_attn.v_proj.scales,<br>layers.33.self_attn.v_proj.weight,<br>layers.34.input_layernorm.weight,<br>layers.34.mlp.down_proj.biases,<br>layers.34.mlp.down_proj.scales,<br>layers.34.mlp.down_proj.weight,<br>layers.34.mlp.gate_proj.biases,<br>layers.34.mlp.gate_proj.scales,<br>layers.34.mlp.gate_proj.weight,<br>layers.34.mlp.up_proj.biases,<br>layers.34.mlp.up_proj.scales,<br>layers.34.mlp.up_proj.weight,<br>layers.34.post_attention_layernorm.weight,<br>layers.34.post_feedforward_layernorm.weight,<br>layers.34.pre_feedforward_layernorm.weight,<br>layers.34.self_attn.gate_proj.biases,<br>layers.34.self_attn.gate_proj.scales,<br>layers.34.self_attn.gate_proj.weight,<br>layers.34.self_attn.k_proj.biases,<br>layers.34.self_attn.k_proj.scales,<br>layers.34.self_attn.k_proj.weight,<br>layers.34.self_attn.o_proj.biases,<br>layers.34.self_attn.o_proj.scales,<br>layers.34.self_attn.o_proj.weight,<br>layers.34.self_attn.q_proj.biases,<br>layers.34.self_attn.q_proj.scales,<br>layers.34.self_attn.q_proj.weight,<br>layers.34.self_attn.v_proj.biases,<br>layers.34.self_attn.v_proj.scales,<br>layers.34.self_attn.v_proj.weight,<br>layers.35.input_layernorm.weight,<br>layers.35.mlp.down_proj.biases,<br>layers.35.mlp.down_proj.scales,<br>layers.35.mlp.down_proj.weight,<br>layers.35.mlp.gate_proj.biases,<br>layers.35.mlp.gate_proj.scales,<br>layers.35.mlp.gate_proj.weight,<br>layers.35.mlp.up_proj.biases,<br>layers.35.mlp.up_proj.scales,<br>layers.35.mlp.up_proj.weight,<br>layers.35.post_attention_layernorm.weight,<br>layers.35.post_feedforward_layernorm.weight,<br>layers.35.pre_feedforward_layernorm.weight,<br>layers.35.self_attn.gate_proj.biases,<br>layers.35.self_attn.gate_proj.scales,<br>layers.35.self_attn.gate_proj.weight,<br>layers.35.self_attn.k_proj.biases,<br>layers.35.self_attn.k_proj.scales,<br>layers.35.self_attn.k_proj.weight,<br>layers.35.self_attn.o_proj.biases,<br>layers.35.self_attn.o_proj.scales,<br>layers.35.self_attn.o_proj.weight,<br>layers.35.self_attn.q_proj.biases,<br>layers.35.self_attn.q_proj.scales,<br>layers.35.self_attn.q_proj.weight,<br>layers.35.self_attn.v_proj.biases,<br>layers.35.self_attn.v_proj.scales,<br>layers.35.self_attn.v_proj.weight,<br>layers.36.input_layernorm.weight,<br>layers.36.mlp.down_proj.biases,<br>layers.36.mlp.down_proj.scales,<br>layers.36.mlp.down_proj.weight,<br>layers.36.mlp.gate_proj.biases,<br>layers.36.mlp.gate_proj.scales,<br>layers.36.mlp.gate_proj.weight,<br>layers.36.mlp.up_proj.biases,<br>layers.36.mlp.up_proj.scales,<br>layers.36.mlp.up_proj.weight,<br>layers.36.post_attention_layernorm.weight,<br>layers.36.post_feedforward_layernorm.weight,<br>layers.36.pre_feedforward_layernorm.weight,<br>layers.36.self_attn.gate_proj.biases,<br>layers.36.self_attn.gate_proj.scales,<br>layers.36.self_attn.gate_proj.weight,<br>layers.36.self_attn.k_proj.biases,<br>layers.36.self_attn.k_proj.scales,<br>layers.36.self_attn.k_proj.weight,<br>layers.36.self_attn.o_proj.biases,<br>layers.36.self_attn.o_proj.scales,<br>layers.36.self_attn.o_proj.weight,<br>layers.36.self_attn.q_proj.biases,<br>layers.36.self_attn.q_proj.scales,<br>layers.36.self_attn.q_proj.weight,<br>layers.36.self_attn.v_proj.biases,<br>layers.36.self_attn.v_proj.scales,<br>layers.36.self_attn.v_proj.weight,<br>layers.37.input_layernorm.weight,<br>layers.37.mlp.down_proj.biases,<br>layers.37.mlp.down_proj.scales,<br>layers.37.mlp.down_proj.weight,<br>layers.37.mlp.gate_proj.biases,<br>layers.37.mlp.gate_proj.scales,<br>layers.37.mlp.gate_proj.weight,<br>layers.37.mlp.up_proj.biases,<br>layers.37.mlp.up_proj.scales,<br>layers.37.mlp.up_proj.weight,<br>layers.37.post_attention_layernorm.weight,<br>layers.37.post_feedforward_layernorm.weight,<br>layers.37.pre_feedforward_layernorm.weight,<br>layers.37.self_attn.gate_proj.biases,<br>layers.37.self_attn.gate_proj.scales,<br>layers.37.self_attn.gate_proj.weight,<br>layers.37.self_attn.k_proj.biases,<br>layers.37.self_attn.k_proj.scales,<br>layers.37.self_attn.k_proj.weight,<br>layers.37.self_attn.o_proj.biases,<br>layers.37.self_attn.o_proj.scales,<br>layers.37.self_attn.o_proj.weight,<br>layers.37.self_attn.q_proj.biases,<br>layers.37.self_attn.q_proj.scales,<br>layers.37.self_attn.q_proj.weight,<br>layers.37.self_attn.v_proj.biases,<br>layers.37.self_attn.v_proj.scales,<br>layers.37.self_attn.v_proj.weight,<br>layers.38.input_layernorm.weight,<br>layers.38.mlp.down_proj.biases,<br>layers.38.mlp.down_proj.scales,<br>layers.38.mlp.down_proj.weight,<br>layers.38.mlp.gate_proj.biases,<br>layers.38.mlp.gate_proj.scales,<br>layers.38.mlp.gate_proj.weight,<br>layers.38.mlp.up_proj.biases,<br>layers.38.mlp.up_proj.scales,<br>layers.38.mlp.up_proj.weight,<br>layers.38.post_attention_layernorm.weight,<br>layers.38.post_feedforward_layernorm.weight,<br>layers.38.pre_feedforward_layernorm.weight,<br>layers.38.self_attn.gate_proj.biases,<br>layers.38.self_attn.gate_proj.scales,<br>layers.38.self_attn.gate_proj.weight,<br>layers.38.self_attn.k_proj.biases,<br>layers.38.self_attn.k_proj.scales,<br>layers.38.self_attn.k_proj.weight,<br>layers.38.self_attn.o_proj.biases,<br>layers.38.self_attn.o_proj.scales,<br>layers.38.self_attn.o_proj.weight,<br>layers.38.self_attn.q_proj.biases,<br>layers.38.self_attn.q_proj.scales,<br>layers.38.self_attn.q_proj.weight,<br>layers.38.self_attn.v_proj.biases,<br>layers.38.self_attn.v_proj.scales,<br>layers.38.self_attn.v_proj.weight,<br>layers.39.input_layernorm.weight,<br>layers.39.mlp.down_proj.biases,<br>layers.39.mlp.down_proj.scales,<br>layers.39.mlp.down_proj.weight,<br>layers.39.mlp.gate_proj.biases,<br>layers.39.mlp.gate_proj.scales,<br>layers.39.mlp.gate_proj.weight,<br>layers.39.mlp.up_proj.biases,<br>layers.39.mlp.up_proj.scales,<br>layers.39.mlp.up_proj.weight,<br>layers.39.post_attention_layernorm.weight,<br>layers.39.post_feedforward_layernorm.weight,<br>layers.39.pre_feedforward_layernorm.weight,<br>layers.39.self_attn.gate_proj.biases,<br>layers.39.self_attn.gate_proj.scales,<br>layers.39.self_attn.gate_proj.weight,<br>layers.39.self_attn.k_proj.biases,<br>layers.39.self_attn.k_proj.scales,<br>layers.39.self_attn.k_proj.weight,<br>layers.39.self_attn.o_proj.biases,<br>layers.39.self_attn.o_proj.scales,<br>layers.39.self_attn.o_proj.weight,<br>layers.39.self_attn.q_proj.biases,<br>layers.39.self_attn.q_proj.scales,<br>layers.39.self_attn.q_proj.weight,<br>layers.39.self_attn.v_proj.biases,<br>layers.39.self_attn.v_proj.scales,<br>layers.39.self_attn.v_proj.weight,<br>layers.4.input_layernorm.weight,<br>layers.4.mlp.down_proj.biases,<br>layers.4.mlp.down_proj.scales,<br>layers.4.mlp.down_proj.weight,<br>layers.4.mlp.gate_proj.biases,<br>layers.4.mlp.gate_proj.scales,<br>layers.4.mlp.gate_proj.weight,<br>layers.4.mlp.up_proj.biases,<br>layers.4.mlp.up_proj.scales,<br>layers.4.mlp.up_proj.weight,<br>layers.4.post_attention_layernorm.weight,<br>layers.4.post_feedforward_layernorm.weight,<br>layers.4.pre_feedforward_layernorm.weight,<br>layers.4.self_attn.gate_proj.biases,<br>layers.4.self_attn.gate_proj.scales,<br>layers.4.self_attn.gate_proj.weight,<br>layers.4.self_attn.k_proj.biases,<br>layers.4.self_attn.k_proj.scales,<br>layers.4.self_attn.k_proj.weight,<br>layers.4.self_attn.o_proj.biases,<br>layers.4.self_attn.o_proj.scales,<br>layers.4.self_attn.o_proj.weight,<br>layers.4.self_attn.q_proj.biases,<br>layers.4.self_attn.q_proj.scales,<br>layers.4.self_attn.q_proj.weight,<br>layers.4.self_attn.v_proj.biases,<br>layers.4.self_attn.v_proj.scales,<br>layers.4.self_attn.v_proj.weight,<br>layers.40.input_layernorm.weight,<br>layers.40.mlp.down_proj.biases,<br>layers.40.mlp.down_proj.scales,<br>layers.40.mlp.down_proj.weight,<br>layers.40.mlp.gate_proj.biases,<br>layers.40.mlp.gate_proj.scales,<br>layers.40.mlp.gate_proj.weight,<br>layers.40.mlp.up_proj.biases,<br>layers.40.mlp.up_proj.scales,<br>layers.40.mlp.up_proj.weight,<br>layers.40.post_attention_layernorm.weight,<br>layers.40.post_feedforward_layernorm.weight,<br>layers.40.pre_feedforward_layernorm.weight,<br>layers.40.self_attn.gate_proj.biases,<br>layers.40.self_attn.gate_proj.scales,<br>layers.40.self_attn.gate_proj.weight,<br>layers.40.self_attn.k_proj.biases,<br>layers.40.self_attn.k_proj.scales,<br>layers.40.self_attn.k_proj.weight,<br>layers.40.self_attn.o_proj.biases,<br>layers.40.self_attn.o_proj.scales,<br>layers.40.self_attn.o_proj.weight,<br>layers.40.self_attn.q_proj.biases,<br>layers.40.self_attn.q_proj.scales,<br>layers.40.self_attn.q_proj.weight,<br>layers.40.self_attn.v_proj.biases,<br>layers.40.self_attn.v_proj.scales,<br>layers.40.self_attn.v_proj.weight,<br>layers.41.input_layernorm.weight,<br>layers.41.mlp.down_proj.biases,<br>layers.41.mlp.down_proj.scales,<br>layers.41.mlp.down_proj.weight,<br>layers.41.mlp.gate_proj.biases,<br>layers.41.mlp.gate_proj.scales,<br>layers.41.mlp.gate_proj.weight,<br>layers.41.mlp.up_proj.biases,<br>layers.41.mlp.up_proj.scales,<br>layers.41.mlp.up_proj.weight,<br>layers.41.post_attention_layernorm.weight,<br>layers.41.post_feedforward_layernorm.weight,<br>layers.41.pre_feedforward_layernorm.weight,<br>layers.41.self_attn.gate_proj.biases,<br>layers.41.self_attn.gate_proj.scales,<br>layers.41.self_attn.gate_proj.weight,<br>layers.41.self_attn.k_proj.biases,<br>layers.41.self_attn.k_proj.scales,<br>layers.41.self_attn.k_proj.weight,<br>layers.41.self_attn.o_proj.biases,<br>layers.41.self_attn.o_proj.scales,<br>layers.41.self_attn.o_proj.weight,<br>layers.41.self_attn.q_proj.biases,<br>layers.41.self_attn.q_proj.scales,<br>layers.41.self_attn.q_proj.weight,<br>layers.41.self_attn.v_proj.biases,<br>layers.41.self_attn.v_proj.scales,<br>layers.41.self_attn.v_proj.weight,<br>layers.42.input_layernorm.weight,<br>layers.42.mlp.down_proj.biases,<br>layers.42.mlp.down_proj.scales,<br>layers.42.mlp.down_proj.weight,<br>layers.42.mlp.gate_proj.biases,<br>layers.42.mlp.gate_proj.scales,<br>layers.42.mlp.gate_proj.weight,<br>layers.42.mlp.up_proj.biases,<br>layers.42.mlp.up_proj.scales,<br>layers.42.mlp.up_proj.weight,<br>layers.42.post_attention_layernorm.weight,<br>layers.42.post_feedforward_layernorm.weight,<br>layers.42.pre_feedforward_layernorm.weight,<br>layers.42.self_attn.gate_proj.biases,<br>layers.42.self_attn.gate_proj.scales,<br>layers.42.self_attn.gate_proj.weight,<br>layers.42.self_attn.k_proj.biases,<br>layers.42.self_attn.k_proj.scales,<br>layers.42.self_attn.k_proj.weight,<br>layers.42.self_attn.o_proj.biases,<br>layers.42.self_attn.o_proj.scales,<br>layers.42.self_attn.o_proj.weight,<br>layers.42.self_attn.q_proj.biases,<br>layers.42.self_attn.q_proj.scales,<br>layers.42.self_attn.q_proj.weight,<br>layers.42.self_attn.v_proj.biases,<br>layers.42.self_attn.v_proj.scales,<br>layers.42.self_attn.v_proj.weight,<br>layers.43.input_layernorm.weight,<br>layers.43.mlp.down_proj.biases,<br>layers.43.mlp.down_proj.scales,<br>layers.43.mlp.down_proj.weight,<br>layers.43.mlp.gate_proj.biases,<br>layers.43.mlp.gate_proj.scales,<br>layers.43.mlp.gate_proj.weight,<br>layers.43.mlp.up_proj.biases,<br>layers.43.mlp.up_proj.scales,<br>layers.43.mlp.up_proj.weight,<br>layers.43.post_attention_layernorm.weight,<br>layers.43.post_feedforward_layernorm.weight,<br>layers.43.pre_feedforward_layernorm.weight,<br>layers.43.self_attn.gate_proj.biases,<br>layers.43.self_attn.gate_proj.scales,<br>layers.43.self_attn.gate_proj.weight,<br>layers.43.self_attn.k_proj.biases,<br>layers.43.self_attn.k_proj.scales,<br>layers.43.self_attn.k_proj.weight,<br>layers.43.self_attn.o_proj.biases,<br>layers.43.self_attn.o_proj.scales,<br>layers.43.self_attn.o_proj.weight,<br>layers.43.self_attn.q_proj.biases,<br>layers.43.self_attn.q_proj.scales,<br>layers.43.self_attn.q_proj.weight,<br>layers.43.self_attn.v_proj.biases,<br>layers.43.self_attn.v_proj.scales,<br>layers.43.self_attn.v_proj.weight,<br>layers.44.input_layernorm.weight,<br>layers.44.mlp.down_proj.biases,<br>layers.44.mlp.down_proj.scales,<br>layers.44.mlp.down_proj.weight,<br>layers.44.mlp.gate_proj.biases,<br>layers.44.mlp.gate_proj.scales,<br>layers.44.mlp.gate_proj.weight,<br>layers.44.mlp.up_proj.biases,<br>layers.44.mlp.up_proj.scales,<br>layers.44.mlp.up_proj.weight,<br>layers.44.post_attention_layernorm.weight,<br>layers.44.post_feedforward_layernorm.weight,<br>layers.44.pre_feedforward_layernorm.weight,<br>layers.44.self_attn.gate_proj.biases,<br>layers.44.self_attn.gate_proj.scales,<br>layers.44.self_attn.gate_proj.weight,<br>layers.44.self_attn.k_proj.biases,<br>layers.44.self_attn.k_proj.scales,<br>layers.44.self_attn.k_proj.weight,<br>layers.44.self_attn.o_proj.biases,<br>layers.44.self_attn.o_proj.scales,<br>layers.44.self_attn.o_proj.weight,<br>layers.44.self_attn.q_proj.biases,<br>layers.44.self_attn.q_proj.scales,<br>layers.44.self_attn.q_proj.weight,<br>layers.44.self_attn.v_proj.biases,<br>layers.44.self_attn.v_proj.scales,<br>layers.44.self_attn.v_proj.weight,<br>layers.45.input_layernorm.weight,<br>layers.45.mlp.down_proj.biases,<br>layers.45.mlp.down_proj.scales,<br>layers.45.mlp.down_proj.weight,<br>layers.45.mlp.gate_proj.biases,<br>layers.45.mlp.gate_proj.scales,<br>layers.45.mlp.gate_proj.weight,<br>layers.45.mlp.up_proj.biases,<br>layers.45.mlp.up_proj.scales,<br>layers.45.mlp.up_proj.weight,<br>layers.45.post_attention_layernorm.weight,<br>layers.45.post_feedforward_layernorm.weight,<br>layers.45.pre_feedforward_layernorm.weight,<br>layers.45.self_attn.gate_proj.biases,<br>layers.45.self_attn.gate_proj.scales,<br>layers.45.self_attn.gate_proj.weight,<br>layers.45.self_attn.k_proj.biases,<br>layers.45.self_attn.k_proj.scales,<br>layers.45.self_attn.k_proj.weight,<br>layers.45.self_attn.o_proj.biases,<br>layers.45.self_attn.o_proj.scales,<br>layers.45.self_attn.o_proj.weight,<br>layers.45.self_attn.q_proj.biases,<br>layers.45.self_attn.q_proj.scales,<br>layers.45.self_attn.q_proj.weight,<br>layers.45.self_attn.v_proj.biases,<br>layers.45.self_attn.v_proj.scales,<br>layers.45.self_attn.v_proj.weight,<br>layers.46.input_layernorm.weight,<br>layers.46.mlp.down_proj.biases,<br>layers.46.mlp.down_proj.scales,<br>layers.46.mlp.down_proj.weight,<br>layers.46.mlp.gate_proj.biases,<br>layers.46.mlp.gate_proj.scales,<br>layers.46.mlp.gate_proj.weight,<br>layers.46.mlp.up_proj.biases,<br>layers.46.mlp.up_proj.scales,<br>layers.46.mlp.up_proj.weight,<br>layers.46.post_attention_layernorm.weight,<br>layers.46.post_feedforward_layernorm.weight,<br>layers.46.pre_feedforward_layernorm.weight,<br>layers.46.self_attn.gate_proj.biases,<br>layers.46.self_attn.gate_proj.scales,<br>layers.46.self_attn.gate_proj.weight,<br>layers.46.self_attn.k_proj.biases,<br>layers.46.self_attn.k_proj.scales,<br>layers.46.self_attn.k_proj.weight,<br>layers.46.self_attn.o_proj.biases,<br>layers.46.self_attn.o_proj.scales,<br>layers.46.self_attn.o_proj.weight,<br>layers.46.self_attn.q_proj.biases,<br>layers.46.self_attn.q_proj.scales,<br>layers.46.self_attn.q_proj.weight,<br>layers.46.self_attn.v_proj.biases,<br>layers.46.self_attn.v_proj.scales,<br>layers.46.self_attn.v_proj.weight,<br>layers.47.input_layernorm.weight,<br>layers.47.mlp.down_proj.biases,<br>layers.47.mlp.down_proj.scales,<br>layers.47.mlp.down_proj.weight,<br>layers.47.mlp.gate_proj.biases,<br>layers.47.mlp.gate_proj.scales,<br>layers.47.mlp.gate_proj.weight,<br>layers.47.mlp.up_proj.biases,<br>layers.47.mlp.up_proj.scales,<br>layers.47.mlp.up_proj.weight,<br>layers.47.post_attention_layernorm.weight,<br>layers.47.post_feedforward_layernorm.weight,<br>layers.47.pre_feedforward_layernorm.weight,<br>layers.47.self_attn.gate_proj.biases,<br>layers.47.self_attn.gate_proj.scales,<br>layers.47.self_attn.gate_proj.weight,<br>layers.47.self_attn.k_proj.biases,<br>layers.47.self_attn.k_proj.scales,<br>layers.47.self_attn.k_proj.weight,<br>layers.47.self_attn.o_proj.biases,<br>layers.47.self_attn.o_proj.scales,<br>layers.47.self_attn.o_proj.weight,<br>layers.47.self_attn.q_proj.biases,<br>layers.47.self_attn.q_proj.scales,<br>layers.47.self_attn.q_proj.weight,<br>layers.47.self_attn.v_proj.biases,<br>layers.47.self_attn.v_proj.scales,<br>layers.47.self_attn.v_proj.weight,<br>layers.48.input_layernorm.weight,<br>layers.48.mlp.down_proj.biases,<br>layers.48.mlp.down_proj.scales,<br>layers.48.mlp.down_proj.weight,<br>layers.48.mlp.gate_proj.biases,<br>layers.48.mlp.gate_proj.scales,<br>layers.48.mlp.gate_proj.weight,<br>layers.48.mlp.up_proj.biases,<br>layers.48.mlp.up_proj.scales,<br>layers.48.mlp.up_proj.weight,<br>layers.48.post_attention_layernorm.weight,<br>layers.48.post_feedforward_layernorm.weight,<br>layers.48.pre_feedforward_layernorm.weight,<br>layers.48.self_attn.gate_proj.biases,<br>layers.48.self_attn.gate_proj.scales,<br>layers.48.self_attn.gate_proj.weight,<br>layers.48.self_attn.k_proj.biases,<br>layers.48.self_attn.k_proj.scales,<br>layers.48.self_attn.k_proj.weight,<br>layers.48.self_attn.o_proj.biases,<br>layers.48.self_attn.o_proj.scales,<br>layers.48.self_attn.o_proj.weight,<br>layers.48.self_attn.q_proj.biases,<br>layers.48.self_attn.q_proj.scales,<br>layers.48.self_attn.q_proj.weight,<br>layers.48.self_attn.v_proj.biases,<br>layers.48.self_attn.v_proj.scales,<br>layers.48.self_attn.v_proj.weight,<br>layers.49.input_layernorm.weight,<br>layers.49.mlp.down_proj.biases,<br>layers.49.mlp.down_proj.scales,<br>layers.49.mlp.down_proj.weight,<br>layers.49.mlp.gate_proj.biases,<br>layers.49.mlp.gate_proj.scales,<br>layers.49.mlp.gate_proj.weight,<br>layers.49.mlp.up_proj.biases,<br>layers.49.mlp.up_proj.scales,<br>layers.49.mlp.up_proj.weight,<br>layers.49.post_attention_layernorm.weight,<br>layers.49.post_feedforward_layernorm.weight,<br>layers.49.pre_feedforward_layernorm.weight,<br>layers.49.self_attn.gate_proj.biases,<br>layers.49.self_attn.gate_proj.scales,<br>layers.49.self_attn.gate_proj.weight,<br>layers.49.self_attn.k_proj.biases,<br>layers.49.self_attn.k_proj.scales,<br>layers.49.self_attn.k_proj.weight,<br>layers.49.self_attn.o_proj.biases,<br>layers.49.self_attn.o_proj.scales,<br>layers.49.self_attn.o_proj.weight,<br>layers.49.self_attn.q_proj.biases,<br>layers.49.self_attn.q_proj.scales,<br>layers.49.self_attn.q_proj.weight,<br>layers.49.self_attn.v_proj.biases,<br>layers.49.self_attn.v_proj.scales,<br>layers.49.self_attn.v_proj.weight,<br>layers.5.input_layernorm.weight,<br>layers.5.mlp.down_proj.biases,<br>layers.5.mlp.down_proj.scales,<br>layers.5.mlp.down_proj.weight,<br>layers.5.mlp.gate_proj.biases,<br>layers.5.mlp.gate_proj.scales,<br>layers.5.mlp.gate_proj.weight,<br>layers.5.mlp.up_proj.biases,<br>layers.5.mlp.up_proj.scales,<br>layers.5.mlp.up_proj.weight,<br>layers.5.post_attention_layernorm.weight,<br>layers.5.post_feedforward_layernorm.weight,<br>layers.5.pre_feedforward_layernorm.weight,<br>layers.5.self_attn.gate_proj.biases,<br>layers.5.self_attn.gate_proj.scales,<br>layers.5.self_attn.gate_proj.weight,<br>layers.5.self_attn.k_proj.biases,<br>layers.5.self_attn.k_proj.scales,<br>layers.5.self_attn.k_proj.weight,<br>layers.5.self_attn.o_proj.biases,<br>layers.5.self_attn.o_proj.scales,<br>layers.5.self_attn.o_proj.weight,<br>layers.5.self_attn.q_proj.biases,<br>layers.5.self_attn.q_proj.scales,<br>layers.5.self_attn.q_proj.weight,<br>layers.5.self_attn.v_proj.biases,<br>layers.5.self_attn.v_proj.scales,<br>layers.5.self_attn.v_proj.weight,<br>layers.50.input_layernorm.weight,<br>layers.50.mlp.down_proj.biases,<br>layers.50.mlp.down_proj.scales,<br>layers.50.mlp.down_proj.weight,<br>layers.50.mlp.gate_proj.biases,<br>layers.50.mlp.gate_proj.scales,<br>layers.50.mlp.gate_proj.weight,<br>layers.50.mlp.up_proj.biases,<br>layers.50.mlp.up_proj.scales,<br>layers.50.mlp.up_proj.weight,<br>layers.50.post_attention_layernorm.weight,<br>layers.50.post_feedforward_layernorm.weight,<br>layers.50.pre_feedforward_layernorm.weight,<br>layers.50.self_attn.gate_proj.biases,<br>layers.50.self_attn.gate_proj.scales,<br>layers.50.self_attn.gate_proj.weight,<br>layers.50.self_attn.k_proj.biases,<br>layers.50.self_attn.k_proj.scales,<br>layers.50.self_attn.k_proj.weight,<br>layers.50.self_attn.o_proj.biases,<br>layers.50.self_attn.o_proj.scales,<br>layers.50.self_attn.o_proj.weight,<br>layers.50.self_attn.q_proj.biases,<br>layers.50.self_attn.q_proj.scales,<br>layers.50.self_attn.q_proj.weight,<br>layers.50.self_attn.v_proj.biases,<br>layers.50.self_attn.v_proj.scales,<br>layers.50.self_attn.v_proj.weight,<br>layers.51.input_layernorm.weight,<br>layers.51.mlp.down_proj.biases,<br>layers.51.mlp.down_proj.scales,<br>layers.51.mlp.down_proj.weight,<br>layers.51.mlp.gate_proj.biases,<br>layers.51.mlp.gate_proj.scales,<br>layers.51.mlp.gate_proj.weight,<br>layers.51.mlp.up_proj.biases,<br>layers.51.mlp.up_proj.scales,<br>layers.51.mlp.up_proj.weight,<br>layers.51.post_attention_layernorm.weight,<br>layers.51.post_feedforward_layernorm.weight,<br>layers.51.pre_feedforward_layernorm.weight,<br>layers.51.self_attn.gate_proj.biases,<br>layers.51.self_attn.gate_proj.scales,<br>layers.51.self_attn.gate_proj.weight,<br>layers.51.self_attn.k_proj.biases,<br>layers.51.self_attn.k_proj.scales,<br>layers.51.self_attn.k_proj.weight,<br>layers.51.self_attn.o_proj.biases,<br>layers.51.self_attn.o_proj.scales,<br>layers.51.self_attn.o_proj.weight,<br>layers.51.self_attn.q_proj.biases,<br>layers.51.self_attn.q_proj.scales,<br>layers.51.self_attn.q_proj.weight,<br>layers.51.self_attn.v_proj.biases,<br>layers.51.self_attn.v_proj.scales,<br>layers.51.self_attn.v_proj.weight,<br>layers.6.input_layernorm.weight,<br>layers.6.mlp.down_proj.biases,<br>layers.6.mlp.down_proj.scales,<br>layers.6.mlp.down_proj.weight,<br>layers.6.mlp.gate_proj.biases,<br>layers.6.mlp.gate_proj.scales,<br>layers.6.mlp.gate_proj.weight,<br>layers.6.mlp.up_proj.biases,<br>layers.6.mlp.up_proj.scales,<br>layers.6.mlp.up_proj.weight,<br>layers.6.post_attention_layernorm.weight,<br>layers.6.post_feedforward_layernorm.weight,<br>layers.6.pre_feedforward_layernorm.weight,<br>layers.6.self_attn.gate_proj.biases,<br>layers.6.self_attn.gate_proj.scales,<br>layers.6.self_attn.gate_proj.weight,<br>layers.6.self_attn.k_proj.biases,<br>layers.6.self_attn.k_proj.scales,<br>layers.6.self_attn.k_proj.weight,<br>layers.6.self_attn.o_proj.biases,<br>layers.6.self_attn.o_proj.scales,<br>layers.6.self_attn.o_proj.weight,<br>layers.6.self_attn.q_proj.biases,<br>layers.6.self_attn.q_proj.scales,<br>layers.6.self_attn.q_proj.weight,<br>layers.6.self_attn.v_proj.biases,<br>layers.6.self_attn.v_proj.scales,<br>layers.6.self_attn.v_proj.weight,<br>layers.7.input_layernorm.weight,<br>layers.7.mlp.down_proj.biases,<br>layers.7.mlp.down_proj.scales,<br>layers.7.mlp.down_proj.weight,<br>layers.7.mlp.gate_proj.biases,<br>layers.7.mlp.gate_proj.scales,<br>layers.7.mlp.gate_proj.weight,<br>layers.7.mlp.up_proj.biases,<br>layers.7.mlp.up_proj.scales,<br>layers.7.mlp.up_proj.weight,<br>layers.7.post_attention_layernorm.weight,<br>layers.7.post_feedforward_layernorm.weight,<br>layers.7.pre_feedforward_layernorm.weight,<br>layers.7.self_attn.gate_proj.biases,<br>layers.7.self_attn.gate_proj.scales,<br>layers.7.self_attn.gate_proj.weight,<br>layers.7.self_attn.k_proj.biases,<br>layers.7.self_attn.k_proj.scales,<br>layers.7.self_attn.k_proj.weight,<br>layers.7.self_attn.o_proj.biases,<br>layers.7.self_attn.o_proj.scales,<br>layers.7.self_attn.o_proj.weight,<br>layers.7.self_attn.q_proj.biases,<br>layers.7.self_attn.q_proj.scales,<br>layers.7.self_attn.q_proj.weight,<br>layers.7.self_attn.v_proj.biases,<br>layers.7.self_attn.v_proj.scales,<br>layers.7.self_attn.v_proj.weight,<br>layers.8.input_layernorm.weight,<br>layers.8.mlp.down_proj.biases,<br>layers.8.mlp.down_proj.scales,<br>layers.8.mlp.down_proj.weight,<br>layers.8.mlp.gate_proj.biases,<br>layers.8.mlp.gate_proj.scales,<br>layers.8.mlp.gate_proj.weight,<br>layers.8.mlp.up_proj.biases,<br>layers.8.mlp.up_proj.scales,<br>layers.8.mlp.up_proj.weight,<br>layers.8.post_attention_layernorm.weight,<br>layers.8.post_feedforward_layernorm.weight,<br>layers.8.pre_feedforward_layernorm.weight,<br>layers.8.self_attn.gate_proj.biases,<br>layers.8.self_attn.gate_proj.scales,<br>layers.8.self_attn.gate_proj.weight,<br>layers.8.self_attn.k_proj.biases,<br>layers.8.self_attn.k_proj.scales,<br>layers.8.self_attn.k_proj.weight,<br>layers.8.self_attn.o_proj.biases,<br>layers.8.self_attn.o_proj.scales,<br>layers.8.self_attn.o_proj.weight,<br>layers.8.self_attn.q_proj.biases,<br>layers.8.self_attn.q_proj.scales,<br>layers.8.self_attn.q_proj.weight,<br>layers.8.self_attn.v_proj.biases,<br>layers.8.self_attn.v_proj.scales,<br>layers.8.self_attn.v_proj.weight,<br>layers.9.input_layernorm.weight,<br>layers.9.mlp.down_proj.biases,<br>layers.9.mlp.down_proj.scales,<br>layers.9.mlp.down_proj.weight,<br>layers.9.mlp.gate_proj.biases,<br>layers.9.mlp.gate_proj.scales,<br>layers.9.mlp.gate_proj.weight,<br>layers.9.mlp.up_proj.biases,<br>layers.9.mlp.up_proj.scales,<br>layers.9.mlp.up_proj.weight,<br>layers.9.post_attention_layernorm.weight,<br>layers.9.post_feedforward_layernorm.weight,<br>layers.9.pre_feedforward_layernorm.weight,<br>layers.9.self_attn.gate_proj.biases,<br>layers.9.self_attn.gate_proj.scales,<br>layers.9.self_attn.gate_proj.weight,<br>layers.9.self_attn.k_proj.biases,<br>layers.9.self_attn.k_proj.scales,<br>layers.9.self_attn.k_proj.weight,<br>layers.9.self_attn.o_proj.biases,<br>layers.9.self_attn.o_proj.scales,<br>layers.9.self_attn.o_proj.weight,<br>layers.9.self_attn.q_proj.biases,<br>layers.9.self_attn.q_proj.scales,<br>layers.9.self_attn.q_proj.weight,<br>layers.9.self_attn.v_proj.biases,<br>layers.9.self_attn.v_proj.scales,<br>layers.9.self_attn.v_proj.weight,<br>norm.weight.
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 0.50s
-- *Generation time:* -
-- *Total time:* 0.50s
-- *Input validation time:* 4.92e-05
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.0729
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory:* -
-- *Active memory:* -
-- *Cache memory:* -
-- *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.00598
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Image placeholders:* not captured
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13601, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12726, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1282, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1147, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
-    raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
-    )
-ValueError: Received 1460 parameters not in model: 
-embed_tokens.biases,
-embed_tokens.scales,
-embed_tokens.weight,
-layers.0.input_layernorm.weight,
-layers.0.mlp.down_proj.biases,
-layers.0.mlp.down_proj.scales,
-layers.0.mlp.down_proj.weight,
-layers.0.mlp.gate_proj.biases,
-layers.0.mlp.gate_proj.scales,
-layers.0.mlp.gate_proj.weight,
-layers.0.mlp.up_proj.biases,
-layers.0.mlp.up_proj.scales,
-layers.0.mlp.up_proj.weight,
-layers.0.post_attention_layernorm.weight,
-layers.0.post_feedforward_layernorm.weight,
-layers.0.pre_feedforward_layernorm.weight,
-layers.0.self_attn.gate_proj.biases,
-layers.0.self_attn.gate_proj.scales,
-layers.0.self_attn.gate_proj.weight,
-layers.0.self_attn.k_proj.biases,
-layers.0.self_attn.k_proj.scales,
-layers.0.self_attn.k_proj.weight,
-layers.0.self_attn.o_proj.biases,
-layers.0.self_attn.o_proj.scales,
-layers.0.self_attn.o_proj.weight,
-layers.0.self_attn.q_proj.biases,
-layers.0.self_attn.q_proj.scales,
-layers.0.self_attn.q_proj.weight,
-layers.0.self_attn.v_proj.biases,
-layers.0.self_attn.v_proj.scales,
-layers.0.self_attn.v_proj.weight,
-layers.1.input_layernorm.weight,
-layers.1.mlp.down_proj.biases,
-layers.1.mlp.down_proj.scales,
-layers.1.mlp.down_proj.weight,
-layers.1.mlp.gate_proj.biases,
-layers.1.mlp.gate_proj.scales,
-layers.1.mlp.gate_proj.weight,
-layers.1.mlp.up_proj.biases,
-layers.1.mlp.up_proj.scales,
-layers.1.mlp.up_proj.weight,
-layers.1.post_attention_layernorm.weight,
-layers.1.post_feedforward_layernorm.weight,
-layers.1.pre_feedforward_layernorm.weight,
-layers.1.self_attn.gate_proj.biases,
-layers.1.self_attn.gate_proj.scales,
-layers.1.self_attn.gate_proj.weight,
-layers.1.self_attn.k_proj.biases,
-layers.1.self_attn.k_proj.scales,
-layers.1.self_attn.k_proj.weight,
-layers.1.self_attn.o_proj.biases,
-layers.1.self_attn.o_proj.scales,
-layers.1.self_attn.o_proj.weight,
-layers.1.self_attn.q_proj.biases,
-layers.1.self_attn.q_proj.scales,
-layers.1.self_attn.q_proj.weight,
-layers.1.self_attn.v_proj.biases,
-layers.1.self_attn.v_proj.scales,
-layers.1.self_attn.v_proj.weight,
-layers.10.input_layernorm.weight,
-layers.10.mlp.down_proj.biases,
-layers.10.mlp.down_proj.scales,
-layers.10.mlp.down_proj.weight,
-layers.10.mlp.gate_proj.biases,
-layers.10.mlp.gate_proj.scales,
-layers.10.mlp.gate_proj.weight,
-layers.10.mlp.up_proj.biases,
-layers.10.mlp.up_proj.scales,
-layers.10.mlp.up_proj.weight,
-layers.10.post_attention_layernorm.weight,
-layers.10.post_feedforward_layernorm.weight,
-layers.10.pre_feedforward_layernorm.weight,
-layers.10.self_attn.gate_proj.biases,
-layers.10.self_attn.gate_proj.scales,
-layers.10.self_attn.gate_proj.weight,
-layers.10.self_attn.k_proj.biases,
-layers.10.self_attn.k_proj.scales,
-layers.10.self_attn.k_proj.weight,
-layers.10.self_attn.o_proj.biases,
-layers.10.self_attn.o_proj.scales,
-layers.10.self_attn.o_proj.weight,
-layers.10.self_attn.q_proj.biases,
-layers.10.self_attn.q_proj.scales,
-layers.10.self_attn.q_proj.weight,
-layers.10.self_attn.v_proj.biases,
-layers.10.self_attn.v_proj.scales,
-layers.10.self_attn.v_proj.weight,
-layers.11.input_layernorm.weight,
-layers.11.mlp.down_proj.biases,
-layers.11.mlp.down_proj.scales,
-layers.11.mlp.down_proj.weight,
-layers.11.mlp.gate_proj.biases,
-layers.11.mlp.gate_proj.scales,
-layers.11.mlp.gate_proj.weight,
-layers.11.mlp.up_proj.biases,
-layers.11.mlp.up_proj.scales,
-layers.11.mlp.up_proj.weight,
-layers.11.post_attention_layernorm.weight,
-layers.11.post_feedforward_layernorm.weight,
-layers.11.pre_feedforward_layernorm.weight,
-layers.11.self_attn.gate_proj.biases,
-layers.11.self_attn.gate_proj.scales,
-layers.11.self_attn.gate_proj.weight,
-layers.11.self_attn.k_proj.biases,
-layers.11.self_attn.k_proj.scales,
-layers.11.self_attn.k_proj.weight,
-layers.11.self_attn.o_proj.biases,
-layers.11.self_attn.o_proj.scales,
-layers.11.self_attn.o_proj.weight,
-layers.11.self_attn.q_proj.biases,
-layers.11.self_attn.q_proj.scales,
-layers.11.self_attn.q_proj.weight,
-layers.11.self_attn.v_proj.biases,
-layers.11.self_attn.v_proj.scales,
-layers.11.self_attn.v_proj.weight,
-layers.12.input_layernorm.weight,
-layers.12.mlp.down_proj.biases,
-layers.12.mlp.down_proj.scales,
-layers.12.mlp.down_proj.weight,
-layers.12.mlp.gate_proj.biases,
-layers.12.mlp.gate_proj.scales,
-layers.12.mlp.gate_proj.weight,
-layers.12.mlp.up_proj.biases,
-layers.12.mlp.up_proj.scales,
-layers.12.mlp.up_proj.weight,
-layers.12.post_attention_layernorm.weight,
-layers.12.post_feedforward_layernorm.weight,
-layers.12.pre_feedforward_layernorm.weight,
-layers.12.self_attn.gate_proj.biases,
-layers.12.self_attn.gate_proj.scales,
-layers.12.self_attn.gate_proj.weight,
-layers.12.self_attn.k_proj.biases,
-layers.12.self_attn.k_proj.scales,
-layers.12.self_attn.k_proj.weight,
-layers.12.self_attn.o_proj.biases,
-layers.12.self_attn.o_proj.scales,
-layers.12.self_attn.o_proj.weight,
-layers.12.self_attn.q_proj.biases,
-layers.12.self_attn.q_proj.scales,
-layers.12.self_attn.q_proj.weight,
-layers.12.self_attn.v_proj.biases,
-layers.12.self_attn.v_proj.scales,
-layers.12.self_attn.v_proj.weight,
-layers.13.input_layernorm.weight,
-layers.13.mlp.down_proj.biases,
-layers.13.mlp.down_proj.scales,
-layers.13.mlp.down_proj.weight,
-layers.13.mlp.gate_proj.biases,
-layers.13.mlp.gate_proj.scales,
-layers.13.mlp.gate_proj.weight,
-layers.13.mlp.up_proj.biases,
-layers.13.mlp.up_proj.scales,
-layers.13.mlp.up_proj.weight,
-layers.13.post_attention_layernorm.weight,
-layers.13.post_feedforward_layernorm.weight,
-layers.13.pre_feedforward_layernorm.weight,
-layers.13.self_attn.gate_proj.biases,
-layers.13.self_attn.gate_proj.scales,
-layers.13.self_attn.gate_proj.weight,
-layers.13.self_attn.k_proj.biases,
-layers.13.self_attn.k_proj.scales,
-layers.13.self_attn.k_proj.weight,
-layers.13.self_attn.o_proj.biases,
-layers.13.self_attn.o_proj.scales,
-layers.13.self_attn.o_proj.weight,
-layers.13.self_attn.q_proj.biases,
-layers.13.self_attn.q_proj.scales,
-layers.13.self_attn.q_proj.weight,
-layers.13.self_attn.v_proj.biases,
-layers.13.self_attn.v_proj.scales,
-layers.13.self_attn.v_proj.weight,
-layers.14.input_layernorm.weight,
-layers.14.mlp.down_proj.biases,
-layers.14.mlp.down_proj.scales,
-layers.14.mlp.down_proj.weight,
-layers.14.mlp.gate_proj.biases,
-layers.14.mlp.gate_proj.scales,
-layers.14.mlp.gate_proj.weight,
-layers.14.mlp.up_proj.biases,
-layers.14.mlp.up_proj.scales,
-layers.14.mlp.up_proj.weight,
-layers.14.post_attention_layernorm.weight,
-layers.14.post_feedforward_layernorm.weight,
-layers.14.pre_feedforward_layernorm.weight,
-layers.14.self_attn.gate_proj.biases,
-layers.14.self_attn.gate_proj.scales,
-layers.14.self_attn.gate_proj.weight,
-layers.14.self_attn.k_proj.biases,
-layers.14.self_attn.k_proj.scales,
-layers.14.self_attn.k_proj.weight,
-layers.14.self_attn.o_proj.biases,
-layers.14.self_attn.o_proj.scales,
-layers.14.self_attn.o_proj.weight,
-layers.14.self_attn.q_proj.biases,
-layers.14.self_attn.q_proj.scales,
-layers.14.self_attn.q_proj.weight,
-layers.14.self_attn.v_proj.biases,
-layers.14.self_attn.v_proj.scales,
-layers.14.self_attn.v_proj.weight,
-layers.15.input_layernorm.weight,
-layers.15.mlp.down_proj.biases,
-layers.15.mlp.down_proj.scales,
-layers.15.mlp.down_proj.weight,
-layers.15.mlp.gate_proj.biases,
-layers.15.mlp.gate_proj.scales,
-layers.15.mlp.gate_proj.weight,
-layers.15.mlp.up_proj.biases,
-layers.15.mlp.up_proj.scales,
-layers.15.mlp.up_proj.weight,
-layers.15.post_attention_layernorm.weight,
-layers.15.post_feedforward_layernorm.weight,
-layers.15.pre_feedforward_layernorm.weight,
-layers.15.self_attn.gate_proj.biases,
-layers.15.self_attn.gate_proj.scales,
-layers.15.self_attn.gate_proj.weight,
-layers.15.self_attn.k_proj.biases,
-layers.15.self_attn.k_proj.scales,
-layers.15.self_attn.k_proj.weight,
-layers.15.self_attn.o_proj.biases,
-layers.15.self_attn.o_proj.scales,
-layers.15.self_attn.o_proj.weight,
-layers.15.self_attn.q_proj.biases,
-layers.15.self_attn.q_proj.scales,
-layers.15.self_attn.q_proj.weight,
-layers.15.self_attn.v_proj.biases,
-layers.15.self_attn.v_proj.scales,
-layers.15.self_attn.v_proj.weight,
-layers.16.input_layernorm.weight,
-layers.16.mlp.down_proj.biases,
-layers.16.mlp.down_proj.scales,
-layers.16.mlp.down_proj.weight,
-layers.16.mlp.gate_proj.biases,
-layers.16.mlp.gate_proj.scales,
-layers.16.mlp.gate_proj.weight,
-layers.16.mlp.up_proj.biases,
-layers.16.mlp.up_proj.scales,
-layers.16.mlp.up_proj.weight,
-layers.16.post_attention_layernorm.weight,
-layers.16.post_feedforward_layernorm.weight,
-layers.16.pre_feedforward_layernorm.weight,
-layers.16.self_attn.gate_proj.biases,
-layers.16.self_attn.gate_proj.scales,
-layers.16.self_attn.gate_proj.weight,
-layers.16.self_attn.k_proj.biases,
-layers.16.self_attn.k_proj.scales,
-layers.16.self_attn.k_proj.weight,
-layers.16.self_attn.o_proj.biases,
-layers.16.self_attn.o_proj.scales,
-layers.16.self_attn.o_proj.weight,
-layers.16.self_attn.q_proj.biases,
-layers.16.self_attn.q_proj.scales,
-layers.16.self_attn.q_proj.weight,
-layers.16.self_attn.v_proj.biases,
-layers.16.self_attn.v_proj.scales,
-layers.16.self_attn.v_proj.weight,
-layers.17.input_layernorm.weight,
-layers.17.mlp.down_proj.biases,
-layers.17.mlp.down_proj.scales,
-layers.17.mlp.down_proj.weight,
-layers.17.mlp.gate_proj.biases,
-layers.17.mlp.gate_proj.scales,
-layers.17.mlp.gate_proj.weight,
-layers.17.mlp.up_proj.biases,
-layers.17.mlp.up_proj.scales,
-layers.17.mlp.up_proj.weight,
-layers.17.post_attention_layernorm.weight,
-layers.17.post_feedforward_layernorm.weight,
-layers.17.pre_feedforward_layernorm.weight,
-layers.17.self_attn.gate_proj.biases,
-layers.17.self_attn.gate_proj.scales,
-layers.17.self_attn.gate_proj.weight,
-layers.17.self_attn.k_proj.biases,
-layers.17.self_attn.k_proj.scales,
-layers.17.self_attn.k_proj.weight,
-layers.17.self_attn.o_proj.biases,
-layers.17.self_attn.o_proj.scales,
-layers.17.self_attn.o_proj.weight,
-layers.17.self_attn.q_proj.biases,
-layers.17.self_attn.q_proj.scales,
-layers.17.self_attn.q_proj.weight,
-layers.17.self_attn.v_proj.biases,
-layers.17.self_attn.v_proj.scales,
-layers.17.self_attn.v_proj.weight,
-layers.18.input_layernorm.weight,
-layers.18.mlp.down_proj.biases,
-layers.18.mlp.down_proj.scales,
-layers.18.mlp.down_proj.weight,
-layers.18.mlp.gate_proj.biases,
-layers.18.mlp.gate_proj.scales,
-layers.18.mlp.gate_proj.weight,
-layers.18.mlp.up_proj.biases,
-layers.18.mlp.up_proj.scales,
-layers.18.mlp.up_proj.weight,
-layers.18.post_attention_layernorm.weight,
-layers.18.post_feedforward_layernorm.weight,
-layers.18.pre_feedforward_layernorm.weight,
-layers.18.self_attn.gate_proj.biases,
-layers.18.self_attn.gate_proj.scales,
-layers.18.self_attn.gate_proj.weight,
-layers.18.self_attn.k_proj.biases,
-layers.18.self_attn.k_proj.scales,
-layers.18.self_attn.k_proj.weight,
-layers.18.self_attn.o_proj.biases,
-layers.18.self_attn.o_proj.scales,
-layers.18.self_attn.o_proj.weight,
-layers.18.self_attn.q_proj.biases,
-layers.18.self_attn.q_proj.scales,
-layers.18.self_attn.q_proj.weight,
-layers.18.self_attn.v_proj.biases,
-layers.18.self_attn.v_proj.scales,
-layers.18.self_attn.v_proj.weight,
-layers.19.input_layernorm.weight,
-layers.19.mlp.down_proj.biases,
-layers.19.mlp.down_proj.scales,
-layers.19.mlp.down_proj.weight,
-layers.19.mlp.gate_proj.biases,
-layers.19.mlp.gate_proj.scales,
-layers.19.mlp.gate_proj.weight,
-layers.19.mlp.up_proj.biases,
-layers.19.mlp.up_proj.scales,
-layers.19.mlp.up_proj.weight,
-layers.19.post_attention_layernorm.weight,
-layers.19.post_feedforward_layernorm.weight,
-layers.19.pre_feedforward_layernorm.weight,
-layers.19.self_attn.gate_proj.biases,
-layers.19.self_attn.gate_proj.scales,
-layers.19.self_attn.gate_proj.weight,
-layers.19.self_attn.k_proj.biases,
-layers.19.self_attn.k_proj.scales,
-layers.19.self_attn.k_proj.weight,
-layers.19.self_attn.o_proj.biases,
-layers.19.self_attn.o_proj.scales,
-layers.19.self_attn.o_proj.weight,
-layers.19.self_attn.q_proj.biases,
-layers.19.self_attn.q_proj.scales,
-layers.19.self_attn.q_proj.weight,
-layers.19.self_attn.v_proj.biases,
-layers.19.self_attn.v_proj.scales,
-layers.19.self_attn.v_proj.weight,
-layers.2.input_layernorm.weight,
-layers.2.mlp.down_proj.biases,
-layers.2.mlp.down_proj.scales,
-layers.2.mlp.down_proj.weight,
-layers.2.mlp.gate_proj.biases,
-layers.2.mlp.gate_proj.scales,
-layers.2.mlp.gate_proj.weight,
-layers.2.mlp.up_proj.biases,
-layers.2.mlp.up_proj.scales,
-layers.2.mlp.up_proj.weight,
-layers.2.post_attention_layernorm.weight,
-layers.2.post_feedforward_layernorm.weight,
-layers.2.pre_feedforward_layernorm.weight,
-layers.2.self_attn.gate_proj.biases,
-layers.2.self_attn.gate_proj.scales,
-layers.2.self_attn.gate_proj.weight,
-layers.2.self_attn.k_proj.biases,
-layers.2.self_attn.k_proj.scales,
-layers.2.self_attn.k_proj.weight,
-layers.2.self_attn.o_proj.biases,
-layers.2.self_attn.o_proj.scales,
-layers.2.self_attn.o_proj.weight,
-layers.2.self_attn.q_proj.biases,
-layers.2.self_attn.q_proj.scales,
-layers.2.self_attn.q_proj.weight,
-layers.2.self_attn.v_proj.biases,
-layers.2.self_attn.v_proj.scales,
-layers.2.self_attn.v_proj.weight,
-layers.20.input_layernorm.weight,
-layers.20.mlp.down_proj.biases,
-layers.20.mlp.down_proj.scales,
-layers.20.mlp.down_proj.weight,
-layers.20.mlp.gate_proj.biases,
-layers.20.mlp.gate_proj.scales,
-layers.20.mlp.gate_proj.weight,
-layers.20.mlp.up_proj.biases,
-layers.20.mlp.up_proj.scales,
-layers.20.mlp.up_proj.weight,
-layers.20.post_attention_layernorm.weight,
-layers.20.post_feedforward_layernorm.weight,
-layers.20.pre_feedforward_layernorm.weight,
-layers.20.self_attn.gate_proj.biases,
-layers.20.self_attn.gate_proj.scales,
-layers.20.self_attn.gate_proj.weight,
-layers.20.self_attn.k_proj.biases,
-layers.20.self_attn.k_proj.scales,
-layers.20.self_attn.k_proj.weight,
-layers.20.self_attn.o_proj.biases,
-layers.20.self_attn.o_proj.scales,
-layers.20.self_attn.o_proj.weight,
-layers.20.self_attn.q_proj.biases,
-layers.20.self_attn.q_proj.scales,
-layers.20.self_attn.q_proj.weight,
-layers.20.self_attn.v_proj.biases,
-layers.20.self_attn.v_proj.scales,
-layers.20.self_attn.v_proj.weight,
-layers.21.input_layernorm.weight,
-layers.21.mlp.down_proj.biases,
-layers.21.mlp.down_proj.scales,
-layers.21.mlp.down_proj.weight,
-layers.21.mlp.gate_proj.biases,
-layers.21.mlp.gate_proj.scales,
-layers.21.mlp.gate_proj.weight,
-layers.21.mlp.up_proj.biases,
-layers.21.mlp.up_proj.scales,
-layers.21.mlp.up_proj.weight,
-layers.21.post_attention_layernorm.weight,
-layers.21.post_feedforward_layernorm.weight,
-layers.21.pre_feedforward_layernorm.weight,
-layers.21.self_attn.gate_proj.biases,
-layers.21.self_attn.gate_proj.scales,
-layers.21.self_attn.gate_proj.weight,
-layers.21.self_attn.k_proj.biases,
-layers.21.self_attn.k_proj.scales,
-layers.21.self_attn.k_proj.weight,
-layers.21.self_attn.o_proj.biases,
-layers.21.self_attn.o_proj.scales,
-layers.21.self_attn.o_proj.weight,
-layers.21.self_attn.q_proj.biases,
-layers.21.self_attn.q_proj.scales,
-layers.21.self_attn.q_proj.weight,
-layers.21.self_attn.v_proj.biases,
-layers.21.self_attn.v_proj.scales,
-layers.21.self_attn.v_proj.weight,
-layers.22.input_layernorm.weight,
-layers.22.mlp.down_proj.biases,
-layers.22.mlp.down_proj.scales,
-layers.22.mlp.down_proj.weight,
-layers.22.mlp.gate_proj.biases,
-layers.22.mlp.gate_proj.scales,
-layers.22.mlp.gate_proj.weight,
-layers.22.mlp.up_proj.biases,
-layers.22.mlp.up_proj.scales,
-layers.22.mlp.up_proj.weight,
-layers.22.post_attention_layernorm.weight,
-layers.22.post_feedforward_layernorm.weight,
-layers.22.pre_feedforward_layernorm.weight,
-layers.22.self_attn.gate_proj.biases,
-layers.22.self_attn.gate_proj.scales,
-layers.22.self_attn.gate_proj.weight,
-layers.22.self_attn.k_proj.biases,
-layers.22.self_attn.k_proj.scales,
-layers.22.self_attn.k_proj.weight,
-layers.22.self_attn.o_proj.biases,
-layers.22.self_attn.o_proj.scales,
-layers.22.self_attn.o_proj.weight,
-layers.22.self_attn.q_proj.biases,
-layers.22.self_attn.q_proj.scales,
-layers.22.self_attn.q_proj.weight,
-layers.22.self_attn.v_proj.biases,
-layers.22.self_attn.v_proj.scales,
-layers.22.self_attn.v_proj.weight,
-layers.23.input_layernorm.weight,
-layers.23.mlp.down_proj.biases,
-layers.23.mlp.down_proj.scales,
-layers.23.mlp.down_proj.weight,
-layers.23.mlp.gate_proj.biases,
-layers.23.mlp.gate_proj.scales,
-layers.23.mlp.gate_proj.weight,
-layers.23.mlp.up_proj.biases,
-layers.23.mlp.up_proj.scales,
-layers.23.mlp.up_proj.weight,
-layers.23.post_attention_layernorm.weight,
-layers.23.post_feedforward_layernorm.weight,
-layers.23.pre_feedforward_layernorm.weight,
-layers.23.self_attn.gate_proj.biases,
-layers.23.self_attn.gate_proj.scales,
-layers.23.self_attn.gate_proj.weight,
-layers.23.self_attn.k_proj.biases,
-layers.23.self_attn.k_proj.scales,
-layers.23.self_attn.k_proj.weight,
-layers.23.self_attn.o_proj.biases,
-layers.23.self_attn.o_proj.scales,
-layers.23.self_attn.o_proj.weight,
-layers.23.self_attn.q_proj.biases,
-layers.23.self_attn.q_proj.scales,
-layers.23.self_attn.q_proj.weight,
-layers.23.self_attn.v_proj.biases,
-layers.23.self_attn.v_proj.scales,
-layers.23.self_attn.v_proj.weight,
-layers.24.input_layernorm.weight,
-layers.24.mlp.down_proj.biases,
-layers.24.mlp.down_proj.scales,
-layers.24.mlp.down_proj.weight,
-layers.24.mlp.gate_proj.biases,
-layers.24.mlp.gate_proj.scales,
-layers.24.mlp.gate_proj.weight,
-layers.24.mlp.up_proj.biases,
-layers.24.mlp.up_proj.scales,
-layers.24.mlp.up_proj.weight,
-layers.24.post_attention_layernorm.weight,
-layers.24.post_feedforward_layernorm.weight,
-layers.24.pre_feedforward_layernorm.weight,
-layers.24.self_attn.gate_proj.biases,
-layers.24.self_attn.gate_proj.scales,
-layers.24.self_attn.gate_proj.weight,
-layers.24.self_attn.k_proj.biases,
-layers.24.self_attn.k_proj.scales,
-layers.24.self_attn.k_proj.weight,
-layers.24.self_attn.o_proj.biases,
-layers.24.self_attn.o_proj.scales,
-layers.24.self_attn.o_proj.weight,
-layers.24.self_attn.q_proj.biases,
-layers.24.self_attn.q_proj.scales,
-layers.24.self_attn.q_proj.weight,
-layers.24.self_attn.v_proj.biases,
-layers.24.self_attn.v_proj.scales,
-layers.24.self_attn.v_proj.weight,
-layers.25.input_layernorm.weight,
-layers.25.mlp.down_proj.biases,
-layers.25.mlp.down_proj.scales,
-layers.25.mlp.down_proj.weight,
-layers.25.mlp.gate_proj.biases,
-layers.25.mlp.gate_proj.scales,
-layers.25.mlp.gate_proj.weight,
-layers.25.mlp.up_proj.biases,
-layers.25.mlp.up_proj.scales,
-layers.25.mlp.up_proj.weight,
-layers.25.post_attention_layernorm.weight,
-layers.25.post_feedforward_layernorm.weight,
-layers.25.pre_feedforward_layernorm.weight,
-layers.25.self_attn.gate_proj.biases,
-layers.25.self_attn.gate_proj.scales,
-layers.25.self_attn.gate_proj.weight,
-layers.25.self_attn.k_proj.biases,
-layers.25.self_attn.k_proj.scales,
-layers.25.self_attn.k_proj.weight,
-layers.25.self_attn.o_proj.biases,
-layers.25.self_attn.o_proj.scales,
-layers.25.self_attn.o_proj.weight,
-layers.25.self_attn.q_proj.biases,
-layers.25.self_attn.q_proj.scales,
-layers.25.self_attn.q_proj.weight,
-layers.25.self_attn.v_proj.biases,
-layers.25.self_attn.v_proj.scales,
-layers.25.self_attn.v_proj.weight,
-layers.26.input_layernorm.weight,
-layers.26.mlp.down_proj.biases,
-layers.26.mlp.down_proj.scales,
-layers.26.mlp.down_proj.weight,
-layers.26.mlp.gate_proj.biases,
-layers.26.mlp.gate_proj.scales,
-layers.26.mlp.gate_proj.weight,
-layers.26.mlp.up_proj.biases,
-layers.26.mlp.up_proj.scales,
-layers.26.mlp.up_proj.weight,
-layers.26.post_attention_layernorm.weight,
-layers.26.post_feedforward_layernorm.weight,
-layers.26.pre_feedforward_layernorm.weight,
-layers.26.self_attn.gate_proj.biases,
-layers.26.self_attn.gate_proj.scales,
-layers.26.self_attn.gate_proj.weight,
-layers.26.self_attn.k_proj.biases,
-layers.26.self_attn.k_proj.scales,
-layers.26.self_attn.k_proj.weight,
-layers.26.self_attn.o_proj.biases,
-layers.26.self_attn.o_proj.scales,
-layers.26.self_attn.o_proj.weight,
-layers.26.self_attn.q_proj.biases,
-layers.26.self_attn.q_proj.scales,
-layers.26.self_attn.q_proj.weight,
-layers.26.self_attn.v_proj.biases,
-layers.26.self_attn.v_proj.scales,
-layers.26.self_attn.v_proj.weight,
-layers.27.input_layernorm.weight,
-layers.27.mlp.down_proj.biases,
-layers.27.mlp.down_proj.scales,
-layers.27.mlp.down_proj.weight,
-layers.27.mlp.gate_proj.biases,
-layers.27.mlp.gate_proj.scales,
-layers.27.mlp.gate_proj.weight,
-layers.27.mlp.up_proj.biases,
-layers.27.mlp.up_proj.scales,
-layers.27.mlp.up_proj.weight,
-layers.27.post_attention_layernorm.weight,
-layers.27.post_feedforward_layernorm.weight,
-layers.27.pre_feedforward_layernorm.weight,
-layers.27.self_attn.gate_proj.biases,
-layers.27.self_attn.gate_proj.scales,
-layers.27.self_attn.gate_proj.weight,
-layers.27.self_attn.k_proj.biases,
-layers.27.self_attn.k_proj.scales,
-layers.27.self_attn.k_proj.weight,
-layers.27.self_attn.o_proj.biases,
-layers.27.self_attn.o_proj.scales,
-layers.27.self_attn.o_proj.weight,
-layers.27.self_attn.q_proj.biases,
-layers.27.self_attn.q_proj.scales,
-layers.27.self_attn.q_proj.weight,
-layers.27.self_attn.v_proj.biases,
-layers.27.self_attn.v_proj.scales,
-layers.27.self_attn.v_proj.weight,
-layers.28.input_layernorm.weight,
-layers.28.mlp.down_proj.biases,
-layers.28.mlp.down_proj.scales,
-layers.28.mlp.down_proj.weight,
-layers.28.mlp.gate_proj.biases,
-layers.28.mlp.gate_proj.scales,
-layers.28.mlp.gate_proj.weight,
-layers.28.mlp.up_proj.biases,
-layers.28.mlp.up_proj.scales,
-layers.28.mlp.up_proj.weight,
-layers.28.post_attention_layernorm.weight,
-layers.28.post_feedforward_layernorm.weight,
-layers.28.pre_feedforward_layernorm.weight,
-layers.28.self_attn.gate_proj.biases,
-layers.28.self_attn.gate_proj.scales,
-layers.28.self_attn.gate_proj.weight,
-layers.28.self_attn.k_proj.biases,
-layers.28.self_attn.k_proj.scales,
-layers.28.self_attn.k_proj.weight,
-layers.28.self_attn.o_proj.biases,
-layers.28.self_attn.o_proj.scales,
-layers.28.self_attn.o_proj.weight,
-layers.28.self_attn.q_proj.biases,
-layers.28.self_attn.q_proj.scales,
-layers.28.self_attn.q_proj.weight,
-layers.28.self_attn.v_proj.biases,
-layers.28.self_attn.v_proj.scales,
-layers.28.self_attn.v_proj.weight,
-layers.29.input_layernorm.weight,
-layers.29.mlp.down_proj.biases,
-layers.29.mlp.down_proj.scales,
-layers.29.mlp.down_proj.weight,
-layers.29.mlp.gate_proj.biases,
-layers.29.mlp.gate_proj.scales,
-layers.29.mlp.gate_proj.weight,
-layers.29.mlp.up_proj.biases,
-layers.29.mlp.up_proj.scales,
-layers.29.mlp.up_proj.weight,
-layers.29.post_attention_layernorm.weight,
-layers.29.post_feedforward_layernorm.weight,
-layers.29.pre_feedforward_layernorm.weight,
-layers.29.self_attn.gate_proj.biases,
-layers.29.self_attn.gate_proj.scales,
-layers.29.self_attn.gate_proj.weight,
-layers.29.self_attn.k_proj.biases,
-layers.29.self_attn.k_proj.scales,
-layers.29.self_attn.k_proj.weight,
-layers.29.self_attn.o_proj.biases,
-layers.29.self_attn.o_proj.scales,
-layers.29.self_attn.o_proj.weight,
-layers.29.self_attn.q_proj.biases,
-layers.29.self_attn.q_proj.scales,
-layers.29.self_attn.q_proj.weight,
-layers.29.self_attn.v_proj.biases,
-layers.29.self_attn.v_proj.scales,
-layers.29.self_attn.v_proj.weight,
-layers.3.input_layernorm.weight,
-layers.3.mlp.down_proj.biases,
-layers.3.mlp.down_proj.scales,
-layers.3.mlp.down_proj.weight,
-layers.3.mlp.gate_proj.biases,
-layers.3.mlp.gate_proj.scales,
-layers.3.mlp.gate_proj.weight,
-layers.3.mlp.up_proj.biases,
-layers.3.mlp.up_proj.scales,
-layers.3.mlp.up_proj.weight,
-layers.3.post_attention_layernorm.weight,
-layers.3.post_feedforward_layernorm.weight,
-layers.3.pre_feedforward_layernorm.weight,
-layers.3.self_attn.gate_proj.biases,
-layers.3.self_attn.gate_proj.scales,
-layers.3.self_attn.gate_proj.weight,
-layers.3.self_attn.k_proj.biases,
-layers.3.self_attn.k_proj.scales,
-layers.3.self_attn.k_proj.weight,
-layers.3.self_attn.o_proj.biases,
-layers.3.self_attn.o_proj.scales,
-layers.3.self_attn.o_proj.weight,
-layers.3.self_attn.q_proj.biases,
-layers.3.self_attn.q_proj.scales,
-layers.3.self_attn.q_proj.weight,
-layers.3.self_attn.v_proj.biases,
-layers.3.self_attn.v_proj.scales,
-layers.3.self_attn.v_proj.weight,
-layers.30.input_layernorm.weight,
-layers.30.mlp.down_proj.biases,
-layers.30.mlp.down_proj.scales,
-layers.30.mlp.down_proj.weight,
-layers.30.mlp.gate_proj.biases,
-layers.30.mlp.gate_proj.scales,
-layers.30.mlp.gate_proj.weight,
-layers.30.mlp.up_proj.biases,
-layers.30.mlp.up_proj.scales,
-layers.30.mlp.up_proj.weight,
-layers.30.post_attention_layernorm.weight,
-layers.30.post_feedforward_layernorm.weight,
-layers.30.pre_feedforward_layernorm.weight,
-layers.30.self_attn.gate_proj.biases,
-layers.30.self_attn.gate_proj.scales,
-layers.30.self_attn.gate_proj.weight,
-layers.30.self_attn.k_proj.biases,
-layers.30.self_attn.k_proj.scales,
-layers.30.self_attn.k_proj.weight,
-layers.30.self_attn.o_proj.biases,
-layers.30.self_attn.o_proj.scales,
-layers.30.self_attn.o_proj.weight,
-layers.30.self_attn.q_proj.biases,
-layers.30.self_attn.q_proj.scales,
-layers.30.self_attn.q_proj.weight,
-layers.30.self_attn.v_proj.biases,
-layers.30.self_attn.v_proj.scales,
-layers.30.self_attn.v_proj.weight,
-layers.31.input_layernorm.weight,
-layers.31.mlp.down_proj.biases,
-layers.31.mlp.down_proj.scales,
-layers.31.mlp.down_proj.weight,
-layers.31.mlp.gate_proj.biases,
-layers.31.mlp.gate_proj.scales,
-layers.31.mlp.gate_proj.weight,
-layers.31.mlp.up_proj.biases,
-layers.31.mlp.up_proj.scales,
-layers.31.mlp.up_proj.weight,
-layers.31.post_attention_layernorm.weight,
-layers.31.post_feedforward_layernorm.weight,
-layers.31.pre_feedforward_layernorm.weight,
-layers.31.self_attn.gate_proj.biases,
-layers.31.self_attn.gate_proj.scales,
-layers.31.self_attn.gate_proj.weight,
-layers.31.self_attn.k_proj.biases,
-layers.31.self_attn.k_proj.scales,
-layers.31.self_attn.k_proj.weight,
-layers.31.self_attn.o_proj.biases,
-layers.31.self_attn.o_proj.scales,
-layers.31.self_attn.o_proj.weight,
-layers.31.self_attn.q_proj.biases,
-layers.31.self_attn.q_proj.scales,
-layers.31.self_attn.q_proj.weight,
-layers.31.self_attn.v_proj.biases,
-layers.31.self_attn.v_proj.scales,
-layers.31.self_attn.v_proj.weight,
-layers.32.input_layernorm.weight,
-layers.32.mlp.down_proj.biases,
-layers.32.mlp.down_proj.scales,
-layers.32.mlp.down_proj.weight,
-layers.32.mlp.gate_proj.biases,
-layers.32.mlp.gate_proj.scales,
-layers.32.mlp.gate_proj.weight,
-layers.32.mlp.up_proj.biases,
-layers.32.mlp.up_proj.scales,
-layers.32.mlp.up_proj.weight,
-layers.32.post_attention_layernorm.weight,
-layers.32.post_feedforward_layernorm.weight,
-layers.32.pre_feedforward_layernorm.weight,
-layers.32.self_attn.gate_proj.biases,
-layers.32.self_attn.gate_proj.scales,
-layers.32.self_attn.gate_proj.weight,
-layers.32.self_attn.k_proj.biases,
-layers.32.self_attn.k_proj.scales,
-layers.32.self_attn.k_proj.weight,
-layers.32.self_attn.o_proj.biases,
-layers.32.self_attn.o_proj.scales,
-layers.32.self_attn.o_proj.weight,
-layers.32.self_attn.q_proj.biases,
-layers.32.self_attn.q_proj.scales,
-layers.32.self_attn.q_proj.weight,
-layers.32.self_attn.v_proj.biases,
-layers.32.self_attn.v_proj.scales,
-layers.32.self_attn.v_proj.weight,
-layers.33.input_layernorm.weight,
-layers.33.mlp.down_proj.biases,
-layers.33.mlp.down_proj.scales,
-layers.33.mlp.down_proj.weight,
-layers.33.mlp.gate_proj.biases,
-layers.33.mlp.gate_proj.scales,
-layers.33.mlp.gate_proj.weight,
-layers.33.mlp.up_proj.biases,
-layers.33.mlp.up_proj.scales,
-layers.33.mlp.up_proj.weight,
-layers.33.post_attention_layernorm.weight,
-layers.33.post_feedforward_layernorm.weight,
-layers.33.pre_feedforward_layernorm.weight,
-layers.33.self_attn.gate_proj.biases,
-layers.33.self_attn.gate_proj.scales,
-layers.33.self_attn.gate_proj.weight,
-layers.33.self_attn.k_proj.biases,
-layers.33.self_attn.k_proj.scales,
-layers.33.self_attn.k_proj.weight,
-layers.33.self_attn.o_proj.biases,
-layers.33.self_attn.o_proj.scales,
-layers.33.self_attn.o_proj.weight,
-layers.33.self_attn.q_proj.biases,
-layers.33.self_attn.q_proj.scales,
-layers.33.self_attn.q_proj.weight,
-layers.33.self_attn.v_proj.biases,
-layers.33.self_attn.v_proj.scales,
-layers.33.self_attn.v_proj.weight,
-layers.34.input_layernorm.weight,
-layers.34.mlp.down_proj.biases,
-layers.34.mlp.down_proj.scales,
-layers.34.mlp.down_proj.weight,
-layers.34.mlp.gate_proj.biases,
-layers.34.mlp.gate_proj.scales,
-layers.34.mlp.gate_proj.weight,
-layers.34.mlp.up_proj.biases,
-layers.34.mlp.up_proj.scales,
-layers.34.mlp.up_proj.weight,
-layers.34.post_attention_layernorm.weight,
-layers.34.post_feedforward_layernorm.weight,
-layers.34.pre_feedforward_layernorm.weight,
-layers.34.self_attn.gate_proj.biases,
-layers.34.self_attn.gate_proj.scales,
-layers.34.self_attn.gate_proj.weight,
-layers.34.self_attn.k_proj.biases,
-layers.34.self_attn.k_proj.scales,
-layers.34.self_attn.k_proj.weight,
-layers.34.self_attn.o_proj.biases,
-layers.34.self_attn.o_proj.scales,
-layers.34.self_attn.o_proj.weight,
-layers.34.self_attn.q_proj.biases,
-layers.34.self_attn.q_proj.scales,
-layers.34.self_attn.q_proj.weight,
-layers.34.self_attn.v_proj.biases,
-layers.34.self_attn.v_proj.scales,
-layers.34.self_attn.v_proj.weight,
-layers.35.input_layernorm.weight,
-layers.35.mlp.down_proj.biases,
-layers.35.mlp.down_proj.scales,
-layers.35.mlp.down_proj.weight,
-layers.35.mlp.gate_proj.biases,
-layers.35.mlp.gate_proj.scales,
-layers.35.mlp.gate_proj.weight,
-layers.35.mlp.up_proj.biases,
-layers.35.mlp.up_proj.scales,
-layers.35.mlp.up_proj.weight,
-layers.35.post_attention_layernorm.weight,
-layers.35.post_feedforward_layernorm.weight,
-layers.35.pre_feedforward_layernorm.weight,
-layers.35.self_attn.gate_proj.biases,
-layers.35.self_attn.gate_proj.scales,
-layers.35.self_attn.gate_proj.weight,
-layers.35.self_attn.k_proj.biases,
-layers.35.self_attn.k_proj.scales,
-layers.35.self_attn.k_proj.weight,
-layers.35.self_attn.o_proj.biases,
-layers.35.self_attn.o_proj.scales,
-layers.35.self_attn.o_proj.weight,
-layers.35.self_attn.q_proj.biases,
-layers.35.self_attn.q_proj.scales,
-layers.35.self_attn.q_proj.weight,
-layers.35.self_attn.v_proj.biases,
-layers.35.self_attn.v_proj.scales,
-layers.35.self_attn.v_proj.weight,
-layers.36.input_layernorm.weight,
-layers.36.mlp.down_proj.biases,
-layers.36.mlp.down_proj.scales,
-layers.36.mlp.down_proj.weight,
-layers.36.mlp.gate_proj.biases,
-layers.36.mlp.gate_proj.scales,
-layers.36.mlp.gate_proj.weight,
-layers.36.mlp.up_proj.biases,
-layers.36.mlp.up_proj.scales,
-layers.36.mlp.up_proj.weight,
-layers.36.post_attention_layernorm.weight,
-layers.36.post_feedforward_layernorm.weight,
-layers.36.pre_feedforward_layernorm.weight,
-layers.36.self_attn.gate_proj.biases,
-layers.36.self_attn.gate_proj.scales,
-layers.36.self_attn.gate_proj.weight,
-layers.36.self_attn.k_proj.biases,
-layers.36.self_attn.k_proj.scales,
-layers.36.self_attn.k_proj.weight,
-layers.36.self_attn.o_proj.biases,
-layers.36.self_attn.o_proj.scales,
-layers.36.self_attn.o_proj.weight,
-layers.36.self_attn.q_proj.biases,
-layers.36.self_attn.q_proj.scales,
-layers.36.self_attn.q_proj.weight,
-layers.36.self_attn.v_proj.biases,
-layers.36.self_attn.v_proj.scales,
-layers.36.self_attn.v_proj.weight,
-layers.37.input_layernorm.weight,
-layers.37.mlp.down_proj.biases,
-layers.37.mlp.down_proj.scales,
-layers.37.mlp.down_proj.weight,
-layers.37.mlp.gate_proj.biases,
-layers.37.mlp.gate_proj.scales,
-layers.37.mlp.gate_proj.weight,
-layers.37.mlp.up_proj.biases,
-layers.37.mlp.up_proj.scales,
-layers.37.mlp.up_proj.weight,
-layers.37.post_attention_layernorm.weight,
-layers.37.post_feedforward_layernorm.weight,
-layers.37.pre_feedforward_layernorm.weight,
-layers.37.self_attn.gate_proj.biases,
-layers.37.self_attn.gate_proj.scales,
-layers.37.self_attn.gate_proj.weight,
-layers.37.self_attn.k_proj.biases,
-layers.37.self_attn.k_proj.scales,
-layers.37.self_attn.k_proj.weight,
-layers.37.self_attn.o_proj.biases,
-layers.37.self_attn.o_proj.scales,
-layers.37.self_attn.o_proj.weight,
-layers.37.self_attn.q_proj.biases,
-layers.37.self_attn.q_proj.scales,
-layers.37.self_attn.q_proj.weight,
-layers.37.self_attn.v_proj.biases,
-layers.37.self_attn.v_proj.scales,
-layers.37.self_attn.v_proj.weight,
-layers.38.input_layernorm.weight,
-layers.38.mlp.down_proj.biases,
-layers.38.mlp.down_proj.scales,
-layers.38.mlp.down_proj.weight,
-layers.38.mlp.gate_proj.biases,
-layers.38.mlp.gate_proj.scales,
-layers.38.mlp.gate_proj.weight,
-layers.38.mlp.up_proj.biases,
-layers.38.mlp.up_proj.scales,
-layers.38.mlp.up_proj.weight,
-layers.38.post_attention_layernorm.weight,
-layers.38.post_feedforward_layernorm.weight,
-layers.38.pre_feedforward_layernorm.weight,
-layers.38.self_attn.gate_proj.biases,
-layers.38.self_attn.gate_proj.scales,
-layers.38.self_attn.gate_proj.weight,
-layers.38.self_attn.k_proj.biases,
-layers.38.self_attn.k_proj.scales,
-layers.38.self_attn.k_proj.weight,
-layers.38.self_attn.o_proj.biases,
-layers.38.self_attn.o_proj.scales,
-layers.38.self_attn.o_proj.weight,
-layers.38.self_attn.q_proj.biases,
-layers.38.self_attn.q_proj.scales,
-layers.38.self_attn.q_proj.weight,
-layers.38.self_attn.v_proj.biases,
-layers.38.self_attn.v_proj.scales,
-layers.38.self_attn.v_proj.weight,
-layers.39.input_layernorm.weight,
-layers.39.mlp.down_proj.biases,
-layers.39.mlp.down_proj.scales,
-layers.39.mlp.down_proj.weight,
-layers.39.mlp.gate_proj.biases,
-layers.39.mlp.gate_proj.scales,
-layers.39.mlp.gate_proj.weight,
-layers.39.mlp.up_proj.biases,
-layers.39.mlp.up_proj.scales,
-layers.39.mlp.up_proj.weight,
-layers.39.post_attention_layernorm.weight,
-layers.39.post_feedforward_layernorm.weight,
-layers.39.pre_feedforward_layernorm.weight,
-layers.39.self_attn.gate_proj.biases,
-layers.39.self_attn.gate_proj.scales,
-layers.39.self_attn.gate_proj.weight,
-layers.39.self_attn.k_proj.biases,
-layers.39.self_attn.k_proj.scales,
-layers.39.self_attn.k_proj.weight,
-layers.39.self_attn.o_proj.biases,
-layers.39.self_attn.o_proj.scales,
-layers.39.self_attn.o_proj.weight,
-layers.39.self_attn.q_proj.biases,
-layers.39.self_attn.q_proj.scales,
-layers.39.self_attn.q_proj.weight,
-layers.39.self_attn.v_proj.biases,
-layers.39.self_attn.v_proj.scales,
-layers.39.self_attn.v_proj.weight,
-layers.4.input_layernorm.weight,
-layers.4.mlp.down_proj.biases,
-layers.4.mlp.down_proj.scales,
-layers.4.mlp.down_proj.weight,
-layers.4.mlp.gate_proj.biases,
-layers.4.mlp.gate_proj.scales,
-layers.4.mlp.gate_proj.weight,
-layers.4.mlp.up_proj.biases,
-layers.4.mlp.up_proj.scales,
-layers.4.mlp.up_proj.weight,
-layers.4.post_attention_layernorm.weight,
-layers.4.post_feedforward_layernorm.weight,
-layers.4.pre_feedforward_layernorm.weight,
-layers.4.self_attn.gate_proj.biases,
-layers.4.self_attn.gate_proj.scales,
-layers.4.self_attn.gate_proj.weight,
-layers.4.self_attn.k_proj.biases,
-layers.4.self_attn.k_proj.scales,
-layers.4.self_attn.k_proj.weight,
-layers.4.self_attn.o_proj.biases,
-layers.4.self_attn.o_proj.scales,
-layers.4.self_attn.o_proj.weight,
-layers.4.self_attn.q_proj.biases,
-layers.4.self_attn.q_proj.scales,
-layers.4.self_attn.q_proj.weight,
-layers.4.self_attn.v_proj.biases,
-layers.4.self_attn.v_proj.scales,
-layers.4.self_attn.v_proj.weight,
-layers.40.input_layernorm.weight,
-layers.40.mlp.down_proj.biases,
-layers.40.mlp.down_proj.scales,
-layers.40.mlp.down_proj.weight,
-layers.40.mlp.gate_proj.biases,
-layers.40.mlp.gate_proj.scales,
-layers.40.mlp.gate_proj.weight,
-layers.40.mlp.up_proj.biases,
-layers.40.mlp.up_proj.scales,
-layers.40.mlp.up_proj.weight,
-layers.40.post_attention_layernorm.weight,
-layers.40.post_feedforward_layernorm.weight,
-layers.40.pre_feedforward_layernorm.weight,
-layers.40.self_attn.gate_proj.biases,
-layers.40.self_attn.gate_proj.scales,
-layers.40.self_attn.gate_proj.weight,
-layers.40.self_attn.k_proj.biases,
-layers.40.self_attn.k_proj.scales,
-layers.40.self_attn.k_proj.weight,
-layers.40.self_attn.o_proj.biases,
-layers.40.self_attn.o_proj.scales,
-layers.40.self_attn.o_proj.weight,
-layers.40.self_attn.q_proj.biases,
-layers.40.self_attn.q_proj.scales,
-layers.40.self_attn.q_proj.weight,
-layers.40.self_attn.v_proj.biases,
-layers.40.self_attn.v_proj.scales,
-layers.40.self_attn.v_proj.weight,
-layers.41.input_layernorm.weight,
-layers.41.mlp.down_proj.biases,
-layers.41.mlp.down_proj.scales,
-layers.41.mlp.down_proj.weight,
-layers.41.mlp.gate_proj.biases,
-layers.41.mlp.gate_proj.scales,
-layers.41.mlp.gate_proj.weight,
-layers.41.mlp.up_proj.biases,
-layers.41.mlp.up_proj.scales,
-layers.41.mlp.up_proj.weight,
-layers.41.post_attention_layernorm.weight,
-layers.41.post_feedforward_layernorm.weight,
-layers.41.pre_feedforward_layernorm.weight,
-layers.41.self_attn.gate_proj.biases,
-layers.41.self_attn.gate_proj.scales,
-layers.41.self_attn.gate_proj.weight,
-layers.41.self_attn.k_proj.biases,
-layers.41.self_attn.k_proj.scales,
-layers.41.self_attn.k_proj.weight,
-layers.41.self_attn.o_proj.biases,
-layers.41.self_attn.o_proj.scales,
-layers.41.self_attn.o_proj.weight,
-layers.41.self_attn.q_proj.biases,
-layers.41.self_attn.q_proj.scales,
-layers.41.self_attn.q_proj.weight,
-layers.41.self_attn.v_proj.biases,
-layers.41.self_attn.v_proj.scales,
-layers.41.self_attn.v_proj.weight,
-layers.42.input_layernorm.weight,
-layers.42.mlp.down_proj.biases,
-layers.42.mlp.down_proj.scales,
-layers.42.mlp.down_proj.weight,
-layers.42.mlp.gate_proj.biases,
-layers.42.mlp.gate_proj.scales,
-layers.42.mlp.gate_proj.weight,
-layers.42.mlp.up_proj.biases,
-layers.42.mlp.up_proj.scales,
-layers.42.mlp.up_proj.weight,
-layers.42.post_attention_layernorm.weight,
-layers.42.post_feedforward_layernorm.weight,
-layers.42.pre_feedforward_layernorm.weight,
-layers.42.self_attn.gate_proj.biases,
-layers.42.self_attn.gate_proj.scales,
-layers.42.self_attn.gate_proj.weight,
-layers.42.self_attn.k_proj.biases,
-layers.42.self_attn.k_proj.scales,
-layers.42.self_attn.k_proj.weight,
-layers.42.self_attn.o_proj.biases,
-layers.42.self_attn.o_proj.scales,
-layers.42.self_attn.o_proj.weight,
-layers.42.self_attn.q_proj.biases,
-layers.42.self_attn.q_proj.scales,
-layers.42.self_attn.q_proj.weight,
-layers.42.self_attn.v_proj.biases,
-layers.42.self_attn.v_proj.scales,
-layers.42.self_attn.v_proj.weight,
-layers.43.input_layernorm.weight,
-layers.43.mlp.down_proj.biases,
-layers.43.mlp.down_proj.scales,
-layers.43.mlp.down_proj.weight,
-layers.43.mlp.gate_proj.biases,
-layers.43.mlp.gate_proj.scales,
-layers.43.mlp.gate_proj.weight,
-layers.43.mlp.up_proj.biases,
-layers.43.mlp.up_proj.scales,
-layers.43.mlp.up_proj.weight,
-layers.43.post_attention_layernorm.weight,
-layers.43.post_feedforward_layernorm.weight,
-layers.43.pre_feedforward_layernorm.weight,
-layers.43.self_attn.gate_proj.biases,
-layers.43.self_attn.gate_proj.scales,
-layers.43.self_attn.gate_proj.weight,
-layers.43.self_attn.k_proj.biases,
-layers.43.self_attn.k_proj.scales,
-layers.43.self_attn.k_proj.weight,
-layers.43.self_attn.o_proj.biases,
-layers.43.self_attn.o_proj.scales,
-layers.43.self_attn.o_proj.weight,
-layers.43.self_attn.q_proj.biases,
-layers.43.self_attn.q_proj.scales,
-layers.43.self_attn.q_proj.weight,
-layers.43.self_attn.v_proj.biases,
-layers.43.self_attn.v_proj.scales,
-layers.43.self_attn.v_proj.weight,
-layers.44.input_layernorm.weight,
-layers.44.mlp.down_proj.biases,
-layers.44.mlp.down_proj.scales,
-layers.44.mlp.down_proj.weight,
-layers.44.mlp.gate_proj.biases,
-layers.44.mlp.gate_proj.scales,
-layers.44.mlp.gate_proj.weight,
-layers.44.mlp.up_proj.biases,
-layers.44.mlp.up_proj.scales,
-layers.44.mlp.up_proj.weight,
-layers.44.post_attention_layernorm.weight,
-layers.44.post_feedforward_layernorm.weight,
-layers.44.pre_feedforward_layernorm.weight,
-layers.44.self_attn.gate_proj.biases,
-layers.44.self_attn.gate_proj.scales,
-layers.44.self_attn.gate_proj.weight,
-layers.44.self_attn.k_proj.biases,
-layers.44.self_attn.k_proj.scales,
-layers.44.self_attn.k_proj.weight,
-layers.44.self_attn.o_proj.biases,
-layers.44.self_attn.o_proj.scales,
-layers.44.self_attn.o_proj.weight,
-layers.44.self_attn.q_proj.biases,
-layers.44.self_attn.q_proj.scales,
-layers.44.self_attn.q_proj.weight,
-layers.44.self_attn.v_proj.biases,
-layers.44.self_attn.v_proj.scales,
-layers.44.self_attn.v_proj.weight,
-layers.45.input_layernorm.weight,
-layers.45.mlp.down_proj.biases,
-layers.45.mlp.down_proj.scales,
-layers.45.mlp.down_proj.weight,
-layers.45.mlp.gate_proj.biases,
-layers.45.mlp.gate_proj.scales,
-layers.45.mlp.gate_proj.weight,
-layers.45.mlp.up_proj.biases,
-layers.45.mlp.up_proj.scales,
-layers.45.mlp.up_proj.weight,
-layers.45.post_attention_layernorm.weight,
-layers.45.post_feedforward_layernorm.weight,
-layers.45.pre_feedforward_layernorm.weight,
-layers.45.self_attn.gate_proj.biases,
-layers.45.self_attn.gate_proj.scales,
-layers.45.self_attn.gate_proj.weight,
-layers.45.self_attn.k_proj.biases,
-layers.45.self_attn.k_proj.scales,
-layers.45.self_attn.k_proj.weight,
-layers.45.self_attn.o_proj.biases,
-layers.45.self_attn.o_proj.scales,
-layers.45.self_attn.o_proj.weight,
-layers.45.self_attn.q_proj.biases,
-layers.45.self_attn.q_proj.scales,
-layers.45.self_attn.q_proj.weight,
-layers.45.self_attn.v_proj.biases,
-layers.45.self_attn.v_proj.scales,
-layers.45.self_attn.v_proj.weight,
-layers.46.input_layernorm.weight,
-layers.46.mlp.down_proj.biases,
-layers.46.mlp.down_proj.scales,
-layers.46.mlp.down_proj.weight,
-layers.46.mlp.gate_proj.biases,
-layers.46.mlp.gate_proj.scales,
-layers.46.mlp.gate_proj.weight,
-layers.46.mlp.up_proj.biases,
-layers.46.mlp.up_proj.scales,
-layers.46.mlp.up_proj.weight,
-layers.46.post_attention_layernorm.weight,
-layers.46.post_feedforward_layernorm.weight,
-layers.46.pre_feedforward_layernorm.weight,
-layers.46.self_attn.gate_proj.biases,
-layers.46.self_attn.gate_proj.scales,
-layers.46.self_attn.gate_proj.weight,
-layers.46.self_attn.k_proj.biases,
-layers.46.self_attn.k_proj.scales,
-layers.46.self_attn.k_proj.weight,
-layers.46.self_attn.o_proj.biases,
-layers.46.self_attn.o_proj.scales,
-layers.46.self_attn.o_proj.weight,
-layers.46.self_attn.q_proj.biases,
-layers.46.self_attn.q_proj.scales,
-layers.46.self_attn.q_proj.weight,
-layers.46.self_attn.v_proj.biases,
-layers.46.self_attn.v_proj.scales,
-layers.46.self_attn.v_proj.weight,
-layers.47.input_layernorm.weight,
-layers.47.mlp.down_proj.biases,
-layers.47.mlp.down_proj.scales,
-layers.47.mlp.down_proj.weight,
-layers.47.mlp.gate_proj.biases,
-layers.47.mlp.gate_proj.scales,
-layers.47.mlp.gate_proj.weight,
-layers.47.mlp.up_proj.biases,
-layers.47.mlp.up_proj.scales,
-layers.47.mlp.up_proj.weight,
-layers.47.post_attention_layernorm.weight,
-layers.47.post_feedforward_layernorm.weight,
-layers.47.pre_feedforward_layernorm.weight,
-layers.47.self_attn.gate_proj.biases,
-layers.47.self_attn.gate_proj.scales,
-layers.47.self_attn.gate_proj.weight,
-layers.47.self_attn.k_proj.biases,
-layers.47.self_attn.k_proj.scales,
-layers.47.self_attn.k_proj.weight,
-layers.47.self_attn.o_proj.biases,
-layers.47.self_attn.o_proj.scales,
-layers.47.self_attn.o_proj.weight,
-layers.47.self_attn.q_proj.biases,
-layers.47.self_attn.q_proj.scales,
-layers.47.self_attn.q_proj.weight,
-layers.47.self_attn.v_proj.biases,
-layers.47.self_attn.v_proj.scales,
-layers.47.self_attn.v_proj.weight,
-layers.48.input_layernorm.weight,
-layers.48.mlp.down_proj.biases,
-layers.48.mlp.down_proj.scales,
-layers.48.mlp.down_proj.weight,
-layers.48.mlp.gate_proj.biases,
-layers.48.mlp.gate_proj.scales,
-layers.48.mlp.gate_proj.weight,
-layers.48.mlp.up_proj.biases,
-layers.48.mlp.up_proj.scales,
-layers.48.mlp.up_proj.weight,
-layers.48.post_attention_layernorm.weight,
-layers.48.post_feedforward_layernorm.weight,
-layers.48.pre_feedforward_layernorm.weight,
-layers.48.self_attn.gate_proj.biases,
-layers.48.self_attn.gate_proj.scales,
-layers.48.self_attn.gate_proj.weight,
-layers.48.self_attn.k_proj.biases,
-layers.48.self_attn.k_proj.scales,
-layers.48.self_attn.k_proj.weight,
-layers.48.self_attn.o_proj.biases,
-layers.48.self_attn.o_proj.scales,
-layers.48.self_attn.o_proj.weight,
-layers.48.self_attn.q_proj.biases,
-layers.48.self_attn.q_proj.scales,
-layers.48.self_attn.q_proj.weight,
-layers.48.self_attn.v_proj.biases,
-layers.48.self_attn.v_proj.scales,
-layers.48.self_attn.v_proj.weight,
-layers.49.input_layernorm.weight,
-layers.49.mlp.down_proj.biases,
-layers.49.mlp.down_proj.scales,
-layers.49.mlp.down_proj.weight,
-layers.49.mlp.gate_proj.biases,
-layers.49.mlp.gate_proj.scales,
-layers.49.mlp.gate_proj.weight,
-layers.49.mlp.up_proj.biases,
-layers.49.mlp.up_proj.scales,
-layers.49.mlp.up_proj.weight,
-layers.49.post_attention_layernorm.weight,
-layers.49.post_feedforward_layernorm.weight,
-layers.49.pre_feedforward_layernorm.weight,
-layers.49.self_attn.gate_proj.biases,
-layers.49.self_attn.gate_proj.scales,
-layers.49.self_attn.gate_proj.weight,
-layers.49.self_attn.k_proj.biases,
-layers.49.self_attn.k_proj.scales,
-layers.49.self_attn.k_proj.weight,
-layers.49.self_attn.o_proj.biases,
-layers.49.self_attn.o_proj.scales,
-layers.49.self_attn.o_proj.weight,
-layers.49.self_attn.q_proj.biases,
-layers.49.self_attn.q_proj.scales,
-layers.49.self_attn.q_proj.weight,
-layers.49.self_attn.v_proj.biases,
-layers.49.self_attn.v_proj.scales,
-layers.49.self_attn.v_proj.weight,
-layers.5.input_layernorm.weight,
-layers.5.mlp.down_proj.biases,
-layers.5.mlp.down_proj.scales,
-layers.5.mlp.down_proj.weight,
-layers.5.mlp.gate_proj.biases,
-layers.5.mlp.gate_proj.scales,
-layers.5.mlp.gate_proj.weight,
-layers.5.mlp.up_proj.biases,
-layers.5.mlp.up_proj.scales,
-layers.5.mlp.up_proj.weight,
-layers.5.post_attention_layernorm.weight,
-layers.5.post_feedforward_layernorm.weight,
-layers.5.pre_feedforward_layernorm.weight,
-layers.5.self_attn.gate_proj.biases,
-layers.5.self_attn.gate_proj.scales,
-layers.5.self_attn.gate_proj.weight,
-layers.5.self_attn.k_proj.biases,
-layers.5.self_attn.k_proj.scales,
-layers.5.self_attn.k_proj.weight,
-layers.5.self_attn.o_proj.biases,
-layers.5.self_attn.o_proj.scales,
-layers.5.self_attn.o_proj.weight,
-layers.5.self_attn.q_proj.biases,
-layers.5.self_attn.q_proj.scales,
-layers.5.self_attn.q_proj.weight,
-layers.5.self_attn.v_proj.biases,
-layers.5.self_attn.v_proj.scales,
-layers.5.self_attn.v_proj.weight,
-layers.50.input_layernorm.weight,
-layers.50.mlp.down_proj.biases,
-layers.50.mlp.down_proj.scales,
-layers.50.mlp.down_proj.weight,
-layers.50.mlp.gate_proj.biases,
-layers.50.mlp.gate_proj.scales,
-layers.50.mlp.gate_proj.weight,
-layers.50.mlp.up_proj.biases,
-layers.50.mlp.up_proj.scales,
-layers.50.mlp.up_proj.weight,
-layers.50.post_attention_layernorm.weight,
-layers.50.post_feedforward_layernorm.weight,
-layers.50.pre_feedforward_layernorm.weight,
-layers.50.self_attn.gate_proj.biases,
-layers.50.self_attn.gate_proj.scales,
-layers.50.self_attn.gate_proj.weight,
-layers.50.self_attn.k_proj.biases,
-layers.50.self_attn.k_proj.scales,
-layers.50.self_attn.k_proj.weight,
-layers.50.self_attn.o_proj.biases,
-layers.50.self_attn.o_proj.scales,
-layers.50.self_attn.o_proj.weight,
-layers.50.self_attn.q_proj.biases,
-layers.50.self_attn.q_proj.scales,
-layers.50.self_attn.q_proj.weight,
-layers.50.self_attn.v_proj.biases,
-layers.50.self_attn.v_proj.scales,
-layers.50.self_attn.v_proj.weight,
-layers.51.input_layernorm.weight,
-layers.51.mlp.down_proj.biases,
-layers.51.mlp.down_proj.scales,
-layers.51.mlp.down_proj.weight,
-layers.51.mlp.gate_proj.biases,
-layers.51.mlp.gate_proj.scales,
-layers.51.mlp.gate_proj.weight,
-layers.51.mlp.up_proj.biases,
-layers.51.mlp.up_proj.scales,
-layers.51.mlp.up_proj.weight,
-layers.51.post_attention_layernorm.weight,
-layers.51.post_feedforward_layernorm.weight,
-layers.51.pre_feedforward_layernorm.weight,
-layers.51.self_attn.gate_proj.biases,
-layers.51.self_attn.gate_proj.scales,
-layers.51.self_attn.gate_proj.weight,
-layers.51.self_attn.k_proj.biases,
-layers.51.self_attn.k_proj.scales,
-layers.51.self_attn.k_proj.weight,
-layers.51.self_attn.o_proj.biases,
-layers.51.self_attn.o_proj.scales,
-layers.51.self_attn.o_proj.weight,
-layers.51.self_attn.q_proj.biases,
-layers.51.self_attn.q_proj.scales,
-layers.51.self_attn.q_proj.weight,
-layers.51.self_attn.v_proj.biases,
-layers.51.self_attn.v_proj.scales,
-layers.51.self_attn.v_proj.weight,
-layers.6.input_layernorm.weight,
-layers.6.mlp.down_proj.biases,
-layers.6.mlp.down_proj.scales,
-layers.6.mlp.down_proj.weight,
-layers.6.mlp.gate_proj.biases,
-layers.6.mlp.gate_proj.scales,
-layers.6.mlp.gate_proj.weight,
-layers.6.mlp.up_proj.biases,
-layers.6.mlp.up_proj.scales,
-layers.6.mlp.up_proj.weight,
-layers.6.post_attention_layernorm.weight,
-layers.6.post_feedforward_layernorm.weight,
-layers.6.pre_feedforward_layernorm.weight,
-layers.6.self_attn.gate_proj.biases,
-layers.6.self_attn.gate_proj.scales,
-layers.6.self_attn.gate_proj.weight,
-layers.6.self_attn.k_proj.biases,
-layers.6.self_attn.k_proj.scales,
-layers.6.self_attn.k_proj.weight,
-layers.6.self_attn.o_proj.biases,
-layers.6.self_attn.o_proj.scales,
-layers.6.self_attn.o_proj.weight,
-layers.6.self_attn.q_proj.biases,
-layers.6.self_attn.q_proj.scales,
-layers.6.self_attn.q_proj.weight,
-layers.6.self_attn.v_proj.biases,
-layers.6.self_attn.v_proj.scales,
-layers.6.self_attn.v_proj.weight,
-layers.7.input_layernorm.weight,
-layers.7.mlp.down_proj.biases,
-layers.7.mlp.down_proj.scales,
-layers.7.mlp.down_proj.weight,
-layers.7.mlp.gate_proj.biases,
-layers.7.mlp.gate_proj.scales,
-layers.7.mlp.gate_proj.weight,
-layers.7.mlp.up_proj.biases,
-layers.7.mlp.up_proj.scales,
-layers.7.mlp.up_proj.weight,
-layers.7.post_attention_layernorm.weight,
-layers.7.post_feedforward_layernorm.weight,
-layers.7.pre_feedforward_layernorm.weight,
-layers.7.self_attn.gate_proj.biases,
-layers.7.self_attn.gate_proj.scales,
-layers.7.self_attn.gate_proj.weight,
-layers.7.self_attn.k_proj.biases,
-layers.7.self_attn.k_proj.scales,
-layers.7.self_attn.k_proj.weight,
-layers.7.self_attn.o_proj.biases,
-layers.7.self_attn.o_proj.scales,
-layers.7.self_attn.o_proj.weight,
-layers.7.self_attn.q_proj.biases,
-layers.7.self_attn.q_proj.scales,
-layers.7.self_attn.q_proj.weight,
-layers.7.self_attn.v_proj.biases,
-layers.7.self_attn.v_proj.scales,
-layers.7.self_attn.v_proj.weight,
-layers.8.input_layernorm.weight,
-layers.8.mlp.down_proj.biases,
-layers.8.mlp.down_proj.scales,
-layers.8.mlp.down_proj.weight,
-layers.8.mlp.gate_proj.biases,
-layers.8.mlp.gate_proj.scales,
-layers.8.mlp.gate_proj.weight,
-layers.8.mlp.up_proj.biases,
-layers.8.mlp.up_proj.scales,
-layers.8.mlp.up_proj.weight,
-layers.8.post_attention_layernorm.weight,
-layers.8.post_feedforward_layernorm.weight,
-layers.8.pre_feedforward_layernorm.weight,
-layers.8.self_attn.gate_proj.biases,
-layers.8.self_attn.gate_proj.scales,
-layers.8.self_attn.gate_proj.weight,
-layers.8.self_attn.k_proj.biases,
-layers.8.self_attn.k_proj.scales,
-layers.8.self_attn.k_proj.weight,
-layers.8.self_attn.o_proj.biases,
-layers.8.self_attn.o_proj.scales,
-layers.8.self_attn.o_proj.weight,
-layers.8.self_attn.q_proj.biases,
-layers.8.self_attn.q_proj.scales,
-layers.8.self_attn.q_proj.weight,
-layers.8.self_attn.v_proj.biases,
-layers.8.self_attn.v_proj.scales,
-layers.8.self_attn.v_proj.weight,
-layers.9.input_layernorm.weight,
-layers.9.mlp.down_proj.biases,
-layers.9.mlp.down_proj.scales,
-layers.9.mlp.down_proj.weight,
-layers.9.mlp.gate_proj.biases,
-layers.9.mlp.gate_proj.scales,
-layers.9.mlp.gate_proj.weight,
-layers.9.mlp.up_proj.biases,
-layers.9.mlp.up_proj.scales,
-layers.9.mlp.up_proj.weight,
-layers.9.post_attention_layernorm.weight,
-layers.9.post_feedforward_layernorm.weight,
-layers.9.pre_feedforward_layernorm.weight,
-layers.9.self_attn.gate_proj.biases,
-layers.9.self_attn.gate_proj.scales,
-layers.9.self_attn.gate_proj.weight,
-layers.9.self_attn.k_proj.biases,
-layers.9.self_attn.k_proj.scales,
-layers.9.self_attn.k_proj.weight,
-layers.9.self_attn.o_proj.biases,
-layers.9.self_attn.o_proj.scales,
-layers.9.self_attn.o_proj.weight,
-layers.9.self_attn.q_proj.biases,
-layers.9.self_attn.q_proj.scales,
-layers.9.self_attn.q_proj.weight,
-layers.9.self_attn.v_proj.biases,
-layers.9.self_attn.v_proj.scales,
-layers.9.self_attn.v_proj.weight,
-norm.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14614, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13616, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 1460 parameters not in model: 
-embed_tokens.biases,
-embed_tokens.scales,
-embed_tokens.weight,
-layers.0.input_layernorm.weight,
-layers.0.mlp.down_proj.biases,
-layers.0.mlp.down_proj.scales,
-layers.0.mlp.down_proj.weight,
-layers.0.mlp.gate_proj.biases,
-layers.0.mlp.gate_proj.scales,
-layers.0.mlp.gate_proj.weight,
-layers.0.mlp.up_proj.biases,
-layers.0.mlp.up_proj.scales,
-layers.0.mlp.up_proj.weight,
-layers.0.post_attention_layernorm.weight,
-layers.0.post_feedforward_layernorm.weight,
-layers.0.pre_feedforward_layernorm.weight,
-layers.0.self_attn.gate_proj.biases,
-layers.0.self_attn.gate_proj.scales,
-layers.0.self_attn.gate_proj.weight,
-layers.0.self_attn.k_proj.biases,
-layers.0.self_attn.k_proj.scales,
-layers.0.self_attn.k_proj.weight,
-layers.0.self_attn.o_proj.biases,
-layers.0.self_attn.o_proj.scales,
-layers.0.self_attn.o_proj.weight,
-layers.0.self_attn.q_proj.biases,
-layers.0.self_attn.q_proj.scales,
-layers.0.self_attn.q_proj.weight,
-layers.0.self_attn.v_proj.biases,
-layers.0.self_attn.v_proj.scales,
-layers.0.self_attn.v_proj.weight,
-layers.1.input_layernorm.weight,
-layers.1.mlp.down_proj.biases,
-layers.1.mlp.down_proj.scales,
-layers.1.mlp.down_proj.weight,
-layers.1.mlp.gate_proj.biases,
-layers.1.mlp.gate_proj.scales,
-layers.1.mlp.gate_proj.weight,
-layers.1.mlp.up_proj.biases,
-layers.1.mlp.up_proj.scales,
-layers.1.mlp.up_proj.weight,
-layers.1.post_attention_layernorm.weight,
-layers.1.post_feedforward_layernorm.weight,
-layers.1.pre_feedforward_layernorm.weight,
-layers.1.self_attn.gate_proj.biases,
-layers.1.self_attn.gate_proj.scales,
-layers.1.self_attn.gate_proj.weight,
-layers.1.self_attn.k_proj.biases,
-layers.1.self_attn.k_proj.scales,
-layers.1.self_attn.k_proj.weight,
-layers.1.self_attn.o_proj.biases,
-layers.1.self_attn.o_proj.scales,
-layers.1.self_attn.o_proj.weight,
-layers.1.self_attn.q_proj.biases,
-layers.1.self_attn.q_proj.scales,
-layers.1.self_attn.q_proj.weight,
-layers.1.self_attn.v_proj.biases,
-layers.1.self_attn.v_proj.scales,
-layers.1.self_attn.v_proj.weight,
-layers.10.input_layernorm.weight,
-layers.10.mlp.down_proj.biases,
-layers.10.mlp.down_proj.scales,
-layers.10.mlp.down_proj.weight,
-layers.10.mlp.gate_proj.biases,
-layers.10.mlp.gate_proj.scales,
-layers.10.mlp.gate_proj.weight,
-layers.10.mlp.up_proj.biases,
-layers.10.mlp.up_proj.scales,
-layers.10.mlp.up_proj.weight,
-layers.10.post_attention_layernorm.weight,
-layers.10.post_feedforward_layernorm.weight,
-layers.10.pre_feedforward_layernorm.weight,
-layers.10.self_attn.gate_proj.biases,
-layers.10.self_attn.gate_proj.scales,
-layers.10.self_attn.gate_proj.weight,
-layers.10.self_attn.k_proj.biases,
-layers.10.self_attn.k_proj.scales,
-layers.10.self_attn.k_proj.weight,
-layers.10.self_attn.o_proj.biases,
-layers.10.self_attn.o_proj.scales,
-layers.10.self_attn.o_proj.weight,
-layers.10.self_attn.q_proj.biases,
-layers.10.self_attn.q_proj.scales,
-layers.10.self_attn.q_proj.weight,
-layers.10.self_attn.v_proj.biases,
-layers.10.self_attn.v_proj.scales,
-layers.10.self_attn.v_proj.weight,
-layers.11.input_layernorm.weight,
-layers.11.mlp.down_proj.biases,
-layers.11.mlp.down_proj.scales,
-layers.11.mlp.down_proj.weight,
-layers.11.mlp.gate_proj.biases,
-layers.11.mlp.gate_proj.scales,
-layers.11.mlp.gate_proj.weight,
-layers.11.mlp.up_proj.biases,
-layers.11.mlp.up_proj.scales,
-layers.11.mlp.up_proj.weight,
-layers.11.post_attention_layernorm.weight,
-layers.11.post_feedforward_layernorm.weight,
-layers.11.pre_feedforward_layernorm.weight,
-layers.11.self_attn.gate_proj.biases,
-layers.11.self_attn.gate_proj.scales,
-layers.11.self_attn.gate_proj.weight,
-layers.11.self_attn.k_proj.biases,
-layers.11.self_attn.k_proj.scales,
-layers.11.self_attn.k_proj.weight,
-layers.11.self_attn.o_proj.biases,
-layers.11.self_attn.o_proj.scales,
-layers.11.self_attn.o_proj.weight,
-layers.11.self_attn.q_proj.biases,
-layers.11.self_attn.q_proj.scales,
-layers.11.self_attn.q_proj.weight,
-layers.11.self_attn.v_proj.biases,
-layers.11.self_attn.v_proj.scales,
-layers.11.self_attn.v_proj.weight,
-layers.12.input_layernorm.weight,
-layers.12.mlp.down_proj.biases,
-layers.12.mlp.down_proj.scales,
-layers.12.mlp.down_proj.weight,
-layers.12.mlp.gate_proj.biases,
-layers.12.mlp.gate_proj.scales,
-layers.12.mlp.gate_proj.weight,
-layers.12.mlp.up_proj.biases,
-layers.12.mlp.up_proj.scales,
-layers.12.mlp.up_proj.weight,
-layers.12.post_attention_layernorm.weight,
-layers.12.post_feedforward_layernorm.weight,
-layers.12.pre_feedforward_layernorm.weight,
-layers.12.self_attn.gate_proj.biases,
-layers.12.self_attn.gate_proj.scales,
-layers.12.self_attn.gate_proj.weight,
-layers.12.self_attn.k_proj.biases,
-layers.12.self_attn.k_proj.scales,
-layers.12.self_attn.k_proj.weight,
-layers.12.self_attn.o_proj.biases,
-layers.12.self_attn.o_proj.scales,
-layers.12.self_attn.o_proj.weight,
-layers.12.self_attn.q_proj.biases,
-layers.12.self_attn.q_proj.scales,
-layers.12.self_attn.q_proj.weight,
-layers.12.self_attn.v_proj.biases,
-layers.12.self_attn.v_proj.scales,
-layers.12.self_attn.v_proj.weight,
-layers.13.input_layernorm.weight,
-layers.13.mlp.down_proj.biases,
-layers.13.mlp.down_proj.scales,
-layers.13.mlp.down_proj.weight,
-layers.13.mlp.gate_proj.biases,
-layers.13.mlp.gate_proj.scales,
-layers.13.mlp.gate_proj.weight,
-layers.13.mlp.up_proj.biases,
-layers.13.mlp.up_proj.scales,
-layers.13.mlp.up_proj.weight,
-layers.13.post_attention_layernorm.weight,
-layers.13.post_feedforward_layernorm.weight,
-layers.13.pre_feedforward_layernorm.weight,
-layers.13.self_attn.gate_proj.biases,
-layers.13.self_attn.gate_proj.scales,
-layers.13.self_attn.gate_proj.weight,
-layers.13.self_attn.k_proj.biases,
-layers.13.self_attn.k_proj.scales,
-layers.13.self_attn.k_proj.weight,
-layers.13.self_attn.o_proj.biases,
-layers.13.self_attn.o_proj.scales,
-layers.13.self_attn.o_proj.weight,
-layers.13.self_attn.q_proj.biases,
-layers.13.self_attn.q_proj.scales,
-layers.13.self_attn.q_proj.weight,
-layers.13.self_attn.v_proj.biases,
-layers.13.self_attn.v_proj.scales,
-layers.13.self_attn.v_proj.weight,
-layers.14.input_layernorm.weight,
-layers.14.mlp.down_proj.biases,
-layers.14.mlp.down_proj.scales,
-layers.14.mlp.down_proj.weight,
-layers.14.mlp.gate_proj.biases,
-layers.14.mlp.gate_proj.scales,
-layers.14.mlp.gate_proj.weight,
-layers.14.mlp.up_proj.biases,
-layers.14.mlp.up_proj.scales,
-layers.14.mlp.up_proj.weight,
-layers.14.post_attention_layernorm.weight,
-layers.14.post_feedforward_layernorm.weight,
-layers.14.pre_feedforward_layernorm.weight,
-layers.14.self_attn.gate_proj.biases,
-layers.14.self_attn.gate_proj.scales,
-layers.14.self_attn.gate_proj.weight,
-layers.14.self_attn.k_proj.biases,
-layers.14.self_attn.k_proj.scales,
-layers.14.self_attn.k_proj.weight,
-layers.14.self_attn.o_proj.biases,
-layers.14.self_attn.o_proj.scales,
-layers.14.self_attn.o_proj.weight,
-layers.14.self_attn.q_proj.biases,
-layers.14.self_attn.q_proj.scales,
-layers.14.self_attn.q_proj.weight,
-layers.14.self_attn.v_proj.biases,
-layers.14.self_attn.v_proj.scales,
-layers.14.self_attn.v_proj.weight,
-layers.15.input_layernorm.weight,
-layers.15.mlp.down_proj.biases,
-layers.15.mlp.down_proj.scales,
-layers.15.mlp.down_proj.weight,
-layers.15.mlp.gate_proj.biases,
-layers.15.mlp.gate_proj.scales,
-layers.15.mlp.gate_proj.weight,
-layers.15.mlp.up_proj.biases,
-layers.15.mlp.up_proj.scales,
-layers.15.mlp.up_proj.weight,
-layers.15.post_attention_layernorm.weight,
-layers.15.post_feedforward_layernorm.weight,
-layers.15.pre_feedforward_layernorm.weight,
-layers.15.self_attn.gate_proj.biases,
-layers.15.self_attn.gate_proj.scales,
-layers.15.self_attn.gate_proj.weight,
-layers.15.self_attn.k_proj.biases,
-layers.15.self_attn.k_proj.scales,
-layers.15.self_attn.k_proj.weight,
-layers.15.self_attn.o_proj.biases,
-layers.15.self_attn.o_proj.scales,
-layers.15.self_attn.o_proj.weight,
-layers.15.self_attn.q_proj.biases,
-layers.15.self_attn.q_proj.scales,
-layers.15.self_attn.q_proj.weight,
-layers.15.self_attn.v_proj.biases,
-layers.15.self_attn.v_proj.scales,
-layers.15.self_attn.v_proj.weight,
-layers.16.input_layernorm.weight,
-layers.16.mlp.down_proj.biases,
-layers.16.mlp.down_proj.scales,
-layers.16.mlp.down_proj.weight,
-layers.16.mlp.gate_proj.biases,
-layers.16.mlp.gate_proj.scales,
-layers.16.mlp.gate_proj.weight,
-layers.16.mlp.up_proj.biases,
-layers.16.mlp.up_proj.scales,
-layers.16.mlp.up_proj.weight,
-layers.16.post_attention_layernorm.weight,
-layers.16.post_feedforward_layernorm.weight,
-layers.16.pre_feedforward_layernorm.weight,
-layers.16.self_attn.gate_proj.biases,
-layers.16.self_attn.gate_proj.scales,
-layers.16.self_attn.gate_proj.weight,
-layers.16.self_attn.k_proj.biases,
-layers.16.self_attn.k_proj.scales,
-layers.16.self_attn.k_proj.weight,
-layers.16.self_attn.o_proj.biases,
-layers.16.self_attn.o_proj.scales,
-layers.16.self_attn.o_proj.weight,
-layers.16.self_attn.q_proj.biases,
-layers.16.self_attn.q_proj.scales,
-layers.16.self_attn.q_proj.weight,
-layers.16.self_attn.v_proj.biases,
-layers.16.self_attn.v_proj.scales,
-layers.16.self_attn.v_proj.weight,
-layers.17.input_layernorm.weight,
-layers.17.mlp.down_proj.biases,
-layers.17.mlp.down_proj.scales,
-layers.17.mlp.down_proj.weight,
-layers.17.mlp.gate_proj.biases,
-layers.17.mlp.gate_proj.scales,
-layers.17.mlp.gate_proj.weight,
-layers.17.mlp.up_proj.biases,
-layers.17.mlp.up_proj.scales,
-layers.17.mlp.up_proj.weight,
-layers.17.post_attention_layernorm.weight,
-layers.17.post_feedforward_layernorm.weight,
-layers.17.pre_feedforward_layernorm.weight,
-layers.17.self_attn.gate_proj.biases,
-layers.17.self_attn.gate_proj.scales,
-layers.17.self_attn.gate_proj.weight,
-layers.17.self_attn.k_proj.biases,
-layers.17.self_attn.k_proj.scales,
-layers.17.self_attn.k_proj.weight,
-layers.17.self_attn.o_proj.biases,
-layers.17.self_attn.o_proj.scales,
-layers.17.self_attn.o_proj.weight,
-layers.17.self_attn.q_proj.biases,
-layers.17.self_attn.q_proj.scales,
-layers.17.self_attn.q_proj.weight,
-layers.17.self_attn.v_proj.biases,
-layers.17.self_attn.v_proj.scales,
-layers.17.self_attn.v_proj.weight,
-layers.18.input_layernorm.weight,
-layers.18.mlp.down_proj.biases,
-layers.18.mlp.down_proj.scales,
-layers.18.mlp.down_proj.weight,
-layers.18.mlp.gate_proj.biases,
-layers.18.mlp.gate_proj.scales,
-layers.18.mlp.gate_proj.weight,
-layers.18.mlp.up_proj.biases,
-layers.18.mlp.up_proj.scales,
-layers.18.mlp.up_proj.weight,
-layers.18.post_attention_layernorm.weight,
-layers.18.post_feedforward_layernorm.weight,
-layers.18.pre_feedforward_layernorm.weight,
-layers.18.self_attn.gate_proj.biases,
-layers.18.self_attn.gate_proj.scales,
-layers.18.self_attn.gate_proj.weight,
-layers.18.self_attn.k_proj.biases,
-layers.18.self_attn.k_proj.scales,
-layers.18.self_attn.k_proj.weight,
-layers.18.self_attn.o_proj.biases,
-layers.18.self_attn.o_proj.scales,
-layers.18.self_attn.o_proj.weight,
-layers.18.self_attn.q_proj.biases,
-layers.18.self_attn.q_proj.scales,
-layers.18.self_attn.q_proj.weight,
-layers.18.self_attn.v_proj.biases,
-layers.18.self_attn.v_proj.scales,
-layers.18.self_attn.v_proj.weight,
-layers.19.input_layernorm.weight,
-layers.19.mlp.down_proj.biases,
-layers.19.mlp.down_proj.scales,
-layers.19.mlp.down_proj.weight,
-layers.19.mlp.gate_proj.biases,
-layers.19.mlp.gate_proj.scales,
-layers.19.mlp.gate_proj.weight,
-layers.19.mlp.up_proj.biases,
-layers.19.mlp.up_proj.scales,
-layers.19.mlp.up_proj.weight,
-layers.19.post_attention_layernorm.weight,
-layers.19.post_feedforward_layernorm.weight,
-layers.19.pre_feedforward_layernorm.weight,
-layers.19.self_attn.gate_proj.biases,
-layers.19.self_attn.gate_proj.scales,
-layers.19.self_attn.gate_proj.weight,
-layers.19.self_attn.k_proj.biases,
-layers.19.self_attn.k_proj.scales,
-layers.19.self_attn.k_proj.weight,
-layers.19.self_attn.o_proj.biases,
-layers.19.self_attn.o_proj.scales,
-layers.19.self_attn.o_proj.weight,
-layers.19.self_attn.q_proj.biases,
-layers.19.self_attn.q_proj.scales,
-layers.19.self_attn.q_proj.weight,
-layers.19.self_attn.v_proj.biases,
-layers.19.self_attn.v_proj.scales,
-layers.19.self_attn.v_proj.weight,
-layers.2.input_layernorm.weight,
-layers.2.mlp.down_proj.biases,
-layers.2.mlp.down_proj.scales,
-layers.2.mlp.down_proj.weight,
-layers.2.mlp.gate_proj.biases,
-layers.2.mlp.gate_proj.scales,
-layers.2.mlp.gate_proj.weight,
-layers.2.mlp.up_proj.biases,
-layers.2.mlp.up_proj.scales,
-layers.2.mlp.up_proj.weight,
-layers.2.post_attention_layernorm.weight,
-layers.2.post_feedforward_layernorm.weight,
-layers.2.pre_feedforward_layernorm.weight,
-layers.2.self_attn.gate_proj.biases,
-layers.2.self_attn.gate_proj.scales,
-layers.2.self_attn.gate_proj.weight,
-layers.2.self_attn.k_proj.biases,
-layers.2.self_attn.k_proj.scales,
-layers.2.self_attn.k_proj.weight,
-layers.2.self_attn.o_proj.biases,
-layers.2.self_attn.o_proj.scales,
-layers.2.self_attn.o_proj.weight,
-layers.2.self_attn.q_proj.biases,
-layers.2.self_attn.q_proj.scales,
-layers.2.self_attn.q_proj.weight,
-layers.2.self_attn.v_proj.biases,
-layers.2.self_attn.v_proj.scales,
-layers.2.self_attn.v_proj.weight,
-layers.20.input_layernorm.weight,
-layers.20.mlp.down_proj.biases,
-layers.20.mlp.down_proj.scales,
-layers.20.mlp.down_proj.weight,
-layers.20.mlp.gate_proj.biases,
-layers.20.mlp.gate_proj.scales,
-layers.20.mlp.gate_proj.weight,
-layers.20.mlp.up_proj.biases,
-layers.20.mlp.up_proj.scales,
-layers.20.mlp.up_proj.weight,
-layers.20.post_attention_layernorm.weight,
-layers.20.post_feedforward_layernorm.weight,
-layers.20.pre_feedforward_layernorm.weight,
-layers.20.self_attn.gate_proj.biases,
-layers.20.self_attn.gate_proj.scales,
-layers.20.self_attn.gate_proj.weight,
-layers.20.self_attn.k_proj.biases,
-layers.20.self_attn.k_proj.scales,
-layers.20.self_attn.k_proj.weight,
-layers.20.self_attn.o_proj.biases,
-layers.20.self_attn.o_proj.scales,
-layers.20.self_attn.o_proj.weight,
-layers.20.self_attn.q_proj.biases,
-layers.20.self_attn.q_proj.scales,
-layers.20.self_attn.q_proj.weight,
-layers.20.self_attn.v_proj.biases,
-layers.20.self_attn.v_proj.scales,
-layers.20.self_attn.v_proj.weight,
-layers.21.input_layernorm.weight,
-layers.21.mlp.down_proj.biases,
-layers.21.mlp.down_proj.scales,
-layers.21.mlp.down_proj.weight,
-layers.21.mlp.gate_proj.biases,
-layers.21.mlp.gate_proj.scales,
-layers.21.mlp.gate_proj.weight,
-layers.21.mlp.up_proj.biases,
-layers.21.mlp.up_proj.scales,
-layers.21.mlp.up_proj.weight,
-layers.21.post_attention_layernorm.weight,
-layers.21.post_feedforward_layernorm.weight,
-layers.21.pre_feedforward_layernorm.weight,
-layers.21.self_attn.gate_proj.biases,
-layers.21.self_attn.gate_proj.scales,
-layers.21.self_attn.gate_proj.weight,
-layers.21.self_attn.k_proj.biases,
-layers.21.self_attn.k_proj.scales,
-layers.21.self_attn.k_proj.weight,
-layers.21.self_attn.o_proj.biases,
-layers.21.self_attn.o_proj.scales,
-layers.21.self_attn.o_proj.weight,
-layers.21.self_attn.q_proj.biases,
-layers.21.self_attn.q_proj.scales,
-layers.21.self_attn.q_proj.weight,
-layers.21.self_attn.v_proj.biases,
-layers.21.self_attn.v_proj.scales,
-layers.21.self_attn.v_proj.weight,
-layers.22.input_layernorm.weight,
-layers.22.mlp.down_proj.biases,
-layers.22.mlp.down_proj.scales,
-layers.22.mlp.down_proj.weight,
-layers.22.mlp.gate_proj.biases,
-layers.22.mlp.gate_proj.scales,
-layers.22.mlp.gate_proj.weight,
-layers.22.mlp.up_proj.biases,
-layers.22.mlp.up_proj.scales,
-layers.22.mlp.up_proj.weight,
-layers.22.post_attention_layernorm.weight,
-layers.22.post_feedforward_layernorm.weight,
-layers.22.pre_feedforward_layernorm.weight,
-layers.22.self_attn.gate_proj.biases,
-layers.22.self_attn.gate_proj.scales,
-layers.22.self_attn.gate_proj.weight,
-layers.22.self_attn.k_proj.biases,
-layers.22.self_attn.k_proj.scales,
-layers.22.self_attn.k_proj.weight,
-layers.22.self_attn.o_proj.biases,
-layers.22.self_attn.o_proj.scales,
-layers.22.self_attn.o_proj.weight,
-layers.22.self_attn.q_proj.biases,
-layers.22.self_attn.q_proj.scales,
-layers.22.self_attn.q_proj.weight,
-layers.22.self_attn.v_proj.biases,
-layers.22.self_attn.v_proj.scales,
-layers.22.self_attn.v_proj.weight,
-layers.23.input_layernorm.weight,
-layers.23.mlp.down_proj.biases,
-layers.23.mlp.down_proj.scales,
-layers.23.mlp.down_proj.weight,
-layers.23.mlp.gate_proj.biases,
-layers.23.mlp.gate_proj.scales,
-layers.23.mlp.gate_proj.weight,
-layers.23.mlp.up_proj.biases,
-layers.23.mlp.up_proj.scales,
-layers.23.mlp.up_proj.weight,
-layers.23.post_attention_layernorm.weight,
-layers.23.post_feedforward_layernorm.weight,
-layers.23.pre_feedforward_layernorm.weight,
-layers.23.self_attn.gate_proj.biases,
-layers.23.self_attn.gate_proj.scales,
-layers.23.self_attn.gate_proj.weight,
-layers.23.self_attn.k_proj.biases,
-layers.23.self_attn.k_proj.scales,
-layers.23.self_attn.k_proj.weight,
-layers.23.self_attn.o_proj.biases,
-layers.23.self_attn.o_proj.scales,
-layers.23.self_attn.o_proj.weight,
-layers.23.self_attn.q_proj.biases,
-layers.23.self_attn.q_proj.scales,
-layers.23.self_attn.q_proj.weight,
-layers.23.self_attn.v_proj.biases,
-layers.23.self_attn.v_proj.scales,
-layers.23.self_attn.v_proj.weight,
-layers.24.input_layernorm.weight,
-layers.24.mlp.down_proj.biases,
-layers.24.mlp.down_proj.scales,
-layers.24.mlp.down_proj.weight,
-layers.24.mlp.gate_proj.biases,
-layers.24.mlp.gate_proj.scales,
-layers.24.mlp.gate_proj.weight,
-layers.24.mlp.up_proj.biases,
-layers.24.mlp.up_proj.scales,
-layers.24.mlp.up_proj.weight,
-layers.24.post_attention_layernorm.weight,
-layers.24.post_feedforward_layernorm.weight,
-layers.24.pre_feedforward_layernorm.weight,
-layers.24.self_attn.gate_proj.biases,
-layers.24.self_attn.gate_proj.scales,
-layers.24.self_attn.gate_proj.weight,
-layers.24.self_attn.k_proj.biases,
-layers.24.self_attn.k_proj.scales,
-layers.24.self_attn.k_proj.weight,
-layers.24.self_attn.o_proj.biases,
-layers.24.self_attn.o_proj.scales,
-layers.24.self_attn.o_proj.weight,
-layers.24.self_attn.q_proj.biases,
-layers.24.self_attn.q_proj.scales,
-layers.24.self_attn.q_proj.weight,
-layers.24.self_attn.v_proj.biases,
-layers.24.self_attn.v_proj.scales,
-layers.24.self_attn.v_proj.weight,
-layers.25.input_layernorm.weight,
-layers.25.mlp.down_proj.biases,
-layers.25.mlp.down_proj.scales,
-layers.25.mlp.down_proj.weight,
-layers.25.mlp.gate_proj.biases,
-layers.25.mlp.gate_proj.scales,
-layers.25.mlp.gate_proj.weight,
-layers.25.mlp.up_proj.biases,
-layers.25.mlp.up_proj.scales,
-layers.25.mlp.up_proj.weight,
-layers.25.post_attention_layernorm.weight,
-layers.25.post_feedforward_layernorm.weight,
-layers.25.pre_feedforward_layernorm.weight,
-layers.25.self_attn.gate_proj.biases,
-layers.25.self_attn.gate_proj.scales,
-layers.25.self_attn.gate_proj.weight,
-layers.25.self_attn.k_proj.biases,
-layers.25.self_attn.k_proj.scales,
-layers.25.self_attn.k_proj.weight,
-layers.25.self_attn.o_proj.biases,
-layers.25.self_attn.o_proj.scales,
-layers.25.self_attn.o_proj.weight,
-layers.25.self_attn.q_proj.biases,
-layers.25.self_attn.q_proj.scales,
-layers.25.self_attn.q_proj.weight,
-layers.25.self_attn.v_proj.biases,
-layers.25.self_attn.v_proj.scales,
-layers.25.self_attn.v_proj.weight,
-layers.26.input_layernorm.weight,
-layers.26.mlp.down_proj.biases,
-layers.26.mlp.down_proj.scales,
-layers.26.mlp.down_proj.weight,
-layers.26.mlp.gate_proj.biases,
-layers.26.mlp.gate_proj.scales,
-layers.26.mlp.gate_proj.weight,
-layers.26.mlp.up_proj.biases,
-layers.26.mlp.up_proj.scales,
-layers.26.mlp.up_proj.weight,
-layers.26.post_attention_layernorm.weight,
-layers.26.post_feedforward_layernorm.weight,
-layers.26.pre_feedforward_layernorm.weight,
-layers.26.self_attn.gate_proj.biases,
-layers.26.self_attn.gate_proj.scales,
-layers.26.self_attn.gate_proj.weight,
-layers.26.self_attn.k_proj.biases,
-layers.26.self_attn.k_proj.scales,
-layers.26.self_attn.k_proj.weight,
-layers.26.self_attn.o_proj.biases,
-layers.26.self_attn.o_proj.scales,
-layers.26.self_attn.o_proj.weight,
-layers.26.self_attn.q_proj.biases,
-layers.26.self_attn.q_proj.scales,
-layers.26.self_attn.q_proj.weight,
-layers.26.self_attn.v_proj.biases,
-layers.26.self_attn.v_proj.scales,
-layers.26.self_attn.v_proj.weight,
-layers.27.input_layernorm.weight,
-layers.27.mlp.down_proj.biases,
-layers.27.mlp.down_proj.scales,
-layers.27.mlp.down_proj.weight,
-layers.27.mlp.gate_proj.biases,
-layers.27.mlp.gate_proj.scales,
-layers.27.mlp.gate_proj.weight,
-layers.27.mlp.up_proj.biases,
-layers.27.mlp.up_proj.scales,
-layers.27.mlp.up_proj.weight,
-layers.27.post_attention_layernorm.weight,
-layers.27.post_feedforward_layernorm.weight,
-layers.27.pre_feedforward_layernorm.weight,
-layers.27.self_attn.gate_proj.biases,
-layers.27.self_attn.gate_proj.scales,
-layers.27.self_attn.gate_proj.weight,
-layers.27.self_attn.k_proj.biases,
-layers.27.self_attn.k_proj.scales,
-layers.27.self_attn.k_proj.weight,
-layers.27.self_attn.o_proj.biases,
-layers.27.self_attn.o_proj.scales,
-layers.27.self_attn.o_proj.weight,
-layers.27.self_attn.q_proj.biases,
-layers.27.self_attn.q_proj.scales,
-layers.27.self_attn.q_proj.weight,
-layers.27.self_attn.v_proj.biases,
-layers.27.self_attn.v_proj.scales,
-layers.27.self_attn.v_proj.weight,
-layers.28.input_layernorm.weight,
-layers.28.mlp.down_proj.biases,
-layers.28.mlp.down_proj.scales,
-layers.28.mlp.down_proj.weight,
-layers.28.mlp.gate_proj.biases,
-layers.28.mlp.gate_proj.scales,
-layers.28.mlp.gate_proj.weight,
-layers.28.mlp.up_proj.biases,
-layers.28.mlp.up_proj.scales,
-layers.28.mlp.up_proj.weight,
-layers.28.post_attention_layernorm.weight,
-layers.28.post_feedforward_layernorm.weight,
-layers.28.pre_feedforward_layernorm.weight,
-layers.28.self_attn.gate_proj.biases,
-layers.28.self_attn.gate_proj.scales,
-layers.28.self_attn.gate_proj.weight,
-layers.28.self_attn.k_proj.biases,
-layers.28.self_attn.k_proj.scales,
-layers.28.self_attn.k_proj.weight,
-layers.28.self_attn.o_proj.biases,
-layers.28.self_attn.o_proj.scales,
-layers.28.self_attn.o_proj.weight,
-layers.28.self_attn.q_proj.biases,
-layers.28.self_attn.q_proj.scales,
-layers.28.self_attn.q_proj.weight,
-layers.28.self_attn.v_proj.biases,
-layers.28.self_attn.v_proj.scales,
-layers.28.self_attn.v_proj.weight,
-layers.29.input_layernorm.weight,
-layers.29.mlp.down_proj.biases,
-layers.29.mlp.down_proj.scales,
-layers.29.mlp.down_proj.weight,
-layers.29.mlp.gate_proj.biases,
-layers.29.mlp.gate_proj.scales,
-layers.29.mlp.gate_proj.weight,
-layers.29.mlp.up_proj.biases,
-layers.29.mlp.up_proj.scales,
-layers.29.mlp.up_proj.weight,
-layers.29.post_attention_layernorm.weight,
-layers.29.post_feedforward_layernorm.weight,
-layers.29.pre_feedforward_layernorm.weight,
-layers.29.self_attn.gate_proj.biases,
-layers.29.self_attn.gate_proj.scales,
-layers.29.self_attn.gate_proj.weight,
-layers.29.self_attn.k_proj.biases,
-layers.29.self_attn.k_proj.scales,
-layers.29.self_attn.k_proj.weight,
-layers.29.self_attn.o_proj.biases,
-layers.29.self_attn.o_proj.scales,
-layers.29.self_attn.o_proj.weight,
-layers.29.self_attn.q_proj.biases,
-layers.29.self_attn.q_proj.scales,
-layers.29.self_attn.q_proj.weight,
-layers.29.self_attn.v_proj.biases,
-layers.29.self_attn.v_proj.scales,
-layers.29.self_attn.v_proj.weight,
-layers.3.input_layernorm.weight,
-layers.3.mlp.down_proj.biases,
-layers.3.mlp.down_proj.scales,
-layers.3.mlp.down_proj.weight,
-layers.3.mlp.gate_proj.biases,
-layers.3.mlp.gate_proj.scales,
-layers.3.mlp.gate_proj.weight,
-layers.3.mlp.up_proj.biases,
-layers.3.mlp.up_proj.scales,
-layers.3.mlp.up_proj.weight,
-layers.3.post_attention_layernorm.weight,
-layers.3.post_feedforward_layernorm.weight,
-layers.3.pre_feedforward_layernorm.weight,
-layers.3.self_attn.gate_proj.biases,
-layers.3.self_attn.gate_proj.scales,
-layers.3.self_attn.gate_proj.weight,
-layers.3.self_attn.k_proj.biases,
-layers.3.self_attn.k_proj.scales,
-layers.3.self_attn.k_proj.weight,
-layers.3.self_attn.o_proj.biases,
-layers.3.self_attn.o_proj.scales,
-layers.3.self_attn.o_proj.weight,
-layers.3.self_attn.q_proj.biases,
-layers.3.self_attn.q_proj.scales,
-layers.3.self_attn.q_proj.weight,
-layers.3.self_attn.v_proj.biases,
-layers.3.self_attn.v_proj.scales,
-layers.3.self_attn.v_proj.weight,
-layers.30.input_layernorm.weight,
-layers.30.mlp.down_proj.biases,
-layers.30.mlp.down_proj.scales,
-layers.30.mlp.down_proj.weight,
-layers.30.mlp.gate_proj.biases,
-layers.30.mlp.gate_proj.scales,
-layers.30.mlp.gate_proj.weight,
-layers.30.mlp.up_proj.biases,
-layers.30.mlp.up_proj.scales,
-layers.30.mlp.up_proj.weight,
-layers.30.post_attention_layernorm.weight,
-layers.30.post_feedforward_layernorm.weight,
-layers.30.pre_feedforward_layernorm.weight,
-layers.30.self_attn.gate_proj.biases,
-layers.30.self_attn.gate_proj.scales,
-layers.30.self_attn.gate_proj.weight,
-layers.30.self_attn.k_proj.biases,
-layers.30.self_attn.k_proj.scales,
-layers.30.self_attn.k_proj.weight,
-layers.30.self_attn.o_proj.biases,
-layers.30.self_attn.o_proj.scales,
-layers.30.self_attn.o_proj.weight,
-layers.30.self_attn.q_proj.biases,
-layers.30.self_attn.q_proj.scales,
-layers.30.self_attn.q_proj.weight,
-layers.30.self_attn.v_proj.biases,
-layers.30.self_attn.v_proj.scales,
-layers.30.self_attn.v_proj.weight,
-layers.31.input_layernorm.weight,
-layers.31.mlp.down_proj.biases,
-layers.31.mlp.down_proj.scales,
-layers.31.mlp.down_proj.weight,
-layers.31.mlp.gate_proj.biases,
-layers.31.mlp.gate_proj.scales,
-layers.31.mlp.gate_proj.weight,
-layers.31.mlp.up_proj.biases,
-layers.31.mlp.up_proj.scales,
-layers.31.mlp.up_proj.weight,
-layers.31.post_attention_layernorm.weight,
-layers.31.post_feedforward_layernorm.weight,
-layers.31.pre_feedforward_layernorm.weight,
-layers.31.self_attn.gate_proj.biases,
-layers.31.self_attn.gate_proj.scales,
-layers.31.self_attn.gate_proj.weight,
-layers.31.self_attn.k_proj.biases,
-layers.31.self_attn.k_proj.scales,
-layers.31.self_attn.k_proj.weight,
-layers.31.self_attn.o_proj.biases,
-layers.31.self_attn.o_proj.scales,
-layers.31.self_attn.o_proj.weight,
-layers.31.self_attn.q_proj.biases,
-layers.31.self_attn.q_proj.scales,
-layers.31.self_attn.q_proj.weight,
-layers.31.self_attn.v_proj.biases,
-layers.31.self_attn.v_proj.scales,
-layers.31.self_attn.v_proj.weight,
-layers.32.input_layernorm.weight,
-layers.32.mlp.down_proj.biases,
-layers.32.mlp.down_proj.scales,
-layers.32.mlp.down_proj.weight,
-layers.32.mlp.gate_proj.biases,
-layers.32.mlp.gate_proj.scales,
-layers.32.mlp.gate_proj.weight,
-layers.32.mlp.up_proj.biases,
-layers.32.mlp.up_proj.scales,
-layers.32.mlp.up_proj.weight,
-layers.32.post_attention_layernorm.weight,
-layers.32.post_feedforward_layernorm.weight,
-layers.32.pre_feedforward_layernorm.weight,
-layers.32.self_attn.gate_proj.biases,
-layers.32.self_attn.gate_proj.scales,
-layers.32.self_attn.gate_proj.weight,
-layers.32.self_attn.k_proj.biases,
-layers.32.self_attn.k_proj.scales,
-layers.32.self_attn.k_proj.weight,
-layers.32.self_attn.o_proj.biases,
-layers.32.self_attn.o_proj.scales,
-layers.32.self_attn.o_proj.weight,
-layers.32.self_attn.q_proj.biases,
-layers.32.self_attn.q_proj.scales,
-layers.32.self_attn.q_proj.weight,
-layers.32.self_attn.v_proj.biases,
-layers.32.self_attn.v_proj.scales,
-layers.32.self_attn.v_proj.weight,
-layers.33.input_layernorm.weight,
-layers.33.mlp.down_proj.biases,
-layers.33.mlp.down_proj.scales,
-layers.33.mlp.down_proj.weight,
-layers.33.mlp.gate_proj.biases,
-layers.33.mlp.gate_proj.scales,
-layers.33.mlp.gate_proj.weight,
-layers.33.mlp.up_proj.biases,
-layers.33.mlp.up_proj.scales,
-layers.33.mlp.up_proj.weight,
-layers.33.post_attention_layernorm.weight,
-layers.33.post_feedforward_layernorm.weight,
-layers.33.pre_feedforward_layernorm.weight,
-layers.33.self_attn.gate_proj.biases,
-layers.33.self_attn.gate_proj.scales,
-layers.33.self_attn.gate_proj.weight,
-layers.33.self_attn.k_proj.biases,
-layers.33.self_attn.k_proj.scales,
-layers.33.self_attn.k_proj.weight,
-layers.33.self_attn.o_proj.biases,
-layers.33.self_attn.o_proj.scales,
-layers.33.self_attn.o_proj.weight,
-layers.33.self_attn.q_proj.biases,
-layers.33.self_attn.q_proj.scales,
-layers.33.self_attn.q_proj.weight,
-layers.33.self_attn.v_proj.biases,
-layers.33.self_attn.v_proj.scales,
-layers.33.self_attn.v_proj.weight,
-layers.34.input_layernorm.weight,
-layers.34.mlp.down_proj.biases,
-layers.34.mlp.down_proj.scales,
-layers.34.mlp.down_proj.weight,
-layers.34.mlp.gate_proj.biases,
-layers.34.mlp.gate_proj.scales,
-layers.34.mlp.gate_proj.weight,
-layers.34.mlp.up_proj.biases,
-layers.34.mlp.up_proj.scales,
-layers.34.mlp.up_proj.weight,
-layers.34.post_attention_layernorm.weight,
-layers.34.post_feedforward_layernorm.weight,
-layers.34.pre_feedforward_layernorm.weight,
-layers.34.self_attn.gate_proj.biases,
-layers.34.self_attn.gate_proj.scales,
-layers.34.self_attn.gate_proj.weight,
-layers.34.self_attn.k_proj.biases,
-layers.34.self_attn.k_proj.scales,
-layers.34.self_attn.k_proj.weight,
-layers.34.self_attn.o_proj.biases,
-layers.34.self_attn.o_proj.scales,
-layers.34.self_attn.o_proj.weight,
-layers.34.self_attn.q_proj.biases,
-layers.34.self_attn.q_proj.scales,
-layers.34.self_attn.q_proj.weight,
-layers.34.self_attn.v_proj.biases,
-layers.34.self_attn.v_proj.scales,
-layers.34.self_attn.v_proj.weight,
-layers.35.input_layernorm.weight,
-layers.35.mlp.down_proj.biases,
-layers.35.mlp.down_proj.scales,
-layers.35.mlp.down_proj.weight,
-layers.35.mlp.gate_proj.biases,
-layers.35.mlp.gate_proj.scales,
-layers.35.mlp.gate_proj.weight,
-layers.35.mlp.up_proj.biases,
-layers.35.mlp.up_proj.scales,
-layers.35.mlp.up_proj.weight,
-layers.35.post_attention_layernorm.weight,
-layers.35.post_feedforward_layernorm.weight,
-layers.35.pre_feedforward_layernorm.weight,
-layers.35.self_attn.gate_proj.biases,
-layers.35.self_attn.gate_proj.scales,
-layers.35.self_attn.gate_proj.weight,
-layers.35.self_attn.k_proj.biases,
-layers.35.self_attn.k_proj.scales,
-layers.35.self_attn.k_proj.weight,
-layers.35.self_attn.o_proj.biases,
-layers.35.self_attn.o_proj.scales,
-layers.35.self_attn.o_proj.weight,
-layers.35.self_attn.q_proj.biases,
-layers.35.self_attn.q_proj.scales,
-layers.35.self_attn.q_proj.weight,
-layers.35.self_attn.v_proj.biases,
-layers.35.self_attn.v_proj.scales,
-layers.35.self_attn.v_proj.weight,
-layers.36.input_layernorm.weight,
-layers.36.mlp.down_proj.biases,
-layers.36.mlp.down_proj.scales,
-layers.36.mlp.down_proj.weight,
-layers.36.mlp.gate_proj.biases,
-layers.36.mlp.gate_proj.scales,
-layers.36.mlp.gate_proj.weight,
-layers.36.mlp.up_proj.biases,
-layers.36.mlp.up_proj.scales,
-layers.36.mlp.up_proj.weight,
-layers.36.post_attention_layernorm.weight,
-layers.36.post_feedforward_layernorm.weight,
-layers.36.pre_feedforward_layernorm.weight,
-layers.36.self_attn.gate_proj.biases,
-layers.36.self_attn.gate_proj.scales,
-layers.36.self_attn.gate_proj.weight,
-layers.36.self_attn.k_proj.biases,
-layers.36.self_attn.k_proj.scales,
-layers.36.self_attn.k_proj.weight,
-layers.36.self_attn.o_proj.biases,
-layers.36.self_attn.o_proj.scales,
-layers.36.self_attn.o_proj.weight,
-layers.36.self_attn.q_proj.biases,
-layers.36.self_attn.q_proj.scales,
-layers.36.self_attn.q_proj.weight,
-layers.36.self_attn.v_proj.biases,
-layers.36.self_attn.v_proj.scales,
-layers.36.self_attn.v_proj.weight,
-layers.37.input_layernorm.weight,
-layers.37.mlp.down_proj.biases,
-layers.37.mlp.down_proj.scales,
-layers.37.mlp.down_proj.weight,
-layers.37.mlp.gate_proj.biases,
-layers.37.mlp.gate_proj.scales,
-layers.37.mlp.gate_proj.weight,
-layers.37.mlp.up_proj.biases,
-layers.37.mlp.up_proj.scales,
-layers.37.mlp.up_proj.weight,
-layers.37.post_attention_layernorm.weight,
-layers.37.post_feedforward_layernorm.weight,
-layers.37.pre_feedforward_layernorm.weight,
-layers.37.self_attn.gate_proj.biases,
-layers.37.self_attn.gate_proj.scales,
-layers.37.self_attn.gate_proj.weight,
-layers.37.self_attn.k_proj.biases,
-layers.37.self_attn.k_proj.scales,
-layers.37.self_attn.k_proj.weight,
-layers.37.self_attn.o_proj.biases,
-layers.37.self_attn.o_proj.scales,
-layers.37.self_attn.o_proj.weight,
-layers.37.self_attn.q_proj.biases,
-layers.37.self_attn.q_proj.scales,
-layers.37.self_attn.q_proj.weight,
-layers.37.self_attn.v_proj.biases,
-layers.37.self_attn.v_proj.scales,
-layers.37.self_attn.v_proj.weight,
-layers.38.input_layernorm.weight,
-layers.38.mlp.down_proj.biases,
-layers.38.mlp.down_proj.scales,
-layers.38.mlp.down_proj.weight,
-layers.38.mlp.gate_proj.biases,
-layers.38.mlp.gate_proj.scales,
-layers.38.mlp.gate_proj.weight,
-layers.38.mlp.up_proj.biases,
-layers.38.mlp.up_proj.scales,
-layers.38.mlp.up_proj.weight,
-layers.38.post_attention_layernorm.weight,
-layers.38.post_feedforward_layernorm.weight,
-layers.38.pre_feedforward_layernorm.weight,
-layers.38.self_attn.gate_proj.biases,
-layers.38.self_attn.gate_proj.scales,
-layers.38.self_attn.gate_proj.weight,
-layers.38.self_attn.k_proj.biases,
-layers.38.self_attn.k_proj.scales,
-layers.38.self_attn.k_proj.weight,
-layers.38.self_attn.o_proj.biases,
-layers.38.self_attn.o_proj.scales,
-layers.38.self_attn.o_proj.weight,
-layers.38.self_attn.q_proj.biases,
-layers.38.self_attn.q_proj.scales,
-layers.38.self_attn.q_proj.weight,
-layers.38.self_attn.v_proj.biases,
-layers.38.self_attn.v_proj.scales,
-layers.38.self_attn.v_proj.weight,
-layers.39.input_layernorm.weight,
-layers.39.mlp.down_proj.biases,
-layers.39.mlp.down_proj.scales,
-layers.39.mlp.down_proj.weight,
-layers.39.mlp.gate_proj.biases,
-layers.39.mlp.gate_proj.scales,
-layers.39.mlp.gate_proj.weight,
-layers.39.mlp.up_proj.biases,
-layers.39.mlp.up_proj.scales,
-layers.39.mlp.up_proj.weight,
-layers.39.post_attention_layernorm.weight,
-layers.39.post_feedforward_layernorm.weight,
-layers.39.pre_feedforward_layernorm.weight,
-layers.39.self_attn.gate_proj.biases,
-layers.39.self_attn.gate_proj.scales,
-layers.39.self_attn.gate_proj.weight,
-layers.39.self_attn.k_proj.biases,
-layers.39.self_attn.k_proj.scales,
-layers.39.self_attn.k_proj.weight,
-layers.39.self_attn.o_proj.biases,
-layers.39.self_attn.o_proj.scales,
-layers.39.self_attn.o_proj.weight,
-layers.39.self_attn.q_proj.biases,
-layers.39.self_attn.q_proj.scales,
-layers.39.self_attn.q_proj.weight,
-layers.39.self_attn.v_proj.biases,
-layers.39.self_attn.v_proj.scales,
-layers.39.self_attn.v_proj.weight,
-layers.4.input_layernorm.weight,
-layers.4.mlp.down_proj.biases,
-layers.4.mlp.down_proj.scales,
-layers.4.mlp.down_proj.weight,
-layers.4.mlp.gate_proj.biases,
-layers.4.mlp.gate_proj.scales,
-layers.4.mlp.gate_proj.weight,
-layers.4.mlp.up_proj.biases,
-layers.4.mlp.up_proj.scales,
-layers.4.mlp.up_proj.weight,
-layers.4.post_attention_layernorm.weight,
-layers.4.post_feedforward_layernorm.weight,
-layers.4.pre_feedforward_layernorm.weight,
-layers.4.self_attn.gate_proj.biases,
-layers.4.self_attn.gate_proj.scales,
-layers.4.self_attn.gate_proj.weight,
-layers.4.self_attn.k_proj.biases,
-layers.4.self_attn.k_proj.scales,
-layers.4.self_attn.k_proj.weight,
-layers.4.self_attn.o_proj.biases,
-layers.4.self_attn.o_proj.scales,
-layers.4.self_attn.o_proj.weight,
-layers.4.self_attn.q_proj.biases,
-layers.4.self_attn.q_proj.scales,
-layers.4.self_attn.q_proj.weight,
-layers.4.self_attn.v_proj.biases,
-layers.4.self_attn.v_proj.scales,
-layers.4.self_attn.v_proj.weight,
-layers.40.input_layernorm.weight,
-layers.40.mlp.down_proj.biases,
-layers.40.mlp.down_proj.scales,
-layers.40.mlp.down_proj.weight,
-layers.40.mlp.gate_proj.biases,
-layers.40.mlp.gate_proj.scales,
-layers.40.mlp.gate_proj.weight,
-layers.40.mlp.up_proj.biases,
-layers.40.mlp.up_proj.scales,
-layers.40.mlp.up_proj.weight,
-layers.40.post_attention_layernorm.weight,
-layers.40.post_feedforward_layernorm.weight,
-layers.40.pre_feedforward_layernorm.weight,
-layers.40.self_attn.gate_proj.biases,
-layers.40.self_attn.gate_proj.scales,
-layers.40.self_attn.gate_proj.weight,
-layers.40.self_attn.k_proj.biases,
-layers.40.self_attn.k_proj.scales,
-layers.40.self_attn.k_proj.weight,
-layers.40.self_attn.o_proj.biases,
-layers.40.self_attn.o_proj.scales,
-layers.40.self_attn.o_proj.weight,
-layers.40.self_attn.q_proj.biases,
-layers.40.self_attn.q_proj.scales,
-layers.40.self_attn.q_proj.weight,
-layers.40.self_attn.v_proj.biases,
-layers.40.self_attn.v_proj.scales,
-layers.40.self_attn.v_proj.weight,
-layers.41.input_layernorm.weight,
-layers.41.mlp.down_proj.biases,
-layers.41.mlp.down_proj.scales,
-layers.41.mlp.down_proj.weight,
-layers.41.mlp.gate_proj.biases,
-layers.41.mlp.gate_proj.scales,
-layers.41.mlp.gate_proj.weight,
-layers.41.mlp.up_proj.biases,
-layers.41.mlp.up_proj.scales,
-layers.41.mlp.up_proj.weight,
-layers.41.post_attention_layernorm.weight,
-layers.41.post_feedforward_layernorm.weight,
-layers.41.pre_feedforward_layernorm.weight,
-layers.41.self_attn.gate_proj.biases,
-layers.41.self_attn.gate_proj.scales,
-layers.41.self_attn.gate_proj.weight,
-layers.41.self_attn.k_proj.biases,
-layers.41.self_attn.k_proj.scales,
-layers.41.self_attn.k_proj.weight,
-layers.41.self_attn.o_proj.biases,
-layers.41.self_attn.o_proj.scales,
-layers.41.self_attn.o_proj.weight,
-layers.41.self_attn.q_proj.biases,
-layers.41.self_attn.q_proj.scales,
-layers.41.self_attn.q_proj.weight,
-layers.41.self_attn.v_proj.biases,
-layers.41.self_attn.v_proj.scales,
-layers.41.self_attn.v_proj.weight,
-layers.42.input_layernorm.weight,
-layers.42.mlp.down_proj.biases,
-layers.42.mlp.down_proj.scales,
-layers.42.mlp.down_proj.weight,
-layers.42.mlp.gate_proj.biases,
-layers.42.mlp.gate_proj.scales,
-layers.42.mlp.gate_proj.weight,
-layers.42.mlp.up_proj.biases,
-layers.42.mlp.up_proj.scales,
-layers.42.mlp.up_proj.weight,
-layers.42.post_attention_layernorm.weight,
-layers.42.post_feedforward_layernorm.weight,
-layers.42.pre_feedforward_layernorm.weight,
-layers.42.self_attn.gate_proj.biases,
-layers.42.self_attn.gate_proj.scales,
-layers.42.self_attn.gate_proj.weight,
-layers.42.self_attn.k_proj.biases,
-layers.42.self_attn.k_proj.scales,
-layers.42.self_attn.k_proj.weight,
-layers.42.self_attn.o_proj.biases,
-layers.42.self_attn.o_proj.scales,
-layers.42.self_attn.o_proj.weight,
-layers.42.self_attn.q_proj.biases,
-layers.42.self_attn.q_proj.scales,
-layers.42.self_attn.q_proj.weight,
-layers.42.self_attn.v_proj.biases,
-layers.42.self_attn.v_proj.scales,
-layers.42.self_attn.v_proj.weight,
-layers.43.input_layernorm.weight,
-layers.43.mlp.down_proj.biases,
-layers.43.mlp.down_proj.scales,
-layers.43.mlp.down_proj.weight,
-layers.43.mlp.gate_proj.biases,
-layers.43.mlp.gate_proj.scales,
-layers.43.mlp.gate_proj.weight,
-layers.43.mlp.up_proj.biases,
-layers.43.mlp.up_proj.scales,
-layers.43.mlp.up_proj.weight,
-layers.43.post_attention_layernorm.weight,
-layers.43.post_feedforward_layernorm.weight,
-layers.43.pre_feedforward_layernorm.weight,
-layers.43.self_attn.gate_proj.biases,
-layers.43.self_attn.gate_proj.scales,
-layers.43.self_attn.gate_proj.weight,
-layers.43.self_attn.k_proj.biases,
-layers.43.self_attn.k_proj.scales,
-layers.43.self_attn.k_proj.weight,
-layers.43.self_attn.o_proj.biases,
-layers.43.self_attn.o_proj.scales,
-layers.43.self_attn.o_proj.weight,
-layers.43.self_attn.q_proj.biases,
-layers.43.self_attn.q_proj.scales,
-layers.43.self_attn.q_proj.weight,
-layers.43.self_attn.v_proj.biases,
-layers.43.self_attn.v_proj.scales,
-layers.43.self_attn.v_proj.weight,
-layers.44.input_layernorm.weight,
-layers.44.mlp.down_proj.biases,
-layers.44.mlp.down_proj.scales,
-layers.44.mlp.down_proj.weight,
-layers.44.mlp.gate_proj.biases,
-layers.44.mlp.gate_proj.scales,
-layers.44.mlp.gate_proj.weight,
-layers.44.mlp.up_proj.biases,
-layers.44.mlp.up_proj.scales,
-layers.44.mlp.up_proj.weight,
-layers.44.post_attention_layernorm.weight,
-layers.44.post_feedforward_layernorm.weight,
-layers.44.pre_feedforward_layernorm.weight,
-layers.44.self_attn.gate_proj.biases,
-layers.44.self_attn.gate_proj.scales,
-layers.44.self_attn.gate_proj.weight,
-layers.44.self_attn.k_proj.biases,
-layers.44.self_attn.k_proj.scales,
-layers.44.self_attn.k_proj.weight,
-layers.44.self_attn.o_proj.biases,
-layers.44.self_attn.o_proj.scales,
-layers.44.self_attn.o_proj.weight,
-layers.44.self_attn.q_proj.biases,
-layers.44.self_attn.q_proj.scales,
-layers.44.self_attn.q_proj.weight,
-layers.44.self_attn.v_proj.biases,
-layers.44.self_attn.v_proj.scales,
-layers.44.self_attn.v_proj.weight,
-layers.45.input_layernorm.weight,
-layers.45.mlp.down_proj.biases,
-layers.45.mlp.down_proj.scales,
-layers.45.mlp.down_proj.weight,
-layers.45.mlp.gate_proj.biases,
-layers.45.mlp.gate_proj.scales,
-layers.45.mlp.gate_proj.weight,
-layers.45.mlp.up_proj.biases,
-layers.45.mlp.up_proj.scales,
-layers.45.mlp.up_proj.weight,
-layers.45.post_attention_layernorm.weight,
-layers.45.post_feedforward_layernorm.weight,
-layers.45.pre_feedforward_layernorm.weight,
-layers.45.self_attn.gate_proj.biases,
-layers.45.self_attn.gate_proj.scales,
-layers.45.self_attn.gate_proj.weight,
-layers.45.self_attn.k_proj.biases,
-layers.45.self_attn.k_proj.scales,
-layers.45.self_attn.k_proj.weight,
-layers.45.self_attn.o_proj.biases,
-layers.45.self_attn.o_proj.scales,
-layers.45.self_attn.o_proj.weight,
-layers.45.self_attn.q_proj.biases,
-layers.45.self_attn.q_proj.scales,
-layers.45.self_attn.q_proj.weight,
-layers.45.self_attn.v_proj.biases,
-layers.45.self_attn.v_proj.scales,
-layers.45.self_attn.v_proj.weight,
-layers.46.input_layernorm.weight,
-layers.46.mlp.down_proj.biases,
-layers.46.mlp.down_proj.scales,
-layers.46.mlp.down_proj.weight,
-layers.46.mlp.gate_proj.biases,
-layers.46.mlp.gate_proj.scales,
-layers.46.mlp.gate_proj.weight,
-layers.46.mlp.up_proj.biases,
-layers.46.mlp.up_proj.scales,
-layers.46.mlp.up_proj.weight,
-layers.46.post_attention_layernorm.weight,
-layers.46.post_feedforward_layernorm.weight,
-layers.46.pre_feedforward_layernorm.weight,
-layers.46.self_attn.gate_proj.biases,
-layers.46.self_attn.gate_proj.scales,
-layers.46.self_attn.gate_proj.weight,
-layers.46.self_attn.k_proj.biases,
-layers.46.self_attn.k_proj.scales,
-layers.46.self_attn.k_proj.weight,
-layers.46.self_attn.o_proj.biases,
-layers.46.self_attn.o_proj.scales,
-layers.46.self_attn.o_proj.weight,
-layers.46.self_attn.q_proj.biases,
-layers.46.self_attn.q_proj.scales,
-layers.46.self_attn.q_proj.weight,
-layers.46.self_attn.v_proj.biases,
-layers.46.self_attn.v_proj.scales,
-layers.46.self_attn.v_proj.weight,
-layers.47.input_layernorm.weight,
-layers.47.mlp.down_proj.biases,
-layers.47.mlp.down_proj.scales,
-layers.47.mlp.down_proj.weight,
-layers.47.mlp.gate_proj.biases,
-layers.47.mlp.gate_proj.scales,
-layers.47.mlp.gate_proj.weight,
-layers.47.mlp.up_proj.biases,
-layers.47.mlp.up_proj.scales,
-layers.47.mlp.up_proj.weight,
-layers.47.post_attention_layernorm.weight,
-layers.47.post_feedforward_layernorm.weight,
-layers.47.pre_feedforward_layernorm.weight,
-layers.47.self_attn.gate_proj.biases,
-layers.47.self_attn.gate_proj.scales,
-layers.47.self_attn.gate_proj.weight,
-layers.47.self_attn.k_proj.biases,
-layers.47.self_attn.k_proj.scales,
-layers.47.self_attn.k_proj.weight,
-layers.47.self_attn.o_proj.biases,
-layers.47.self_attn.o_proj.scales,
-layers.47.self_attn.o_proj.weight,
-layers.47.self_attn.q_proj.biases,
-layers.47.self_attn.q_proj.scales,
-layers.47.self_attn.q_proj.weight,
-layers.47.self_attn.v_proj.biases,
-layers.47.self_attn.v_proj.scales,
-layers.47.self_attn.v_proj.weight,
-layers.48.input_layernorm.weight,
-layers.48.mlp.down_proj.biases,
-layers.48.mlp.down_proj.scales,
-layers.48.mlp.down_proj.weight,
-layers.48.mlp.gate_proj.biases,
-layers.48.mlp.gate_proj.scales,
-layers.48.mlp.gate_proj.weight,
-layers.48.mlp.up_proj.biases,
-layers.48.mlp.up_proj.scales,
-layers.48.mlp.up_proj.weight,
-layers.48.post_attention_layernorm.weight,
-layers.48.post_feedforward_layernorm.weight,
-layers.48.pre_feedforward_layernorm.weight,
-layers.48.self_attn.gate_proj.biases,
-layers.48.self_attn.gate_proj.scales,
-layers.48.self_attn.gate_proj.weight,
-layers.48.self_attn.k_proj.biases,
-layers.48.self_attn.k_proj.scales,
-layers.48.self_attn.k_proj.weight,
-layers.48.self_attn.o_proj.biases,
-layers.48.self_attn.o_proj.scales,
-layers.48.self_attn.o_proj.weight,
-layers.48.self_attn.q_proj.biases,
-layers.48.self_attn.q_proj.scales,
-layers.48.self_attn.q_proj.weight,
-layers.48.self_attn.v_proj.biases,
-layers.48.self_attn.v_proj.scales,
-layers.48.self_attn.v_proj.weight,
-layers.49.input_layernorm.weight,
-layers.49.mlp.down_proj.biases,
-layers.49.mlp.down_proj.scales,
-layers.49.mlp.down_proj.weight,
-layers.49.mlp.gate_proj.biases,
-layers.49.mlp.gate_proj.scales,
-layers.49.mlp.gate_proj.weight,
-layers.49.mlp.up_proj.biases,
-layers.49.mlp.up_proj.scales,
-layers.49.mlp.up_proj.weight,
-layers.49.post_attention_layernorm.weight,
-layers.49.post_feedforward_layernorm.weight,
-layers.49.pre_feedforward_layernorm.weight,
-layers.49.self_attn.gate_proj.biases,
-layers.49.self_attn.gate_proj.scales,
-layers.49.self_attn.gate_proj.weight,
-layers.49.self_attn.k_proj.biases,
-layers.49.self_attn.k_proj.scales,
-layers.49.self_attn.k_proj.weight,
-layers.49.self_attn.o_proj.biases,
-layers.49.self_attn.o_proj.scales,
-layers.49.self_attn.o_proj.weight,
-layers.49.self_attn.q_proj.biases,
-layers.49.self_attn.q_proj.scales,
-layers.49.self_attn.q_proj.weight,
-layers.49.self_attn.v_proj.biases,
-layers.49.self_attn.v_proj.scales,
-layers.49.self_attn.v_proj.weight,
-layers.5.input_layernorm.weight,
-layers.5.mlp.down_proj.biases,
-layers.5.mlp.down_proj.scales,
-layers.5.mlp.down_proj.weight,
-layers.5.mlp.gate_proj.biases,
-layers.5.mlp.gate_proj.scales,
-layers.5.mlp.gate_proj.weight,
-layers.5.mlp.up_proj.biases,
-layers.5.mlp.up_proj.scales,
-layers.5.mlp.up_proj.weight,
-layers.5.post_attention_layernorm.weight,
-layers.5.post_feedforward_layernorm.weight,
-layers.5.pre_feedforward_layernorm.weight,
-layers.5.self_attn.gate_proj.biases,
-layers.5.self_attn.gate_proj.scales,
-layers.5.self_attn.gate_proj.weight,
-layers.5.self_attn.k_proj.biases,
-layers.5.self_attn.k_proj.scales,
-layers.5.self_attn.k_proj.weight,
-layers.5.self_attn.o_proj.biases,
-layers.5.self_attn.o_proj.scales,
-layers.5.self_attn.o_proj.weight,
-layers.5.self_attn.q_proj.biases,
-layers.5.self_attn.q_proj.scales,
-layers.5.self_attn.q_proj.weight,
-layers.5.self_attn.v_proj.biases,
-layers.5.self_attn.v_proj.scales,
-layers.5.self_attn.v_proj.weight,
-layers.50.input_layernorm.weight,
-layers.50.mlp.down_proj.biases,
-layers.50.mlp.down_proj.scales,
-layers.50.mlp.down_proj.weight,
-layers.50.mlp.gate_proj.biases,
-layers.50.mlp.gate_proj.scales,
-layers.50.mlp.gate_proj.weight,
-layers.50.mlp.up_proj.biases,
-layers.50.mlp.up_proj.scales,
-layers.50.mlp.up_proj.weight,
-layers.50.post_attention_layernorm.weight,
-layers.50.post_feedforward_layernorm.weight,
-layers.50.pre_feedforward_layernorm.weight,
-layers.50.self_attn.gate_proj.biases,
-layers.50.self_attn.gate_proj.scales,
-layers.50.self_attn.gate_proj.weight,
-layers.50.self_attn.k_proj.biases,
-layers.50.self_attn.k_proj.scales,
-layers.50.self_attn.k_proj.weight,
-layers.50.self_attn.o_proj.biases,
-layers.50.self_attn.o_proj.scales,
-layers.50.self_attn.o_proj.weight,
-layers.50.self_attn.q_proj.biases,
-layers.50.self_attn.q_proj.scales,
-layers.50.self_attn.q_proj.weight,
-layers.50.self_attn.v_proj.biases,
-layers.50.self_attn.v_proj.scales,
-layers.50.self_attn.v_proj.weight,
-layers.51.input_layernorm.weight,
-layers.51.mlp.down_proj.biases,
-layers.51.mlp.down_proj.scales,
-layers.51.mlp.down_proj.weight,
-layers.51.mlp.gate_proj.biases,
-layers.51.mlp.gate_proj.scales,
-layers.51.mlp.gate_proj.weight,
-layers.51.mlp.up_proj.biases,
-layers.51.mlp.up_proj.scales,
-layers.51.mlp.up_proj.weight,
-layers.51.post_attention_layernorm.weight,
-layers.51.post_feedforward_layernorm.weight,
-layers.51.pre_feedforward_layernorm.weight,
-layers.51.self_attn.gate_proj.biases,
-layers.51.self_attn.gate_proj.scales,
-layers.51.self_attn.gate_proj.weight,
-layers.51.self_attn.k_proj.biases,
-layers.51.self_attn.k_proj.scales,
-layers.51.self_attn.k_proj.weight,
-layers.51.self_attn.o_proj.biases,
-layers.51.self_attn.o_proj.scales,
-layers.51.self_attn.o_proj.weight,
-layers.51.self_attn.q_proj.biases,
-layers.51.self_attn.q_proj.scales,
-layers.51.self_attn.q_proj.weight,
-layers.51.self_attn.v_proj.biases,
-layers.51.self_attn.v_proj.scales,
-layers.51.self_attn.v_proj.weight,
-layers.6.input_layernorm.weight,
-layers.6.mlp.down_proj.biases,
-layers.6.mlp.down_proj.scales,
-layers.6.mlp.down_proj.weight,
-layers.6.mlp.gate_proj.biases,
-layers.6.mlp.gate_proj.scales,
-layers.6.mlp.gate_proj.weight,
-layers.6.mlp.up_proj.biases,
-layers.6.mlp.up_proj.scales,
-layers.6.mlp.up_proj.weight,
-layers.6.post_attention_layernorm.weight,
-layers.6.post_feedforward_layernorm.weight,
-layers.6.pre_feedforward_layernorm.weight,
-layers.6.self_attn.gate_proj.biases,
-layers.6.self_attn.gate_proj.scales,
-layers.6.self_attn.gate_proj.weight,
-layers.6.self_attn.k_proj.biases,
-layers.6.self_attn.k_proj.scales,
-layers.6.self_attn.k_proj.weight,
-layers.6.self_attn.o_proj.biases,
-layers.6.self_attn.o_proj.scales,
-layers.6.self_attn.o_proj.weight,
-layers.6.self_attn.q_proj.biases,
-layers.6.self_attn.q_proj.scales,
-layers.6.self_attn.q_proj.weight,
-layers.6.self_attn.v_proj.biases,
-layers.6.self_attn.v_proj.scales,
-layers.6.self_attn.v_proj.weight,
-layers.7.input_layernorm.weight,
-layers.7.mlp.down_proj.biases,
-layers.7.mlp.down_proj.scales,
-layers.7.mlp.down_proj.weight,
-layers.7.mlp.gate_proj.biases,
-layers.7.mlp.gate_proj.scales,
-layers.7.mlp.gate_proj.weight,
-layers.7.mlp.up_proj.biases,
-layers.7.mlp.up_proj.scales,
-layers.7.mlp.up_proj.weight,
-layers.7.post_attention_layernorm.weight,
-layers.7.post_feedforward_layernorm.weight,
-layers.7.pre_feedforward_layernorm.weight,
-layers.7.self_attn.gate_proj.biases,
-layers.7.self_attn.gate_proj.scales,
-layers.7.self_attn.gate_proj.weight,
-layers.7.self_attn.k_proj.biases,
-layers.7.self_attn.k_proj.scales,
-layers.7.self_attn.k_proj.weight,
-layers.7.self_attn.o_proj.biases,
-layers.7.self_attn.o_proj.scales,
-layers.7.self_attn.o_proj.weight,
-layers.7.self_attn.q_proj.biases,
-layers.7.self_attn.q_proj.scales,
-layers.7.self_attn.q_proj.weight,
-layers.7.self_attn.v_proj.biases,
-layers.7.self_attn.v_proj.scales,
-layers.7.self_attn.v_proj.weight,
-layers.8.input_layernorm.weight,
-layers.8.mlp.down_proj.biases,
-layers.8.mlp.down_proj.scales,
-layers.8.mlp.down_proj.weight,
-layers.8.mlp.gate_proj.biases,
-layers.8.mlp.gate_proj.scales,
-layers.8.mlp.gate_proj.weight,
-layers.8.mlp.up_proj.biases,
-layers.8.mlp.up_proj.scales,
-layers.8.mlp.up_proj.weight,
-layers.8.post_attention_layernorm.weight,
-layers.8.post_feedforward_layernorm.weight,
-layers.8.pre_feedforward_layernorm.weight,
-layers.8.self_attn.gate_proj.biases,
-layers.8.self_attn.gate_proj.scales,
-layers.8.self_attn.gate_proj.weight,
-layers.8.self_attn.k_proj.biases,
-layers.8.self_attn.k_proj.scales,
-layers.8.self_attn.k_proj.weight,
-layers.8.self_attn.o_proj.biases,
-layers.8.self_attn.o_proj.scales,
-layers.8.self_attn.o_proj.weight,
-layers.8.self_attn.q_proj.biases,
-layers.8.self_attn.q_proj.scales,
-layers.8.self_attn.q_proj.weight,
-layers.8.self_attn.v_proj.biases,
-layers.8.self_attn.v_proj.scales,
-layers.8.self_attn.v_proj.weight,
-layers.9.input_layernorm.weight,
-layers.9.mlp.down_proj.biases,
-layers.9.mlp.down_proj.scales,
-layers.9.mlp.down_proj.weight,
-layers.9.mlp.gate_proj.biases,
-layers.9.mlp.gate_proj.scales,
-layers.9.mlp.gate_proj.weight,
-layers.9.mlp.up_proj.biases,
-layers.9.mlp.up_proj.scales,
-layers.9.mlp.up_proj.weight,
-layers.9.post_attention_layernorm.weight,
-layers.9.post_feedforward_layernorm.weight,
-layers.9.pre_feedforward_layernorm.weight,
-layers.9.self_attn.gate_proj.biases,
-layers.9.self_attn.gate_proj.scales,
-layers.9.self_attn.gate_proj.weight,
-layers.9.self_attn.k_proj.biases,
-layers.9.self_attn.k_proj.scales,
-layers.9.self_attn.k_proj.weight,
-layers.9.self_attn.o_proj.biases,
-layers.9.self_attn.o_proj.scales,
-layers.9.self_attn.o_proj.weight,
-layers.9.self_attn.q_proj.biases,
-layers.9.self_attn.q_proj.scales,
-layers.9.self_attn.q_proj.weight,
-layers.9.self_attn.v_proj.biases,
-layers.9.self_attn.v_proj.scales,
-layers.9.self_attn.v_proj.weight,
-norm.weight.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 2893.24it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[22:51:27] DEBUG    HF Cache Info for mlx-community/Muse-Glimmer-30B-OptiQ-4bit: size=22770.3 MB, files=15
-```
+Keywords: Adobe Stock, Aerial view, Architecture, Blue sky, Chimney, Clay tiles, Elderly woman, England, Mill, National Trust, Pedestrians, People, River Itchen, Riverbank, Scenery, Sitting, Stone wall
+</pre>
 
 </details>
 
@@ -5986,13 +2902,13 @@ Reconstruction complete: |          |  0.00B /  0.00B
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
-- *Model load time:* 1.17s
+- *Model load time:* 1.03s
 - *Generation time:* -
-- *Total time:* 1.17s
-- *Input validation time:* 5.17e-05
+- *Total time:* 1.03s
+- *Input validation time:* 5.83e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.142
+- *Cleanup time:* 0.145
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -6002,7 +2918,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Active memory:* -
 - *Cache memory:* -
 - *Model-load active memory:* -
-- *Post-cleanup active memory:* 0.0131
+- *Post-cleanup active memory:* 0.0134
 - *Post-cleanup cache memory:* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -6045,25 +2961,25 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1292, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1298, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1437, in load_processor
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1443, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -6078,21 +2994,21 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -6155,12 +3071,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2703.52it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:59:14] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 </details>

@@ -8,9 +8,9 @@ model. Results say nothing about a model's fitness for other uses.
 
 ## Run at a glance
 
-- Models attempted: 42 (completed 40, crashed 2, indeterminate 0)
-- Usability: usable 18, usable with caveats 14, unusable 8, not evaluated 2
-- Top observations: No response text was returned (1), Response repeats the same text (4), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (1), Required fields are missing or empty (5)
+- Models attempted: 42 (completed 41, crashed 1, indeterminate 0)
+- Usability: usable 15, usable with caveats 18, unusable 8, not evaluated 1
+- Top observations: Response repeats the same text (2), Unrecognised model control tokens remain visible (1), Required fields are missing or empty (5), Response repeats the task instructions instead of only returning the requested fields (2), Extra text appears before the Title field (4)
 
 ## Start here
 
@@ -27,5 +27,4 @@ model. Results say nothing about a model's fitness for other uses.
 
 ## Issue drafts
 
-- [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Muse-Glimmer-30B-OptiQ-4bit.md)
 - [tencent/Youtu-VL-4B-Instruct](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_tencent_Youtu-VL-4B-Instruct.md)

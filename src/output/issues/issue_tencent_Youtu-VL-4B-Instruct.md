@@ -30,7 +30,7 @@ builtins.ValueError: Model loading failed: cannot import name 'DefaultFastImageP
   from 'transformers.image_processing_utils_fast' (unknown location)
 - *Resolved model revision:* 8d30a0e49662a1d628a472b12df264dbcd768753
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.013059306
+- *Post-cleanup active memory (GB):* 0.013436274
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 10.68
 - *Parameter count:* 4.00B (name-estimate)
@@ -67,25 +67,25 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1292, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1298, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1437, in load_processor
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1443, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -100,21 +100,21 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 644, in _patched_auto_processor_from_pretrained
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 652, in _patched_auto_processor_from_pretrained
     return previous_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -179,20 +179,20 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 2703.52it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:59:14] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 43,299,212 bytes
-- *Image SHA-256:* a843ca79cc4b147bd543f362fdd35173cc6793bdf5c739fe4ec9a2a95de92d76
+- *Image dimensions:* 6,656 x 9,984 pixels
+- *Image size:* 66,295,254 bytes
+- *Image SHA-256:* 168b4850b1427394bbe84a99ffd05533ffaf7e995e4213d9ce2d36c959e70c7b
 
 <details>
 <summary>Exact prompt</summary>
@@ -203,13 +203,11 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-08-18 17:46:05 UTC+01:00
-- GPS: 55.951722°N, 3.201417°W
+- Capture date/time: 2026-08-31 15:02:20 UTC+01:00
 
 Descriptive hints:
-- Title hint: City Centre, Edinburgh, Scotland, UK, GBR, Europe
-- Description hint: Extensive scaffolding covers the facade of a building undergoing major renovation and redevelopment along Princes Street in Edinburgh, Scotland, while pedestrians walk past temporary construction fences and a Boots pharmacy beneath an overcast sky.
-- Keyword hints: 10 Best (structured), Adobe Stock, Any Vision, City Centre, Civil engineering, Construction fence, Construction site, Crane, Edinburgh, Europe, Fence, Modern Architecture, Objects, Overcast, Overcast Sky, Pedestrians, Princes Street, Roadworks, Scaffolding, Scotland
+- Description hint: Visitors walk along the pathway and relax in front of the historic Winchester City Mill, an ancient watermill situated over the River Itchen in Winchester, Hampshire, England.
+- Keyword hints: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, England, Girls, Hampshire, Mill, National Trust, Pedestrians, People, Rapids, River Itchen, Riverbank, Scenery, Sitting, Stone wall
 
 Write:
 - a concrete 5-10-word title;
@@ -239,16 +237,16 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Component       | Value                                                            |
 |-----------------|------------------------------------------------------------------|
 | mlx-vlm         | 0.7.0rc0                                                         |
-| mlx             | 0.32.3.dev20260830+37c26e575                                     |
+| mlx             | 0.32.3.dev20260904+b6368984b                                     |
 | mlx-lm          | 0.32.0                                                           |
 | transformers    | 5.16.1                                                           |
-| tokenizers      | 0.23.1                                                           |
-| huggingface-hub | 1.29.0                                                           |
+| tokenizers      | 0.23.2                                                           |
+| huggingface-hub | 1.30.0                                                           |
 | Pillow          | 12.3.0                                                           |
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.16.6; revision 082cb805666ca30ed48f5b7c35252fe92f945ef1; clean |
+| check_models    | 0.16.6; revision 8b5e2e71c028719b337e145cf62b723bf319129b; clean |
 
 ### Full environment evidence
 
