@@ -2110,6 +2110,40 @@ def test_schema_3_metadata_contains_complete_run_context(tmp_path: Path) -> None
     assert "run.json" not in json.dumps(header)
 
 
+def test_failed_retained_run_rewrite_leaves_the_previous_file_intact(tmp_path: Path) -> None:
+    """The final manifest rewrite must not truncate the pre-report file on failure."""
+    retained = _retained_run_fixture(tmp_path)
+    path = tmp_path / "results.jsonl"
+    check_models._write_retained_run(retained, path)
+    before = path.read_bytes()
+
+    def _explode(target: Path, content: str, *, append: bool = False) -> None:
+        del content, append
+        safe_io.write_text_no_follow(target, "partial")
+        msg = "disk full"
+        raise OSError(msg)
+
+    with (
+        patch.object(check_models, "_write_text_file", _explode),
+        pytest.raises(OSError, match="disk full"),
+    ):
+        check_models._write_retained_run(retained, path)
+
+    assert path.read_bytes() == before
+    assert sorted(p.name for p in tmp_path.iterdir() if p.name.startswith(".results")) == []
+
+    # A successful rewrite replaces the file in place and leaves no staging file.
+    updated = check_models.RetainedRun(
+        metadata=cast(
+            "check_models.JsonlMetadataRecord", {**retained.metadata, "artifacts": {"x": "y"}}
+        ),
+        results=retained.results,
+    )
+    check_models._write_retained_run(updated, path)
+    assert json.loads(path.read_text(encoding="utf-8").splitlines()[0])["artifacts"] == {"x": "y"}
+    assert [p.name for p in tmp_path.iterdir() if p.suffix == ".tmp"] == []
+
+
 def test_retained_run_round_trips_through_the_single_loader(tmp_path: Path) -> None:
     """One loader owns decoding and validation for every consumer."""
     retained = _retained_run_fixture(tmp_path)

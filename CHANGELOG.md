@@ -33,6 +33,17 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Baseline comparisons no longer treat runs on different hardware as
+  like-for-like for performance: the chip (`system["GPU/Chip"]`) is now a
+  comparison fact, so a differing chip withholds the tok/s ratio, throughput
+  flags and peak-memory moves (quality transitions still show), a missing chip
+  on either side is reported as an unverified fact, the baseline's hardware
+  appears in the component rows, and the retained `comparison` block carries
+  a `hardware` pair alongside `execution_mode`.
+- The retained `results.jsonl` is now rewritten atomically (staged next to
+  the target and renamed into place), so a failure during the final manifest
+  reconciliation leaves the pre-report file intact instead of truncated, as
+  the failure message already promised.
 - `--isolate` works again: the parent wrote the child spec with keys such
   as `params.model_identifier` (a mechanical rename had rewritten the JSON
   key strings too) while the child still read `model_identifier`, so every

@@ -1292,7 +1292,9 @@ def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
     real_write_text = check_models._write_text_file
 
     def record_writes(path: Path, content: str, *, append: bool = False) -> None:
-        if path == paths.jsonl and '"_type": "metadata"' in content:
+        # The retained run is staged beside its target and renamed into place.
+        staged_jsonl = path.parent == paths.jsonl.parent and paths.jsonl.name in path.name
+        if staged_jsonl and '"_type": "metadata"' in content:
             events.append("jsonl")
         real_write_text(path, content, append=append)
 

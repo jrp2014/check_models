@@ -5914,7 +5914,7 @@ def _comparison_baseline(records: list[dict[str, object]]) -> check_models.Compa
             "_type": "metadata",
             "format_version": "2.0",
             "prompt": "p",
-            "system": {"Python Version": "3.13.14"},
+            "system": {"Python Version": "3.13.14", "GPU/Chip": "Apple M5 Max"},
             "timestamp": "2026-08-01 10:00:00 BST",
             "eval_mode": "assisted",
             "library_versions": {"mlx": "0.32.1", "mlx-vlm": "0.6.15"},
@@ -5984,6 +5984,7 @@ def test_compare_run_results_reports_transitions_text_tps_and_memory() -> None:
         ("mlx", "0.32.1 @ abcdef123"),
         ("mlx-vlm", "0.6.15"),
         ("python", "3.13.14"),
+        ("hardware", "Apple M5 Max"),
     )
     assert comparison.has_changes
 
@@ -6228,6 +6229,69 @@ def test_throughput_withheld_when_execution_modes_differ() -> None:
         )
     )
     assert "withheld" in rendered
+
+
+def test_throughput_withheld_when_hardware_differs() -> None:
+    """A different chip keeps quality transitions but withholds tok/s and memory."""
+    baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
+    current = [
+        cast(
+            "check_models.JsonlResultRecord",
+            _comparison_record("org/m", usability="unusable", tps=50.0),
+        )
+    ]
+    kwargs = _verified_comparison_kwargs(baseline)
+    kwargs["current_metadata"] = {
+        **cast("dict[str, object]", baseline.metadata),
+        "system": {"Python Version": "3.13.14", "GPU/Chip": "Apple M2 Ultra"},
+    }
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", kwargs)
+    )
+    assert comparison.comparability == "comparable"
+    assert (comparison.baseline_hardware, comparison.current_hardware) == (
+        "Apple M5 Max",
+        "Apple M2 Ultra",
+    )
+    assert comparison.throughput_comparable is False
+    assert comparison.tps_ratio_median is None
+    assert comparison.throughput_flags == ()
+    assert comparison.memory_changes == ()
+    assert [c.model for c in comparison.changes] == ["org/m"]
+    assert ("hardware", "Apple M5 Max") in comparison.baseline_components
+
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    assert payload["throughput_comparable"] is False
+    assert payload["hardware"] == {"baseline": "Apple M5 Max", "current": "Apple M2 Ultra"}
+    assert check_models._run_comparison_from_json(payload) == comparison
+
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Apple M2 Ultra now vs Apple M5 Max in the baseline" in rendered
+    assert "withheld" in rendered
+
+
+def test_missing_hardware_identity_is_unverified_not_comparable() -> None:
+    """A header without a chip cannot vouch for like-for-like throughput."""
+    baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
+    kwargs = _verified_comparison_kwargs(baseline)
+    kwargs["current_metadata"] = {
+        **cast("dict[str, object]", baseline.metadata),
+        "system": {"Python Version": "3.13.14"},
+    }
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=100.0))],
+        baseline,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison.comparability == "unknown"
+    assert "hardware identity" in comparison.unverified_facts
+    assert comparison.throughput_comparable is False
+    assert comparison.current_hardware is None
 
 
 def test_unknown_comparability_withholds_performance_but_keeps_transitions() -> None:

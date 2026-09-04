@@ -17878,7 +17878,15 @@ def _write_retained_run(run: RetainedRun, filename: Path) -> None:
     """Serialize one retained run as a metadata line plus ordered result lines."""
     lines = [json.dumps(run.metadata)]
     lines.extend(json.dumps(result) for result in run.results)
-    _write_text_file(filename, "\n".join(lines) + "\n")
+    # Stage next to the target and rename, so a failed rewrite (serialisation,
+    # disk full, interrupt) leaves the previous file untouched rather than
+    # truncated: the final manifest reconciliation relies on that guarantee.
+    staging = filename.with_name(f".{filename.name}.{os.getpid()}.tmp")
+    try:
+        _write_text_file(staging, "\n".join(lines) + "\n")
+        staging.replace(filename)
+    finally:
+        staging.unlink(missing_ok=True)
 
 
 def save_jsonl_report(
@@ -18076,6 +18084,8 @@ class RunComparison:
     history_runs_used: int
     baseline_execution_mode: str = "in_process"
     current_execution_mode: str = "in_process"
+    baseline_hardware: str | None = None
+    current_hardware: str | None = None
     comparability: Literal["comparable", "unknown", "incomparable"] = "comparable"
     incomparable_reasons: tuple[str, ...] = ()
     unverified_facts: tuple[str, ...] = ()
@@ -18359,6 +18369,8 @@ def _comparison_component_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str
 
     if python_version:
         rows.append(("python", f"{python_version}"))
+    if (hardware := _comparison_hardware(metadata)) is not None:
+        rows.append(("hardware", hardware))
     return tuple(rows)
 
 
@@ -18516,8 +18528,11 @@ def compare_run_results(
         current_image=current_image,
         current_generation_settings=current_generation_settings,
     )
+    baseline_hardware = _comparison_hardware(baseline.metadata)
+    current_hardware = _comparison_hardware(current_metadata)
     throughput_comparable = (
         current_execution_mode == str(baseline.metadata.get("execution_mode", "in_process"))
+        and baseline_hardware == current_hardware
         and not unverified_facts
         and not incomparable_reasons
     )
@@ -18576,6 +18591,8 @@ def compare_run_results(
         history_runs_used=history_runs,
         baseline_execution_mode=str(baseline.metadata.get("execution_mode", "in_process")),
         current_execution_mode=current_execution_mode,
+        baseline_hardware=baseline_hardware,
+        current_hardware=current_hardware,
         comparability=(
             "incomparable"
             if incomparable_reasons
@@ -18586,6 +18603,13 @@ def compare_run_results(
         revision_changes=tuple(revision_changes),
         throughput_comparable=throughput_comparable,
     )
+
+
+def _comparison_hardware(metadata: JsonlMetadataRecord | None) -> str | None:
+    """Return the chip a run executed on, or None when the header does not say."""
+    system_info = metadata.get("system") if metadata is not None else None
+    chip = system_info.get("GPU/Chip") if isinstance(system_info, dict) else None
+    return chip if isinstance(chip, str) and chip else None
 
 
 def _comparison_compatibility(
@@ -18622,6 +18646,10 @@ def _comparison_compatibility(
             reasons.append(f"image differs (sha256 {before_sha[:12]}… → {now_sha[:12]}…)")
     else:
         unverified.append("image identity")
+    if _comparison_hardware(current_metadata) is None or (
+        _comparison_hardware(baseline.metadata) is None
+    ):
+        unverified.append("hardware identity")
     if current_generation_settings and baseline.generation_settings:
         now_settings = dict(current_generation_settings)
         before_settings = dict(baseline.generation_settings)
@@ -18649,6 +18677,10 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "baseline": comparison.baseline_execution_mode,
         "current": comparison.current_execution_mode,
     }
+    hardware: JsonLike = {
+        "baseline": comparison.baseline_hardware,
+        "current": comparison.current_hardware,
+    }
     if not comparison.comparable:
         return {
             "baseline": comparison.baseline_label,
@@ -18657,6 +18689,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "comparability": comparison.comparability,
             "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
             "execution_mode": execution_mode,
+            "hardware": hardware,
         }
     return {
         "baseline": comparison.baseline_label,
@@ -18713,6 +18746,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         ],
         "history_runs_used": comparison.history_runs_used,
         "execution_mode": execution_mode,
+        "hardware": hardware,
     }
 
 
@@ -18820,6 +18854,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
     """
     components = _comparison_mapping(value.get("baseline_components"))
     execution_mode = _comparison_mapping(value.get("execution_mode"))
+    hardware = _comparison_mapping(value.get("hardware"))
     comparability_value = value.get("comparability", "comparable")
     if comparability_value not in ("comparable", "unknown", "incomparable"):
         message = f"comparison comparability is not a known value: {comparability_value!r}"
@@ -18836,6 +18871,8 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             execution_mode.get("baseline", "in_process")
         ),
         "current_execution_mode": _comparison_req_str(execution_mode.get("current", "in_process")),
+        "baseline_hardware": _comparison_opt_str(hardware.get("baseline")),
+        "current_hardware": _comparison_opt_str(hardware.get("current")),
         "comparability": comparability,
     }
     if comparability == "incomparable":
@@ -18972,7 +19009,9 @@ class _ComparisonView:
 def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     """Derive every formatted row of the baseline diff exactly once."""
     if not comparison.throughput_comparable:
-        ratio_text = "withheld (execution mode or inputs not established as like-for-like)"
+        ratio_text = (
+            "withheld (hardware, execution mode or inputs not established as like-for-like)"
+        )
     elif (
         comparison.tps_ratio_median is not None
         and comparison.tps_ratio_min is not None
@@ -19017,6 +19056,13 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
             "start-up differs, so throughput is not directly comparable"
         )
         summary_rows.append(("Execution mode", mode_note))
+    if comparison.current_hardware != comparison.baseline_hardware:
+        hardware_note = (
+            f"{comparison.current_hardware or 'unknown'} now vs "
+            f"{comparison.baseline_hardware or 'unknown'} in the baseline — throughput "
+            "and peak memory are not comparable across machines"
+        )
+        summary_rows.append(("Hardware", hardware_note))
 
     banner: str | None = None
     if comparison.comparability == "incomparable":
