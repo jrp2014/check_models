@@ -43,4 +43,4 @@ echo "=== Skylos Verify ==="
 # payload on stdin, so closing it would break the documented mode above. Safe
 # because `verify` has no gate interaction and no prompts; if that ever changes,
 # guard the non---stdin path only.
-quality_run_python_tool skylos verify . --project-context "$@"
+quality_run_skylos verify . --project-context "$@"

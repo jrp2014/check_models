@@ -97,11 +97,11 @@ quality_run_python_tool vulture
 # [tool.skylos.gate] thresholds in favour of fail-on-any-finding.
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_python_tool skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
+    quality_run_skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
 
 echo "=== Skylos Audit Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_python_tool skylos . -a </dev/null
+    quality_run_skylos . -a </dev/null
 
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="

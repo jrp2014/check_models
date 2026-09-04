@@ -1049,13 +1049,13 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     assert quality_script.count('"!**/.worktrees/**"') == 2
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_python_tool skylos \. --quality --secrets --sca --gate --no-upload "
+        r"quality_run_skylos \. --quality --secrets --sca --gate --no-upload "
         r"--format concise",
         quality_script,
     )
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_python_tool skylos \. -a",
+        r"quality_run_skylos \. -a",
         quality_script,
     )
 
@@ -1106,6 +1106,7 @@ def test_skylos_danger_scan_excludes_third_party_worktrees(tmp_path: Path) -> No
                     shift
                 done
             }
+            quality_run_skylos() { quality_run_python_tool skylos "$@"; }
             """
         ),
         encoding="utf-8",
@@ -1139,7 +1140,7 @@ def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
     assert "Usage: bash tools/run_skylos_verify.sh" in script
     assert 'cd "$(quality_repo_root)"' in script
     assert "quality_require_python_tool skylos" in script
-    assert 'quality_run_python_tool skylos verify . --project-context "$@"' in script
+    assert 'quality_run_skylos verify . --project-context "$@"' in script
 
 
 def test_defusedxml_probe_is_a_real_import_without_suppression() -> None:

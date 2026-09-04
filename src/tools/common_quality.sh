@@ -204,6 +204,37 @@ quality_require_command() {
         "$tool_path" "$@"
     }
 
+    # Skylos's grade renderer copies its README badge to the system clipboard
+    # (pyperclip, copy_badge=True with no CLI switch), overwriting whatever the
+    # user had there. pyperclip is a hard Skylos dependency, but the import is
+    # lazy and the copy is wrapped in `except pyperclip.PyperclipException`, so
+    # a throwaway stub module that raises it turns the copy into a silent
+    # no-op. The stub lives only for the duration of the call and is never a
+    # tracked source file, so it is invisible to the linters and to Skylos.
+    quality_run_skylos() {
+        local stub_dir status
+        stub_dir="$(mktemp -d -t skylos-clipboard-shim)" || return 1
+        printf '%s\n' \
+            '"""Clipboard shim: keep Skylos from overwriting the user clipboard."""' \
+            '' \
+            '' \
+            'class PyperclipException(RuntimeError):' \
+            '    """Raised so Skylos takes its quiet no-clipboard branch."""' \
+            '' \
+            '' \
+            'def copy(_text):' \
+            '    raise PyperclipException("clipboard disabled by check_models quality tooling")' \
+            '' \
+            '' \
+            'def paste():' \
+            '    return ""' \
+            > "$stub_dir/pyperclip.py"
+        PYTHONPATH="$stub_dir${PYTHONPATH:+:$PYTHONPATH}" quality_run_python_tool skylos "$@"
+        status=$?
+        rm -rf "$stub_dir"
+        return "$status"
+    }
+
     quality_resolve_python_path() {
         if [ -n "${QUALITY_PYTHON:-}" ] && [ -x "$QUALITY_PYTHON" ]; then
             printf '%s\n' "$QUALITY_PYTHON"

@@ -106,7 +106,7 @@ else
 fi
 
 set +e
-quality_run_python_tool skylos "${scan_args[@]}" </dev/null
+quality_run_skylos "${scan_args[@]}" </dev/null
 scan_exit_code=$?
 set -e
 
@@ -128,7 +128,7 @@ if [ "$dropped_worktree_count" -gt 0 ]; then
     echo "ℹ️  Dropped $dropped_worktree_count finding(s) from third-party .worktrees/ checkouts (not this repository's files to gate)."
 fi
 
-quality_run_python_tool skylos cicd annotate --input "$report_path" --severity medium </dev/null
+quality_run_skylos cicd annotate --input "$report_path" --severity medium </dev/null
 
 gate_args=(cicd gate --input "$report_path")
 if [ "$GATE_MODE" -eq 0 ]; then
@@ -147,7 +147,7 @@ fi
 # report its own verdict. Piping stdout keeps the gate non-interactive whichever
 # stream skylos consults, and PIPESTATUS keeps the gate's real exit code.
 set +e
-quality_run_python_tool skylos "${gate_args[@]}" </dev/null | cat
+quality_run_skylos "${gate_args[@]}" </dev/null | cat
 gate_exit_code="${PIPESTATUS[0]}"
 set -e
 
@@ -183,7 +183,7 @@ fi
 
 if [ "$WRITE_LLM_REPORT" -eq 1 ]; then
     set +e
-    quality_run_python_tool skylos "${llm_args[@]}" </dev/null
+    quality_run_skylos "${llm_args[@]}" </dev/null
     llm_exit_code=$?
     set -e
 

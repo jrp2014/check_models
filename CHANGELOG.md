@@ -29,6 +29,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Skylos no longer overwrites the user's clipboard from the quality gate:
+  every Skylos invocation goes through `quality_run_skylos`, which puts a
+  throwaway `pyperclip` stub (raising `PyperclipException`) first on
+  `PYTHONPATH` so the grade renderer's unconditional badge copy takes its
+  quiet no-clipboard branch. No Skylos pin or dependency change.
 - Run timing is one wall-clock concept a skimmer can read: the overall
   runtime is now measured on the wall clock (it previously used a perf
   counter that stops during system sleep, so a sweep that slept mid-run
