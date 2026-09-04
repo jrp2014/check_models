@@ -156,6 +156,17 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- Tooling cruft found in the maintainability review: `bugtest.py` and
+  `update.sh`'s Metal-regression reminder (the M5 NAX matmul regression it
+  probed for is long fixed, and the runtime smoke already catches a broken
+  backend), the custom `install_precommit_hook.py` (the checked-in
+  `.pre-commit-config.yaml` installs the same two hooks via
+  `pre-commit install`, which `make dev`, `setup_conda_env.sh`, and
+  `validate_env`'s auto-fix now run), the `update-env` / `update-full` /
+  `check_models-demo` alias targets, and the never-filed workflow-hardening
+  PR draft (archived). `make probe-python-next` is now listed with the
+  other maintenance targets. All three type checkers (mypy, ty, pyrefly)
+  stay in the gate.
 - Dead code and rolled-our-own utilities found in a maintainability
   review: `ResultSet.get_fields` / `_get_available_fields` (never used by
   the harness), the `_version_components` fallback (PEP 440 parsing via

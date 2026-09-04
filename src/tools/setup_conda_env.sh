@@ -242,7 +242,7 @@ install_dependencies() {
         fi
 
         log_info "Installing repository git hooks from the active environment..."
-        python -m tools.install_precommit_hook
+        pre-commit install
         log_success "Repository git hooks installed"
     fi
 
@@ -371,7 +371,7 @@ Optional follow-up installs:
             Otherwise install Node.js and run:
         ${BLUE}npm install --prefix src${NC}
             Reinstall them later with:
-        ${BLUE}cd src && python -m tools.install_precommit_hook${NC}
+        ${BLUE}pre-commit install${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}

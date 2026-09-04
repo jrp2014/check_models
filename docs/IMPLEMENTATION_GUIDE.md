@@ -120,7 +120,6 @@ A single medium-sized, well-commented function is often clearer than a web of on
   - **`src/tools/`** - Developer utilities:
     - `validate_env.py`: Diagnostics for dependencies and environment.
     - `update_readme_deps.py`: Syncs `pyproject.toml` deps to `README.md`.
-    - `install_precommit_hook.py`: Sets up git hooks.
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated run artifacts; all are tracked in git except the append-only `results.history.jsonl`

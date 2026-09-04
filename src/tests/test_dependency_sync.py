@@ -25,10 +25,8 @@ from packaging.requirements import Requirement
 import check_models
 from check_models_data import dependency_policy
 from tools import (
-    bugtest,
     check_suppressions,
     filter_danger_report,
-    install_precommit_hook,
     quarantine_broken_pip_metadata,
     safe_io,
     update_readme_deps,
@@ -971,46 +969,6 @@ def test_python_sources_write_variation_selectors_as_escapes() -> None:
     assert offenders == [], offenders
 
 
-def test_install_hook_rejects_symlink_target(tmp_path: Path) -> None:
-    """Hook installation should not write through a symlink target."""
-    hooks_dir = tmp_path / "hooks"
-    hooks_dir.mkdir()
-    target_path = tmp_path / "target-hook"
-    hook_path = hooks_dir / "pre-commit"
-    hook_path.symlink_to(target_path)
-
-    with pytest.raises(OSError, match="symlink"):
-        install_precommit_hook._install_hook(hooks_dir, "pre-commit", "#!/usr/bin/env bash\n")
-
-    assert not target_path.exists()
-
-
-def test_bugtest_formats_metal_regression_warning() -> None:
-    """The Metal backend probe should provide a pasteable maintenance warning."""
-    assert bugtest.classify_relative_error(0.001) == "ok"
-    assert bugtest.classify_relative_error(1.11) == "buggy"
-
-    message = bugtest.format_probe_message(
-        status="buggy",
-        relative_error=1.11,
-        metal_version="Apple metal version 32023.883 (metalfe-32023.883)",
-    )
-
-    assert "still appears broken" in message
-    assert "relative error 1.110000" in message
-    assert "metalfe-32023.883" in message
-    assert "MLX_METAL_GPU_ARCH=applegpu_g16s" in message
-
-
-def test_update_script_runs_nonblocking_metal_bug_reminder() -> None:
-    """update.sh should surface the Metal regression probe without blocking updates."""
-    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-
-    assert "run_metal_bug_reminder" in update_script
-    assert 'python "$SCRIPT_DIR/bugtest.py" --warn-only' in update_script
-    assert "MLX_METAL_BUG_REMINDER" in update_script
-
-
 def test_quality_script_runs_skylos_quality_gate() -> None:
     """Local quality checks should include the calibrated Skylos quality gate."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
@@ -1802,30 +1760,20 @@ def test_agents_and_claude_docs_stay_in_sync() -> None:
     )
 
 
-def test_precommit_hook_types_match_framework_config() -> None:
-    """Both installers and validate_env must agree with .pre-commit-config.yaml."""
+def test_precommit_framework_config_installs_both_hooks() -> None:
+    """The checked-in pre-commit config is the single hook mechanism."""
     config = yaml.safe_load((REPO_ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8"))
 
-    assert tuple(config["default_install_hook_types"]) == (
-        install_precommit_hook.REQUIRED_HOOK_TYPES
-    )
-    # Each configured hook's entry script must exist and be the same script the
-    # custom installer's generated hooks execute.
+    assert tuple(config["default_install_hook_types"]) == ("pre-commit", "pre-push")
     entries = [hook["entry"] for repo in config["repos"] for hook in repo["hooks"]]
     for entry in entries:
         script = entry.removeprefix("bash ").split()[0]
         assert (REPO_ROOT / script).is_file(), entry
-    hook_bodies = (
-        install_precommit_hook.PRECOMMIT_HOOK_CONTENT + install_precommit_hook.PREPUSH_HOOK_CONTENT
-    )
-    for entry in entries:
-        script_name = Path(entry.removeprefix("bash ").split()[0]).name
-        if script_name == "run_commit_hygiene.sh":
-            assert script_name in hook_bodies
-    # The custom pre-push hook delegates to check_quality_simple.sh, which the
-    # framework runs via its own fast-push hook; both must reference it.
-    assert "check_quality_simple.sh" in hook_bodies
+    assert any("run_commit_hygiene.sh" in entry for entry in entries)
     assert any("check_quality_simple.sh" in entry for entry in entries)
+    assert (PKG_ROOT / "tools" / "validate_env.py").read_text(encoding="utf-8").count(
+        'REQUIRED_HOOK_TYPES: tuple[str, ...] = ("pre-commit", "pre-push")'
+    ) == 1
 
 
 def test_python_floor_is_single_sourced() -> None:

@@ -110,7 +110,7 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + torch + hooks + validat
 		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
 	fi
 	@echo "[bootstrap] Installing commit/push hooks..."
-	@$(RUN_PY) -m tools.install_precommit_hook || echo "⚠️  Could not install custom git hook"
+	@$(RUN_TOOL_PREFIX) pre-commit install || echo "⚠️  Could not install git hooks (pre-commit ships with the dev extras)"
 	@if command -v pre-commit >/dev/null 2>&1; then \
 		echo "[bootstrap] Installing pre-commit framework hooks..."; \
 		$(RUN_TOOL_PREFIX) pre-commit install || echo "⚠️  pre-commit install failed"; \
@@ -149,10 +149,6 @@ validate-env: ## Validate the environment via tools.validate_env (single source 
 .PHONY: check_models
 check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <path> ...')
 	$(RUN_PY) -m check_models $(ARGS)
-
-.PHONY: check_models-demo
-check_models-demo: ## Demo run with verbose output (override via ARGS to customize)
-	$(RUN_PY) -m check_models --verbose $(ARGS)
 
 .PHONY: analyze-quality
 analyze-quality: ## Run output quality diagnostic script (pass args via ARGS='--text "..."' or ARGS='--file ...')
@@ -214,12 +210,6 @@ update-quick: ## Quick in-env refresh: upgrade pip and reinstall project (dev+ex
 .PHONY: probe-python-next
 probe-python-next: ## Check whether the next Python (default 3.14) is viable in a throwaway conda env; never touches mlx-vlm
 	bash tools/probe_python_next.sh
-
-.PHONY: update-env
-update-env: update ## Alias for 'update' target
-
-.PHONY: update-full
-update-full: update ## Alias for 'update' (kept for compatibility)
 
 # Aggregates
 .PHONY: check

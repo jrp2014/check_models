@@ -128,12 +128,6 @@ update-quick: ## Quick in-env refresh: upgrade pip and reinstall project depende
 probe-python-next: ## Check whether the next Python is viable in a throwaway conda env (never touches mlx-vlm)
 	$(MAKE) -C $(SRC) probe-python-next
 
-.PHONY: update-env
-update-env: update ## Alias for 'update' target
-
-.PHONY: update-full
-update-full: update ## Alias for 'update' (kept for compatibility)
-
 
 .PHONY: deps-sync
 deps-sync: ## Sync README dependency blocks with pyproject.toml

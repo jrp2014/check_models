@@ -166,7 +166,7 @@ The file is organized in this order — search for these exact landmark headers 
 - **Static CI job**: GitHub Actions `static-quality` on `macos-15`, a Python matrix of the floor (3.13) plus the next candidate (3.14), Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA and `-a` audit checks.
 - **Runtime CI job**: separate `runtime-smoke` job runs `bash src/tools/run_runtime_smoke.sh` so Metal/runtime failures do not mask static quality results.
 - **Dependency sync CI job**: `.github/workflows/dependency-sync.yml` runs on `ubuntu-latest` with path filters and verifies `python -m tools.update_readme_deps --check`.
-- **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:
+- **Pre-commit hooks**: `pre-commit install` (from the checked-in `.pre-commit-config.yaml`; `make dev` runs it). Two stages:
   - commit stage: `bash src/tools/run_commit_hygiene.sh`
   - push stage: `bash src/tools/check_quality_simple.sh`
 - **PRs must pass**: workflow YAML validation, dependency sync check, type-stub contract check, ruff format + lint, mypy, suppression audit, ty, pyrefly, vulture, Skylos quality/secrets/SCA and `-a` audit, the blocking Skylos danger gate, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.

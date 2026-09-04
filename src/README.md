@@ -694,21 +694,13 @@ This repo excludes ephemeral caches and local environments via `.gitignore`. Com
 Recommended workflow:
 
 ```bash
-cd src
-python -m tools.install_precommit_hook
-```
-
-This installs the repo's custom git hooks directly and is the path used by
-`tools/setup_conda_env.sh` when you opt into development dependencies.
-
-Alternative workflow:
-
-- `pre-commit` framework:
-
-```bash
-pip install pre-commit
 pre-commit install
 ```
+
+`pre-commit` ships with the dev extras; the checked-in
+`.pre-commit-config.yaml` installs both the `pre-commit` (staged hygiene) and
+`pre-push` (fast static gate) hooks, and `make dev` / `tools/setup_conda_env.sh`
+run this for you.
 
   This installs both commit-stage and pre-push hooks from the checked-in
   `.pre-commit-config.yaml`. The commit hook runs staged-file hygiene only; the
@@ -1471,6 +1463,7 @@ Key commands:
 - `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
 - `make test` — run pytest only; useful for a faster test loop before the full gate
 - `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
+- `make probe-python-next` — check whether the next Python release is viable for the MLX stack in a throwaway conda env
 - `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit, full pytest, shellcheck, markdownlint)
 - `make skylos-danger` — advisory Skylos `--danger` scan for workflow and security findings
 - `make skylos-danger-llm` — advisory Skylos `--danger` scan with LLM-oriented output for agent triage
@@ -1495,12 +1488,6 @@ make -C src help
 
 Recommended workflow:
 
-- Custom git hooks shipped with this repo:
-
-  ```bash
-  cd src
-  python -m tools.install_precommit_hook
-  ```
 
 Alternative workflow:
 

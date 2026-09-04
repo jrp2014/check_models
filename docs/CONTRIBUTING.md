@@ -77,12 +77,10 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    ```
 
    If you answered `y` to development dependencies during setup, the repo's
-   custom git hooks are already installed. To reinstall them manually:
+   git hooks are already installed. To reinstall them manually:
 
    ```bash
-   cd src
-   python -m tools.install_precommit_hook
-   cd ..
+   pre-commit install
    ```
 
 ### Manual Environment Validation
@@ -237,21 +235,15 @@ changes, and use `Make: quality` as the broader gate.
 
 ### Git Hooks
 
-Two supported hook workflows:
+The hooks come from the checked-in `.pre-commit-config.yaml` (`pre-commit
+install`):
 
-- `pre-commit install`: installs the checked-in `pre-commit` and `pre-push`
-   hooks from `.pre-commit-config.yaml`.
-- Framework `pre-commit` stage: runs staged hygiene via
-   `src/tools/run_commit_hygiene.sh`.
-- Framework `pre-push` stage: runs fast checks via
-   `src/tools/check_quality_simple.sh`, including Vulture.
-- `cd src && python -m tools.install_precommit_hook`: installs the custom repo
-   hooks.
-- Custom `pre-commit` stage: formats Python files, fixes markdown when
-   possible, and syncs README deps when `src/pyproject.toml` changes.
-- Custom `pre-push` stage: runs workflow YAML validation, dependency sync
-   verification, Ruff format check + lint, mypy, ty, pyrefly, Vulture, and
-   `pytest -m "not slow and not e2e"`.
+- `pre-commit` stage: staged hygiene via `src/tools/run_commit_hygiene.sh`
+   (validates staged YAML/TOML/shebangs, formats and lints staged Python, fixes
+   staged Markdown, syncs README deps when `src/pyproject.toml` changes).
+- `pre-push` stage: the fast static gate via `src/tools/check_quality_simple.sh`
+   (workflow YAML validation, dependency sync verification, Ruff format check +
+   lint, mypy, ty, pyrefly, Vulture, and `pytest -m "not slow and not e2e"`).
 
 To bypass hooks (not recommended):
 
