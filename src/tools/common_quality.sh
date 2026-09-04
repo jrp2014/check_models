@@ -213,7 +213,9 @@ quality_require_command() {
     # tracked source file, so it is invisible to the linters and to Skylos.
     quality_run_skylos() {
         local stub_dir status
-        stub_dir="$(mktemp -d -t skylos-clipboard-shim)" || return 1
+        # Explicit template: GNU mktemp (Linux CI) requires the X's, BSD mktemp
+        # (macOS) accepts them; `-t prefix` alone is BSD-only.
+        stub_dir="$(mktemp -d "${TMPDIR:-/tmp}/skylos-clipboard-shim.XXXXXX")" || return 1
         printf '%s\n' \
             '"""Clipboard shim: keep Skylos from overwriting the user clipboard."""' \
             '' \
