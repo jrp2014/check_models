@@ -29,6 +29,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The packaged-wheel test builds through standard PEP 517 isolation from
+  the declared `[build-system]` instead of `--no-build-isolation`: it had
+  only ever passed on CI because `huggingface-hub[torch]` dragged `torch`
+  and, transitively, `setuptools` into the environment, and it broke the
+  moment that unrelated extra was removed.
 - Skylos no longer overwrites the user's clipboard from the quality gate:
   every Skylos invocation goes through `quality_run_skylos`, which puts a
   throwaway `pyperclip` stub (raising `PyperclipException`) first on

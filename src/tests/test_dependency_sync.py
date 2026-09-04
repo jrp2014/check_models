@@ -648,7 +648,10 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
     dist_dir = tmp_path / "dist"
     dist_dir.mkdir()
 
-    # Fixed local command against the checked-in repo; no user input reaches subprocess.
+    # Standard PEP 517 build: pip provisions the declared [build-system]
+    # requirements in an isolated environment, so this passes or fails on the
+    # checked-in packaging metadata alone, never on whatever happens to be
+    # installed around it (a transitive setuptools once masked exactly that).
     result = subprocess.run(  # noqa: S603 - fixed interpreter builds the checked-in package
         [
             sys.executable,
@@ -657,7 +660,6 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
             "wheel",
             ".",
             "--no-deps",
-            "--no-build-isolation",
             "--wheel-dir",
             str(dist_dir),
         ],
