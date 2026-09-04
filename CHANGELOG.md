@@ -33,6 +33,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Skylos `SKY-L021` (diff-based "security control regression") is ignored
+  in the quality gate: inside the pre-push hook of a linked git worktree it
+  compared files against the wrong revision (dozens of "sanitization call
+  was removed" findings on an unchanged file) and flagged the retained run
+  log for a "removed" HTTP header, blocking every push; the same checks
+  pass when run directly, and the full-mode `--danger` gate still covers
+  real security regressions.
 - `update.sh` no longer skips rebuilding a local MLX checkout that has
   uncommitted or untracked changes: an unchanged HEAD with modified C++,
   Metal, or packaging inputs left an older compiled extension, metallib, or
