@@ -29,14 +29,18 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- The schema-3 header retains the run's wall-clock `started_at` (optional,
-  so existing files load unchanged) and the retained-run window prefers it
-  over `end - total_runtime_seconds`. That runtime is a perf-counter
-  duration which stops during system sleep, so a sweep that slept mid-run
-  computed a start 4.6 minutes late and the summary omitted the run's own
+- Run timing is one wall-clock concept a skimmer can read: the overall
+  runtime is now measured on the wall clock (it previously used a perf
+  counter that stops during system sleep, so a sweep that slept mid-run
+  reported 15 minutes for a 20-minute run), the schema-3 header retains
+  the run's `started_at` (optional, so existing files load unchanged),
+  `run_summary.md` opens with *Run started / Run finished / Run duration*,
+  `index.md`'s dashboard leads with the duration, and long durations render
+  as `15m 26s` / `1h 05m 12s` instead of `925.55s`. The retained-run window
+  prefers `started_at`; older headers bound the start by the earliest
+  retained result timestamp, which fixes the summary omitting the run's own
   `check_models.log` and `environment.log` as "stale" while `index.md`
-  still linked them. Older headers now bound the start by the earliest
-  retained result timestamp instead.
+  still linked them.
 - Every scripted `npm install` (`update.sh`, `setup_conda_env.sh`, the
   Makefile's lazy tooling installs, and the CI static-quality job) passes
   `--no-audit --no-fund`: nothing consumes the audit or funding output, and

@@ -8,16 +8,18 @@ import check_models
 @pytest.mark.parametrize(
     ("seconds", "expected"),
     [
-        pytest.param(45.5, "00:00:45", id="seconds_only"),
-        pytest.param(125.3, "00:02:05", id="minutes"),
-        pytest.param(3665.0, "01:01:05", id="hours"),
-        pytest.param(0.0, "00:00:00", id="zero"),
-        pytest.param(7384.2, "02:03:04", id="multiple_hours"),
+        pytest.param(0.0, "0.00s", id="zero"),
+        pytest.param(45.5, "45.50s", id="seconds_only"),
+        pytest.param(89.99, "89.99s", id="just_under_minutes"),
+        pytest.param(90.0, "1m 30s", id="minutes_threshold"),
+        pytest.param(925.55, "15m 25s", id="minutes"),
+        pytest.param(3665.0, "1h 01m 05s", id="hours"),
+        pytest.param(7384.2, "2h 03m 04s", id="multiple_hours"),
     ],
 )
-def test_format_hms(seconds: float, expected: str) -> None:
-    """Should format total seconds as HH:MM:SS."""
-    assert check_models._format_hms(seconds) == expected
+def test_format_overall_runtime_reads_at_a_glance(seconds: float, expected: str) -> None:
+    """Short spans keep precise seconds; longer ones read as m/s or h/m/s."""
+    assert check_models.format_overall_runtime(seconds) == expected
 
 
 @pytest.mark.parametrize(

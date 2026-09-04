@@ -1124,7 +1124,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     _run_finalize_with_report_patches(
         args=args,
         results=[result],
-        overall_start_time=time.perf_counter() - 0.5,
+        overall_start_time=time.time() - 0.5,
     )
 
     messages = [record.message for record in caplog.records]
@@ -1164,7 +1164,7 @@ def test_finalize_execution_separates_each_model_result_block(
     _run_finalize_with_report_patches(
         args=args,
         results=results,
-        overall_start_time=time.perf_counter() - 0.5,
+        overall_start_time=time.time() - 0.5,
     )
 
     messages = [record.message for record in caplog.records]
@@ -1433,7 +1433,7 @@ def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: 
         _run_finalize_with_report_patches(
             args=args,
             results=[result],
-            overall_start_time=time.perf_counter() - 0.5,
+            overall_start_time=time.time() - 0.5,
         )
 
     assert check_models._assess_result(result) == expected

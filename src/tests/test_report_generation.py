@@ -879,6 +879,32 @@ def test_run_issue_summary_legacy_window_bounds_start_by_earliest_result(
     assert "src/output/check_models.log" in content
 
 
+def test_run_summary_header_shows_start_finish_and_duration(tmp_path: Path) -> None:
+    """A skimmer gets when the run started, when it finished, and how long it took."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(_observed_result(),),
+        total_runtime_seconds=1201.0,
+        started_at="2026-07-31 11:41:59 BST",
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "- *Run started:* 2026-07-31 11:41:59 BST" in content
+    assert "- *Run finished:* 2026-07-31 12:02:00 BST" in content
+    assert "- *Run duration:* 20m 01s" in content
+    assert "Run timestamp" not in content
+
+
+def test_output_index_dashboard_leads_with_run_duration() -> None:
+    lines = check_models._output_index_dashboard_lines([], 1201.0)
+    assert lines[2] == "- Run duration: 20m 01s"
+    assert check_models._output_index_dashboard_lines([])[2].startswith("- Models attempted")
+
+
 def test_retained_run_window_prefers_started_at() -> None:
     parse = check_models._parse_local_timestamp
     metadata = cast(

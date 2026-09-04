@@ -15,7 +15,8 @@ fact from this one image and prompt.
 
 ## Run summary
 
-- *Run timestamp:* 2026-09-04 13:16:45 BST
+- *Run finished:* 2026-09-04 13:16:45 BST
+- *Run duration:* 15m 25s
 - *Evaluation mode:* assisted
 - *Models attempted:* 42
 - *Completed:* 41

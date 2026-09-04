@@ -461,7 +461,6 @@ class FormattingThresholds:
     memory_gb_integer: float = 10.0  # Show GB as integer (no decimals)
 
     # Time formatting thresholds
-    hour_threshold_seconds: float = 3600.0  # Show HH:MM:SS format
 
     # Dry-run output thresholds
     max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
@@ -1129,9 +1128,8 @@ class JsonlMetadataRecord(TypedDict, total=False):
     prompt_sha256: Required[str]
     system: Required[dict[str, str]]
     timestamp: Required[str]
-    # Wall-clock start; total_runtime_seconds is a perf-counter duration that
-    # stops during system sleep, so end - runtime can land after the run's
-    # own early log lines.
+    # Wall-clock start (the run's end is ``timestamp``); explicit so the run
+    # window never depends on subtracting a duration from the end.
     started_at: NotRequired[str]
     total_runtime_seconds: Required[float]
     counts: Required[RunOutcomeCounts]
@@ -3645,27 +3643,24 @@ def _format_tps(num: float) -> str:
     return f"{num:.3g}"
 
 
-def _format_hms(total_seconds: float) -> str:
-    """Return HH:MM:SS string for durations >= 1 hour.
-
-    Seconds are floored for the human-friendly component; fractional part is
-    still preserved in the separate seconds display when shown.
-    """
-    hours = int(total_seconds // 3600)
-    minutes = int((total_seconds % 3600) // 60)
-    seconds = int(total_seconds % 60)
-    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+_MINUTES_DISPLAY_THRESHOLD_SECONDS: Final[float] = 90.0
 
 
 def format_overall_runtime(total_seconds: float) -> str:
-    """Format runtime with a short/long display mode.
+    """Format a duration the way a skimmer reads it.
 
-    Uses seconds-only below the hour threshold. For long runs, prefixes with
-    ``HH:MM:SS`` while preserving precise seconds in parentheses.
+    Short spans keep precise seconds (``56.78s``); anything from a minute
+    and a half up reads as minutes and seconds (``15m 26s``) or hours,
+    minutes, and seconds (``1h 05m 12s``) — no raw four-digit second counts.
     """
-    if total_seconds >= FORMATTING.hour_threshold_seconds:
-        return f"{_format_hms(total_seconds)} ({total_seconds:.2f}s)"
-    return f"{total_seconds:.2f}s"
+    if total_seconds < _MINUTES_DISPLAY_THRESHOLD_SECONDS:
+        return f"{total_seconds:.2f}s"
+    whole = int(total_seconds)
+    hours, remainder = divmod(whole, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    if hours:
+        return f"{hours}h {minutes:02d}m {seconds:02d}s"
+    return f"{minutes}m {seconds:02d}s"
 
 
 def _detect_repetitive_output(text: str, threshold: float | None = None) -> tuple[bool, str | None]:
@@ -19691,9 +19686,10 @@ def _retained_run_window(
     """Derive the run's wall-clock window.
 
     ``started_at`` is authoritative. Older headers only carry the end
-    timestamp and a perf-counter runtime, which excludes system sleep, so
-    the arithmetic start can land after the run's own early log lines; the
-    earliest retained result timestamp bounds the start from above instead.
+    timestamp and a runtime that, before 0.16.7, was a perf-counter duration
+    excluding system sleep, so the arithmetic start could land after the
+    run's own early log lines; the earliest retained result timestamp bounds
+    the start from above instead.
     """
     run_end = _parse_local_timestamp(metadata.get("timestamp"))
     if run_end is None:
@@ -20373,6 +20369,18 @@ def _run_issue_summary_quality_observed(result: JsonlResultRecord) -> str:
     return "; ".join(glosses) if glosses else "none"
 
 
+def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple[str, str], ...]:
+    """Start, finish, and a human-readable duration for the run-summary header."""
+    rows: list[tuple[str, str]] = []
+    if (started := metadata.get("started_at")) is not None:
+        rows.append(("Run started", started))
+    rows.append(("Run finished", metadata["timestamp"]))
+    runtime = metadata.get("total_runtime_seconds")
+    if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
+        rows.append(("Run duration", format_overall_runtime(float(runtime))))
+    return tuple(rows)
+
+
 def _run_issue_summary_quality_section(
     results: Sequence[JsonlResultRecord],
 ) -> ReportSection:
@@ -20717,7 +20725,7 @@ def generate_run_issue_summary_report(
             (
                 ReportKeyValues(
                     (
-                        ("Run timestamp", source.metadata["timestamp"]),
+                        *_run_issue_summary_timing_rows(source.metadata),
                         ("Evaluation mode", str(source.metadata.get("eval_mode", "unknown"))),
                         ("Models attempted", str(len(source.results))),
                         ("Completed", str(counts["completed"])),
@@ -20844,6 +20852,7 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
 
 def _output_index_dashboard_lines(
     assessments: Sequence[tuple[str, ResultAssessment]],
+    run_duration_seconds: float | None = None,
 ) -> list[str]:
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
@@ -20854,6 +20863,11 @@ def _output_index_dashboard_lines(
     lines = [
         "## Run at a glance",
         "",
+        *(
+            [f"- Run duration: {format_overall_runtime(run_duration_seconds)}"]
+            if run_duration_seconds is not None
+            else []
+        ),
         (
             f"- Models attempted: {counts['models_attempted']} "
             f"(completed {counts['models_completed']}, "
@@ -20891,6 +20905,7 @@ def generate_output_index_report(
     issue_reports: Mapping[str, Path] | None = None,
     assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
     eval_mode: str | None = None,
+    run_duration_seconds: float | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -20907,7 +20922,7 @@ def generate_output_index_report(
     md = ["# Check Models Output Index", ""]
     md.extend((*_wrap_markdown_text(_run_objective_statement(eval_mode)), ""))
     if assessments is not None:
-        md.extend(_output_index_dashboard_lines(assessments))
+        md.extend(_output_index_dashboard_lines(assessments, run_duration_seconds))
     if run_issue_summary is not None:
         md.extend(("## Start here", ""))
         md.append(
@@ -21419,6 +21434,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 artifacts=(),
                 assessments=inputs.report_context.assessments,
                 eval_mode=inputs.report_context.mode_policy.eval_mode,
+                run_duration_seconds=inputs.overall_time,
             ),
         ),
         ReportArtifact(
@@ -21852,6 +21868,7 @@ def _generate_reports_and_log_outputs(
             issue_reports=diagnostics_artifacts.issue_reports,
             assessments=inputs.report_context.assessments,
             eval_mode=inputs.report_context.mode_policy.eval_mode,
+            run_duration_seconds=inputs.overall_time,
         ),
     )
     run_artifact(index_artifact)
@@ -22017,7 +22034,7 @@ def finalize_execution(
     started_at: str | None = None,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
-    overall_time: float = time.perf_counter() - overall_start_time
+    overall_time: float = time.time() - overall_start_time
     if results:
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
 
@@ -22156,7 +22173,9 @@ def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     _LinkStyleState.value = getattr(args, "link_style", "github")
 
-    overall_start_time: float = time.perf_counter()
+    # Wall clock, not a perf counter: the reported run duration must match
+    # what a person experienced, including any time the machine was asleep.
+    overall_start_time: float = time.time()
     started_at: str = local_now_str()
     library_versions: LibraryVersionDict | None = None
     try:

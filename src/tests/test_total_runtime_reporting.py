@@ -119,8 +119,8 @@ def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
     assert "Generation total:" in content
 
 
-def test_html_long_runtime_hms(tmp_path: Path) -> None:
-    """HTML should show HH:MM:SS plus seconds for long runtimes (>= 1 hour)."""
+def test_html_long_runtime_reads_as_hours_minutes_seconds(tmp_path: Path) -> None:
+    """Long runtimes read at a glance; no raw four-digit second counts."""
     results = [_build_single_result()]
     html_file = tmp_path / "long.html"
     long_seconds = 7_245.9  # 2h 0m 45.9s
@@ -132,9 +132,5 @@ def test_html_long_runtime_hms(tmp_path: Path) -> None:
         total_runtime_seconds=long_seconds,
     )
     content = html_file.read_text(encoding="utf-8")
-    if "02:00:45" not in content:
-        msg = "Missing HH:MM:SS component in long runtime HTML report"
-        raise AssertionError(msg)
-    if "7245.90" not in content:
-        msg = "Missing precise seconds component in long runtime HTML report"
-        raise AssertionError(msg)
+    assert "2h 00m 45s" in content
+    assert "7245.90" not in content
