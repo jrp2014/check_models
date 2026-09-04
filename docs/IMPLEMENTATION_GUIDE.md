@@ -1026,7 +1026,7 @@ diagnostics report the same requirements that packaging installs. When
 (`mlx-lm` is optional ecosystem provenance in `extras`, not a runtime floor.)
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `wcwidth`, `PyYAML`
+`mlx`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[typing]`, `numpy`, `packaging`, `rich`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 

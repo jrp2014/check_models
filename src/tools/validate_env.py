@@ -385,18 +385,14 @@ def fix_issues() -> None:
         cwd=Path(__file__).resolve().parents[1],
     )
 
-    # Install git hooks
-    logger.info("Installing git pre-commit hook...")
+    # One interpreter-qualified install: .pre-commit-config.yaml declares both
+    # hook types, and a PATH `pre-commit` could belong to another environment.
+    logger.info("Installing git hooks from .pre-commit-config.yaml...")
     subprocess.run(
         [sys.executable, "-m", "pre_commit", "install"],
         check=True,
+        cwd=Path(__file__).resolve().parents[2],
     )
-
-    # Install pre-commit framework if available
-    precommit_path = shutil.which("pre-commit")
-    if precommit_path:
-        logger.info("Installing pre-commit framework hooks...")
-        subprocess.run([precommit_path, "install"], check=True)
 
 
 def main() -> int:

@@ -66,12 +66,16 @@ PROJECT_TORCH_EXTRA_COMPAT_SPECS: Final[dict[str, str]] = {
     "timm": ">=1.0.23",
 }
 
+# Every hard runtime requirement in src/pyproject.toml (extras and version
+# markers aside), so validate_env's no-pyproject fallback checks exactly the
+# packages the project declares; a test holds the two name sets equal.
 VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     **PROJECT_RUNTIME_STACK_SPECS,
     "defusedxml": ">=0.7.1",
-    "packaging": ">=26.0",
     "Pillow": f">={PROJECT_PILLOW_MINIMUM_VERSION}",
-    "wcwidth": ">=0.2.13",
+    "numpy": ">=2.1.0",
+    "packaging": ">=26.0",
+    "rich": ">=14.1.0",
     "PyYAML": ">=6.0",
 }
 

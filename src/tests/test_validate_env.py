@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from packaging.specifiers import SpecifierSet
@@ -150,3 +152,24 @@ def test_psutil_memory_facts_degrade_without_psutil(
     monkeypatch.setattr(check_models, "psutil", None)
 
     assert check_models._get_psutil_memory_facts() == {}
+
+
+def test_fix_issues_installs_dependencies_and_hooks_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """--fix runs one interpreter-qualified dependency install and one hook install."""
+    calls: list[tuple[list[str], object]] = []
+
+    def record(argv: list[str], **kwargs: object) -> None:
+        calls.append((list(argv), kwargs.get("cwd")))
+
+    monkeypatch.setattr(validate_env.subprocess, "run", record)
+
+    validate_env.fix_issues()
+
+    src_root = Path(validate_env.__file__).resolve().parents[1]
+    repo_root = src_root.parent
+    assert calls == [
+        ([sys.executable, "-m", "pip", "install", "-e", ".[dev]"], src_root),
+        ([sys.executable, "-m", "pre_commit", "install"], repo_root),
+    ]

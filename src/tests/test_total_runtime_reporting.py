@@ -81,7 +81,7 @@ def _build_result_with_runtime() -> PerformanceResult:
 
 
 def test_html_report_includes_runtime(tmp_path: Path) -> None:
-    """HTML report should include the formatted overall runtime string with 's' suffix."""
+    """HTML report labels the pre-report sweep duration and formats it with an 's' suffix."""
     results = [_build_single_result()]
     html_file = tmp_path / "report.html"
     generate_html_report(
@@ -93,8 +93,8 @@ def test_html_report_includes_runtime(tmp_path: Path) -> None:
     )
     content = html_file.read_text(encoding="utf-8")
     msg: str
-    if "Overall runtime:" not in content:
-        msg = "Missing overall runtime label in HTML report"
+    if "Model sweep runtime:" not in content:
+        msg = "Missing model sweep runtime label in HTML report"
         raise AssertionError(msg)
     if "56.78s" not in content:
         msg = "Expected formatted runtime '56.78s' not found in HTML report"

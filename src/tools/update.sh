@@ -27,7 +27,7 @@
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to check_models/),
 #   the script will automatically:
-#   1. Run git pull in each repository (an unchanged repo whose editable
+#   1. Run git pull in each repository (an unchanged, clean repo whose editable
 #      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides)
 #   2. Install requirements.txt (if present) for additional dependencies
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
@@ -57,17 +57,16 @@
 
 set -euo pipefail
 
-# Check if we're in a virtual environment (uv, conda, venv, virtualenv)
-if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${UV_ACTIVE:-}" ]]; then
+# Check if we're in a virtual environment (conda, venv, virtualenv)
+if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]]; then
 	echo "⚠️  WARNING: You don't appear to be in a virtual environment!"
-	echo "   (No VIRTUAL_ENV, CONDA_DEFAULT_ENV, or UV_ACTIVE detected)"
+	echo "   (No VIRTUAL_ENV or CONDA_DEFAULT_ENV detected)"
 	echo ""
 	echo "   This script will update packages globally on your system."
 	echo "   It's strongly recommended to activate a virtual environment first:"
 	echo ""
 	echo "   • conda: conda activate <env-name>"
 	echo "   • venv/virtualenv: source /path/to/venv/bin/activate"
-	echo "   • uv: uv venv && source .venv/bin/activate"
 	echo ""
 	read -p "   Continue anyway? [y/N] " -n 1 -r
 	echo
@@ -744,6 +743,21 @@ check_mlx_build_requirements() {
 	return $has_errors
 }
 
+# Pure rebuild decision for one local MLX repo, kept free of side effects so
+# the shell contract is unit-testable. Prints "skip" or "rebuild".
+#   $1 force      FORCE_REINSTALL (0/1)
+#   $2 unchanged  git pull left HEAD unchanged (0/1)
+#   $3 dirty      git status --porcelain was non-empty (0/1)
+#   $4 verified   the editable install points at this checkout (0/1)
+mlx_repo_rebuild_decision() {
+	local force="$1" unchanged="$2" dirty="$3" verified="$4"
+	if [[ "$force" == "1" || "$unchanged" != "1" || "$dirty" == "1" || "$verified" != "1" ]]; then
+		echo "rebuild"
+	else
+		echo "skip"
+	fi
+}
+
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming check_models/src/tools/update.sh)
@@ -762,6 +776,7 @@ update_local_mlx_repos() {
 	local -a REPO_PATHS=()
 	local -a REPO_SKIP=()
 	local -a REPO_UNCHANGED=()
+	local -a REPO_DIRTY=()
 	
 	for repo in "${MLX_REPOS[@]}"; do
 		local REPO_PATH="$PARENT_DIR/$repo"
@@ -770,6 +785,7 @@ update_local_mlx_repos() {
 			REPO_PATHS+=("$REPO_PATH")
 			REPO_SKIP+=(0)
 			REPO_UNCHANGED+=(0)
+			REPO_DIRTY+=(0)
 		fi
 	done
 	
@@ -856,8 +872,14 @@ update_local_mlx_repos() {
 			exit 1
 		fi
 		
-		# Warn about uncommitted changes
-		git diff --quiet HEAD 2>/dev/null || echo "⚠️  Warning: ${REPO_NAMES[idx]} has uncommitted changes"
+		# Uncommitted or untracked changes make the rebuild shortcut unsafe: HEAD
+		# can be unchanged while modified C++, Metal, or packaging inputs would
+		# leave an older compiled extension, metallib, or dylib in use under a
+		# provenance that claims the current source.
+		if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+			echo "⚠️  Warning: ${REPO_NAMES[idx]} has uncommitted or untracked changes — rebuild forced"
+			REPO_DIRTY[idx]=1
+		fi
 	done
 	echo "✓ All repositories verified"
 	cd "$ORIGINAL_DIR"
@@ -869,15 +891,18 @@ update_local_mlx_repos() {
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
 
-		# Nothing new from GitHub and the installed package is verifiably the
-		# editable from this checkout: rebuilding would produce the identical
-		# result, so skip it. The verification is the dependency-change guard —
-		# a PyPI release that clobbered the editable, a rebuilt environment, or
-		# a missing install all fail it and force the full rebuild path.
-		# FORCE_REINSTALL=1 keeps its documented meaning and never skips.
-		if [[ "${FORCE_REINSTALL:-0}" != "1" && ${REPO_UNCHANGED[idx]} -eq 1 ]] \
-			&& verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
-			echo "✓ ${REPO_NAMES[idx]} unchanged upstream; editable install verified — skipping rebuild"
+		# Nothing new from GitHub, a clean checkout, and an installed package that
+		# is verifiably the editable from this checkout: rebuilding would produce
+		# the identical result, so skip it. The verification is the
+		# dependency-change guard — a PyPI release that clobbered the editable, a
+		# rebuilt environment, or a missing install all fail it; a dirty checkout
+		# (Stage 3) always rebuilds; FORCE_REINSTALL=1 never skips.
+		local editable_verified=0
+		if verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
+			editable_verified=1
+		fi
+		if [[ "$(mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" "${REPO_DIRTY[idx]}" "$editable_verified")" == "skip" ]]; then
+			echo "✓ ${REPO_NAMES[idx]} unchanged upstream, clean checkout; editable install verified — skipping rebuild"
 			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 				# The local build still needs its pin against PyPI releases.
 				pin_local_mlx_build

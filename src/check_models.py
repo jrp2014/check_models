@@ -1388,6 +1388,9 @@ class ReportGenerationInputs:
     comparison: RunComparison | None = None
     history_appended: bool = False
     started_at: str | None = None
+    # Wall-clock epoch when the run began; lets the retained record and the
+    # dashboard report end-to-end duration once report generation is done.
+    overall_start_time: float | None = None
 
 
 @dataclass(frozen=True)
@@ -10355,7 +10358,9 @@ def _html_runtime_facts(
     total_runtime_seconds: float,
 ) -> str:
     """Render factual total and aggregate timing evidence without semantic projections."""
-    rows = [("Overall runtime", format_overall_runtime(total_runtime_seconds))]
+    # Rendered before reports finish, so this is the model sweep only; the
+    # retained JSONL header and run summary carry the end-to-end duration.
+    rows = [("Model sweep runtime", format_overall_runtime(total_runtime_seconds))]
     runtime_analysis = _build_runtime_analysis_summary(results)
     if runtime_analysis is not None:
         facts = [
@@ -21640,6 +21645,55 @@ def _build_retained_run_guarded(
         return None
 
 
+def _elapsed_run_seconds(inputs: ReportGenerationInputs) -> float:
+    """End-to-end wall-clock seconds so far, or the pre-report figure if unknown."""
+    if inputs.overall_start_time is None:
+        return inputs.overall_time
+    return time.time() - inputs.overall_start_time
+
+
+def _finalize_retained_run_record(
+    inputs: ReportGenerationInputs,
+    retained: RetainedRun | None,
+    artifacts: Sequence[ReportArtifact],
+    outcomes: Sequence[ReportArtifactOutcome],
+    *,
+    run_issue_summary: Path | None,
+    jsonl_succeeded: bool,
+) -> None:
+    """Rewrite the JSONL header once every report outcome is known.
+
+    The pre-report write lists every planned destination. A renderer that
+    failed (leaving nothing, or a stale file from an earlier run) must not
+    stay advertised in the sole machine contract, so the manifest is reduced
+    to the artifacts this run produced — matching index.md — and the
+    duration and timestamp become end-to-end. A failed rewrite keeps the
+    earlier header rather than costing the run.
+    """
+    if retained is None or not jsonl_succeeded:
+        return
+    successful_keys = frozenset(outcome.key for outcome in outcomes if outcome.succeeded)
+    manifest = {
+        artifact.public_key: _public_artifact_path(artifact.path)
+        for artifact in artifacts
+        if artifact.key in successful_keys
+    }
+    if run_issue_summary is not None:
+        manifest["run_issue_summary"] = "issues/run_summary.md"
+    metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
+    if inputs.overall_start_time is not None:
+        metadata["total_runtime_seconds"] = round(time.time() - inputs.overall_start_time, 3)
+        metadata["timestamp"] = local_now_str()
+    try:
+        _write_retained_run(
+            RetainedRun(metadata=metadata, results=retained.results), inputs.output_paths.jsonl
+        )
+    except Exception:
+        logger.exception(
+            "Retained-run manifest reconciliation failed; the pre-report header stands."
+        )
+
+
 def _run_jsonl_artifact(
     retained: RetainedRun | None,
     artifact: ReportArtifact,
@@ -21787,10 +21841,22 @@ def _generate_reports_and_log_outputs(
             issue_reports=diagnostics_artifacts.issue_reports,
             assessments=inputs.report_context.assessments,
             eval_mode=inputs.report_context.mode_policy.eval_mode,
-            run_duration_seconds=inputs.overall_time,
+            run_duration_seconds=_elapsed_run_seconds(inputs),
         ),
     )
     run_artifact(index_artifact)
+
+    # The definitive machine record is written last: only artifacts this run
+    # actually produced stay in its manifest, and its duration and timestamp
+    # cover report generation too.
+    _finalize_retained_run_record(
+        inputs,
+        retained,
+        artifacts,
+        outcomes,
+        run_issue_summary=run_issue_summary,
+        jsonl_succeeded=jsonl_succeeded,
+    )
 
     _log_report_generation_outcomes(
         artifacts=artifacts,
@@ -22041,6 +22107,7 @@ def finalize_execution(
             metadata=metadata,
             overall_time=overall_time,
             started_at=started_at,
+            overall_start_time=overall_start_time,
             image_path=image_path,
             system_info=system_info,
             report_context=report_context,
@@ -22077,7 +22144,7 @@ def finalize_execution(
     log_blank()
     logger.info(
         "⏱  Overall runtime: %s",
-        format_overall_runtime(overall_time),
+        format_overall_runtime(time.time() - overall_start_time),
         extra={"style_hint": LogStyles.METRIC_LABEL},
     )
     print_version_info(library_versions)

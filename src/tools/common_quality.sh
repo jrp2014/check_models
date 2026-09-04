@@ -42,10 +42,6 @@ quality_repo_root() {
     cd "$(quality_tools_dir)/../.." && pwd
 }
 
-quality_activate_conda() {
-    return 0
-}
-
 quality_find_conda_env_python() {
     local conda_bin=""
     local env_prefix=""
@@ -117,7 +113,6 @@ quality_path_tool_fallback_allowed() {
 quality_setup_python() {
     local env_python=""
 
-    quality_activate_conda
 
     if env_python="$(quality_find_conda_env_python)"; then
         QUALITY_PYTHON="$env_python"

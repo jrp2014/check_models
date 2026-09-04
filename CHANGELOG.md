@@ -33,6 +33,27 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `update.sh` no longer skips rebuilding a local MLX checkout that has
+  uncommitted or untracked changes: an unchanged HEAD with modified C++,
+  Metal, or packaging inputs left an older compiled extension, metallib, or
+  dylib in use under a provenance claiming the current source. The
+  decision is a pure shell function with a behavioural test over the
+  unchanged-clean, dirty, changed-HEAD, wrong-editable-origin, and
+  FORCE_REINSTALL cases.
+- The schema-3 `results.jsonl` header is rewritten last, after every
+  report outcome is known: its `artifacts` manifest lists only artifacts
+  this run produced (matching `index.md`, never a failed renderer's stale
+  file), and its `total_runtime_seconds` / `timestamp` are end-to-end.
+  The HTML runtime row, rendered before reports finish, is labelled
+  "Model sweep runtime"; the console line is computed at exit.
+- `validate_env`'s no-pyproject fallback tracks the declared runtime set
+  again (it still required the retired `wcwidth` and omitted `numpy` and
+  `rich`); a test now holds the two name sets equal. The implementation
+  guide's runtime list matches `pyproject.toml`.
+- `validate_env --fix` installs the pre-commit hooks once, interpreter-
+  qualified, instead of a second time via whatever `pre-commit` is on PATH.
+- `update.sh` no longer advertises or detects `uv`; `common_quality.sh`
+  drops a no-op `quality_activate_conda` shim.
 - The packaged-wheel test builds through standard PEP 517 isolation from
   the declared `[build-system]` instead of `--no-build-isolation`: it had
   only ever passed on CI because `huggingface-hub[torch]` dragged `torch`

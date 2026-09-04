@@ -33,6 +33,9 @@ from tools import (
     validate_env,
 )
 
+if typing.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
 PKG_ROOT = _TEST_FILE.parents[1]
@@ -252,6 +255,26 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     assert (
         f"mlx-lm{dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS['mlx-lm']}" in extras_deps
     )
+
+
+def _normalized_requirement_names(requirements: Iterable[str]) -> set[str]:
+    return {
+        re.split(r"[\[<>=!~; ]", requirement, maxsplit=1)[0].strip().lower().replace("_", "-")
+        for requirement in requirements
+    }
+
+
+def test_validate_env_fallback_matches_declared_runtime_dependencies() -> None:
+    """The no-pyproject fallback must check exactly the declared hard runtime set.
+
+    It exists for the case where pyproject.toml cannot be loaded, so a stale
+    literal there would flag removed packages as missing while overlooking
+    genuinely missing ones (as happened when wcwidth was retired).
+    """
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    declared = _normalized_requirement_names(pyproject["project"]["dependencies"])
+    fallback = _normalized_requirement_names(dependency_policy.VALIDATE_ENV_CORE_FALLBACK_SPECS)
+    assert fallback == declared
 
 
 def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
@@ -1231,34 +1254,61 @@ def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
         assert Path(entry).is_absolute(), entry
 
 
-def test_update_script_skips_rebuild_only_when_unchanged_and_verified() -> None:
-    """An unchanged repo skips its rebuild only behind the full safety guard.
+def _update_script_function(name: str) -> str:
+    """Extract one top-level shell function body from update.sh."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    match = re.search(
+        rf"^{re.escape(name)}\(\) \{{\n.*?^\}}\n", update_script, re.DOTALL | re.MULTILINE
+    )
+    assert match is not None, name
+    return match.group(0)
 
-    The skip must require all three of: no new commits from the pull, a
-    verified editable install pointing at this checkout (the dependency-change
-    guard — a PyPI clobber, rebuilt env, or missing install fails it), and
-    FORCE_REINSTALL not being set. A skipped mlx build must still pin the
-    local build against PyPI releases.
+
+@pytest.mark.parametrize(
+    ("force", "unchanged", "dirty", "verified", "expected"),
+    [
+        pytest.param("0", "1", "0", "1", "skip", id="unchanged-clean-verified"),
+        pytest.param("0", "1", "1", "1", "rebuild", id="unchanged-dirty"),
+        pytest.param("0", "0", "0", "1", "rebuild", id="changed-head"),
+        pytest.param("0", "1", "0", "0", "rebuild", id="wrong-editable-origin"),
+        pytest.param("1", "1", "0", "1", "rebuild", id="force-reinstall"),
+    ],
+)
+def test_update_script_rebuild_decision(
+    force: str, unchanged: str, dirty: str, verified: str, expected: str
+) -> None:
+    """A rebuild is skipped only for an unchanged, clean, verified checkout.
+
+    A dirty checkout can leave modified C++, Metal, or packaging inputs
+    behind an unchanged HEAD, so the compiled extension in use would predate
+    the source the provenance claims; it must always rebuild.
     """
+    function = _update_script_function("mlx_repo_rebuild_decision")
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        [
+            "/bin/bash",
+            "-c",
+            f"{function}\nmlx_repo_rebuild_decision {force} {unchanged} {dirty} {verified}",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.strip() == expected
+
+
+def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
+    """Stage 3 records git status --porcelain; Stage 4 consults it before skipping."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
 
-    guard_pos = update_script.index(
-        '[[ "${FORCE_REINSTALL:-0}" != "1" && ${REPO_UNCHANGED[idx]} -eq 1 ]]'
+    assert 'if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then' in update_script
+    assert "REPO_DIRTY[idx]=1" in update_script
+    decision_call = (
+        'mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" '
+        '"${REPO_DIRTY[idx]}" "$editable_verified"'
     )
-    verify_pos = update_script.index(
-        'verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null'
-    )
-    skip_msg_pos = update_script.index("skipping rebuild")
-    assert guard_pos < verify_pos < skip_msg_pos
-
-    # The skip branch still pins the untouched local mlx build.
-    skip_branch = update_script[skip_msg_pos : skip_msg_pos + 400]
-    assert "pin_local_mlx_build" in skip_branch
-
-    # The unchanged flag is set only when the pulled HEAD equals the pre-pull
-    # HEAD; a failed rev-parse must never count as unchanged.
-    assert 'PRE_PULL_HEAD="$(git rev-parse HEAD 2>/dev/null || echo unknown)"' in update_script
-    assert '"$PRE_PULL_HEAD" != "unknown"' in update_script
+    assert decision_call in update_script
+    assert update_script.index("REPO_DIRTY[idx]=1") < update_script.index(decision_call)
 
 
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
