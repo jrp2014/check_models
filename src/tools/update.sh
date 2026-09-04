@@ -206,14 +206,17 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # Same override convention as common_quality.sh and the Makefiles.
 CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
 
-# Repo-local markdownlint tools (if npm is available)
+# Repo-local markdownlint tools (if npm is available). The audit and funding
+# steps are extra registry round-trips whose output nothing here consumes;
+# the advisory endpoint has hung installs for minutes when it was degraded
+# while the package registry itself answered instantly, so both are skipped.
 if command -v npm >/dev/null 2>&1; then
 	if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then
 		echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
-		npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
+		npm install --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
 	else
 		echo "[update.sh] Installing repo-local markdownlint tooling from package-lock.json..."
-		npm install --ignore-scripts --prefix "$PROJECT_ROOT"
+		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"
 	fi
 	echo "[update.sh] repo-local npm tooling is installed"
 else

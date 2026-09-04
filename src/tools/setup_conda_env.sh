@@ -234,7 +234,7 @@ install_dependencies() {
 
         if command -v npm &> /dev/null; then
             log_info "Installing repo-local Markdown tooling..."
-            npm install
+            npm install --no-audit --no-fund
             log_success "Markdown tooling installed"
         else
             log_warn "npm not found; staged Markdown commits will require markdownlint-cli2"

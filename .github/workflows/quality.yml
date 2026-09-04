@@ -80,7 +80,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e "src/.[dev]"
-          npm install --ignore-scripts --prefix src
+          npm install --ignore-scripts --no-audit --no-fund --prefix src
 
       - name: Run static quality checks
         env:

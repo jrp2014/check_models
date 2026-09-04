@@ -29,6 +29,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Every scripted `npm install` (`update.sh`, `setup_conda_env.sh`, the
+  Makefile's lazy tooling installs, and the CI static-quality job) passes
+  `--no-audit --no-fund`: nothing consumes the audit or funding output, and
+  a degraded npm advisory endpoint (registry ping 0.3 s, bulk-advisories
+  POST timing out with zero bytes) left every `npm install` hanging in its
+  final audit phase on multiple consecutive runs — on CI that would hold a
+  runner until the job timeout.
 - The repetition guard mirrors two upstream `generate()` behaviours added
   for diffusion_gemma (mlx-vlm #2101): the joined text passes through the
   processor's optional `clean_output` hook (stripping leaked

@@ -720,9 +720,12 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
         )
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
-    assert 'npm install --ignore-scripts --prefix "$PROJECT_ROOT"' in update_script
+    assert 'npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"' in (
+        update_script
+    )
     assert (
-        'npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest' in update_script
+        'npm install --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest'
+        in update_script
     )
     assert "--save-exact" not in update_script
     assert update_script.index("markdownlint-cli2@latest") > update_script.index(
@@ -1602,7 +1605,9 @@ def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> 
         for step in quality_workflow["jobs"]["static-quality"]["steps"]
         if step.get("name") == "Install dependencies"
     )
-    assert "npm install --ignore-scripts --prefix src" in static_quality_install
+    assert "npm install --ignore-scripts --no-audit --no-fund --prefix src" in (
+        static_quality_install
+    )
 
 
 def test_should_audit_path_excludes_generated_paths(tmp_path: Path) -> None:

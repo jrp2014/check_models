@@ -104,7 +104,7 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + torch + hooks + validat
 	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
 	@if command -v npm >/dev/null 2>&1; then \
 		echo "[bootstrap] npm found, installing markdownlint-cli2..."; \
-		npm install --silent 2>/dev/null || echo "⚠️  npm install failed (run 'npm install' inside src)"; \
+		npm install --silent --no-audit --no-fund 2>/dev/null || echo "⚠️  npm install failed (run 'npm install' inside src)"; \
 	else \
 		echo "[bootstrap] npm not found - markdownlint-cli2 will use npx on-demand"; \
 		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
@@ -127,7 +127,7 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + torch + hooks + validat
 install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js/npm)
 	@if command -v npm >/dev/null 2>&1; then \
 		echo "Installing markdownlint-cli2 via npm..."; \
-		npm install; \
+		npm install --no-audit --no-fund; \
 		echo "✓ markdownlint-cli2 installed to node_modules/.bin/"; \
 		echo "  Add node_modules/.bin to PATH or quality checks will use npx fallback"; \
 	else \
