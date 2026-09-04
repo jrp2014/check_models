@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-09-04 13:16:46 BST
+Generated on: 2026-09-04 15:03:15 BST
 
 These models serve many purposes; this run probes exactly one narrow task:
 producing catalogue metadata for a single photograph from the assisted-lane
@@ -24,55 +24,55 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                                      |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------|------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 8.83s   | 32.5 tok/s | 1.11            | 18      | 2,597      | 162     | none                                                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.28s   | 34.1 tok/s | 1.33            | 17      | 2,086      | 88      | none                                                                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.42s   | 210 tok/s  | 0.46            | 4.0     | 2,086      | 83      | none                                                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.72s   | 67.1 tok/s | 1.99            | 13      | 2,918      | 180     | none                                                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.34s   | 190 tok/s  | 0.98            | 7.8     | 2,917      | 139     | none                                                                                                                              |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `usable`              | 51.00s  | 25.3 tok/s | 8.12            | 25      | 4,388      | 992     | none                                                                                                                              |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 29.13s  | 89.9 tok/s | 17.23           | 8.4     | 16,522     | 907     | none                                                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 59.29s  | 110 tok/s  | 54.38           | 24      | 16,536     | 143     | none                                                                                                                              |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 79.22s  | 18.2 tok/s | 67.21           | 33      | 16,536     | 139     | none                                                                                                                              |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 78.18s  | 29.6 tok/s | 70.58           | 21      | 16,536     | 131     | none                                                                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | 6.31s   | 57.7 tok/s | 0.61            | 29      | 570        | 85      | none                                                                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | 5.92s   | 57.1 tok/s | 0.32            | 28      | 570        | 85      | none                                                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.44s   | 129 tok/s  | 0.44            | 16      | 574        | 105     | none                                                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.79s   | 26.0 tok/s | 1.07            | 20      | 574        | 90      | none                                                                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.60s   | 177 tok/s  | 0.52            | 4.7     | 1,371      | 88      | none                                                                                                                              |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable with caveats` | 1.65s   | 482 tok/s  | 0.12            | 1.9     | 2,094      | 76      | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 10.29s  | 29.8 tok/s | 3.38            | 23      | 2,385      | 119     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 24.39s  | 62.9 tok/s | 4.50            | 60      | 1,605      | 583     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 29.19s  | 40.0 tok/s | 17.60           | 78      | 6,430      | 108     | control tokens visible                                                                                                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 158.31s | 4.67 tok/s | 2.06            | 40      | 1,307      | 710     | role tokens visible                                                                                                               |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.22s   | 186 tok/s  | 0.34            | 4.0     | 2,094      | 119     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.86s   | 64.7 tok/s | 2.00            | 13      | 2,918      | 180     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable with caveats` | 4.80s   | 72.9 tok/s | 1.15            | 8.1     | 1,516      | 132     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.64s   | 231 tok/s  | 3.06            | 3.9     | 4,062      | 152     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable with caveats` | 5.40s   | 107 tok/s  | 0.81            | 24      | 1,262      | 135     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.26s   | 56.3 tok/s | 0.41            | 9.5     | 1,103      | 128     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 60.90s  | 86.8 tok/s | 56.38           | 23      | 16,520     | 133     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 58.53s  | 91.6 tok/s | 54.61           | 10.0    | 16,536     | 132     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.66s   | 125 tok/s  | 0.40            | 5.4     | 1,401      | 84      | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 28.98s  | 45.4 tok/s | 17.31           | 70      | 3,464      | 114     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 21.72s  | 58.4 tok/s | 17.23           | 13      | 16,531     | 136     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 8.01s   | 31.5 tok/s | 1.00            | 17      | 569        | 128     | title/keyword constraints failed                                                                                                  |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.95s   | 39.4 tok/s | 1.88            | 16      | 3,111      | 110     | title/keyword constraints failed                                                                                                  |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.96s  | 93.0 tok/s | 13.56           | 8.4     | 16,520     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.81s   | 139 tok/s  | 1.15            | 3.7     | 2,050      | 294     | missing required fields                                                                                                           |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 28.45s  | 41.5 tok/s | 2.12            | 15      | 3,202      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.64s   | 358 tok/s  | 0.21            | 2.2     | 307        | 155     | missing required fields                                                                                                           |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.58s  | 45.7 tok/s | 5.38            | 13      | 6,426      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 22.30s  | 73.1 tok/s | 6.62            | 8.4     | 6,430      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.11s   | 289 tok/s  | 0.25            | 3.3     | 907        | 70      | missing required fields; extra text before Title                                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 7.37s   | 48.9 tok/s | 0.90            | 17      | 568        | 167     | missing required fields; extra text before Title                                                                                  |
-| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.03s   | -          | -               | -       | -          | -       | none                                                                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable`              | 8.87s   | 32.3 tok/s | 1.09            | 18      | 2,597      | 162     | none                                                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.74s   | 34.3 tok/s | 0.81            | 17      | 2,086      | 88      | none                                                                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `usable`              | 2.39s   | 210 tok/s  | 0.46            | 4.0     | 2,086      | 83      | none                                                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 6.99s   | 67.1 tok/s | 2.27            | 13      | 2,918      | 180     | none                                                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 3.33s   | 190 tok/s  | 0.97            | 7.8     | 2,917      | 139     | none                                                                                                                              |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `usable`              | 50.63s  | 25.4 tok/s | 7.85            | 25      | 4,388      | 992     | none                                                                                                                              |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 28.07s  | 91.5 tok/s | 16.39           | 8.4     | 16,522     | 907     | none                                                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 57.81s  | 110 tok/s  | 52.93           | 24      | 16,536     | 143     | none                                                                                                                              |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 86.51s  | 17.8 tok/s | 74.45           | 33      | 16,536     | 139     | none                                                                                                                              |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | 74.62s  | 30.5 tok/s | 67.22           | 21      | 16,536     | 131     | none                                                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | 5.60s   | 81.9 tok/s | 0.33            | 29      | 570        | 84      | none                                                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | 5.95s   | 56.2 tok/s | 0.32            | 28      | 570        | 85      | none                                                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 4.34s   | 129 tok/s  | 0.40            | 16      | 574        | 105     | none                                                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 7.98s   | 25.1 tok/s | 1.13            | 20      | 574        | 90      | none                                                                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | 2.47s   | 176 tok/s  | 0.40            | 4.7     | 1,371      | 88      | none                                                                                                                              |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable with caveats` | 1.62s   | 483 tok/s  | 0.11            | 1.9     | 2,094      | 76      | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable with caveats` | 9.91s   | 30.2 tok/s | 3.15            | 23      | 2,385      | 119     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `usable with caveats` | 19.05s  | 63.1 tok/s | 2.65            | 60      | 1,605      | 583     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable with caveats` | 25.67s  | 39.9 tok/s | 15.17           | 78      | 6,430      | 108     | control tokens visible                                                                                                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable with caveats` | 157.63s | 4.67 tok/s | 1.49            | 40      | 1,307      | 710     | role tokens visible                                                                                                               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable with caveats` | 2.23s   | 183 tok/s  | 0.34            | 4.0     | 2,094      | 119     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable with caveats` | 6.86s   | 64.7 tok/s | 2.02            | 13      | 2,918      | 180     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `usable with caveats` | 4.40s   | 72.7 tok/s | 0.74            | 8.1     | 1,516      | 132     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `usable with caveats` | 5.62s   | 229 tok/s  | 3.09            | 3.9     | 4,062      | 152     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `usable with caveats` | 5.41s   | 107 tok/s  | 0.72            | 24      | 1,262      | 135     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable with caveats` | 4.08s   | 56.8 tok/s | 0.30            | 9.5     | 1,103      | 128     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `usable with caveats` | 58.72s  | 87.1 tok/s | 54.20           | 23      | 16,520     | 133     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable with caveats` | 56.12s  | 92.1 tok/s | 52.23           | 10.0    | 16,536     | 132     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable with caveats` | 2.73s   | 125 tok/s  | 0.41            | 5.4     | 1,401      | 84      | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable with caveats` | 25.61s  | 46.6 tok/s | 14.62           | 70      | 3,464      | 114     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable with caveats` | 20.47s  | 57.8 tok/s | 15.85           | 13      | 16,531     | 136     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable with caveats` | 8.05s   | 31.2 tok/s | 0.99            | 17      | 569        | 128     | title/keyword constraints failed                                                                                                  |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable with caveats` | 6.80s   | 38.9 tok/s | 1.70            | 16      | 3,111      | 110     | title/keyword constraints failed                                                                                                  |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `unusable`            | 25.88s  | 92.2 tok/s | 13.44           | 8.4     | 16,520     | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`jinaai/jina-vlm-mlx`](#model-jinaai-jina-vlm-mlx)                                                                     | `unusable`            | 4.61s   | 139 tok/s  | 0.95            | 3.7     | 2,050      | 294     | missing required fields                                                                                                           |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 27.99s  | 42.0 tok/s | 2.00            | 15      | 3,202      | 1,000   | missing required fields; echoes instructions; extra text before Title; cut off at token limit                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 2.43s   | 359 tok/s  | 0.11            | 2.2     | 307        | 155     | missing required fields                                                                                                           |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 29.38s  | 46.4 tok/s | 5.49            | 13      | 6,426      | 1,000   | echoes instructions; extra text before Title; cut off at token limit; incomplete thinking block; title/keyword constraints failed |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 20.79s  | 76.4 tok/s | 5.71            | 8.4     | 6,430      | 1,000   | repeated text; cut off at token limit; title/keyword constraints failed                                                           |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 2.21s   | 288 tok/s  | 0.25            | 3.3     | 907        | 70      | missing required fields; extra text before Title                                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `unusable`            | 6.81s   | 48.8 tok/s | 0.36            | 17      | 568        | 167     | missing required fields; extra text before Title                                                                                  |
+| [`tencent/Youtu-VL-4B-Instruct`](#model-tencent-youtu-vl-4b-instruct)                                                   | `not evaluated`       | 1.06s   | -          | -               | -       | -          | -       | none                                                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
 Fastest clean completion: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 210 tok/s
 
-Average clean-completion throughput: 83.5 tok/s (indicative only: tokenizers and architectures differ across models)
+Average clean-completion throughput: 85.2 tok/s (indicative only: tokenizers and architectures differ across models)
 
 Lowest peak memory among clean completions: `mlx-community/LFM2.5-VL-3B-OptiQ-4bit` at 4.0 GB
 
@@ -111,8 +111,8 @@ The first 280 characters of each model's actual output (or failure evidence for 
 | [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | Title: Historic Watermill Over River Itchen<br><br>Description: Captured on August 31, 2026, this image depicts the historic Winchester City Mill, an ancient structure featuring a weathered clay-tiled roof and flint-and-brick walls, situated over the River Itchen in Hampshire. Under...                |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | Title:<br>Winchester City Mill on the River Itchen<br><br>Description:<br>Visitors walk along the bridge and an elderly woman sits with a walker in front of the historic Winchester City Mill, a brick and stone watermill situated over the River Itchen in Hampshire, England. The scene is ca...          |
 | [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                | `usable`              | Title:<br>Winchester City Mill Spanning the River Itchen<br><br>Description:<br>The historic Winchester City Mill, a brick and stone structure with a clay-tiled roof, stands over the River Itchen in Hampshire, England. Pedestrians walk along the bridge pathway in front of the building whi...          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | Title: Historic Winchester City Mill over River Itchen<br>Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill on the River Itchen under a cloudy sky.<br>Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, arch...                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | Title: Historic Winchester City Mill on River Itchen<br>Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill situated over the rapids of the River Itchen.<br>Keywords: Winchester, Hampshire, England, River Itchen, Mill, National T...                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable`              | Title: Historic Winchester City Mill on River Itchen<br>Description: Visitors walk along a stone pathway in front of the ancient brick and stone watermill situated over the rushing River Itchen in Hampshire.<br>Keywords: Winchester, Hampshire, River Itchen, England, watermill, histo...                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable`              | Title: Historic Winchester City Mill on the River Itchen<br>Description: Visitors walk along a stone pathway in front of the ancient brick and stone watermill situated over the rushing River Itchen in Hampshire.<br>Keywords: Winchester, Hampshire, River Itchen, England, watermill, N...                |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | Title: People walking by historic Winchester City Mill<br>Description: Two women walk along a stone pathway in front of the historic brick and flint Winchester City Mill over the River Itchen. The scene captures the ancient watermill's tiled roof and stone architecture under a br...                   |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | Title: Visitors at the historic Winchester City Mill, Hampshire<br>Description: Visitors walk along a pathway and relax in front of the ancient Winchester City Mill, situated over the River Itchen in Hampshire, England, under a bright blue sky.<br>Keywords: Winchester City Mill, Riv...                |
 | [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `usable`              | Title: "Historic Mill by the River Itchen"<br>Description: "Visitors stroll along the pathway in front of the historic Winchester City Mill, enjoying the serene setting by the River Itchen."<br>Keywords: Historic Mill, Winchester City Mill, River Itchen, Pedestrians, Elderly woman,...                 |
@@ -236,18 +236,18 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 1.90s
-- *Generation time:* 6.92s
-- *Total time:* 8.83s
-- *Input validation time:* 6.5e-05
-- *Prompt preparation time:* 0.00233
-- *First-token latency:* 1.11
-- *Cleanup time:* 0.107
+- *Model load time:* 1.93s
+- *Generation time:* 6.94s
+- *Total time:* 8.87s
+- *Input validation time:* 6.48e-05
+- *Prompt preparation time:* 0.00268
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,597
 - *Generation tokens:* 162
 - *Total tokens:* 2,759
-- *Prompt throughput (raw):* 2,339 tok/s
-- *Generation throughput (raw):* 32.5 tok/s
+- *Prompt throughput (raw):* 2,389 tok/s
+- *Generation throughput (raw):* 32.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 17
 - *Cache memory:* 0.43
@@ -293,18 +293,18 @@ Keywords: Winchester City Mill, Hampshire, England, River Itchen, historic mill,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.63s
-- *Generation time:* 4.64s
-- *Total time:* 6.28s
-- *Input validation time:* 5.69e-05
+- *Model load time:* 1.62s
+- *Generation time:* 4.11s
+- *Total time:* 5.74s
+- *Input validation time:* 6.7e-05
 - *Prompt preparation time:* 0.00289
-- *First-token latency:* 1.33
-- *Cleanup time:* 0.101
+- *First-token latency:* 0.814
+- *Cleanup time:* 0.0999
 - *Prompt tokens:* 2,086
 - *Generation tokens:* 88
 - *Total tokens:* 2,174
-- *Prompt throughput (raw):* 1,564 tok/s
-- *Generation throughput (raw):* 34.1 tok/s
+- *Prompt throughput (raw):* 2,564 tok/s
+- *Generation throughput (raw):* 34.3 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.17
@@ -350,13 +350,13 @@ Keywords: Winchester City Mill, historic watermill, River Itchen, Hampshire, Eng
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.93s
-- *Generation time:* 1.48s
-- *Total time:* 2.42s
-- *Input validation time:* 5.35e-05
-- *Prompt preparation time:* 0.00895
+- *Model load time:* 0.90s
+- *Generation time:* 1.47s
+- *Total time:* 2.39s
+- *Input validation time:* 4.59e-05
+- *Prompt preparation time:* 0.0092
 - *First-token latency:* 0.46
-- *Cleanup time:* 0.081
+- *Cleanup time:* 0.0791
 - *Prompt tokens:* 2,086
 - *Generation tokens:* 83
 - *Total tokens:* 2,169
@@ -409,17 +409,17 @@ Keywords: National Trust, Hampshire, England, Mill, River Itchen, Pedestrians, P
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.40s
-- *Generation time:* 5.31s
-- *Total time:* 6.72s
-- *Input validation time:* 5.72e-05
-- *Prompt preparation time:* 0.00768
-- *First-token latency:* 1.99
-- *Cleanup time:* 0.0932
+- *Model load time:* 1.37s
+- *Generation time:* 5.60s
+- *Total time:* 6.99s
+- *Input validation time:* 4.98e-05
+- *Prompt preparation time:* 0.00758
+- *First-token latency:* 2.27
+- *Cleanup time:* 0.0924
 - *Prompt tokens:* 2,918
 - *Generation tokens:* 180
 - *Total tokens:* 3,098
-- *Prompt throughput (raw):* 1,467 tok/s
+- *Prompt throughput (raw):* 1,288 tok/s
 - *Generation throughput (raw):* 67.1 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.0
@@ -472,16 +472,16 @@ Winchester City Mill, River Itchen, National Trust, historic watermill, stone br
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
 - *Model load time:* 0.98s
-- *Generation time:* 2.35s
-- *Total time:* 3.34s
-- *Input validation time:* 5.23e-05
-- *Prompt preparation time:* 0.00723
-- *First-token latency:* 0.976
-- *Cleanup time:* 0.0831
+- *Generation time:* 2.33s
+- *Total time:* 3.33s
+- *Input validation time:* 5.25e-05
+- *Prompt preparation time:* 0.00717
+- *First-token latency:* 0.969
+- *Cleanup time:* 0.0817
 - *Prompt tokens:* 2,917
 - *Generation tokens:* 139
 - *Total tokens:* 3,056
-- *Prompt throughput (raw):* 2,989 tok/s
+- *Prompt throughput (raw):* 3,011 tok/s
 - *Generation throughput (raw):* 190 tok/s
 - *Peak memory:* 7.8
 - *Active memory:* 2.8
@@ -533,18 +533,18 @@ Winchester City Mill, brick-and-stone structure, clay tiles, River Itchen, stone
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 2.93s
-- *Generation time:* 48.04s
-- *Total time:* 51.00s
-- *Input validation time:* 5.04e-05
-- *Prompt preparation time:* 0.0203
-- *First-token latency:* 8.12
-- *Cleanup time:* 0.126
+- *Model load time:* 3.01s
+- *Generation time:* 47.59s
+- *Total time:* 50.63s
+- *Input validation time:* 4.98e-05
+- *Prompt preparation time:* 0.0201
+- *First-token latency:* 7.85
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 4,388
 - *Generation tokens:* 992
 - *Total tokens:* 5,380
-- *Prompt throughput (raw):* 540 tok/s
-- *Generation throughput (raw):* 25.3 tok/s
+- *Prompt throughput (raw):* 559 tok/s
+- *Generation throughput (raw):* 25.4 tok/s
 - *Peak memory:* 25
 - *Active memory:* 24
 - *Cache memory:* 0.30
@@ -595,18 +595,18 @@ Winchester City Mill, River Itchen, Hampshire, England, historic watermill, bric
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.74s
-- *Generation time:* 28.37s
-- *Total time:* 29.13s
-- *Input validation time:* 5.02e-05
-- *Prompt preparation time:* 0.012
-- *First-token latency:* 17.2
-- *Cleanup time:* 0.0991
+- *Model load time:* 0.72s
+- *Generation time:* 27.33s
+- *Total time:* 28.07s
+- *Input validation time:* 6.2e-05
+- *Prompt preparation time:* 0.013
+- *First-token latency:* 16.4
+- *Cleanup time:* 0.0976
 - *Prompt tokens:* 16,522
 - *Generation tokens:* 907
 - *Total tokens:* 17,429
-- *Prompt throughput (raw):* 959 tok/s
-- *Generation throughput (raw):* 89.9 tok/s
+- *Prompt throughput (raw):* 1,008 tok/s
+- *Generation throughput (raw):* 91.5 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.7
@@ -687,17 +687,17 @@ Keywords: England, Hampshire, Winchester City Mill, National Trust, River Itchen
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.53s
-- *Generation time:* 56.73s
-- *Total time:* 59.29s
-- *Input validation time:* 6.6e-05
-- *Prompt preparation time:* 0.0162
-- *First-token latency:* 54.4
-- *Cleanup time:* 0.124
+- *Model load time:* 2.52s
+- *Generation time:* 55.26s
+- *Total time:* 57.81s
+- *Input validation time:* 6.1e-05
+- *Prompt preparation time:* 0.0155
+- *First-token latency:* 52.9
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 143
 - *Total tokens:* 16,679
-- *Prompt throughput (raw):* 304 tok/s
+- *Prompt throughput (raw):* 312 tok/s
 - *Generation throughput (raw):* 110 tok/s
 - *Peak memory:* 24
 - *Active memory:* 20
@@ -746,18 +746,18 @@ Keywords: Winchester City Mill, River Itchen, Hampshire, England, Clay tiles, Fl
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 3.29s
-- *Generation time:* 75.90s
-- *Total time:* 79.22s
-- *Input validation time:* 8.33e-05
-- *Prompt preparation time:* 0.0157
-- *First-token latency:* 67.2
-- *Cleanup time:* 0.149
+- *Model load time:* 3.17s
+- *Generation time:* 83.32s
+- *Total time:* 86.51s
+- *Input validation time:* 6.09e-05
+- *Prompt preparation time:* 0.0162
+- *First-token latency:* 74.5
+- *Cleanup time:* 0.145
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 139
 - *Total tokens:* 16,675
-- *Prompt throughput (raw):* 246 tok/s
-- *Generation throughput (raw):* 18.2 tok/s
+- *Prompt throughput (raw):* 222 tok/s
+- *Generation throughput (raw):* 17.8 tok/s
 - *Peak memory:* 33
 - *Active memory:* 29
 - *Cache memory:* 1.9
@@ -808,18 +808,18 @@ Winchester City Mill, River Itchen, Hampshire, England, Watermill, Bridge, Pedes
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.08s
-- *Generation time:* 76.08s
-- *Total time:* 78.18s
-- *Input validation time:* 7.19e-05
-- *Prompt preparation time:* 0.0174
-- *First-token latency:* 70.6
-- *Cleanup time:* 0.129
+- *Model load time:* 2.05s
+- *Generation time:* 72.54s
+- *Total time:* 74.62s
+- *Input validation time:* 6.73e-05
+- *Prompt preparation time:* 0.0184
+- *First-token latency:* 67.2
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 131
 - *Total tokens:* 16,667
-- *Prompt throughput (raw):* 234 tok/s
-- *Generation throughput (raw):* 29.6 tok/s
+- *Prompt throughput (raw):* 246 tok/s
+- *Generation throughput (raw):* 30.5 tok/s
 - *Peak memory:* 21
 - *Active memory:* 16
 - *Cache memory:* 1.9
@@ -871,17 +871,17 @@ Winchester City Mill, River Itchen, Hampshire, England, Watermill, Brick buildin
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Model load time:* 3.34s
-- *Generation time:* 2.94s
-- *Total time:* 6.31s
-- *Input validation time:* 6.64e-05
-- *Prompt preparation time:* 0.023
-- *First-token latency:* 0.608
-- *Cleanup time:* 0.123
+- *Generation time:* 2.23s
+- *Total time:* 5.60s
+- *Input validation time:* 5.98e-05
+- *Prompt preparation time:* 0.0248
+- *First-token latency:* 0.329
+- *Cleanup time:* 0.156
 - *Prompt tokens:* 570
-- *Generation tokens:* 85
-- *Total tokens:* 655
-- *Prompt throughput (raw):* 937 tok/s
-- *Generation throughput (raw):* 57.7 tok/s
+- *Generation tokens:* 84
+- *Total tokens:* 654
+- *Prompt throughput (raw):* 1,733 tok/s
+- *Generation throughput (raw):* 81.9 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -906,9 +906,9 @@ Winchester City Mill, River Itchen, Hampshire, England, Watermill, Brick buildin
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Historic Winchester City Mill over River Itchen
-Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill on the River Itchen under a cloudy sky.
-Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, architecture, brick, stone, clay tiles, chimney, pedestrians, rapids, river, bridge, scenery, National Trust
+Title: Historic Winchester City Mill on River Itchen
+Description: Visitors walk along a stone pathway in front of the ancient brick and stone watermill situated over the rushing River Itchen in Hampshire.
+Keywords: Winchester, Hampshire, River Itchen, England, watermill, historic, brick, stone, clay tiles, chimney, pedestrians, rapids, riverbank, National Trust, architecture, scenery
 </pre>
 
 </details>
@@ -928,17 +928,17 @@ Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, architec
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
 - *Model load time:* 3.23s
-- *Generation time:* 2.68s
-- *Total time:* 5.92s
-- *Input validation time:* 6.36e-05
-- *Prompt preparation time:* 0.00159
+- *Generation time:* 2.71s
+- *Total time:* 5.95s
+- *Input validation time:* 6.29e-05
+- *Prompt preparation time:* 0.000949
 - *First-token latency:* 0.324
-- *Cleanup time:* 0.118
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 570
 - *Generation tokens:* 85
 - *Total tokens:* 655
 - *Prompt throughput (raw):* 1,761 tok/s
-- *Generation throughput (raw):* 57.1 tok/s
+- *Generation throughput (raw):* 56.2 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -963,9 +963,9 @@ Keywords: Winchester, Hampshire, England, River Itchen, mill, historic, architec
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Historic Winchester City Mill on River Itchen
-Description: Visitors walk along a stone bridge pathway in front of the ancient brick and stone watermill situated over the rapids of the River Itchen.
-Keywords: Winchester, Hampshire, England, River Itchen, Mill, National Trust, historic, brick, stone, clay tiles, chimney, pedestrians, rapids, bridge, architecture, scenery, outdoors
+Title: Historic Winchester City Mill on the River Itchen
+Description: Visitors walk along a stone pathway in front of the ancient brick and stone watermill situated over the rushing River Itchen in Hampshire.
+Keywords: Winchester, Hampshire, River Itchen, England, watermill, National Trust, historic, pedestrians, stone wall, brick, clay tiles, chimney, arch, river, rapids, scenery
 </pre>
 
 </details>
@@ -984,17 +984,17 @@ Keywords: Winchester, Hampshire, England, River Itchen, Mill, National Trust, hi
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.46s
-- *Generation time:* 1.95s
-- *Total time:* 4.44s
-- *Input validation time:* 7.95e-05
-- *Prompt preparation time:* 0.0242
-- *First-token latency:* 0.44
+- *Model load time:* 2.39s
+- *Generation time:* 1.92s
+- *Total time:* 4.34s
+- *Input validation time:* 4.85e-05
+- *Prompt preparation time:* 0.0226
+- *First-token latency:* 0.405
 - *Cleanup time:* 0.123
 - *Prompt tokens:* 574
 - *Generation tokens:* 105
 - *Total tokens:* 679
-- *Prompt throughput (raw):* 1,304 tok/s
+- *Prompt throughput (raw):* 1,418 tok/s
 - *Generation throughput (raw):* 129 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
@@ -1041,18 +1041,18 @@ Keywords: Winchester, River Itchen, Hampshire, England, historic mill, watermill
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.54s
-- *Generation time:* 5.24s
-- *Total time:* 7.79s
-- *Input validation time:* 7.58e-05
-- *Prompt preparation time:* 0.00158
-- *First-token latency:* 1.07
-- *Cleanup time:* 0.134
+- *Model load time:* 2.55s
+- *Generation time:* 5.42s
+- *Total time:* 7.98s
+- *Input validation time:* 5.02e-05
+- *Prompt preparation time:* 0.00161
+- *First-token latency:* 1.13
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 574
 - *Generation tokens:* 90
 - *Total tokens:* 664
-- *Prompt throughput (raw):* 536 tok/s
-- *Generation throughput (raw):* 26.0 tok/s
+- *Prompt throughput (raw):* 507 tok/s
+- *Generation throughput (raw):* 25.1 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.76
@@ -1099,17 +1099,17 @@ Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, Nat
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
 - *Model load time:* 0.66s
-- *Generation time:* 1.93s
-- *Total time:* 2.60s
-- *Input validation time:* 6.05e-05
-- *Prompt preparation time:* 0.0104
-- *First-token latency:* 0.52
-- *Cleanup time:* 0.0914
+- *Generation time:* 1.80s
+- *Total time:* 2.47s
+- *Input validation time:* 6.11e-05
+- *Prompt preparation time:* 0.0106
+- *First-token latency:* 0.395
+- *Cleanup time:* 0.0908
 - *Prompt tokens:* 1,371
 - *Generation tokens:* 88
 - *Total tokens:* 1,459
-- *Prompt throughput (raw):* 2,639 tok/s
-- *Generation throughput (raw):* 177 tok/s
+- *Prompt throughput (raw):* 3,469 tok/s
+- *Generation throughput (raw):* 176 tok/s
 - *Peak memory:* 4.7
 - *Active memory:* 3.0
 - *Cache memory:* 0.22
@@ -1156,18 +1156,18 @@ Keywords: Historic Mill, Winchester City Mill, River Itchen, Pedestrians, Elderl
 - *Observations:* Title has 4 words (requested 5-10); Duplicate keywords:
   bridge
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.37s
-- *Generation time:* 0.85s
-- *Total time:* 1.65s
-- *Input validation time:* 0.417
-- *Prompt preparation time:* 0.00683
-- *First-token latency:* 0.118
-- *Cleanup time:* 0.0637
+- *Model load time:* 0.38s
+- *Generation time:* 0.82s
+- *Total time:* 1.62s
+- *Input validation time:* 0.407
+- *Prompt preparation time:* 0.00671
+- *First-token latency:* 0.108
+- *Cleanup time:* 0.0609
 - *Prompt tokens:* 2,094
 - *Generation tokens:* 76
 - *Total tokens:* 2,170
-- *Prompt throughput (raw):* 17,814 tok/s
-- *Generation throughput (raw):* 482 tok/s
+- *Prompt throughput (raw):* 19,429 tok/s
+- *Generation throughput (raw):* 483 tok/s
 - *Peak memory:* 1.9
 - *Active memory:* 0.90
 - *Cache memory:* 0.08
@@ -1218,18 +1218,18 @@ Historic, watermill, Winchester, England, River Itchen, bridge, visitors, stone,
 - *Maintainer status:* none
 - *Observations:* Keyword list has 23 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.23s
-- *Generation time:* 8.05s
-- *Total time:* 10.29s
-- *Input validation time:* 6.12e-05
-- *Prompt preparation time:* 0.00784
-- *First-token latency:* 3.38
-- *Cleanup time:* 0.11
+- *Model load time:* 2.14s
+- *Generation time:* 7.76s
+- *Total time:* 9.91s
+- *Input validation time:* 6.02e-05
+- *Prompt preparation time:* 0.00874
+- *First-token latency:* 3.15
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,385
 - *Generation tokens:* 119
 - *Total tokens:* 2,504
-- *Prompt throughput (raw):* 706 tok/s
-- *Generation throughput (raw):* 29.8 tok/s
+- *Prompt throughput (raw):* 756 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 0.47
@@ -1281,18 +1281,18 @@ Winchester City Mill, River Itchen, Hampshire, England, watermill, historic buil
 - *Observations:* Keyword list has 24 terms (requested 10-18); Duplicate
   keywords: riverbank, national trust
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 8.18s
-- *Generation time:* 16.20s
-- *Total time:* 24.39s
-- *Input validation time:* 6.26e-05
+- *Model load time:* 5.96s
+- *Generation time:* 13.08s
+- *Total time:* 19.05s
+- *Input validation time:* 8.66e-05
 - *Prompt preparation time:* 0.0109
-- *First-token latency:* 4.5
-- *Cleanup time:* 0.231
+- *First-token latency:* 2.65
+- *Cleanup time:* 0.221
 - *Prompt tokens:* 1,605
 - *Generation tokens:* 583
 - *Total tokens:* 2,188
-- *Prompt throughput (raw):* 356 tok/s
-- *Generation throughput (raw):* 62.9 tok/s
+- *Prompt throughput (raw):* 605 tok/s
+- *Generation throughput (raw):* 63.1 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.15
@@ -1385,18 +1385,18 @@ Keywords: Hampshire, England, River Itchen, Winchester, stone house, riverbank, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 8.15s
-- *Generation time:* 21.01s
-- *Total time:* 29.19s
-- *Input validation time:* 5.61e-05
-- *Prompt preparation time:* 0.0112
-- *First-token latency:* 17.6
-- *Cleanup time:* 0.244
+- *Model load time:* 7.11s
+- *Generation time:* 18.54s
+- *Total time:* 25.67s
+- *Input validation time:* 6.37e-05
+- *Prompt preparation time:* 0.0116
+- *First-token latency:* 15.2
+- *Cleanup time:* 0.283
 - *Prompt tokens:* 6,430
 - *Generation tokens:* 108
 - *Total tokens:* 6,538
-- *Prompt throughput (raw):* 365 tok/s
-- *Generation throughput (raw):* 40.0 tok/s
+- *Prompt throughput (raw):* 424 tok/s
+- *Generation throughput (raw):* 39.9 tok/s
 - *Peak memory:* 78
 - *Active memory:* 62
 - *Cache memory:* 1.4
@@ -1457,17 +1457,17 @@ Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, bri
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 3.26s
-- *Generation time:* 155.04s
-- *Total time:* 158.31s
-- *Input validation time:* 4.74e-05
-- *Prompt preparation time:* 0.00351
-- *First-token latency:* 2.06
-- *Cleanup time:* 0.155
+- *Model load time:* 3.25s
+- *Generation time:* 154.36s
+- *Total time:* 157.63s
+- *Input validation time:* 4.61e-05
+- *Prompt preparation time:* 0.00405
+- *First-token latency:* 1.49
+- *Cleanup time:* 0.145
 - *Prompt tokens:* 1,307
 - *Generation tokens:* 710
 - *Total tokens:* 2,017
-- *Prompt throughput (raw):* 636 tok/s
+- *Prompt throughput (raw):* 879 tok/s
 - *Generation throughput (raw):* 4.67 tok/s
 - *Peak memory:* 40
 - *Active memory:* 33
@@ -1529,18 +1529,18 @@ Keywords: Winchester City Mill, River Itchen, England, Hampshire, Stone bridge, 
 - *Maintainer status:* none
 - *Observations:* Title has 4 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 0.62s
-- *Generation time:* 1.59s
-- *Total time:* 2.22s
-- *Input validation time:* 6.59e-05
+- *Model load time:* 0.63s
+- *Generation time:* 1.60s
+- *Total time:* 2.23s
+- *Input validation time:* 6.83e-05
 - *Prompt preparation time:* 0.00399
-- *First-token latency:* 0.337
-- *Cleanup time:* 0.0798
+- *First-token latency:* 0.336
+- *Cleanup time:* 0.0777
 - *Prompt tokens:* 2,094
 - *Generation tokens:* 119
 - *Total tokens:* 2,213
-- *Prompt throughput (raw):* 6,219 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Prompt throughput (raw):* 6,231 tok/s
+- *Generation throughput (raw):* 183 tok/s
 - *Peak memory:* 4.0
 - *Active memory:* 3.2
 - *Cache memory:* 0.06
@@ -1588,17 +1588,17 @@ Keywords: Winchester City Mill, historic watermill, River Itchen, Hampshire, Eng
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.42s
-- *Generation time:* 5.42s
+- *Model load time:* 1.43s
+- *Generation time:* 5.43s
 - *Total time:* 6.86s
-- *Input validation time:* 5.3e-05
-- *Prompt preparation time:* 0.00139
-- *First-token latency:* 2
-- *Cleanup time:* 0.0946
+- *Input validation time:* 5.12e-05
+- *Prompt preparation time:* 0.0011
+- *First-token latency:* 2.02
+- *Cleanup time:* 0.0932
 - *Prompt tokens:* 2,918
 - *Generation tokens:* 180
 - *Total tokens:* 3,098
-- *Prompt throughput (raw):* 1,456 tok/s
+- *Prompt throughput (raw):* 1,447 tok/s
 - *Generation throughput (raw):* 64.7 tok/s
 - *Peak memory:* 13
 - *Active memory:* 8.4
@@ -1667,17 +1667,17 @@ Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
 - *Model load time:* 1.06s
-- *Generation time:* 3.73s
-- *Total time:* 4.80s
-- *Input validation time:* 4.73e-05
-- *Prompt preparation time:* 0.00575
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.0876
+- *Generation time:* 3.32s
+- *Total time:* 4.40s
+- *Input validation time:* 4.85e-05
+- *Prompt preparation time:* 0.00565
+- *First-token latency:* 0.742
+- *Cleanup time:* 0.0877
 - *Prompt tokens:* 1,516
 - *Generation tokens:* 132
 - *Total tokens:* 1,648
-- *Prompt throughput (raw):* 1,320 tok/s
-- *Generation throughput (raw):* 72.9 tok/s
+- *Prompt throughput (raw):* 2,044 tok/s
+- *Generation throughput (raw):* 72.7 tok/s
 - *Peak memory:* 8.1
 - *Active memory:* 6.5
 - *Cache memory:* 0.31
@@ -1726,18 +1726,18 @@ Keywords: Winchester, Hampshire, England, watermill, stone wall, clay tiles, riv
 - *Observations:* Title has 4 words (requested 5-10); Keyword list has 20
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.00s
+- *Model load time:* 0.99s
 - *Generation time:* 4.62s
-- *Total time:* 5.64s
-- *Input validation time:* 6.97e-05
-- *Prompt preparation time:* 0.00482
-- *First-token latency:* 3.06
-- *Cleanup time:* 0.103
+- *Total time:* 5.62s
+- *Input validation time:* 5.63e-05
+- *Prompt preparation time:* 0.00486
+- *First-token latency:* 3.09
+- *Cleanup time:* 0.1
 - *Prompt tokens:* 4,062
 - *Generation tokens:* 152
 - *Total tokens:* 4,214
-- *Prompt throughput (raw):* 1,327 tok/s
-- *Generation throughput (raw):* 231 tok/s
+- *Prompt throughput (raw):* 1,315 tok/s
+- *Generation throughput (raw):* 229 tok/s
 - *Peak memory:* 3.9
 - *Active memory:* 2.2
 - *Cache memory:* 0.64
@@ -1785,17 +1785,17 @@ Keywords: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly 
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.57s
-- *Generation time:* 2.80s
-- *Total time:* 5.40s
-- *Input validation time:* 5.94e-05
-- *Prompt preparation time:* 0.0169
-- *First-token latency:* 0.814
-- *Cleanup time:* 0.136
+- *Model load time:* 2.68s
+- *Generation time:* 2.70s
+- *Total time:* 5.41s
+- *Input validation time:* 5.11e-05
+- *Prompt preparation time:* 0.019
+- *First-token latency:* 0.722
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 1,262
 - *Generation tokens:* 135
 - *Total tokens:* 1,397
-- *Prompt throughput (raw):* 1,549 tok/s
+- *Prompt throughput (raw):* 1,747 tok/s
 - *Generation throughput (raw):* 107 tok/s
 - *Peak memory:* 24
 - *Active memory:* 23
@@ -1844,18 +1844,18 @@ Keywords: Winchester City Mill, River Itchen, Hampshire, England, watermill, cla
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.96s
-- *Generation time:* 3.29s
-- *Total time:* 4.26s
-- *Input validation time:* 6.22e-05
-- *Prompt preparation time:* 0.00247
-- *First-token latency:* 0.415
-- *Cleanup time:* 0.0922
+- *Model load time:* 0.93s
+- *Generation time:* 3.15s
+- *Total time:* 4.08s
+- *Input validation time:* 6.45e-05
+- *Prompt preparation time:* 0.00158
+- *First-token latency:* 0.298
+- *Cleanup time:* 0.0887
 - *Prompt tokens:* 1,103
 - *Generation tokens:* 128
 - *Total tokens:* 1,231
-- *Prompt throughput (raw):* 2,660 tok/s
-- *Generation throughput (raw):* 56.3 tok/s
+- *Prompt throughput (raw):* 3,702 tok/s
+- *Generation throughput (raw):* 56.8 tok/s
 - *Peak memory:* 9.5
 - *Active memory:* 8.3
 - *Cache memory:* 0.52
@@ -1903,18 +1903,18 @@ Keywords: Historic, Winchester, City Mill, National Trust, River Itchen, Hampshi
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.89s
-- *Generation time:* 58.99s
-- *Total time:* 60.90s
-- *Input validation time:* 6.48e-05
-- *Prompt preparation time:* 0.00134
-- *First-token latency:* 56.4
-- *Cleanup time:* 0.132
+- *Model load time:* 1.93s
+- *Generation time:* 56.78s
+- *Total time:* 58.72s
+- *Input validation time:* 5.59e-05
+- *Prompt preparation time:* 0.00215
+- *First-token latency:* 54.2
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 16,520
 - *Generation tokens:* 133
 - *Total tokens:* 16,653
-- *Prompt throughput (raw):* 293 tok/s
-- *Generation throughput (raw):* 86.8 tok/s
+- *Prompt throughput (raw):* 305 tok/s
+- *Generation throughput (raw):* 87.1 tok/s
 - *Peak memory:* 23
 - *Active memory:* 18
 - *Cache memory:* 2.3
@@ -1962,18 +1962,18 @@ Keywords: Winchester City Mill, River Itchen, Hampshire, England, historic mill,
 - *Maintainer status:* none
 - *Observations:* Title has 12 words (requested 5-10)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.40s
-- *Generation time:* 57.12s
-- *Total time:* 58.53s
-- *Input validation time:* 6.28e-05
-- *Prompt preparation time:* 0.0019
-- *First-token latency:* 54.6
-- *Cleanup time:* 0.106
+- *Model load time:* 1.41s
+- *Generation time:* 54.69s
+- *Total time:* 56.12s
+- *Input validation time:* 5.4e-05
+- *Prompt preparation time:* 0.00169
+- *First-token latency:* 52.2
+- *Cleanup time:* 0.098
 - *Prompt tokens:* 16,536
 - *Generation tokens:* 132
 - *Total tokens:* 16,668
-- *Prompt throughput (raw):* 303 tok/s
-- *Generation throughput (raw):* 91.6 tok/s
+- *Prompt throughput (raw):* 317 tok/s
+- *Generation throughput (raw):* 92.1 tok/s
 - *Peak memory:* 10.0
 - *Active memory:* 6.0
 - *Cache memory:* 1.2
@@ -2041,17 +2041,17 @@ Winchester City Mill, River Itchen, Hampshire, England, National Trust, historic
 - *Observations:* Title has 3 words (requested 5-10); Keyword list has 20
   terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.70s
-- *Generation time:* 1.95s
-- *Total time:* 2.66s
-- *Input validation time:* 5.75e-05
-- *Prompt preparation time:* 0.00263
-- *First-token latency:* 0.396
-- *Cleanup time:* 0.0908
+- *Model load time:* 0.71s
+- *Generation time:* 2.02s
+- *Total time:* 2.73s
+- *Input validation time:* 7.7e-05
+- *Prompt preparation time:* 0.00278
+- *First-token latency:* 0.407
+- *Cleanup time:* 0.0856
 - *Prompt tokens:* 1,401
 - *Generation tokens:* 84
 - *Total tokens:* 1,485
-- *Prompt throughput (raw):* 3,542 tok/s
+- *Prompt throughput (raw):* 3,440 tok/s
 - *Generation throughput (raw):* 125 tok/s
 - *Peak memory:* 5.4
 - *Active memory:* 4.5
@@ -2098,18 +2098,18 @@ Keywords: Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly 
 - *Maintainer status:* none
 - *Observations:* Keyword list has 20 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 8.17s
-- *Generation time:* 20.79s
-- *Total time:* 28.98s
-- *Input validation time:* 6.05e-05
-- *Prompt preparation time:* 0.0203
-- *First-token latency:* 17.3
-- *Cleanup time:* 0.266
+- *Model load time:* 7.55s
+- *Generation time:* 18.02s
+- *Total time:* 25.61s
+- *Input validation time:* 6.28e-05
+- *Prompt preparation time:* 0.0218
+- *First-token latency:* 14.6
+- *Cleanup time:* 0.271
 - *Prompt tokens:* 3,464
 - *Generation tokens:* 114
 - *Total tokens:* 3,578
-- *Prompt throughput (raw):* 200 tok/s
-- *Generation throughput (raw):* 45.4 tok/s
+- *Prompt throughput (raw):* 237 tok/s
+- *Generation throughput (raw):* 46.6 tok/s
 - *Peak memory:* 70
 - *Active memory:* 63
 - *Cache memory:* 0.39
@@ -2160,18 +2160,18 @@ Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Eng
 - *Maintainer status:* none
 - *Observations:* Keyword list has 23 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.16s
-- *Generation time:* 20.55s
-- *Total time:* 21.72s
-- *Input validation time:* 6.71e-05
-- *Prompt preparation time:* 0.0048
-- *First-token latency:* 17.2
-- *Cleanup time:* 0.101
+- *Model load time:* 1.18s
+- *Generation time:* 19.27s
+- *Total time:* 20.47s
+- *Input validation time:* 7.43e-05
+- *Prompt preparation time:* 0.00466
+- *First-token latency:* 15.9
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 16,531
 - *Generation tokens:* 136
 - *Total tokens:* 16,667
-- *Prompt throughput (raw):* 959 tok/s
-- *Generation throughput (raw):* 58.4 tok/s
+- *Prompt throughput (raw):* 1,043 tok/s
+- *Generation throughput (raw):* 57.8 tok/s
 - *Peak memory:* 13
 - *Active memory:* 9.5
 - *Cache memory:* 1.4
@@ -2221,18 +2221,18 @@ Keywords: Winchester City Mill, Hampshire, England, River Itchen, Watermill, His
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.25s
-- *Generation time:* 5.74s
-- *Total time:* 8.01s
-- *Input validation time:* 6.12e-05
-- *Prompt preparation time:* 0.0043
-- *First-token latency:* 1
-- *Cleanup time:* 0.134
+- *Model load time:* 2.28s
+- *Generation time:* 5.75s
+- *Total time:* 8.05s
+- *Input validation time:* 5.12e-05
+- *Prompt preparation time:* 0.00459
+- *First-token latency:* 0.988
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 569
 - *Generation tokens:* 128
 - *Total tokens:* 697
-- *Prompt throughput (raw):* 567 tok/s
-- *Generation throughput (raw):* 31.5 tok/s
+- *Prompt throughput (raw):* 576 tok/s
+- *Generation throughput (raw):* 31.2 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.43
@@ -2280,18 +2280,18 @@ Keywords: Winchester City Mill, Hampshire, England, River Itchen, Watermill, His
 - *Maintainer status:* none
 - *Observations:* Keyword list has 19 terms (requested 10-18)
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.65s
-- *Generation time:* 5.29s
-- *Total time:* 6.95s
-- *Input validation time:* 5.12e-05
-- *Prompt preparation time:* 0.0034
-- *First-token latency:* 1.88
-- *Cleanup time:* 0.106
+- *Model load time:* 1.66s
+- *Generation time:* 5.13s
+- *Total time:* 6.80s
+- *Input validation time:* 6.08e-05
+- *Prompt preparation time:* 0.00419
+- *First-token latency:* 1.7
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 3,111
 - *Generation tokens:* 110
 - *Total tokens:* 3,221
-- *Prompt throughput (raw):* 1,651 tok/s
-- *Generation throughput (raw):* 39.4 tok/s
+- *Prompt throughput (raw):* 1,829 tok/s
+- *Generation throughput (raw):* 38.9 tok/s
 - *Peak memory:* 16
 - *Active memory:* 13
 - *Cache memory:* 0.59
@@ -2347,17 +2347,17 @@ Adobe Stock, Any Vision, Arch, Blue sky, Chimney, Clay tiles, Elderly woman, Eng
   elderly woman, girls, rapids, scenery, sitting, people, river
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.67s
-- *Generation time:* 25.27s
-- *Total time:* 25.96s
-- *Input validation time:* 5.59e-05
-- *Prompt preparation time:* 0.00974
-- *First-token latency:* 13.6
-- *Cleanup time:* 0.0844
+- *Generation time:* 25.20s
+- *Total time:* 25.88s
+- *Input validation time:* 3.67e-05
+- *Prompt preparation time:* 0.00964
+- *First-token latency:* 13.4
+- *Cleanup time:* 0.0839
 - *Prompt tokens:* 16,520
 - *Generation tokens:* 1,000
 - *Total tokens:* 17,520
-- *Prompt throughput (raw):* 1,218 tok/s
-- *Generation throughput (raw):* 93.0 tok/s
+- *Prompt throughput (raw):* 1,229 tok/s
+- *Generation throughput (raw):* 92.2 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 4.3
 - *Cache memory:* 2.4
@@ -2405,17 +2405,17 @@ Keywords: River Itchen, Hampshire, England, Mill, National Trust, Pedestrians, R
 - *Maintainer status:* none
 - *Observations:* Missing or empty fields: Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type jvlm via jina_vlm)
-- *Model load time:* 0.57s
-- *Generation time:* 4.23s
-- *Total time:* 4.81s
-- *Input validation time:* 4.94e-05
-- *Prompt preparation time:* 0.00207
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.0756
+- *Model load time:* 0.58s
+- *Generation time:* 4.02s
+- *Total time:* 4.61s
+- *Input validation time:* 5.02e-05
+- *Prompt preparation time:* 0.00211
+- *First-token latency:* 0.946
+- *Cleanup time:* 0.0751
 - *Prompt tokens:* 2,050
 - *Generation tokens:* 294
 - *Total tokens:* 2,344
-- *Prompt throughput (raw):* 1,788 tok/s
+- *Prompt throughput (raw):* 2,168 tok/s
 - *Generation throughput (raw):* 139 tok/s
 - *Peak memory:* 3.7
 - *Active memory:* 2.1
@@ -2467,18 +2467,18 @@ The historic Winchester City Mill, an ancient watermill situated over the River 
   requested fields; Extra text appears before the Title field; Response
   appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.57s
-- *Generation time:* 26.86s
-- *Total time:* 28.45s
-- *Input validation time:* 5.19e-05
-- *Prompt preparation time:* 0.00802
-- *First-token latency:* 2.12
-- *Cleanup time:* 0.106
+- *Model load time:* 1.58s
+- *Generation time:* 26.40s
+- *Total time:* 27.99s
+- *Input validation time:* 4.85e-05
+- *Prompt preparation time:* 0.00801
+- *First-token latency:* 2
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 3,202
 - *Generation tokens:* 1,000
 - *Total tokens:* 4,202
-- *Prompt throughput (raw):* 1,507 tok/s
-- *Generation throughput (raw):* 41.5 tok/s
+- *Prompt throughput (raw):* 1,599 tok/s
+- *Generation throughput (raw):* 42.0 tok/s
 - *Peak memory:* 15
 - *Active memory:* 13
 - *Cache memory:* 0.87
@@ -2538,18 +2538,18 @@ The hint includes "Girls". The image does not show girls explicitly, but there i
 - *Observations:* Missing or empty fields: Title, Description, Keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.65s
-- *Generation time:* 1.97s
-- *Total time:* 2.64s
-- *Input validation time:* 6.04e-05
-- *Prompt preparation time:* 0.00221
-- *First-token latency:* 0.215
-- *Cleanup time:* 0.0791
+- *Model load time:* 0.64s
+- *Generation time:* 1.78s
+- *Total time:* 2.43s
+- *Input validation time:* 5.5e-05
+- *Prompt preparation time:* 0.00217
+- *First-token latency:* 0.106
+- *Cleanup time:* 0.0794
 - *Prompt tokens:* 307
 - *Generation tokens:* 155
 - *Total tokens:* 462
-- *Prompt throughput (raw):* 1,429 tok/s
-- *Generation throughput (raw):* 358 tok/s
+- *Prompt throughput (raw):* 2,892 tok/s
+- *Generation throughput (raw):* 359 tok/s
 - *Peak memory:* 2.2
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
@@ -2600,17 +2600,17 @@ A tranquil scene captures visitors enjoying a walk along the historic Winchester
   sitting
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
 - *Model load time:* 1.68s
-- *Generation time:* 27.88s
-- *Total time:* 29.58s
-- *Input validation time:* 7.25e-05
-- *Prompt preparation time:* 0.00276
-- *First-token latency:* 5.38
-- *Cleanup time:* 0.101
+- *Generation time:* 27.70s
+- *Total time:* 29.38s
+- *Input validation time:* 6.72e-05
+- *Prompt preparation time:* 0.00274
+- *First-token latency:* 5.49
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 6,426
 - *Generation tokens:* 1,000
 - *Total tokens:* 7,426
-- *Prompt throughput (raw):* 1,195 tok/s
-- *Generation throughput (raw):* 45.7 tok/s
+- *Prompt throughput (raw):* 1,169 tok/s
+- *Generation throughput (raw):* 46.4 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.44
@@ -2703,18 +2703,18 @@ Wait, check if "Rapids" is visible? The water has some movement, maybe rapids? T
   riverfront, historic mill with water flow, traditional english architecture,
   stone and brick building
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.36s
-- *Generation time:* 20.93s
-- *Total time:* 22.30s
-- *Input validation time:* 6.25e-05
-- *Prompt preparation time:* 0.00794
-- *First-token latency:* 6.62
-- *Cleanup time:* 0.0884
+- *Model load time:* 1.34s
+- *Generation time:* 19.44s
+- *Total time:* 20.79s
+- *Input validation time:* 6.13e-05
+- *Prompt preparation time:* 0.00843
+- *First-token latency:* 5.71
+- *Cleanup time:* 0.0888
 - *Prompt tokens:* 6,430
 - *Generation tokens:* 1,000
 - *Total tokens:* 7,430
-- *Prompt throughput (raw):* 971 tok/s
-- *Generation throughput (raw):* 73.1 tok/s
+- *Prompt throughput (raw):* 1,126 tok/s
+- *Generation throughput (raw):* 76.4 tok/s
 - *Peak memory:* 8.4
 - *Active memory:* 6.8
 - *Cache memory:* 0.45
@@ -2761,18 +2761,18 @@ Keywords: Winchester City Mill, River Itchen, watermill, historic building, pede
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.84s
-- *Generation time:* 1.25s
-- *Total time:* 2.11s
-- *Input validation time:* 5.3e-05
-- *Prompt preparation time:* 0.00935
-- *First-token latency:* 0.251
-- *Cleanup time:* 0.0929
+- *Model load time:* 0.94s
+- *Generation time:* 1.26s
+- *Total time:* 2.21s
+- *Input validation time:* 3.55e-05
+- *Prompt preparation time:* 0.00955
+- *First-token latency:* 0.249
+- *Cleanup time:* 0.0898
 - *Prompt tokens:* 907
 - *Generation tokens:* 70
 - *Total tokens:* 977
-- *Prompt throughput (raw):* 3,611 tok/s
-- *Generation throughput (raw):* 289 tok/s
+- *Prompt throughput (raw):* 3,641 tok/s
+- *Generation throughput (raw):* 288 tok/s
 - *Peak memory:* 3.3
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
@@ -2832,18 +2832,18 @@ Keywords: historic mill, river Itchen, stone bridge, brick building, blue sky, p
 - *Observations:* Missing or empty fields: Title, Description; Extra text
   appears before the Title field
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 2.31s
-- *Generation time:* 4.97s
-- *Total time:* 7.37s
-- *Input validation time:* 6.33e-05
-- *Prompt preparation time:* 0.00417
-- *First-token latency:* 0.896
-- *Cleanup time:* 0.127
+- *Model load time:* 2.29s
+- *Generation time:* 4.43s
+- *Total time:* 6.81s
+- *Input validation time:* 6.43e-05
+- *Prompt preparation time:* 0.00468
+- *First-token latency:* 0.361
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 568
 - *Generation tokens:* 167
 - *Total tokens:* 735
-- *Prompt throughput (raw):* 634 tok/s
-- *Generation throughput (raw):* 48.9 tok/s
+- *Prompt throughput (raw):* 1,572 tok/s
+- *Generation throughput (raw):* 48.8 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.05
@@ -2902,13 +2902,13 @@ Keywords: Adobe Stock, Aerial view, Architecture, Blue sky, Chimney, Clay tiles,
   'DefaultFastImageProcessorKwargs' from
   'transformers.image_processing_utils_fast' (unknown location)
 - *Arch supported by installed mlx-vlm:* yes (model_type youtu_vl)
-- *Model load time:* 1.03s
+- *Model load time:* 1.06s
 - *Generation time:* -
-- *Total time:* 1.03s
-- *Input validation time:* 5.83e-05
+- *Total time:* 1.06s
+- *Input validation time:* 6.6e-05
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.145
+- *Cleanup time:* 0.146
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -2951,7 +2951,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 817, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -3071,12 +3071,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3199.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[15:03:13] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 </details>

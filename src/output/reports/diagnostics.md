@@ -121,7 +121,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 817, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -243,12 +243,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3199.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[15:03:13] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Completed Runs with Observations
@@ -615,21 +615,21 @@ is in the model gallery.
 
 | Model                                             | Runtime identity                                           | Performance                                                                                |
 |---------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| mlx-community/diffusiongemma-26B-A4B-it-8bit      | rev 7b95e3887078; DiffusionGemma4Processor; stop completed | 570 prompt / 85 generated; 57.7 tok/s; 29 GB peak; cleanup 0.0108/0.0 GB active/cache      |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8     | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 570 prompt / 85 generated; 57.1 tok/s; 28 GB peak; cleanup 0.0108/0.0 GB active/cache      |
+| mlx-community/diffusiongemma-26B-A4B-it-8bit      | rev 7b95e3887078; DiffusionGemma4Processor; stop completed | 570 prompt / 84 generated; 81.9 tok/s; 29 GB peak; cleanup 0.0108/0.0 GB active/cache      |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8     | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 570 prompt / 85 generated; 56.2 tok/s; 28 GB peak; cleanup 0.0108/0.0 GB active/cache      |
 | mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed          | 574 prompt / 105 generated; 129 tok/s; 16 GB peak; cleanup 0.0124/0.0 GB active/cache      |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed          | 574 prompt / 90 generated; 26.0 tok/s; 20 GB peak; cleanup 0.013/0.0 GB active/cache       |
-| mlx-community/granite-4.0-3b-vision-4bit          | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1371 prompt / 88 generated; 177 tok/s; 4.7 GB peak; cleanup 0.0132/0.0 GB active/cache     |
-| mlx-community/Idefics3-8B-Llama3-bf16             | rev 8c2a30c48864; Idefics3Processor; stop completed        | 2597 prompt / 162 generated; 32.5 tok/s; 18 GB peak; cleanup 0.003/0.0 GB active/cache     |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2086 prompt / 88 generated; 34.1 tok/s; 17 GB peak; cleanup 0.00331/0.0 GB active/cache    |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed          | 574 prompt / 90 generated; 25.1 tok/s; 20 GB peak; cleanup 0.013/0.0 GB active/cache       |
+| mlx-community/granite-4.0-3b-vision-4bit          | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1371 prompt / 88 generated; 176 tok/s; 4.7 GB peak; cleanup 0.0132/0.0 GB active/cache     |
+| mlx-community/Idefics3-8B-Llama3-bf16             | rev 8c2a30c48864; Idefics3Processor; stop completed        | 2597 prompt / 162 generated; 32.3 tok/s; 18 GB peak; cleanup 0.003/0.0 GB active/cache     |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2086 prompt / 88 generated; 34.3 tok/s; 17 GB peak; cleanup 0.00331/0.0 GB active/cache    |
 | mlx-community/LFM2.5-VL-3B-OptiQ-4bit             | rev 12c5ae493041; Lfm2VlProcessor; stop completed          | 2086 prompt / 83 generated; 210 tok/s; 4.0 GB peak; cleanup 0.00436/0.0 GB active/cache    |
 | mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed        | 2918 prompt / 180 generated; 67.1 tok/s; 13 GB peak; cleanup 0.00513/0.0 GB active/cache   |
 | mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed        | 2917 prompt / 139 generated; 190 tok/s; 7.8 GB peak; cleanup 0.00565/0.0 GB active/cache   |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit         | rev b4a74fa6001f; MuseGlimmerProcessor; stop completed     | 4388 prompt / 992 generated; 25.3 tok/s; 25 GB peak; cleanup 0.00637/0.0 GB active/cache   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16522 prompt / 907 generated; 89.9 tok/s; 8.4 GB peak; cleanup 0.00778/0.0 GB active/cache |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit         | rev b4a74fa6001f; MuseGlimmerProcessor; stop completed     | 4388 prompt / 992 generated; 25.4 tok/s; 25 GB peak; cleanup 0.00637/0.0 GB active/cache   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16           | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16522 prompt / 907 generated; 91.5 tok/s; 8.4 GB peak; cleanup 0.00778/0.0 GB active/cache |
 | mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16536 prompt / 143 generated; 110 tok/s; 24 GB peak; cleanup 0.0086/0.0 GB active/cache    |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed         | 16536 prompt / 139 generated; 18.2 tok/s; 33 GB peak; cleanup 0.00964/0.0 GB active/cache  |
-| mlx-community/Qwen3.8-27B-4bit                    | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16536 prompt / 131 generated; 29.6 tok/s; 21 GB peak; cleanup 0.0101/0.0 GB active/cache   |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed         | 16536 prompt / 139 generated; 17.8 tok/s; 33 GB peak; cleanup 0.00964/0.0 GB active/cache  |
+| mlx-community/Qwen3.8-27B-4bit                    | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16536 prompt / 131 generated; 30.5 tok/s; 21 GB peak; cleanup 0.0101/0.0 GB active/cache   |
 
 </details>
 

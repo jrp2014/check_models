@@ -8,6 +8,7 @@ model. Results say nothing about a model's fitness for other uses.
 
 ## Run at a glance
 
+- Run duration: 48m 18s
 - Models attempted: 42 (completed 41, crashed 1, indeterminate 0)
 - Usability: usable 15, usable with caveats 18, unusable 8, not evaluated 1
 - Top observations: Response repeats the same text (2), Unrecognised model control tokens remain visible (1), Required fields are missing or empty (5), Response repeats the task instructions instead of only returning the requested fields (2), Extra text appears before the Title field (4)

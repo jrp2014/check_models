@@ -57,7 +57,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 818, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 817, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -179,12 +179,12 @@ ValueError: Model loading failed: cannot import name 'DefaultFastImageProcessorK
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]
-Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3465.91it/s]
+Fetching 19 files: 100%|##########| 19/19 [00:00<00:00, 3199.06it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[13:16:44] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
+[15:03:13] DEBUG    HF Cache Info for tencent/Youtu-VL-4B-Instruct: size=10229.6 MB, files=27
 ```
 
 ## Reproduction inputs
@@ -246,7 +246,7 @@ python -m mlx_vlm.generate --model tencent/Youtu-VL-4B-Instruct --image any-loca
 | Python Version  | 3.14.7                                                           |
 | macOS Version   | 26.6.2                                                           |
 | GPU/Chip        | Apple M5 Max                                                     |
-| check_models    | 0.16.6; revision 8b5e2e71c028719b337e145cf62b723bf319129b; clean |
+| check_models    | 0.16.8; revision 37840f076c0c3e515bb01d1a0d9097ae73f6fb59; clean |
 
 ### Full environment evidence
 
