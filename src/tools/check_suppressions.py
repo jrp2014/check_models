@@ -1,4 +1,12 @@
-"""Audit repo suppressions so stale or overly broad suppressions fail quality checks."""
+"""Audit inline suppressions so stale or overly broad ones fail quality checks.
+
+Scope: per-line ``# noqa``, ``# type: ignore``, and ``# shellcheck disable``
+comments, each re-checked without the suppression to prove it still earns
+its keep. Configuration-wide suppressions (Ruff ``ignore`` /
+``per-file-ignores``, Skylos ``ignore``, mypy overrides, markdownlint
+rules) are deliberate policy in ``src/pyproject.toml``, ``.skylos/config.yaml``,
+and ``.markdownlint.jsonc``; review those by hand when they change.
+"""
 
 from __future__ import annotations
 
@@ -236,7 +244,7 @@ def _run_for_finding(
     temp_path: Path = _write_temp_variant(finding.file_path, finding.line_num, finding.kind)
     try:
         if finding.kind == "noqa":
-            return subprocess.run(
+            return subprocess.run(  # noqa: S603 - fixed interpreter over a repo-local temp file
                 [sys.executable, "-m", "ruff", "check", str(temp_path)],
                 capture_output=True,
                 text=True,
@@ -244,7 +252,7 @@ def _run_for_finding(
                 cwd=src_root,
             )
         if finding.kind == "type-ignore":
-            return subprocess.run(
+            return subprocess.run(  # noqa: S603 - fixed interpreter over a repo-local temp file
                 [
                     sys.executable,
                     "-m",
@@ -260,10 +268,11 @@ def _run_for_finding(
                 cwd=src_root,
             )
         if finding.kind == "shellcheck":
-            if shutil.which("shellcheck") is None:
+            shellcheck_path = shutil.which("shellcheck")
+            if shellcheck_path is None:
                 return None
-            return subprocess.run(
-                ["shellcheck", "-x", str(temp_path)],
+            return subprocess.run(  # noqa: S603 - resolved absolute binary over a repo-local temp file
+                [shellcheck_path, "-x", str(temp_path)],
                 capture_output=True,
                 text=True,
                 check=False,
@@ -334,7 +343,7 @@ def main() -> int:
     src_root: Path = Path(__file__).resolve().parents[1]
     repo_root: Path = src_root.parent
 
-    print(f"Auditing suppressions in: {repo_root}\n")
+    print(f"Auditing inline suppressions (noqa / type: ignore / shellcheck) in: {repo_root}\n")
     print("=" * 80)
 
     findings: list[SuppressionFinding] = iter_repo_suppressions(repo_root)
@@ -342,7 +351,7 @@ def main() -> int:
         print("No suppressions found!")
         return 0
 
-    print(f"Found {len(findings)} suppression(s) across the repository\n")
+    print(f"Found {len(findings)} inline suppression(s) across the repository\n")
 
     necessary: list[tuple[SuppressionFinding, str]] = []
     unnecessary: list[tuple[SuppressionFinding, str]] = []

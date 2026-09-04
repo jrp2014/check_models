@@ -253,6 +253,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Suppression review: configuration-wide suppressions that suppressed
+  nothing or hid real findings are gone. Ruff `S311` (no `random` use) and
+  the `tests.*` mypy override are removed (markdownlint `MD041` stays off,
+  now with a rationale naming the two deliberately H1-less files); the
+  argument ceiling is enforced again (`PLR0913` and Skylos `SKY-C303` are
+  no longer ignored globally — the four builders that exceed it carry
+  individually justified suppressions); `ANN401` applies everywhere except
+  argparse's keyword protocol, and `_open_image_for_exif` is typed as
+  returning `Image.Image`; the blanket test `ARG001`/`PLR0915` exclusions
+  are replaced by removing five dead parameters (including an unused
+  `harness_type` on a test helper) and three targeted long-test
+  suppressions; the `tools/**` `S603`/`S607`/`BLE001` exclusions are
+  replaced by narrowed exception types in `validate_env`, a resolved
+  shellcheck path, per-call rationales, and removal of a duplicate
+  `pre-commit install` subprocess. `tools.check_suppressions` now states
+  that it audits inline suppressions only.
 - The test suite runs in parallel (`pytest -n auto`) from `make test`,
   `make test-cov`, and both gate invocations — pytest-xdist was already a
   dev dependency that nothing used; wall clock drops from ~61 s to ~34 s

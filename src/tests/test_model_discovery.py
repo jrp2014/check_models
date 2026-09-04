@@ -1213,9 +1213,7 @@ class TestShardIndexFailsClosed:
         assert captured == [("org/m", "my-branch")]
 
 
-def test_shard_skip_reason_carries_single_cache_layout_prefix(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_shard_skip_reason_carries_single_cache_layout_prefix() -> None:
     """skip_reasons prefixes layout reasons once; the shard reason must not re-prefix."""
     entry = check_models.CachedModelEligibility(
         repo_id="org/m",

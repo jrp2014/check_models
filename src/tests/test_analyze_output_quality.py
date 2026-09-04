@@ -228,7 +228,7 @@ def test_analyze_output_quality_json_special_token_observation(
         ("x", "minimal_output", "observation", 0),
     ],
 )
-def test_json_mode_uses_canonical_assessment(
+def test_json_mode_uses_canonical_assessment(  # skylos: ignore[SKY-C303] six explicit inputs beat a config object for one assertion helper
     text: str,
     observation: str,
     status: str,

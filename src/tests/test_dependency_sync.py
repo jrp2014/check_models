@@ -84,7 +84,6 @@ SKYLOS_DANGER_ADVISORY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_danger_advisory
 SKYLOS_VERIFY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_verify.sh"
 
 SKYLOS_ADVISORY_QUALITY_IGNORES = {
-    "SKY-C303",
     "SKY-C401",
     "SKY-L004",
     "SKY-L017",

@@ -453,9 +453,7 @@ def test_retained_metadata_captures_public_snapshot_contract(
     }
 
 
-def test_retained_manifest_includes_summary_only_for_surfaced_results(
-    tmp_path: Path,
-) -> None:
+def test_retained_manifest_includes_summary_only_for_surfaced_results() -> None:
     """The optional paste-ready issue artifact should follow the cached assessment."""
     result = PerformanceResult(
         model_name="org/empty-output",

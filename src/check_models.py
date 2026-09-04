@@ -4574,7 +4574,7 @@ def _split_prompt_tokens(
     return text_est, nontext_est, source, rejected
 
 
-def analyze_generation_text(
+def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every prompt-contract knob  # skylos: ignore[SKY-C303]
     text: str,
     generated_tokens: int | None,
     prompt_tokens: int | None = None,
@@ -5775,7 +5775,7 @@ def _parse_public_image_source_url(value: str) -> str:
     return value
 
 
-def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> Any:
+def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> Image.Image:
     """Open an image for EXIF extraction from a local path or HTTP(S) URL."""
     if not is_url:
         return Image.open(Path(image_path))
@@ -13595,7 +13595,7 @@ def _run_model_generation(
     return result
 
 
-def _build_failure_result(
+def _build_failure_result(  # noqa: PLR0913 - every retained failure fact is an explicit keyword  # skylos: ignore[SKY-C303]
     *,
     model_name: str,
     error: BaseException,
@@ -17543,7 +17543,7 @@ def append_history_record(
     return record
 
 
-def _build_jsonl_metadata_record(
+def _build_jsonl_metadata_record(  # noqa: PLR0913 - the schema-3 header names each retained field  # skylos: ignore[SKY-C303]
     *,
     prompt: str,
     system_info: dict[str, str],
@@ -17759,7 +17759,7 @@ def _build_jsonl_result_record(
     return record
 
 
-def _build_retained_run(
+def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole retained-run contract  # skylos: ignore[SKY-C303]
     results: Sequence[PerformanceResult],
     *,
     prompt: str,
@@ -22389,7 +22389,7 @@ class _ConditionalDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
 class _ArgumentAdder(Protocol):
     """Minimal argparse container protocol for parser and argument groups."""
 
-    def add_argument(self, *_name_or_flags: str, **kwargs: Any) -> argparse.Action:
+    def add_argument(self, *_name_or_flags: str, **kwargs: Any) -> argparse.Action:  # noqa: ANN401 - argparse keyword protocol
         """Register an argparse option."""
         ...
 

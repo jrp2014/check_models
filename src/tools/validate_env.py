@@ -39,12 +39,14 @@ REQUIRED_HOOK_TYPES: tuple[str, ...] = ("pre-commit", "pre-push")
 logger = logging.getLogger("validate-env")
 
 try:
-    from packaging.requirements import Requirement
-    from packaging.specifiers import SpecifierSet
+    from packaging.requirements import InvalidRequirement, Requirement
+    from packaging.specifiers import InvalidSpecifier, SpecifierSet
     from packaging.version import InvalidVersion, Version
 except ImportError:  # pragma: no cover - optional for bootstrap scenarios
     Requirement = None
+    InvalidRequirement = ValueError
     SpecifierSet = None
+    InvalidSpecifier = ValueError
     InvalidVersion = ValueError
     Version = None
 
@@ -84,7 +86,7 @@ def _parse_dependency_spec(requirement: str) -> tuple[str, str]:
 
     try:
         parsed = Requirement(requirement)
-    except Exception:
+    except InvalidRequirement:
         return _parse_dependency_spec_fallback(requirement)
 
     return parsed.name, str(parsed.specifier)
@@ -109,8 +111,7 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     try:
         with pyproject_path.open("rb") as f:
             data = tomllib.load(f)
-
-    except Exception as e:
+    except (OSError, tomllib.TOMLDecodeError) as e:
         logger.warning("Failed to parse pyproject.toml: %s", e)
         return {}, {}, {}
 
@@ -247,7 +248,7 @@ def _version_matches_specifier(
 
     try:
         specifier = SpecifierSet(version_spec)
-    except Exception:
+    except InvalidSpecifier:
         logger.warning(
             "⚠ Skipping malformed version constraint check for %s: %s",
             package_name,

@@ -12,7 +12,9 @@
   "MD003": { "style": "consistent" },
   // Catch repeated headings that share the same parent; nested "To reproduce" sections are OK
   "MD024": { "siblings_only": true },
-  // Don't require top-level heading in some auxiliary docs if added later
+  // Two files deliberately have no H1: .agents/workflows/quality.md is a
+  // front-matter workflow snippet, and .github/copilot-instructions.md is an
+  // H2-rooted instruction sheet whose sections are H3 throughout
   "MD041": false,
   // Permit only the GitHub-supported HTML that this repo intentionally emits
   "MD033": { "allowed_elements": ["a", "br", "details", "pre", "summary"] }

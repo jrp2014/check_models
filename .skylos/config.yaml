@@ -23,7 +23,6 @@ max_lines: 450
 duplicate_strings: 40
 
 ignore:
-  - SKY-C303 # CLI/test helper signatures intentionally favor explicit kwargs.
   - SKY-C401 # Small report-summary clones are clearer than generic indirection.
   - SKY-L004 # Cohesive orchestration try blocks are documented as acceptable.
   - SKY-L017 # CLI diagnostics intentionally include local probe errors.

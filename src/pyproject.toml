@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
-version = "0.16.10"
+version = "0.16.11"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -123,7 +123,6 @@ exclude = [
     "check_models.suppression-audit*.py",
 ]
 ignore = [
-    "SKY-C303", # CLI/test helper signatures intentionally favor explicit kwargs.
     "SKY-C401", # Small report-summary clones are clearer than generic indirection.
     "SKY-L004", # Cohesive orchestration try blocks are documented as acceptable.
     "SKY-L017", # CLI diagnostics intentionally include local probe errors.
@@ -217,7 +216,6 @@ ignore = [
     "D213", # multi-line-summary-second-line (conflicts with D212)
 
     # === Stylistic choices (intentional design decisions) ===
-    "ANN401", # Dynamically typed Any - used for mlx library interop
     "FBT001", # Boolean positional arg - common pattern in CLI tools
     "FBT002", # Boolean default arg - common pattern in CLI tools
     "TD002",  # Missing TODO author - not critical for small team
@@ -230,12 +228,10 @@ ignore = [
     "CPY001",
 
     # === Complexity thresholds (configured separately via pylint section) ===
-    "PLR0913", # Too many arguments - configured via max-args=10
 
     # === Security rules - S311 only (others use targeted noqa with justification) ===
     # S311: random module used for non-cryptographic purposes (seed generation)
     # S603/S607/S310/S105: use targeted # noqa comments with justification
-    "S311", # random module - deterministic seeds, not cryptographic
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -248,8 +244,6 @@ ignore = [
     "D103",    # Missing docstring in public function - test names are self-documenting
     "PLR2004", # Magic values in test assertions - values match test parameters
     "SLF001",  # Private member access - tests need to verify internal functions
-    "ARG001",  # Unused argument - pytest fixtures may have unused params
-    "PLR0915", # Statement count - long scenario tests read better whole than fragmented
 ]
 "src/tests/**" = [
     "S101",    # Use of assert - required for pytest
@@ -257,15 +251,10 @@ ignore = [
     "D103",    # Missing docstring in public function - test names are self-documenting
     "PLR2004", # Magic values in test assertions - values match test parameters
     "SLF001",  # Private member access - tests need to verify internal functions
-    "ARG001",  # Unused argument - pytest fixtures may have unused params
-    "PLR0915", # Statement count - long scenario tests read better whole than fragmented
 ]
 # Tools: allow intentional CLI prints and fixed-command robustness patterns.
 "tools/**" = [
-    "T201",   # Print statements - tools are CLI utilities
-    "S603",   # subprocess calls - tool commands are hardcoded, not user input
-    "S607",   # partial executable path - tools call known commands in PATH
-    "BLE001", # blind Exception - tools use broad catches for robustness
+    "T201",   # Print statements - tools are CLI utilities whose output is their interface
 ]
 [tool.ruff.lint.pydocstyle]
 # Use Google docstring convention (resolves D203/D211 and D212/D213 conflicts)
@@ -321,15 +310,6 @@ warn_return_any = true
 warn_redundant_casts = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
-
-# Ignore errors in tests (they intentionally test edge cases)
-[[tool.mypy.overrides]]
-module = "tests.*"
-# Tests may call functions with various types for edge case testing
-disallow_untyped_defs = false
-warn_return_any = false
-# Allow broader exception handling in tests
-strict_optional = false
 
 # Allow missing stubs for third-party runtime dependencies used by check_models.py.
 [[tool.mypy.overrides]]

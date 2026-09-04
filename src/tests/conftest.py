@@ -262,10 +262,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "subprocess: marks tests that spawn subprocesses")
 
 
-def pytest_collection_modifyitems(
-    config: pytest.Config,
-    items: list[pytest.Item],
-) -> None:
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Auto-mark tests based on their characteristics."""
     for item in items:
         # Auto-mark tests in test_e2e_smoke.py as slow and e2e
