@@ -24,7 +24,7 @@ bash tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
 
-*(See [Installation Details](#installation-and-environment-setup) for manual pip/uv methods)*
+*(See [Installation Details](#installation-and-environment-setup) for manual pip setup)*
 
 ### 2. Run Your First Check
 

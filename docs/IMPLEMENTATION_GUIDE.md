@@ -1142,16 +1142,6 @@ Before committing changes:
 - [ ] No unscoped broad `except:` blocks
 - [ ] No bare `# type: ignore` (use specific code)
 
-## Migration Path (Future Tightening)
-
-Potential future enhancements (not required now):
-
-- Gradually re-enable selected docstring rules for public API boundaries
-- Introduce targeted complexity caps per module
-- Add mypy stricter flags (e.g., `disallow_untyped_defs`) after legacy code trimmed
-
----
-
 ## Dependency Management Strategy
 
 > [!NOTE]
