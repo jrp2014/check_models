@@ -29,6 +29,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=common_quality.sh
 source "$SCRIPT_DIR/common_quality.sh"
 
+# Git exports GIT_DIR into hook processes (always for linked worktrees).
+# With GIT_DIR set and GIT_WORK_TREE unset, git treats the *current
+# directory* as the work tree, so once this script has cd'ed into src/ every
+# `git diff` run by a tool reports the entire repository as deleted: Skylos's
+# SKY-L021 regression pass then flags every validation call as "removed" and
+# pyrefly's file enumeration doubles. Drop the variable so git rediscovers the
+# repository from the working directory, exactly as it does outside a hook.
+unset GIT_DIR
+
 cd "$(quality_src_root)"
 quality_setup_python
 

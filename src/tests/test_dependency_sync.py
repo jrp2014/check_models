@@ -1311,6 +1311,18 @@ def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
     assert update_script.index("REPO_DIRTY[idx]=1") < update_script.index(decision_call)
 
 
+def test_quality_script_drops_hook_exported_git_dir_before_entering_src() -> None:
+    """Git exports GIT_DIR into hooks; left set, git treats src/ as the work tree.
+
+    Every ``git diff`` a tool ran from ``src/`` then reported the whole
+    repository as deleted (a Skylos SKY-L021 storm from linked worktrees).
+    """
+    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
+
+    assert "\nunset GIT_DIR\n" in quality_script
+    assert quality_script.index("unset GIT_DIR") < quality_script.index('cd "$(quality_src_root)"')
+
+
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     """Local MLX builds should follow upstream's editable dev install guidance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

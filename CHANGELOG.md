@@ -33,6 +33,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The pre-push quality gate no longer misfires from a linked git worktree.
+  Git exports `GIT_DIR` into hook processes; with `GIT_WORK_TREE` unset,
+  git then treats the current directory as the work tree, so every
+  `git diff` run from `src/` reported the whole repository as deleted and
+  Skylos `SKY-L021` flagged every validation call as "removed" (it also
+  scanned the excluded `src/output/` log). `run_quality_checks.sh` now
+  unsets `GIT_DIR` so git rediscovers the repository normally; the
+  short-lived `SKY-L021` ignore is gone and the upstream bug is reported.
+
 - `update.sh` no longer skips rebuilding a local MLX checkout that has
   uncommitted or untracked changes: an unchanged HEAD with modified C++,
   Metal, or packaging inputs left an older compiled extension, metallib, or
