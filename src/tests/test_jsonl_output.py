@@ -2079,6 +2079,21 @@ def _retained_run_fixture(tmp_path: Path) -> check_models.RetainedRun:
     )
 
 
+def test_schema_3_header_retains_wall_clock_start(tmp_path: Path) -> None:
+    """started_at is retained verbatim when the orchestrator supplies it."""
+    result = PerformanceResult(model_name="org/m", generation=None, success=False)
+    retained = check_models._build_retained_run(
+        [result],
+        prompt="Describe the image.",
+        system_info={"OS": "test"},
+        total_runtime_seconds=1.5,
+        started_at="2026-07-31 11:00:00 BST",
+    )
+    assert retained.metadata.get("started_at") == "2026-07-31 11:00:00 BST"
+    # Absent by default so older consumers see an unchanged header.
+    assert "started_at" not in _retained_run_fixture(tmp_path).metadata
+
+
 def test_schema_3_metadata_contains_complete_run_context(tmp_path: Path) -> None:
     """The single retained artifact's header carries the whole run context."""
     retained = _retained_run_fixture(tmp_path)

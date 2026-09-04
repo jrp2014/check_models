@@ -1129,6 +1129,10 @@ class JsonlMetadataRecord(TypedDict, total=False):
     prompt_sha256: Required[str]
     system: Required[dict[str, str]]
     timestamp: Required[str]
+    # Wall-clock start; total_runtime_seconds is a perf-counter duration that
+    # stops during system sleep, so end - runtime can land after the run's
+    # own early log lines.
+    started_at: NotRequired[str]
     total_runtime_seconds: Required[float]
     counts: Required[RunOutcomeCounts]
     artifacts: Required[dict[str, str]]
@@ -1394,6 +1398,7 @@ class ReportGenerationInputs:
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
     comparison: RunComparison | None = None
     history_appended: bool = False
+    started_at: str | None = None
 
 
 @dataclass(frozen=True)
@@ -17635,6 +17640,7 @@ def _build_jsonl_metadata_record(
     producer: CheckModelsProvenanceRecord | None = None,
     trust_remote_code: bool = True,
     comparison: RunComparison | None = None,
+    started_at: str | None = None,
 ) -> JsonlMetadataRecord:
     """Build the schema-3 metadata header row carrying the whole run context."""
     record: JsonlMetadataRecord = {
@@ -17658,6 +17664,8 @@ def _build_jsonl_metadata_record(
         "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
         "execution_mode": execution_mode,
     }
+    if started_at is not None:
+        record["started_at"] = started_at
     if library_versions is not None:
         record["library_versions"] = library_versions
         record["component_provenance"] = _collect_component_provenance(library_versions)
@@ -17850,6 +17858,7 @@ def _build_retained_run(
     trust_remote_code: bool = True,
     comparison: RunComparison | None = None,
     producer: CheckModelsProvenanceRecord | None = None,
+    started_at: str | None = None,
 ) -> RetainedRun:
     """Build the schema-3 retained run: one metadata row plus ordered results."""
     resolved_policy = (
@@ -17893,6 +17902,7 @@ def _build_retained_run(
         producer=producer,
         trust_remote_code=trust_remote_code,
         comparison=comparison,
+        started_at=started_at,
     )
     records: list[JsonlResultRecord] = []
     for original_result in results:
@@ -19338,6 +19348,10 @@ def _validate_schema3_metadata_fields(metadata_value: dict[str, JsonLike]) -> No
     if not isinstance(metadata_value.get("trust_remote_code"), bool):
         message = "JSONL metadata trust_remote_code is missing"
         raise RunIssueSummaryValidationError(message)
+    started_at = metadata_value.get("started_at")
+    if started_at is not None and not isinstance(started_at, str):
+        message = "JSONL metadata started_at must be a string when present"
+        raise RunIssueSummaryValidationError(message)
     if "comparison" not in metadata_value or not isinstance(
         metadata_value.get("comparison"), dict | type(None)
     ):
@@ -19670,18 +19684,35 @@ def _load_retained_run(path: Path) -> RetainedRun:
     return _load_retained_run_text(_read_text_file(path), str(path))
 
 
-def _retained_run_window(metadata: JsonlMetadataRecord) -> tuple[datetime, datetime] | None:
-    """Derive the run's wall-clock window from its end timestamp and runtime."""
+def _retained_run_window(
+    metadata: JsonlMetadataRecord,
+    results: Sequence[JsonlResultRecord] = (),
+) -> tuple[datetime, datetime] | None:
+    """Derive the run's wall-clock window.
+
+    ``started_at`` is authoritative. Older headers only carry the end
+    timestamp and a perf-counter runtime, which excludes system sleep, so
+    the arithmetic start can land after the run's own early log lines; the
+    earliest retained result timestamp bounds the start from above instead.
+    """
     run_end = _parse_local_timestamp(metadata.get("timestamp"))
+    if run_end is None:
+        return None
+    started = _parse_local_timestamp(metadata.get("started_at"))
+    if started is not None and started <= run_end:
+        return started, run_end
     runtime = metadata.get("total_runtime_seconds")
-    if (
-        run_end is not None
-        and isinstance(runtime, int | float)
-        and not isinstance(runtime, bool)
-        and runtime >= 0
-    ):
-        return run_end - timedelta(seconds=runtime), run_end
-    return None
+    if not isinstance(runtime, int | float) or isinstance(runtime, bool) or runtime < 0:
+        return None
+    run_start = run_end - timedelta(seconds=runtime)
+    row_times = [
+        row_time
+        for result in results
+        if (row_time := _parse_local_timestamp(result.get("timestamp"))) is not None
+    ]
+    if row_times:
+        run_start = min(run_start, *row_times)
+    return run_start, run_end
 
 
 def _run_issue_summary_source_from_run(run: RetainedRun) -> RunIssueSummarySource:
@@ -19704,7 +19735,7 @@ def _run_issue_summary_source_from_run(run: RetainedRun) -> RunIssueSummarySourc
         generation_settings=generation_settings,
         trust_remote_code=raw_trust if isinstance(raw_trust, bool) else None,
         producer=_narrow_run_issue_producer(cast("JsonLike", metadata.get("producer"))),
-        run_window=_retained_run_window(metadata),
+        run_window=_retained_run_window(metadata, run.results),
     )
 
 
@@ -21658,6 +21689,7 @@ def _build_retained_run_guarded(
                 "isolated" if getattr(inputs.run_args, "isolate", False) else "in_process"
             ),
             total_runtime_seconds=inputs.overall_time,
+            started_at=inputs.started_at,
             artifacts=manifest,
             image_path=inputs.image_path,
             image_source_url=(
@@ -21982,6 +22014,7 @@ def finalize_execution(
     prompt: str,
     image_path: Path | None = None,
     metadata: MetadataDict | None = None,
+    started_at: str | None = None,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
@@ -22071,6 +22104,7 @@ def finalize_execution(
             prompt=prompt,
             metadata=metadata,
             overall_time=overall_time,
+            started_at=started_at,
             image_path=image_path,
             system_info=system_info,
             report_context=report_context,
@@ -22123,6 +22157,7 @@ def main(args: argparse.Namespace) -> None:
     _LinkStyleState.value = getattr(args, "link_style", "github")
 
     overall_start_time: float = time.perf_counter()
+    started_at: str = local_now_str()
     library_versions: LibraryVersionDict | None = None
     try:
         library_versions = setup_environment(args)
@@ -22165,6 +22200,7 @@ def main(args: argparse.Namespace) -> None:
             prompt=prompt,
             image_path=image_path,
             metadata=metadata,
+            started_at=started_at,
         )
     except KeyboardInterrupt:
         logger.warning("Execution interrupted by user.")

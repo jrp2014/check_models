@@ -204,6 +204,7 @@ def _issue_summary_metadata(
     trust_remote_code: bool = False,
     total_runtime_seconds: float | None = None,
     comparison: dict[str, object] | None = None,
+    started_at: str | None = None,
 ) -> dict[str, object]:
     """Build one literal, loader-valid schema-3.0 header for the given rows."""
     image: dict[str, object] = {
@@ -243,6 +244,7 @@ def _issue_summary_metadata(
         "generation_settings": {"max_tokens": 500, "temperature": 0.0},
         "trust_remote_code": trust_remote_code,
         "comparison": comparison,
+        **({"started_at": started_at} if started_at is not None else {}),
         "eval_mode": "assisted",
         "metadata_exposed_to_prompt": True,
         "library_versions": {
@@ -264,6 +266,7 @@ def _write_issue_summary_fixture(
     trust_remote_code: bool = False,
     total_runtime_seconds: float | None = None,
     comparison: dict[str, object] | None = None,
+    started_at: str | None = None,
 ) -> None:
     """Write hand-authored retained input for issue-summary tests."""
     output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -274,6 +277,7 @@ def _write_issue_summary_fixture(
         trust_remote_code=trust_remote_code,
         total_runtime_seconds=total_runtime_seconds,
         comparison=comparison,
+        started_at=started_at,
     )
     rows = (metadata, *results)
     check_models._write_text_file(
@@ -815,6 +819,100 @@ def test_run_issue_summary_withholds_stale_log_and_environment_links(tmp_path: P
     assert "src/output/environment.log" not in content
     assert "| Environment |" not in content
     assert "| Log |" not in content
+
+
+def _observed_result() -> dict[str, object]:
+    return _issue_summary_result(
+        "org/observed",
+        usability="usable_with_caveats",
+        maintainer_status="observation_needs_reproduction",
+        observations=["minimal_output"],
+    )
+
+
+def _write_logs_starting_at(output_paths: check_models.ReportOutputPaths, stamp: str) -> None:
+    check_models._write_text_file(output_paths.log, f"{stamp} - INFO - run start\n")
+    check_models._write_text_file(output_paths.environment, f"FULL ENVIRONMENT DUMP - {stamp}\n")
+
+
+def test_run_issue_summary_trusts_started_at_over_runtime_arithmetic(tmp_path: Path) -> None:
+    """The retained wall-clock start must keep the run's own early logs linked.
+
+    A perf-counter runtime excludes system sleep, so end - runtime can land
+    after the log's first line.
+    """
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    # Header ends 12:02:00 with a 120 s runtime, so arithmetic says 12:00:00;
+    # the machine slept, and the logs actually began at 11:56:00.
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(_observed_result(),),
+        total_runtime_seconds=120.0,
+        started_at="2026-07-31 11:55:30 BST",
+    )
+    _write_logs_starting_at(output_paths, "2026-07-31 11:56:00 BST")
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "Stale retained artifacts omitted" not in content
+    assert "src/output/check_models.log" in content
+    assert "src/output/environment.log" in content
+
+
+def test_run_issue_summary_legacy_window_bounds_start_by_earliest_result(
+    tmp_path: Path,
+) -> None:
+    """Headers without started_at fall back to the earliest result timestamp."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _observed_result()
+    result["timestamp"] = "2026-07-31 11:56:30 BST"
+    _write_issue_summary_fixture(output_paths, results=(result,), total_runtime_seconds=120.0)
+    _write_logs_starting_at(output_paths, "2026-07-31 11:56:00 BST")
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "Stale retained artifacts omitted" not in content
+    assert "src/output/check_models.log" in content
+
+
+def test_retained_run_window_prefers_started_at() -> None:
+    parse = check_models._parse_local_timestamp
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {
+            "timestamp": "2026-07-31 12:02:00 BST",
+            "total_runtime_seconds": 120.0,
+            "started_at": "2026-07-31 11:55:30 BST",
+        },
+    )
+    assert check_models._retained_run_window(metadata) == (
+        parse("2026-07-31 11:55:30 BST"),
+        parse("2026-07-31 12:02:00 BST"),
+    )
+    # A malformed or future started_at falls back to the arithmetic window.
+    metadata["started_at"] = "2026-07-31 12:03:00 BST"
+    assert check_models._retained_run_window(metadata) == (
+        parse("2026-07-31 12:00:00 BST"),
+        parse("2026-07-31 12:02:00 BST"),
+    )
+
+
+def test_retained_loader_rejects_non_string_started_at(tmp_path: Path) -> None:
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    result = _issue_summary_result("org/model")
+    metadata = _issue_summary_metadata((result,))
+    metadata["started_at"] = 5
+    check_models._write_text_file(
+        output_paths.jsonl, json.dumps(metadata) + "\n" + json.dumps(result) + "\n"
+    )
+
+    with pytest.raises(ValueError, match="started_at must be a string"):
+        check_models.generate_run_issue_summary_report(output_paths)
 
 
 def test_run_issue_summary_keeps_current_log_and_environment_links(tmp_path: Path) -> None:
