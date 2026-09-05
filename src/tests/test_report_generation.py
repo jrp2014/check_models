@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import html
 import io
 import json
@@ -3948,7 +3949,16 @@ def test_diagnostics_describe_local_reproduction_input_without_fake_command(
     assert "The original local input is not published" in diagnostics_content
     assert "reproduce.py" not in diagnostics_content
     assert "prompt.txt" not in diagnostics_content
-    assert "python -m mlx_vlm.generate" not in diagnostics_content
+    # The only runnable command is the clearly labelled stand-in against the
+    # committed preview, never a command that pretends to use the local file.
+    stand_in = diagnostics_content.index("Shareable stand-in")
+    assert diagnostics_content.index("mlx_vlm.generate") > stand_in
+    assert diagnostics_content.count("mlx_vlm.generate") == 1
+    assert (
+        "raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image.jpg"
+        in diagnostics_content
+    )
+    assert "repro-image.jpg" in diagnostics_content
     assert resolved_revision in diagnostics_content
     assert "Reproduction inputs" in diagnostics_content
     assert "JPEG" in diagnostics_content
@@ -6956,4 +6966,70 @@ def test_history_bands_require_matching_per_model_settings(tmp_path: Path) -> No
         in check_models._history_tps_bands(
             history, fingerprint="f", exclude_last=False, current_settings={"org/m": None}
         )[0]
+    )
+
+
+def test_reproduction_inputs_offer_the_published_preview_as_a_stand_in() -> None:
+    """An unpublished original still yields a verifiable command against the committed preview."""
+    image_path = Path(__file__).parent / "fixtures/check_models-task9-fixture.jpg"
+    preview = check_models._published_preview_record(image_path)
+    assert preview is not None
+    assert preview["source_url"] == (
+        "https://raw.githubusercontent.com/jrp2014/check_models/main/"
+        "src/output/reports/assets/source-image.jpg"
+    )
+    width, height = preview["width"], preview["height"]
+    assert width is not None
+    assert height is not None
+    assert max(width, height) <= 1024
+    raw_preview = check_models._report_image_preview(image_path)
+    assert raw_preview is not None
+    assert preview["sha256"] == hashlib.sha256(raw_preview[2]).hexdigest()
+    assert preview["size_bytes"] == len(raw_preview[2])
+
+    original = check_models._run_image_record(image_path, None)
+    blocks = check_models._reproduction_input_blocks(
+        model_name="org/m",
+        prompt="p",
+        image=original,
+        run_args=None,
+        resolved_revision="rev",
+        published_preview=preview,
+    )
+    rendered = "\n".join(check_models.render_report_markdown(blocks))
+    assert "The original local input is not published" in rendered
+    assert preview["source_url"] in rendered
+    assert "Shareable stand-in" in rendered
+    assert "not on the exact inference input" in rendered
+    assert f"{preview['sha256']}  repro-image.jpg" in rendered
+    assert "mlx_vlm.generate" in rendered
+
+    plain = "\n".join(
+        check_models.render_report_markdown(
+            check_models._reproduction_input_blocks(
+                model_name="org/m",
+                prompt="p",
+                image=original,
+                run_args=None,
+                resolved_revision="rev",
+            )
+        )
+    )
+    assert "Shareable stand-in" not in plain
+    assert check_models._published_preview_record(None) is None
+
+
+def test_file_digest_and_preview_are_cached_per_file_identity(tmp_path: Path) -> None:
+    """The same bytes are hashed and re-encoded once per run, never per report."""
+    target = tmp_path / "blob.bin"
+    check_models._write_text_file(target, "one")
+    first = check_models._sha256_file(target)
+    with patch.object(check_models.hashlib, "file_digest", side_effect=AssertionError("re-hashed")):
+        assert check_models._sha256_file(target) == first
+    check_models._write_text_file(target, "two, longer")
+    assert check_models._sha256_file(target) != first
+
+    image_path = Path(__file__).parent / "fixtures/check_models-task9-fixture.jpg"
+    assert check_models._report_image_preview(image_path) is check_models._report_image_preview(
+        image_path
     )

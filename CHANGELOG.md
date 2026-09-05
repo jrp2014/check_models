@@ -6,6 +6,21 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- A dependency import probe that merely times out is now inconclusive — a
+  warning is logged and the in-process import proceeds — instead of marking
+  mlx-vlm unavailable. Under load (the parallel test suite, a busy machine)
+  the probe expired while the import would have succeeded, which skipped the
+  four end-to-end tests on every gate run and could mark a real sweep's
+  dependency missing.
+- Reproduction inputs now name the committed gallery preview as a shareable,
+  digest-verifiable stand-in when the original photograph is unpublished: its
+  raw GitHub URL, dimensions, size and SHA-256 plus a download-verify-run
+  command, explicitly labelled as reproducing on the preview rather than on
+  the exact inference input. Diagnostics, the HTML report and crash drafts
+  all carry it.
+- File digests and the report image preview are cached per (path, size,
+  mtime) for the run, so the input photograph is hashed and re-encoded once
+  rather than once per report surface.
 - The resolved prompt configuration is logged as one line — lane, prompt
   source (built-in with or without hints, brief triage caption, or custom),
   assessment profile and effective max tokens — so a run's effective settings

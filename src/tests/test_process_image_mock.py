@@ -1542,6 +1542,42 @@ class TestIsolatedExecution:
         assert assessment.maintainer_status != "actionable_failure"
 
 
+class TestImportProbe:
+    """The subprocess import probe shields the parent from crashes, not from slowness."""
+
+    def test_timed_out_probe_is_inconclusive(self, caplog: pytest.LogCaptureFixture) -> None:
+        """A probe that expires under load falls through to the in-process import."""
+
+        def _timeout(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            del kwargs
+            raise subprocess.TimeoutExpired(command, 8.0)
+
+        with (
+            patch.object(check_models.subprocess, "run", side_effect=_timeout),
+            caplog.at_level(logging.WARNING, logger=check_models.LOGGER_NAME),
+        ):
+            outcome = check_models._probe_import_runtime(
+                import_target="mlx_vlm", error_prefix="Core dependency initialization failed:"
+            )
+        assert outcome is None
+        assert any("inconclusive" in record.message for record in caplog.records)
+
+    def test_failed_probe_still_reports_the_error(self) -> None:
+        """A non-zero exit remains a real, actionable dependency failure."""
+        completed = subprocess.CompletedProcess(
+            args=["python", "-c", "import mlx_vlm"],
+            returncode=1,
+            stdout="",
+            stderr="ImportError: boom",
+        )
+        with patch.object(check_models.subprocess, "run", return_value=completed):
+            message = check_models._probe_import_runtime(
+                import_target="mlx_vlm", error_prefix="Core dependency initialization failed:"
+            )
+        assert message is not None
+        assert "boom" in message
+
+
 class TestRepetitionGuard:
     """The streaming wrapper reproduces generate() and aborts degenerate loops."""
 

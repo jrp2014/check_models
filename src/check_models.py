@@ -622,9 +622,10 @@ def _probe_import_runtime(
 
     Skipped inside an ``--isolate`` worker: the probe exists to shield the
     long-lived parent from a hard-crashing dependency, and a worker is already
-    the crash boundary. Running it per child also made it a false failure
-    source — an 8 s timeout under transient load marked mlx-vlm "unavailable"
-    for one model.
+    the crash boundary. A probe that merely *times out* is inconclusive, not a
+    failure: under load (many test workers probing at once, a busy machine)
+    the import finishes after the deadline, and treating that as "unavailable"
+    produced false negatives both in real runs and in the parallel test suite.
     """
     if len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
         return None
@@ -637,9 +638,13 @@ def _probe_import_runtime(
             timeout=MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
         )
     except subprocess.TimeoutExpired:
-        return (
-            f"{error_prefix} Import probe timed out after {MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
+        logger.warning(
+            "Import probe for %s timed out after %.0fs; treating it as inconclusive and "
+            "importing in-process.",
+            import_target,
+            MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
         )
+        return None
     except OSError as probe_err:
         return f"{error_prefix} Import probe failed: {probe_err}"
 
@@ -1683,6 +1688,7 @@ DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 _GITHUB_REPO_URL: Final[str] = "https://github.com/jrp2014/check_models"
+_GITHUB_RAW_URL: Final[str] = "https://raw.githubusercontent.com/jrp2014/check_models"
 _GITHUB_DEFAULT_BRANCH: Final[str] = "main"
 _GITHUB_REF_OVERRIDE: str | None = None
 _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
@@ -9027,15 +9033,38 @@ def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
-def _sha256_file(path: Path) -> str | None:
-    """Return SHA256 hash for file contents, or None if unreadable."""
-    if not path.exists() or not path.is_file():
-        return None
+_FILE_DIGEST_CACHE: dict[tuple[str, int, int], str] = {}
+_IMAGE_PREVIEW_CACHE: dict[tuple[str, int, int], tuple[str, str, bytes]] = {}
+
+
+def _file_identity(path: Path) -> tuple[str, int, int] | None:
+    """Return (resolved path, size, mtime_ns) — the cache key for per-file derived facts."""
     try:
-        with path.open("rb") as handle:
-            return hashlib.file_digest(handle, "sha256").hexdigest()
+        stat = path.stat()
     except OSError:
         return None
+    return (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+
+
+def _sha256_file(path: Path) -> str | None:
+    """Return SHA256 hash for file contents, or None if unreadable.
+
+    Cached per (path, size, mtime): the run hashes the same 66 MB input for
+    the metadata header, every report, the comparison and the history row.
+    """
+    if not path.exists() or not path.is_file():
+        return None
+    identity = _file_identity(path)
+    if identity is not None and (cached := _FILE_DIGEST_CACHE.get(identity)) is not None:
+        return cached
+    try:
+        with path.open("rb") as handle:
+            digest = hashlib.file_digest(handle, "sha256").hexdigest()
+    except OSError:
+        return None
+    if identity is not None:
+        _FILE_DIGEST_CACHE[identity] = digest
+    return digest
 
 
 @dataclass(frozen=True)
@@ -9793,9 +9822,16 @@ applyAssessmentFilters();
 
 
 def _report_image_preview(image_path: Path | None) -> tuple[str, str, bytes] | None:
-    """Return a bounded, orientation-corrected preview shared by report formats."""
+    """Return a bounded, orientation-corrected preview shared by report formats.
+
+    Cached per (path, size, mtime): the gallery, the HTML report and the
+    reproduction inputs all want the same re-encoding of the same input.
+    """
     if image_path is None or not image_path.is_file():
         return None
+    identity = _file_identity(image_path)
+    if identity is not None and (cached := _IMAGE_PREVIEW_CACHE.get(identity)) is not None:
+        return cached
     output_formats: Mapping[str, tuple[str, str, str]] = {
         ".jpg": (".jpg", "JPEG", "image/jpeg"),
         ".jpeg": (".jpeg", "JPEG", "image/jpeg"),
@@ -9823,7 +9859,10 @@ def _report_image_preview(image_path: Path | None) -> tuple[str, str, bytes] | N
     except (OSError, ValueError):
         logger.warning("Failed to prepare report image preview: %s", image_path)
         return None
-    return suffix, mime_type, img_buffer.getvalue()
+    preview = (suffix, mime_type, img_buffer.getvalue())
+    if identity is not None:
+        _IMAGE_PREVIEW_CACHE[identity] = preview
+    return preview
 
 
 def _html_embedded_image(image_path: Path | None) -> str:
@@ -19820,6 +19859,68 @@ def _shared_repro_thinking_caveat(
     )
 
 
+def _published_preview_record(image_path: Path | None) -> RunImageRecord | None:
+    """Describe the committed gallery preview as a shareable, digest-verifiable stand-in.
+
+    Every run publishes a downscaled re-encoding of the input under
+    ``reports/assets``; its raw GitHub URL and digest let a maintainer
+    reproduce an observation on public bytes when the original photograph is
+    not published. It is a stand-in, never the exact inference input.
+    """
+    preview = _report_image_preview(image_path)
+    if preview is None:
+        return None
+    suffix, _mime_type, data = preview
+    try:
+        with Image.open(io.BytesIO(data)) as decoded:
+            width, height = decoded.size
+    except (OSError, ValueError):
+        return None
+    name = f"source-image{suffix}"
+    repo_path = _PUBLISHED_OUTPUT_ROOT / "reports" / "assets" / name
+    encoded_path = "/".join(quote(part) for part in repo_path.parts)
+    return {
+        "name": name,
+        "source_url": f"{_GITHUB_RAW_URL}/{_github_blob_ref()}/{encoded_path}",
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "size_bytes": len(data),
+        "width": width,
+        "height": height,
+        "megapixels": (width * height) / MEGAPIXEL_CONVERSION,
+    }
+
+
+def _verified_public_reproduction_blocks(
+    *,
+    image: RunImageRecord,
+    source_url: str,
+    sha256: str,
+    model_name: str,
+    prompt: str,
+    run_args: argparse.Namespace | None,
+    resolved_revision: str | None,
+    lead: str,
+) -> tuple[ReportBlock, ...]:
+    """Download-verify-run command for a public image whose digest is known."""
+    filename = _public_reproduction_filename(image, source_url)
+    commands = [
+        "set -euo pipefail",
+        shlex_join(("curl", "--fail", "--location", "--output", filename, source_url)),
+    ]
+    hash_record = f"{sha256}  {filename}"
+    commands.append(f"{shlex_join(('printf', '%s\\n', hash_record))} | shasum -a 256 --check")
+    commands.append(
+        build_native_mlx_vlm_repro_command_spec(
+            model_name=model_name,
+            prompt=prompt,
+            image_ref=filename,
+            run_args=run_args,
+            resolved_revision=resolved_revision,
+        ).shell_command()
+    )
+    return (ReportParagraph(lead), ReportCodeBlock("\n".join(commands), language="bash"))
+
+
 def _reproduction_input_blocks(
     *,
     model_name: str,
@@ -19829,11 +19930,14 @@ def _reproduction_input_blocks(
     resolved_revision: str | None,
     crash_phase: str | None = None,
     effective_generate_kwargs: Mapping[str, object] | None = None,
+    published_preview: RunImageRecord | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Describe exact inputs and render a command only when it is exact evidence.
 
     A full command is rendered for a verifiable public image, or for model-load
     crashes, which occur before image decoding and so reproduce with any image.
+    When the original is unpublished but the run's committed preview is known,
+    a clearly labelled stand-in command is rendered against that public file.
     """
     run_args = _effective_repro_args(run_args, effective_generate_kwargs)
     blocks: list[ReportBlock] = [
@@ -19872,6 +19976,40 @@ def _reproduction_input_blocks(
                 "the original image before filing."
             )
         )
+        preview_url = published_preview.get("source_url") if published_preview else None
+        preview_sha256 = published_preview["sha256"] if published_preview else None
+        if published_preview is not None and preview_url and preview_sha256:
+            blocks.append(
+                ReportKeyValues(
+                    (
+                        ("Published preview", preview_url),
+                        (
+                            "Preview dimensions",
+                            f"{published_preview['width']:,} x {published_preview['height']:,} pixels",
+                        ),
+                        ("Preview size", f"{published_preview['size_bytes']:,} bytes"),
+                        ("Preview SHA-256", preview_sha256),
+                    )
+                )
+            )
+            blocks.extend(
+                _verified_public_reproduction_blocks(
+                    image=published_preview,
+                    source_url=preview_url,
+                    sha256=preview_sha256,
+                    model_name=model_name,
+                    prompt=prompt,
+                    run_args=run_args,
+                    resolved_revision=resolved_revision,
+                    lead=(
+                        "Shareable stand-in: the committed gallery preview is a downscaled "
+                        "re-encoding of the original, so an observation reproduced on it "
+                        "must be reported as reproduced on the preview, not on the exact "
+                        "inference input. Download and verify it, then run one native "
+                        "mlx-vlm process."
+                    ),
+                )
+            )
         return tuple(blocks)
 
     sha256 = image["sha256"]
@@ -19884,37 +20022,16 @@ def _reproduction_input_blocks(
         )
         return tuple(blocks)
 
-    filename = _public_reproduction_filename(image, source_url)
-    commands = [
-        "set -euo pipefail",
-        shlex_join(
-            (
-                "curl",
-                "--fail",
-                "--location",
-                "--output",
-                filename,
-                source_url,
-            )
-        ),
-    ]
-    hash_record = f"{sha256}  {filename}"
-    commands.append(f"{shlex_join(('printf', '%s\\n', hash_record))} | shasum -a 256 --check")
-    commands.append(
-        build_native_mlx_vlm_repro_command_spec(
+    blocks.extend(
+        _verified_public_reproduction_blocks(
+            image=image,
+            source_url=source_url,
+            sha256=sha256,
             model_name=model_name,
             prompt=prompt,
-            image_ref=filename,
             run_args=run_args,
             resolved_revision=resolved_revision,
-        ).shell_command()
-    )
-    blocks.extend(
-        (
-            ReportParagraph(
-                "Download and verify the exact public input, then run one native mlx-vlm process."
-            ),
-            ReportCodeBlock("\n".join(commands), language="bash"),
+            lead="Download and verify the exact public input, then run one native mlx-vlm process.",
         )
     )
     return tuple(blocks)
@@ -21192,6 +21309,7 @@ def _diagnostics_shared_context_blocks(
         image=image,
         run_args=run_args,
         resolved_revision="RESOLVED_REVISION",
+        published_preview=_published_preview_record(image_path),
     )
     if thinking_caveat is not None:
         reproduction_blocks = (*reproduction_blocks, thinking_caveat)
@@ -21273,6 +21391,7 @@ def _generate_github_issue_reports(
                         provenance["resolved_revision"] if provenance is not None else None
                     ),
                     crash_phase=result.failure_phase,
+                    published_preview=_published_preview_record(image_path),
                     effective_generate_kwargs=(
                         result.prompt_diagnostics.generate_kwargs
                         if result.prompt_diagnostics is not None
