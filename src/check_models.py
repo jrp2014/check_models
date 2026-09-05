@@ -15482,6 +15482,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     prompt: str
     if args.prompt:
         prompt = args.prompt
+        prompt_source = "custom (no automatic hints)"
         logger.info("Using user-provided prompt from --prompt.")
         logger.info(
             "User-provided prompt (--prompt): %s",
@@ -15489,9 +15490,13 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         )
     elif eval_mode == "triage":
         prompt = TRIAGE_PROMPT
+        prompt_source = "brief caption (no hints)"
         logger.info("Using triage-mode prompt (minimal context).")
     else:
         include_metadata_hints = eval_mode == "assisted"
+        prompt_source = (
+            "built-in (metadata hints)" if include_metadata_hints else "built-in (no hints)"
+        )
         logger.info("Generating default prompt for the '%s' evaluation lane.", eval_mode)
         prompt = _build_cataloguing_prompt(
             metadata if include_metadata_hints else {},
@@ -15504,6 +15509,13 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         )
     logger.debug("Full prompt:\n%s", prompt)
     logger.info("Prompt length: %d characters", len(prompt))
+    logger.info(
+        "Lane: %s | Prompt: %s | Assessment: %s | Max tokens: %s",
+        eval_mode,
+        prompt_source,
+        getattr(args, "assessment_profile", None) or "unresolved",
+        getattr(args, "max_tokens", None),
+    )
     logger.info("Assessment: %s", _assessment_scope(getattr(args, "assessment_profile", None)))
     return prompt
 
@@ -22564,7 +22576,7 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
             "Prompt text to send to the model. Requires text when provided. If omitted, "
             "the resolved --eval-mode lane supplies the prompt. When provided, it "
             "overrides the lane prompt only: the lane still governs the default token "
-            "cap and report labeling, and 'assisted' still requires descriptive "
+            "cap and report labeling. No metadata hints are appended; 'assisted' still requires descriptive "
             "metadata."
         ),
     )
@@ -22655,7 +22667,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--assessment-profile",
         choices=("general", "metadata"),
         default=None,
-        help="Checks independent of prompt wording: metadata for the built-in metadata prompt; general for custom and triage prompts. Metadata checks fields and duplicate keywords, not prose limits.",
+        help=(
+            "Checks applied to the answer, not a prompt change. Defaults to metadata for "
+            "built-in metadata prompts and general for custom/triage prompts; explicit "
+            "selection overrides the default. Metadata checks Title/Description/Keywords "
+            "and duplicate keywords, not prose limits. --rerun-triage always uses general."
+        ),
     )
     generation_group.add_argument(
         "--eval-mode",
@@ -22910,7 +22927,9 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         help=(
             "After the first pass, rerun crashed models and completed models with "
             "recorded mechanical observations using a simple prompt. "
-            "First-pass results are never overwritten."
+            f"Reruns override prompt, assessment (general), max tokens ({RERUN_TRIAGE_MAX_TOKENS}), "
+            f"temperature (0), timeout ({RERUN_TRIAGE_TIMEOUT:g}s), and verbose output (off). "
+            "Other settings, including --isolate, are retained; first-pass results are never overwritten."
         ),
     )
     quality_group.add_argument(

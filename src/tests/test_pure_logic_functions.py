@@ -374,6 +374,63 @@ class TestValidateAndWarnModelSelection:
 class TestPreparePrompt:
     """Tests for prepare_prompt()."""
 
+    @pytest.mark.parametrize(
+        ("cli", "expected"),
+        [
+            (
+                [],
+                "Lane: assisted | Prompt: built-in (metadata hints) | Assessment: metadata | Max tokens: 1000",
+            ),
+            (
+                ["--eval-mode", "blind"],
+                "Lane: blind | Prompt: built-in (no hints) | Assessment: metadata | Max tokens: 1000",
+            ),
+            (
+                ["--eval-mode", "triage"],
+                "Lane: triage | Prompt: brief caption (no hints) | Assessment: general | Max tokens: 200",
+            ),
+            (
+                ["--prompt", "Caption."],
+                "Lane: assisted | Prompt: custom (no automatic hints) | Assessment: general | Max tokens: 1000",
+            ),
+            (
+                ["--eval-mode", "triage", "--prompt", "Caption."],
+                "Lane: triage | Prompt: custom (no automatic hints) | Assessment: general | Max tokens: 200",
+            ),
+            (
+                [
+                    "--prompt",
+                    "Metadata.",
+                    "--assessment-profile",
+                    "metadata",
+                    "--max-tokens",
+                    "350",
+                ],
+                "Lane: assisted | Prompt: custom (no automatic hints) | Assessment: metadata | Max tokens: 350",
+            ),
+            (
+                ["--assessment-profile", "general"],
+                "Lane: assisted | Prompt: built-in (metadata hints) | Assessment: general | Max tokens: 1000",
+            ),
+        ],
+    )
+    def test_resolved_configuration_is_logged(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+        cli: list[str],
+        expected: str,
+    ) -> None:
+        """Log effective settings, not lane defaults or assumed hint exposure."""
+        args = mod._build_cli_parser().parse_args(cli)
+        metadata = {"description": "Reference hint"}
+        with caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME):
+            mod._apply_eval_mode_defaults(args, metadata)
+            prompt = mod.prepare_prompt(args, metadata)
+        assert expected in caplog.messages
+        if args.prompt:
+            assert prompt == args.prompt
+
     @staticmethod
     def _make_args(
         prompt: str | None = None,

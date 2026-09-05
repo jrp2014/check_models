@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The resolved prompt configuration is logged as one line — lane, prompt
+  source (built-in with or without hints, brief triage caption, or custom),
+  assessment profile and effective max tokens — so a run's effective settings
+  are visible without inferring them from lane defaults. The `--prompt`,
+  `--assessment-profile` and `--rerun-triage` help texts now state exactly
+  what each option overrides and what it leaves in place.
 - Cruft pass: archived the thinking-budget evidence note (upstream #1819 closed
   as completed), removed a stale 98 MB session worktree and empty `.cursor`,
   `.worktrees` and `docs/superpowers` directories, trimmed `src/.gitignore` to
