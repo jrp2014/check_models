@@ -4,8 +4,24 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Cruft pass: archived the thinking-budget evidence note (upstream #1819 closed
+  as completed), removed a stale 98 MB session worktree and empty `.cursor`,
+  `.worktrees` and `docs/superpowers` directories, trimmed `src/.gitignore` to
+  the entries the root ignore file does not cover, and refreshed the README
+  analysis sample, "clean completion" wording and test-suite size figures.
+  Everything shipped since 0.15.0 (0.16.0–0.17.0) is now recorded under the
+  `[0.17.0]` heading below.
+
+## [0.17.0] - 2026-09-05
+
 ### Assessment profiles (0.17.0)
 
+- Clarified lane, custom-prompt, assessment-profile, and token-budget precedence
+  with an interaction table and explicit triage-rerun overrides in CLI help and
+  the README. Startup now logs the resolved lane, prompt source/hint exposure,
+  assessment profile, and token budget together; execution behaviour is unchanged.
 - Added `--assessment-profile general|metadata`, independent of prompt wording
   and the evaluation lane. Built-in metadata prompts select metadata checks;
   custom prompts and triage select general checks. Explicit selection overrides

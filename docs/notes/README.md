@@ -7,7 +7,9 @@ once fully resolved.
 ## Active Documents
 
 - **[GPS_DATA_FORMAT_EXPLANATION.md](GPS_DATA_FORMAT_EXPLANATION.md)** — GPS/EXIF data format reference
-- **[UPSTREAM_THINKING_BUDGET_EMITTED_START_ISSUE.md](UPSTREAM_THINKING_BUDGET_EMITTED_START_ISSUE.md)** — Evidence file behind the posted upstream issue [Blaizzy/mlx-vlm#1819](https://github.com/Blaizzy/mlx-vlm/issues/1819) (thinking budget vs. model-emitted `<think>`); kept current with each re-verification against upstream `main` while fix PR #1882 is open
+
+The thinking-budget evidence file behind [Blaizzy/mlx-vlm#1819](https://github.com/Blaizzy/mlx-vlm/issues/1819)
+moved to `archive/` when that issue closed as completed on 2026-08-19.
 
 Upstream issue drafts are created under this directory only while a finding is
 being prepared or actively tracked; once posted and closed upstream, or

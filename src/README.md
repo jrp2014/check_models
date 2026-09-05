@@ -279,7 +279,8 @@ The tool generates a deliberately small artifact set in `output/` by default:
   GitHub issue body. It expands crashes with root exceptions and a parameterised
   reproduction command, separates completed, crashed, and indeterminate attempts
   requiring review into severity-ordered compact tables, explains structured
-  failures even when no output observation exists, counts clean completions, and
+  failures even when no output observation exists, counts completions passing
+  mechanical checks, and
   records remote-code and producer provenance. It links to complete retained
   evidence without copying full prompts, outputs, tracebacks, or scripts. Its
   cross-file links always use canonical GitHub repository URLs so they still work
@@ -1035,8 +1036,8 @@ if analysis.is_repetitive:
     print(f"Repetitive token: {analysis.repeated_token}")
 if analysis.missing_sections:
     print(f"Missing requested sections: {analysis.missing_sections}")
-if analysis.instruction_echo:
-    print("Prompt instructions appear verbatim in the output")
+if analysis.thinking_trace_incomplete:
+    print("A thinking trace opened but never closed")
 if analysis.likely_capped:
     print("The recorded output token count reached the requested cap")
 if analysis.unexpected_special_tokens:
@@ -1103,6 +1104,55 @@ A custom `--prompt` overrides the lane prompt only. The resolved lane still
 governs the default `--max-tokens` cap and how the run is labeled in reports
 and JSONL, and `--eval-mode assisted` still requires descriptive metadata even
 when `--prompt` is supplied; the run logs this interaction explicitly.
+
+### How prompt, lane, and assessment interact
+
+`--eval-mode` chooses the built-in prompt and default token budget. `--prompt`
+replaces that prompt completely: metadata hints are **not automatically appended**.
+`--assessment-profile` chooses how the answer is checked; it does not change what
+the model is asked. `--max-tokens` overrides the lane's default budget.
+
+| Options | Prompt sent | Default assessment | Default token cap |
+| ------- | ----------- | ------------------ | ----------------- |
+| `--eval-mode blind` | Built-in metadata request, no hints | metadata | 1000 |
+| `--eval-mode assisted` | Built-in metadata request with hints | metadata | 1000 |
+| `--eval-mode triage` | Brief caption request | general | 200 |
+| `--prompt "…"` | Exactly your custom prompt | general | 1000 |
+| `--eval-mode triage --prompt "…"` | Exactly your custom prompt | general | 200 |
+| `--prompt "…" --assessment-profile metadata` | Exactly your custom prompt | metadata (explicit) | Lane default |
+
+An explicit profile wins over the defaults above, independently of the lane.
+Metadata assessment expects nonempty Title, Description, and Keywords fields;
+it does not infer your requested format from the prompt. For example,
+`--eval-mode triage --assessment-profile metadata` is allowed, but asks for a
+caption while checking for metadata fields. Supply a suitable custom prompt if
+you want that combination. Conversely, `--assessment-profile general` with a
+built-in metadata prompt keeps the metadata request but disables field checks.
+Neither profile assesses factual accuracy or enforces prose length limits.
+
+With a custom prompt, `auto` still selects and labels the lane based on image
+metadata, even though that metadata is not automatically sent to the model.
+Explicit `assisted` still rejects images without descriptive metadata. The startup
+log makes the effective choices visible, for example:
+
+```text
+Lane: assisted | Prompt: custom (no automatic hints) | Assessment: general | Max tokens: 1000
+```
+
+### Triage lane versus triage reruns
+
+`--eval-mode triage` selects the first-pass lane for every model, with a default
+200-token cap; explicit prompt, profile, and token-cap options still win.
+
+`--rerun-triage` instead adds secondary attempts for selected problematic models
+after the first pass. Those attempts **override** the first-pass prompt with the
+brief caption request, assessment with **general**, token cap with **100**,
+temperature with **0**, timeout with **60 seconds**, and verbose output with
+**off**. Other settings, including `--isolate`, are retained. Original results
+are never overwritten; the reruns supply additional evidence. These overrides
+apply even when the first pass explicitly selected a different profile or budget.
+
+### Prompt burden
 
 Prompt burden is reported independently from quality as `visual input` (image or
 estimated non-text tokens dominate), `text` (text tokens dominate), `mixed`
@@ -1176,9 +1226,9 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
-| `--assessment-profile` | str | By prompt origin | `metadata` for the built-in metadata prompt; `general` for custom and triage prompts. Explicit selection overrides this default, independently of `--eval-mode`. |
+| `--assessment-profile` | str | By prompt origin | Checks the answer, not a prompt change: `metadata` for built-in metadata prompts; `general` for custom and triage prompts. Explicit selection overrides this default, independently of `--eval-mode`; secondary `--rerun-triage` attempts always use general. See [option interactions](#how-prompt-lane-and-assessment-interact). |
 | `--isolate` | flag | `False` | Run each model in a fresh child interpreter. A native crash (segfault, abort, interpreter-finalization fault) in one model is then recorded as that model's phase-tagged failure — with the signal name and the phase the child reached — instead of ending the sweep. The parent bounds each child by the model timeout plus 120 s start-up/cleanup grace and records an expiry as a phase-tagged timeout, and `--rerun-triage` reruns go through the same boundary. Costs a few seconds of import time per model and frees GPU memory between models; results round-trip through JSON so outputs and reports are identical to in-process runs. Each child starts with cold per-process caches, so treat throughput from isolated and in-process sweeps as separate populations — the JSONL metadata records `execution_mode`, and `--compare-with` says so when the two differ. Like any sweep, keep the machine otherwise idle: concurrent CPU-heavy work (a test suite, type checkers) measurably slows prefill. |
-| `--rerun-triage` | flag | `False` | Rerun crashed models and completed models with recorded mechanical observations using a simple prompt. First-pass results are never overwritten. |
+| `--rerun-triage` | flag | `False` | Add secondary attempts for crashed models and completed models with recorded mechanical observations. Overrides prompt (brief caption), assessment (general), token cap (100), temperature (0), timeout (60 s), and verbose output (off); other settings, including `--isolate`, are retained. First-pass results are never overwritten. See [triage versus reruns](#triage-lane-versus-triage-reruns). |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
 ### Selection Logic
@@ -1306,8 +1356,8 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
   indeterminate attempts, or preflight compatibility warnings are detected.
 - **Hard crashes**: Expands each actionable crash with traceback-first complete evidence.
 - **Other evidence**: Collapses complete observed and indeterminate evidence, with
-  generated output included once as exact code evidence; clean completions contribute
-  only compact runtime and performance context.
+  generated output included once as exact code evidence; completions passing
+  mechanical checks contribute only compact runtime and performance context.
 - **Neutral observations**: Records declared EOS/thinking wrappers and draft fields
   returned unchanged exactly as captured, without assigning fault or a quality score.
 - **Reproducibility**: Records the prompt, highlighted model revisions, common

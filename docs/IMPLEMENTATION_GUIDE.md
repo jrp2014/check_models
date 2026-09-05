@@ -480,8 +480,8 @@ once per model. Direct crash issue drafts may retain a single-model copy/paste
 reproduction.
 For completed observations, render the exact model output once in diagnostics;
 reserve the gallery's second, readable view for model comparison. Omit optional
-per-model facts rather than repeating `unavailable`, and keep clean completions in
-the compact context table. Render model-authored Markdown inside inert `<pre>`
+per-model facts rather than repeating `unavailable`, and keep completions that
+passed every mechanical check in the compact context table. Render model-authored Markdown inside inert `<pre>`
 content so headings and lists cannot break generated-document lint.
 
 ### Ruff Configuration
