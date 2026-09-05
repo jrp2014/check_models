@@ -315,28 +315,41 @@ tool_config["disable-project-excludes-heuristics"] = True
 # Disabling the heuristics/ignore files drops Pyrefly's default excludes and
 # the gitignore-driven ones, so restore them explicitly to keep the gate as
 # strict as the primary checkout without scanning generated junk.
+# Anchored to the package root (the config file itself lives outside the
+# tree, so relative globs would resolve against the wrong directory).
+src_root = pyproject_path.parent.resolve()
 explicit_excludes = [
-    "**/node_modules/",
-    "**/__pycache__/",
-    "**/venv/**/*",
-    "**/.*/**",
-    "**/build/",
-    "**/dist/",
-    "**/*.egg-info/",
-    "**/output/test*",
+    f"{src_root}/{pattern}"
+    for pattern in (
+        "**/node_modules/",
+        "**/__pycache__/",
+        "**/venv/**/*",
+        "**/.*/**",
+        "**/build/",
+        "**/dist/",
+        "**/*.egg-info/",
+        "**/output/test*",
+    )
 ]
-project_excludes = list(tool_config.get("project-excludes", []))
+project_excludes = [
+    pattern if Path(pattern).is_absolute() else f"{src_root}/{pattern}"
+    for pattern in tool_config.get("project-excludes", [])
+]
 project_excludes.extend(
     pattern for pattern in explicit_excludes if pattern not in project_excludes
 )
 tool_config["project-excludes"] = project_excludes
 
+# The config file lives outside the tree, so tell Pyrefly where the project
+# is instead of letting it infer an import root from the config's directory.
+tool_config.setdefault("project-includes", [f"{src_root}/**/*.py"])
+
 # Absolutize search-path entries; a relative entry missing from this checkout
 # (worktrees do not carry gitignored typings/) resolves against the primary
-# checkout instead so both use the same stub source.
-src_root = pyproject_path.parent.resolve()
+# checkout instead so both use the same stub source. The package root itself
+# always leads so `check_models`, `check_models_data` and `tools` resolve.
 checkout_root = src_root.parent
-search_path_entries: list[str] = []
+search_path_entries: list[str] = [str(src_root)]
 for entry in tool_config.get("search-path", []):
     entry_path = Path(entry)
     resolved = entry_path if entry_path.is_absolute() else (src_root / entry_path).resolve()
@@ -349,9 +362,9 @@ for entry in tool_config.get("search-path", []):
             fallback = main_checkout_root / relative_to_checkout
             if fallback.exists():
                 resolved = fallback
-    search_path_entries.append(str(resolved))
-if search_path_entries:
-    tool_config["search-path"] = search_path_entries
+    if str(resolved) not in search_path_entries:
+        search_path_entries.append(str(resolved))
+tool_config["search-path"] = search_path_entries
 
 
 def format_toml(value: Any) -> str:
@@ -428,8 +441,12 @@ PY
 
         python_path="$(quality_resolve_python_path)" || return 1
         pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
-        config_path="$(mktemp "$(quality_src_root)/.pyrefly-quality.XXXXXX")"
-        output_path="$(mktemp "$(quality_src_root)/.pyrefly-output.XXXXXX")"
+        # Outside the tree: the quality gate scans src/ with Skylos while tests
+        # (which exercise this wrapper) run, and Skylos aborts on files that
+        # appear or vanish under it. The generated config carries absolute
+        # paths, so its location does not matter to Pyrefly.
+        config_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-quality.XXXXXX")"
+        output_path="$(mktemp "${TMPDIR:-/tmp}/pyrefly-output.XXXXXX")"
 
         if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
             rm -f "$config_path"

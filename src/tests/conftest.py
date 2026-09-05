@@ -20,6 +20,7 @@ import logging
 import os
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -266,6 +267,70 @@ def cleanup_test_outputs() -> Generator[None]:
 # =============================================================================
 # PYTEST HOOKS & CONFIGURATION
 # =============================================================================
+
+
+# Nothing under the package may change while the suite runs: the quality gate
+# scans src/ with Skylos concurrently, and its dead-code grep verification
+# aborts (SKY-ANALYSIS-INCOMPLETE) when files appear or vanish under it. Tests
+# write to tmp_path; caches are redirected by the gate. The controller records
+# the session start and fails the run if anything else was modified.
+_PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+_GUARD_IGNORED_DIRS = frozenset(
+    {
+        ".git",
+        ".skylos",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "__pycache__",
+        "node_modules",
+    }
+)
+_SESSION_STARTED_AT: float | None = None
+
+
+def _paths_modified_since(root: Path, since: float) -> list[Path]:
+    modified: list[Path] = []
+    for current, dirnames, filenames in os.walk(root):
+        dirnames[:] = [name for name in dirnames if name not in _GUARD_IGNORED_DIRS]
+        for name in (*dirnames, *filenames):
+            path = Path(current) / name
+            try:
+                if path.lstat().st_mtime > since:
+                    modified.append(path)
+            except OSError:
+                modified.append(path)
+    return sorted(modified)
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Record when the controller session began (workers do not guard)."""
+    global _SESSION_STARTED_AT  # noqa: PLW0603 - single session-scoped timestamp
+    if getattr(session.config, "workerinput", None) is None:
+        _SESSION_STARTED_AT = time.time()
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """Fail the run if the suite modified anything inside the package tree."""
+    del exitstatus
+    if _SESSION_STARTED_AT is None or getattr(session.config, "workerinput", None) is not None:
+        return
+    modified = _paths_modified_since(_PACKAGE_ROOT, _SESSION_STARTED_AT)
+    if not modified:
+        return
+    listing = "\n".join(f"  {path.relative_to(_PACKAGE_ROOT)}" for path in modified[:20])
+    message = (
+        "FAILED: tests modified files inside the package tree (write to tmp_path instead; "
+        f"the quality gate scans src/ concurrently):\n{listing}"
+    )
+    reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+    if reporter is not None:
+        reporter.write_line(message, red=True)
+    else:
+        sys.stderr.write(message + "\n")
+    # pytest returns session.exitstatus after this hook, so a clean run of
+    # every test still fails the session when the tree was touched.
+    session.exitstatus = int(pytest.ExitCode.TESTS_FAILED)
 
 
 def pytest_configure(config: pytest.Config) -> None:

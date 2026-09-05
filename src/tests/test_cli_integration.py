@@ -13,14 +13,6 @@ import pytest
 # Import check_models
 import check_models
 
-# Path to check_models.py relative to test file location
-_TEST_DIR = Path(__file__).parent
-_SRC_DIR = _TEST_DIR.parent
-_OUTPUT_DIR = _SRC_DIR / "output"
-
-# Test-specific output root (excluded from git via .gitignore's test_* rule)
-_TEST_OUTPUT_ROOT = _OUTPUT_DIR / "test_cli_integration"
-
 
 class CLIResult(NamedTuple):
     """Result of a CLI execution for testing."""
@@ -44,9 +36,9 @@ def _run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> CLIResult:
     return CLIResult(exit_code, captured.out, captured.err)
 
 
-def _get_test_output_args() -> list[str]:
-    """Return CLI arguments redirecting the whole retained layout."""
-    return ["--output-dir", str(_TEST_OUTPUT_ROOT)]
+def _get_test_output_args(tmp_path: Path) -> list[str]:
+    """Redirect the whole retained layout outside the tree (never into src/output)."""
+    return ["--output-dir", str(tmp_path / "output")]
 
 
 def test_cli_help_displays(capsys: pytest.CaptureFixture[str]) -> None:
@@ -133,9 +125,11 @@ def test_cli_output_dir_default_is_the_canonical_output_root() -> None:
     assert args.output_dir == check_models._SCRIPT_DIR / "output"
 
 
-def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_exits_on_nonexistent_folder(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Should exit with error when folder does not exist."""
-    result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)
+    result = _run_cli([*_get_test_output_args(tmp_path), "--folder", "/nonexistent/path"], capsys)
     assert result.exit_code != 0
     output = result.stdout + result.stderr
     # Should mention the folder doesn't exist (exact message from exit_with_cli_error)
@@ -147,7 +141,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
     empty_folder = tmp_path / "empty"
     empty_folder.mkdir()
 
-    result = _run_cli([*_get_test_output_args(), "--folder", str(empty_folder)], capsys)
+    result = _run_cli([*_get_test_output_args(tmp_path), "--folder", str(empty_folder)], capsys)
     assert result.exit_code != 0
     output = result.stdout + result.stderr
     # Should mention no images found in the provided folder.
@@ -156,12 +150,13 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
 
 def test_cli_invalid_temperature_value(
     folder_with_images: Path,
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Should reject temperature outside valid range."""
     result = _run_cli(
         [
-            *_get_test_output_args(),
+            *_get_test_output_args(tmp_path),
             "--temperature",
             "-0.5",
             "--folder",
@@ -176,11 +171,18 @@ def test_cli_invalid_temperature_value(
 
 def test_cli_invalid_max_tokens(
     folder_with_images: Path,
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Should reject negative max_tokens."""
     result = _run_cli(
-        [*_get_test_output_args(), "--max-tokens", "-10", "--folder", str(folder_with_images)],
+        [
+            *_get_test_output_args(tmp_path),
+            "--max-tokens",
+            "-10",
+            "--folder",
+            str(folder_with_images),
+        ],
         capsys,
     )
     assert result.exit_code != 0
@@ -201,7 +203,9 @@ def test_cli_accepts_valid_parameters(capsys: pytest.CaptureFixture[str]) -> Non
     assert "--output-gallery-markdown" not in output
 
 
-def test_cli_rejects_url_passed_to_image(capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_rejects_url_passed_to_image(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """--image with a URL must fail with guidance, not a mangled-path ENOENT.
 
     argparse wraps the value in a Path, so a URL previously surfaced only as
@@ -209,7 +213,7 @@ def test_cli_rejects_url_passed_to_image(capsys: pytest.CaptureFixture[str]) -> 
     """
     result = _run_cli(
         [
-            *_get_test_output_args(),
+            *_get_test_output_args(tmp_path),
             "--image",
             "https://github.com/Blaizzy/mlx-vlm/blob/main/examples/images/cats.jpg",
         ],

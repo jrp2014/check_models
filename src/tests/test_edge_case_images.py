@@ -11,7 +11,6 @@ import pytest
 import check_models
 
 _SRC_DIR = Path(__file__).parent.parent
-_OUTPUT_DIR = _SRC_DIR / "output"
 
 
 def test_cli_handles_corrupted_image(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
@@ -24,7 +23,7 @@ def test_cli_handles_corrupted_image(tmp_path: Path, capsys: pytest.CaptureFixtu
         "--image",
         str(img_path),
         "--output-dir",
-        str(_OUTPUT_DIR / "test_edge_case"),
+        str(tmp_path / "output"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
@@ -49,7 +48,7 @@ def test_cli_handles_unsupported_format(tmp_path: Path, capsys: pytest.CaptureFi
         "--image",
         str(txt_path),
         "--output-dir",
-        str(_OUTPUT_DIR / "test_edge_case"),
+        str(tmp_path / "output"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:

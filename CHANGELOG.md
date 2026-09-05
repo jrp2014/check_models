@@ -6,6 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The test suite no longer writes anywhere under `src/` while the gate's
+  Skylos lane scans it, closing the last race between the two lanes: the
+  four CLI tests that wrote to gitignored `src/output/test_*` directories
+  now use `tmp_path`, the wheel-build test builds from a copy of the package
+  so setuptools's `build/` and `*.egg-info` never land in the tree, and the
+  Pyrefly wrapper writes its generated config and output under `$TMPDIR`
+  (with project includes, excludes and search path anchored to the package
+  root). `conftest.py` now fails the session if any path under the package
+  changed during the run, so the guarantee is enforced rather than assumed.
 - The quality gate runs its two long poles — the three Skylos scans and the
   pytest suite — as background lanes while the quick static checks stream in
   the foreground, then prints each lane whole in a fixed order, so the log

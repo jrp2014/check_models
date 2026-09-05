@@ -13,7 +13,6 @@ import pytest
 import check_models
 
 _SRC_DIR = Path(__file__).parent.parent
-_OUTPUT_DIR = _SRC_DIR / "output"
 
 
 @pytest.mark.parametrize(
@@ -26,13 +25,16 @@ _OUTPUT_DIR = _SRC_DIR / "output"
     ],
 )
 def test_error_message_consistency(
-    args: list[str], expected_phrases: list[str], capsys: pytest.CaptureFixture[str]
+    args: list[str],
+    expected_phrases: list[str],
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     test_args = [
         "check_models.py",
         *args,
         "--output-dir",
-        str(_OUTPUT_DIR / "test_error_consistency"),
+        str(tmp_path / "output"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:

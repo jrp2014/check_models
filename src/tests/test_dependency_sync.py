@@ -10,6 +10,7 @@ import ast
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tomllib
@@ -660,6 +661,25 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
     """Built wheels should ship the packaged default quality config."""
     dist_dir = tmp_path / "dist"
     dist_dir.mkdir()
+    # Build from a copy: setuptools writes build/ and *.egg-info next to the
+    # sources, and the quality gate scans the tree with Skylos while this
+    # suite runs, so nothing may be written inside src/.
+    source_copy = tmp_path / "src"
+    shutil.copytree(
+        PKG_ROOT,
+        source_copy,
+        ignore=shutil.ignore_patterns(
+            ".*",
+            "__pycache__",
+            "build",
+            "dist",
+            "*.egg-info",
+            "node_modules",
+            "output",
+            "tests",
+            "typings",
+        ),
+    )
 
     # Standard PEP 517 build: pip provisions the declared [build-system]
     # requirements in an isolated environment, so this passes or fails on the
@@ -679,7 +699,7 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
         capture_output=True,
         text=True,
         check=False,
-        cwd=PKG_ROOT,
+        cwd=source_copy,
     )
 
     assert result.returncode == 0, result.stderr or result.stdout
@@ -1245,15 +1265,17 @@ def test_pyrefly_generated_config_neutralizes_parent_repo_ignore_files(
     assert generated["use-ignore-files"] is False
     assert generated["disable-project-excludes-heuristics"] is True
 
+    # The generated config lives outside the tree (the gate scans src/ with
+    # Skylos while tests run), so every pattern and path is anchored to the
+    # package root rather than resolved relative to the config file.
     project_excludes = generated["project-excludes"]
     for restored_default in ("**/node_modules/", "**/__pycache__/", "**/.*/**"):
-        assert restored_default in project_excludes, (
+        assert f"{PKG_ROOT.resolve()}/{restored_default}" in project_excludes, (
             f"disabled exclude heuristics must be restored explicitly: {restored_default}"
         )
-
-    # No search-path remains now that local stub generation is fully retired;
-    # the absolutizer must simply not fabricate one.
-    for entry in generated.get("search-path", []):
+    assert generated["project-includes"] == [f"{PKG_ROOT.resolve()}/**/*.py"]
+    assert generated["search-path"][0] == str(PKG_ROOT.resolve())
+    for entry in generated["search-path"]:
         assert Path(entry).is_absolute(), entry
 
 

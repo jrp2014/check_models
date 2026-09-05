@@ -14,7 +14,6 @@ import pytest
 import check_models
 
 _SRC_DIR = Path(__file__).parent.parent
-_OUTPUT_DIR = _SRC_DIR / "output"
 
 
 @pytest.mark.parametrize(
@@ -32,13 +31,14 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 def test_cli_invalid_arguments(
     args: list[str],
     expected_error: str,
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     test_args = [
         "check_models.py",
         *args,
         "--output-dir",
-        str(_OUTPUT_DIR / "test_invalid_args"),
+        str(tmp_path / "output"),
     ]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
