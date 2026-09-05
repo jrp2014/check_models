@@ -678,6 +678,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | Variable | Purpose | Default | Example |
 | -------- | ------- | ------- | ------- |
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
+| `CHECK_MODELS_SKIP_IMPORT_PROBE` | Skip the subprocess import probes that shield a long-lived run from a hard-crashing dependency import (the test suite sets it; each worker already imports mlx-vlm in-process) | Not set (probes run) | `CHECK_MODELS_SKIP_IMPORT_PROBE=1` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
