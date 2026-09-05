@@ -1012,12 +1012,16 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     assert quality_script.count('"!**/.worktrees/**"') == 1
     assert quality_script.count("run_markdownlint_step") == 2
     # Skylos and pytest are the long poles; they run as background lanes
-    # started before the foreground static checks and are printed whole, in a
+    # forked only after the tree-writing static checks have finished (Skylos's
+    # grep verification aborts on files appearing or vanishing under it), with
+    # pytest's caches redirected outside the tree, and are printed whole, in a
     # fixed order, once finished.
-    ruff_lint = quality_script.index('echo "=== Ruff Lint ==="')
-    assert quality_script.index(') > "$SKYLOS_LOG" 2>&1 &') < ruff_lint
-    assert quality_script.index(') > "$PYTEST_LOG" 2>&1 &') < ruff_lint
+    markdownlint_call = quality_script.rindex("run_markdownlint_step")
+    assert quality_script.index(') > "$SKYLOS_LOG" 2>&1 &') > markdownlint_call
+    assert quality_script.index(') > "$PYTEST_LOG" 2>&1 &') > markdownlint_call
     assert quality_script.index('cat "$SKYLOS_LOG"') < quality_script.index('cat "$PYTEST_LOG"')
+    assert 'export PYTHONPYCACHEPREFIX="$QUALITY_PYTEST_CACHE/pycache"' in quality_script
+    assert quality_script.count('-o cache_dir="$QUALITY_PYTEST_CACHE/pytest"') == 2
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
         r"quality_run_skylos \. --quality --secrets --sca --gate --no-upload "

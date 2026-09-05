@@ -51,14 +51,22 @@ fi
 
 # ---------------------------------------------------------------------------
 # Lanes. Skylos (three scans, ~20 s) and pytest (~15 s) dominate the gate and
-# are independent of everything else, so they run in the background while the
-# quick static checks stream in the foreground. Each lane's output is captured
-# and printed whole, in a fixed order, once it finishes, so the gate log reads
-# exactly as it did when everything was sequential. A failing foreground step
-# exits under `set -e` and the EXIT trap kills the lanes; a failing lane is
-# reported after both lanes have printed, so no evidence is lost.
+# are independent of each other, so they run as two background lanes. The
+# quick static checks run first, in the foreground, because they write into
+# the tree (mypy/ruff caches, tools/__pycache__, pyrefly's temporary config)
+# and Skylos's dead-code grep verification aborts with SKY-ANALYSIS-INCOMPLETE
+# when files appear or vanish under it — seen on a 3-core CI runner, never on
+# an 18-core laptop. For the same reason the pytest lane keeps its bytecode
+# and result cache outside the tree while Skylos scans it. Each lane's output
+# is printed whole, in a fixed order, once it finishes, so the gate log reads
+# as it did when everything was sequential. A failing foreground step exits
+# under `set -e` and the EXIT trap kills the lanes; a failing lane is reported
+# after both lanes have printed, so no evidence is lost.
 # ---------------------------------------------------------------------------
 LANE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/check_models-quality-lanes.XXXXXX")"
+# Stable (not per-run) so pytest's --lf still works from one gate run to the
+# next; outside the tree so the Skylos lane never sees pytest's writes.
+QUALITY_PYTEST_CACHE="${TMPDIR:-/tmp}/check_models-quality-pytest-cache"
 SKYLOS_LOG="$LANE_DIR/skylos.log"
 PYTEST_LOG="$LANE_DIR/pytest.log"
 SKYLOS_PID=""
@@ -108,12 +116,15 @@ lane_skylos() {
 }
 
 lane_pytest() {
+    export PYTHONPYCACHEPREFIX="$QUALITY_PYTEST_CACHE/pycache"
     if [ "$QUALITY_MODE" = "fast" ]; then
         echo "=== Pytest (fast set) ==="
-        "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=8 -m "not slow and not e2e"
+        "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=8 -m "not slow and not e2e" \
+            -o cache_dir="$QUALITY_PYTEST_CACHE/pytest"
     else
         echo "=== Pytest ==="
-        "$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=8
+        "$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=8 \
+            -o cache_dir="$QUALITY_PYTEST_CACHE/pytest"
     fi
 }
 
@@ -131,17 +142,6 @@ run_markdownlint_step() {
             "!**/.claude/**"
     )
 }
-
-(
-    set -euo pipefail
-    lane_skylos
-) > "$SKYLOS_LOG" 2>&1 &
-SKYLOS_PID="$!"
-(
-    set -euo pipefail
-    lane_pytest
-) > "$PYTEST_LOG" 2>&1 &
-PYTEST_PID="$!"
 
 echo "=== Workflow YAML Validation ==="
 # Glob rather than enumerate so a new workflow file cannot silently skip
@@ -200,6 +200,18 @@ if [ "$QUALITY_MODE" = "full" ]; then
 fi
 
 run_markdownlint_step
+
+# The tree is quiet from here on: fork the two long lanes.
+(
+    set -euo pipefail
+    lane_skylos
+) > "$SKYLOS_LOG" 2>&1 &
+SKYLOS_PID="$!"
+(
+    set -euo pipefail
+    lane_pytest
+) > "$PYTEST_LOG" 2>&1 &
+PYTEST_PID="$!"
 
 skylos_status=0
 lane_wait "$SKYLOS_PID" || skylos_status=$?

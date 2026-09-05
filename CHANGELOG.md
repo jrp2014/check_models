@@ -12,7 +12,11 @@ Notable changes to this project will be documented in this file.
   reads as before and the wall time drops from about 44 s to roughly the
   longest lane. A failing foreground step kills the lanes; a failing lane is
   reported after both have printed. Fast (push-hook) mode uses the same
-  lanes with its smaller test set.
+  lanes with its smaller test set. The lanes fork only after the
+  tree-writing static checks finish, and the pytest lane keeps its bytecode
+  and result cache under `$TMPDIR`, because Skylos's dead-code grep
+  verification aborts with `SKY-ANALYSIS-INCOMPLETE` when files appear or
+  vanish under it (seen on a 3-core CI runner, never locally).
 - The test suite runs in about half the wall time (roughly 35 s to 17 s on
   an 18-core M5 Max) with no test removed: `CHECK_MODELS_SKIP_IMPORT_PROBE=1`
   (new, documented) lets the suite skip the subprocess import probes that
