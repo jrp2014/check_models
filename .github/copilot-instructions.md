@@ -111,7 +111,7 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit and the blocking `--danger` gate, full pytest, shellcheck, markdownlint |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit and the blocking `--danger` gate, full pytest, shellcheck, markdownlint. Skylos and pytest run as background lanes and are printed whole after the static checks, so read the log top to bottom rather than assuming chronological order. |
 | `make skylos-danger` | Advisory Skylos `--danger` scan (diff-aware on PRs) for triage; the same scan runs blocking inside `make quality` full mode |
 | `make skylos-danger-llm` | Advisory Skylos `--danger` scan with LLM-optimized output for agent triage |
 | `make skylos-verify` | Run `skylos verify` with repo project context for narrow post-edit agent checks |

@@ -49,6 +49,100 @@ if [ "$QUALITY_MODE" = "full" ]; then
     quality_require_command shellcheck "Install with: brew install shellcheck"
 fi
 
+# ---------------------------------------------------------------------------
+# Lanes. Skylos (three scans, ~20 s) and pytest (~15 s) dominate the gate and
+# are independent of everything else, so they run in the background while the
+# quick static checks stream in the foreground. Each lane's output is captured
+# and printed whole, in a fixed order, once it finishes, so the gate log reads
+# exactly as it did when everything was sequential. A failing foreground step
+# exits under `set -e` and the EXIT trap kills the lanes; a failing lane is
+# reported after both lanes have printed, so no evidence is lost.
+# ---------------------------------------------------------------------------
+LANE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/check_models-quality-lanes.XXXXXX")"
+SKYLOS_LOG="$LANE_DIR/skylos.log"
+PYTEST_LOG="$LANE_DIR/pytest.log"
+SKYLOS_PID=""
+PYTEST_PID=""
+cleanup_lanes() {
+    local pid
+    for pid in $SKYLOS_PID $PYTEST_PID; do
+        kill "$pid" 2>/dev/null || true
+    done
+    rm -rf "$LANE_DIR"
+}
+trap cleanup_lanes EXIT
+
+# Lanes are forked directly from this shell (never inside a `$(...)` capture):
+# `wait` only knows its own children and returns 127 for anyone else's.
+lane_wait() {
+    local status=0
+    wait "$1" || status=$?
+    return "$status"
+}
+
+# A failing skylos gate can offer a "Continue anyway?" prompt and a deployment
+# wizard that pushes commits. </dev/null alone does NOT prevent that: 4.33.x
+# decides from stdout.isatty(), not stdin, so a terminal run gets the prompt and
+# then aborts on the EOF. Only calls reaching run_gate_interaction can prompt —
+# `skylos cicd gate` and a bare `--gate` scan with no `--format`. Both calls
+# below are safe by construction: `--format concise --gate` routes to skylos's
+# quiet gate path, and `-a` without `--gate` never gates at all. </dev/null
+# stays as defence in depth (and the lane's stdout is a file, never a TTY). If
+# you add a skylos call that can prompt, pipe its stdout and read the status
+# from PIPESTATUS (see run_skylos_danger_advisory.sh) rather than reaching for
+# --strict, which discards the configured [tool.skylos.gate] thresholds in
+# favour of fail-on-any-finding.
+lane_skylos() {
+    echo "=== Skylos Quality Gate ==="
+    TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+        quality_run_skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
+
+    echo "=== Skylos Audit Gate ==="
+    TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+        quality_run_skylos . -a </dev/null
+
+    if [ "$QUALITY_MODE" = "full" ]; then
+        echo "=== Skylos Danger Gate ==="
+        bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate
+    fi
+}
+
+lane_pytest() {
+    if [ "$QUALITY_MODE" = "fast" ]; then
+        echo "=== Pytest (fast set) ==="
+        "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=8 -m "not slow and not e2e"
+    else
+        echo "=== Pytest ==="
+        "$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=8
+    fi
+}
+
+run_markdownlint_step() {
+    # Markdown linting runs from the repo root.
+    (
+        cd "$(quality_repo_root)"
+        echo "=== Markdown Lint ==="
+        quality_run_markdownlint \
+            --config .markdownlint.jsonc \
+            "**/*.md" \
+            "!src/node_modules/**" \
+            "!**/node_modules/**" \
+            "!**/.worktrees/**" \
+            "!**/.claude/**"
+    )
+}
+
+(
+    set -euo pipefail
+    lane_skylos
+) > "$SKYLOS_LOG" 2>&1 &
+SKYLOS_PID="$!"
+(
+    set -euo pipefail
+    lane_pytest
+) > "$PYTEST_LOG" 2>&1 &
+PYTEST_PID="$!"
+
 echo "=== Workflow YAML Validation ==="
 # Glob rather than enumerate so a new workflow file cannot silently skip
 # validation.
@@ -93,75 +187,39 @@ quality_run_pyrefly_check "$@"
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
 
-# A failing skylos gate can offer a "Continue anyway?" prompt and a deployment
-# wizard that pushes commits. </dev/null alone does NOT prevent that: 4.33.x
-# decides from stdout.isatty(), not stdin, so a terminal run gets the prompt and
-# then aborts on the EOF. Only calls reaching run_gate_interaction can prompt —
-# `skylos cicd gate` and a bare `--gate` scan with no `--format`. Both calls
-# below are safe by construction: `--format concise --gate` routes to skylos's
-# quiet gate path, and `-a` without `--gate` never gates at all. </dev/null
-# stays as defence in depth. If you add a skylos call that can prompt, pipe its
-# stdout and read the status from PIPESTATUS (see run_skylos_danger_advisory.sh)
-# rather than reaching for --strict, which discards the configured
-# [tool.skylos.gate] thresholds in favour of fail-on-any-finding.
-echo "=== Skylos Quality Gate ==="
-TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
-
-echo "=== Skylos Audit Gate ==="
-TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . -a </dev/null
-
 if [ "$QUALITY_MODE" = "full" ]; then
-    echo "=== Skylos Danger Gate ==="
-    bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate
+    echo "=== ShellCheck ==="
+    shell_scripts=()
+    while IFS= read -r -d '' script_path; do
+        shell_scripts+=("$script_path")
+    done < <(find tools -name "*.sh" -type f -print0)
+
+    if [ "${#shell_scripts[@]}" -gt 0 ]; then
+        shellcheck -x "${shell_scripts[@]}"
+    fi
 fi
 
-if [ "$QUALITY_MODE" = "fast" ]; then
-    echo "=== Pytest (fast set) ==="
-    "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=8 -m "not slow and not e2e"
+run_markdownlint_step
 
-    # Markdown linting runs from the repo root
-    cd "$(quality_repo_root)"
-
-    echo "=== Markdown Lint ==="
-    quality_run_markdownlint \
-        --config .markdownlint.jsonc \
-        "**/*.md" \
-        "!src/node_modules/**" \
-        "!**/node_modules/**" \
-        "!**/.worktrees/**" \
-        "!**/.claude/**"
-
-    echo ""
-    echo "✅ Fast quality checks passed!"
-    exit 0
+skylos_status=0
+lane_wait "$SKYLOS_PID" || skylos_status=$?
+cat "$SKYLOS_LOG"
+if [ "$skylos_status" -ne 0 ]; then
+    echo "❌ Skylos lane failed (exit $skylos_status)" >&2
 fi
-
-echo "=== Pytest ==="
-"$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=8
-
-echo "=== ShellCheck ==="
-shell_scripts=()
-while IFS= read -r -d '' script_path; do
-    shell_scripts+=("$script_path")
-done < <(find tools -name "*.sh" -type f -print0)
-
-if [ "${#shell_scripts[@]}" -gt 0 ]; then
-    shellcheck -x "${shell_scripts[@]}"
+pytest_status=0
+lane_wait "$PYTEST_PID" || pytest_status=$?
+cat "$PYTEST_LOG"
+if [ "$pytest_status" -ne 0 ]; then
+    echo "❌ Pytest lane failed (exit $pytest_status)" >&2
 fi
-
-# Markdown linting runs from the repo root
-cd "$(quality_repo_root)"
-
-echo "=== Markdown Lint ==="
-quality_run_markdownlint \
-    --config .markdownlint.jsonc \
-    "**/*.md" \
-    "!src/node_modules/**" \
-    "!**/node_modules/**" \
-    "!**/.worktrees/**" \
-    "!**/.claude/**"
+if [ "$skylos_status" -ne 0 ] || [ "$pytest_status" -ne 0 ]; then
+    exit 1
+fi
 
 echo ""
-echo "✅ All quality checks passed!"
+if [ "$QUALITY_MODE" = "fast" ]; then
+    echo "✅ Fast quality checks passed!"
+else
+    echo "✅ All quality checks passed!"
+fi

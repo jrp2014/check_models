@@ -1008,7 +1008,16 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     # worktree post-filter and non-interactive guards).
     assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate' in quality_script
     assert "skylos . --danger" not in quality_script
-    assert quality_script.count('"!**/.worktrees/**"') == 2
+    # One markdownlint step (with the worktree exclusion) serves both modes.
+    assert quality_script.count('"!**/.worktrees/**"') == 1
+    assert quality_script.count("run_markdownlint_step") == 2
+    # Skylos and pytest are the long poles; they run as background lanes
+    # started before the foreground static checks and are printed whole, in a
+    # fixed order, once finished.
+    ruff_lint = quality_script.index('echo "=== Ruff Lint ==="')
+    assert quality_script.index(') > "$SKYLOS_LOG" 2>&1 &') < ruff_lint
+    assert quality_script.index(') > "$PYTEST_LOG" 2>&1 &') < ruff_lint
+    assert quality_script.index('cat "$SKYLOS_LOG"') < quality_script.index('cat "$PYTEST_LOG"')
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
         r"quality_run_skylos \. --quality --secrets --sca --gate --no-upload "

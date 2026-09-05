@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The quality gate runs its two long poles — the three Skylos scans and the
+  pytest suite — as background lanes while the quick static checks stream in
+  the foreground, then prints each lane whole in a fixed order, so the log
+  reads as before and the wall time drops from about 44 s to roughly the
+  longest lane. A failing foreground step kills the lanes; a failing lane is
+  reported after both have printed. Fast (push-hook) mode uses the same
+  lanes with its smaller test set.
 - The test suite runs in about half the wall time (roughly 35 s to 17 s on
   an 18-core M5 Max) with no test removed: `CHECK_MODELS_SKIP_IMPORT_PROBE=1`
   (new, documented) lets the suite skip the subprocess import probes that
