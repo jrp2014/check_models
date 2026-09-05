@@ -429,7 +429,9 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "## Completed attempts requiring review" in content
     assert "## Crashed attempts requiring review" in content
     assert "## Indeterminate attempts requiring review" in content
-    assert content.count("| Model | Usability | Observed result | Evidence |") == 3
+    assert (
+        content.count("| Model | Format/structural usability | Observed result | Evidence |") == 3
+    )
     assert "| Model | Execution / usability | Observations | Full evidence |" not in content
     assert "## Observation clusters" in content
     # Clusters group by observation codes only (no per-model detail expansion).
@@ -454,7 +456,10 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert "1 clean completion (`org/clean`). See the [full model gallery]" in content
+    assert (
+        "1 completion passing mechanical checks (`org/clean`). See the [full model gallery]"
+        in content
+    )
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -469,7 +474,9 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     # Clean models appear only in the at-a-glance table and the named clean
     # completions, never in the review sections.
     review_sections = content[content.index("## Observation clusters") :]
-    review_sections = review_sections[: review_sections.index("## Clean completions")]
+    review_sections = review_sections[
+        : review_sections.index("## Completions passing mechanical checks")
+    ]
     assert "org/clean" not in review_sections
     assert "Traceback (most recent call last)" not in content
     assert "generated output that must not be copied" not in content
@@ -595,7 +602,7 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
     compliance = _extract_markdown_subsection(
         content,
         "## Model Compliance Notes (not maintainer issues)",
-        end_headings=("## Clean Completion Context",),
+        end_headings=("## Context for completions passing mechanical checks",),
     )
     assert "org/a-minimal" in compliance
     assert "org/z-repeated" not in compliance
@@ -3233,7 +3240,7 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
         "## Crashes requiring action",
         "## Completed Runs with Observations",
         "## Indeterminate Attempts",
-        "## Clean Completion Context",
+        "## Context for completions passing mechanical checks",
     )
     assert all(heading in content for heading in headings)
     assert content.index(headings[0]) < content.index(headings[1])
@@ -3482,7 +3489,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(  # noqa
     assert diagnostics.count("#### Complete output") == 1
     assert "Repeated fragment" in diagnostics
     assert "SERVER-COULD-NOT-BE-CONTACTED" in diagnostics
-    assert "<summary>Clean completions</summary>" in diagnostics
+    assert "<summary>Completions passing mechanical checks</summary>" in diagnostics
     assert "000000000004" in diagnostics
     assert "CleanProcessor" in diagnostics
     assert "eos" in diagnostics
@@ -5395,8 +5402,8 @@ class TestMarkdownGalleryReport:
         assert "999" not in short_row
         # Both clean rows share total_time=1.0; the tie resolves alphabetically.
         assert (
-            "Quickest clean completion (end-to-end, including model load): `org/short` at 1.00s"
-            in content
+            "Quickest completion passing mechanical checks (end-to-end, including model load): "
+            "`org/short` at 1.00s" in content
         )
         assert "Average clean-completion throughput" not in content
         assert "Decode tok/s stays per model in the chooser" in content
@@ -5581,13 +5588,16 @@ class TestMarkdownGalleryReport:
         # Highlights consider only clean completions (usable, no observations);
         # ties on end-to-end time resolve alphabetically.
         assert (
-            "Quickest clean completion (end-to-end, including model load): `org/alpha` at "
-            in highlights
+            "Quickest completion passing mechanical checks (end-to-end, including model load): "
+            "`org/alpha` at " in highlights
         )
         assert "Fastest clean completion" not in highlights
         assert "Average clean-completion throughput" not in highlights
         # gamma has the lowest captured peak memory (1.0 GB) among clean rows.
-        assert "Lowest peak memory among clean completions: `org/gamma` at " in highlights
+        assert (
+            "Lowest peak memory among completions passing mechanical checks: `org/gamma` at "
+            in highlights
+        )
 
     def test_gallery_crash_evidence_keeps_traceback_before_captured_output(
         self,
@@ -6055,8 +6065,12 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
         json.dumps(
             {
                 "_type": "run",
-                "prompt_hash": "h",
-                "model_results": {"org/m": {"generation_tps": tps}},
+                "comparison_fingerprint": "h",
+                # The fixture's current row resolves to revision-m; history
+                # samples from any other revision would be excluded.
+                "model_results": {
+                    "org/m": {"generation_tps": tps, "resolved_revision": "revision-m"}
+                },
             }
         )
         for tps in (100.0, 102.0, 98.0, 101.0, 99.0)
@@ -6066,8 +6080,10 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
         json.dumps(
             {
                 "_type": "run",
-                "prompt_hash": "h",
-                "model_results": {"org/m": {"generation_tps": 130.0}},
+                "comparison_fingerprint": "h",
+                "model_results": {
+                    "org/m": {"generation_tps": 130.0, "resolved_revision": "revision-m"}
+                },
             }
         )
     )
@@ -6081,7 +6097,7 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
         current,
         baseline,
         history_path=history,
-        prompt_hash="h",
+        comparison_fingerprint="h",
         history_excludes_current=True,
         **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     )
@@ -6098,7 +6114,7 @@ def test_compare_run_results_uses_history_bands_and_excludes_current_run(tmp_pat
         steady,
         baseline,
         history_path=history,
-        prompt_hash="h",
+        comparison_fingerprint="h",
         **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
     ).throughput_flags
 
@@ -6226,22 +6242,22 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
 
 
 def test_history_bands_ignore_hashless_rows_and_respect_confirmed_append(tmp_path: Path) -> None:
-    """Legacy rows without a prompt hash cannot vouch for the current prompt."""
+    """Legacy rows without a comparison fingerprint cannot vouch for the current workload."""
     history = tmp_path / "results.history.jsonl"
     rows = [
         json.dumps({"_type": "run", "model_results": {"org/m": {"generation_tps": t}}})
         for t in (100.0, 101.0, 99.0, 100.5)
     ]
     history.write_text("\n".join(rows) + "\n", encoding="utf-8")
-    bands, runs = check_models._history_tps_bands(history, prompt_hash="h", exclude_last=False)
+    bands, runs = check_models._history_tps_bands(history, fingerprint="h", exclude_last=False)
     assert bands == {}
     assert runs == 0
     # Without a current hash, legacy rows are usable.
-    bands, runs = check_models._history_tps_bands(history, prompt_hash=None, exclude_last=False)
+    bands, runs = check_models._history_tps_bands(history, fingerprint=None, exclude_last=False)
     assert "org/m" in bands
     assert runs == 4
     # exclude_last only when the caller confirmed the append.
-    _, runs_excl = check_models._history_tps_bands(history, prompt_hash=None, exclude_last=True)
+    _, runs_excl = check_models._history_tps_bands(history, fingerprint=None, exclude_last=True)
     assert runs_excl == 3
 
 
@@ -6507,7 +6523,7 @@ def test_history_bands_skip_repetition_aborted_samples(tmp_path: Path) -> None:
         json.dumps(
             {
                 "_type": "run",
-                "prompt_hash": "h" * 8,
+                "comparison_fingerprint": "h" * 8,
                 "model_results": {"org/m": aborted if i % 2 else steady},
             }
         )
@@ -6515,7 +6531,7 @@ def test_history_bands_skip_repetition_aborted_samples(tmp_path: Path) -> None:
     ]
     check_models._write_text_file(history, "\n".join(rows) + "\n")
 
-    bands, runs = check_models._history_tps_bands(history, prompt_hash="h" * 8, exclude_last=False)
+    bands, runs = check_models._history_tps_bands(history, fingerprint="h" * 8, exclude_last=False)
     assert runs == 6
     # Only the three steady samples qualify; if that is below the minimum
     # sample count the band is absent — either way the 400 tok/s aborts
@@ -6717,3 +6733,123 @@ def test_prompt_seeded_thinking_close_is_treated_as_reasoning() -> None:
     answer, reasoning = check_models._final_answer_text(result)
     assert answer == "Title: A title"
     assert reasoning == "thinking continues here</think>"
+
+
+def test_hardware_identity_includes_gpu_cores_and_ram() -> None:
+    """The same chip with a different core count or memory is different hardware."""
+    identity = check_models._hardware_identity
+    assert identity({"GPU/Chip": "Apple M5 Max", "GPU Cores": "40", "RAM": "128.0 GB"}) == (
+        "Apple M5 Max, 40 GPU cores, 128.0 GB RAM"
+    )
+    assert identity({"GPU/Chip": "Apple M5 Max"}) == "Apple M5 Max"
+    assert identity({"GPU Cores": "40"}) is None
+    assert identity(None) is None
+
+    baseline = _comparison_baseline([_comparison_record("org/m", tps=100.0)])
+    kwargs = _verified_comparison_kwargs(baseline)
+    kwargs["current_metadata"] = {
+        **cast("dict[str, object]", baseline.metadata),
+        "system": {"Python Version": "3.13.14", "GPU/Chip": "Apple M5 Max", "GPU Cores": "32"},
+    }
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/m", tps=100.0))],
+        baseline,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison.current_hardware == "Apple M5 Max, 32 GPU cores"
+    assert comparison.throughput_comparable is False
+
+
+def test_comparison_fingerprint_separates_workloads() -> None:
+    """Prompt, image, settings, lane, execution mode and hardware all shape the identity."""
+    base = {
+        "prompt": "p",
+        "image_sha256": "a" * 64,
+        "generation_settings": {"max_tokens": 500, "temperature": 0.0},
+        "execution_mode": "in_process",
+        "eval_mode": "assisted",
+        "system_info": {"GPU/Chip": "Apple M5 Max", "GPU Cores": "40", "RAM": "128.0 GB"},
+    }
+    fingerprint = check_models._comparison_fingerprint(**cast("dict[str, Any]", base))
+    assert fingerprint == check_models._comparison_fingerprint(**cast("dict[str, Any]", base))
+    for key, value in (
+        ("prompt", "q"),
+        ("image_sha256", "b" * 64),
+        ("generation_settings", {"max_tokens": 500, "temperature": 0.2}),
+        ("execution_mode", "isolated"),
+        ("eval_mode", "blind"),
+        ("system_info", {"GPU/Chip": "Apple M5 Max", "GPU Cores": "32", "RAM": "128.0 GB"}),
+    ):
+        changed = check_models._comparison_fingerprint(
+            **cast("dict[str, Any]", {**base, key: value})
+        )
+        assert changed != fingerprint, key
+
+    metadata = _issue_summary_metadata((_observed_result(),))
+    from_header = check_models._comparison_fingerprint_from_metadata(
+        cast("check_models.JsonlMetadataRecord", metadata)
+    )
+    assert from_header == check_models._comparison_fingerprint(
+        prompt=str(metadata["prompt"]),
+        image_sha256="a" * 64,
+        generation_settings={"max_tokens": 500, "temperature": 0.0},
+        execution_mode="in_process",
+        eval_mode="assisted",
+        system_info=cast("dict[str, object]", metadata["system"]),
+    )
+
+
+def test_history_bands_require_the_current_model_revision(tmp_path: Path) -> None:
+    """Samples from another revision of the same model must not shape its band."""
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        json.dumps(
+            {
+                "_type": "run",
+                "comparison_fingerprint": "f",
+                "model_results": {
+                    "org/m": {"generation_tps": 100.0 + i, "resolved_revision": "old"}
+                },
+            }
+        )
+        for i in range(5)
+    ]
+    check_models._write_text_file(history, "\n".join(rows) + "\n")
+    with_old = check_models._history_tps_bands(
+        history, fingerprint="f", exclude_last=False, current_revisions={"org/m": "old"}
+    )[0]
+    assert "org/m" in with_old
+    with_new = check_models._history_tps_bands(
+        history, fingerprint="f", exclude_last=False, current_revisions={"org/m": "new"}
+    )[0]
+    assert with_new == {}
+    # An unknown current revision cannot exclude anything.
+    assert (
+        "org/m"
+        in check_models._history_tps_bands(
+            history, fingerprint="f", exclude_last=False, current_revisions={"org/m": None}
+        )[0]
+    )
+
+
+def test_history_record_carries_fingerprint_and_model_revision() -> None:
+    """The history row records the workload fingerprint and each model's revision."""
+    record = check_models._build_history_run_record(
+        results=[_make_success("org/m")],
+        prompt="p",
+        system_info={"GPU/Chip": "Apple M5 Max"},
+        library_versions={},
+        image_path=None,
+        eval_mode="assisted",
+        comparison_fingerprint="f" * 64,
+        model_provenance={
+            "org/m": {
+                "model": "org/m",
+                "requested_revision": None,
+                "resolved_revision": "rev-m",
+                "snapshot_path": None,
+            }
+        },
+    )
+    assert record["comparison_fingerprint"] == "f" * 64
+    assert record["model_results"]["org/m"]["resolved_revision"] == "rev-m"

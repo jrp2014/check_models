@@ -233,6 +233,54 @@ def test_catalog_constraint_violations_are_repairable_caveats(
     )
 
 
+def test_description_over_requested_sentence_count_is_a_constraint_violation() -> None:
+    """Five description sentences against a requested one or two is a caveat."""
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: The mill stands over the river. People walk along the path. "
+        "The sky is blue. A chimney rises above the tiled roof. Trees line the bank.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.description_sentence_count == 5
+    assert result.quality_analysis.description_sentence_range == (1, 2)
+    assessment = check_models._assess_result(result)
+    assert assessment.observations == ("catalog_constraint_violation",)
+    details = check_models._observation_details(result)
+    assert details["description_sentence_count"] == 5
+    assert details["description_sentence_range"] == [1, 2]
+    assert "Description has 5 sentences (requested 1-2)" in check_models._human_observation_labels(
+        assessment.observations, details=details
+    )
+
+
+def test_description_sentence_count_is_conservative() -> None:
+    """Abbreviations, initials, acronyms and decimals never split a sentence."""
+    count = check_models._count_description_sentences
+    assert count("") == 0
+    assert count("A single sentence without a terminator") == 1
+    assert (
+        count("Dr. J. Smith stands by St. Pancras, e.g. near the U.S. flag. It is 2.5 m tall.") == 2
+    )
+    assert count("First sentence! Second one? Third one.") == 3
+    # No capital after the terminator: not a boundary the splitter will claim.
+    assert count("Version 2. then lowercase continues") == 1
+
+    # A two-sentence description with abbreviations stays inside the contract.
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: Dr. Smith's mill at St. Cross, built c. 1744, spans the river. "
+        "Visitors walk past on a 2.5 m wide path.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
+        prompt=CATALOG_PROMPT,
+    )
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.description_sentence_count == 2
+    assert check_models._assess_result(result).observations == ()
+
+
 def test_compliant_catalog_constraints_remain_clean() -> None:
     result = _result(
         "Title: Five Word Catalogue Title Here\n"

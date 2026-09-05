@@ -417,7 +417,7 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
     assert "*Next action:*" not in md
     # Chooser uses short selector glosses; complete evidence keeps maintainer labels.
     assert "cut off at token limit" in md
-    assert "title/keyword constraints failed" in md
+    assert "title/description/keyword constraints failed" in md
     assert "Prefill/first s" in md
     assert "*Observations:* Response appears cut off at the token limit" in md
     # Wrapped bullet lines may break inside the label; compare space-normalized.

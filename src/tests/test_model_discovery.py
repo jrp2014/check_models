@@ -1300,9 +1300,51 @@ class TestModelBurdenFacts:
         assert check_models._parameter_count_from_name("org/mid-16.9b") == 16_900_000_000
 
     def test_moe_names_report_total_not_activated_parameters(self) -> None:
-        """MoE names carry total and activated sizes; the total (largest) wins."""
+        """MoE names carry total and activated sizes; the total is the plain token."""
         moe = check_models._parameter_count_from_name("mlx-community/Qwen3-30B-A3B-Instruct-4bit")
         assert moe == 30_000_000_000
+        assert check_models._parameter_counts_from_name(
+            "mlx-community/Qwen3-30B-A3B-Instruct-4bit"
+        ) == (30_000_000_000, 3_000_000_000)
+        assert check_models._parameter_counts_from_name(
+            "mlx-community/gemma-4-26b-a4b-it-4bit"
+        ) == (
+            26_000_000_000,
+            4_000_000_000,
+        )
+
+    def test_active_only_names_leave_the_total_unknown(self) -> None:
+        """An A3B token states active parameters only; it must not become a 3B checkpoint."""
+        name = "mlx-community/Kimi-VL-A3B-Thinking-2506-8bit"
+        assert check_models._parameter_count_from_name(name) is None
+        assert check_models._parameter_counts_from_name(name) == (None, 3_000_000_000)
+        # A capital A that is simply the last letter of a word is not a designation.
+        assert check_models._parameter_counts_from_name("org/LLaVA-3B") == (3_000_000_000, None)
+
+    def test_active_only_burden_reports_active_count_separately(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Burden facts keep the active count apart from an unknown total."""
+        snapshot = self._snapshot(tmp_path)
+        safe_io.write_text_no_follow(snapshot / "config.json", json.dumps({}))
+        self._install_snapshot(monkeypatch, snapshot)
+
+        burden = check_models._collect_model_burden("mlx-community/Kimi-VL-A3B-Thinking-2506-8bit")
+        assert burden is not None
+        assert burden.parameter_count is None
+        assert burden.active_parameter_count == 3_000_000_000
+        assert burden.parameter_count_source == "name-estimate"
+        rows = dict(
+            check_models._model_burden_rows(
+                check_models.PerformanceResult(
+                    model_name="org/m", generation=None, success=True, model_burden=burden
+                )
+            )
+        )
+        assert "Parameter count" not in rows
+        assert rows["Active parameter count"] == (
+            "3.00B (name-estimate; total not stated in the name)"
+        )
 
     def test_weight_bytes_ignores_shards_escaping_the_repo_root(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path

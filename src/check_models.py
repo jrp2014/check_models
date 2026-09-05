@@ -917,6 +917,7 @@ class HistoryModelResultRecord(TypedDict):
     """Per-model factual execution, timing, and resource data in raw history."""
 
     success: bool
+    resolved_revision: NotRequired[str | None]
     failure_phase: NotRequired[str | None]
     error_stage: NotRequired[str | None]
     error_type: NotRequired[str | None]
@@ -952,6 +953,7 @@ class HistoryRunRecord(TypedDict, total=False):
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
     eval_mode: EvaluationLane
+    comparison_fingerprint: str
 
 
 class JsonlTimingRecord(TypedDict):
@@ -1205,6 +1207,8 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     role_boundary_tokens: list[str]
     title_word_count: int
     title_word_range: list[int]
+    description_sentence_count: int
+    description_sentence_range: list[int]
     keyword_count: int
     keyword_count_range: list[int]
     duplicate_keywords: list[str]
@@ -1994,10 +1998,19 @@ def _model_burden_rows(
     if weight_gb is not None:
         rows.append(("Checkpoint weights (GB)", f"{weight_gb:.2f}"))
     if burden.parameter_count is not None:
+        count_text = f"{burden.parameter_count / 1e9:.2f}B"
+        if burden.active_parameter_count is not None:
+            count_text += f" total, {burden.active_parameter_count / 1e9:.2f}B active"
+        rows.append(("Parameter count", f"{count_text} ({burden.parameter_count_source})"))
+    elif burden.active_parameter_count is not None:
+        # An "A3B"-style name states the active size only; the total is unknown.
         rows.append(
             (
-                "Parameter count",
-                f"{burden.parameter_count / 1e9:.2f}B ({burden.parameter_count_source})",
+                "Active parameter count",
+                (
+                    f"{burden.active_parameter_count / 1e9:.2f}B "
+                    f"({burden.parameter_count_source}; total not stated in the name)"
+                ),
             )
         )
     if burden.quantization_bits is not None or burden.quantization_mode is not None:
@@ -4057,9 +4070,41 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
     )
 
 
+_SENTENCE_BOUNDARY_RE: Final[re.Pattern[str]] = re.compile(
+    r"[.!?]+[\"'\u201d\u2019)\]]*\s+(?=[\"'\u201c\u2018(\[]?[A-Z0-9])"
+)
+_SENTENCE_ABBREVIATIONS: Final[frozenset[str]] = frozenset(
+    {"mr", "mrs", "ms", "dr", "prof", "st", "mt", "ft", "no", "vs", "etc", "cf", "jr", "sr"}
+)
+
+
+def _count_description_sentences(text: str) -> int:
+    """Count sentences conservatively: terminator, whitespace, then a capital or digit.
+
+    Abbreviations ("Dr.", "St.", "e.g.", initials), dotted acronyms ("U.S.")
+    and decimals ("2.5 m") never split. The count feeds only an upper-bound
+    check, so a boundary the splitter misses can under-count but never
+    invent a violation — deliberately no sentence parser.
+    """
+    collapsed = " ".join(text.split())
+    if not collapsed:
+        return 0
+    count = 1
+    for match in _SENTENCE_BOUNDARY_RE.finditer(collapsed):
+        last_word = collapsed[: match.start()].rsplit(None, 1)[-1].casefold()
+        if (
+            last_word in _SENTENCE_ABBREVIATIONS
+            or "." in last_word
+            or (len(last_word) == 1 and last_word.isalpha())
+        ):
+            continue
+        count += 1
+    return count
+
+
 def _catalog_requested_range(
     prompt: str,
-    field: Literal["title", "keyword"],
+    field: Literal["title", "description", "keyword"],
 ) -> tuple[int, int] | None:
     """Return an explicit numeric range from a catalogue requirement line."""
     prompt_lines = prompt.splitlines()
@@ -4374,6 +4419,8 @@ class GenerationQualityAnalysis:
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
     title_word_range: tuple[int, int] | None = None
+    description_sentence_count: int | None = None
+    description_sentence_range: tuple[int, int] | None = None
     keyword_count: int | None = None
     keyword_count_range: tuple[int, int] | None = None
     duplicate_keywords: list[str] = dataclass_field(default_factory=list)
@@ -4396,6 +4443,8 @@ class PromptQualitySignals:
     missing_sections: tuple[str, ...] = ()
     title_word_count: int | None = None
     title_word_range: tuple[int, int] | None = None
+    description_sentence_count: int | None = None
+    description_sentence_range: tuple[int, int] | None = None
     keyword_count: int | None = None
     keyword_count_range: tuple[int, int] | None = None
     duplicate_keywords: tuple[str, ...] = ()
@@ -4474,6 +4523,8 @@ def _collect_prompt_quality_signals(
     unexpected_preamble: str | None = None
     title_word_count: int | None = None
     title_word_range: tuple[int, int] | None = None
+    description_sentence_count: int | None = None
+    description_sentence_range: tuple[int, int] | None = None
     keyword_count: int | None = None
     keyword_count_range: tuple[int, int] | None = None
     duplicate_keywords: tuple[str, ...] = ()
@@ -4492,6 +4543,8 @@ def _collect_prompt_quality_signals(
             re.findall(r"\b\w+(?:[-\u2019']\w+)*\b", sections["title"], re.UNICODE)
         )
         title_word_range = _catalog_requested_range(prompt, "title")
+        description_sentence_count = _count_description_sentences(sections["description"])
+        description_sentence_range = _catalog_requested_range(prompt, "description")
         keyword_count = len(generated_keywords)
         keyword_count_range = _catalog_requested_range(prompt, "keyword")
         normalized_keywords = [
@@ -4516,6 +4569,8 @@ def _collect_prompt_quality_signals(
         missing_sections=tuple(missing_sections),
         title_word_count=title_word_count,
         title_word_range=title_word_range,
+        description_sentence_count=description_sentence_count,
+        description_sentence_range=description_sentence_range,
         keyword_count=keyword_count,
         keyword_count_range=keyword_count_range,
         duplicate_keywords=duplicate_keywords,
@@ -4690,6 +4745,8 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
         title_word_count=prompt_signals.title_word_count,
         title_word_range=prompt_signals.title_word_range,
+        description_sentence_count=prompt_signals.description_sentence_count,
+        description_sentence_range=prompt_signals.description_sentence_range,
         keyword_count=prompt_signals.keyword_count,
         keyword_count_range=prompt_signals.keyword_count_range,
         duplicate_keywords=list(prompt_signals.duplicate_keywords),
@@ -7443,6 +7500,10 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
 
 
 _PARAM_COUNT_NAME_RE = re.compile(r"(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE)
+# "A3B" / "a4b": an *active*-parameter designation (MoE), never the total.
+_ACTIVE_PARAM_COUNT_NAME_RE = re.compile(
+    r"(?<![a-z0-9])a(\d+(?:\.\d+)?)([bm])(?![a-z0-9])", re.IGNORECASE
+)
 _CONTEXT_LENGTH_CONFIG_KEYS: Final[tuple[str, ...]] = (
     "max_position_embeddings",
     "context_length",
@@ -7464,6 +7525,7 @@ class ModelBurdenFacts:
     weight_bytes: int | None = None
     parameter_count: int | None = None
     parameter_count_source: str | None = None
+    active_parameter_count: int | None = None
     quantization_bits: int | None = None
     quantization_group_size: int | None = None
     quantization_mode: str | None = None
@@ -7489,21 +7551,39 @@ def _snapshot_weight_bytes(snapshot_path: Path) -> int | None:
     return total if counted else None
 
 
-def _parameter_count_from_name(model_identifier: str) -> int | None:
-    """Estimate parameters from the size tokens in the model name (largest wins).
-
-    MoE names carry both total and activated sizes ("30B-A3B"); the largest
-    token is the total parameter count this estimate stands in for.
-    """
-    matches = _PARAM_COUNT_NAME_RE.findall(model_identifier)
-    if not matches:
-        return None
+def _size_token_value(value_text: str, unit: str) -> int:
+    """Convert one "<number><B|M>" token to a parameter count."""
     # Decimal, not float: int(float("4.1") * 1e9) truncates to 4_099_999_999
     # (same defect mlx-lm fixed in ml-explore/mlx-lm#1726).
-    return max(
-        int(Decimal(value_text) * (10**9 if unit.lower() == "b" else 10**6))
-        for value_text, unit in matches
+    return int(Decimal(value_text) * (10**9 if unit.lower() == "b" else 10**6))
+
+
+def _parameter_counts_from_name(model_identifier: str) -> tuple[int | None, int | None]:
+    """Return (total, active) parameter estimates from the size tokens in a name.
+
+    MoE names may carry both ("30B-A3B") or only the active size ("A3B" in
+    Kimi-VL-A3B). An active designation never stands in for the total: a
+    name with no plain size token leaves the total unknown rather than
+    reporting the active count as the checkpoint size.
+    """
+    active_spans = [
+        (match.start(), match.end(), _size_token_value(match.group(1), match.group(2)))
+        for match in _ACTIVE_PARAM_COUNT_NAME_RE.finditer(model_identifier)
+    ]
+    totals = [
+        _size_token_value(match.group(1), match.group(2))
+        for match in _PARAM_COUNT_NAME_RE.finditer(model_identifier)
+        if not any(start <= match.start() < end for start, end, _value in active_spans)
+    ]
+    return (
+        max(totals) if totals else None,
+        max(value for _start, _end, value in active_spans) if active_spans else None,
     )
+
+
+def _parameter_count_from_name(model_identifier: str) -> int | None:
+    """Estimate total parameters from the model name; None when only an active size is given."""
+    return _parameter_counts_from_name(model_identifier)[0]
 
 
 def _collect_model_burden(
@@ -7532,9 +7612,10 @@ def _collect_model_burden(
             parameter_count = value
             parameter_count_source = key
             break
+    active_parameter_count: int | None = None
     if parameter_count is None:
-        parameter_count = _parameter_count_from_name(model_identifier)
-        if parameter_count is not None:
+        parameter_count, active_parameter_count = _parameter_counts_from_name(model_identifier)
+        if parameter_count is not None or active_parameter_count is not None:
             parameter_count_source = "name-estimate"
 
     quantization = config.get("quantization")
@@ -7569,6 +7650,7 @@ def _collect_model_burden(
         weight_bytes=_snapshot_weight_bytes(snapshot_path),
         parameter_count=parameter_count,
         parameter_count_source=parameter_count_source,
+        active_parameter_count=active_parameter_count,
         quantization_bits=quantization_bits,
         quantization_group_size=quantization_group_size,
         quantization_mode=quantization_mode,
@@ -8078,8 +8160,8 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
     ),
     ObservationDisplaySpec(
         "catalog_constraint_violation",
-        "Title or keywords do not meet requested constraints",
-        "title/keyword constraints failed",
+        "Title, description or keywords do not meet requested constraints",
+        "title/description/keyword constraints failed",
     ),
     ObservationDisplaySpec(
         "minimal_output",
@@ -8204,6 +8286,18 @@ def _human_observation_labels(
                 constraint_labels.append(
                     f"Title has {title_count} words (requested {title_range[0]}-{title_range[1]})"
                 )
+            sentence_count = details.get("description_sentence_count")
+            sentence_range = details.get("description_sentence_range")
+            if (
+                sentence_count is not None
+                and sentence_range is not None
+                and len(sentence_range) == _RANGE_ENDPOINT_COUNT
+                and sentence_count > sentence_range[1]
+            ):
+                constraint_labels.append(
+                    f"Description has {sentence_count} sentences "
+                    f"(requested {sentence_range[0]}-{sentence_range[1]})"
+                )
             keyword_count = details.get("keyword_count")
             keyword_range = details.get("keyword_count_range")
             if (
@@ -8319,9 +8413,11 @@ class GalleryChooserData:
 def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     """Compute the single chooser ordering and resource highlights once.
 
-    Highlights consider only clean completions (usable, no observations): a
-    fast model that merely reformulates supplied hints is not a useful
-    "quickest" recommendation. Time to complete the task end-to-end is the
+    Highlights consider only completions that passed every mechanical check
+    (usable, no observations). That is a format/structure bar, not an
+    accuracy bar — passing while copying hint keywords or misnaming the
+    subject still qualifies, which is why the wording never says "clean" or
+    "good". Time to complete the task end-to-end is the
     highlight, not decode tok/s: tokenizers, image-token expansion and
     reasoning lengths differ so much across models that a tok/s ranking or
     a cross-model average carries little decision value.
@@ -8381,7 +8477,11 @@ _GALLERY_THROUGHPUT_CAVEAT: Final[str] = (
 def _gallery_chooser_explanation() -> str:
     """Return the metric caveat shared verbatim by both chooser formats."""
     return (
-        "Current-run usability and captured resource facts only. Total time is end-to-end; "
+        "Format/structural usability for this run and captured resource facts only. "
+        "Usability means the output passed the mechanical checks on the requested "
+        "Title/Description/Keywords structure — never that the metadata is accurate: a "
+        "model can pass every check while copying hint keywords verbatim or "
+        "misidentifying the subject. Total time is end-to-end; "
         "throughput covers generation only and requires "
         f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
         "Prefill/first is first-token latency when captured; Prompt tok is the full "
@@ -8417,7 +8517,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         *_render_gallery_table(
             headers=(
                 "Model",
-                "Usability",
+                "Format/structural usability",
                 "Total s",
                 "Gen TPS",
                 "Prefill/first s",
@@ -8439,19 +8539,29 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         parts.extend(
             [
                 (
-                    "Quickest clean completion (end-to-end, including model load): "
-                    f"`{data.quickest.model}` at {_gallery_total_time_cell(data.quickest)}"
+                    "Quickest completion passing mechanical checks (end-to-end, including "
+                    f"model load): `{data.quickest.model}` at "
+                    f"{_gallery_total_time_cell(data.quickest)}"
                 ),
                 "",
             ]
         )
     else:
-        parts.extend(["No clean completions with a captured end-to-end time in this run.", ""])
+        parts.extend(
+            [
+                (
+                    "No completion passing mechanical checks has a captured end-to-end time "
+                    "in this run."
+                ),
+                "",
+            ]
+        )
     if data.lowest_memory is not None:
         parts.extend(
             [
                 (
-                    f"Lowest peak memory among clean completions: `{data.lowest_memory.model}` at "
+                    "Lowest peak memory among completions passing mechanical checks: "
+                    f"`{data.lowest_memory.model}` at "
                     f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB"
                 ),
                 "",
@@ -8463,7 +8573,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     if data.avoided:
         parts.extend(
             _render_gallery_table(
-                headers=("Model", "Usability", "Observations"),
+                headers=("Model", "Format/structural usability", "Observations"),
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
@@ -8502,7 +8612,7 @@ def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
         ),
         "",
         *_render_gallery_table(
-            headers=("Model", "Usability", "Output preview"),
+            headers=("Model", "Format/structural usability", "Output preview"),
             rows=[
                 (
                     _gallery_summary_model_link(row.model),
@@ -8645,8 +8755,18 @@ def _has_catalog_constraint_violation(analysis: GenerationQualityAnalysis) -> bo
     )
     return (
         title_count_outside_range
+        or _description_exceeds_requested_sentences(analysis)
         or keyword_count_outside_range
         or bool(analysis.duplicate_keywords)
+    )
+
+
+def _description_exceeds_requested_sentences(analysis: GenerationQualityAnalysis) -> bool:
+    """Upper bound only: the conservative sentence count never flags a short description."""
+    return (
+        analysis.description_sentence_count is not None
+        and analysis.description_sentence_range is not None
+        and analysis.description_sentence_count > analysis.description_sentence_range[1]
     )
 
 
@@ -8749,6 +8869,10 @@ def _catalog_constraint_observation_details(
         details["title_word_count"] = analysis.title_word_count
     if analysis.title_word_range is not None:
         details["title_word_range"] = list(analysis.title_word_range)
+    if analysis.description_sentence_count is not None:
+        details["description_sentence_count"] = analysis.description_sentence_count
+    if analysis.description_sentence_range is not None:
+        details["description_sentence_range"] = list(analysis.description_sentence_range)
     if analysis.keyword_count is not None:
         details["keyword_count"] = analysis.keyword_count
     if analysis.keyword_count_range is not None:
@@ -9535,6 +9659,8 @@ def _diagnostics_result_facts(
         "role_boundary_tokens": "Role-boundary tokens in output",
         "title_word_count": "Title word count",
         "title_word_range": "Requested title word range",
+        "description_sentence_count": "Description sentence count",
+        "description_sentence_range": "Requested description sentence range",
         "keyword_count": "Keyword count",
         "keyword_count_range": "Requested keyword count range",
         "duplicate_keywords": "Duplicate keywords",
@@ -9932,13 +10058,13 @@ def _diagnostics_evidence_blocks(
     )
     clean: ReportBlock = (
         ReportDetails(
-            "Clean completions",
+            "Completions passing mechanical checks",
             (ReportTable(("Model", "Runtime identity", "Performance"), clean_rows),),
         )
         if clean_rows
-        else ReportParagraph("No clean completions.")
+        else ReportParagraph("No completion passed every mechanical check.")
     )
-    blocks.append(_report_section("Clean Completion Context", clean))
+    blocks.append(_report_section("Context for completions passing mechanical checks", clean))
     return tuple(blocks)
 
 
@@ -10229,7 +10355,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             headers=(
                 "Model",
                 "Execution",
-                "Usability",
+                "Format/structural usability",
                 "Maintainer status",
                 "Total s",
                 "Gen TPS",
@@ -10253,15 +10379,18 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     # lowest-memory/fastest re-listing tables collapse into highlight lines.
     if data.quickest is not None:
         parts.append(
-            "<p>Quickest clean completion (end-to-end, including model load): "
-            f"{_html_model_link(data.quickest.model)} at "
+            "<p>Quickest completion passing mechanical checks (end-to-end, including "
+            f"model load): {_html_model_link(data.quickest.model)} at "
             f"{html.escape(_gallery_total_time_cell(data.quickest))}.</p>"
         )
     else:
-        parts.append("<p>No clean completions with a captured end-to-end time in this run.</p>")
+        parts.append(
+            "<p>No completion passing mechanical checks has a captured end-to-end time "
+            "in this run.</p>"
+        )
     if data.lowest_memory is not None:
         parts.append(
-            "<p>Lowest peak memory among clean completions: "
+            "<p>Lowest peak memory among completions passing mechanical checks: "
             f"{_html_model_link(data.lowest_memory.model)} at "
             f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
             "GB.</p>"
@@ -10273,7 +10402,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         parts.append(
             _html_table(
                 caption="Unusable and not-evaluated models",
-                headers=("Model", "Usability", "Observations", "Output preview"),
+                headers=("Model", "Format/structural usability", "Observations", "Output preview"),
                 rows=[
                     (
                         _html_model_link(row.model),
@@ -17510,10 +17639,15 @@ def _resolved_memory_deltas_gb(
     return active, cache
 
 
-def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
+def _history_model_result_from_result(
+    result: PerformanceResult,
+    *,
+    resolved_revision: str | None = None,
+) -> HistoryModelResultRecord:
     """Return raw execution, timing, token, and resource facts for one model."""
     record: HistoryModelResultRecord = {
         "success": result.success,
+        "resolved_revision": resolved_revision,
         "failure_phase": result.failure_phase,
         "error_stage": result.error_stage,
         "error_type": result.error_type,
@@ -17558,6 +17692,8 @@ def _build_history_run_record(
     image_path: Path | None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: EvaluationLane,
+    comparison_fingerprint: str | None = None,
+    model_provenance: Mapping[str, ModelProvenanceRecord] | None = None,
 ) -> HistoryRunRecord:
     """Build one append-only run record without current-report semantics.
 
@@ -17573,7 +17709,15 @@ def _build_history_run_record(
         "prompt_preview": _build_prompt_preview(prompt),
         "image_path": str(image_path) if image_path is not None else None,
         "model_results": {
-            result.model_name: _history_model_result_from_result(result) for result in results
+            result.model_name: _history_model_result_from_result(
+                result,
+                resolved_revision=(
+                    model_provenance[result.model_name]["resolved_revision"]
+                    if model_provenance is not None and result.model_name in model_provenance
+                    else None
+                ),
+            )
+            for result in results
         },
         "system": system_info,
         "library_versions": library_versions,
@@ -17581,6 +17725,8 @@ def _build_history_run_record(
     }
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
+    if comparison_fingerprint is not None:
+        record["comparison_fingerprint"] = comparison_fingerprint
     return record
 
 
@@ -17594,6 +17740,8 @@ def append_history_record(
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: EvaluationLane,
+    comparison_fingerprint: str | None = None,
+    model_provenance: Mapping[str, ModelProvenanceRecord] | None = None,
 ) -> HistoryRunRecord | None:
     """Append raw factual run data for optional out-of-band history analysis.
 
@@ -17608,6 +17756,8 @@ def append_history_record(
         image_path=image_path,
         runtime_fingerprint=runtime_fingerprint,
         eval_mode=eval_mode,
+        comparison_fingerprint=comparison_fingerprint,
+        model_provenance=model_provenance,
     )
 
     try:
@@ -18354,17 +18504,21 @@ def _history_band_tps_sample(facts: object) -> float | None:
 def _history_tps_bands(
     history_path: Path,
     *,
-    prompt_hash: str | None,
+    fingerprint: str | None,
     exclude_last: bool,
+    current_revisions: Mapping[str, str | None] | None = None,
 ) -> tuple[dict[str, tuple[float, float, int]], int]:
     """Return per-model (low, high, samples) throughput bands from retained history.
 
-    Uses the last ``_COMPARISON_HISTORY_WINDOW`` runs with the same prompt hash
-    (rows without a recorded hash are excluded — they cannot be shown to match)
-    and a Tukey fence (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model, never narrower
-    than ±10% of the median. ``exclude_last`` drops the record just appended for
-    the current run so it cannot vouch for itself; callers pass it only after a
-    confirmed append.
+    Uses the last ``_COMPARISON_HISTORY_WINDOW`` runs with the same comparison
+    fingerprint — prompt, image, generation settings, lane, execution mode and
+    hardware (rows recorded without one are excluded: they cannot be shown to
+    be the same workload, so the fixed fallback band applies) — and a Tukey
+    fence (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model, never narrower than ±10% of
+    the median. A model's samples must also come from the revision now under
+    test when ``current_revisions`` names one. ``exclude_last`` drops the
+    record just appended for the current run so it cannot vouch for itself;
+    callers pass it only after a confirmed append.
     """
     if not history_path.is_file():
         return {}, 0
@@ -18382,9 +18536,9 @@ def _history_tps_bands(
             continue
         if not isinstance(record, dict) or record.get("_type") != "run":
             continue
-        if prompt_hash and record.get("prompt_hash") != prompt_hash:
-            # Legacy rows without a hash cannot be shown to be the same prompt;
-            # a band must only be built from runs known to match.
+        if fingerprint and record.get("comparison_fingerprint") != fingerprint:
+            # Rows without a matching fingerprint cannot be shown to be the
+            # same workload; a band must only be built from runs known to match.
             continue
         runs.append(record)
     runs = runs[-_COMPARISON_HISTORY_WINDOW:]
@@ -18394,6 +18548,11 @@ def _history_tps_bands(
         if not isinstance(model_results, dict):
             continue
         for model, facts in model_results.items():
+            wanted_revision = (current_revisions or {}).get(model)
+            if wanted_revision is not None and (
+                not isinstance(facts, dict) or facts.get("resolved_revision") != wanted_revision
+            ):
+                continue
             if (tps := _history_band_tps_sample(facts)) is not None:
                 samples.setdefault(model, []).append(tps)
     bands: dict[str, tuple[float, float, int]] = {}
@@ -18587,7 +18746,7 @@ def compare_run_results(
     baseline: ComparisonBaseline,
     *,
     history_path: Path | None = None,
-    prompt_hash: str | None = None,
+    comparison_fingerprint: str | None = None,
     history_excludes_current: bool = True,
     current_execution_mode: str = "in_process",
     current_metadata: JsonlMetadataRecord | None = None,
@@ -18623,7 +18782,14 @@ def compare_run_results(
     shared = [model for model in current_by if model in baseline_by]
     bands, history_runs = (
         _history_tps_bands(
-            history_path, prompt_hash=prompt_hash, exclude_last=history_excludes_current
+            history_path,
+            fingerprint=comparison_fingerprint,
+            exclude_last=history_excludes_current,
+            current_revisions={
+                record["model"]: provenance.get("resolved_revision")
+                for record in current
+                if isinstance(provenance := record.get("model_provenance"), dict)
+            },
         )
         if history_path is not None
         else ({}, 0)
@@ -18687,11 +18853,76 @@ def compare_run_results(
     )
 
 
+def _hardware_identity(system_info: Mapping[str, object] | None) -> str | None:
+    """Chip, GPU core count and RAM: the facts that set throughput and peak memory.
+
+    The chip name alone is not an identity — the same chip ships with
+    different GPU core counts and memory, and both move the numbers.
+    """
+    if not isinstance(system_info, Mapping):
+        return None
+    chip = system_info.get("GPU/Chip")
+    if not isinstance(chip, str) or not chip:
+        return None
+    parts = [chip]
+    if isinstance(cores := system_info.get("GPU Cores"), str) and cores:
+        parts.append(f"{cores} GPU cores")
+    if isinstance(ram := system_info.get("RAM"), str) and ram:
+        parts.append(f"{ram} RAM")
+    return ", ".join(parts)
+
+
 def _comparison_hardware(metadata: JsonlMetadataRecord | None) -> str | None:
-    """Return the chip a run executed on, or None when the header does not say."""
-    system_info = metadata.get("system") if metadata is not None else None
-    chip = system_info.get("GPU/Chip") if isinstance(system_info, dict) else None
-    return chip if isinstance(chip, str) and chip else None
+    """Return the hardware identity a run executed on, or None when the header lacks it."""
+    return _hardware_identity(metadata.get("system") if metadata is not None else None)
+
+
+def _comparison_fingerprint(
+    *,
+    prompt: str,
+    image_sha256: str | None,
+    generation_settings: Mapping[str, JsonLike],
+    execution_mode: str,
+    eval_mode: str,
+    system_info: Mapping[str, object] | None,
+) -> str:
+    """Identity of one throughput workload: inputs, settings, lane, mode and hardware.
+
+    History noise bands are built only from runs sharing this fingerprint. A
+    blind prompt reused for several photographs, a settings change on the same
+    prompt, an isolated rerun, or another machine must not blend into one
+    "noise" estimate; runs recorded before the fingerprint existed simply
+    fall back to the fixed band.
+    """
+    payload = {
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        "image_sha256": image_sha256,
+        "generation_settings": {
+            key: json.dumps(value, ensure_ascii=False, sort_keys=True)
+            for key, value in sorted(generation_settings.items())
+        },
+        "execution_mode": execution_mode,
+        "eval_mode": eval_mode,
+        "hardware": _hardware_identity(system_info),
+    }
+    return hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
+def _comparison_fingerprint_from_metadata(metadata: JsonlMetadataRecord) -> str:
+    """Fingerprint of a retained run from its schema-3 header alone."""
+    image = metadata.get("image")
+    sha256 = image.get("sha256") if isinstance(image, dict) else None
+    settings = metadata.get("generation_settings")
+    return _comparison_fingerprint(
+        prompt=metadata["prompt"],
+        image_sha256=sha256 if isinstance(sha256, str) else None,
+        generation_settings=settings if isinstance(settings, dict) else {},
+        execution_mode=str(metadata.get("execution_mode", "in_process")),
+        eval_mode=str(metadata.get("eval_mode", "")),
+        system_info=cast("Mapping[str, object] | None", metadata.get("system")),
+    )
 
 
 def _comparison_compatibility(
@@ -19521,8 +19752,16 @@ _DETAIL_TEXT_FIELDS: Final[tuple[str, ...]] = (
     "repeated_fragment",
     "unexpected_catalog_preamble",
 )
-_DETAIL_COUNT_FIELDS: Final[tuple[str, ...]] = ("title_word_count", "keyword_count")
-_DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = ("title_word_range", "keyword_count_range")
+_DETAIL_COUNT_FIELDS: Final[tuple[str, ...]] = (
+    "title_word_count",
+    "description_sentence_count",
+    "keyword_count",
+)
+_DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = (
+    "title_word_range",
+    "description_sentence_range",
+    "keyword_count_range",
+)
 
 _DETAIL_RANGE_LENGTH: Final[int] = 2
 
@@ -20265,6 +20504,7 @@ def _run_issue_summary_constraint_breakdown(
         return None
 
     title_by_range: dict[tuple[int, int], list[int]] = {}
+    description_by_range: dict[tuple[int, int], list[int]] = {}
     keyword_by_range: dict[tuple[int, int], list[int]] = {}
     duplicate_models = 0
 
@@ -20291,11 +20531,16 @@ def _run_issue_summary_constraint_breakdown(
             title_by_range, details.get("title_word_count"), details.get("title_word_range")
         )
         _record_outside_range(
+            description_by_range,
+            details.get("description_sentence_count"),
+            details.get("description_sentence_range"),
+        )
+        _record_outside_range(
             keyword_by_range, details.get("keyword_count"), details.get("keyword_count_range")
         )
         if details.get("duplicate_keywords"):
             duplicate_models += 1
-    if not (title_by_range or keyword_by_range or duplicate_models):
+    if not (title_by_range or description_by_range or keyword_by_range or duplicate_models):
         return None
 
     def _range_line(label: str, observed: list[int], bounds: tuple[int, int], unit: str) -> str:
@@ -20309,6 +20554,8 @@ def _run_issue_summary_constraint_breakdown(
     lines: list[str] = []
     for bounds, observed in sorted(title_by_range.items()):
         lines.append(_range_line("Title length", observed, bounds, " words"))
+    for bounds, observed in sorted(description_by_range.items()):
+        lines.append(_range_line("Description length", observed, bounds, " sentences"))
     for bounds, observed in sorted(keyword_by_range.items()):
         lines.append(_range_line("Keyword count", observed, bounds, ""))
     if duplicate_models:
@@ -20487,9 +20734,12 @@ def _run_issue_summary_quality_section(
         "Model quality at a glance",
         (
             ReportParagraph(
-                "Every attempted model ranked by current-run usability, with captured "
-                "resource facts. Usability reflects this single image and prompt only: "
-                "*usable* means the output followed the prompt's requested structure; "
+                "Every attempted model ranked by current-run format/structural "
+                "usability, with captured resource facts. Usability is a mechanical "
+                "verdict on this single image and prompt, never an accuracy verdict: "
+                "a model can pass every check while copying hint keywords verbatim or "
+                "misidentifying the subject. *usable* means the output passed every "
+                "mechanical check on the prompt's requested structure; "
                 "*usable with caveats* means repairable deviations (constraint misses, "
                 "visible control tokens); *unusable* means mechanically broken output "
                 "(repetition, missing sections, truncation); *not evaluated* means the "
@@ -20499,7 +20749,14 @@ def _run_issue_summary_quality_section(
                 "maintainer evidence."
             ),
             ReportTable(
-                ("Model", "Usability", "Total", "Gen tok/s", "Peak GB", "Observed"),
+                (
+                    "Model",
+                    "Format/structural usability",
+                    "Total",
+                    "Gen tok/s",
+                    "Peak GB",
+                    "Observed",
+                ),
                 tuple(rows),
                 compact=True,
             ),
@@ -20556,7 +20813,7 @@ def _run_issue_summary_surfaced_sections(
                     heading,
                     (
                         ReportTable(
-                            ("Model", "Usability", "Observed result", "Evidence"),
+                            ("Model", "Format/structural usability", "Observed result", "Evidence"),
                             tuple(rows),
                             compact=True,
                         ),
@@ -20726,7 +20983,7 @@ def _run_issue_summary_clean_completions_section(
         if result["assessment"]["execution"] == "completed"
         and not result["assessment"]["observations"]
     )
-    clean_phrase = _pluralized_count(clean_count, "clean completion")
+    clean_phrase = _pluralized_count(clean_count, "completion") + " passing mechanical checks"
     if clean_models:
         clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
     clean_sentence = f"{clean_phrase}."
@@ -20744,7 +21001,7 @@ def _run_issue_summary_clean_completions_section(
         )
         clean_sentence += f" See the {_render_report_cell_markdown(gallery_link, escaped=False)}."
     return ReportSection(
-        "Clean completions",
+        "Completions passing mechanical checks",
         (
             ReportRaw(
                 markdown_lines=(clean_sentence,),
@@ -21754,7 +22011,7 @@ def _compute_run_comparison(
             current.results,
             baseline,
             history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
-            prompt_hash=hashlib.sha256(inputs.prompt.encode("utf-8")).hexdigest(),
+            comparison_fingerprint=_comparison_fingerprint_from_metadata(current.metadata),
             history_excludes_current=inputs.history_appended,
             current_execution_mode=str(current.metadata.get("execution_mode", "in_process")),
             current_metadata=current.metadata,
@@ -22252,6 +22509,7 @@ def finalize_execution(
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Preserve raw append-only history without reading it into current reports.
+        current_image_record = _run_image_record(image_path, report_context.image_profile)
         history_record = append_history_record(
             history_path=history_path,
             results=results,
@@ -22261,6 +22519,17 @@ def finalize_execution(
             image_path=image_path,
             runtime_fingerprint=runtime_fingerprint,
             eval_mode=eval_mode,
+            comparison_fingerprint=_comparison_fingerprint(
+                prompt=prompt,
+                image_sha256=(
+                    current_image_record["sha256"] if current_image_record is not None else None
+                ),
+                generation_settings=_common_generation_settings(results),
+                execution_mode="isolated" if getattr(args, "isolate", False) else "in_process",
+                eval_mode=eval_mode,
+                system_info=system_info,
+            ),
+            model_provenance=model_provenance,
         )
 
         log_file_path(history_path, label="   History:     ")

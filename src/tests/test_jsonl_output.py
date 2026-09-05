@@ -1540,6 +1540,7 @@ def test_append_history_record_contains_only_raw_execution_and_resource_facts(
     model_record = model_results["test-model"]
     assert model_record == {
         "success": True,
+        "resolved_revision": None,
         "failure_phase": None,
         "error_stage": None,
         "error_type": None,

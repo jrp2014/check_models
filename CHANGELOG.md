@@ -278,6 +278,37 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Format compliance is no longer confusable with accuracy on the influential
+  surfaces: chooser, output-at-a-glance and run-summary tables head their
+  axis "Format/structural usability", resource highlights and the
+  run-summary/diagnostics sections say "passing mechanical checks" instead of
+  "clean", and the chooser explanation states outright that a model can pass
+  every check while copying hint keywords or misidentifying the subject.
+  Machine codes (`usable`, `usable_with_caveats`, observation codes) are
+  unchanged.
+- The description part of the catalogue contract is now assessed, conservatively:
+  a description with more sentences than the prompt's requested range is a
+  `catalog_constraint_violation` with `description_sentence_count` and
+  `description_sentence_range` evidence, surfaced in the per-model label,
+  the constraint-failure breakdown and the details table. The sentence
+  counter only splits on a terminator followed by whitespace and a capital
+  or digit, ignores abbreviations, initials, dotted acronyms and decimals,
+  and checks the upper bound only, so it can under-count but never invent a
+  violation. The observation label reads "Title, description or keywords do
+  not meet requested constraints".
+- Performance comparability uses a fuller identity. Hardware identity is
+  now chip plus GPU core count plus RAM, so the same chip with fewer cores
+  or less memory withholds throughput. History noise bands are grouped by a
+  comparison fingerprint (prompt, image digest, generation settings, lane,
+  execution mode, hardware) that `results.history.jsonl` now records as
+  `comparison_fingerprint`, and a model's samples must come from the
+  revision under test (`resolved_revision` is now stored per model);
+  older history rows without those facts fall back to the fixed ±15% band.
+- Parameter estimates from model names distinguish active from total: an
+  `A3B`-style token is an active-parameter designation, so
+  `Kimi-VL-A3B` reports "Active parameter count: 3.00B (name-estimate; total
+  not stated in the name)" instead of a 3B checkpoint, and `30B-A3B` names
+  report "30.00B total, 3.00B active".
 - Chooser and output-at-a-glance previews now show each model's final
   answer: a closed thinking trace (emitted or prompt-seeded, the same rule
   the assessment uses) is left out of the preview, reported as an
