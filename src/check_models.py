@@ -918,6 +918,7 @@ class HistoryModelResultRecord(TypedDict):
 
     success: bool
     resolved_revision: NotRequired[str | None]
+    generation_settings: NotRequired[dict[str, JsonLike]]
     failure_phase: NotRequired[str | None]
     error_stage: NotRequired[str | None]
     error_type: NotRequired[str | None]
@@ -3728,6 +3729,53 @@ def _strip_empty_thinking_wrappers(text: str) -> str:
     return _EMPTY_THINKING_WRAPPER_RE.sub(" ", text)
 
 
+def _final_answer_split(
+    text: str,
+    *,
+    delimiter_pairs: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
+    seeded_text: str = "",
+) -> tuple[str, tuple[str, ...]]:
+    """Return (final answer, removed trace segments) for one output.
+
+    The segments are exactly the spans the delimiter processing removed, in
+    removal order, so a caller that reports "N characters of reasoning
+    omitted" or opens the trace under disclosure never has to rediscover
+    the boundary by text matching — which fails when the model drafts its
+    final answer inside the thinking block.
+    """
+    if not text:
+        return text, ()
+    removed: list[str] = []
+
+    def _collect(match: re.Match[str]) -> str:
+        removed.append(match.group(0))
+        return " "
+
+    view = text
+    seeded_lower = seeded_text.casefold()
+    for start_marker, end_marker in delimiter_pairs:
+        # Complete emitted blocks (non-greedy, may span lines).
+        block_re = re.compile(
+            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
+            re.IGNORECASE | re.DOTALL,
+        )
+        view = block_re.sub(_collect, view)
+        # A closing marker whose opener was seeded by the prompt: everything
+        # from the start of the output through that first end marker is
+        # reasoning that continues the seeded block.
+        start_lower = start_marker.casefold()
+        end_lower = end_marker.casefold()
+        seeded_open = seeded_lower.rfind(start_lower) > seeded_lower.rfind(end_lower)
+        if seeded_open:
+            view_lower = view.casefold()
+            end_position = view_lower.find(end_lower)
+            if end_position >= 0 and view_lower.find(start_lower, 0, end_position) < 0:
+                cut = end_position + len(end_marker)
+                removed.append(view[:cut])
+                view = view[cut:]
+    return view.strip(), tuple(removed)
+
+
 def _final_answer_view(
     text: str,
     *,
@@ -3748,29 +3796,7 @@ def _final_answer_view(
     incomplete-trace observation still sees them. Raw text and markers stay
     available to callers as neutral evidence.
     """
-    if not text:
-        return text
-    view = text
-    seeded_lower = seeded_text.casefold()
-    for start_marker, end_marker in delimiter_pairs:
-        # Complete emitted blocks (non-greedy, may span lines).
-        block_re = re.compile(
-            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
-            re.IGNORECASE | re.DOTALL,
-        )
-        view = block_re.sub(" ", view)
-        # A closing marker whose opener was seeded by the prompt: everything
-        # from the start of the output through that first end marker is
-        # reasoning that continues the seeded block.
-        start_lower = start_marker.casefold()
-        end_lower = end_marker.casefold()
-        seeded_open = seeded_lower.rfind(start_lower) > seeded_lower.rfind(end_lower)
-        if seeded_open:
-            view_lower = view.casefold()
-            end_position = view_lower.find(end_lower)
-            if end_position >= 0 and view_lower.find(start_lower, 0, end_position) < 0:
-                view = view[end_position + len(end_marker) :]
-    return view.strip()
+    return _final_answer_split(text, delimiter_pairs=delimiter_pairs, seeded_text=seeded_text)[0]
 
 
 @dataclass(frozen=True)
@@ -4070,30 +4096,65 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
     )
 
 
+# A boundary needs a capital letter after the whitespace: a following digit
+# ("approx. 1750", "c. 1744", "No. 5") is far more often an abbreviation than
+# a sentence that starts with a number.
 _SENTENCE_BOUNDARY_RE: Final[re.Pattern[str]] = re.compile(
-    r"[.!?]+[\"'\u201d\u2019)\]]*\s+(?=[\"'\u201c\u2018(\[]?[A-Z0-9])"
+    r"[.!?]+[\"'\u201d\u2019)\]]*\s+(?=[\"'\u201c\u2018(\[]?[A-Z])"
 )
 _SENTENCE_ABBREVIATIONS: Final[frozenset[str]] = frozenset(
-    {"mr", "mrs", "ms", "dr", "prof", "st", "mt", "ft", "no", "vs", "etc", "cf", "jr", "sr"}
+    {
+        "approx",
+        "ave",
+        "bldg",
+        "ca",
+        "cf",
+        "co",
+        "dept",
+        "dr",
+        "ed",
+        "est",
+        "etc",
+        "fig",
+        "ft",
+        "inc",
+        "jr",
+        "ltd",
+        "mr",
+        "mrs",
+        "ms",
+        "mt",
+        "no",
+        "prof",
+        "rd",
+        "sr",
+        "st",
+        "vol",
+        "vs",
+    }
 )
 
 
 def _count_description_sentences(text: str) -> int:
-    """Count sentences conservatively: terminator, whitespace, then a capital or digit.
+    """Count sentences conservatively: terminator, whitespace, then a capital letter.
 
-    Abbreviations ("Dr.", "St.", "e.g.", initials), dotted acronyms ("U.S.")
-    and decimals ("2.5 m") never split. The count feeds only an upper-bound
-    check, so a boundary the splitter misses can under-count but never
-    invent a violation — deliberately no sentence parser.
+    Known abbreviations ("Dr.", "St.", "approx."), initials, dotted acronyms
+    ("U.S."), decimals ("2.5 m"), a terminator with nothing before it ("...")
+    and a following digit never split. The count feeds only an upper-bound
+    check, so a missed boundary under-counts; the residual risk is an
+    unlisted abbreviation followed by a capitalised word, which is why this
+    stays a bounded heuristic rather than a sentence parser.
     """
     collapsed = " ".join(text.split())
     if not collapsed:
         return 0
     count = 1
     for match in _SENTENCE_BOUNDARY_RE.finditer(collapsed):
-        last_word = collapsed[: match.start()].rsplit(None, 1)[-1].casefold()
+        preceding = collapsed[: match.start()].rsplit(None, 1)
+        last_word = preceding[-1].casefold() if preceding else ""
         if (
-            last_word in _SENTENCE_ABBREVIATIONS
+            not last_word
+            or last_word in _SENTENCE_ABBREVIATIONS
             or "." in last_word
             or (len(last_word) == 1 and last_word.isalpha())
         ):
@@ -7579,11 +7640,6 @@ def _parameter_counts_from_name(model_identifier: str) -> tuple[int | None, int 
         max(totals) if totals else None,
         max(value for _start, _end, value in active_spans) if active_spans else None,
     )
-
-
-def _parameter_count_from_name(model_identifier: str) -> int | None:
-    """Estimate total parameters from the model name; None when only an active size is given."""
-    return _parameter_counts_from_name(model_identifier)[0]
 
 
 def _collect_model_burden(
@@ -16970,16 +17026,14 @@ def _final_answer_text(result: PerformanceResult) -> tuple[str, str]:
     under disclosure rather than losing it.
     """
     text = _generation_text_value(result.generation)
-    answer = _final_answer_view(
+    answer, removed = _final_answer_split(
         text,
         delimiter_pairs=_result_thinking_delimiters(result),
         seeded_text=_result_seeded_thinking_text(result),
     )
-    if not answer or answer == text.strip():
+    if not removed or not answer:
         return text, ""
-    answer_start = text.find(answer[:60])
-    reasoning = text[:answer_start] if answer_start > 0 else ""
-    return answer, reasoning.strip()
+    return answer, "\n".join(segment.strip() for segment in removed if segment.strip())
 
 
 def _configured_thinking_markers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
@@ -17658,6 +17712,12 @@ def _history_model_result_from_result(
         "model_load_time_s": result.model_load_time,
         "total_time_s": result.total_time,
     }
+    # Effective per-model settings (a thinking budget, say) are not in the
+    # run-level fingerprint, which keeps only settings shared by the whole
+    # sweep; noise bands match them per model instead.
+    diagnostics = result.prompt_diagnostics
+    if diagnostics is not None and diagnostics.generate_kwargs:
+        record["generation_settings"] = dict(diagnostics.generate_kwargs)
     if result.generation is not None:
         performance = _extract_generation_performance_data(result.generation)
         active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance)
@@ -18507,6 +18567,7 @@ def _history_tps_bands(
     fingerprint: str | None,
     exclude_last: bool,
     current_revisions: Mapping[str, str | None] | None = None,
+    current_settings: Mapping[str, str | None] | None = None,
 ) -> tuple[dict[str, tuple[float, float, int]], int]:
     """Return per-model (low, high, samples) throughput bands from retained history.
 
@@ -18516,7 +18577,9 @@ def _history_tps_bands(
     be the same workload, so the fixed fallback band applies) — and a Tukey
     fence (Q1 - 1.5 IQR, Q3 + 1.5 IQR) per model, never narrower than ±10% of
     the median. A model's samples must also come from the revision now under
-    test when ``current_revisions`` names one. ``exclude_last`` drops the
+    test when ``current_revisions`` names one, and from the same effective
+    per-model generation settings when ``current_settings`` carries their
+    canonical form (see ``_canonical_generation_settings``). ``exclude_last`` drops the
     record just appended for the current run so it cannot vouch for itself;
     callers pass it only after a confirmed append.
     """
@@ -18548,9 +18611,10 @@ def _history_tps_bands(
         if not isinstance(model_results, dict):
             continue
         for model, facts in model_results.items():
-            wanted_revision = (current_revisions or {}).get(model)
-            if wanted_revision is not None and (
-                not isinstance(facts, dict) or facts.get("resolved_revision") != wanted_revision
+            if not _history_sample_matches_current(
+                facts,
+                wanted_revision=(current_revisions or {}).get(model),
+                wanted_settings=(current_settings or {}).get(model),
             ):
                 continue
             if (tps := _history_band_tps_sample(facts)) is not None:
@@ -18570,6 +18634,56 @@ def _history_tps_bands(
         high = max(q3 + 1.5 * iqr, median * (1.0 + _COMPARISON_TPS_BAND_MIN_HALF_WIDTH))
         bands[model] = (max(low, 0.0), high, len(values))
     return bands, len(runs)
+
+
+def _current_model_revisions(
+    current: Sequence[JsonlResultRecord],
+) -> dict[str, str | None]:
+    """Resolved revision per model in the current run, from the retained rows."""
+    return {
+        record["model"]: provenance.get("resolved_revision")
+        for record in current
+        if isinstance(provenance := record.get("model_provenance"), dict)
+    }
+
+
+def _current_model_settings(
+    current: Sequence[JsonlResultRecord],
+) -> dict[str, str | None]:
+    """Canonical effective generation settings per model in the current run."""
+    return {
+        record["model"]: _canonical_generation_settings(diagnostics.get("generate_kwargs"))
+        for record in current
+        if isinstance(diagnostics := record.get("prompt_diagnostics"), dict)
+    }
+
+
+def _history_sample_matches_current(
+    facts: object,
+    *,
+    wanted_revision: str | None,
+    wanted_settings: str | None,
+) -> bool:
+    """Return whether a history sample shares the current model's revision and settings.
+
+    A wanted fact the row cannot show it matches (missing or different)
+    excludes the sample; an unknown current fact excludes nothing.
+    """
+    if wanted_revision is not None and (
+        not isinstance(facts, dict) or facts.get("resolved_revision") != wanted_revision
+    ):
+        return False
+    return wanted_settings is None or (
+        isinstance(facts, dict)
+        and _canonical_generation_settings(facts.get("generation_settings")) == wanted_settings
+    )
+
+
+def _canonical_generation_settings(settings: object) -> str | None:
+    """Canonical JSON for one model's effective generation settings, or None if absent."""
+    if not isinstance(settings, dict) or not settings:
+        return None
+    return json.dumps(settings, ensure_ascii=False, sort_keys=True, default=str)
 
 
 def _quantile(ordered: Sequence[float], q: float) -> float:
@@ -18785,11 +18899,8 @@ def compare_run_results(
             history_path,
             fingerprint=comparison_fingerprint,
             exclude_last=history_excludes_current,
-            current_revisions={
-                record["model"]: provenance.get("resolved_revision")
-                for record in current
-                if isinstance(provenance := record.get("model_provenance"), dict)
-            },
+            current_revisions=_current_model_revisions(current),
+            current_settings=_current_model_settings(current),
         )
         if history_path is not None
         else ({}, 0)

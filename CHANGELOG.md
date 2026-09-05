@@ -33,6 +33,24 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The description sentence counter no longer raises on a terminator with
+  nothing before it (`Description: ... The mill spans a river.` crashed
+  inside successful-result construction) and no longer splits after an
+  abbreviation followed by a number (`Built approx. 1750, ...` counted as
+  three sentences): a boundary now needs a capital letter after the
+  whitespace, more abbreviations are known, and the docstring states the
+  residual over-count risk instead of claiming none. Both cases are
+  regression-tested through the assessment path.
+- History noise bands additionally match each model's effective generation
+  settings (`generation_settings` is now recorded per model in
+  `results.history.jsonl`), so a thinking-budget change that the run-level
+  fingerprint cannot see — it keeps only settings common to the whole sweep
+  — no longer blends two workloads into one band.
+- The reasoning disclosure and omitted-character count now come from the
+  spans the delimiter processing actually removed, not from re-finding the
+  answer's first characters in the raw output; a model that drafts its final
+  answer inside the thinking block previously had most of its trace
+  mis-attributed to the answer.
 - Baseline comparisons no longer treat runs on different hardware as
   like-for-like for performance: the chip (`system["GPU/Chip"]`) is now a
   comparison fact, so a differing chip withholds the tok/s ratio, throughput
@@ -213,6 +231,8 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- `_parameter_count_from_name` compatibility wrapper; callers and tests use
+  `_parameter_counts_from_name` (total, active) directly.
 - `mlx-lm` is gone from the project entirely: nothing imports it and
   mlx-vlm has not depended on it since 0.6.14, so the `extras` entry, the
   legacy mlx-vlm < 0.6.14 floor logic and its policy constants, the report

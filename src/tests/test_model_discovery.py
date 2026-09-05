@@ -1285,9 +1285,9 @@ class TestModelBurdenFacts:
 
     def test_million_scale_and_fractional_size_tokens(self) -> None:
         """M-scale and fractional size tokens parse; the largest token wins."""
-        assert check_models._parameter_count_from_name("org/nano-350M") == 350_000_000
-        assert check_models._parameter_count_from_name("org/big-2.7b-chat") == 2_700_000_000
-        assert check_models._parameter_count_from_name("org/no-size-here") is None
+        assert check_models._parameter_counts_from_name("org/nano-350M")[0] == 350_000_000
+        assert check_models._parameter_counts_from_name("org/big-2.7b-chat")[0] == 2_700_000_000
+        assert check_models._parameter_counts_from_name("org/no-size-here")[0] is None
 
     def test_fractional_sizes_do_not_truncate(self) -> None:
         """Decimal arithmetic: 4.1 is inexact in binary and float-int truncated.
@@ -1295,13 +1295,15 @@ class TestModelBurdenFacts:
         Mirrors ml-explore/mlx-lm#1726, which fixed the same defect in
         mlx-lm's _parse_size.
         """
-        assert check_models._parameter_count_from_name("org/model-4.1B") == 4_100_000_000
-        assert check_models._parameter_count_from_name("org/tiny-8.2M") == 8_200_000
-        assert check_models._parameter_count_from_name("org/mid-16.9b") == 16_900_000_000
+        assert check_models._parameter_counts_from_name("org/model-4.1B")[0] == 4_100_000_000
+        assert check_models._parameter_counts_from_name("org/tiny-8.2M")[0] == 8_200_000
+        assert check_models._parameter_counts_from_name("org/mid-16.9b")[0] == 16_900_000_000
 
     def test_moe_names_report_total_not_activated_parameters(self) -> None:
         """MoE names carry total and activated sizes; the total is the plain token."""
-        moe = check_models._parameter_count_from_name("mlx-community/Qwen3-30B-A3B-Instruct-4bit")
+        moe = check_models._parameter_counts_from_name("mlx-community/Qwen3-30B-A3B-Instruct-4bit")[
+            0
+        ]
         assert moe == 30_000_000_000
         assert check_models._parameter_counts_from_name(
             "mlx-community/Qwen3-30B-A3B-Instruct-4bit"
@@ -1316,7 +1318,7 @@ class TestModelBurdenFacts:
     def test_active_only_names_leave_the_total_unknown(self) -> None:
         """An A3B token states active parameters only; it must not become a 3B checkpoint."""
         name = "mlx-community/Kimi-VL-A3B-Thinking-2506-8bit"
-        assert check_models._parameter_count_from_name(name) is None
+        assert check_models._parameter_counts_from_name(name)[0] is None
         assert check_models._parameter_counts_from_name(name) == (None, 3_000_000_000)
         # A capital A that is simply the last letter of a word is not a designation.
         assert check_models._parameter_counts_from_name("org/LLaVA-3B") == (3_000_000_000, None)

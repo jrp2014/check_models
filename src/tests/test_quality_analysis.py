@@ -281,6 +281,38 @@ def test_description_sentence_count_is_conservative() -> None:
     assert check_models._assess_result(result).observations == ()
 
 
+def test_leading_ellipsis_description_neither_crashes_nor_violates() -> None:
+    """A terminator with nothing before it must not raise inside result construction."""
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: ... The mill spans a river.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.description_sentence_count == 1
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
+def test_abbreviation_before_a_number_does_not_invent_a_violation() -> None:
+    """An abbreviation before a number is a boundary of the abbreviation, not a sentence."""
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: Built approx. 1750, the mill spans the river. Visitors walk past.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.description_sentence_count == 2
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
 def test_compliant_catalog_constraints_remain_clean() -> None:
     result = _result(
         "Title: Five Word Catalogue Title Here\n"

@@ -6853,3 +6853,87 @@ def test_history_record_carries_fingerprint_and_model_revision() -> None:
     )
     assert record["comparison_fingerprint"] == "f" * 64
     assert record["model_results"]["org/m"]["resolved_revision"] == "rev-m"
+
+
+def test_reasoning_disclosure_keeps_the_whole_trace_when_the_answer_is_drafted_inside() -> None:
+    """The omitted span comes from the delimiter processing, not from text matching."""
+    answer = "Title: Stone mill by a river\nDescription: A mill.\nKeywords: mill, river"
+    trace = f"<think>Let me draft it first.\n{answer}\nThat looks right, I will emit it.</think>"
+    result = PerformanceResult(
+        model_name="org/drafter",
+        success=True,
+        generation=_MockGeneration(
+            text=f"{trace}\n{answer}", prompt_tokens=10, generation_tokens=40
+        ),
+        total_time=2.0,
+    )
+    final, reasoning = check_models._final_answer_text(result)
+    assert final == answer
+    assert reasoning == trace
+    row = check_models._gallery_row(
+        result, check_models.ResultAssessment("completed", "usable", "none", ())
+    )
+    assert row.reasoning_chars == len(trace)
+
+
+def test_history_bands_require_matching_per_model_settings(tmp_path: Path) -> None:
+    """A thinking budget change on one model must not blend into that model's band."""
+    history = tmp_path / "results.history.jsonl"
+    budget_100 = {"max_tokens": 500, "thinking_budget": 100}
+    budget_800 = {"max_tokens": 500, "thinking_budget": 800}
+    rows = [
+        json.dumps(
+            {
+                "_type": "run",
+                "comparison_fingerprint": "f",
+                "model_results": {
+                    "org/m": {"generation_tps": 100.0 + i, "generation_settings": budget_100}
+                },
+            }
+        )
+        for i in range(5)
+    ]
+    check_models._write_text_file(history, "\n".join(rows) + "\n")
+    canonical = check_models._canonical_generation_settings
+    assert canonical(budget_100) != canonical(budget_800)
+    assert canonical({}) is None
+    same = check_models._history_tps_bands(
+        history,
+        fingerprint="f",
+        exclude_last=False,
+        current_settings={"org/m": canonical(budget_100)},
+    )[0]
+    assert "org/m" in same
+    changed = check_models._history_tps_bands(
+        history,
+        fingerprint="f",
+        exclude_last=False,
+        current_settings={"org/m": canonical(budget_800)},
+    )[0]
+    assert changed == {}
+    # History rows without per-model settings cannot vouch for a known current setting.
+    bare = [
+        json.dumps(
+            {
+                "_type": "run",
+                "comparison_fingerprint": "f",
+                "model_results": {"org/m": {"generation_tps": 100.0}},
+            }
+        )
+    ] * 5
+    check_models._write_text_file(history, "\n".join(bare) + "\n")
+    assert (
+        check_models._history_tps_bands(
+            history,
+            fingerprint="f",
+            exclude_last=False,
+            current_settings={"org/m": canonical(budget_100)},
+        )[0]
+        == {}
+    )
+    assert (
+        "org/m"
+        in check_models._history_tps_bands(
+            history, fingerprint="f", exclude_last=False, current_settings={"org/m": None}
+        )[0]
+    )
