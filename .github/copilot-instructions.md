@@ -62,6 +62,14 @@ The file is organized in this order — search for these exact landmark headers 
 
 ### 4. Architecture & patterns
 
+- **Assessment profiles (0.17+)**: `general` performs task-independent checks;
+  `metadata` adds required Title/Description/Keywords fields and duplicate
+  keywords. Select by prompt origin or explicit `--assessment-profile`, never by
+  parsing prompt prose. Custom prompts and differential triage default to general.
+  Short answers, copied hints and length counts are not automatic faults. Reports
+  must say when task compliance is unassessed. Keep profile provenance through
+  isolated workers and retained JSON. Legacy observation codes remain readable,
+  but do not revive their retired detectors merely to satisfy old fixture tests.
 - **Single CLI runner**: discovers models (HF cache scan), runs each with per-model
   isolation (timeouts, try/except), and generates retained HTML, gallery Markdown,
   diagnostics Markdown, schema-3 JSONL, index, log, environment, and raw history

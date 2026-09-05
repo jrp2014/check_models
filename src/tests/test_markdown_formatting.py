@@ -376,12 +376,13 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
     text = (
         "Title: Brick storefront with outdoor seating\n"
         "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
-        "Keywords: brick storefront brick storefront brick storefront brick storefront"
+        "Keywords: brick storefront, sidewalk, brick storefront,"
     )
     analysis = check_models.analyze_generation_text(
         text,
         generated_tokens=60,
         requested_max_tokens=60,
+        assessment_profile="metadata",
         prompt=prompt,
     )
     result = check_models.PerformanceResult(
@@ -396,6 +397,7 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
         generation_time=2.0,
         total_time=3.0,
         quality_analysis=analysis,
+        assessment_profile="metadata",
         requested_max_tokens=60,
     )
 
@@ -417,12 +419,12 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
     assert "*Next action:*" not in md
     # Chooser uses short selector glosses; complete evidence keeps maintainer labels.
     assert "cut off at token limit" in md
-    assert "title/description/keyword constraints failed" in md
+    assert "duplicate keywords" in md
     assert "Prefill/first s" in md
     assert "*Observations:* Response appears cut off at the token limit" in md
     # Wrapped bullet lines may break inside the label; compare space-normalized.
     normalized = " ".join(md.split())
-    assert "Keyword list has 1 terms (requested 10-18)" in normalized
+    assert "Duplicate keywords: brick storefront" in normalized
     # The in-range title count must not be presented as a violation.
     assert "Title has 5 words" not in normalized
     assert "Keyword count violation" not in md

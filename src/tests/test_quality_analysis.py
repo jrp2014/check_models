@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from argparse import Namespace
 from dataclasses import dataclass
 from typing import Literal
 
@@ -27,6 +28,7 @@ def _result(
     requested_max_tokens: int | None = None,
     model_name: str = "example/model",
     known_special_tokens: tuple[str, ...] = (),
+    assessment_profile: check_models.AssessmentProfile = "general",
 ) -> check_models.PerformanceResult:
     analysis = check_models.analyze_generation_text(
         text,
@@ -34,6 +36,7 @@ def _result(
         prompt=prompt,
         requested_max_tokens=requested_max_tokens,
         known_special_tokens=known_special_tokens,
+        assessment_profile=assessment_profile,
     )
     return check_models.PerformanceResult(
         model_name=model_name,
@@ -41,6 +44,7 @@ def _result(
         generation=_Generation(text, generated_tokens),
         requested_max_tokens=requested_max_tokens,
         quality_analysis=analysis,
+        assessment_profile=assessment_profile,
     )
 
 
@@ -49,6 +53,66 @@ CATALOG_PROMPT = (
     "Title: 5-10 words.\nDescription: 1-2 factual sentences.\n"
     "Keywords: 10-18 terms."
 )
+
+
+def test_general_profile_does_not_infer_a_contract_from_prompt_words() -> None:
+    """An arbitrary short answer must not inherit the built-in metadata contract."""
+    analysis = check_models.analyze_generation_text(
+        "Yes", 1, prompt=CATALOG_PROMPT, requested_max_tokens=1
+    )
+    result = check_models.PerformanceResult(
+        model_name="org/m",
+        success=True,
+        generation=_Generation("Yes", 1),
+        quality_analysis=analysis,
+    )
+    assert check_models._assess_result(result).observations == ()
+    assert analysis.assessment_profile == "general"
+
+
+def test_empty_thinking_wrapper_still_requires_a_final_answer() -> None:
+    """Removing short-answer judgments must not hide a protocol-only response."""
+    result = _result("<think></think>", generated_tokens=2)
+    assert check_models._assess_result(result).observations == ("missing_final_answer",)
+
+
+def test_metadata_profile_checks_fields_without_parsing_the_prompt() -> None:
+    """Explicit metadata checks work on paraphrased prompts and ignore prose limits."""
+    analysis = check_models.analyze_generation_text(
+        "Title: Mill\nDescription: A mill. People walk. Water flows.\nKeywords: mill, river, mill",
+        30,
+        prompt="Please tag this picture however you think best.",
+        assessment_profile="metadata",
+    )
+    assert analysis.missing_sections == []
+    assert analysis.title_word_count == 1
+    assert analysis.keyword_count == 3
+    assert analysis.duplicate_keywords == ["mill"]
+    assert check_models._quality_observations(text="answer", analysis=analysis) == (
+        "duplicate_keywords",
+    )
+    missing = check_models.analyze_generation_text(
+        "A mill by a river.", 10, assessment_profile="metadata"
+    )
+    assert missing.missing_sections == ["title", "description", "keywords"]
+
+
+@pytest.mark.parametrize(
+    ("prompt", "lane", "override", "expected"),
+    [
+        (None, "blind", None, "metadata"),
+        (CATALOG_PROMPT, "blind", None, "general"),
+        (None, "triage", None, "general"),
+        ("Tag it", "blind", "metadata", "metadata"),
+        (None, "blind", "general", "general"),
+    ],
+)
+def test_profile_selection_uses_prompt_origin_not_its_contents(
+    prompt: str | None, lane: str, override: str | None, expected: str
+) -> None:
+    args = Namespace(prompt=prompt, eval_mode=lane, assessment_profile=override, max_tokens=50)
+    check_models._apply_eval_mode_defaults(args, {})
+    assert args.assessment_profile == expected
 
 
 @pytest.mark.parametrize(
@@ -65,9 +129,9 @@ CATALOG_PROMPT = (
             _result("Brief reply", generated_tokens=2),
             check_models.ResultAssessment(
                 "completed",
-                "usable_with_caveats",
+                "usable",
                 "none",
-                ("minimal_output",),
+                (),
             ),
             id="minimal-output",
         ),
@@ -79,7 +143,11 @@ CATALOG_PROMPT = (
             id="contiguous-repetition",
         ),
         pytest.param(
-            _result("A misty lakeshore with trees and power lines.", prompt=CATALOG_PROMPT),
+            _result(
+                "A misty lakeshore with trees and power lines.",
+                prompt=CATALOG_PROMPT,
+                assessment_profile="metadata",
+            ),
             check_models.ResultAssessment(
                 "completed",
                 "unusable",
@@ -105,9 +173,9 @@ CATALOG_PROMPT = (
             ),
             check_models.ResultAssessment(
                 "completed",
-                "unusable",
+                "usable",
                 "none",
-                ("prompt_instruction_echo",),
+                (),
             ),
             id="instruction-echo",
         ),
@@ -150,9 +218,9 @@ CATALOG_PROMPT = (
             ),
             check_models.ResultAssessment(
                 "completed",
-                "usable_with_caveats",
+                "usable",
                 "none",
-                ("no_keyword_overlap",),
+                (),
             ),
             id="no-keyword-overlap",
         ),
@@ -206,19 +274,20 @@ def test_token_cap_alone_is_neutral() -> None:
         ),
     ],
 )
-def test_catalog_constraint_violations_are_repairable_caveats(
+def test_metadata_counts_are_facts_and_duplicates_are_caveats(
     title: str,
     keywords: str,
     expected_title_words: int,
     expected_keyword_count: int,
     duplicates: list[str],
 ) -> None:
-    """Counts and duplicates should qualify otherwise complete catalogue output."""
+    """Prose-derived limits are ignored; duplicate keywords remain a repairable caveat."""
     result = _result(
         f"Title: {title}\n"
         "Description: A factual description of the visible building.\n"
         f"Keywords: {keywords}",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
@@ -227,89 +296,9 @@ def test_catalog_constraint_violations_are_repairable_caveats(
     assert result.quality_analysis.duplicate_keywords == duplicates
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed",
-        "usable_with_caveats",
+        "usable_with_caveats" if duplicates else "usable",
         "none",
-        ("catalog_constraint_violation",),
-    )
-
-
-def test_description_over_requested_sentence_count_is_a_constraint_violation() -> None:
-    """Five description sentences against a requested one or two is a caveat."""
-    result = _result(
-        "Title: Five Word Catalogue Title Here\n"
-        "Description: The mill stands over the river. People walk along the path. "
-        "The sky is blue. A chimney rises above the tiled roof. Trees line the bank.\n"
-        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
-        prompt=CATALOG_PROMPT,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.description_sentence_count == 5
-    assert result.quality_analysis.description_sentence_range == (1, 2)
-    assessment = check_models._assess_result(result)
-    assert assessment.observations == ("catalog_constraint_violation",)
-    details = check_models._observation_details(result)
-    assert details["description_sentence_count"] == 5
-    assert details["description_sentence_range"] == [1, 2]
-    assert "Description has 5 sentences (requested 1-2)" in check_models._human_observation_labels(
-        assessment.observations, details=details
-    )
-
-
-def test_description_sentence_count_is_conservative() -> None:
-    """Abbreviations, initials, acronyms and decimals never split a sentence."""
-    count = check_models._count_description_sentences
-    assert count("") == 0
-    assert count("A single sentence without a terminator") == 1
-    assert (
-        count("Dr. J. Smith stands by St. Pancras, e.g. near the U.S. flag. It is 2.5 m tall.") == 2
-    )
-    assert count("First sentence! Second one? Third one.") == 3
-    # No capital after the terminator: not a boundary the splitter will claim.
-    assert count("Version 2. then lowercase continues") == 1
-
-    # A two-sentence description with abbreviations stays inside the contract.
-    result = _result(
-        "Title: Five Word Catalogue Title Here\n"
-        "Description: Dr. Smith's mill at St. Cross, built c. 1744, spans the river. "
-        "Visitors walk past on a 2.5 m wide path.\n"
-        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
-        prompt=CATALOG_PROMPT,
-    )
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.description_sentence_count == 2
-    assert check_models._assess_result(result).observations == ()
-
-
-def test_leading_ellipsis_description_neither_crashes_nor_violates() -> None:
-    """A terminator with nothing before it must not raise inside result construction."""
-    result = _result(
-        "Title: Five Word Catalogue Title Here\n"
-        "Description: ... The mill spans a river.\n"
-        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
-        prompt=CATALOG_PROMPT,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.description_sentence_count == 1
-    assert check_models._assess_result(result) == check_models.ResultAssessment(
-        "completed", "usable", "none", ()
-    )
-
-
-def test_abbreviation_before_a_number_does_not_invent_a_violation() -> None:
-    """An abbreviation before a number is a boundary of the abbreviation, not a sentence."""
-    result = _result(
-        "Title: Five Word Catalogue Title Here\n"
-        "Description: Built approx. 1750, the mill spans the river. Visitors walk past.\n"
-        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
-        prompt=CATALOG_PROMPT,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.description_sentence_count == 2
-    assert check_models._assess_result(result) == check_models.ResultAssessment(
-        "completed", "usable", "none", ()
+        ("duplicate_keywords",) if duplicates else (),
     )
 
 
@@ -319,35 +308,9 @@ def test_compliant_catalog_constraints_remain_clean() -> None:
         "Description: A factual description of the visible building.\n"
         "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
-    assert check_models._assess_result(result) == check_models.ResultAssessment(
-        "completed", "usable", "none", ()
-    )
-
-
-def test_catalog_constraint_ranges_ignore_numeric_metadata_hints() -> None:
-    prompt = (
-        "Context: Descriptive hints:\n"
-        "- Title hint: Studies 1-2 at Halesworth\n"
-        "- Keyword hints: archive 3-4, building\n\n"
-        "Write:\n"
-        "- a concrete 5-10-word title;\n"
-        "- a 1-2-sentence factual description;\n"
-        "- 10-18 unique, comma-separated keywords.\n\n"
-        "Return exactly these three sections and nothing else:\n"
-        "Title:\nDescription:\nKeywords:"
-    )
-    result = _result(
-        "Title: Five Word Catalogue Title Here\n"
-        "Description: A factual description of the visible building.\n"
-        "Keywords: archive, building, three, four, five, six, seven, eight, nine, ten",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.title_word_range == (5, 10)
-    assert result.quality_analysis.keyword_count_range == (10, 18)
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed", "usable", "none", ()
     )
@@ -376,6 +339,7 @@ def test_configured_utterance_boundary_is_reported_when_visible() -> None:
     result = _result(
         text,
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
         known_special_tokens=("<end_of_utterance>",),
     )
 
@@ -663,11 +627,12 @@ def test_prompt_seeded_thinking_open_without_generated_close_is_unusable() -> No
         "Based on the image, here is the requested description:\n\n*   **",
     ],
 )
-def test_degraded_token_cap_is_unusable(text: str) -> None:
+def test_general_cap_does_not_infer_truncation_from_prose(text: str) -> None:
     result = _result(text, generated_tokens=500, requested_max_tokens=500)
 
-    assert check_models._assess_result(result).usability == "unusable"
-    assert "token_cap_truncation" in check_models._assess_result(result).observations
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.likely_capped
+    assert "token_cap_truncation" not in check_models._assess_result(result).observations
 
 
 def test_configured_thinking_delimiters_are_observed_without_model_name_policy() -> None:
@@ -790,100 +755,6 @@ def test_declared_generation_wrappers_are_neutral_without_model_name_policy() ->
     )
 
 
-def test_assisted_output_returning_every_supplied_draft_field_is_observed_exactly() -> None:
-    """An unchanged descriptive draft is chooser evidence, not a semantic score."""
-    prompt = check_models._build_cataloguing_prompt(
-        {
-            "title": "Harbour boats at dusk",
-            "description": "Two boats rest on calm water at dusk.",
-            "keywords": "boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
-        }
-    )
-    result = _result(
-        "Title: Harbour boats at dusk\n"
-        "Description: Two boats rest on calm water at dusk.\n"
-        "Keywords: boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.unchanged_draft_fields == [
-        "title",
-        "description",
-        "keywords",
-    ]
-    assert check_models._assess_result(result) == check_models.ResultAssessment(
-        "completed",
-        "usable_with_caveats",
-        "none",
-        ("catalog_constraint_violation", "draft_returned_unchanged"),
-    )
-
-
-def test_assisted_output_that_changes_one_draft_field_is_not_called_unchanged() -> None:
-    """The exact draft observation must not infer whether a rewrite is better or worse."""
-    prompt = check_models._build_cataloguing_prompt(
-        {
-            "title": "Harbour boats at dusk",
-            "description": "Two boats rest on calm water at dusk.",
-            "keywords": "boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
-        }
-    )
-    result = _result(
-        "Title: Harbour boats beneath a violet sky\n"
-        "Description: Two boats rest on calm water at dusk.\n"
-        "Keywords: boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.unchanged_draft_fields == []
-    assert "draft_returned_unchanged" not in check_models._assess_result(result).observations
-
-
-def test_historical_existing_labels_still_detect_unchanged_draft_fields() -> None:
-    """Retained prompts should remain analysable after generated labels change."""
-    prompt = (
-        f"{CATALOG_PROMPT}\n\n"
-        "Context: Draft descriptive metadata:\n"
-        "- Existing title: Harbour boats at dusk\n"
-        "- Existing description: Two boats rest on calm water at dusk.\n"
-        "- Existing keywords: boats, harbour, water"
-    )
-    result = _result(
-        "Title: Harbour boats at dusk\n"
-        "Description: Two boats rest on calm water at dusk.\n"
-        "Keywords: boats, harbour, water",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.unchanged_draft_fields == [
-        "title",
-        "description",
-        "keywords",
-    ]
-
-
-def test_authoritative_context_keeps_adjacent_keyword_hints_assessable() -> None:
-    """The second assisted context block must reach weak keyword-overlap analysis."""
-    prompt = check_models._build_cataloguing_prompt(
-        {
-            "date": "2026-07-31",
-            "keywords": "boat, harbour, water",
-        }
-    )
-    result = _result(
-        "Title: Mountain path beneath cloud\n"
-        "Description: A rocky path crosses a mountain slope beneath cloud.\n"
-        "Keywords: mountain, path, rocks, cloud, slope, landscape, hiking, grey, outdoors, trail",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.keyword_overlap == "no_overlap"
-
-
 def test_configured_user_role_token_mid_output_is_observed_as_a_boundary() -> None:
     result = _result(
         "Title: Two cats\nDescription: Two cats rest indoors.\n"
@@ -922,12 +793,13 @@ def test_draft_metadata_keywords_do_not_become_output_requirements() -> None:
     assert "no_keyword_overlap" not in check_models._assess_result(result).observations
 
 
-def test_requested_section_parser_is_prompt_gated() -> None:
+def test_requested_section_parser_is_profile_gated() -> None:
     plain = check_models.analyze_generation_text("A plain caption.", 12)
     requested = check_models.analyze_generation_text(
         "A plain caption.",
         12,
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert plain.missing_sections == []
@@ -939,68 +811,24 @@ def test_short_catalog_response_still_has_to_satisfy_requested_sections() -> Non
         "Do not output the prompt instructions.",
         generated_tokens=8,
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert check_models._assess_result(result).usability == "unusable"
-    assert check_models._assess_result(result).observations == (
-        "missing_requested_sections",
-        "prompt_instruction_echo",
-    )
+    assert check_models._assess_result(result).observations == ("missing_requested_sections",)
 
 
-def test_multiple_title_list_items_do_not_satisfy_catalog_contract() -> None:
+def test_multiline_title_is_present_without_an_inferred_single_line_contract() -> None:
     result = _result(
         "Title:\n- remote control\n- cat\n- sofa\n"
         "Description: A cat sits beside a remote control.\n"
         "Keywords: cat, sofa, remote, indoor, pet, furniture, resting, home, animal, room",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
-    assert result.quality_analysis.missing_sections == ["title"]
-    assert check_models._assess_result(result).usability == "unusable"
-
-
-def test_instruction_echo_detects_normalized_prompt_span() -> None:
-    prompt = (
-        f"{CATALOG_PROMPT}\n"
-        "Keywords: 10-18 unique comma-separated terms covering supplied authoritative "
-        "context and clearly visible subjects, setting, colors, composition, and style."
-    )
-    result = _result(
-        "Title: Two cats on a sofa\n"
-        "Description: Two cats rest together indoors.\n"
-        "Keywords: supplied authoritative context and clearly visible subjects, setting, "
-        "colors, composition, and style",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.instruction_echo is True
-    assert check_models._assess_result(result).usability == "unusable"
-
-
-def test_instruction_echo_ignores_authoritative_context_values() -> None:
-    prompt = (
-        f"{CATALOG_PROMPT}\n\n"
-        "Context: Authoritative context:\n"
-        "- Capture date/time: 2026-07-25 18:33:16 UTC+01:00\n"
-        "- GPS: 51.358240°N, 1.432820°E\n\n"
-        "Draft descriptive metadata:\n"
-        "- Existing title: Viking Bay, Broadstairs, England, UK\n"
-        "- Existing description: A sunny beach in Broadstairs, Kent.\n"
-        "- Existing keywords: beach, Broadstairs, Kent, coast"
-    )
-    result = _result(
-        "Title: Viking Bay, 2026-07-25 18:33:16 UTC+01:00\n"
-        "Description: A sunny beach in Broadstairs, Kent.\n"
-        "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
-        "buildings, summer",
-        prompt=prompt,
-    )
-
-    assert result.quality_analysis is not None
-    assert result.quality_analysis.instruction_echo is False
+    assert result.quality_analysis.missing_sections == []
     assert check_models._assess_result(result).usability == "usable"
 
 
@@ -1011,6 +839,7 @@ def test_markdown_bold_catalog_labels_satisfy_requested_sections() -> None:
         "**Keywords:**\nbeach, Broadstairs, Kent, coast, sand, sea, people, sky, "
         "buildings, summer",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
@@ -1027,6 +856,7 @@ def test_markdown_heading_catalog_labels_satisfy_requested_sections(heading: str
         "cats, lounging, red couch, remote controls, relaxed, indoor, comfort, "
         "feline, domestic, resting",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
@@ -1034,7 +864,7 @@ def test_markdown_heading_catalog_labels_satisfy_requested_sections(heading: str
     assert check_models._assess_result(result).usability == "usable"
 
 
-def test_text_before_catalog_sections_is_reported_as_unusable() -> None:
+def test_text_before_catalog_sections_does_not_infer_an_exact_output_contract() -> None:
     result = _result(
         "Remove non-visual information.\n\n"
         "Title: Viking Bay Beach, Broadstairs, Kent\n"
@@ -1042,12 +872,12 @@ def test_text_before_catalog_sections_is_reported_as_unusable() -> None:
         "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
         "buildings, summer",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
-    assert result.quality_analysis.unexpected_catalog_preamble == ("Remove non-visual information.")
-    assert check_models._assess_result(result).observations == ("unexpected_catalog_preamble",)
-    assert check_models._assess_result(result).usability == "unusable"
+    assert check_models._assess_result(result).observations == ()
+    assert check_models._assess_result(result).usability == "usable"
 
 
 def test_empty_thinking_wrapper_before_catalog_sections_is_neutral() -> None:
@@ -1058,10 +888,10 @@ def test_empty_thinking_wrapper_before_catalog_sections_is_neutral() -> None:
         "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
         "buildings, summer",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
     )
 
     assert result.quality_analysis is not None
-    assert result.quality_analysis.unexpected_catalog_preamble is None
     assert check_models._assess_result(result).usability == "usable"
 
 
@@ -1072,6 +902,7 @@ def test_repeated_keyword_cycle_is_repetitive_output() -> None:
         "Description: Two cats rest on a sofa.\n"
         f"Keywords: {cycle}, {cycle}, {cycle}",
         prompt=CATALOG_PROMPT,
+        assessment_profile="metadata",
         generated_tokens=80,
     )
 
@@ -1198,14 +1029,13 @@ class TestFinalAnswerView:
             generated_tokens=400,
             requested_max_tokens=1000,
             prompt=CATALOG_PROMPT,
+            assessment_profile="metadata",
             seeded_thinking_text="assistant\n<think>",
         )
 
         assert analysis.has_thinking_trace is True
         assert analysis.thinking_trace_incomplete is False
-        assert analysis.unexpected_catalog_preamble is None
         assert analysis.missing_sections == []
-        assert analysis.instruction_echo is False
 
     def test_capped_comma_tail_reports_unfinished_list(self) -> None:
         """Regression: ERNIE shape — capped answer ending mid keyword list."""
@@ -1220,6 +1050,7 @@ class TestFinalAnswerView:
             generated_tokens=1000,
             requested_max_tokens=1000,
             prompt=CATALOG_PROMPT,
+            assessment_profile="metadata",
         )
 
         assert analysis.likely_capped is True
@@ -1277,8 +1108,6 @@ def test_configured_thinking_markers_are_not_prestripped_from_analysis() -> None
     analysis = populated.quality_analysis
     assert analysis is not None
     assert analysis.has_thinking_trace is True
-    assert analysis.unexpected_catalog_preamble is None
-    assert analysis.instruction_echo is False
     assert check_models._assess_result(populated).usability == "usable"
 
 
@@ -1323,7 +1152,6 @@ def test_tokenizer_special_thinking_tokens_survive_without_configured_budget() -
     analysis = populated.quality_analysis
     assert analysis is not None
     assert analysis.has_thinking_trace is True
-    assert analysis.unexpected_catalog_preamble is None
     assert check_models._assess_result(populated).usability == "usable"
 
 

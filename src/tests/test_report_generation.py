@@ -429,9 +429,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "## Completed attempts requiring review" in content
     assert "## Crashed attempts requiring review" in content
     assert "## Indeterminate attempts requiring review" in content
-    assert (
-        content.count("| Model | Format/structural usability | Observed result | Evidence |") == 3
-    )
+    assert content.count("| Model | Mechanical checks | Observed result | Evidence |") == 3
     assert "| Model | Execution / usability | Observations | Full evidence |" not in content
     assert "## Observation clusters" in content
     # Clusters group by observation codes only (no per-model detail expansion).
@@ -439,7 +437,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         "| Response repeats the same text; Required fields are missing or empty | 1 |"
     ) in content
     assert (
-        "| org/observed | unusable | Response repeats the same text; "
+        "| org/observed | major concerns | Response repeats the same text; "
         "Missing or empty fields: Title, Keywords |"
     ) in content
     crashed_table = _extract_markdown_subsection(
@@ -457,7 +455,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
     assert (
-        "1 completion passing mechanical checks (`org/clean`). See the [full model gallery]"
+        "1 completion without detected concerns (`org/clean`). See the [full model gallery]"
         in content
     )
     assert "Trust remote code" in content
@@ -475,7 +473,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     # completions, never in the review sections.
     review_sections = content[content.index("## Observation clusters") :]
     review_sections = review_sections[
-        : review_sections.index("## Completions passing mechanical checks")
+        : review_sections.index("## Completions without detected concerns")
     ]
     assert "org/clean" not in review_sections
     assert "Traceback (most recent call last)" not in content
@@ -558,7 +556,10 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
     minimal = PerformanceResult(
         model_name="org/a-minimal",
         success=True,
-        generation=_MockGeneration(text="Cat", generation_tokens=1),
+        generation=_MockGeneration(
+            text="Title: Cat\nDescription: A cat.\nKeywords: cat, cat", generation_tokens=12
+        ),
+        assessment_profile="metadata",
     )
     repeated = PerformanceResult(
         model_name="org/z-repeated",
@@ -593,7 +594,7 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
         "## Completed Runs with Observations",
         end_headings=("## Indeterminate Attempts",),
     )
-    # Repetition is an integration signal; a minimal response is a
+    # Repetition is an integration signal; duplicate keywords are a
     # compliance-only note and stays out of the maintainer lane entirely.
     assert "org/z-repeated" in triage
     assert "org/a-minimal" not in triage
@@ -602,7 +603,7 @@ def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) 
     compliance = _extract_markdown_subsection(
         content,
         "## Model Compliance Notes (not maintainer issues)",
-        end_headings=("## Context for completions passing mechanical checks",),
+        end_headings=("## Context for completions without detected concerns",),
     )
     assert "org/a-minimal" in compliance
     assert "org/z-repeated" not in compliance
@@ -916,7 +917,7 @@ def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -
     lines = summary.read_text(encoding="utf-8").splitlines()
     finished = next(i for i, line in enumerate(lines) if line.startswith("- *Run finished:*"))
     assert lines[finished + 2] == "- *Evaluation lane:* assisted"
-    assert lines[finished + 3] == "- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.0 MB"
+    assert lines[finished + 4] == "- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.0 MB"
     assert "Evaluation mode" not in "\n".join(lines)
 
     image = cast(
@@ -933,13 +934,15 @@ def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -
     index_lines = check_models._output_index_dashboard_lines(
         [], 10.0, image=image, eval_mode="assisted"
     )
-    assert index_lines[2:5] == [
+    assert index_lines[2:6] == [
         "- Run duration: 10.00s",
         "- Evaluation lane: assisted",
+        "- Assessment: Legacy assessment; profile not recorded",
         "- Input image: JPEG, 6,656 x 9,984 pixels (66.5 MP), 66.3 MB",
     ]
     assert check_models._run_input_summary_rows(None, None) == (
         ("Evaluation lane", "unknown"),
+        ("Assessment", "Legacy assessment; profile not recorded"),
         ("Input image", "unavailable"),
     )
 
@@ -1265,7 +1268,7 @@ def test_run_issue_summary_uses_cached_assessment_without_reclassification(
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
     assert "## Completed attempts requiring review" in content
-    assert "| org/cached | usable with caveats |" in content
+    assert "| org/cached | concerns detected |" in content
     assert "Response is unusually short" in content
 
 
@@ -1314,11 +1317,13 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
         pytest.fail("a clean run must still write the run summary entry point")
     content = summary.read_text(encoding="utf-8")
     assert "**What this run measures.**" in content
-    assert "exactly one narrow task" in " ".join(content.split())
-    assert "say nothing about a model's fitness for other uses" in " ".join(content.split())
+    assert "one shared image and prompt" in " ".join(content.split())
+    assert "do not establish fitness for other tasks" in " ".join(content.split())
     assert "Exact prompt sent to every model" in content
     assert "full prompt that must not be copied" in content
-    assert "*usable with caveats* means repairable deviations" in " ".join(content.split())
+    assert "No concerns detected is not a task-compliance or accuracy verdict" in " ".join(
+        content.split()
+    )
     assert "## Model quality at a glance" in content
     assert "org/clean" in content
     assert "## Crashes requiring action" not in content
@@ -1984,6 +1989,7 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
     assert output_paths.index.read_text(encoding="utf-8") == (
         "# Check Models Output Index\n"
         "\n"
+        "Assessment: Legacy assessment; profile not recorded\n\n"
         f"{objective_lines}"
         "\n"
         "- [results.html](reports/results.html)\n"
@@ -3240,7 +3246,7 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
         "## Crashes requiring action",
         "## Completed Runs with Observations",
         "## Indeterminate Attempts",
-        "## Context for completions passing mechanical checks",
+        "## Context for completions without detected concerns",
     )
     assert all(heading in content for heading in headings)
     assert content.index(headings[0]) < content.index(headings[1])
@@ -3258,8 +3264,6 @@ def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_nois
         is_repetitive=True,
         repeated_token=repeated_fragment,
         missing_sections=["title"],
-        instruction_echo=True,
-        instruction_echo_fragments=["prompt instructions"],
         unexpected_special_tokens=["<|im_user|>"],
     )
     result = PerformanceResult(
@@ -3286,7 +3290,6 @@ def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_nois
 
     assert facts["Missing sections"] == '["title"]'
     assert facts["Repeated fragment"] == 'keyword: "remote control"'
-    assert facts["Echoed instruction fragments"] == '["prompt instructions"]'
     assert facts["Unexpected special tokens"] == '["<|im_user|>"]'
     assert "Error type" not in facts
     assert "Configured EOS token" not in facts
@@ -3297,9 +3300,7 @@ def test_diagnostics_facts_render_catalog_constraint_evidence() -> None:
         is_repetitive=False,
         repeated_token=None,
         title_word_count=4,
-        title_word_range=(5, 10),
         keyword_count=10,
-        keyword_count_range=(10, 18),
         duplicate_keywords=["building"],
     )
     result = PerformanceResult(
@@ -3325,9 +3326,7 @@ def test_diagnostics_facts_render_catalog_constraint_evidence() -> None:
     )
 
     assert facts["Title word count"] == "4"
-    assert facts["Requested title word range"] == "[5, 10]"
     assert facts["Keyword count"] == "10"
-    assert facts["Requested keyword count range"] == "[10, 18]"
     assert facts["Duplicate keywords"] == '["building"]'
 
 
@@ -3489,7 +3488,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(  # noqa
     assert diagnostics.count("#### Complete output") == 1
     assert "Repeated fragment" in diagnostics
     assert "SERVER-COULD-NOT-BE-CONTACTED" in diagnostics
-    assert "<summary>Completions passing mechanical checks</summary>" in diagnostics
+    assert "<summary>Completions without detected concerns</summary>" in diagnostics
     assert "000000000004" in diagnostics
     assert "CleanProcessor" in diagnostics
     assert "eos" in diagnostics
@@ -4224,7 +4223,10 @@ class TestHtmlReportEdgeCases:
             assert serialized["maintainer_status"] == assessment.maintainer_status
             gallery_entry = _extract_markdown_model_section(gallery, model)
             assert f"*Execution:* {assessment.execution}" in gallery_entry
-            assert f"*Usability:* {assessment.usability}" in gallery_entry
+            assert (
+                f"*Mechanical checks:* {check_models._human_status_label(assessment.usability)}"
+                in gallery_entry
+            )
             assert f"*Maintainer status:* {assessment.maintainer_status}" in gallery_entry
             escaped_model = html.escape(model, quote=True)
             row_pattern = (
@@ -4237,7 +4239,10 @@ class TestHtmlReportEdgeCases:
             if assessment.maintainer_status != "none" or assessment.execution == "indeterminate":
                 diagnostics_entry = _extract_markdown_diagnostic_entry(diagnostics, model)
                 assert f"*Execution:* {assessment.execution}" in diagnostics_entry
-                assert f"*Usability:* {assessment.usability}" in diagnostics_entry
+                assert (
+                    f"*Mechanical checks:* {check_models._human_status_label(assessment.usability)}"
+                    in diagnostics_entry
+                )
                 assert f"*Maintainer status:* {assessment.maintainer_status}" in diagnostics_entry
 
     def test_standalone_html_does_not_build_legacy_semantic_context(
@@ -4826,7 +4831,7 @@ class TestMarkdownGalleryReport:
         assert "<summary>Complete evidence: org/good</summary>" in content
         assert '<pre class="model-output-readable">' in content
         assert '<a id="model-org-good"></a>' in content
-        assert "*Usability:*" in content
+        assert "*Mechanical checks:*" in content
         assert "*Observations:*" in content
         assert "*Verdict:*" not in content
         assert "*Maintainer:*" not in content
@@ -4860,7 +4865,7 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         chooser_row = next(line for line in content.splitlines() if "org/thinking" in line)
-        assert "`usable`" in chooser_row
+        assert "`no concerns detected`" in chooser_row
         assert "none" in chooser_row
         assert "### org/thinking" in content
         assert "### ⚠\ufe0f org/thinking" not in content
@@ -5010,7 +5015,7 @@ class TestMarkdownGalleryReport:
         assert r"answer with \| pipe" not in chooser
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" not in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser
-        assert "not evaluated" in chooser
+        assert "not assessed" in chooser
         assert "boom" not in chooser
         avoid = _extract_markdown_subsection(
             content,
@@ -5229,7 +5234,7 @@ class TestMarkdownGalleryReport:
         assert [content.index(f"### {model}") for model in expected_model_order] == sorted(
             content.index(f"### {model}") for model in expected_model_order
         )
-        assert "`usable with caveats`" in chooser
+        assert "`concerns detected`" in chooser
         assert "`usable_with_caveats`" not in chooser
         assert "*Verdict:*" not in content
         assert "*Maintainer:*" not in content
@@ -5254,7 +5259,7 @@ class TestMarkdownGalleryReport:
         assert [html_chooser.index(model) for model in expected_model_order] == sorted(
             html_chooser.index(model) for model in expected_model_order
         )
-        assert "usable with caveats" in html_chooser
+        assert "concerns detected" in html_chooser
         assert ">usable_with_caveats<" not in html_chooser
         html_complete_evidence = html_content[
             html_content.index('<section id="complete-model-evidence">') :
@@ -5397,12 +5402,12 @@ class TestMarkdownGalleryReport:
             end_headings=("## Avoid for This Run",),
         )
         short_row = next(line for line in chooser.splitlines() if "org/short" in line)
-        assert "usable" in short_row
+        assert "no concerns detected" in short_row
         assert "insufficient sample" in short_row
         assert "999" not in short_row
         # Both clean rows share total_time=1.0; the tie resolves alphabetically.
         assert (
-            "Quickest completion passing mechanical checks (end-to-end, including model load): "
+            "Quickest completion without detected concerns (end-to-end, including model load): "
             "`org/short` at 1.00s" in content
         )
         assert "Average clean-completion throughput" not in content
@@ -5588,14 +5593,14 @@ class TestMarkdownGalleryReport:
         # Highlights consider only clean completions (usable, no observations);
         # ties on end-to-end time resolve alphabetically.
         assert (
-            "Quickest completion passing mechanical checks (end-to-end, including model load): "
+            "Quickest completion without detected concerns (end-to-end, including model load): "
             "`org/alpha` at " in highlights
         )
         assert "Fastest clean completion" not in highlights
         assert "Average clean-completion throughput" not in highlights
         # gamma has the lowest captured peak memory (1.0 GB) among clean rows.
         assert (
-            "Lowest peak memory among completions passing mechanical checks: `org/gamma` at "
+            "Lowest peak memory among completions without detected concerns: `org/gamma` at "
             in highlights
         )
 
@@ -5725,7 +5730,7 @@ class TestMarkdownGalleryReport:
         assert "## 🚨 Failures by Package (Actionable)" not in content
         assert "*Review focus:*" not in content
         assert "*Score:*" not in content
-        assert "*Usability:*" in content
+        assert "*Mechanical checks:*" in content
         assert "*Execution:*" in content
         assert "*Next action:*" not in content
 
@@ -6174,7 +6179,7 @@ def test_run_issue_summary_comparison_section_renders_tables_and_collapses_long_
     rendered = "\n".join(check_models.render_report_markdown((section,)))
     assert "Since the baseline sweep" in rendered
     assert "HEAD:src/output/results.jsonl" in rendered
-    assert "usable → unusable" in rendered
+    assert "no concerns detected → major concerns" in rendered
     assert "+repeated text" in rendered
     assert "In baseline, not run this time: 11 models (targeted run" in rendered
     assert check_models._comparison_model_list(("org/a", "org/b")) == "`org/a`, `org/b`"
@@ -6222,7 +6227,7 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
         )
     )
     assert "Not directly comparable" in rendered
-    assert "usable → unusable" not in rendered
+    assert "no concerns detected → major concerns" not in rendered
 
     # Same inputs -> comparable, and a revision change is reported alongside the diff.
     same_metadata = cast("check_models.JsonlMetadataRecord", dict(baseline.metadata))
@@ -6579,7 +6584,9 @@ def test_comparison_surfaces_render_from_one_view(
         current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
     )
     view = check_models._comparison_view(comparison)
-    assert view.change_rows == (("org/m", "completed", "usable → unusable", "+repeated text"),)
+    assert view.change_rows == (
+        ("org/m", "completed", "no concerns detected → major concerns", "+repeated text"),
+    )
     assert [row[0] for row in view.flag_rows] == ["org/m"]
 
     rendered = "\n".join(
@@ -6590,7 +6597,7 @@ def test_comparison_surfaces_render_from_one_view(
     with caplog.at_level(logging.INFO, logger=check_models.logger.name):
         check_models._log_run_comparison(comparison)
     logged = "\n".join(record.getMessage() for record in caplog.records)
-    for cell in ("usable → unusable", "+repeated text"):
+    for cell in ("no concerns detected → major concerns", "+repeated text"):
         assert cell in rendered
         assert cell in logged
     ratio_cell = view.flag_rows[0][3]
@@ -6675,6 +6682,19 @@ def test_write_environment_failure_diagnostics_contains_write_errors(
         )
 
     assert "Failed to write environment diagnostics report" in caplog.text
+
+
+@pytest.mark.parametrize("profile", ["general", "metadata"])
+def test_standalone_html_states_the_executed_assessment_scope(
+    profile: check_models.AssessmentProfile,
+) -> None:
+    result = replace(_make_success(), assessment_profile=profile)
+    context = check_models._build_html_report_context(
+        results=[result], prompt="Any wording", system_info={}
+    )
+    scope = check_models._html_run_inputs(None, context)
+    assert ("task compliance not assessed" in scope) == (profile == "general")
+    assert ("metadata fields and duplicate keywords" in scope) == (profile == "metadata")
 
 
 def test_gallery_preview_shows_the_final_answer_with_reasoning_under_disclosure() -> None:

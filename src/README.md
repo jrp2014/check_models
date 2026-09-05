@@ -313,8 +313,30 @@ Every current-run row uses one immutable assessment with three independent field
 - `usability`: `usable`, `usable_with_caveats`, `unusable`, or `not_evaluated`
 - `maintainer_status`: `actionable_failure`, `observation_needs_reproduction`, or `none`
 
-These are mechanical contract labels from one image, not semantic caption scores or
-claims that a model is generally accurate. Human comparison remains necessary.
+These machine codes are retained for compatibility. Human reports describe them as
+"no concerns detected", "concerns detected", "major concerns", and "not assessed";
+none is a semantic accuracy score. The selected assessment profile is recorded in
+the JSONL header and each result's assessment.
+
+Assessment is independent of the evaluation lane and prompt wording:
+
+- **General** is the default for custom `--prompt` text and triage runs. It checks
+  empty output, repetition, incomplete thinking and visible control tokens. Reports
+  explicitly state **task compliance not assessed**.
+- **Metadata** is the default for the built-in blind/assisted metadata prompt.
+  It adds missing/empty Title, Description and Keywords fields and duplicate
+  keywords. Markdown-labelled fields are accepted. Title word count and keyword
+  count are evidence, not length-limit verdicts.
+- Use `--assessment-profile metadata` with a custom metadata prompt, or
+  `--assessment-profile general` to disable field checks for a built-in prompt.
+  Differential triage reruns always use general checks.
+
+Length ranges are no longer inferred from prose, and sentence counting, hint-overlap
+and instruction-echo heuristics have been removed. Short answers, copied hints,
+prefaces and lack of final punctuation are not automatically faults. Inspect the
+image, exact prompt and visible final answer to judge suitability. Complete raw
+output, including thinking, remains available. Older retained runs keep their
+original verdicts and are labelled as having no recorded assessment profile.
 
 Complete model output is retained as evidence for every attempt.
 Crashes prioritize the complete traceback, followed by captured partial output and
@@ -322,8 +344,6 @@ exact factual provenance. Reaching the configured token cap alone is neutral.
 Long complete output is not a fault. A cap becomes an observation only when mechanical evidence
 also shows repetition, missing requested sections, or an incomplete thinking trace.
 
-Zero keyword overlap is a weak caveat. Partial keyword overlap is neutral, and
-neither state claims semantic correctness.
 External connectivity failures are `indeterminate`, so they are retained without being counted as model crashes.
 Configured thinking tokens are not automatically faults; observed or incomplete
 thinking traces remain factual observations that may need controlled reproduction.
@@ -335,14 +355,6 @@ content, its exact token is retained as a separate role-boundary observation.
 Control-wrapper syntax that appears in output without any of those declarations is
 retained as an `unexpected_special_token` observation; no model-name allowlist is
 used.
-For strict catalog prompts, non-wrapper text before the requested `Title` label is
-retained as an `unexpected_catalog_preamble` observation. Conventional Markdown
-label emphasis such as `**Title:**` and one-to-six-hash headings such as
-`### Title:` are accepted, and authoritative context values are never treated as
-copied instructions merely because a model reuses them.
-When the prompt explicitly requests catalogue ranges and unique keywords, complete
-three-field outputs also record out-of-range title/keyword counts and duplicate
-keywords as repairable caveats rather than unusable results.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 
@@ -753,7 +765,6 @@ thresholds and prompt-size limits.
 **Key Configurable Areas:**
 
 - **Repetition**: Thresholds for token and phrase repetition.
-- **Minimal output**: Recorded token-count and prompt/output-ratio thresholds.
 - **Prompt burden**: Recorded and estimated prompt-size thresholds.
 - **Prompt compaction**: Limits for metadata hints injected into the default prompt
   (`prompt_title_max_chars`, `prompt_description_max_chars`,
@@ -1165,7 +1176,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
-| `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
+| `--assessment-profile` | str | By prompt origin | `metadata` for the built-in metadata prompt; `general` for custom and triage prompts. Explicit selection overrides this default, independently of `--eval-mode`. |
 | `--isolate` | flag | `False` | Run each model in a fresh child interpreter. A native crash (segfault, abort, interpreter-finalization fault) in one model is then recorded as that model's phase-tagged failure — with the signal name and the phase the child reached — instead of ending the sweep. The parent bounds each child by the model timeout plus 120 s start-up/cleanup grace and records an expiry as a phase-tagged timeout, and `--rerun-triage` reruns go through the same boundary. Costs a few seconds of import time per model and frees GPU memory between models; results round-trip through JSON so outputs and reports are identical to in-process runs. Each child starts with cold per-process caches, so treat throughput from isolated and in-process sweeps as separate populations — the JSONL metadata records `execution_mode`, and `--compare-with` says so when the two differ. Like any sweep, keep the machine otherwise idle: concurrent CPU-heavy work (a test suite, type checkers) measurably slows prefill. |
 | `--rerun-triage` | flag | `False` | Rerun crashed models and completed models with recorded mechanical observations using a simple prompt. First-pass results are never overwritten. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |

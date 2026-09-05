@@ -4,6 +4,29 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Assessment profiles (0.17.0)
+
+- Added `--assessment-profile general|metadata`, independent of prompt wording
+  and the evaluation lane. Built-in metadata prompts select metadata checks;
+  custom prompts and triage select general checks. Explicit selection overrides
+  the default; differential triage reruns remain general. The profile is retained
+  in the JSONL header and each result assessment.
+- Reports state the assessment scope and use "no concerns detected" rather than
+  implying that an arbitrary task or factual-accuracy check passed. Metadata
+  checks retain required fields, duplicate keywords, and neutral title/keyword
+  counts. Duplicate keywords have their own `duplicate_keywords` observation.
+- Removed prompt-contract recognition, prose range parsing, sentence counting,
+  hint-overlap and instruction-echo heuristics, their obsolete tests/thresholds,
+  and `--context-marker`. Short answers, copied hints and prefaces no longer
+  cause automatic downgrades. Cap hits without stronger evidence remain neutral;
+  absence of final punctuation is not proof of truncation.
+- General checks retain crashes, empty output, repetition, control-token evidence,
+  incomplete thinking and runtime facts. Complete answers and raw output remain
+  available for human review. Older retained assessments remain readable and
+  are labelled as having no recorded profile; report regeneration does not
+  silently reclassify them. Comparisons with different assessment profiles are
+  withheld rather than reported as model regressions.
+
 ### Added
 
 - Tests for eight live functions no test had exercised (`_model_burden_rows`,

@@ -18,8 +18,10 @@ from typing import cast
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from check_models import (
+    AssessmentProfile,
     GenerationQualityAnalysis,
     ResultAssessment,
+    _assessment_scope,
     _completed_assessment,
     _human_observation_labels,
     _quality_observations,
@@ -41,7 +43,7 @@ def _build_parser() -> argparse.ArgumentParser:
     prompt_group.add_argument(
         "--prompt",
         type=str,
-        help="Optional prompt string used for context-echo and contract checks.",
+        help="Optional prompt string for token-burden evidence; never parsed as a contract.",
     )
     prompt_group.add_argument(
         "--prompt-file",
@@ -49,10 +51,10 @@ def _build_parser() -> argparse.ArgumentParser:
         help="File containing prompt text. Mutually exclusive with --prompt.",
     )
     parser.add_argument(
-        "--context-marker",
-        type=str,
-        default="Context:",
-        help="Prompt section marker where factual context begins.",
+        "--assessment-profile",
+        choices=("general", "metadata"),
+        default="general",
+        help="Select general checks or add required metadata fields and duplicate-keyword checks.",
     )
     parser.add_argument(
         "--json",
@@ -134,6 +136,7 @@ def _print_analysis_report(
         print(f"With prompt context (approx ~{prompt_tokens} tokens)")
     print("=" * 60 + "\n")
 
+    print(_assessment_scope(analysis.assessment_profile))
     print("Mechanical Observations:")
     if analysis.special_token_wrappers:
         _print_field("Special Token Wrappers", analysis.special_token_wrappers)
@@ -142,17 +145,15 @@ def _print_analysis_report(
         _print_field("Repeated Token", analysis.repeated_token)
     _print_field("Prompt Checks Ran", analysis.prompt_checks_ran)
     _print_field("Missing Required Sections", analysis.missing_sections)
-    _print_field("Instruction Echo", analysis.instruction_echo)
     _print_field("Thinking Trace", analysis.has_thinking_trace)
     _print_field("Thinking Incomplete", analysis.thinking_trace_incomplete)
     _print_field("Likely Token Cap", analysis.likely_capped)
     _print_field("Unexpected Special Tokens", analysis.unexpected_special_tokens)
-    _print_field("Keyword Overlap", analysis.keyword_overlap)
 
     print("\n" + "-" * 60)
     status = _assessment_status(assessment)
     if status == "clean":
-        print("  🟢 CLEAN (No issues detected)")
+        print("  🟢 NO CONCERNS DETECTED (not an accuracy verdict)")
     else:
         prefix = "🔴 UNUSABLE" if status == "unusable" else "🟡 OBSERVATION"
         labels = _human_observation_labels(assessment.observations)
@@ -211,11 +212,10 @@ def main() -> int:
         generated_tokens=estimated_tokens,
         prompt=prompt_text,
         prompt_tokens=prompt_tokens,
-        context_marker=args.context_marker,
+        assessment_profile=cast("AssessmentProfile", args.assessment_profile),
     )
     observations = _quality_observations(
         text=output_text,
-        generated_tokens=estimated_tokens,
         analysis=analysis,
     )
     assessment = _completed_assessment(observations)

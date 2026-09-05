@@ -867,8 +867,8 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Completed Models (5):" in messages
-    assert messages.index("Unusable (2):") < messages.index("Usable with caveats (2):")
-    assert messages.index("Usable with caveats (2):") < messages.index("Usable (1):")
+    assert messages.index("Major concerns (2):") < messages.index("Concerns detected (2):")
+    assert messages.index("Concerns detected (2):") < messages.index("No concerns detected (1):")
     # Console summary uses short selector glosses in actionability order.
     assert messages.index("repeated text") < messages.index("missing required fields")
     assert messages.index("org/z-repeated") < messages.index("org/a-missing")
@@ -876,7 +876,7 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
     assert "very short response" in messages
     assert "| usability=" not in messages
     assert "Maintainer" not in messages
-    clean_group = messages[messages.index("Usable (1):") :]
+    clean_group = messages[messages.index("No concerns detected (1):") :]
     assert "Observations" not in clean_group
 
 
@@ -1407,6 +1407,8 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
     assert paths.index.read_text(encoding="utf-8").splitlines() == [
         "# Check Models Output Index",
         "",
+        "Assessment: Legacy assessment; profile not recorded",
+        "",
         *objective_lines,
         "",
         "- [results.html](reports/results.html)",
@@ -1490,8 +1492,6 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
         repeated_token="loop",  # noqa: S106 - generated-text fixture, not a credential
         missing_sections=["keywords"],
         thinking_trace_incomplete=True,
-        instruction_echo=True,
-        unexpected_catalog_preamble="preface",
         likely_capped=True,
         token_cap_reasons=["repetition"],
         unexpected_special_tokens=["<bad>"],
@@ -1506,8 +1506,6 @@ def test_preview_and_verbose_modes_log_the_same_quality_warnings(
         "Repetitive: 'loop'",
         "Missing sections: keywords",
         "Expected thinking trace did not reach a final answer",
-        "Instruction text appears in output",
-        "Unexpected text appears before the Title section",
         "Output reached requested token limit (500 tokens)",
         "Unexpected special token wrappers: <bad>",
     )

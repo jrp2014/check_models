@@ -47,7 +47,8 @@ def test_analyze_output_quality_clean_text(capsys: pytest.CaptureFixture[str]) -
         sys.argv = original_argv
 
     captured = capsys.readouterr()
-    assert "CLEAN (No issues detected)" in captured.out
+    assert "NO CONCERNS DETECTED" in captured.out
+    assert "task compliance not assessed" in captured.out
     assert "Is Repetitive             : ❌ No" in captured.out
 
 
@@ -135,7 +136,7 @@ def test_analyze_output_quality_with_prompt_file(
 
     captured = capsys.readouterr()
     assert "Prompt Checks Ran         : ✅ Yes" in captured.out
-    assert "CLEAN" in captured.out
+    assert "NO CONCERNS DETECTED" in captured.out
 
 
 def test_analyze_output_quality_rejects_prompt_and_prompt_file(
@@ -225,12 +226,12 @@ def test_analyze_output_quality_json_special_token_observation(
     [
         ("", "empty_output", "unusable", 1),
         ("<think>unfinished reasoning", "thinking_trace_incomplete", "unusable", 1),
-        ("x", "minimal_output", "observation", 0),
+        ("x", None, "clean", 0),
     ],
 )
 def test_json_mode_uses_canonical_assessment(  # skylos: ignore[SKY-C303] six explicit inputs beat a config object for one assertion helper
     text: str,
-    observation: str,
+    observation: str | None,
     status: str,
     exit_code: int,
     monkeypatch: pytest.MonkeyPatch,
@@ -242,7 +243,7 @@ def test_json_mode_uses_canonical_assessment(  # skylos: ignore[SKY-C303] six ex
     assert main() == exit_code
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == status
-    assert observation in payload["assessment"]["observations"]
+    assert payload["assessment"]["observations"] == ([observation] if observation else [])
     assert payload["assessment"]["usability"] == (
-        "unusable" if exit_code else "usable_with_caveats"
+        "unusable" if exit_code else "usable_with_caveats" if observation else "usable"
     )

@@ -368,6 +368,7 @@ def test_retained_metadata_captures_public_snapshot_contract(
         assert isinstance(discovery, list)
         assert {"repo_id", "selected", "capability_verdict", "skip_reasons"} <= set(discovery[0])
     assert set(header) == {
+        "assessment_profile",
         "_type",
         "format_version",
         "timestamp",
@@ -668,8 +669,30 @@ def test_model_provenance_distinguishes_requested_and_resolved_revision(
     }
 
 
-def test_catalog_constraint_details_are_emitted_only_for_a_violation() -> None:
-    """Routine counts must not bloat rows without the matching observation."""
+@pytest.mark.parametrize("profile", ["general", "metadata"])
+def test_retained_profile_matches_the_executed_checks(
+    tmp_path: Path, profile: check_models.AssessmentProfile
+) -> None:
+    """A header must not claim general-only checks for a metadata-assessed result."""
+    result = PerformanceResult(
+        model_name="org/m",
+        generation=MockGeneration(text="Yes"),
+        success=True,
+        assessment_profile=profile,
+    )
+    output = tmp_path / "results.jsonl"
+    save_jsonl_report([result], output, prompt="Please answer", system_info={})
+    header, rows = _read_jsonl(output)
+    assert header["assessment_profile"] == profile
+    assert rows[0]["assessment"]["profile"] == profile
+    assert rows[0]["assessment"]["observations"] == (
+        ["missing_requested_sections"] if profile == "metadata" else []
+    )
+    assert rows[0]["generated_text"] == "Yes"
+
+
+def test_metadata_counts_remain_evidence_even_without_a_violation() -> None:
+    """Counts are neutral facts, not verdicts derived from prompt prose."""
     compliant = PerformanceResult(
         model_name="org/compliant",
         generation=MockGeneration(),
@@ -678,9 +701,7 @@ def test_catalog_constraint_details_are_emitted_only_for_a_violation() -> None:
             is_repetitive=False,
             repeated_token=None,
             title_word_count=5,
-            title_word_range=(5, 10),
             keyword_count=10,
-            keyword_count_range=(10, 18),
         ),
     )
     violation = dataclasses.replace(
@@ -693,12 +714,13 @@ def test_catalog_constraint_details_are_emitted_only_for_a_violation() -> None:
         ),
     )
 
-    assert check_models._observation_details(compliant) == {}
+    assert check_models._observation_details(compliant) == {
+        "title_word_count": 5,
+        "keyword_count": 10,
+    }
     assert check_models._observation_details(violation) == {
         "title_word_count": 4,
-        "title_word_range": [5, 10],
         "keyword_count": 10,
-        "keyword_count_range": [10, 18],
         "duplicate_keywords": ["halesworth"],
     }
 
@@ -892,6 +914,7 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert data["model"] == "test-model"
     assert data["timestamp"] == "2026-07-31 12:34:56 BST"
     assert data["assessment"] == {
+        "profile": "general",
         "execution": "completed",
         "usability": "usable",
         "maintainer_status": "none",
@@ -924,6 +947,7 @@ def test_jsonl_assessment_retains_factual_observation_evidence(tmp_path: Path) -
         text,
         generated_tokens=80,
         prompt=prompt,
+        assessment_profile="metadata",
         requested_max_tokens=80,
     )
     result = PerformanceResult(
@@ -931,6 +955,7 @@ def test_jsonl_assessment_retains_factual_observation_evidence(tmp_path: Path) -
         generation=MockGeneration(text=text, generation_tokens=80),
         success=True,
         quality_analysis=analysis,
+        assessment_profile="metadata",
         requested_max_tokens=80,
     )
 
@@ -940,7 +965,7 @@ def test_jsonl_assessment_retains_factual_observation_evidence(tmp_path: Path) -
     details = rows[0]["assessment"]["details"]
     assert details["missing_sections"] == ["title", "description", "keywords"]
     assert details["repeated_fragment"] == "cat"
-    assert details["instruction_echo_fragments"] == ["prompt instructions"]
+    assert "instruction_echo_fragments" not in details
     assert details["unexpected_special_tokens"] == ["<|im_user|>"]
     assert details["thinking_trace_markers"] == ["<think>", "</think>"]
     assert "repetitive_tail" in details["token_cap_reasons"]
@@ -962,6 +987,7 @@ def test_jsonl_retains_neutral_thinking_markers_without_review_observation(
 
     _header, rows = _read_jsonl(output_file)
     assert rows[0]["assessment"] == {
+        "profile": "general",
         "execution": "completed",
         "usability": "usable",
         "maintainer_status": "none",
@@ -1009,6 +1035,7 @@ def test_save_jsonl_report_serializes_only_cached_result_assessment(tmp_path: Pa
     _header, rows = _read_jsonl(output_file)
     row = rows[0]
     assert row["assessment"] == {
+        "profile": "general",
         "execution": "completed",
         "usability": "usable",
         "maintainer_status": "none",
@@ -1039,6 +1066,7 @@ def test_save_jsonl_report_serializes_crash_assessment_and_failure(tmp_path: Pat
     _header, rows = _read_jsonl(output_file)
     row = rows[0]
     assert row["assessment"] == {
+        "profile": "general",
         "execution": "crashed",
         "usability": "not_evaluated",
         "maintainer_status": "actionable_failure",
@@ -1098,6 +1126,7 @@ def test_save_jsonl_report_marks_external_connectivity_as_indeterminate(tmp_path
 
     _header, rows = _read_jsonl(output_file)
     assert rows[0]["assessment"] == {
+        "profile": "general",
         "execution": "indeterminate",
         "usability": "not_evaluated",
         "maintainer_status": "none",
@@ -1952,7 +1981,7 @@ class TestRerunEvidence:
             thinking_mode="budget",
             thinking_start_token="<think>",  # noqa: S106 - protocol delimiter, not a credential
             thinking_end_token="</think>",  # noqa: S106 - protocol delimiter, not a credential
-            context_marker="Metadata:",
+            assessment_profile="metadata",
         )
 
         def capture(params: check_models.ProcessImageParams) -> PerformanceResult:
@@ -1997,7 +2026,7 @@ class TestRerunEvidence:
         assert params.thinking_mode == "budget"
         assert params.thinking_start_token == "<think>"
         assert params.thinking_end_token == "</think>"
-        assert params.context_marker == "Metadata:"
+        assert params.assessment_profile == "general"  # Triage overrides the metadata first pass.
 
 
 class TestModelBurdenRecord:

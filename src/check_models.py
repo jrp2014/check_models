@@ -476,9 +476,6 @@ class QualityThresholds:
     min_catalog_keywords_for_repeat: int = 10
     min_catalog_keyword_repetitions: int = 3
     catalog_keyword_duplicate_ratio: float = 0.4
-    min_context_term_length: int = 2
-    min_tokens_for_substantial: int = 10
-    max_words_for_minimal_output: int = 2
     long_prompt_tokens_threshold: int = 3000
     heavy_nontext_prompt_ratio: float = 0.5
     mixed_prompt_burden_ratio_floor: float = 0.25
@@ -837,6 +834,7 @@ type JsonLike = bool | int | float | str | list[JsonLike] | dict[str, JsonLike] 
 type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type EvaluationLane = Literal["triage", "blind", "assisted"]
+type AssessmentProfile = Literal["general", "metadata"]
 type RequestedEvaluationMode = EvaluationLane | Literal["auto"]
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
@@ -1033,11 +1031,11 @@ type ObservationCode = Literal[
     "thinking_trace_incomplete",
     "role_boundary_token_present",
     "catalog_constraint_violation",
+    "duplicate_keywords",
     "no_keyword_overlap",
     "draft_returned_unchanged",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
-type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
 type MlxMemoryGetterName = Literal["get_active_memory", "get_cache_memory"]
 
 
@@ -1124,6 +1122,7 @@ class JsonlMetadataRecord(TypedDict, total=False):
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
     eval_mode: EvaluationLane
+    assessment_profile: NotRequired[AssessmentProfile]
     metadata_exposed_to_prompt: bool
     component_provenance: dict[str, ComponentProvenanceRecord]
     execution_mode: Literal["in_process", "isolated"]
@@ -1193,6 +1192,7 @@ class JsonlAssessmentRecord(TypedDict):
     maintainer_status: MaintainerStatus
     observations: list[ObservationCode]
     details: NotRequired[JsonlObservationDetailsRecord]
+    profile: NotRequired[AssessmentProfile]
 
 
 class JsonlObservationDetailsRecord(TypedDict, total=False):
@@ -1854,6 +1854,7 @@ class PerformanceResult:
     root_error_message: str | None = None
     exception_chain: tuple[FailureException, ...] = ()
     quality_analysis: GenerationQualityAnalysis | None = None
+    assessment_profile: AssessmentProfile = "general"
     active_memory: float | None = None
     cache_memory: float | None = None
     error_package: str | None = None
@@ -2865,7 +2866,8 @@ def _gallery_model_facts(
     """Return factual per-model evidence shared by gallery renderers."""
     facts = (
         ("Execution", assessment.execution),
-        ("Usability", row.usability),
+        ("Mechanical checks", _human_status_label(row.usability)),
+        ("Assessment", _assessment_scope(result.assessment_profile)),
         ("Maintainer status", assessment.maintainer_status),
         (
             "Observations",
@@ -3083,7 +3085,7 @@ class ProcessImageParams:
     thinking_end_token: str = DEFAULT_THINKING_END_MARKER
     auto_thinking_budget: bool = True
     system_telemetry: SystemTelemetryMode = "snapshot"
-    context_marker: str = "Context:"
+    assessment_profile: AssessmentProfile = "general"
 
 
 # =============================================================================
@@ -3850,26 +3852,6 @@ def _configured_role_boundaries(text: str, wrappers: Sequence[str]) -> list[str]
     return _dedupe_preserve_order(boundaries)
 
 
-PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
-    "return exactly these three sections",
-    "prompt instructions",
-    "do not output reasoning",
-    "do not copy context hints verbatim",
-    "context: existing metadata hints",
-    "title hint:",
-    "description hint:",
-    "keyword hints:",
-    "capture metadata:",
-)
-
-
-@dataclass(frozen=True)
-class TrustedHintBundle:
-    """Explicit keyword hints that are eligible for the weak overlap check."""
-
-    trusted_keywords: tuple[str, ...] = ()
-
-
 @dataclass(frozen=True)
 class MetadataProvenance:
     """Authoritative structured context plus fallible descriptive draft fields."""
@@ -3921,62 +3903,6 @@ def _normalize_phrase_for_matching(text: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.casefold())).strip()
 
 
-def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") -> str:
-    """Extract prompt context text anchored at ``context_marker``.
-
-    Supports inline-marker context (``Context: ...``) and multi-line bullet
-    context blocks. Stops on the first blank line after context content starts,
-    except for adjacent authoritative/descriptive sections emitted by assisted prompts.
-    """
-    if not prompt:
-        return ""
-
-    marker_lower: str = context_marker.casefold()
-    lines: list[str] = prompt.splitlines()
-
-    for idx, raw_line in enumerate(lines):
-        line: str = raw_line.strip()
-        if not line.casefold().startswith(marker_lower):
-            continue
-
-        extracted: list[str] = []
-        inline_remainder: str = (
-            line[len(context_marker) :].strip() if len(line) >= len(context_marker) else ""
-        )
-        if inline_remainder:
-            extracted.append(inline_remainder.lstrip("-").strip())
-
-        follow_lines = lines[idx + 1 :]
-        allow_descriptive_section = inline_remainder.casefold() == "authoritative context:"
-        for follow_idx, follow in enumerate(follow_lines):
-            stripped: str = follow.strip()
-            if not stripped:
-                if extracted:
-                    remaining_lines = follow_lines[follow_idx + 1 :]
-                    next_content = next(
-                        (candidate.strip() for candidate in remaining_lines if candidate.strip()),
-                        "",
-                    )
-                    if allow_descriptive_section and next_content.casefold() in {
-                        "descriptive hints:",
-                        "draft descriptive metadata:",
-                    }:
-                        allow_descriptive_section = False
-                        continue
-                    break
-                continue
-            # Context bullets are expected; strip bullet prefix but retain content.
-            if stripped.startswith(("-", "*", "•")):
-                extracted.append(stripped.lstrip("-*• ").strip())
-                continue
-            # Treat non-bulleted lines as context continuation until first blank line.
-            extracted.append(stripped)
-
-        return "\n".join(part for part in extracted if part).strip()
-
-    return ""
-
-
 def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     """Split keyword section text into normalized keyword terms."""
     if not raw_keywords:
@@ -4009,53 +3935,6 @@ def _repeated_catalog_keyword(text: str) -> str | None:
     )
 
 
-def _keyword_overlap_state(
-    reference: Sequence[str],
-    generated: Sequence[str],
-) -> KeywordOverlapState:
-    """Return an elementary keyword-overlap smell, never a recall score."""
-    reference_terms = tuple(filter(None, map(_normalize_phrase_for_matching, reference)))
-    generated_terms = tuple(filter(None, map(_normalize_phrase_for_matching, generated)))
-    if not reference_terms or not generated_terms:
-        return "not_assessable"
-
-    def _variants(term: str) -> tuple[str, ...]:
-        words = term.split()
-        final = words[-1]
-        alternate = (
-            final[:-1]
-            if final.endswith("s") and len(final) > QUALITY.min_context_term_length
-            else f"{final}s"
-        )
-        return term, " ".join((*words[:-1], alternate))
-
-    generated_text = " ".join(generated_terms)
-    has_overlap = any(
-        re.search(rf"\b{re.escape(variant)}\b", generated_text)
-        for term in reference_terms
-        for variant in _variants(term)
-    )
-    return "some_overlap" if has_overlap else "no_overlap"
-
-
-def _extract_trusted_hint_bundle(
-    prompt: str,
-    *,
-    context_marker: str = "Context:",
-) -> TrustedHintBundle:
-    """Parse only explicitly labelled keyword hints for weak overlap detection."""
-    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
-    if not context_text:
-        return TrustedHintBundle()
-    prefix = "keyword hints:"
-    hinted_keywords: list[str] = []
-    for raw_line in context_text.splitlines():
-        stripped = raw_line.strip().lstrip("-").strip()
-        if stripped.casefold().startswith(prefix):
-            hinted_keywords.extend(_split_catalog_keywords(stripped[len(prefix) :]))
-    return TrustedHintBundle(tuple(_dedupe_preserve_order(hinted_keywords)))
-
-
 CATALOG_SECTION_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"(?im)^[ \t]*(?:(?:#{1,6})[ \t]+|[>*-][ \t]*)?"
     r"\*{0,2}[ \t]*(title|description|keywords)"
@@ -4085,129 +3964,12 @@ def _extract_catalog_sections(text: str) -> dict[str, str]:
     return sections
 
 
-def _prompt_requests_catalog_contract(prompt: str) -> bool:
-    """Return True when prompt clearly requests strict Title/Description/Keywords output."""
-    prompt_lower: str = prompt.casefold()
-    has_required_labels: bool = all(
-        label in prompt_lower for label in ("title:", "description:", "keywords:")
-    )
-    return has_required_labels and (
-        "return exactly these three sections" in prompt_lower or "catalog" in prompt_lower
-    )
-
-
-# A boundary needs a capital letter after the whitespace: a following digit
-# ("approx. 1750", "c. 1744", "No. 5") is far more often an abbreviation than
-# a sentence that starts with a number.
-_SENTENCE_BOUNDARY_RE: Final[re.Pattern[str]] = re.compile(
-    r"[.!?]+[\"'\u201d\u2019)\]]*\s+(?=[\"'\u201c\u2018(\[]?[A-Z])"
-)
-_SENTENCE_ABBREVIATIONS: Final[frozenset[str]] = frozenset(
-    {
-        "approx",
-        "ave",
-        "bldg",
-        "ca",
-        "cf",
-        "co",
-        "dept",
-        "dr",
-        "ed",
-        "est",
-        "etc",
-        "fig",
-        "ft",
-        "inc",
-        "jr",
-        "ltd",
-        "mr",
-        "mrs",
-        "ms",
-        "mt",
-        "no",
-        "prof",
-        "rd",
-        "sr",
-        "st",
-        "vol",
-        "vs",
-    }
-)
-
-
-def _count_description_sentences(text: str) -> int:
-    """Count sentences conservatively: terminator, whitespace, then a capital letter.
-
-    Known abbreviations ("Dr.", "St.", "approx."), initials, dotted acronyms
-    ("U.S."), decimals ("2.5 m"), a terminator with nothing before it ("...")
-    and a following digit never split. The count feeds only an upper-bound
-    check, so a missed boundary under-counts; the residual risk is an
-    unlisted abbreviation followed by a capitalised word, which is why this
-    stays a bounded heuristic rather than a sentence parser.
-    """
-    collapsed = " ".join(text.split())
-    if not collapsed:
-        return 0
-    count = 1
-    for match in _SENTENCE_BOUNDARY_RE.finditer(collapsed):
-        preceding = collapsed[: match.start()].rsplit(None, 1)
-        last_word = preceding[-1].casefold() if preceding else ""
-        if (
-            not last_word
-            or last_word in _SENTENCE_ABBREVIATIONS
-            or "." in last_word
-            or (len(last_word) == 1 and last_word.isalpha())
-        ):
-            continue
-        count += 1
-    return count
-
-
-def _catalog_requested_range(
-    prompt: str,
-    field: Literal["title", "description", "keyword"],
-) -> tuple[int, int] | None:
-    """Return an explicit numeric range from a catalogue requirement line."""
-    prompt_lines = prompt.splitlines()
-    write_index = next(
-        (index for index, line in enumerate(prompt_lines) if line.strip().casefold() == "write:"),
-        None,
-    )
-    candidate_lines = prompt_lines[write_index + 1 :] if write_index is not None else prompt_lines
-    hint_label = re.compile(rf"\b{field}s?\s+hints?\s*:", re.IGNORECASE)
-    for line in candidate_lines:
-        if field not in line.casefold():
-            continue
-        if hint_label.search(line):
-            continue
-        match = re.search(r"\b(\d+)\s*[-\u2013]\s*(\d+)\b", line)
-        if match is None:
-            continue
-        lower, upper = (int(match.group(1)), int(match.group(2)))
-        if 0 <= lower <= upper:
-            return lower, upper
-    return None
-
-
 def _missing_catalog_sections(text: str) -> list[str]:
     """Return requested catalog sections that are absent or structurally empty."""
     sections: dict[str, str] = _extract_catalog_sections(text)
-    missing = [
+    return [
         section for section in ("title", "description", "keywords") if not sections.get(section)
     ]
-    title_lines = [line.strip() for line in sections.get("title", "").splitlines() if line.strip()]
-    if len(title_lines) > 1:
-        missing.append("title")
-    return _dedupe_preserve_order(missing)
-
-
-def _unexpected_catalog_preamble(text: str) -> str | None:
-    """Return non-wrapper text emitted before the first requested catalog section."""
-    first_section = CATALOG_SECTION_PATTERN.search(text)
-    if first_section is None:
-        return None
-    preamble = _strip_empty_thinking_wrappers(text[: first_section.start()]).strip()
-    return preamble or None
 
 
 @dataclass(frozen=True)
@@ -4243,7 +4005,7 @@ def _detect_reasoning_output(
     text_lower: str = semantic_text.casefold()
     seeded_lower = seeded_text.casefold()
     thinking_trace_incomplete = False
-    thinking_only_output = False
+    thinking_only_output = bool(thinking_trace_markers) and not semantic_text.strip()
     for start_marker, end_marker in delimiter_pairs:
         start_lower = start_marker.casefold()
         end_lower = end_marker.casefold()
@@ -4277,50 +4039,6 @@ def _detect_reasoning_output(
     )
 
 
-def _shared_normalized_word_span(text: str, prompt: str, *, size: int = 8) -> str | None:
-    """Return one substantial word span copied from the prompt into the output."""
-    text_words = _normalize_phrase_for_matching(text).split()
-    if len(text_words) < size:
-        return None
-    context_labels = (
-        "context:",
-        "capture date/time:",
-        "gps:",
-        "title hint:",
-        "description hint:",
-        "keyword hints:",
-        "existing title:",
-        "existing description:",
-        "existing keywords:",
-    )
-    prompt_spans: set[tuple[str, ...]] = set()
-    for line in prompt.splitlines():
-        stripped = line.strip().lstrip("-*• ").casefold()
-        if not stripped or stripped.startswith(context_labels):
-            continue
-        words = _normalize_phrase_for_matching(stripped).split()
-        prompt_spans.update(
-            tuple(words[index : index + size]) for index in range(len(words) - size + 1)
-        )
-    for index in range(len(text_words) - size + 1):
-        span = tuple(text_words[index : index + size])
-        if span in prompt_spans:
-            return " ".join(span)
-    return None
-
-
-def _detect_instruction_echo(text: str, prompt: str | None = None) -> tuple[bool, list[str]]:
-    """Detect direct reuse of prompt/task instructions in the answer."""
-    if not text:
-        return False, []
-    text_lower = text.casefold()
-    findings = [marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower]
-    if prompt and (shared_span := _shared_normalized_word_span(text, prompt)):
-        findings.append(shared_span)
-    deduped = _dedupe_preserve_order(findings)
-    return bool(deduped), deduped[:4]
-
-
 def _estimate_prompt_tokens_from_text(prompt: str | None) -> int | None:
     """Estimate text-only prompt tokens with a lightweight word-based heuristic."""
     if not prompt:
@@ -4339,6 +4057,7 @@ def _detect_likely_cutoff(
     is_repetitive: bool,
     missing_sections: Sequence[str],
     thinking_trace_incomplete: bool = False,
+    assessment_profile: AssessmentProfile = "general",
 ) -> tuple[bool, list[str]]:
     """Detect likely early termination at the generation cap.
 
@@ -4360,11 +4079,9 @@ def _detect_likely_cutoff(
         reasons.append("repetitive_tail")
     if thinking_trace_incomplete:
         reasons.append("incomplete_thinking_trace")
-    if tail:
+    if tail and assessment_profile == "metadata":
         if re.search(r"(title|description|keywords)\s*:?\s*$", tail, re.IGNORECASE):
             reasons.append("unfinished_section")
-        if tail[-1].isalnum() and not re.search(r"[.!?\"')\]]\s*$", tail):
-            reasons.append("abrupt_tail")
         if re.search(r"(?:^|\n)\s*(?:[-+*]|\d+[.)])(?:\s+\*{1,3})?\s*$", tail):
             reasons.append("dangling_markdown")
         # A capped answer ending mid-list (e.g. "Keywords: ..., Clouds,") was
@@ -4385,8 +4102,6 @@ SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     (r"<end_of_turn>", "<end_of_turn>"),
     (r"</s>(?!\w)", "</s>"),
     (r"<s>(?!\w)", "<s>"),
-    (r"# INSTRUCTION", "# INSTRUCTION"),
-    (r"# SOLUTION", "# SOLUTION"),
     (r"\[INST\]", "[INST]"),
     (r"\[/INST\]", "[/INST]"),
     (re.escape(DEFAULT_THINKING_END_MARKER), DEFAULT_THINKING_END_MARKER),
@@ -4426,27 +4141,6 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
     return bool(deduplicated), deduplicated
 
 
-def _detect_minimal_output(
-    text: str,
-    generated_tokens: int | None,
-) -> tuple[bool, str | None]:
-    """Detect only empty or one/two-word output with recorded token evidence."""
-    if generated_tokens is None:
-        return False, None
-
-    if generated_tokens == 0:
-        return True, "zero_tokens"
-
-    word_count = len(text.strip().split())
-    if (
-        word_count <= QUALITY.max_words_for_minimal_output
-        and generated_tokens < QUALITY.min_tokens_for_substantial
-    ):
-        return True, f"minimal_words({word_count}w;{generated_tokens}tok)"
-
-    return False, None
-
-
 # =============================================================================
 # CATALOGING QUALITY METRICS, LIBRARY VERSIONS & PROVENANCE SNAPSHOTS
 # =============================================================================
@@ -4458,6 +4152,7 @@ class GenerationQualityAnalysis:
 
     is_repetitive: bool
     repeated_token: str | None
+    assessment_profile: AssessmentProfile = "general"
     missing_sections: list[str] = dataclass_field(default_factory=list)
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
@@ -4465,9 +4160,6 @@ class GenerationQualityAnalysis:
     thinking_trace_markers: list[str] = dataclass_field(default_factory=list)
     word_count: int = 0
     prompt_checks_ran: bool = False
-    instruction_echo: bool = False
-    instruction_echo_fragments: list[str] = dataclass_field(default_factory=list)
-    unexpected_catalog_preamble: str | None = None
     likely_capped: bool = False
     token_cap_reasons: list[str] = dataclass_field(default_factory=list)
     prompt_tokens_total: int | None = None
@@ -4479,165 +4171,9 @@ class GenerationQualityAnalysis:
     configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
-    title_word_range: tuple[int, int] | None = None
-    description_sentence_count: int | None = None
-    description_sentence_range: tuple[int, int] | None = None
     keyword_count: int | None = None
-    keyword_count_range: tuple[int, int] | None = None
     duplicate_keywords: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
-    keyword_overlap: KeywordOverlapState = "not_assessable"
-    unchanged_draft_fields: list[str] = dataclass_field(default_factory=list)
-
-
-@dataclass(frozen=True)
-class PromptQualitySignals:
-    """Prompt-aware mechanical signals used by current-run assessment."""
-
-    has_thinking_trace: bool = False
-    thinking_trace_incomplete: bool = False
-    thinking_only_output: bool = False
-    thinking_trace_markers: tuple[str, ...] = ()
-    instruction_echo: bool = False
-    instruction_echo_fragments: tuple[str, ...] = ()
-    unexpected_catalog_preamble: str | None = None
-    missing_sections: tuple[str, ...] = ()
-    title_word_count: int | None = None
-    title_word_range: tuple[int, int] | None = None
-    description_sentence_count: int | None = None
-    description_sentence_range: tuple[int, int] | None = None
-    keyword_count: int | None = None
-    keyword_count_range: tuple[int, int] | None = None
-    duplicate_keywords: tuple[str, ...] = ()
-    keyword_overlap: KeywordOverlapState = "not_assessable"
-    unchanged_draft_fields: tuple[str, ...] = ()
-
-
-_DRAFT_PROMPT_FIELD_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"(?im)^\s*-\s*(?:(?:Existing (title|description|keywords))|"
-    r"(?:(title|description|keyword) hints?)):\s*(.+?)\s*$"
-)
-
-
-def _unchanged_draft_fields(text: str, prompt: str) -> tuple[str, ...]:
-    """Return all supplied draft fields only when the output preserves every one exactly."""
-    supplied: dict[str, str] = {}
-    for match in _DRAFT_PROMPT_FIELD_PATTERN.finditer(prompt):
-        field = (match.group(1) or match.group(2)).casefold()
-        supplied["keywords" if field == "keyword" else field] = match.group(3).strip()
-    if not supplied:
-        return ()
-
-    generated = _extract_catalog_sections(text)
-    ordered_fields = tuple(
-        field for field in ("title", "description", "keywords") if field in supplied
-    )
-    for field in ordered_fields:
-        output_value = generated.get(field)
-        if not output_value:
-            return ()
-        if field == "keywords":
-            supplied_value = tuple(
-                _normalize_phrase_for_matching(value)
-                for value in _split_catalog_keywords(supplied[field])
-            )
-            output_normalized = tuple(
-                _normalize_phrase_for_matching(value)
-                for value in _split_catalog_keywords(output_value)
-            )
-        else:
-            supplied_value = (_normalize_phrase_for_matching(supplied[field]),)
-            output_normalized = (_normalize_phrase_for_matching(output_value),)
-        if output_normalized != supplied_value:
-            return ()
-    return ordered_fields
-
-
-def _collect_prompt_quality_signals(
-    text: str,
-    *,
-    raw_text: str | None = None,
-    prompt: str | None,
-    context_marker: str,
-    thinking_trace_delimiters: Sequence[tuple[str, str]],
-    seeded_thinking_text: str,
-) -> PromptQualitySignals:
-    """Collect only prompt-aware signals used by the reduced assessment."""
-    reasoning_signals = _detect_reasoning_output(
-        raw_text or text,
-        delimiter_pairs=thinking_trace_delimiters,
-        seeded_text=seeded_thinking_text,
-    )
-    instruction_echo, instruction_markers = _detect_instruction_echo(text, prompt)
-    if not prompt:
-        return PromptQualitySignals(
-            has_thinking_trace=reasoning_signals.has_thinking_trace,
-            thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
-            thinking_only_output=reasoning_signals.thinking_only_output,
-            thinking_trace_markers=reasoning_signals.thinking_trace_markers,
-            instruction_echo=instruction_echo,
-            instruction_echo_fragments=tuple(instruction_markers),
-        )
-
-    prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
-    missing_sections: list[str] = []
-    unexpected_preamble: str | None = None
-    title_word_count: int | None = None
-    title_word_range: tuple[int, int] | None = None
-    description_sentence_count: int | None = None
-    description_sentence_range: tuple[int, int] | None = None
-    keyword_count: int | None = None
-    keyword_count_range: tuple[int, int] | None = None
-    duplicate_keywords: tuple[str, ...] = ()
-    catalog_contract_requested = _prompt_requests_catalog_contract(prompt)
-    if catalog_contract_requested:
-        missing_sections = _missing_catalog_sections(text)
-        unexpected_preamble = _unexpected_catalog_preamble(text)
-    sections = _extract_catalog_sections(text)
-    generated_keywords = _split_catalog_keywords(sections.get("keywords", ""))
-    if (
-        catalog_contract_requested
-        and not missing_sections
-        and all(sections.get(field) for field in ("title", "description", "keywords"))
-    ):
-        title_word_count = len(
-            re.findall(r"\b\w+(?:[-\u2019']\w+)*\b", sections["title"], re.UNICODE)
-        )
-        title_word_range = _catalog_requested_range(prompt, "title")
-        description_sentence_count = _count_description_sentences(sections["description"])
-        description_sentence_range = _catalog_requested_range(prompt, "description")
-        keyword_count = len(generated_keywords)
-        keyword_count_range = _catalog_requested_range(prompt, "keyword")
-        normalized_keywords = [
-            _normalize_phrase_for_matching(keyword) for keyword in generated_keywords
-        ]
-        counts = Counter(keyword for keyword in normalized_keywords if keyword)
-        duplicate_keywords = tuple(keyword for keyword, count in counts.items() if count > 1)
-    keyword_overlap = _keyword_overlap_state(
-        prompt_bundle.trusted_keywords,
-        generated_keywords,
-    )
-    unchanged_draft_fields = _unchanged_draft_fields(text, prompt)
-
-    return PromptQualitySignals(
-        has_thinking_trace=reasoning_signals.has_thinking_trace,
-        thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
-        thinking_only_output=reasoning_signals.thinking_only_output,
-        thinking_trace_markers=reasoning_signals.thinking_trace_markers,
-        instruction_echo=instruction_echo,
-        instruction_echo_fragments=tuple(instruction_markers),
-        unexpected_catalog_preamble=unexpected_preamble,
-        missing_sections=tuple(missing_sections),
-        title_word_count=title_word_count,
-        title_word_range=title_word_range,
-        description_sentence_count=description_sentence_count,
-        description_sentence_range=description_sentence_range,
-        keyword_count=keyword_count,
-        keyword_count_range=keyword_count_range,
-        duplicate_keywords=duplicate_keywords,
-        keyword_overlap=keyword_overlap,
-        unchanged_draft_fields=unchanged_draft_fields,
-    )
 
 
 def _split_prompt_tokens(
@@ -4683,7 +4219,7 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
     prompt_tokens: int | None = None,
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
-    context_marker: str = "Context:",
+    assessment_profile: AssessmentProfile = "general",
     known_special_tokens: Sequence[str] = (),
     configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
@@ -4723,14 +4259,15 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         ),
     )
     is_repetitive, repeated_token = _detect_repetitive_output(analysis_text)
-    prompt_signals = _collect_prompt_quality_signals(
-        analysis_text,
-        raw_text=text,
-        prompt=prompt,
-        context_marker=context_marker,
-        thinking_trace_delimiters=thinking_trace_delimiters,
-        seeded_thinking_text=seeded_thinking_text,
+    reasoning = _detect_reasoning_output(
+        text, delimiter_pairs=thinking_trace_delimiters, seeded_text=seeded_thinking_text
     )
+    sections = _extract_catalog_sections(analysis_text) if assessment_profile == "metadata" else {}
+    missing_sections = (
+        _missing_catalog_sections(analysis_text) if assessment_profile == "metadata" else []
+    )
+    keywords = _split_catalog_keywords(sections.get("keywords", ""))
+    keyword_counts = Counter(filter(None, map(_normalize_phrase_for_matching, keywords)))
     (
         prompt_tokens_text_est,
         prompt_tokens_nontext_est,
@@ -4744,8 +4281,9 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         generated_tokens=generated_tokens,
         requested_max_tokens=requested_max_tokens,
         is_repetitive=is_repetitive,
-        missing_sections=prompt_signals.missing_sections,
-        thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
+        missing_sections=missing_sections,
+        thinking_trace_incomplete=reasoning.thinking_trace_incomplete,
+        assessment_profile=assessment_profile,
     )
     leakage_text = text
     for token in normalized.removed_wrappers:
@@ -4763,11 +4301,11 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         for marker in (pair.start, pair.end)
     )
     unexpected_special_tokens.extend(empty_reported_markers)
-    if prompt_signals.has_thinking_trace:
+    if reasoning.has_thinking_trace:
         # A legitimate detected trace neutralises its own delimiters, including
         # <|...|>-style pairs where the generic control-token regex captures
         # only a prefix of the marker (e.g. "<|channel>" of "<|channel>thought").
-        thinking_markers = {DEFAULT_THINKING_END_MARKER, *prompt_signals.thinking_trace_markers}
+        thinking_markers = {DEFAULT_THINKING_END_MARKER, *reasoning.thinking_trace_markers}
         unexpected_special_tokens = [
             wrapper
             for wrapper in unexpected_special_tokens
@@ -4784,16 +4322,14 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
-        missing_sections=list(prompt_signals.missing_sections),
-        has_thinking_trace=prompt_signals.has_thinking_trace,
-        thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
-        thinking_only_output=prompt_signals.thinking_only_output,
-        thinking_trace_markers=list(prompt_signals.thinking_trace_markers),
+        assessment_profile=assessment_profile,
+        missing_sections=missing_sections,
+        has_thinking_trace=reasoning.has_thinking_trace,
+        thinking_trace_incomplete=reasoning.thinking_trace_incomplete,
+        thinking_only_output=reasoning.thinking_only_output,
+        thinking_trace_markers=list(reasoning.thinking_trace_markers),
         word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
-        instruction_echo=prompt_signals.instruction_echo,
-        instruction_echo_fragments=list(prompt_signals.instruction_echo_fragments),
-        unexpected_catalog_preamble=prompt_signals.unexpected_catalog_preamble,
         likely_capped=likely_capped,
         token_cap_reasons=cutoff_reasons,
         prompt_tokens_total=prompt_tokens,
@@ -4804,16 +4340,12 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         special_token_wrappers=list(normalized.removed_wrappers),
         configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
-        title_word_count=prompt_signals.title_word_count,
-        title_word_range=prompt_signals.title_word_range,
-        description_sentence_count=prompt_signals.description_sentence_count,
-        description_sentence_range=prompt_signals.description_sentence_range,
-        keyword_count=prompt_signals.keyword_count,
-        keyword_count_range=prompt_signals.keyword_count_range,
-        duplicate_keywords=list(prompt_signals.duplicate_keywords),
+        title_word_count=len(re.findall(r"\b\w+(?:[-\u2019']\w+)*\b", sections["title"]))
+        if "title" in sections
+        else None,
+        keyword_count=len(keywords) if "keywords" in sections else None,
+        duplicate_keywords=[word for word, count in keyword_counts.items() if count > 1],
         unexpected_special_tokens=unexpected_special_tokens,
-        keyword_overlap=prompt_signals.keyword_overlap,
-        unchanged_draft_fields=list(prompt_signals.unchanged_draft_fields),
     )
 
 
@@ -6674,6 +6206,7 @@ def _build_report_mode_policy(
     eval_mode: str,
     metadata: MetadataDict | None = None,
     metadata_exposed_to_prompt: bool | None = None,
+    assessment_profile: AssessmentProfile = "general",
 ) -> ReportModePolicy:
     """Return only factual evaluation-mode and prompt-exposure settings."""
     resolved_eval_mode = _resolve_eval_mode(eval_mode, metadata)
@@ -6683,6 +6216,7 @@ def _build_report_mode_policy(
     return ReportModePolicy(
         eval_mode=resolved_eval_mode,
         metadata_exposed_to_prompt=resolved_metadata_exposure,
+        assessment_profile=assessment_profile,
     )
 
 
@@ -6722,6 +6256,9 @@ def _build_report_render_context(
             eval_mode=eval_mode,
             metadata=metadata,
             metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+            assessment_profile=resolved_results[0].assessment_profile
+            if resolved_results
+            else "general",
         ),
         assessments=tuple(
             (result.model_name, _assess_result(result)) for result in result_set.results
@@ -8214,6 +7751,8 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         "wrapper tokens visible",
         integration_signal=True,
     ),
+    ObservationDisplaySpec("duplicate_keywords", "Repeated keyword entries", "duplicate keywords"),
+    # Legacy codes remain renderable for retained pre-0.17 evidence.
     ObservationDisplaySpec(
         "catalog_constraint_violation",
         "Title, description or keywords do not meet requested constraints",
@@ -8306,7 +7845,12 @@ def _assessment_actionability_key(
 
 def _human_status_label(status: str) -> str:
     """Render a stable machine status for human-facing report surfaces."""
-    return status.replace("_", " ")
+    return {
+        "usable": "no concerns detected",
+        "usable_with_caveats": "concerns detected",
+        "unusable": "major concerns",
+        "not_evaluated": "not assessed",
+    }.get(status, status.replace("_", " "))
 
 
 def _human_observation_labels(
@@ -8326,7 +7870,7 @@ def _human_observation_labels(
             if missing_sections:
                 fields = ", ".join(field.title() for field in missing_sections)
                 label = f"Missing or empty fields: {fields}"
-        elif code == "catalog_constraint_violation" and details is not None:
+        elif code in {"catalog_constraint_violation", "duplicate_keywords"} and details is not None:
             # Name only the constraints that were actually breached; an
             # in-range count alongside e.g. a duplicate-keyword violation must
             # not read as a second failure.
@@ -8469,7 +8013,7 @@ class GalleryChooserData:
 def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     """Compute the single chooser ordering and resource highlights once.
 
-    Highlights consider only completions that passed every mechanical check
+    Highlights consider only completions that had no detected concerns
     (usable, no observations). That is a format/structure bar, not an
     accuracy bar — passing while copying hint keywords or misnaming the
     subject still qualifies, which is why the wording never says "clean" or
@@ -8508,18 +8052,11 @@ def _run_objective_statement(eval_mode: str | None) -> str:
     front which single narrow objective this run measured so readers do not
     mistake mechanical findings for general model quality.
     """
-    assistance = (
-        " — here, camera-recorded capture context plus draft descriptive "
-        "hints previously produced by a more capable model"
-        if eval_mode == "assisted"
-        else ""
-    )
-    lane = f"the {eval_mode}-lane prompt" if eval_mode else "one shared prompt"
     return (
-        "These models serve many purposes; this run probes exactly one narrow "
-        "task: producing catalogue metadata for a single photograph from "
-        f"{lane} and whatever context it supplies{assistance}. "
-        "Results say nothing about a model's fitness for other uses."
+        "This run records model responses to one shared image and prompt "
+        f"(evaluation lane: {eval_mode or 'unknown'}). "
+        "Mechanical checks are not factual-accuracy judgments; inspect the image, prompt "
+        "and final answers before choosing a model. Results do not establish fitness for other tasks."
     )
 
 
@@ -8533,11 +8070,9 @@ _GALLERY_THROUGHPUT_CAVEAT: Final[str] = (
 def _gallery_chooser_explanation() -> str:
     """Return the metric caveat shared verbatim by both chooser formats."""
     return (
-        "Format/structural usability for this run and captured resource facts only. "
-        "Usability means the output passed the mechanical checks on the requested "
-        "Title/Description/Keywords structure — never that the metadata is accurate: a "
-        "model can pass every check while copying hint keywords verbatim or "
-        "misidentifying the subject. Total time is end-to-end; "
+        "Mechanical observations and captured resource facts for this run only. "
+        "No concerns detected does not mean the response fulfilled an arbitrary prompt "
+        "or described the image accurately. Consult the assessment scope above. Total time is end-to-end; "
         "throughput covers generation only and requires "
         f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
         "Prefill/first is first-token latency when captured; Prompt tok is the full "
@@ -8573,7 +8108,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         *_render_gallery_table(
             headers=(
                 "Model",
-                "Format/structural usability",
+                "Mechanical checks",
                 "Total s",
                 "Gen TPS",
                 "Prefill/first s",
@@ -8595,7 +8130,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         parts.extend(
             [
                 (
-                    "Quickest completion passing mechanical checks (end-to-end, including "
+                    "Quickest completion without detected concerns (end-to-end, including "
                     f"model load): `{data.quickest.model}` at "
                     f"{_gallery_total_time_cell(data.quickest)}"
                 ),
@@ -8606,7 +8141,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         parts.extend(
             [
                 (
-                    "No completion passing mechanical checks has a captured end-to-end time "
+                    "No completion without detected concerns has a captured end-to-end time "
                     "in this run."
                 ),
                 "",
@@ -8616,7 +8151,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         parts.extend(
             [
                 (
-                    "Lowest peak memory among completions passing mechanical checks: "
+                    "Lowest peak memory among completions without detected concerns: "
                     f"`{data.lowest_memory.model}` at "
                     f"{_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb)} GB"
                 ),
@@ -8629,7 +8164,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     if data.avoided:
         parts.extend(
             _render_gallery_table(
-                headers=("Model", "Format/structural usability", "Observations"),
+                headers=("Model", "Mechanical checks", "Observations"),
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
@@ -8668,11 +8203,11 @@ def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
         ),
         "",
         *_render_gallery_table(
-            headers=("Model", "Format/structural usability", "Output preview"),
+            headers=("Model", "Mechanical checks", "Output preview"),
             rows=[
                 (
                     _gallery_summary_model_link(row.model),
-                    _markdown_inline_code(row.usability),
+                    _markdown_inline_code(_human_status_label(row.usability)),
                     _gallery_preview_cell_markdown(row),
                 )
                 for row in ordered
@@ -8793,43 +8328,9 @@ def _execution_status(result: PerformanceResult) -> ExecutionStatus:
     return "completed" if result.success else "crashed"
 
 
-def _has_catalog_constraint_violation(analysis: GenerationQualityAnalysis) -> bool:
-    """Return whether recorded catalogue counts breach the requested contract."""
-    title_count_outside_range = (
-        analysis.title_word_count is not None
-        and analysis.title_word_range is not None
-        and not analysis.title_word_range[0]
-        <= analysis.title_word_count
-        <= analysis.title_word_range[1]
-    )
-    keyword_count_outside_range = (
-        analysis.keyword_count is not None
-        and analysis.keyword_count_range is not None
-        and not analysis.keyword_count_range[0]
-        <= analysis.keyword_count
-        <= analysis.keyword_count_range[1]
-    )
-    return (
-        title_count_outside_range
-        or _description_exceeds_requested_sentences(analysis)
-        or keyword_count_outside_range
-        or bool(analysis.duplicate_keywords)
-    )
-
-
-def _description_exceeds_requested_sentences(analysis: GenerationQualityAnalysis) -> bool:
-    """Upper bound only: the conservative sentence count never flags a short description."""
-    return (
-        analysis.description_sentence_count is not None
-        and analysis.description_sentence_range is not None
-        and analysis.description_sentence_count > analysis.description_sentence_range[1]
-    )
-
-
 def _quality_observations(
     *,
     text: str,
-    generated_tokens: int | None,
     analysis: GenerationQualityAnalysis | None,
     stop_reason: str | None = None,
 ) -> tuple[ObservationCode, ...]:
@@ -8842,8 +8343,6 @@ def _quality_observations(
     observations: list[ObservationCode] = []
     if not text.strip():
         observations.append("empty_output")
-    elif _detect_minimal_output(text, generated_tokens)[0]:
-        observations.append("minimal_output")
     is_repetitive = (
         analysis.is_repetitive if analysis is not None else _detect_repetitive_output(text)[0]
     )
@@ -8863,16 +8362,12 @@ def _quality_observations(
             analysis.likely_capped and bool(analysis.token_cap_reasons),
             "token_cap_truncation",
         ),
-        (analysis.instruction_echo, "prompt_instruction_echo"),
-        (bool(analysis.unexpected_catalog_preamble), "unexpected_catalog_preamble"),
         (bool(analysis.unexpected_special_tokens), "unexpected_special_token"),
         (bool(non_thinking_wrappers), "configured_wrapper_present"),
         (analysis.thinking_only_output, "missing_final_answer"),
         (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
-        (_has_catalog_constraint_violation(analysis), "catalog_constraint_violation"),
-        (analysis.keyword_overlap == "no_overlap", "no_keyword_overlap"),
-        (bool(analysis.unchanged_draft_fields), "draft_returned_unchanged"),
+        (bool(analysis.duplicate_keywords), "duplicate_keywords"),
     )
     observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
@@ -8901,7 +8396,6 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
     runtime = result.runtime_diagnostics
     return _quality_observations(
         text=_generation_text_value(result.generation),
-        generated_tokens=_generation_int_metric(result.generation, "generation_tokens"),
         analysis=result.quality_analysis,
         stop_reason=runtime.stop_reason if runtime is not None else None,
     )
@@ -8923,16 +8417,8 @@ def _catalog_constraint_observation_details(
     details: JsonlObservationDetailsRecord = {}
     if analysis.title_word_count is not None:
         details["title_word_count"] = analysis.title_word_count
-    if analysis.title_word_range is not None:
-        details["title_word_range"] = list(analysis.title_word_range)
-    if analysis.description_sentence_count is not None:
-        details["description_sentence_count"] = analysis.description_sentence_count
-    if analysis.description_sentence_range is not None:
-        details["description_sentence_range"] = list(analysis.description_sentence_range)
     if analysis.keyword_count is not None:
         details["keyword_count"] = analysis.keyword_count
-    if analysis.keyword_count_range is not None:
-        details["keyword_count_range"] = list(analysis.keyword_count_range)
     if analysis.duplicate_keywords:
         details["duplicate_keywords"] = list(analysis.duplicate_keywords)
     return details
@@ -8948,10 +8434,6 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["missing_sections"] = list(analysis.missing_sections)
     if analysis.repeated_token:
         details["repeated_fragment"] = analysis.repeated_token
-    if analysis.instruction_echo_fragments:
-        details["instruction_echo_fragments"] = list(analysis.instruction_echo_fragments)
-    if analysis.unexpected_catalog_preamble:
-        details["unexpected_catalog_preamble"] = analysis.unexpected_catalog_preamble
     if analysis.unexpected_special_tokens:
         details["unexpected_special_tokens"] = list(analysis.unexpected_special_tokens)
     if analysis.configured_generation_wrappers:
@@ -8960,12 +8442,9 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
     if analysis.role_boundary_tokens:
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
-    if _has_catalog_constraint_violation(analysis):
-        details.update(_catalog_constraint_observation_details(analysis))
+    details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
-    if analysis.unchanged_draft_fields:
-        details["unchanged_draft_fields"] = list(analysis.unchanged_draft_fields)
     return details
 
 
@@ -8979,6 +8458,7 @@ def _assessment_to_json(
         "usability": assessment.usability,
         "maintainer_status": assessment.maintainer_status,
         "observations": list(assessment.observations),
+        "profile": result.assessment_profile if result is not None else "general",
     }
     if result is not None and (details := _observation_details(result)):
         record["details"] = details
@@ -8991,6 +8471,7 @@ class ReportModePolicy:
 
     eval_mode: EvaluationLane
     metadata_exposed_to_prompt: bool
+    assessment_profile: AssessmentProfile = "general"
 
 
 def _default_report_mode_policy() -> ReportModePolicy:
@@ -9697,7 +9178,8 @@ def _diagnostics_result_facts(
     tokenizer = prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
     rows: list[tuple[str, str]] = [
         ("Execution", assessment.execution),
-        ("Usability", assessment.usability),
+        ("Mechanical checks", _human_status_label(assessment.usability)),
+        ("Assessment", _assessment_scope(result.assessment_profile)),
         ("Maintainer status", assessment.maintainer_status),
         ("Observations", ", ".join(assessment.observations) or "none"),
     ]
@@ -10008,9 +9490,15 @@ def _run_input_rows_for_context(
     report_context: HtmlReportContext,
 ) -> tuple[tuple[str, str], ...]:
     """Lane and input-image rows from whichever report context a renderer holds."""
+    results = report_context.result_set.results
     return _run_input_summary_rows(
         _run_image_record(image_path, getattr(report_context, "image_profile", None)),
         getattr(getattr(report_context, "mode_policy", None), "eval_mode", None),
+        getattr(
+            getattr(report_context, "mode_policy", None),
+            "assessment_profile",
+            results[0].assessment_profile if results else "general",
+        ),
     )
 
 
@@ -10114,13 +9602,13 @@ def _diagnostics_evidence_blocks(
     )
     clean: ReportBlock = (
         ReportDetails(
-            "Completions passing mechanical checks",
+            "Completions without detected concerns",
             (ReportTable(("Model", "Runtime identity", "Performance"), clean_rows),),
         )
         if clean_rows
-        else ReportParagraph("No completion passed every mechanical check.")
+        else ReportParagraph("No completion had no detected concerns.")
     )
-    blocks.append(_report_section("Context for completions passing mechanical checks", clean))
+    blocks.append(_report_section("Context for completions without detected concerns", clean))
     return tuple(blocks)
 
 
@@ -10411,7 +9899,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             headers=(
                 "Model",
                 "Execution",
-                "Format/structural usability",
+                "Mechanical checks",
                 "Maintainer status",
                 "Total s",
                 "Gen TPS",
@@ -10435,18 +9923,18 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     # lowest-memory/fastest re-listing tables collapse into highlight lines.
     if data.quickest is not None:
         parts.append(
-            "<p>Quickest completion passing mechanical checks (end-to-end, including "
+            "<p>Quickest completion without detected concerns (end-to-end, including "
             f"model load): {_html_model_link(data.quickest.model)} at "
             f"{html.escape(_gallery_total_time_cell(data.quickest))}.</p>"
         )
     else:
         parts.append(
-            "<p>No completion passing mechanical checks has a captured end-to-end time "
+            "<p>No completion without detected concerns has a captured end-to-end time "
             "in this run.</p>"
         )
     if data.lowest_memory is not None:
         parts.append(
-            "<p>Lowest peak memory among completions passing mechanical checks: "
+            "<p>Lowest peak memory among completions without detected concerns: "
             f"{_html_model_link(data.lowest_memory.model)} at "
             f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
             "GB.</p>"
@@ -10458,7 +9946,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         parts.append(
             _html_table(
                 caption="Unusable and not-evaluated models",
-                headers=("Model", "Format/structural usability", "Observations", "Output preview"),
+                headers=("Model", "Mechanical checks", "Observations", "Output preview"),
                 rows=[
                     (
                         _html_model_link(row.model),
@@ -10820,6 +10308,7 @@ def generate_markdown_gallery_report(
         for label, value in _run_input_summary_rows(
             _run_image_record(image_path, report_context.image_profile),
             report_context.mode_policy.eval_mode,
+            report_context.mode_policy.assessment_profile,
         )
     )
     md.append("")
@@ -14020,12 +13509,12 @@ def _build_success_process_result(
         ),
         requested_max_tokens=params.max_tokens,
         prompt_diagnostics=_object_prompt_diagnostics(output),
+        assessment_profile=params.assessment_profile,
     )
     result_payload = _populate_result_quality_analysis(
         result_payload,
         prompt=params.prompt,
         requested_max_tokens=params.max_tokens,
-        context_marker=params.context_marker,
     )
     return result_payload, stop_reason
 
@@ -14059,7 +13548,7 @@ def _build_exception_process_result(
                 max(len(stdout_clean.split()), 1),
                 prompt=params.prompt,
                 requested_max_tokens=params.max_tokens,
-                context_marker=params.context_marker,
+                assessment_profile=params.assessment_profile,
             )
     if stderr_clean:
         captured_sections.append("=== STDERR ===\n" + stderr_clean)
@@ -15169,10 +14658,6 @@ def _quality_warning_messages(
         messages.append(f"Missing sections: {', '.join(analysis.missing_sections)}")
     if analysis.thinking_trace_incomplete:
         messages.append("Expected thinking trace did not reach a final answer")
-    if analysis.instruction_echo:
-        messages.append("Instruction text appears in output")
-    if analysis.unexpected_catalog_preamble:
-        messages.append("Unexpected text appears before the Title section")
     if analysis.likely_capped and analysis.token_cap_reasons:
         messages.append(f"Output reached requested token limit ({generated_tokens} tokens)")
     if analysis.unexpected_special_tokens:
@@ -15197,7 +14682,6 @@ def _preview_generation(
     *,
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
-    context_marker: str = "Context:",
 ) -> None:
     if not gen:
         return
@@ -15210,7 +14694,6 @@ def _preview_generation(
             gen_tokens,
             prompt_tokens=prompt_tokens,
             prompt=prompt,
-            context_marker=context_marker,
         )
 
     if not text_val:
@@ -15237,7 +14720,6 @@ def _log_verbose_success_details(
     *,
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
-    context_marker: str = "Context:",
 ) -> None:
     """Emit verbose block with warnings and metrics after the guard's live echo."""
     if not res.generation:
@@ -15256,7 +14738,6 @@ def _log_verbose_success_details(
             gen_tokens,
             prompt_tokens=prompt_tokens,
             prompt=prompt,
-            context_marker=context_marker,
         )
 
     log_blank()
@@ -15477,7 +14958,6 @@ def print_model_result(
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,
-    context_marker: str = "Context:",
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     resolved_assessment = assessment or _assess_result(result)
@@ -15504,7 +14984,6 @@ def print_model_result(
             result.generation,
             analysis=result.quality_analysis,
             prompt=prompt,
-            context_marker=context_marker,
         )
         return
     # For failures, show detailed error info; for success, show generation details
@@ -15517,7 +14996,6 @@ def print_model_result(
             result,
             analysis=result.quality_analysis,
             prompt=prompt,
-            context_marker=context_marker,
         )
 
 
@@ -15862,6 +15340,9 @@ def _apply_eval_mode_defaults(
             resolved_eval_mode,
         )
     args.eval_mode = resolved_eval_mode
+    args.assessment_profile = getattr(args, "assessment_profile", None) or (
+        "general" if getattr(args, "prompt", None) or resolved_eval_mode == "triage" else "metadata"
+    )
 
     # None marks "not set on the CLI": an explicit --max-tokens always wins, even
     # when it equals a lane default (the old value-comparison sentinel silently
@@ -16023,6 +15504,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         )
     logger.debug("Full prompt:\n%s", prompt)
     logger.info("Prompt length: %d characters", len(prompt))
+    logger.info("Assessment: %s", _assessment_scope(getattr(args, "assessment_profile", None)))
     return prompt
 
 
@@ -16759,7 +16241,7 @@ def _process_image_params_from_args(
         thinking_end_token=args.thinking_end_token,
         auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
         system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
-        context_marker=args.context_marker,
+        assessment_profile=getattr(args, "assessment_profile", None) or "general",
     )
 
 
@@ -16789,9 +16271,12 @@ def _run_one_model(
         timeout=timeout,
         verbose=verbose,
     )
-    if getattr(args, "isolate", False):
-        return _run_model_isolated(args, params)
-    return process_image_with_model(params)
+    result = (
+        _run_model_isolated(args, params)
+        if getattr(args, "isolate", False)
+        else process_image_with_model(params)
+    )
+    return replace(result, assessment_profile=params.assessment_profile)
 
 
 def process_models(
@@ -16889,7 +16374,6 @@ def process_models(
                 result,
                 prompt=prompt,
                 requested_max_tokens=args.max_tokens,
-                context_marker=args.context_marker,
             )
             analysis = result.quality_analysis
             if analysis is None:
@@ -16958,21 +16442,11 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
             "thinking_incomplete",
             analysis.thinking_trace_incomplete,
         ),
-        _format_quality_log_flag("instruction_echo", analysis.instruction_echo),
-        _format_quality_log_flag(
-            "unexpected_catalog_preamble",
-            bool(analysis.unexpected_catalog_preamble),
-        ),
         _format_quality_log_flag("likely_capped", analysis.likely_capped),
         _format_quality_log_flag(
             "unexpected_special_token",
             bool(analysis.unexpected_special_tokens),
             detail=",".join(analysis.unexpected_special_tokens[:2]),
-        ),
-        (
-            f"keyword_overlap={analysis.keyword_overlap}"
-            if analysis.keyword_overlap != "not_assessable"
-            else None
         ),
     )
     parts = [part for part in parts_raw if part is not None]
@@ -17097,7 +16571,6 @@ def _populate_result_quality_analysis(
     *,
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
-    context_marker: str = "Context:",
 ) -> PerformanceResult:
     """Attach mechanical analysis to a completed result exactly once per prompt."""
     if not result.success or result.generation is None:
@@ -17105,7 +16578,11 @@ def _populate_result_quality_analysis(
 
     text = str(getattr(result.generation, "text", ""))
     cached_analysis = _quality_analysis_for_result(result)
-    if cached_analysis is not None and (not prompt or cached_analysis.prompt_checks_ran):
+    if (
+        cached_analysis is not None
+        and cached_analysis.assessment_profile == result.assessment_profile
+        and (not prompt or cached_analysis.prompt_checks_ran)
+    ):
         return result
 
     generated_tokens = _generation_int_metric(result.generation, "generation_tokens")
@@ -17120,7 +16597,7 @@ def _populate_result_quality_analysis(
         prompt_tokens=prompt_tokens,
         prompt=prompt,
         requested_max_tokens=resolved_requested_max_tokens,
-        context_marker=context_marker,
+        assessment_profile=result.assessment_profile,
         known_special_tokens=_configured_output_wrappers(diagnostics),
         configured_generation_wrappers=_configured_generation_wrappers(diagnostics),
         thinking_trace_delimiters=_result_thinking_delimiters(result),
@@ -17518,9 +16995,9 @@ def _log_completed_models_list(
     """Log completed models in compact actionability-ordered tables."""
     logger.info("Completed Models (%d):", len(completed))
     groups: tuple[tuple[ModelUsability, str], ...] = (
-        ("unusable", "Unusable"),
-        ("usable_with_caveats", "Usable with caveats"),
-        ("usable", "Usable"),
+        ("unusable", "Major concerns"),
+        ("usable_with_caveats", "Concerns detected"),
+        ("usable", "No concerns detected"),
     )
     for usability, label in groups:
         grouped = sorted(
@@ -17866,6 +17343,7 @@ def _build_jsonl_metadata_record(  # noqa: PLR0913 - the schema-3 header names e
         "trust_remote_code": trust_remote_code,
         "comparison": _run_comparison_to_json(comparison),
         "eval_mode": mode_policy.eval_mode,
+        "assessment_profile": mode_policy.assessment_profile,
         "metadata_exposed_to_prompt": mode_policy.metadata_exposed_to_prompt,
         "execution_mode": execution_mode,
     }
@@ -18083,6 +17561,8 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
             metadata_exposed_to_prompt=resolved_policy.metadata_exposed_to_prompt,
             system_info=system_info,
         )
+    if mode_policy is None:
+        resolved_policy = report_context.mode_policy
     cached_results = {result.model_name: result for result in report_context.result_set.results}
     assessments = _assessments_by_model(report_context)
     model_provenance = _model_provenance_by_model(report_context)
@@ -18272,9 +17752,19 @@ def _describe_run_image(image: RunImageRecord) -> str:
     return ", ".join(parts)
 
 
+def _assessment_scope(profile: str | None) -> str:
+    """State the checks actually selected; absence is never a passed contract."""
+    if profile == "metadata":
+        return "General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed"
+    if profile == "general":
+        return "General checks only; task compliance not assessed"
+    return "Legacy assessment; profile not recorded"
+
+
 def _run_input_summary_rows(
     image: RunImageRecord | None,
     eval_mode: str | None,
+    assessment_profile: str | None = None,
 ) -> tuple[tuple[str, str], ...]:
     """Evaluation lane and input-image facts that every summary surface leads with.
 
@@ -18283,6 +17773,7 @@ def _run_input_summary_rows(
     """
     return (
         ("Evaluation lane", eval_mode or "unknown"),
+        ("Assessment", _assessment_scope(assessment_profile)),
         ("Input image", _describe_run_image(image) if image is not None else "unavailable"),
     )
 
@@ -19070,6 +18561,10 @@ def _comparison_compatibility(
             reasons.append(f"image differs (sha256 {before_sha[:12]}… → {now_sha[:12]}…)")
     else:
         unverified.append("image identity")
+    if current_metadata is not None and current_metadata.get(
+        "assessment_profile"
+    ) != baseline.metadata.get("assessment_profile"):
+        reasons.append("assessment profile differs (or was not recorded in the baseline)")
     if _comparison_hardware(current_metadata) is None or (
         _comparison_hardware(baseline.metadata) is None
     ):
@@ -20477,9 +19972,7 @@ def _pluralized_count(count: int, singular: str, plural: str | None = None) -> s
 
 def _run_issue_summary_assessment_label(assessment: JsonlAssessmentRecord) -> str:
     """Render cached execution and usability values as compact human labels."""
-    return (
-        f"{assessment['execution'].replace('_', ' ')} / {assessment['usability'].replace('_', ' ')}"
-    )
+    return f"{assessment['execution'].replace('_', ' ')} / {_human_status_label(assessment['usability'])}"
 
 
 def _run_issue_summary_crash_section(
@@ -20635,7 +20128,9 @@ def _run_issue_summary_constraint_breakdown(
 
     for result in results:
         assessment = result["assessment"]
-        if "catalog_constraint_violation" not in assessment["observations"]:
+        if not {"catalog_constraint_violation", "duplicate_keywords"}.intersection(
+            assessment["observations"]
+        ):
             continue
         details = cast("dict[str, JsonLike]", assessment.get("details") or {})
         _record_outside_range(
@@ -20845,24 +20340,16 @@ def _run_issue_summary_quality_section(
         "Model quality at a glance",
         (
             ReportParagraph(
-                "Every attempted model ranked by current-run format/structural "
-                "usability, with captured resource facts. Usability is a mechanical "
-                "verdict on this single image and prompt, never an accuracy verdict: "
-                "a model can pass every check while copying hint keywords verbatim or "
-                "misidentifying the subject. *usable* means the output passed every "
-                "mechanical check on the prompt's requested structure; "
-                "*usable with caveats* means repairable deviations (constraint misses, "
-                "visible control tokens); *unusable* means mechanically broken output "
-                "(repetition, missing sections, truncation); *not evaluated* means the "
-                "attempt crashed. Total is end-to-end wall time including model load, "
-                "Gen tok/s is decode-only throughput, and Peak GB is peak MLX memory. "
-                "The model gallery holds full outputs and the diagnostics report holds "
+                "Every attempted model ranked by mechanical observations, with captured "
+                "resource facts. No concerns detected is not a task-compliance or accuracy "
+                "verdict. Consult the assessment scope above and inspect the final answers. "
+                "Crashes and integration signals have expanded "
                 "maintainer evidence."
             ),
             ReportTable(
                 (
                     "Model",
-                    "Format/structural usability",
+                    "Mechanical checks",
                     "Total",
                     "Gen tok/s",
                     "Peak GB",
@@ -20924,7 +20411,7 @@ def _run_issue_summary_surfaced_sections(
                     heading,
                     (
                         ReportTable(
-                            ("Model", "Format/structural usability", "Observed result", "Evidence"),
+                            ("Model", "Mechanical checks", "Observed result", "Evidence"),
                             tuple(rows),
                             compact=True,
                         ),
@@ -21094,7 +20581,7 @@ def _run_issue_summary_clean_completions_section(
         if result["assessment"]["execution"] == "completed"
         and not result["assessment"]["observations"]
     )
-    clean_phrase = _pluralized_count(clean_count, "completion") + " passing mechanical checks"
+    clean_phrase = _pluralized_count(clean_count, "completion") + " without detected concerns"
     if clean_models:
         clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
     clean_sentence = f"{clean_phrase}."
@@ -21112,7 +20599,7 @@ def _run_issue_summary_clean_completions_section(
         )
         clean_sentence += f" See the {_render_report_cell_markdown(gallery_link, escaped=False)}."
     return ReportSection(
-        "Completions passing mechanical checks",
+        "Completions without detected concerns",
         (
             ReportRaw(
                 markdown_lines=(clean_sentence,),
@@ -21169,7 +20656,9 @@ def generate_run_issue_summary_report(
                 ReportKeyValues(
                     (
                         *_run_issue_summary_timing_rows(source.metadata),
-                        *_run_input_summary_rows(source.image, eval_mode),
+                        *_run_input_summary_rows(
+                            source.image, eval_mode, source.metadata.get("assessment_profile")
+                        ),
                         ("Models attempted", str(len(source.results))),
                         ("Completed", str(counts["completed"])),
                         ("Crashed", str(counts["crashed"])),
@@ -21299,6 +20788,7 @@ def _output_index_dashboard_lines(
     *,
     image: RunImageRecord | None = None,
     eval_mode: str | None = None,
+    assessment_profile: AssessmentProfile | None = None,
 ) -> list[str]:
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
@@ -21315,7 +20805,10 @@ def _output_index_dashboard_lines(
             else []
         ),
         *(
-            [f"- {label}: {value}" for label, value in _run_input_summary_rows(image, eval_mode)]
+            [
+                f"- {label}: {value}"
+                for label, value in _run_input_summary_rows(image, eval_mode, assessment_profile)
+            ]
             if image is not None or eval_mode is not None
             else []
         ),
@@ -21358,6 +20851,7 @@ def generate_output_index_report(
     eval_mode: str | None = None,
     run_duration_seconds: float | None = None,
     image: RunImageRecord | None = None,
+    assessment_profile: AssessmentProfile | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -21371,12 +20865,21 @@ def generate_output_index_report(
         for artifact in artifacts
         if artifact.key != "output_index"
     )
-    md = ["# Check Models Output Index", ""]
+    md = [
+        "# Check Models Output Index",
+        "",
+        f"Assessment: {_assessment_scope(assessment_profile)}",
+        "",
+    ]
     md.extend((*_wrap_markdown_text(_run_objective_statement(eval_mode)), ""))
     if assessments is not None:
         md.extend(
             _output_index_dashboard_lines(
-                assessments, run_duration_seconds, image=image, eval_mode=eval_mode
+                assessments,
+                run_duration_seconds,
+                image=image,
+                eval_mode=eval_mode,
+                assessment_profile=assessment_profile,
             )
         )
     if run_issue_summary is not None:
@@ -22375,6 +21878,7 @@ def _generate_reports_and_log_outputs(
             eval_mode=inputs.report_context.mode_policy.eval_mode,
             run_duration_seconds=_elapsed_run_seconds(inputs),
             image=_run_image_record(inputs.image_path, inputs.report_context.image_profile),
+            assessment_profile=inputs.report_context.mode_policy.assessment_profile,
         ),
     )
     run_artifact(index_artifact)
@@ -22463,7 +21967,7 @@ def _run_differential_reruns(
             result.model_name,
         )
         rerun_result = _run_one_model(
-            args,
+            argparse.Namespace(**{**vars(args), "assessment_profile": "general"}),
             model_identifier=result.model_name,
             image_path=image_path,
             prompt=TRIAGE_PROMPT,
@@ -22571,7 +22075,13 @@ def finalize_execution(
             for result in results
         }
         report_context = _build_report_render_context(
-            results=results,
+            results=[
+                replace(
+                    result,
+                    assessment_profile=getattr(args, "assessment_profile", None) or "general",
+                )
+                for result in results
+            ],
             prompt=prompt,
             image_path=image_path,
             metadata=metadata,
@@ -22595,7 +22105,6 @@ def finalize_execution(
                 run_index=index,
                 total_runs=len(results),
                 prompt=prompt,
-                context_marker=str(getattr(args, "context_marker", "Context:")),
             )
         log_summary(
             results,
@@ -23143,6 +22652,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
 
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
+        "--assessment-profile",
+        choices=("general", "metadata"),
+        default=None,
+        help="Checks independent of prompt wording: metadata for the built-in metadata prompt; general for custom and triage prompts. Metadata checks fields and duplicate keywords, not prose limits.",
+    )
+    generation_group.add_argument(
         "--eval-mode",
         choices=[DEFAULT_EVAL_MODE, "triage", "blind", "assisted"],
         default=DEFAULT_EVAL_MODE,
@@ -23376,12 +22891,6 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         type=Path,
         default=None,
         help="Path to custom quality configuration YAML file.",
-    )
-    quality_group.add_argument(
-        "--context-marker",
-        type=str,
-        default="Context:",
-        help="Marker used to identify context section in prompt.",
     )
     quality_group.add_argument(
         "--isolate",

@@ -1344,6 +1344,10 @@ class TestIsolatedExecution:
             success=True,
             generation=_FakeGenerationResult(text="hello", prompt_tokens=50, generation_tps=42.0),
             generation_time=1.5,
+            assessment_profile="metadata",
+            quality_analysis=check_models.analyze_generation_text(
+                "hello", 10, assessment_profile="metadata"
+            ),
             prompt_diagnostics=diagnostics,
             exception_chain=(
                 check_models.FailureException(
@@ -1368,6 +1372,8 @@ class TestIsolatedExecution:
         assert restored.exception_chain == result.exception_chain
         assert restored.runtime_diagnostics == result.runtime_diagnostics
         assert restored.generation_time == 1.5
+        assert restored.assessment_profile == "metadata"
+        assert check_models._assess_result(restored).observations == ("missing_requested_sections",)
 
     def test_signal_names(self) -> None:
         """Negative and 128+N return codes map to signal names."""
@@ -1671,7 +1677,16 @@ class TestRepetitionGuard:
         image = tmp_path / "img.jpg"
         image.write_bytes(b"not-a-jpeg")
         args = check_models._build_cli_parser().parse_args(
-            ["--image", str(image), "--models", "org/m", "--isolate", "--verbose"]
+            [
+                "--image",
+                str(image),
+                "--models",
+                "org/m",
+                "--isolate",
+                "--verbose",
+                "--assessment-profile",
+                "metadata",
+            ]
         )
         params = check_models._process_image_params_from_args(
             args,
@@ -1684,11 +1699,13 @@ class TestRepetitionGuard:
             verbose=False,
         )
 
+        assert params.assessment_profile == "metadata"
         spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
         restored = check_models._isolated_params_from_spec(
             spec, check_models._namespace_from_json(spec["args"])
         )
 
+        assert restored.assessment_profile == "metadata"
         for field in (
             "model_identifier",
             "image_path",
