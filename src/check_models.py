@@ -7930,8 +7930,13 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
     """Build one chooser row from cached assessment and captured facts only."""
     generation = result.generation
     output = _generation_text_value(generation)
+    reasoning = ""
     if assessment.execution == "completed":
-        preview_source = output or "empty output"
+        # The preview shows what the model finally answered; a closed
+        # reasoning trace is counted and kept available under disclosure so
+        # a thinking model's preview is not spent on its scratch work.
+        answer, reasoning = _final_answer_text(result)
+        preview_source = answer or "empty output"
     else:
         preview_source = (
             result.error_message
@@ -7945,6 +7950,9 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         max_chars=MAX_OUTPUT_PREVIEW_CHARS,
     )
     peak_memory = _generation_float_metric(generation, "peak_memory")
+    reasoning_preview = _truncate_text_preview(
+        _collapse_preview_line_whitespace(reasoning), max_chars=MAX_OUTPUT_PREVIEW_CHARS
+    )
     return GalleryRow(
         model=result.model_name,
         usability=assessment.usability,
@@ -7962,6 +7970,8 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         prompt_tokens=_generation_int_metric(generation, "prompt_tokens"),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
         output_preview=output_preview,
+        reasoning_chars=len(reasoning),
+        reasoning_preview=reasoning_preview,
     )
 
 
@@ -8250,6 +8260,32 @@ def _gallery_throughput_cell(row: GalleryRow) -> str:
     return "-"
 
 
+def _gallery_reasoning_note(row: GalleryRow) -> str:
+    """Return the omitted-reasoning note for a preview, or an empty string."""
+    if not row.reasoning_chars:
+        return ""
+    return f"{row.reasoning_chars:,} characters of reasoning omitted"
+
+
+def _gallery_preview_cell_markdown(row: GalleryRow) -> str:
+    """Render the final-answer preview plus the omitted-reasoning note."""
+    cell = MARKDOWN_ESCAPER.escape(row.output_preview)
+    if note := _gallery_reasoning_note(row):
+        cell += MARKDOWN_ESCAPER.escape(f" [{note}; complete output in the evidence block]")
+    return cell
+
+
+def _gallery_preview_cell_html(row: GalleryRow) -> str:
+    """Render the escaped preview with the reasoning trace under disclosure."""
+    cell = html.escape(row.output_preview)
+    if note := _gallery_reasoning_note(row):
+        cell += (
+            f"<details><summary>{html.escape(note)}</summary>"
+            f"<pre>{html.escape(row.reasoning_preview)}</pre></details>"
+        )
+    return cell
+
+
 def _gallery_total_time_cell(row: GalleryRow) -> str:
     """Render captured end-to-end model time ahead of decode-only throughput."""
     return _format_time_seconds(row.total_time_s) if row.total_time_s is not None else "-"
@@ -8276,8 +8312,7 @@ class GalleryChooserData:
 
     ordered: tuple[GalleryRow, ...]
     avoided: tuple[GalleryRow, ...]
-    fastest: GalleryRow | None
-    average_tps: float | None
+    quickest: GalleryRow | None
     lowest_memory: GalleryRow | None
 
 
@@ -8286,23 +8321,19 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
 
     Highlights consider only clean completions (usable, no observations): a
     fast model that merely reformulates supplied hints is not a useful
-    "fastest" recommendation.
+    "quickest" recommendation. Time to complete the task end-to-end is the
+    highlight, not decode tok/s: tokenizers, image-token expansion and
+    reasoning lengths differ so much across models that a tok/s ranking or
+    a cross-model average carries little decision value.
     """
     ordered = tuple(
         sorted(rows, key=lambda row: (_gallery_usability_sort_key(row.usability), row.model))
     )
     avoided = tuple(row for row in ordered if row.usability in {"unusable", "not_evaluated"})
     usable = [row for row in ordered if row.usability == "usable" and not row.observations]
-    valid_rows = [row for row in usable if row.generation_tps is not None]
-    fastest = (
-        min(valid_rows, key=lambda row: (-cast("float", row.generation_tps), row.model))
-        if valid_rows
-        else None
-    )
-    average_tps = (
-        sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
-        if valid_rows
-        else None
+    timed = [row for row in usable if row.total_time_s is not None]
+    quickest = (
+        min(timed, key=lambda row: (cast("float", row.total_time_s), row.model)) if timed else None
     )
     with_memory = [row for row in usable if row.peak_memory_gb is not None]
     lowest_memory = (
@@ -8313,8 +8344,7 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     return GalleryChooserData(
         ordered=ordered,
         avoided=avoided,
-        fastest=fastest,
-        average_tps=average_tps,
+        quickest=quickest,
         lowest_memory=lowest_memory,
     )
 
@@ -8339,6 +8369,13 @@ def _run_objective_statement(eval_mode: str | None) -> str:
         f"{lane} and whatever context it supplies{assistance}. "
         "Results say nothing about a model's fitness for other uses."
     )
+
+
+_GALLERY_THROUGHPUT_CAVEAT: Final[str] = (
+    "Decode tok/s stays per model in the chooser and is not averaged across models: "
+    "tokenizers, image-token expansion and reasoning lengths differ too much for a "
+    "cross-model mean to guide a choice."
+)
 
 
 def _gallery_chooser_explanation() -> str:
@@ -8397,25 +8434,19 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     ]
 
     # One sortable row set replaces the former lowest-memory/fastest re-listing
-    # tables; the highlights carry the same decisions in three lines.
-    if data.fastest is not None and data.average_tps is not None:
+    # tables; the highlights carry the same decisions in a few lines.
+    if data.quickest is not None:
         parts.extend(
             [
                 (
-                    f"Fastest clean completion: `{data.fastest.model}` at "
-                    f"{_gallery_metric('generation_tps', data.fastest.generation_tps)} tok/s"
-                ),
-                "",
-                (
-                    "Average clean-completion throughput: "
-                    f"{_gallery_metric('generation_tps', data.average_tps)} tok/s "
-                    "(indicative only: tokenizers and architectures differ across models)"
+                    "Quickest clean completion (end-to-end, including model load): "
+                    f"`{data.quickest.model}` at {_gallery_total_time_cell(data.quickest)}"
                 ),
                 "",
             ]
         )
     else:
-        parts.extend(["No clean completions with valid throughput samples in this run.", ""])
+        parts.extend(["No clean completions with a captured end-to-end time in this run.", ""])
     if data.lowest_memory is not None:
         parts.extend(
             [
@@ -8426,6 +8457,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 "",
             ]
         )
+    parts.extend([_GALLERY_THROUGHPUT_CAVEAT, ""])
     parts.extend(["## Avoid for This Run", ""])
 
     if data.avoided:
@@ -8462,9 +8494,11 @@ def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
         "## Output at a Glance",
         "",
         (
-            f"The first {MAX_OUTPUT_PREVIEW_CHARS} characters of each model's actual "
-            "output (or failure evidence for crashes), in chooser order. Complete "
-            "exact evidence for every model follows below."
+            f"The first {MAX_OUTPUT_PREVIEW_CHARS} characters of each model's final "
+            "answer (or failure evidence for crashes), in chooser order. A closed "
+            "reasoning trace is left out of the preview and reported as an "
+            "omitted-character count; the complete output, trace included, is in "
+            "the model's evidence block below."
         ),
         "",
         *_render_gallery_table(
@@ -8473,7 +8507,7 @@ def _render_gallery_output_glance(rows: Sequence[GalleryRow]) -> list[str]:
                 (
                     _gallery_summary_model_link(row.model),
                     _markdown_inline_code(row.usability),
-                    MARKDOWN_ESCAPER.escape(row.output_preview),
+                    _gallery_preview_cell_markdown(row),
                 )
                 for row in ordered
             ],
@@ -8573,6 +8607,8 @@ class GalleryRow:
     prompt_tokens: int | None
     generation_tokens: int | None
     output_preview: str
+    reasoning_chars: int = 0
+    reasoning_preview: str = ""
 
 
 def _execution_status(result: PerformanceResult) -> ExecutionStatus:
@@ -9785,10 +9821,22 @@ def _diagnostics_partition_blocks(
     return tuple(blocks) or (ReportParagraph("None."),)
 
 
+def _run_input_rows_for_context(
+    image_path: Path | None,
+    report_context: HtmlReportContext,
+) -> tuple[tuple[str, str], ...]:
+    """Lane and input-image rows from whichever report context a renderer holds."""
+    return _run_input_summary_rows(
+        _run_image_record(image_path, getattr(report_context, "image_profile", None)),
+        getattr(getattr(report_context, "mode_policy", None), "eval_mode", None),
+    )
+
+
 def _diagnostics_evidence_blocks(
     report_context: HtmlReportContext,
     *,
     run_args: argparse.Namespace | None,
+    image_path: Path | None = None,
 ) -> tuple[ReportBlock, ...]:
     """Build the shared skim-first diagnostics hierarchy from cached assessments."""
     assessments = _assessments_by_model(report_context)
@@ -9814,7 +9862,11 @@ def _diagnostics_evidence_blocks(
         else ReportParagraph("No highlighted attempts.")
     )
     blocks: list[ReportBlock] = [
-        _report_section("Run Summary", *_diagnostics_counts_blocks(report_context)),
+        _report_section(
+            "Run Summary",
+            ReportKeyValues(_run_input_rows_for_context(image_path, report_context)),
+            *_diagnostics_counts_blocks(report_context),
+        ),
         _report_section("Triage", triage),
         _report_section(
             "Crashes requiring action",
@@ -9961,7 +10013,7 @@ def generate_diagnostics_report(
     )
     blocks = (
         ReportParagraph(_run_objective_statement(report_context.mode_policy.eval_mode)),
-        *_diagnostics_evidence_blocks(report_context, run_args=run_args),
+        *_diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path),
         *_diagnostics_shared_context_blocks(
             prompt=prompt,
             highlighted_results=highlighted,
@@ -10142,7 +10194,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             _gallery_metric("prompt_tokens", row.prompt_tokens),
             _gallery_metric("generation_tokens", row.generation_tokens),
             _gallery_observation_labels(row.observations),
-            row.output_preview,
+            _gallery_preview_cell_html(row),
         )
         for row in ordered
     ]
@@ -10190,7 +10242,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             ),
             rows=chooser_rows,
             row_attrs=chooser_attrs,
-            raw_columns=frozenset({0}),
+            raw_columns=frozenset({0, 11}),
             sort_values=chooser_sort_values,
             sortable=True,
         ),
@@ -10199,23 +10251,14 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     ]
     # The chooser table is sortable by every column, so the former
     # lowest-memory/fastest re-listing tables collapse into highlight lines.
-    if data.fastest is not None and data.average_tps is not None:
-        parts.extend(
-            (
-                (
-                    f"<p>Fastest clean completion: {_html_model_link(data.fastest.model)} at "
-                    f"{html.escape(_gallery_metric('generation_tps', data.fastest.generation_tps))} "
-                    "tok/s.</p>"
-                ),
-                (
-                    "<p>Average clean-completion throughput: "
-                    f"{html.escape(_gallery_metric('generation_tps', data.average_tps))} tok/s "
-                    "(indicative only: tokenizers and architectures differ across models).</p>"
-                ),
-            )
+    if data.quickest is not None:
+        parts.append(
+            "<p>Quickest clean completion (end-to-end, including model load): "
+            f"{_html_model_link(data.quickest.model)} at "
+            f"{html.escape(_gallery_total_time_cell(data.quickest))}.</p>"
         )
     else:
-        parts.append("<p>No clean completions with valid throughput samples in this run.</p>")
+        parts.append("<p>No clean completions with a captured end-to-end time in this run.</p>")
     if data.lowest_memory is not None:
         parts.append(
             "<p>Lowest peak memory among clean completions: "
@@ -10223,6 +10266,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             f"{html.escape(_gallery_metric('peak_memory', data.lowest_memory.peak_memory_gb))} "
             "GB.</p>"
         )
+    parts.append(f"<p>{html.escape(_GALLERY_THROUGHPUT_CAVEAT)}</p>")
 
     parts.append("<h3>Avoid for This Run</h3>")
     if data.avoided:
@@ -10313,15 +10357,24 @@ def _html_maintainer_diagnostics(
     report_context: HtmlReportContext,
     *,
     run_args: argparse.Namespace | None,
+    image_path: Path | None,
 ) -> str:
     """Render the same cached diagnostic block hierarchy used by Markdown."""
     parts = [
         '<section id="maintainer-diagnostics">',
         "<h2>Maintainer Diagnostics</h2>",
-        *render_report_html(_diagnostics_evidence_blocks(report_context, run_args=run_args)),
+        *render_report_html(
+            _diagnostics_evidence_blocks(report_context, run_args=run_args, image_path=image_path)
+        ),
         "</section>",
     ]
     return "\n".join(parts)
+
+
+def _html_run_inputs(image_path: Path | None, report_context: HtmlReportContext) -> str:
+    """Render the evaluation lane and input-image facts ahead of every table."""
+    rows = _run_input_rows_for_context(image_path, report_context)
+    return "".join(render_report_html((ReportKeyValues(rows),)))
 
 
 def _html_runtime_facts(
@@ -10442,6 +10495,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 )
             )
             + "</p>",
+            _html_run_inputs(image_path, report_context),
             _html_embedded_image(image_path),
             _html_runtime_facts(report_context.result_set.results, total_runtime_seconds),
             _html_gallery_chooser(report_context),
@@ -10449,6 +10503,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             _html_maintainer_diagnostics(
                 report_context,
                 run_args=run_args,
+                image_path=image_path,
             ),
             _html_provenance(
                 report_context=report_context,
@@ -10574,6 +10629,14 @@ def generate_markdown_gallery_report(
     md.append("# Model Output Gallery")
     md.append("")
     md.append(f"Generated on: {local_now_str()}")
+    md.append("")
+    md.extend(
+        f"- *{label}:* {value}"
+        for label, value in _run_input_summary_rows(
+            _run_image_record(image_path, report_context.image_profile),
+            report_context.mode_policy.eval_mode,
+        )
+    )
     md.append("")
     md.extend(_wrap_markdown_text(_run_objective_statement(report_context.mode_policy.eval_mode)))
     md.append("")
@@ -16746,6 +16809,50 @@ def _collapse_preview_line_whitespace(text: str) -> str:
     return "\n".join(" ".join(line.split()) for line in normalized.split("\n"))
 
 
+def _result_thinking_delimiters(result: PerformanceResult) -> tuple[tuple[str, str], ...]:
+    """Recognised thinking delimiter pairs plus any pair configured for this generation."""
+    pairs = list(THINKING_TRACE_DELIMITER_PAIRS)
+    diagnostics = result.prompt_diagnostics
+    if diagnostics is not None:
+        start_marker = diagnostics.generate_kwargs.get("thinking_start_token")
+        end_marker = diagnostics.generate_kwargs.get("thinking_end_token")
+        if isinstance(start_marker, str) and isinstance(end_marker, str):
+            configured_pair = (start_marker, end_marker)
+            if all(configured_pair) and configured_pair not in pairs:
+                pairs.append(configured_pair)
+    return tuple(pairs)
+
+
+def _result_seeded_thinking_text(result: PerformanceResult) -> str:
+    """Return the rendered prompt whose seeded opener a closing marker may continue."""
+    diagnostics = result.prompt_diagnostics
+    if diagnostics is None:
+        return ""
+    return diagnostics.rendered_prompt or diagnostics.rendered_prompt_preview or ""
+
+
+def _final_answer_text(result: PerformanceResult) -> tuple[str, str]:
+    """Split a completed output into (final answer, reasoning removed before it).
+
+    Uses the same complete-trace rule as the assessment (``_final_answer_view``):
+    only closed thinking traces — emitted or prompt-seeded — count as reasoning,
+    so an unclosed trace stays in the answer text where its observation is
+    still visible. The reasoning text is returned so a reader can open it
+    under disclosure rather than losing it.
+    """
+    text = _generation_text_value(result.generation)
+    answer = _final_answer_view(
+        text,
+        delimiter_pairs=_result_thinking_delimiters(result),
+        seeded_text=_result_seeded_thinking_text(result),
+    )
+    if not answer or answer == text.strip():
+        return text, ""
+    answer_start = text.find(answer[:60])
+    reasoning = text[:answer_start] if answer_start > 0 else ""
+    return answer, reasoning.strip()
+
+
 def _configured_thinking_markers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
     """Return the thinking start/end markers configured for this generation."""
     if diagnostics is None:
@@ -16824,15 +16931,6 @@ def _populate_result_quality_analysis(
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
     diagnostics = result.prompt_diagnostics
-    thinking_trace_delimiters: list[tuple[str, str]] = list(THINKING_TRACE_DELIMITER_PAIRS)
-    if diagnostics is not None:
-        generation_kwargs = diagnostics.generate_kwargs
-        start_marker = generation_kwargs.get("thinking_start_token")
-        end_marker = generation_kwargs.get("thinking_end_token")
-        if isinstance(start_marker, str) and isinstance(end_marker, str):
-            configured_pair = (start_marker, end_marker)
-            if all(configured_pair) and configured_pair not in thinking_trace_delimiters:
-                thinking_trace_delimiters.append(configured_pair)
     analysis = analyze_generation_text(
         text,
         generated_tokens,
@@ -16842,12 +16940,8 @@ def _populate_result_quality_analysis(
         context_marker=context_marker,
         known_special_tokens=_configured_output_wrappers(diagnostics),
         configured_generation_wrappers=_configured_generation_wrappers(diagnostics),
-        thinking_trace_delimiters=thinking_trace_delimiters,
-        seeded_thinking_text=(
-            diagnostics.rendered_prompt or diagnostics.rendered_prompt_preview or ""
-            if diagnostics is not None
-            else ""
-        ),
+        thinking_trace_delimiters=_result_thinking_delimiters(result),
+        seeded_thinking_text=_result_seeded_thinking_text(result),
         prompt_text_tokens=(
             diagnostics.rendered_prompt_token_count if diagnostics is not None else None
         ),
@@ -17091,7 +17185,7 @@ type PerformanceMetricSample = tuple[PerformanceResult, float]
 class PerformanceMetricSamples:
     """Validated samples used by the performance-highlight summary."""
 
-    tps: tuple[PerformanceMetricSample, ...]
+    total: tuple[PerformanceMetricSample, ...]
     memory: tuple[PerformanceMetricSample, ...]
     load: tuple[PerformanceMetricSample, ...]
 
@@ -17100,10 +17194,12 @@ def _collect_performance_metric_samples(
     results: Sequence[PerformanceResult],
 ) -> PerformanceMetricSamples:
     """Collect finite, domain-valid samples for each highlighted metric."""
-    tps: tuple[PerformanceMetricSample, ...] = tuple(
-        (result, value)
+    total: tuple[PerformanceMetricSample, ...] = tuple(
+        (result, result.total_time)
         for result in results
-        if (value := _valid_generation_tps(result)) is not None and math.isfinite(value)
+        if result.total_time is not None
+        and result.total_time >= 0
+        and math.isfinite(result.total_time)
     )
     memory_samples: list[PerformanceMetricSample] = []
     for result in results:
@@ -17122,7 +17218,7 @@ def _collect_performance_metric_samples(
         and result.model_load_time >= 0
         and math.isfinite(result.model_load_time)
     )
-    return PerformanceMetricSamples(tps=tps, memory=memory, load=load)
+    return PerformanceMetricSamples(total=total, memory=memory, load=load)
 
 
 def _log_image_memory_highlights(
@@ -17160,17 +17256,19 @@ def _log_performance_highlights(
         return
 
     samples = _collect_performance_metric_samples(eligible_results)
-    if not samples.tps and not samples.memory and not samples.load:
+    if not samples.total and not samples.memory and not samples.load:
         return
 
+    # Time to complete the task end-to-end is the decision metric; decode
+    # tok/s and any cross-model average (or tokens-per-GB ratio) mislead when
+    # tokenizers, image expansion and reasoning lengths differ per model.
     logger.info("🏆 Performance Highlights:")
-    if samples.tps:
-        fastest, fastest_tps = max(samples.tps, key=lambda item: item[1])
-        logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
+    if samples.total:
+        quickest, quickest_total = min(samples.total, key=lambda item: item[1])
         logger.info(
-            "   📊 Average TPS: %.1f across %d models",
-            sum(tps for _result, tps in samples.tps) / len(samples.tps),
-            len(samples.tps),
+            "   ⏱ Quickest completion: %s (%s end-to-end)",
+            quickest.model_name,
+            _format_time_seconds(quickest_total),
         )
     if samples.memory:
         most_efficient, efficient_memory = min(samples.memory, key=lambda item: item[1])
@@ -17185,12 +17283,6 @@ def _log_performance_highlights(
 
     if samples.memory:
         average_peak_memory = sum(value for _result, value in samples.memory) / len(samples.memory)
-        total_tokens = sum(
-            _generation_nonnegative_int_metric(result.generation, "prompt_tokens")
-            + _generation_nonnegative_int_metric(result.generation, "generation_tokens")
-            for result, _memory in samples.memory
-        )
-        total_memory = sum(value for _result, value in samples.memory)
         logger.info("📈 Resource Usage:")
         logger.info(
             "   Average peak memory: %s",
@@ -17199,7 +17291,6 @@ def _log_performance_highlights(
                 recommended_working_set_bytes,
             ),
         )
-        logger.info("   Memory efficiency: %.0f tokens/GB", total_tokens / total_memory)
 
     _log_image_memory_highlights(eligible_results, image_profile)
 
@@ -17955,6 +18046,35 @@ def _run_image_record(
     if source_url is not None:
         record["source_url"] = source_url
     return record
+
+
+def _describe_run_image(image: RunImageRecord) -> str:
+    """One-line input summary: format, dimensions with megapixels, and byte size."""
+    parts = [_reproduction_image_format(image)]
+    if image["width"] is not None and image["height"] is not None:
+        dimensions = f"{image['width']:,} x {image['height']:,} pixels"
+        if image["megapixels"] is not None:
+            dimensions += f" ({image['megapixels']:.1f} MP)"
+        parts.append(dimensions)
+    if image["size_bytes"] is not None:
+        # Decimal megabytes, matching how camera files and Finder report size.
+        parts.append(f"{image['size_bytes'] / 1_000_000:.1f} MB")
+    return ", ".join(parts)
+
+
+def _run_input_summary_rows(
+    image: RunImageRecord | None,
+    eval_mode: str | None,
+) -> tuple[tuple[str, str], ...]:
+    """Evaluation lane and input-image facts that every summary surface leads with.
+
+    A 66-megapixel, 66 MB photograph is what turns a prefill into a
+    minute-long wait; a skimmer must see that before any per-model timing.
+    """
+    return (
+        ("Evaluation lane", eval_mode or "unknown"),
+        ("Input image", _describe_run_image(image) if image is not None else "unavailable"),
+    )
 
 
 def _output_index_link(index_filename: Path, artifact_path: Path, label: str) -> str:
@@ -20681,7 +20801,7 @@ def generate_run_issue_summary_report(
                 ReportKeyValues(
                     (
                         *_run_issue_summary_timing_rows(source.metadata),
-                        ("Evaluation mode", str(source.metadata.get("eval_mode", "unknown"))),
+                        *_run_input_summary_rows(source.image, eval_mode),
                         ("Models attempted", str(len(source.results))),
                         ("Completed", str(counts["completed"])),
                         ("Crashed", str(counts["crashed"])),
@@ -20808,6 +20928,9 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
 def _output_index_dashboard_lines(
     assessments: Sequence[tuple[str, ResultAssessment]],
     run_duration_seconds: float | None = None,
+    *,
+    image: RunImageRecord | None = None,
+    eval_mode: str | None = None,
 ) -> list[str]:
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
@@ -20821,6 +20944,11 @@ def _output_index_dashboard_lines(
         *(
             [f"- Run duration: {format_overall_runtime(run_duration_seconds)}"]
             if run_duration_seconds is not None
+            else []
+        ),
+        *(
+            [f"- {label}: {value}" for label, value in _run_input_summary_rows(image, eval_mode)]
+            if image is not None or eval_mode is not None
             else []
         ),
         (
@@ -20861,6 +20989,7 @@ def generate_output_index_report(
     assessments: Sequence[tuple[str, ResultAssessment]] | None = None,
     eval_mode: str | None = None,
     run_duration_seconds: float | None = None,
+    image: RunImageRecord | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -20877,7 +21006,11 @@ def generate_output_index_report(
     md = ["# Check Models Output Index", ""]
     md.extend((*_wrap_markdown_text(_run_objective_statement(eval_mode)), ""))
     if assessments is not None:
-        md.extend(_output_index_dashboard_lines(assessments, run_duration_seconds))
+        md.extend(
+            _output_index_dashboard_lines(
+                assessments, run_duration_seconds, image=image, eval_mode=eval_mode
+            )
+        )
     if run_issue_summary is not None:
         md.extend(("## Start here", ""))
         md.append(
@@ -21873,6 +22006,7 @@ def _generate_reports_and_log_outputs(
             assessments=inputs.report_context.assessments,
             eval_mode=inputs.report_context.mode_policy.eval_mode,
             run_duration_seconds=_elapsed_run_seconds(inputs),
+            image=_run_image_record(inputs.image_path, inputs.report_context.image_profile),
         ),
     )
     run_artifact(index_artifact)

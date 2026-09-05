@@ -762,8 +762,12 @@ def test_log_summary_uses_cached_axes_and_excludes_unusable_from_highlights(
         )
     )
     assert "Maintainer outcomes:" in messages
-    assert "Fastest: org/caveated (30.0 tps)" in messages
-    assert "Fastest: org/unusable" not in messages
+    # Time to complete the task ranks models; caveated (1.2 s) beats usable
+    # (1.5 s) while the unusable row stays out of the highlights entirely.
+    assert "Quickest completion: org/caveated (1.20s end-to-end)" in messages
+    assert "org/unusable" not in next(m for m in messages.splitlines() if "Quickest" in m)
+    assert "Average TPS" not in messages
+    assert "tokens/GB" not in messages
     assert "Successful Models" not in messages
     assert "status=OK" not in messages
     assert "org/unusable" in messages

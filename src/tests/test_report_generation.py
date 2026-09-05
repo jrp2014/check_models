@@ -899,6 +899,44 @@ def test_run_summary_header_shows_start_finish_and_duration(tmp_path: Path) -> N
     assert "Run timestamp" not in content
 
 
+def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -> None:
+    """Image size and evaluation lane explain long prefills, so they sit near the top."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(output_paths, results=(_observed_result(),))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    lines = summary.read_text(encoding="utf-8").splitlines()
+    finished = next(i for i, line in enumerate(lines) if line.startswith("- *Run finished:*"))
+    assert lines[finished + 2] == "- *Evaluation lane:* assisted"
+    assert lines[finished + 3] == "- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.0 MB"
+    assert "Evaluation mode" not in "\n".join(lines)
+
+    image = cast(
+        "check_models.RunImageRecord",
+        {
+            "name": "big.jpg",
+            "sha256": None,
+            "size_bytes": 66_295_254,
+            "width": 6656,
+            "height": 9984,
+            "megapixels": 66.453504,
+        },
+    )
+    index_lines = check_models._output_index_dashboard_lines(
+        [], 10.0, image=image, eval_mode="assisted"
+    )
+    assert index_lines[2:5] == [
+        "- Run duration: 10.00s",
+        "- Evaluation lane: assisted",
+        "- Input image: JPEG, 6,656 x 9,984 pixels (66.5 MP), 66.3 MB",
+    ]
+    assert check_models._run_input_summary_rows(None, None) == (
+        ("Evaluation lane", "unknown"),
+        ("Input image", "unavailable"),
+    )
+
+
 def test_output_index_dashboard_leads_with_run_duration() -> None:
     lines = check_models._output_index_dashboard_lines([], 1201.0)
     assert lines[2] == "- Run duration: 20m 01s"
@@ -5355,8 +5393,13 @@ class TestMarkdownGalleryReport:
         assert "usable" in short_row
         assert "insufficient sample" in short_row
         assert "999" not in short_row
-        assert "Fastest clean completion: `org/valid` at 40.0 tok/s" in content
-        assert "Average clean-completion throughput: 40.0 tok/s" in content
+        # Both clean rows share total_time=1.0; the tie resolves alphabetically.
+        assert (
+            "Quickest clean completion (end-to-end, including model load): `org/short` at 1.00s"
+            in content
+        )
+        assert "Average clean-completion throughput" not in content
+        assert "Decode tok/s stays per model in the chooser" in content
         evidence = _extract_markdown_subsection(
             content,
             "### org/short",
@@ -5405,11 +5448,11 @@ class TestMarkdownGalleryReport:
             "org/bad",
         ]
         assert [row.model for row in data.avoided] == ["org/bad"]
-        # Throughput tie at 30.0 resolves alphabetically.
-        assert data.fastest is not None
-        assert data.fastest.model == "org/a-usable"
-        # org/caveats is excluded: highlights consider clean completions only.
-        assert data.average_tps == pytest.approx((30.0 + 30.0) / 2)
+        # End-to-end tie at 1.0 s resolves alphabetically; org/caveats is
+        # excluded because highlights consider clean completions only.
+        assert data.quickest is not None
+        assert data.quickest.model == "org/a-usable"
+        assert not hasattr(data, "average_tps")
         assert data.lowest_memory is not None
         assert data.lowest_memory.model == "org/a-usable"
 
@@ -5474,6 +5517,7 @@ class TestMarkdownGalleryReport:
                     generation_tps=throughput,
                     peak_memory=memory,
                 ),
+                total_time=1.0,
             )
 
         usable_results = [
@@ -5535,9 +5579,13 @@ class TestMarkdownGalleryReport:
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
         assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
         # Highlights consider only clean completions (usable, no observations);
-        # ties on throughput resolve alphabetically.
-        assert "Fastest clean completion: `org/alpha` at " in highlights
-        assert "Average clean-completion throughput: " in highlights
+        # ties on end-to-end time resolve alphabetically.
+        assert (
+            "Quickest clean completion (end-to-end, including model load): `org/alpha` at "
+            in highlights
+        )
+        assert "Fastest clean completion" not in highlights
+        assert "Average clean-completion throughput" not in highlights
         # gamma has the lowest captured peak memory (1.0 GB) among clean rows.
         assert "Lowest peak memory among clean completions: `org/gamma` at " in highlights
 
@@ -6611,3 +6659,61 @@ def test_write_environment_failure_diagnostics_contains_write_errors(
         )
 
     assert "Failed to write environment diagnostics report" in caplog.text
+
+
+def test_gallery_preview_shows_the_final_answer_with_reasoning_under_disclosure() -> None:
+    """A thinking model's preview is its answer; the trace is counted, not shown."""
+    reasoning = "Let me reason about the picture at some length. " * 3
+    answer = "Title: Stone mill by a river\nDescription: A mill.\nKeywords: mill, river"
+    thinking = PerformanceResult(
+        model_name="org/thinker",
+        success=True,
+        generation=_MockGeneration(
+            text=f"<think>{reasoning}</think>\n{answer}", prompt_tokens=10, generation_tokens=40
+        ),
+        total_time=2.0,
+    )
+    assessment = check_models.ResultAssessment("completed", "usable", "none", ())
+    row = check_models._gallery_row(thinking, assessment)
+    assert row.output_preview.startswith("Title: Stone mill by a river")
+    assert "reason about" not in row.output_preview
+    assert row.reasoning_chars == len(f"<think>{reasoning}</think>")
+    assert row.reasoning_preview.startswith("<think>Let me reason")
+
+    markdown_cell = check_models._gallery_preview_cell_markdown(row)
+    assert markdown_cell.startswith("Title: Stone mill by a river")
+    assert "characters of reasoning omitted; complete output in the evidence block" in markdown_cell
+    html_cell = check_models._gallery_preview_cell_html(row)
+    assert html_cell.startswith("Title: Stone mill by a river")
+    assert "<details><summary>" in html_cell
+    assert "characters of reasoning omitted</summary><pre>&lt;think&gt;Let me reason" in html_cell
+
+    # An unclosed trace is not reasoning yet: the preview keeps the raw text so
+    # the incomplete-trace observation stays visible.
+    unclosed = replace(
+        thinking, generation=_MockGeneration(text="<think>still going", generation_tokens=5)
+    )
+    plain = check_models._gallery_row(unclosed, assessment)
+    assert plain.output_preview == "<think>still going"
+    assert plain.reasoning_chars == 0
+    assert "reasoning omitted" not in check_models._gallery_preview_cell_markdown(plain)
+
+
+def test_prompt_seeded_thinking_close_is_treated_as_reasoning() -> None:
+    """A template-opened block the model merely closes counts as reasoning too."""
+    result = PerformanceResult(
+        model_name="org/seeded",
+        success=True,
+        generation=_MockGeneration(
+            text="thinking continues here</think>Title: A title", generation_tokens=12
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="p",
+            tokenizer_class="t",
+            rendered_prompt="<|im_start|>assistant\n<think>\n",
+        ),
+        total_time=1.0,
+    )
+    answer, reasoning = check_models._final_answer_text(result)
+    assert answer == "Title: A title"
+    assert reasoning == "thinking continues here</think>"

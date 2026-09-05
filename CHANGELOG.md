@@ -278,6 +278,25 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Chooser and output-at-a-glance previews now show each model's final
+  answer: a closed thinking trace (emitted or prompt-seeded, the same rule
+  the assessment uses) is left out of the preview, reported as an
+  omitted-character count in Markdown, and opened under a `<details>`
+  disclosure in the HTML chooser. Thinking models such as ERNIE and
+  Qwen3-VL-Thinking no longer spend their preview on scratch work.
+- Every summary surface — run summary, output index, gallery, HTML report,
+  and diagnostics — now leads with the evaluation lane and the input image
+  (format, dimensions with megapixels, size), so a 66-megapixel input is
+  visible before any per-model prefill timing. The run summary's
+  "Evaluation mode" row became "Evaluation lane" within that block.
+- Resource highlights rank by time to complete the task end-to-end instead
+  of decode tok/s: the gallery and HTML "Fastest clean completion" and
+  "Average clean-completion throughput" lines became "Quickest clean
+  completion (end-to-end, including model load)" plus an explicit caveat
+  that tok/s is not averaged across models; the terminal summary's
+  "Fastest (tps)", "Average TPS", and "Memory efficiency: tokens/GB" lines
+  are replaced by "Quickest completion". Per-model tok/s stays in the
+  chooser.
 - Project instructions and adapted skills no longer describe removed
   machinery: `run.json` references now point at the `results.jsonl`
   metadata header (and `issues/run_summary.md` as the skim surface), the
