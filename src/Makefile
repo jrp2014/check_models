@@ -183,11 +183,11 @@ vulture: ## Vulture dead-code scan (configured in pyproject.toml)
 .PHONY: test
 test: ## Run pytest
 	@echo "[test] running tests"; \
-	$(RUN_TOOL_PREFIX) pytest -q -n auto
+	$(RUN_TOOL_PREFIX) pytest -q -n auto --maxprocesses=8
 
 .PHONY: test-cov
 test-cov: ## Run pytest with coverage
-	$(RUN_TOOL_PREFIX) pytest --cov=check_models --cov-report=term-missing --cov-report=xml -q -n auto
+	$(RUN_TOOL_PREFIX) pytest --cov=check_models --cov-report=term-missing --cov-report=xml -q -n auto --maxprocesses=8
 
 # Dependency management
 .PHONY: deps-sync

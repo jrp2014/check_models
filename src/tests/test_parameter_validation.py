@@ -4,11 +4,9 @@ import argparse
 import ast
 import dataclasses
 import importlib.util
-import json
-import subprocess
-import sys
 from pathlib import Path
 from typing import ClassVar
+from unittest.mock import patch
 
 import pytest
 
@@ -645,39 +643,25 @@ class TestUpstreamCliParity:
     # and this test must pass against both.
     DISPLAY_ONLY_FLAGS: ClassVar[frozenset[str]] = frozenset({"--verbose"})
 
-    # Runs in a child interpreter: importing mlx_vlm initializes mlx.core's
-    # native Metal backend, which can abort the process (not raise) when Metal
-    # is unavailable. A subprocess contains the abort; importorskip cannot.
-    _UPSTREAM_DEFAULTS_PROBE: ClassVar[str] = (
-        "import argparse, json\n"
-        "from mlx_vlm.generate import dispatch\n"
-        "captured = {}\n"
-        "def _grab(self, *args, **kwargs):\n"
-        "    for action in self._actions:\n"
-        "        for option in action.option_strings:\n"
-        "            if option.startswith('--'):\n"
-        "                captured[option] = action.default\n"
-        "    return argparse.Namespace()\n"
-        "argparse.ArgumentParser.parse_args = _grab\n"
-        "dispatch.parse_arguments()\n"
-        "print(json.dumps(captured, default=str))\n"
-    )
-
     def test_shared_flag_defaults_match_mlx_vlm_generate(self) -> None:
         """Overlapping flags keep upstream defaults except documented divergences."""
-        probe = subprocess.run(  # noqa: S603 - fixed interpreter runs a literal probe script
-            [sys.executable, "-c", self._UPSTREAM_DEFAULTS_PROBE],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=120,
-        )
-        if probe.returncode != 0:
-            pytest.skip(
-                "mlx_vlm.generate.dispatch unavailable in a subprocess probe "
-                f"(exit {probe.returncode}): {probe.stderr.strip()[:200]}"
-            )
-        upstream: dict[str, object] = json.loads(probe.stdout)
+        # In-process: check_models already imported mlx-vlm into this worker,
+        # so a Metal abort (if any) would have happened before this test; the
+        # former subprocess probe only added a second interpreter start-up.
+        dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
+        upstream: dict[str, object] = {}
+
+        def _grab(
+            self_parser: argparse.ArgumentParser, *_args: object, **_kwargs: object
+        ) -> argparse.Namespace:
+            for action in self_parser._actions:
+                for option in action.option_strings:
+                    if option.startswith("--"):
+                        upstream[option] = action.default
+            return argparse.Namespace()
+
+        with patch.object(argparse.ArgumentParser, "parse_args", _grab):
+            dispatch.parse_arguments()
         parser = check_models._build_cli_parser()
         ours: dict[str, object] = {}
         for action in parser._actions:

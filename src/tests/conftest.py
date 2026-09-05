@@ -34,6 +34,11 @@ from typing import TYPE_CHECKING
 # 3. Else create temp cache (CI environment without cache)
 _DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 
+# Every worker imports check_models, which imports mlx-vlm in-process anyway;
+# the subprocess import probe would only add ~2 s of start-up per worker and,
+# with many workers probing at once, contention-driven timeouts.
+os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
+
 if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
     # CI environment - create temp cache to prevent CacheNotFound
     _temp_hf_cache = Path(tempfile.gettempdir()) / "pytest_hf_cache"
@@ -47,6 +52,8 @@ import pytest  # noqa: E402 - after HF cache env setup
 from huggingface_hub import scan_cache_dir  # noqa: E402 - after HF cache env setup
 from huggingface_hub.errors import CacheNotFound  # noqa: E402 - after HF cache env setup
 from PIL import Image  # noqa: E402 - after HF cache env setup
+
+import check_models  # noqa: E402 - after HF cache env setup
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -196,6 +203,12 @@ def folder_with_single_image(tmp_path: Path) -> Path:
     img = Image.new("RGB", (50, 50), color="green")
     img.save(img_path)
     return folder
+
+
+@pytest.fixture(autouse=True)
+def _reset_provenance_cache() -> None:
+    """Component provenance is memoised per process; tests patch its inputs."""
+    check_models._COMPONENT_PROVENANCE_CACHE.clear()
 
 
 @pytest.fixture(autouse=True)

@@ -247,6 +247,11 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
 )
 ISOLATED_WORKER_FLAG: Final[str] = "--isolated-worker"
 ISOLATION_CRASH_TEST_ENV: Final[str] = "CHECK_MODELS_ISOLATION_CRASH_MODEL"
+# Set to "1" to skip the subprocess import probes that shield a long-lived
+# parent from a hard-crashing dependency import. The test suite sets it: every
+# worker already imports mlx-vlm in-process, so the probe only adds ~2 s of
+# start-up per worker (and contention-driven timeouts) without protecting it.
+IMPORT_PROBE_SKIP_ENV: Final[str] = "CHECK_MODELS_SKIP_IMPORT_PROBE"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
 IMPORT_PROBE_MIN_TAIL_CHARS: Final[int] = 10
@@ -627,7 +632,8 @@ def _probe_import_runtime(
     the import finishes after the deadline, and treating that as "unavailable"
     produced false negatives both in real runs and in the parallel test suite.
     """
-    if len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
+    inside_isolated_worker = len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG  # noqa: PLR2004 - argv[0] + flag
+    if inside_isolated_worker or os.environ.get(IMPORT_PROBE_SKIP_ENV) == "1":
         return None
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
@@ -4728,16 +4734,30 @@ def _local_source_revision(path: Path) -> str | None:
     return _run_macos_toolchain_command(("git", "-C", str(path), "rev-parse", "HEAD"))
 
 
+_COMPONENT_PROVENANCE_CACHE: dict[
+    tuple[tuple[str, str | None], ...], dict[str, ComponentProvenanceRecord]
+] = {}
+
+
 def _collect_component_provenance(
     versions: Mapping[str, str | None] | None = None,
 ) -> dict[str, ComponentProvenanceRecord]:
-    """Collect publication-safe local install provenance without network access."""
+    """Collect publication-safe local install provenance without network access.
+
+    Memoised per process on the resolved version map: the answer comes from
+    installed-distribution metadata and ``git rev-parse`` in editable
+    checkouts, which do not change during a run, and every report surface
+    asks for it.
+    """
     resolved_versions = dict(versions or get_library_versions())
     check_models_version = _collect_check_models_provenance().get("version")
     resolved_versions.setdefault(
         "check_models",
         check_models_version if isinstance(check_models_version, str) else None,
     )
+    cache_key = tuple(sorted(resolved_versions.items()))
+    if (cached := _COMPONENT_PROVENANCE_CACHE.get(cache_key)) is not None:
+        return {name: record.copy() for name, record in cached.items()}
     provenance: dict[str, ComponentProvenanceRecord] = {}
     for name, component_version in resolved_versions.items():
         direct = _distribution_direct_url(name)
@@ -4778,7 +4798,8 @@ def _collect_component_provenance(
             ),
             "vcs_revision": vcs_revision,
         }
-    return provenance
+    _COMPONENT_PROVENANCE_CACHE[cache_key] = provenance
+    return {name: record.copy() for name, record in provenance.items()}
 
 
 def _distribution_location(distribution_name: str) -> str | None:

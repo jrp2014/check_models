@@ -6,6 +6,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The test suite runs in about half the wall time (roughly 35 s to 17 s on
+  an 18-core M5 Max) with no test removed: `CHECK_MODELS_SKIP_IMPORT_PROBE=1`
+  (new, documented) lets the suite skip the subprocess import probes that
+  cost every xdist worker ~2 s of start-up, component provenance is memoised
+  per process instead of re-running `git rev-parse` and metadata lookups for
+  every report surface (a conftest fixture clears it between tests), the
+  upstream CLI-parity test reads mlx-vlm's parser in-process instead of
+  spawning a second interpreter, and pytest is capped at eight workers
+  (`-n auto --maxprocesses=8`) because per-worker start-up made 18 workers
+  slower than 6.
 - A dependency import probe that merely times out is now inconclusive — a
   warning is logged and the in-process import proceeds — instead of marking
   mlx-vlm unavailable. Under load (the parallel test suite, a busy machine)

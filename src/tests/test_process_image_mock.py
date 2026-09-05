@@ -1545,8 +1545,11 @@ class TestIsolatedExecution:
 class TestImportProbe:
     """The subprocess import probe shields the parent from crashes, not from slowness."""
 
-    def test_timed_out_probe_is_inconclusive(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_timed_out_probe_is_inconclusive(
+        self, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """A probe that expires under load falls through to the in-process import."""
+        monkeypatch.delenv(check_models.IMPORT_PROBE_SKIP_ENV, raising=False)
 
         def _timeout(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
             del kwargs
@@ -1562,8 +1565,9 @@ class TestImportProbe:
         assert outcome is None
         assert any("inconclusive" in record.message for record in caplog.records)
 
-    def test_failed_probe_still_reports_the_error(self) -> None:
+    def test_failed_probe_still_reports_the_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """A non-zero exit remains a real, actionable dependency failure."""
+        monkeypatch.delenv(check_models.IMPORT_PROBE_SKIP_ENV, raising=False)
         completed = subprocess.CompletedProcess(
             args=["python", "-c", "import mlx_vlm"],
             returncode=1,
@@ -1576,6 +1580,15 @@ class TestImportProbe:
             )
         assert message is not None
         assert "boom" in message
+
+    def test_skip_override_never_spawns_a_probe(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """The test suite (and embedders) opt out of the probe with one variable."""
+        monkeypatch.setenv(check_models.IMPORT_PROBE_SKIP_ENV, "1")
+        with patch.object(check_models.subprocess, "run", side_effect=AssertionError("spawned")):
+            assert (
+                check_models._probe_import_runtime(import_target="mlx_vlm", error_prefix="X")
+                is None
+            )
 
 
 class TestRepetitionGuard:
