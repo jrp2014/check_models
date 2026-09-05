@@ -70,7 +70,8 @@ Skips are reported as `model purpose: <label> (<evidence>)`. Explicit
 classification so the result is interpreted correctly.
 
 Every cached repo's classification, evidence, and decision is retained in
-`run.json` under `cache_discovery`, so downstream tools can distinguish an
+the `results.jsonl` metadata header under `cache_discovery`, so downstream
+tools can distinguish an
 intentional non-test from a crash. Skipped non-image models never enter the
 per-model results, quality tables, or mlx-vlm failure counts.
 

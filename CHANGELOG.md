@@ -278,6 +278,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Project instructions and adapted skills no longer describe removed
+  machinery: `run.json` references now point at the `results.jsonl`
+  metadata header (and `issues/run_summary.md` as the skim surface), the
+  native-repro Python shape loops over `stream_generate` the way the harness
+  does instead of calling upstream `generate()`, `mlx-lm` is stated as not a
+  dependency, and the generation seam, `--isolate` spec pairing, and atomic
+  final rewrite are documented so future changes start from the real code.
 - Suppression review: configuration-wide suppressions that suppressed
   nothing or hid real findings are gone. Ruff `S311` (no `random` use) and
   the `tests.*` mypy override are removed (markdownlint `MD041` stays off,

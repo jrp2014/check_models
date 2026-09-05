@@ -517,7 +517,7 @@ the named generation flags in this reference, including sampling, penalty,
 thinking, KV-cache, and token-budget options.
 
 Diagnostics and repro artifacts preserve the effective generation kwargs that
-the direct `mlx_vlm.generate()` call receives.
+the `mlx_vlm.generate.stream_generate` call receives.
 
 #### KV Cache Quantization (Memory Optimization)
 

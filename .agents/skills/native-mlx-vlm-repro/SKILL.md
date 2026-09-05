@@ -41,9 +41,11 @@ python -m mlx_vlm.generate --help   # confirm installed CLI flags before finaliz
 2. Prefer an existing local/cached model when reproducing.
 3. If `check_models` already produced artifacts, start from those instead of
    inventing a new command:
-   - crash draft: `src/output/issues/issue_*.md` (CLI + Python blocks)
+   - sweep overview: `src/output/issues/run_summary.md`
+   - crash draft: `src/output/issues/issue_*.md` (native CLI command + traceback)
    - aggregate: `src/output/reports/diagnostics.md` → Shared Reproduction
-   - machine facts: `src/output/results.jsonl`, `src/output/run.json`
+   - machine facts: `src/output/results.jsonl` (the metadata header carries the
+     run context: image digest, generation settings, provenance, comparison)
 4. Confirm flags with `python -m mlx_vlm.generate --help` before treating a
    command as final; mlx-vlm flags drift across releases.
 5. When debugging a model family inside an mlx-vlm checkout, read
@@ -85,10 +87,14 @@ python -m mlx_vlm.generate \
   --trust-remote-code
 ```
 
-Canonical Python shape used in issue drafts (one model per process):
+Canonical Python shape (one model per process). This is the path the
+harness itself takes: `check_models` never calls `generate()`; it loops over
+`stream_generate` inside `_generate_with_repetition_guard`, skipping draft
+chunks and keeping the last chunk's metrics, so a repro that uses the same
+loop isolates upstream behaviour from harness behaviour:
 
 ```python
-from mlx_vlm.generate import generate
+from mlx_vlm.generate import stream_generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
@@ -98,9 +104,21 @@ formatted = apply_chat_template(
 )
 if isinstance(formatted, list):
     formatted = "\n".join(str(message) for message in formatted)
-result = generate(model, processor, formatted, image=IMAGE, **GENERATE_KWARGS)
-print(result.text)
+pieces, last = [], None
+for chunk in stream_generate(
+    model=model, processor=processor, prompt=formatted, image=IMAGE, **GENERATE_KWARGS
+):
+    last = chunk
+    if getattr(chunk, "is_draft", False):
+        continue  # speculative/diffusion drafts are display only
+    pieces.append(chunk.text)
+print("".join(pieces))
+print(last.generation_tps, last.peak_memory, last.finish_reason)
 ```
+
+Use upstream `generate()` in a repro only when the suspected defect is in
+`generate()` itself (its accumulator, verbose printing, or `clean_output`
+hook) — then say so, because the harness does not exercise that code.
 
 ## Reproducibility rules
 
@@ -131,9 +149,8 @@ print(result.text)
 - Check the rendered prompt for a seeded opening delimiter before treating a
   generated closing delimiter as stray output.
 - Reproduce natively when the block is unclosed, consumes the token budget, lacks
-  a final answer, or exposes an undeclared control/role token. State which of
-  those observable conditions is unexpected; do not report “thinking present”
-  as the defect.
+  a final answer, or exposes an undeclared control/role token. Name the specific
+  condition that is unexpected; “thinking present” is not a defect on its own.
 
 ## Failure routing
 

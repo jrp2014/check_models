@@ -30,11 +30,11 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~22,700 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~23,000 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~22,900 lines across 35 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~23,600 lines across 35 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
 | `src/README.md` | Full CLI docs, all flags, usage examples (~1,600 lines) | Reference for CLI behavior |
 
@@ -67,7 +67,9 @@ The file is organized in this order — search for these exact landmark headers 
   diagnostics Markdown, schema-3 JSONL, index, log, environment, and raw history
   artifacts.
 - **Configuration hierarchy**: `src/check_models_data/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
-- **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.
+- **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `transformers`) hard-fail before inference in `_raise_for_missing_runtime_dependencies`. `mlx-lm` is not a dependency at all (mlx-vlm dropped it in 0.6.14 and nothing here imports it) — do not reintroduce it as a floor, an extra, or a report row.
+- **Generation seam**: every inference goes through `_generate_with_repetition_guard`, a loop over upstream `mlx_vlm.generate.stream_generate` that mirrors upstream `generate()` (custom EOS registration, draft-chunk skipping, final-chunk metrics) and adds the tail-cycle abort. There is no direct `generate()` call, so nothing upstream prints for us: verbose echo of non-draft chunks, `text_already_printed` handling, and `processor.clean_output` all live at that seam and must be covered by tests there.
+- **Isolation**: `--isolate` (opt-in) runs one child interpreter per model. The parent writes the child spec with `_isolated_worker_spec` and the child reads it with `_isolated_params_from_spec`; keep them a matched pair and remember that tests with a mocked subprocess never exercise the child parser — the round-trip test does.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
@@ -77,16 +79,21 @@ The file is organized in this order — search for these exact landmark headers 
   `results.history.jsonl`); relocate the whole layout with `--output-dir`,
   the only output-location control. `results.jsonl` (schema 3.0) is the sole
   current-run machine contract: its metadata header carries the run-level
-  context formerly split into a separate run-level JSON file. Navigation
-  surfaces (`index.md`,
-  terminal artifact log) list only artifacts whose `ReportArtifactOutcome`
-  succeeded this run — never stale files found on disk. Hard actionable
-  crashes additionally create factual issue drafts under
-  `src/output/issues/`.
+  context (image, generation settings, cache discovery, component
+  provenance, comparison, counts, wall-clock runtime, artifact manifest);
+  there is no separate `run.json` any more. `src/output/issues/run_summary.md`
+  is the primary skim surface for a sweep (objective statement, timing,
+  comparison against the retained baseline, per-model transitions).
+  Navigation surfaces (`index.md`, terminal artifact log) list only artifacts
+  whose `ReportArtifactOutcome` succeeded this run — never stale files found
+  on disk. Hard actionable crashes additionally create factual
+  `issue_*.md` drafts under `src/output/issues/`. The final rewrite of
+  `results.jsonl` (manifest reconciliation) is atomic, so a failure leaves
+  the pre-report file intact.
 - **Tracked vs local-only outputs**: every run artifact — the human reports
   (`results.html`, `model_gallery.md`), decision artifacts (`index.md`,
   `diagnostics.md`, `results.jsonl`, `environment.log`,
-  `issues/`, `reports/assets/`), and the run log (`check_models.log`) — is
+  `issues/run_summary.md`, `issues/issue_*.md`, `reports/assets/`), and the run log (`check_models.log`) — is
   committed each run so it is browsable on GitHub. Only the append-only
   `results.history.jsonl` is gitignored and local-only; no report links to
   it, so no special link handling exists for it.
@@ -214,7 +221,7 @@ relevant `SKILL.md` **before** starting work of that kind.
 | Skill | When to use | File |
 | ----- | ----------- | ---- |
 | `add-or-fix-type-checking` | Typing errors from mypy, ty, pyrefly, or `make quality` | `.agents/skills/add-or-fix-type-checking/SKILL.md` |
-| `native-mlx-vlm-repro` | Isolate failures with native `python -m mlx_vlm.generate` / Python load→template→generate outside the harness | `.agents/skills/native-mlx-vlm-repro/SKILL.md` |
+| `native-mlx-vlm-repro` | Isolate failures with native `python -m mlx_vlm.generate` / Python load→template→`stream_generate` outside the harness | `.agents/skills/native-mlx-vlm-repro/SKILL.md` |
 | `upstream-mlx-vlm-issues` | Draft or improve maintainer-ready mlx-vlm GitHub issue Markdown from diagnostics or crash drafts (do not file unless asked) | `.agents/skills/upstream-mlx-vlm-issues/SKILL.md` |
 | `hf-cache-mlx-vlm-models` | List or reason about HF cache models under default discovery: the mlx-vlm server-style layout filter plus the image-capability classification and architecture pre-check | `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md` |
 | `benchmarking-mlx-vlm` | Credible perf measurement: median-of-N with warmup, `mx.eval` before timers, peak-memory protocol, A/B across MLX versions | `.agents/skills/benchmarking-mlx-vlm/SKILL.md` |

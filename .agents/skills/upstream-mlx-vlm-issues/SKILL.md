@@ -25,7 +25,8 @@ with this repo’s retained artifacts and pip/conda workflow.
 | --------- | ---------- |
 | Hard crash already drafted | `src/output/issues/issue_*.md` |
 | Aggregate run / observations | `src/output/reports/diagnostics.md` |
-| Exact machine facts | `src/output/results.jsonl`, `src/output/run.json` |
+| Sweep overview | `src/output/issues/run_summary.md` |
+| Exact machine facts | `src/output/results.jsonl` (metadata header + per-model rows) |
 | Environment stamp | `src/output/environment.log`, report provenance blocks |
 | Need a minimal native command first | `native-mlx-vlm-repro` skill |
 
@@ -146,8 +147,9 @@ Optional Python (when CLI cannot express the failing kwargs):
 
 ## Server-only failures
 
-`check_models` benchmarks via direct `mlx_vlm.generate()` and does **not** cover
-HTTP server behavior. For `/v1/chat/completions`, `/v1/responses`, streaming,
+`check_models` benchmarks by looping over `mlx_vlm.generate.stream_generate`
+(the same path upstream `generate()` wraps) and does **not** cover HTTP server
+behavior. For `/v1/chat/completions`, `/v1/responses`, streaming,
 structured outputs, tools, continuous batching, or `/v1/models` mismatches:
 
 ```bash

@@ -77,7 +77,13 @@ python -m check_models --models <model> --image <img> > /tmp/b.log
   timers for whole-model comparisons; `results.history.jsonl` retains prior
   runs for the same machine.
 - Record `pip show mlx mlx-vlm` (version + editable origin) with every
-  measurement; `run.json` captures this automatically for check_models runs.
+  measurement; the `results.jsonl` metadata header captures this
+  automatically for check_models runs (`library_versions`,
+  `component_provenance`, `runtime_fingerprint`, `system`).
+- `--compare-with` diffs a sweep against the retained baseline and withholds
+  tok/s and peak-memory comparisons unless chip, execution mode (`--isolate`
+  or not), prompt, image digest, and generation settings all match; a
+  hand-rolled A/B must respect the same like-for-like rule.
 - Restore the environment afterwards (`bash src/tools/update.sh` or
   `pip install -e .[dev,extras,torch]` from `src/`).
 
