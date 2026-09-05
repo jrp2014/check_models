@@ -15627,23 +15627,120 @@ def _hf_cache_main_snapshot_path(repo: object) -> Path | None:
     return None
 
 
-@functools.cache
-def _installed_mlx_vlm_model_types() -> frozenset[str] | None:
-    """Return model-type package dirs of the installed mlx-vlm without importing it."""
+def _mlx_vlm_package_root() -> Path | None:
+    """Locate the installed mlx-vlm package directory without importing it."""
     try:
         spec = find_spec("mlx_vlm")
     except (ImportError, ValueError):
         return None
     if spec is None or not spec.submodule_search_locations:
         return None
-    models_dir = Path(next(iter(spec.submodule_search_locations))) / "models"
-    if not models_dir.is_dir():
-        return None
+    return Path(next(iter(spec.submodule_search_locations)))
+
+
+def _package_dir_names(root: Path) -> frozenset[str]:
+    """Return the non-private package directories directly under ``root``."""
+    if not root.is_dir():
+        return frozenset()
     return frozenset(
         entry.name
-        for entry in models_dir.iterdir()
+        for entry in root.iterdir()
         if entry.is_dir() and not entry.name.startswith(("_", "."))
     )
+
+
+@functools.cache
+def _installed_mlx_vlm_model_types() -> frozenset[str] | None:
+    """Return model-type package dirs of the installed mlx-vlm without importing it."""
+    root = _mlx_vlm_package_root()
+    if root is None or not (root / "models").is_dir():
+        return None
+    return _package_dir_names(root / "models")
+
+
+@functools.cache
+def _mlx_vlm_drafter_model_types() -> frozenset[str]:
+    """Model types the installed mlx-vlm treats as speculative drafters.
+
+    Parsed from ``speculative/drafters/__init__.py`` (``DRAFTER_KIND_BY_MODEL_TYPE``)
+    plus the drafter package directories, never by importing mlx. A drafter
+    checkpoint is a target model's helper, not an image-to-text model; running
+    it in the sweep would only produce a load crash misread as a model bug.
+    """
+    root = _mlx_vlm_package_root()
+    if root is None:
+        return frozenset()
+    drafters_dir = root / "speculative" / "drafters"
+    model_types = set(_package_dir_names(drafters_dir))
+    try:
+        tree = ast.parse((drafters_dir / "__init__.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, ValueError):
+        return frozenset(model_types)
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(
+            isinstance(target, ast.Name) and target.id == "DRAFTER_KIND_BY_MODEL_TYPE"
+            for target in node.targets
+        ):
+            try:
+                value = ast.literal_eval(node.value)
+            except ValueError:
+                break
+            if isinstance(value, dict):
+                model_types.update(str(key).lower() for key in value)
+    return frozenset(model_types)
+
+
+_IMAGE_GENERATION_CLASS_FLAGS: Final[frozenset[str]] = frozenset(
+    {"is_image_generation_model", "is_image_edit_model"}
+)
+
+
+@functools.cache
+def _mlx_vlm_image_generation_model_types() -> frozenset[str]:
+    """Model types whose upstream loader declares image generation or editing.
+
+    Mirrors Nativ's capability manifest: each ``models/<type>/model.py`` class
+    that sets ``is_image_generation_model`` or ``is_image_edit_model`` to True
+    marks a family that produces images rather than text. Parsed from source
+    without importing mlx; the package directory name and any literal
+    ``model_type`` class attribute both count.
+    """
+    root = _mlx_vlm_package_root()
+    if root is None:
+        return frozenset()
+    model_types: set[str] = set()
+    for model_path in sorted((root / "models").glob("*/model.py")):
+        try:
+            tree = ast.parse(model_path.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError, ValueError):
+            continue
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            flagged = False
+            literal_model_type: str | None = None
+            for statement in node.body:
+                target: ast.expr
+                value: ast.expr | None
+                if isinstance(statement, ast.AnnAssign):
+                    target, value = statement.target, statement.value
+                elif isinstance(statement, ast.Assign) and len(statement.targets) == 1:
+                    target, value = statement.targets[0], statement.value
+                else:
+                    continue
+                if not isinstance(target, ast.Name) or not isinstance(value, ast.Constant):
+                    continue
+                if target.id in _IMAGE_GENERATION_CLASS_FLAGS and value.value is True:
+                    flagged = True
+                elif target.id == "model_type" and isinstance(value.value, str):
+                    literal_model_type = value.value.strip().lower()
+            if flagged:
+                model_types.add(model_path.parent.name.lower())
+                if literal_model_type:
+                    model_types.add(literal_model_type)
+    return frozenset(model_types)
 
 
 @functools.cache
@@ -15745,6 +15842,58 @@ def _meaningful_config_value(value: JsonLike) -> bool:
     return True
 
 
+def _speculative_drafter_signal(
+    config: Mapping[str, JsonLike],
+    *,
+    model_type: str,
+    architectures: tuple[str, ...],
+) -> ImageCapability | None:
+    """Recognise a speculative-decoding draft model (adapted from Nativ's discovery).
+
+    Three signals: the installed mlx-vlm's drafter table, a DSpark projector
+    stamp in ``dflash_config``, or a DSpark/DFlash/EAGLE-3 architecture name.
+    A type that is also a full model family (upstream lists ``laguna`` as a
+    drafter kind while shipping a laguna model loader) is not excluded on
+    the table alone; the projector stamp or architecture must confirm it.
+    """
+    if model_type in _mlx_vlm_drafter_model_types() and (
+        model_type not in (_installed_mlx_vlm_model_types() or frozenset())
+    ):
+        return ImageCapability(
+            "no", "speculative_drafter", (f"model_type={model_type} is an mlx-vlm drafter",)
+        )
+    dflash_config = config.get("dflash_config")
+    projector = dflash_config.get("projector_type") if isinstance(dflash_config, dict) else None
+    if isinstance(projector, str) and projector.lower() == "dspark":
+        return ImageCapability(
+            "no", "speculative_drafter", (f"dflash_config.projector_type={projector}",)
+        )
+    drafter_arch = next(
+        (a for a in architectures if any(m in a.lower() for m in ("dspark", "dflash", "eagle3"))),
+        None,
+    )
+    if drafter_arch is not None:
+        return ImageCapability("no", "speculative_drafter", (f"architectures={drafter_arch}",))
+    return None
+
+
+def _image_generation_family_signal(model_type: str) -> ImageCapability | None:
+    """Recognise an image-producing family from upstream's loader class flags."""
+    resolved_model_type = _mlx_vlm_model_remapping().get(model_type, model_type)
+    if resolved_model_type not in _mlx_vlm_image_generation_model_types():
+        return None
+    return ImageCapability(
+        "no",
+        "image_or_video_generation",
+        (
+            (
+                f"model_type={model_type} is flagged is_image_generation_model/"
+                "is_image_edit_model by the installed mlx-vlm"
+            ),
+        ),
+    )
+
+
 def _capability_negative_signal(
     config: Mapping[str, JsonLike],
     *,
@@ -15763,6 +15912,11 @@ def _capability_negative_signal(
             "speculative_drafter",
             (f"speculators_model_type={config['speculators_model_type']}",),
         )
+    upstream_signal = _speculative_drafter_signal(
+        config, model_type=model_type, architectures=architectures
+    ) or _image_generation_family_signal(model_type)
+    if upstream_signal is not None:
+        return upstream_signal
     embeddings_meta = config.get("mlx_embeddings")
     if isinstance(embeddings_meta, dict) and embeddings_meta.get("kind") == "embedding":
         return ImageCapability("no", "embedding", ("mlx_embeddings.kind=embedding",))

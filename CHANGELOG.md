@@ -6,6 +6,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cache discovery now flags, rather than runs and crashes, two kinds of
+  cached repo that cannot serve the image-description task: speculative
+  draft models (recognised from the installed mlx-vlm's
+  `DRAFTER_KIND_BY_MODEL_TYPE` table and drafter packages — 19 types today —
+  a `dflash_config.projector_type` of `dspark`, or a DSpark/DFlash/EAGLE-3
+  architecture name) and image-producing families whose upstream loader
+  declares `is_image_generation_model` or `is_image_edit_model` (bonsai,
+  ernie_image, flux2, ideogram4, mage_flow, z_image today). Both lists are
+  parsed from mlx-vlm's source without importing it, like the existing
+  `MODEL_REMAPPING` alias table, so they track upstream automatically; the
+  skip reason names the evidence. Adapted from Nativ's draft-model discovery
+  and capability manifest.
 - The test suite no longer writes anywhere under `src/` while the gate's
   Skylos lane scans it, closing the last race between the two lanes: the
   four CLI tests that wrote to gitignored `src/output/test_*` directories

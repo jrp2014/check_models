@@ -293,11 +293,22 @@ class _FakeSnapshotRepo:
 @pytest.fixture(name="_clear_arch_caches")
 def _clear_arch_caches_fixture() -> Iterator[None]:
     """Isolate the memoized installed-package probes between tests."""
-    check_models._installed_mlx_vlm_model_types.cache_clear()
-    check_models._mlx_vlm_model_remapping.cache_clear()
+    _clear_arch_caches()
     yield
-    check_models._installed_mlx_vlm_model_types.cache_clear()
-    check_models._mlx_vlm_model_remapping.cache_clear()
+    _clear_arch_caches()
+
+
+def _clear_arch_caches() -> None:
+    """Clear every memoised upstream-source probe (tests may have patched some away)."""
+    for name in (
+        "_installed_mlx_vlm_model_types",
+        "_mlx_vlm_model_remapping",
+        "_mlx_vlm_drafter_model_types",
+        "_mlx_vlm_image_generation_model_types",
+    ):
+        clear = getattr(getattr(check_models, name), "cache_clear", None)
+        if clear is not None:
+            clear()
 
 
 def _fake_mlx_vlm_package(tmp_path: Path, model_types: tuple[str, ...], remapping: str) -> Path:
@@ -325,6 +336,45 @@ def test_installed_mlx_vlm_model_types_scans_package_dirs(
 
     assert check_models._installed_mlx_vlm_model_types() == frozenset({"qwen2_vl", "fastvlm"})
     assert check_models._mlx_vlm_model_remapping() == {"llava_qwen2": "fastvlm"}
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_drafter_and_image_generation_types_are_parsed_from_upstream_source(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Drafter and image-producing families come from mlx-vlm's own source, unimported."""
+    package_dir = _fake_mlx_vlm_package(tmp_path, ("qwen2_vl", "flux2", "bonsai"), "")
+    drafters = package_dir / "speculative" / "drafters"
+    (drafters / "gemma4_dspark").mkdir(parents=True)
+    safe_io.write_text_no_follow(
+        drafters / "__init__.py",
+        'KNOWN_DRAFTER_KINDS = {"dflash", "mtp"}\n'
+        'DRAFTER_KIND_BY_MODEL_TYPE = {"gemma4_dspark": "dflash", "qwen3_5_mtp": "mtp"}\n',
+    )
+    safe_io.write_text_no_follow(
+        package_dir / "models" / "flux2" / "model.py",
+        "from typing import ClassVar\n\n\nclass Model:\n"
+        "    is_image_generation_model: ClassVar[bool] = True\n\n\n"
+        "class EditModel(Model):\n    is_image_edit_model = True\n",
+    )
+    safe_io.write_text_no_follow(
+        package_dir / "models" / "bonsai" / "model.py",
+        'class Model:\n    model_type = "bonsai_image"\n    is_image_generation_model: ClassVar[bool] = True\n',
+    )
+    safe_io.write_text_no_follow(
+        package_dir / "models" / "qwen2_vl" / "model.py",
+        "class Model:\n    is_image_generation_model = False\n",
+    )
+    fake_spec = SimpleNamespace(submodule_search_locations=[str(package_dir)])
+    monkeypatch.setattr(check_models, "find_spec", lambda _name: fake_spec)
+
+    assert check_models._mlx_vlm_drafter_model_types() == frozenset(
+        {"gemma4_dspark", "qwen3_5_mtp"}
+    )
+    assert check_models._mlx_vlm_image_generation_model_types() == frozenset(
+        {"flux2", "bonsai", "bonsai_image"}
+    )
 
 
 @pytest.mark.usefixtures("_clear_arch_caches")
@@ -1468,3 +1518,56 @@ class TestModelBurdenFacts:
         assert burden.parameter_count == 2_000_000_000
         assert burden.parameter_count_source == "name-estimate"
         assert burden.weight_bytes == 8
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_drafter_checkpoints_are_flagged_not_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A speculative-decoding draft model is excluded with its evidence, never crashed."""
+    monkeypatch.setattr(
+        check_models, "_mlx_vlm_drafter_model_types", lambda: frozenset({"qwen3_5_mtp"})
+    )
+    monkeypatch.setattr(check_models, "_mlx_vlm_image_generation_model_types", frozenset)
+    by_table = _capability_for(
+        monkeypatch, config={"model_type": "qwen3_5_mtp", "architectures": ["Qwen3_5MTP"]}
+    )
+    assert (by_table.verdict, by_table.purpose) == ("no", "speculative_drafter")
+    assert "is an mlx-vlm drafter" in by_table.evidence[0]
+
+    by_projector = _capability_for(
+        monkeypatch,
+        config={
+            "model_type": "gemma4",
+            "architectures": ["Gemma4ForConditionalGeneration"],
+            "vision_config": {"depth": 4},
+            "dflash_config": {"projector_type": "dspark"},
+        },
+    )
+    assert (by_projector.verdict, by_projector.purpose) == ("no", "speculative_drafter")
+
+    by_architecture = _capability_for(
+        monkeypatch,
+        config={"model_type": "gemma4_dspark", "architectures": ["Gemma4DSparkForCausalLM"]},
+    )
+    assert (by_architecture.verdict, by_architecture.purpose) == ("no", "speculative_drafter")
+    assert "skip" in (by_architecture.skip_reason or "") or by_architecture.skip_reason
+    assert by_architecture.skip_reason is not None
+    assert "speculative drafter" in by_architecture.skip_reason
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_image_generation_families_are_flagged_not_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Upstream's image-producing loaders are excluded even without pipeline config keys."""
+    monkeypatch.setattr(check_models, "_mlx_vlm_drafter_model_types", frozenset)
+    monkeypatch.setattr(
+        check_models, "_mlx_vlm_image_generation_model_types", lambda: frozenset({"flux2"})
+    )
+    monkeypatch.setattr(check_models, "_mlx_vlm_model_remapping", lambda: {"flux_2": "flux2"})
+    generation = _capability_for(
+        monkeypatch, config={"model_type": "flux_2", "architectures": ["Flux2Transformer"]}
+    )
+    assert (generation.verdict, generation.purpose) == ("no", "image_or_video_generation")
+    assert "is_image_generation_model" in generation.evidence[0]
+
+    # A genuine VLM whose family is not flagged is untouched by the new rules.
+    vlm = _capability_for(monkeypatch, config=VLM_CONFIG)
+    assert (vlm.verdict, vlm.purpose) == ("yes", "image_to_text")

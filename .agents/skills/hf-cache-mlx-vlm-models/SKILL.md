@@ -51,7 +51,14 @@ generation works. Layout failures are reported as `cache layout: <reason>`.
   `image_token_index`, `vision_start_token_id`, … — the keys surveyed across
   every cached VLM family). Purpose `image_to_text`.
 - `no` — positive evidence of a different model kind, most specific first:
-  `speculators_model_type` → speculative drafter; `mlx_embeddings.kind=
+  `speculators_model_type`, a `model_type` in the installed mlx-vlm's
+  `DRAFTER_KIND_BY_MODEL_TYPE` table (unless it is also a full model family,
+  as `laguna` is), a `dflash_config.projector_type` of `dspark`, or a
+  `dspark`/`dflash`/`eagle3` architecture → speculative drafter; a
+  `model_type` whose upstream loader class sets `is_image_generation_model`
+  or `is_image_edit_model` (flux2, ideogram4, mage_flow, z_image, …; parsed
+  from `models/*/model.py`, adapted from Nativ's capability manifest) →
+  image/video generation; `mlx_embeddings.kind=
   embedding` → embedding; sequence-classifier model type/architecture
   (`bert`, `modernbert`, `xlm_roberta`, `*ForSequenceClassification`) →
   reranker; `model_index.json` or pipeline config keys without image keys →
