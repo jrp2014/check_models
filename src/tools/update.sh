@@ -488,7 +488,7 @@ run_local_mlx_backend_smoke() {
 			;;
 	esac
 
-	local smoke_model="${MLX_LOCAL_BUILD_SMOKE_MODEL:-mlx-community/MiniCPM-V-4.6-8bit}"
+	local smoke_model="${MLX_LOCAL_BUILD_SMOKE_MODEL:-mlx-community/nanoLLaVA-1.5-4bit}"
 	local smoke_prompt="${MLX_LOCAL_BUILD_SMOKE_PROMPT:-Hi}"
 	local smoke_max_tokens="${MLX_LOCAL_BUILD_SMOKE_MAX_TOKENS:-10}"
 	local smoke_expected="${MLX_LOCAL_BUILD_SMOKE_EXPECTED:-Hello! How can I help you today?}"

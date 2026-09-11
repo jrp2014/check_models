@@ -686,7 +686,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade for markdownlint tooling | `0` (install from lockfile) | `UPDATE_NODE_TOOLING=1` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 | `MLX_LOCAL_BUILD_SMOKE` | Optional `tools/update.sh` local-MLX smoke control | `auto` (cached model only) | `MLX_LOCAL_BUILD_SMOKE=1` to force |
-| `MLX_LOCAL_BUILD_SMOKE_MODEL` | Model used by the local-MLX smoke test | `mlx-community/MiniCPM-V-4.6-8bit` | Any cached HF model |
+| `MLX_LOCAL_BUILD_SMOKE_MODEL` | Model used by the local-MLX smoke test | `mlx-community/nanoLLaVA-1.5-4bit` | Any cached HF model |
 | `MLX_LOCAL_BUILD_SMOKE_EXPECTED` | Expected deterministic smoke output substring | `Hello! How can I help you today?` | Override for a custom model |
 
 **Examples**:

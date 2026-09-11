@@ -493,7 +493,7 @@ bash tools/update.sh
   `auto` is the default and runs only when the smoke model is already cached;
   `1` forces the test and may download the model; `0` skips it.
 - `MLX_LOCAL_BUILD_SMOKE_MODEL`: Override the default smoke model
-  (`mlx-community/MiniCPM-V-4.6-8bit`).
+  (`mlx-community/nanoLLaVA-1.5-4bit`).
 - `MLX_LOCAL_BUILD_SMOKE_EXPECTED`: Override the expected deterministic output
   substring (`Hello! How can I help you today?`).
 

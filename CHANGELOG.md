@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The local-MLX runtime smoke in `tools/update.sh` defaults to
+  `mlx-community/nanoLLaVA-1.5-4bit` (0.6 GB, 4-bit, so the quantised Metal
+  kernels are exercised too) instead of the no-longer-cached
+  `MiniCPM-V-4.6-8bit`; measured twice, it answers the smoke prompt with the
+  same expected substring, so `MLX_LOCAL_BUILD_SMOKE_EXPECTED` is unchanged.
 - The file log is now a self-contained timeline. The `System: … GPU: …`
   line is logged once per run instead of once per model; the per-model
   word-count line is replaced by one grep-able `REPRO model=<id>
