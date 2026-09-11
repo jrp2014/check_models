@@ -226,7 +226,14 @@ quality_require_command() {
             'def paste():' \
             '    return ""' \
             > "$stub_dir/pyperclip.py"
-        PYTHONPATH="$stub_dir${PYTHONPATH:+:$PYTHONPATH}" quality_run_python_tool skylos "$@"
+        # Skylos 4.36+ caps its dead-code grep verification (SKYLOS_GREP_BUDGET,
+        # default 30 s) and exits 2 as "analysis incomplete" when the cap is
+        # hit; the 3-core CI runner exceeds 30 s on this tree while a laptop
+        # needs ~12 s. The value is a cap, not a duration, so a generous one
+        # costs nothing when verification finishes early.
+        SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}" \
+            PYTHONPATH="$stub_dir${PYTHONPATH:+:$PYTHONPATH}" \
+            quality_run_python_tool skylos "$@"
         status=$?
         rm -rf "$stub_dir"
         return "$status"

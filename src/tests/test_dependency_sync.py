@@ -1039,6 +1039,11 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     assert 'echo "=== Skylos Quality Gate ==="' in quality_script
     assert 'echo "=== Skylos Audit Gate ==="' in quality_script
     assert "SKYLOS_JOBS" not in quality_script
+    # Every Skylos call goes through the wrapper, which raises the 4.36+ grep
+    # verification cap (default 30 s) so the slower CI runner does not turn a
+    # clean tree into SKY-ANALYSIS-INCOMPLETE (exit 2).
+    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
+    assert 'SKYLOS_GREP_BUDGET="${SKYLOS_GREP_BUDGET:-300}"' in common_quality
     # The danger scan is deliberately blocking in full mode, and only via the
     # wrapper script (never a bare `skylos --danger` that would bypass the
     # worktree post-filter and non-interactive guards).

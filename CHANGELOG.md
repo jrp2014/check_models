@@ -218,6 +218,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The Skylos wrapper raises Skylos 4.36's grep-verification cap
+  (`SKYLOS_GREP_BUDGET`, default 30 s) to 300 s: the three-core CI runner
+  exceeded the default on this tree and Skylos exited 2 as "analysis
+  incomplete" although the scan was clean. A cap, not a duration, so local
+  runs are unaffected.
 - The crash section of the run summary no longer guards a `model_provenance`
   the JSONL validator already requires; ty 0.0.80 flags that guard as a
   redundant condition and exits non-zero, which turned the gate red.
