@@ -20716,9 +20716,11 @@ def _run_issue_summary_crash_section(
 ) -> ReportSection:
     """Build the expanded, bounded evidence section for one actionable crash."""
     failure = result.get("failure")
-    provenance = result.get("model_provenance")
-    requested_revision = provenance.get("requested_revision") if provenance else None
-    resolved_revision = provenance.get("resolved_revision") if provenance else None
+    # Required on every validated row (see _validate_run_issue_result), so no
+    # presence guard: a TypedDict with required fields is always truthy anyway.
+    provenance = result["model_provenance"]
+    requested_revision = provenance.get("requested_revision")
+    resolved_revision = provenance.get("resolved_revision")
     facts = [
         (
             "Execution / usability",

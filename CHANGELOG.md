@@ -216,6 +216,12 @@ Notable changes to this project will be documented in this file.
   Everything shipped since 0.15.0 (0.16.0–0.17.0) is now recorded under the
   `[0.17.0]` heading below.
 
+### Fixed
+
+- The crash section of the run summary no longer guards a `model_provenance`
+  the JSONL validator already requires; ty 0.0.80 flags that guard as a
+  redundant condition and exits non-zero, which turned the gate red.
+
 ## [0.17.0] - 2026-09-05
 
 ### Assessment profiles (0.17.0)
