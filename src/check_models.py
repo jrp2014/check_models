@@ -11832,8 +11832,36 @@ def _build_prompt_diagnostics(
     )
 
 
+_STREAM_CAPTURE_STDERR_MARKER: Final[str] = "=== STDERR ===\n"
+
+
+def _captured_upstream_output_for_record(result: PerformanceResult) -> str | None:
+    """Return the captured console output worth retaining in a JSONL row.
+
+    For a completed model the tee'd STDOUT is, by construction, the verbose
+    passthrough of the answer that the row already retains as
+    ``generated_text``; only the STDERR half (upstream warnings, progress)
+    adds anything. The STDOUT half is kept whenever it differs from the
+    retained answer (a Harmony-style transcript that ``clean_output`` later
+    reduced, a truncated capture) and always for failures, where the partial
+    output is the evidence. The file log keeps the complete capture regardless.
+    """
+    captured = result.captured_upstream_output
+    if not captured or not result.success:
+        return captured
+    stdout_part, marker, stderr_part = captured.partition(_STREAM_CAPTURE_STDERR_MARKER)
+    answer = _generation_text_value(result.generation)
+    if " ".join(stdout_part.split()) != " ".join(answer.split()):
+        return captured
+    return f"{marker}{stderr_part}" if marker else None
+
+
 def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[str, JsonLike]:
-    """Serialize prompt diagnostics as optional JSONL/repro metadata."""
+    """Serialize prompt diagnostics as optional JSONL/repro metadata.
+
+    The bounded preview is a prefix of the full rendered prompt, so it is
+    written only when the full prompt is absent.
+    """
     if diagnostics is None:
         return {}
     payload: dict[str, JsonLike] = {}
@@ -11855,6 +11883,8 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "thinking_budget_source",
         "template_thinking_markers",
     ):
+        if key == "rendered_prompt_preview" and diagnostics.rendered_prompt:
+            continue
         value = getattr(diagnostics, key)
         if value is not None:
             if key == "rendered_prompt" and isinstance(value, str):
@@ -18119,10 +18149,8 @@ def _build_jsonl_result_record(
             "resolved_model_type": resolved_model_type,
             "supported_by_installed_mlx_vlm": arch_supported,
         }
-    if result.captured_upstream_output:
-        record["captured_upstream_output"] = _home_relative_report_text(
-            result.captured_upstream_output
-        )
+    if captured := _captured_upstream_output_for_record(result):
+        record["captured_upstream_output"] = _home_relative_report_text(captured)
     if result.system_telemetry is not None:
         record["system_telemetry"] = result.system_telemetry
     return record

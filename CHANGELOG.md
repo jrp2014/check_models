@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `results.jsonl` rows retain less that is already retained: for a completed
+  model whose captured STDOUT is the verbose passthrough of `generated_text`,
+  only the STDERR half of the capture is kept (transcripts that
+  `clean_output` later reduced, truncated captures and failures keep the
+  whole capture), and the bounded `rendered_prompt_preview` is written only
+  when the full rendered prompt is absent. The file log keeps the complete
+  capture regardless.
 - Every summary surface (index, run summary, gallery, diagnostics, HTML)
   states beside the evaluation lane whether the prompt exposed the image's
   own description and keyword hints, since a clean catalogue answer proves
