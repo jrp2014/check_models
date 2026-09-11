@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `tools/update.sh` starts by copying a dated snapshot of the untracked
+  `output/results.history.jsonl` to `HISTORY_BACKUP_DIR` (default
+  `../../backups` beside the local MLX repos; `SKIP_HISTORY_BACKUP=1` skips),
+  skipping the copy when the newest snapshot is byte-identical. The history
+  is what makes like-for-like comparisons across weeks possible and iCloud
+  sync is not a backup.
 - `results.jsonl` rows retain less that is already retained: for a completed
   model whose captured STDOUT is the verbose passthrough of `generated_text`,
   only the STDERR half of the capture is kept (transcripts that

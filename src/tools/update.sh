@@ -3,6 +3,8 @@
 # Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
+#   0. Copy a dated snapshot of the untracked sweep history to the backups
+#      directory (HISTORY_BACKUP_DIR, default ../../backups beside the repos)
 #   1. Update conda/Homebrew by default unless UPDATE_SYSTEM_PACKAGES=0
 #   2. Install repo-local npm tooling from lockfile (or latest if UPDATE_NODE_TOOLING=1)
 #   3. Update pip/wheel/setuptools
@@ -23,6 +25,8 @@
 #   MACOSX_DEPLOYMENT_TARGET=26.2 ./update.sh # Override local mlx build target
 #   MLX_LOCAL_BUILD_SMOKE=1 ./update.sh # Force local MLX runtime smoke test
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
+#   HISTORY_BACKUP_DIR=/path ./update.sh # Where dated results.history.jsonl snapshots go
+#   SKIP_HISTORY_BACKUP=1 ./update.sh # Do not snapshot the sweep history this run
 #
 # Local MLX Development:
 #   If mlx and mlx-vlm directories exist at ../../ (sibling to check_models/),
@@ -204,6 +208,39 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Same override convention as common_quality.sh and the Makefiles.
 CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
+
+# The append-only sweep history is deliberately untracked (it carries local
+# paths and grows every run) and the folder's iCloud sync is not a backup, so
+# a dated copy lands beside the local repos before anything else runs. A
+# copy identical to the newest existing snapshot is not repeated.
+backup_run_history() {
+	if [[ "${SKIP_HISTORY_BACKUP:-0}" == "1" ]]; then
+		echo "[update.sh] Skipping sweep-history backup (SKIP_HISTORY_BACKUP=1)"
+		return 0
+	fi
+	local history="$PROJECT_ROOT/output/results.history.jsonl"
+	if [[ ! -s "$history" ]]; then
+		echo "[update.sh] No sweep history to back up ($history absent or empty)"
+		return 0
+	fi
+	local backup_dir="${HISTORY_BACKUP_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)/backups}"
+	mkdir -p "$backup_dir"
+	# Snapshot names sort by timestamp, so the last glob match is the newest.
+	local latest="" candidate
+	for candidate in "$backup_dir"/results.history.*.jsonl; do
+		[[ -e "$candidate" ]] && latest="$candidate"
+	done
+	if [[ -n "$latest" ]] && cmp -s "$history" "$latest"; then
+		echo "[update.sh] Sweep history unchanged since $(basename "$latest"); no new snapshot"
+		return 0
+	fi
+	local target
+	target="$backup_dir/results.history.$(date +%Y%m%d-%H%M%S).jsonl"
+	cp "$history" "$target"
+	echo "[update.sh] Sweep history snapshot: $target ($(wc -l < "$history" | tr -d ' ') runs)"
+}
+
+backup_run_history
 
 # Repo-local markdownlint tools (if npm is available). The audit and funding
 # steps are extra registry round-trips whose output nothing here consumes;

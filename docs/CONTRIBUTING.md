@@ -480,6 +480,9 @@ bash tools/update.sh
 **Environment Variables**:
 
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
+- `HISTORY_BACKUP_DIR=/path` / `SKIP_HISTORY_BACKUP=1`: Where the dated snapshot of
+  the untracked `output/results.history.jsonl` goes (default `../../backups`
+  beside the local MLX repos), or skip it for one run.
 - `UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew
   update/upgrade. By default, `update.sh` refreshes system package managers.
 - `UPDATE_NODE_TOOLING=1`: Upgrade repo-local markdownlint tooling to the

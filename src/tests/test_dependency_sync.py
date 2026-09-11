@@ -1374,6 +1374,9 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "Apple Clang" in update_script
     assert "Native arm64 shell detected" in update_script
     assert "MLX_LOCAL_BUILD_SMOKE" in update_script
+    assert "backup_run_history" in update_script
+    assert "HISTORY_BACKUP_DIR" in update_script
+    assert "HISTORY_BACKUP_DIR" in contributing
     assert "mlx.metallib" in update_script
     assert "MLX runtime backend provenance" in update_script
     assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
