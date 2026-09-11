@@ -9804,7 +9804,7 @@ def _diagnostics_evidence_blocks(
         (
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
             assessments[result.model_name].execution,
-            assessments[result.model_name].usability,
+            _human_status_label(assessments[result.model_name].usability),
             assessments[result.model_name].maintainer_status,
             _gallery_observation_labels(assessments[result.model_name].observations),
         )

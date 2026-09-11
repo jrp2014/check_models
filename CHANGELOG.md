@@ -223,6 +223,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The diagnostics triage table's "Mechanical checks" column now shows the
+  human gloss (no concerns detected / concerns detected / major concerns)
+  like every other surface; it still printed the machine usability code.
 - The Skylos wrapper raises Skylos 4.36's grep-verification cap
   (`SKYLOS_GREP_BUDGET`, default 30 s) to 300 s: the three-core CI runner
   exceeded the default on this tree and Skylos exited 2 as "analysis
