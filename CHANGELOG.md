@@ -6,6 +6,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Every summary surface (index, run summary, gallery, diagnostics, HTML)
+  states beside the evaluation lane whether the prompt exposed the image's
+  own description and keyword hints, since a clean catalogue answer proves
+  less when its fields may be copied from the prompt.
+- The run summary's quality table explains that a major-concerns row whose
+  observations are format failures only is a chooser verdict and is not
+  repeated under attempts requiring review, which lists only results whose
+  observations may point at mlx-vlm.
+- Gallery and HTML evidence blocks drop padding: image-side processor facts
+  appear only when captured, the always-negligible input-validation time is
+  gone, memory rows carry their unit, and the diagnostics clean-completion
+  row no longer appends post-cleanup residues to the peak.
+- The output index labels `results.html` as a self-contained page to
+  download, because GitHub renders a linked HTML blob as source.
 - The local-MLX runtime smoke in `tools/update.sh` defaults to
   `mlx-community/nanoLLaVA-1.5-4bit` (0.6 GB, 4-bit, so the quantised Metal
   kernels are exercised too) instead of the no-longer-cached

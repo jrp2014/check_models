@@ -920,7 +920,14 @@ def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -
     lines = summary.read_text(encoding="utf-8").splitlines()
     finished = next(i for i, line in enumerate(lines) if line.startswith("- *Run finished:*"))
     assert lines[finished + 2] == "- *Evaluation lane:* assisted"
-    assert lines[finished + 4] == "- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.0 MB"
+    # The fixture exposed the image's own metadata to the prompt, and that
+    # caveat belongs beside the lane before any per-model row.
+    assert lines[finished + 3].startswith(
+        "- *Prompt hints:* the image's description and keyword hints were included"
+    )
+    image_line = "- *Input image:* JPEG, 640 x 480 pixels (0.3 MP), 0.0 MB"
+    assert image_line in lines
+    assert lines.index(image_line) > finished + 3
     assert "Evaluation mode" not in "\n".join(lines)
 
     image = cast(
@@ -948,6 +955,14 @@ def test_every_summary_surface_leads_with_lane_and_input_image(tmp_path: Path) -
         ("Assessment", "Legacy assessment; profile not recorded"),
         ("Input image", "unavailable"),
     )
+    assert check_models._run_input_summary_rows(None, "blind", metadata_exposed_to_prompt=False)[
+        1
+    ] == ("Prompt hints", "none; the prompt carried nothing about the image")
+    exposed = check_models._run_input_summary_rows(
+        None, "assisted", metadata_exposed_to_prompt=True
+    )
+    assert exposed[1][0] == "Prompt hints"
+    assert "may be copied from them rather than seen" in exposed[1][1]
 
 
 def test_output_index_dashboard_leads_with_run_duration() -> None:
@@ -1801,9 +1816,9 @@ def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> No
     )
 
     html_text = html_path.read_text(encoding="utf-8")
-    assert "<td>Peak memory</td>\n<td>1.0</td>" in html_text
+    assert "<td>Peak memory (GB)</td>\n<td>1.0</td>" in html_text
     assert "recommended working set" not in html_text
-    assert "*Peak memory:* 1.0" in gallery_path.read_text(encoding="utf-8")
+    assert "*Peak memory (GB):* 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
 def test_markdown_gallery_publishes_reference_image_beside_report(tmp_path: Path) -> None:
@@ -2012,7 +2027,8 @@ def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
         "Assessment: Legacy assessment; profile not recorded\n\n"
         f"{objective_lines}"
         "\n"
-        "- [results.html](reports/results.html)\n"
+        "- [results.html (self-contained page; download to view, GitHub shows its source)]"
+        "(reports/results.html)\n"
         "- [model_gallery.md](reports/model_gallery.md)\n"
         "- [diagnostics.md](reports/diagnostics.md)\n"
         "- [results.jsonl](results.jsonl)\n"
@@ -5737,6 +5753,11 @@ class TestMarkdownGalleryReport:
         assert "*Stop reason:* not captured" in evidence
         assert "*Processor:* not captured" in evidence
         assert "*Tokenizer:* not captured" in evidence
+        # Image-side processor facts are omitted rather than padded when unknown.
+        assert "*Processed image:*" not in evidence
+        assert "*Image patch count:*" not in evidence
+        assert "*Image placeholders:*" not in evidence
+        assert "*Input validation time:*" not in evidence
 
     def test_gallery_keeps_chooser_and_per_model_factual_status(
         self,

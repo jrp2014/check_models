@@ -2722,13 +2722,6 @@ def _gallery_runtime_facts(
         ("Generation time", _gallery_metric("generation_time", result.generation_time)),
         ("Total time", _gallery_metric("total_time", result.total_time)),
         (
-            "Input validation time",
-            _gallery_metric(
-                "input_validation_time_s",
-                runtime.input_validation_time_s if runtime is not None else None,
-            ),
-        ),
-        (
             "Prompt preparation time",
             _gallery_metric(
                 "prompt_prep_time_s",
@@ -2768,25 +2761,25 @@ def _gallery_runtime_facts(
             if generation_tps is not None
             else "-",
         ),
-        ("Peak memory", _gallery_metric("peak_memory", peak_memory)),
-        ("Active memory", _gallery_metric("active_memory", result.active_memory)),
-        ("Cache memory", _gallery_metric("cache_memory", result.cache_memory)),
+        ("Peak memory (GB)", _gallery_metric("peak_memory", peak_memory)),
+        ("Active memory (GB)", _gallery_metric("active_memory", result.active_memory)),
+        ("Cache memory (GB)", _gallery_metric("cache_memory", result.cache_memory)),
         (
-            "Model-load active memory",
+            "Model-load active memory (GB)",
             _gallery_metric(
                 "model_load_active_memory_gb",
                 runtime.model_load_active_memory_gb if runtime is not None else None,
             ),
         ),
         (
-            "Post-cleanup active memory",
+            "Post-cleanup active memory (GB)",
             _gallery_metric(
                 "post_cleanup_active_memory_gb",
                 runtime.post_cleanup_active_memory_gb if runtime is not None else None,
             ),
         ),
         (
-            "Post-cleanup cache memory",
+            "Post-cleanup cache memory (GB)",
             _gallery_metric(
                 "post_cleanup_cache_memory_gb",
                 runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
@@ -2822,28 +2815,28 @@ def _gallery_prompt_facts(
 ) -> tuple[tuple[str, str], ...]:
     """Return captured prompt, processor, and generation-setting facts."""
     prompt = result.prompt_diagnostics
-    processed_image = "not captured"
-    if (
-        prompt is not None
-        and prompt.processed_image_width is not None
-        and prompt.processed_image_height is not None
-    ):
-        processed_image = f"{prompt.processed_image_width} x {prompt.processed_image_height} px"
+    # Image-side processor facts are only known for the families that report
+    # them; an absent one is padding, not evidence, so the row is omitted.
+    image_facts: list[tuple[str, str]] = []
+    if prompt is not None:
+        if prompt.image_placeholder_count:
+            image_facts.append(("Image placeholders", str(prompt.image_placeholder_count)))
+        if prompt.processed_image_width is not None and prompt.processed_image_height is not None:
+            image_facts.append(
+                (
+                    "Processed image",
+                    f"{prompt.processed_image_width} x {prompt.processed_image_height} px",
+                )
+            )
+        if prompt.image_patch_count is not None:
+            image_facts.append(("Image patch count", str(prompt.image_patch_count)))
     return (
         ("Requested maximum tokens", _gallery_fact(result.requested_max_tokens or None)),
         (
             "Rendered prompt characters",
             _gallery_fact(prompt.rendered_prompt_chars if prompt is not None else None),
         ),
-        (
-            "Image placeholders",
-            _gallery_fact(prompt.image_placeholder_count if prompt is not None else None),
-        ),
-        ("Processed image", processed_image),
-        (
-            "Image patch count",
-            _gallery_fact(prompt.image_patch_count if prompt is not None else None),
-        ),
+        *image_facts,
         (
             "Processor",
             _gallery_fact(prompt.processor_class if prompt is not None else None),
@@ -9699,22 +9692,11 @@ def _diagnostics_clean_row(
     else:
         throughput = "-"
     peak_memory = _generation_float_metric(result.generation, "peak_memory")
+    # Post-cleanup residues stay in the per-model evidence; in a one-line
+    # context row they are noise beside the peak.
     memory = (
         f"{_gallery_metric('peak_memory', peak_memory)} GB peak" if peak_memory is not None else "-"
     )
-    if runtime is not None and (
-        runtime.post_cleanup_active_memory_gb is not None
-        or runtime.post_cleanup_cache_memory_gb is not None
-    ):
-        active = _gallery_metric(
-            "post_cleanup_active_memory_gb",
-            runtime.post_cleanup_active_memory_gb,
-        )
-        cache = _gallery_metric(
-            "post_cleanup_cache_memory_gb",
-            runtime.post_cleanup_cache_memory_gb,
-        )
-        memory = f"{memory}; cleanup {active}/{cache} GB active/cache"
     return result.model_name, identity, f"{token_summary}; {throughput}; {memory}"
 
 
@@ -9775,14 +9757,16 @@ def _run_input_rows_for_context(
 ) -> tuple[tuple[str, str], ...]:
     """Lane and input-image rows from whichever report context a renderer holds."""
     results = report_context.result_set.results
+    mode_policy = getattr(report_context, "mode_policy", None)
     return _run_input_summary_rows(
         _run_image_record(image_path, getattr(report_context, "image_profile", None)),
-        getattr(getattr(report_context, "mode_policy", None), "eval_mode", None),
+        getattr(mode_policy, "eval_mode", None),
         getattr(
-            getattr(report_context, "mode_policy", None),
+            mode_policy,
             "assessment_profile",
             results[0].assessment_profile if results else "general",
         ),
+        metadata_exposed_to_prompt=getattr(mode_policy, "metadata_exposed_to_prompt", None),
     )
 
 
@@ -10612,6 +10596,7 @@ def generate_markdown_gallery_report(
             _run_image_record(image_path, report_context.image_profile),
             report_context.mode_policy.eval_mode,
             report_context.mode_policy.assessment_profile,
+            metadata_exposed_to_prompt=report_context.mode_policy.metadata_exposed_to_prompt,
         )
     )
     md.append("")
@@ -18401,21 +18386,53 @@ def _assessment_scope(profile: str | None) -> str:
     return "Legacy assessment; profile not recorded"
 
 
+_PROMPT_HINTS_EXPOSED: Final[str] = (
+    "the image's description and keyword hints were included in the prompt, so "
+    "field content may be copied from them rather than seen"
+)
+_PROMPT_HINTS_WITHHELD: Final[str] = "none; the prompt carried nothing about the image"
+
+
 def _run_input_summary_rows(
     image: RunImageRecord | None,
     eval_mode: str | None,
     assessment_profile: str | None = None,
+    *,
+    metadata_exposed_to_prompt: bool | None = None,
 ) -> tuple[tuple[str, str], ...]:
     """Evaluation lane and input-image facts that every summary surface leads with.
 
     A 66-megapixel, 66 MB photograph is what turns a prefill into a
     minute-long wait; a skimmer must see that before any per-model timing.
+    Whether the prompt exposed the image's own metadata decides how much a
+    clean catalogue answer proves, so it sits beside the lane when known.
     """
-    return (
+    rows: list[tuple[str, str]] = [
         ("Evaluation lane", eval_mode or "unknown"),
-        ("Assessment", _assessment_scope(assessment_profile)),
-        ("Input image", _describe_run_image(image) if image is not None else "unavailable"),
+    ]
+    if metadata_exposed_to_prompt is not None:
+        rows.append(
+            (
+                "Prompt hints",
+                _PROMPT_HINTS_EXPOSED if metadata_exposed_to_prompt else _PROMPT_HINTS_WITHHELD,
+            )
+        )
+    rows.extend(
+        (
+            ("Assessment", _assessment_scope(assessment_profile)),
+            ("Input image", _describe_run_image(image) if image is not None else "unavailable"),
+        )
     )
+    return tuple(rows)
+
+
+def _output_index_artifact_label(artifact_path: Path) -> str:
+    """Name an artifact link; a self-contained HTML page needs a viewing note."""
+    if artifact_path.suffix.lower() == ".html":
+        return (
+            f"{artifact_path.name} (self-contained page; download to view, GitHub shows its source)"
+        )
+    return artifact_path.name
 
 
 def _output_index_link(index_filename: Path, artifact_path: Path, label: str) -> str:
@@ -21086,8 +21103,12 @@ def _run_issue_summary_quality_section(
                 "Every attempted model ranked by mechanical observations, with captured "
                 "resource facts. No concerns detected is not a task-compliance or accuracy "
                 "verdict. Consult the assessment scope above and inspect the final answers. "
-                "Crashes and integration signals have expanded "
-                "maintainer evidence."
+                "Crashes and integration signals have expanded maintainer evidence. A "
+                "major-concerns row whose observations are format failures only (for "
+                "example labelled fields not detected) is a chooser verdict, not a "
+                "maintainer signal, so it is not repeated under attempts requiring "
+                "review; that list holds results whose observations may point at "
+                "mlx-vlm rather than at the model."
             ),
             ReportTable(
                 (
@@ -21400,7 +21421,12 @@ def generate_run_issue_summary_report(
                     (
                         *_run_issue_summary_timing_rows(source.metadata),
                         *_run_input_summary_rows(
-                            source.image, eval_mode, source.metadata.get("assessment_profile")
+                            source.image,
+                            eval_mode,
+                            source.metadata.get("assessment_profile"),
+                            metadata_exposed_to_prompt=source.metadata.get(
+                                "metadata_exposed_to_prompt"
+                            ),
                         ),
                         ("Models attempted", str(len(source.results))),
                         ("Completed", str(counts["completed"])),
@@ -21536,6 +21562,7 @@ def _output_index_dashboard_lines(
     image: RunImageRecord | None = None,
     eval_mode: str | None = None,
     assessment_profile: AssessmentProfile | None = None,
+    metadata_exposed_to_prompt: bool | None = None,
 ) -> list[str]:
     """Render run-outcome counts and top observations for the output index."""
     counts = _run_outcome_counts(assessments)
@@ -21554,7 +21581,12 @@ def _output_index_dashboard_lines(
         *(
             [
                 f"- {label}: {value}"
-                for label, value in _run_input_summary_rows(image, eval_mode, assessment_profile)
+                for label, value in _run_input_summary_rows(
+                    image,
+                    eval_mode,
+                    assessment_profile,
+                    metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+                )
             ]
             if image is not None or eval_mode is not None
             else []
@@ -21599,6 +21631,7 @@ def generate_output_index_report(
     run_duration_seconds: float | None = None,
     image: RunImageRecord | None = None,
     assessment_profile: AssessmentProfile | None = None,
+    metadata_exposed_to_prompt: bool | None = None,
 ) -> None:
     """Write a run dashboard plus navigation for current-run artifacts only.
 
@@ -21606,9 +21639,10 @@ def generate_output_index_report(
     a file that still exists after a failed renderer is prior-run evidence,
     not a current artifact, and must not be linked.
     """
-    # Labels derive from the actual paths so custom output names stay honest.
+    # Labels derive from the actual paths so custom output names stay honest;
+    # GitHub renders a linked .html blob as source, so that one says so.
     links = tuple(
-        (artifact.path, artifact.path.name)
+        (artifact.path, _output_index_artifact_label(artifact.path))
         for artifact in artifacts
         if artifact.key != "output_index"
     )
@@ -21627,6 +21661,7 @@ def generate_output_index_report(
                 image=image,
                 eval_mode=eval_mode,
                 assessment_profile=assessment_profile,
+                metadata_exposed_to_prompt=metadata_exposed_to_prompt,
             )
         )
     if run_issue_summary is not None:
@@ -22630,6 +22665,9 @@ def _generate_reports_and_log_outputs(
             run_duration_seconds=_elapsed_run_seconds(inputs),
             image=_run_image_record(inputs.image_path, inputs.report_context.image_profile),
             assessment_profile=inputs.report_context.mode_policy.assessment_profile,
+            metadata_exposed_to_prompt=(
+                inputs.report_context.mode_policy.metadata_exposed_to_prompt
+            ),
         ),
     )
     run_artifact(index_artifact)

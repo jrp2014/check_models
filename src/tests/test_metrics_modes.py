@@ -1411,7 +1411,10 @@ def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
         "",
         *objective_lines,
         "",
-        "- [results.html](reports/results.html)",
+        (
+            "- [results.html (self-contained page; download to view, GitHub shows its source)]"
+            "(reports/results.html)"
+        ),
         "- [model_gallery.md](reports/model_gallery.md)",
         "- [diagnostics.md](reports/diagnostics.md)",
         "- [results.jsonl](results.jsonl)",
