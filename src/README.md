@@ -685,7 +685,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `UPDATE_SYSTEM_PACKAGES` | `tools/update.sh` conda base/env and Homebrew updates | `1` (run system updates) | `UPDATE_SYSTEM_PACKAGES=0` to skip |
 | `UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade for markdownlint tooling | `0` (install from lockfile) | `UPDATE_NODE_TOOLING=1` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
-| `HISTORY_BACKUP_DIR` | Where `tools/update.sh` writes dated snapshots of the untracked `output/results.history.jsonl` | `../../backups` beside the local MLX repos | Any directory |
+| `HISTORY_BACKUP_DIR` | Where `tools/update.sh` writes dated snapshots of the untracked `output/results.history.jsonl`; older snapshots that are byte-prefixes of the newest are pruned, with every copy and deletion printed | `../../backups` beside the local MLX repos | Any directory |
 | `SKIP_HISTORY_BACKUP` | Skip that snapshot for one `tools/update.sh` run | `0` (snapshot unless unchanged) | `SKIP_HISTORY_BACKUP=1` |
 | `MLX_LOCAL_BUILD_SMOKE` | Optional `tools/update.sh` local-MLX smoke control | `auto` (cached model only) | `MLX_LOCAL_BUILD_SMOKE=1` to force |
 | `MLX_LOCAL_BUILD_SMOKE_MODEL` | Model used by the local-MLX smoke test | `mlx-community/nanoLLaVA-1.5-4bit` | Any cached HF model |

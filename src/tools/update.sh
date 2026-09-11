@@ -238,6 +238,23 @@ backup_run_history() {
 	target="$backup_dir/results.history.$(date +%Y%m%d-%H%M%S).jsonl"
 	cp "$history" "$target"
 	echo "[update.sh] Sweep history snapshot: $target ($(wc -l < "$history" | tr -d ' ') runs)"
+	# The history is append-only, so an older snapshot that is a byte-prefix of
+	# the new one carries nothing the new one lacks and is pruned; a snapshot
+	# that diverged (a rewritten or rotated history) is kept. Every deletion is
+	# printed so the folder never changes silently.
+	local older kept=0
+	for older in "$backup_dir"/results.history.*.jsonl; do
+		[[ -e "$older" && "$older" != "$target" ]] || continue
+		# BSD cmp has no prefix mode (-n reports EOF), so compare against a
+		# same-length head of the new snapshot.
+		if head -c "$(wc -c < "$older" | tr -d ' ')" "$target" | cmp -s - "$older"; then
+			rm -f "$older"
+			echo "[update.sh]   pruned $(basename "$older") (prefix of the new snapshot)"
+		else
+			kept=$((kept + 1))
+		fi
+	done
+	echo "[update.sh]   $((kept + 1)) snapshot(s) retained in $backup_dir"
 }
 
 backup_run_history

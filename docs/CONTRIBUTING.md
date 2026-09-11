@@ -482,7 +482,9 @@ bash tools/update.sh
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
 - `HISTORY_BACKUP_DIR=/path` / `SKIP_HISTORY_BACKUP=1`: Where the dated snapshot of
   the untracked `output/results.history.jsonl` goes (default `../../backups`
-  beside the local MLX repos), or skip it for one run.
+  beside the local MLX repos), or skip it for one run. Older snapshots that
+  are byte-prefixes of the newest are pruned; every copy and deletion is
+  printed.
 - `UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew
   update/upgrade. By default, `update.sh` refreshes system package managers.
 - `UPDATE_NODE_TOOLING=1`: Upgrade repo-local markdownlint tooling to the
