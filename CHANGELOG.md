@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reorganised the implementation guide into a task-oriented reference with a
+  code/test navigation map and concise generation, assessment and evidence
+  contracts. Removed duplicated setup/dependency recipes, stale examples and
+  contradictory artifact, linting and suppression advice.
 - Compression: the four usability statuses have one canonical order and one
   gloss map in the monolith (five parallel tables, sort keys and label copies
   are gone); `CLAUDE.md` is a symlink to `AGENTS.md` instead of a hand-mirrored
