@@ -86,7 +86,7 @@ python -m check_models --models <model> --image <img> > /tmp/b.log
   or not), prompt, image digest, and generation settings all match; a
   hand-rolled A/B must respect the same like-for-like rule.
 - Restore the environment afterwards (`bash src/tools/update.sh` or
-  `pip install -e .[dev,extras]` from `src/`; add `,torch` only if you opted in).
+  `pip install -e .[dev,extras,torch]` from `src/`).
 
 ## Presentation rules (for upstream PRs/issues)
 

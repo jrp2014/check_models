@@ -482,8 +482,7 @@ bash tools/update.sh
 Every `update.sh` variable, with its default, is listed in the README's
 environment table (`src/README.md`); the ones below are not in that table.
 
-- `INSTALL_TORCH=1`: Also install the optional PyTorch extra (opt-in; no roster
-  model needs it, and transformers imports torch whenever it is present)
+- `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
 - `CLEAN_PIP_INVALID_DISTS=0`: Skip cleanup of stale pip `~package` backup
   directories that can produce "Ignoring invalid distribution" warnings.
 
@@ -509,8 +508,8 @@ MLX_METAL_JIT=ON bash tools/update.sh
 # Bypass the local MLX smoke only after confirming the backend artifact manually
 MLX_LOCAL_BUILD_SMOKE=0 bash tools/update.sh
 
-# Include the optional PyTorch extra
-INSTALL_TORCH=1 bash tools/update.sh
+# Skip PyTorch support
+SKIP_TORCH=1 bash tools/update.sh
 ```
 
 ### Updating Dependencies

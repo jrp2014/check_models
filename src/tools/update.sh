@@ -12,8 +12,8 @@
 #   5. Reinstall project in editable mode from pyproject.toml to reconcile deps
 #
 # Usage examples:
-#   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=OFF by default)
-#   INSTALL_TORCH=1 ./update.sh       # Also install the optional torch extra (opt-in)
+#   ./update.sh                       # Install project + dev + extras + torch (MLX_METAL_JIT=OFF by default)
+#   SKIP_TORCH=1 ./update.sh          # Skip torch group installation
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall (suppressed
 #                                     # after the local mlx build is pinned: preserving the
 #                                     # local source build takes precedence)
@@ -624,16 +624,12 @@ pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly
 
 # Resolve project extras once; the install itself runs after MLX updates so
 # pyproject.toml performs the final dependency reconciliation.
-# The torch extra (torch, torchvision, torchaudio, timm) is opt-in: transformers
-# imports torch whenever it is installed (about 1 s and 320 MB per process) but
-# no model in the current roster uses a torch-backed loader or image processor.
-# An already-installed torch is left in place either way.
-INSTALL_GROUPS=".[dev,extras]"
-if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
-	INSTALL_GROUPS=".[dev,extras,torch]"
-	echo "[update.sh] Including torch group (INSTALL_TORCH=1)"
+INSTALL_GROUPS=".[dev,extras,torch]"
+if [[ "${SKIP_TORCH:-0}" == "1" ]]; then
+	INSTALL_GROUPS=".[dev,extras]"
+	echo "[update.sh] Skipping torch group (SKIP_TORCH=1)"
 else
-	echo "[update.sh] Skipping torch group (opt in with INSTALL_TORCH=1)"
+	echo "[update.sh] Including torch group (default, set SKIP_TORCH=1 to skip)"
 fi
 
 reconcile_project_environment_from_pyproject() {

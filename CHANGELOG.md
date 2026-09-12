@@ -6,12 +6,6 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- `tools/update.sh` no longer installs the `torch` extra by default;
-  `INSTALL_TORCH=1` opts in (replacing `SKIP_TORCH=1`). No model in the
-  roster uses a torch-backed loader or image processor, yet transformers
-  imports torch whenever it is installed, costing about 1 s and 320 MB per
-  process. An installed torch is left in place; `make dev` and
-  `setup_conda_env.sh` still install the extra.
 - Reorganised the implementation guide into a task-oriented reference with a
   code/test navigation map and concise generation, assessment and evidence
   contracts. Removed duplicated setup/dependency recipes, stale examples and
