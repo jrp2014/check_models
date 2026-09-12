@@ -31,38 +31,40 @@ Maintainer status counts
 | Maintainer status              | Count |
 |--------------------------------|-------|
 | actionable failure             | 1     |
-| none                           | 34    |
-| observation needs reproduction | 3     |
+| none                           | 33    |
+| observation needs reproduction | 4     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
 | not assessed         | 1     |
-| major concerns       | 5     |
-| no concerns detected | 28    |
+| major concerns       | 6     |
+| no concerns detected | 27    |
 | concerns detected    | 4     |
 
 Observation counts
 
 | Observation                                                  | Count |
 |--------------------------------------------------------------|-------|
-| Response repeats the same text                               | 2     |
+| Response repeats the same text                               | 1     |
 | Generation was stopped early after sustained repeated output | 2     |
-| Unrecognised model control tokens remain visible             | 1     |
+| Unrecognised model control tokens remain visible             | 2     |
 | Required labelled fields not detected                        | 3     |
-| Response appears cut off at the token limit                  | 1     |
+| Response appears cut off at the token limit                  | 2     |
 | Internal reasoning block appears incomplete                  | 1     |
+| Conversation-role control tokens remain visible              | 1     |
 | Repeated keyword entries                                     | 5     |
 
 ## Triage
 
-| Model                                                                                                        | Execution | Mechanical checks | Maintainer status              | Observations                                                                                  |
-|--------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
-| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                             | crashed   | not assessed      | actionable_failure             | none                                                                                          |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                   | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
-| [mlx-community/North-Micro-Vision-Instruct-4bit](#diagnostic-mlx-community-north-micro-vision-instruct-4bit) | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                              | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                     |
+| Model                                                                                                    | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
+|----------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
+| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                         | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected     |
+| [mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit](#diagnostic-mlx-community-qwen3-vl-30b-a3b-instruct-4bit) | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                      |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)       | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                          | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                         |
 
 ## Crashes requiring action
 
@@ -99,7 +101,7 @@ builtins.ValueError: Model loading failed: Received 904 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002851924
+- *Post-cleanup active memory (GB):* 0.00286831
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
@@ -113,10 +115,10 @@ builtins.ValueError: Model loading failed: Received 904 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14034, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14168, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12976, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13080, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1054,7 +1056,7 @@ model.norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15055, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1065,7 +1067,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14049, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14183, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 904 parameters not in model: 
 model.embed_tokens.biases,
@@ -1981,15 +1983,8 @@ model.norm.weight.
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3259.54it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[23:12:58] DEBUG    HF Cache Info for mlx-community/Mage-VL-OptiQ-4bit: size=3745.9 MB, files=11
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2884.45it/s]
 ```
 
 ## Completed Runs with Observations
@@ -2018,9 +2013,11 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5099616660008905
-- *Peak memory at first token (GB):* 6.72582142
-- *Post-cleanup active memory (GB):* 0.011863376
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.8299940830038395
+- *Peak memory at first token (GB):* 6.725837818
+- *Sampling settings source:* temperature: default; top_p: default; top_k:
+  default; min_p: default; repetition_penalty: default
+- *Post-cleanup active memory (GB):* 0.011879774
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2195
 - *Prompt composition:* 2,195 = 403 text/template + 1,792 image tokens (82%;
@@ -2044,12 +2041,12 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 </details>
 
-<a id="diagnostic-mlx-community-north-micro-vision-instruct-4bit"></a>
+<a id="diagnostic-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
 
 <details>
-<summary>mlx-community/North-Micro-Vision-Instruct-4bit — unusable — repeated text; stopped early: repeating; duplicate keywords</summary>
+<summary>mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit — unusable — stopped early: repeating; duplicate keywords</summary>
 
-### mlx-community/North-Micro-Vision-Instruct-4bit
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
 
 #### Execution and provenance
 
@@ -2058,33 +2055,35 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Repeated fragment:* phrase: "water, swan in the..."
-- *Title word count:* 5
-- *Keyword count:* 40
-- *Duplicate keywords:* ["swan", "water", "foliage", "swan in the water",
-  "swan in the river"]
-- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Processor class:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
-- *Tokenizer class:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
+- *Observations:* repetition_abort, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Title word count:* 9
+- *Keyword count:* 57
+- *Duplicate keywords:* ["wildlife", "animal", "bird"]
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.74482895800611
-- *Peak memory at first token (GB):* 3.885618449
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 35.698828332999256
+- *Peak memory at first token (GB):* 23.302745918
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 0.8; top_k 20; run used temperature 0.0
-- *Post-cleanup active memory (GB):* 0.00570289
+  temperature 0.7; top_p 0.8; top_k 20; repetition_penalty 1.0
+- *Sampling settings source:* temperature: generation_config; top_p:
+  generation_config; top_k: generation_config; min_p: default;
+  repetition_penalty: generation_config
+- *Post-cleanup active memory (GB):* 0.006915324
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4083
-- *Prompt composition:* 4,083 = 333 text/template + 3,750 image tokens (92%;
+- *Prompt tokens:* 16547
+- *Prompt composition:* 16,547 = 323 text/template + 16,224 image tokens (98%;
   exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 2.17
+- *Checkpoint weights (GB):* 18.25
+- *Parameter count:* 30.00B total, 3.00B active (name-estimate)
 - *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 500,000 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.18 GB vs 2.17 GB on disk)
+- *Declared context length:* 262,144 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (18.26 GB vs 18.25 GB on disk)
 - *Generation tokens:* 200
-- *Configured EOS token ID:* 255001
-- *Configured EOS token:* &lt;|END_OF_TURN_TOKEN|&gt;
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
   sample(s); mode snapshot
@@ -2092,11 +2091,125 @@ Reconstruction complete: |          |  0.00B /  0.00B
 #### Complete output
 
 ```text
-Title: Swan on River, Waterfront Scene
+Title: Solitary swan on a calm river with moored boats
+Description: A white swan glides across the calm waters of a river, framed by green foliage in the foreground. In the background, a row of moored motorboats and cruisers are docked beside a residential building with balconies, under a soft, overcast sky.
+Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony, trees, foliage, greenery, water, reflection, calm, wildlife, waterfowl, aquatic bird, architecture, canal, waterfront, marina, pier, waterway, leisure, nature, outdoor, serene, tranquil, peaceful, dusk, evening, overcast, cloudy, landscape, scene, view, perspective, foreground, background, composition, natural, wildlife, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal,
+```
 
-Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery and leisure boats moored alongside riverside residential buildings. The scene captures a serene moment with the swan as the focal point, reflecting on the tranquil waterway and the architectural backdrop.
+</details>
 
-Keywords: Swan, River, Waterfront, Marina, Leisure boats, Residential buildings, Greenery, Water, Aquatic bird, Architecture, Boat, Reflection, Calm, Tranquil, Nature, Wildlife, Waterfowl, Foliage, Foliage, Water, Swan, Riverbank, Swan on water, Swan gliding, Swan in water, Swan in the water, Swan in the river, Swan in the water, Swan in the river, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in
+<a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+
+<details>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — unusable — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</summary>
+
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, token_cap_truncation,
+  unexpected_special_token, role_boundary_token_present
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Labelled fields not detected:* ["title", "description"]
+- *Unexpected special tokens:* ["&lt;|message|&gt;"]
+- *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
+- *Title word count:* 0
+- *Keyword count:* 1
+- *Token-cap degradation evidence:* ["missing_sections"]
+- *Special tokens emitted (by token id):* ["&lt;|message|&gt;"]
+- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
+- *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 10.21737470899825
+- *Peak memory at first token (GB):* 25.463469512
+- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
+  temperature 1.0; top_p 0.95; top_k 64
+- *Sampling settings source:* temperature: generation_config; top_p:
+  generation_config; top_k: generation_config; min_p: default;
+  repetition_penalty: default
+- *Post-cleanup active memory (GB):* 0.005194992
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 4403
+- *Prompt composition:* 4,403 = 347 text/template + 4,056 image tokens (92%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 23.85
+- *Parameter count:* 30.00B (name-estimate)
+- *Quantization:* 4-bit, group 64, affine
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Load active memory vs checkpoint:* 1.00x (23.86 GB vs 23.85 GB on disk)
+- *Generation tokens:* 1000
+- *Configured EOS token ID:* 200001
+- *Configured EOS token:* &lt;|end_of_text|&gt;
+- *Snapshot notes (neutral):* processor config missing from snapshot
+  (preprocessor_config.json, processor_config.json)
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); mode snapshot
+
+#### Complete output
+
+```text
+ to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-09-12 17:41:02 UTC+01:00
+- GPS: 52.393850°N, 0.270830°E
+
+Descriptive hints:
+- Description hint: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
+- Keyword hints: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+
+We need title 5-10 words. Concrete. Maybe "Mute Swan on River with Moored Boats and Apartments". Count words. Mute(1) Swan(2) on(3) River(4) with(5) Moored(6) Boats(7) and(8) Apartments(9). Good 9 words.
+
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time and GPS as authoritative facts but do not claim they are visible. So we can mention captured on 2026-09-12... at GPS...? Maybe include in description? It says combining relevant context with main visible subject, setting, action, lighting, and distinctive details. Context includes capture date/time and GPS. Should we include them in description? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention them as metadata in description? Possibly "Captured on 2026-09-12..." That is factual. Might be okay. Typically catalogue description includes date and location. Could incorporate. Must not claim they are visible. So we can say "Photographed on 12 September 2026 at 17:41 BST at 52.393850°N, 0.270830°E..."
+
+We need factual description. Main visible subject: solitary white swan gliding on calm water. Boats moored: white boat named 'Samar II' with blue stripe, boat 'Magna Carta' with red cover, etc. Riverside residential buildings with brown facade, tiled roof, balconies. Foliage framing. Water reflection. Lighting appears overcast daylight.
+
+Need 1-2 sentences. Let's craft one sentence: A mute swan swims on calm water in the foreground with moored motorboats and cruisers, including 'Samar II' and 'Magna Carta', along a riverbank with riverside apartments behind, framed by trees and foliage. The scene is captured on 2026-09-12 17:41:02 UTC+01:00 at 52.393850°N, 0.270830°E under overcast daylight with reflections on the water.
+
+That's a bit long but okay. Maybe two sentences.
+
+Make sure not claim date visible.
+
+Keywords: 10-18 unique comma-separated keywords. Cover relevant context and visible details. Use British English spelling? Probably fine.
+
+Keywords: mute swan, river, moored boats, motorboat, marina, riverbank, residential building, waterfront, water reflection, foliage, trees, vegetation, pier, mooring, waterfowl, aquatic bird, architecture
+
+Need 10-18. Let's count: mute swan(1), river(2), moored boats(3), motorboat(4), marina(5), riverbank(6), residential building(7), waterfront(8), water reflection(9), foliage(10), trees(11), vegetation(12), pier(13), mooring(14), waterfowl(15), aquatic bird(16), architecture(17). Good.
+
+Maybe include "Samar II", "Magna Carta"? Might be specific. Could include but maybe okay.
+
+Ensure keywords comma-separated.
+
+Return exactly these three sections and nothing else:
+
+Title:
+Description:
+Keywords:
+
+Let's produce.
+
+Potential issues: title 5-10 words. Ensure concrete.
+
+Description should be 
 ```
 
 </details>
@@ -2118,18 +2231,20 @@ Keywords: Swan, River, Waterfront, Marina, Leisure boats, Residential buildings,
 - *Observations:* thinking_trace_incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
 - *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 11
-- *Keyword count:* 19
+- *Title word count:* 7
+- *Keyword count:* 16
 - *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.572870874995715
-- *Peak memory at first token (GB):* 3.217850312
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9064237919956213
+- *Peak memory at first token (GB):* 3.254435786
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0; run used
-  temperature 0.0
-- *Post-cleanup active memory (GB):* 0.00335984
+  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
+- *Sampling settings source:* temperature: generation_config; top_p:
+  generation_config; top_k: generation_config; min_p: default;
+  repetition_penalty: generation_config
+- *Post-cleanup active memory (GB):* 0.003376226
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 932
 - *Prompt composition:* 932 = 343 text/template (tokenizer-exact) + 589
@@ -2138,7 +2253,7 @@ Keywords: Swan, River, Waterfront, Marina, Leisure boats, Residential buildings,
 - *Quantization:* 4-bit, group 64, affine
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *Load active memory vs checkpoint:* 1.00x (2.16 GB vs 2.16 GB on disk)
-- *Generation tokens:* 122
+- *Generation tokens:* 93
 - *Configured EOS token ID:* 248046
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
@@ -2149,15 +2264,15 @@ Keywords: Swan, River, Waterfront, Marina, Leisure boats, Residential buildings,
 
 ```text
 <think>
-Here's the structured output based on the provided context and hints:
+Here's the response following the instructions:
 
 Title:
-A graceful swan glides among moored boats on a tranquil river.
+Swan gliding near boats in tranquil canal
 
 Description:
-The image shows a white swan moving through calm water, surrounded by leisure boats and greenery, with residential buildings in the background. The scene is peaceful and reflects the natural and man-made elements.
+The image shows a white swan swimming gracefully among moored boats and lush greenery, with residential buildings reflecting in the calm water.
 
-Keywords: swan, river, boats, marina, greenery, reflection, water, architecture, trees, vegetation, waterway, aquatic, bird, leisure, residential, buildings, calm, peaceful, daylight
+Keywords: swan, boat, canal, greenery, reflection, water, waterfront, architecture, mooring, trees, vegetation, aquatic bird, river, calm, residential, buildings
 ```
 
 </details>
@@ -2172,50 +2287,49 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                            | Mechanical checks | Observations                                         |
-|--------------------------------------------------|-------------------|------------------------------------------------------|
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | major concerns    | labelled fields not detected; cut off at token limit |
-| mlx-community/nanoLLaVA-1.5-4bit                 | major concerns    | labelled fields not detected                         |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                 | concerns detected | duplicate keywords                                   |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | concerns detected | duplicate keywords                                   |
-| mlx-community/LFM2.5-VL-1.6B-bf16                | concerns detected | duplicate keywords                                   |
-| mlx-community/Molmo2-8B-4bit                     | concerns detected | duplicate keywords                                   |
+| Model                                         | Mechanical checks | Observations                 |
+|-----------------------------------------------|-------------------|------------------------------|
+| mlx-community/nanoLLaVA-1.5-4bit              | major concerns    | labelled fields not detected |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit  | major concerns    | cut off at token limit       |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16              | concerns detected | duplicate keywords           |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | concerns detected | duplicate keywords           |
+| mlx-community/LFM2.5-VL-1.6B-bf16             | concerns detected | duplicate keywords           |
+| mlx-community/Molmo2-8B-4bit                  | concerns detected | duplicate keywords           |
 
 ## Context for completions without detected concerns
 
 <details>
 <summary>Completions without detected concerns</summary>
 
-| Model                                                 | Runtime identity                                           | Performance                                           |
-|-------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2393 prompt / 159 generated; 30.4 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 591 prompt / 79 generated; 53.2 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 590 prompt / 152 generated; 29.7 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 595 prompt / 99 generated; 130 tok/s; 16 GB peak      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 595 prompt / 93 generated; 26.4 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed          | 591 prompt / 73 generated; 133 tok/s; 6.0 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed          | 6450 prompt / 106 generated; 77.9 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed       | 6450 prompt / 107 generated; 43.1 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1379 prompt / 65 generated; 179 tok/s; 4.7 GB peak    |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed        | 2612 prompt / 138 generated; 32.2 tok/s; 18 GB peak   |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2113 prompt / 77 generated; 34.4 tok/s; 17 GB peak    |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit          | rev e5abbe34cbfa; KimiVLProcessor; stop completed          | 1324 prompt / 807 generated; 66.3 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 12c5ae493041; Lfm2VlProcessor; stop completed          | 2103 prompt / 80 generated; 213 tok/s; 4.0 GB peak    |
-| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed        | 391 prompt / 98 generated; 111 tok/s; 7.0 GB peak     |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2926 prompt / 109 generated; 66.9 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed        | 2926 prompt / 187 generated; 64.0 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2925 prompt / 102 generated; 189 tok/s; 7.8 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed         | 1289 prompt / 135 generated; 105 tok/s; 24 GB peak    |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1133 prompt / 107 generated; 56.8 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed         | 3116 prompt / 102 generated; 39.1 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16549 prompt / 899 generated; 88.0 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16547 prompt / 171 generated; 83.0 tok/s; 23 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16563 prompt / 108 generated; 103 tok/s; 25 GB peak   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16563 prompt / 86 generated; 90.8 tok/s; 11 GB peak   |
-| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16563 prompt / 112 generated; 30.0 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed         | 1426 prompt / 98 generated; 125 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed         | 3491 prompt / 121 generated; 50.2 tok/s; 92 GB peak   |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed      | 16558 prompt / 136 generated; 59.1 tok/s; 14 GB peak  |
+| Model                                                 | Runtime identity                                          | Performance                                           |
+|-------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------|
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed       | 2393 prompt / 151 generated; 29.5 tok/s; 23 GB peak   |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit      | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed    | 1634 prompt / 997 generated; 77.8 tok/s; 19 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed         | 590 prompt / 152 generated; 25.8 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed         | 595 prompt / 96 generated; 98.2 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed         | 595 prompt / 89 generated; 21.8 tok/s; 20 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed         | 591 prompt / 73 generated; 107 tok/s; 6.0 GB peak     |
+| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed         | 6450 prompt / 140 generated; 74.9 tok/s; 8.7 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed      | 6450 prompt / 103 generated; 40.4 tok/s; 78 GB peak   |
+| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed | 1379 prompt / 65 generated; 151 tok/s; 4.7 GB peak    |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed       | 2612 prompt / 138 generated; 31.6 tok/s; 18 GB peak   |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed   | 2113 prompt / 77 generated; 34.5 tok/s; 17 GB peak    |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 12c5ae493041; Lfm2VlProcessor; stop completed         | 2103 prompt / 80 generated; 209 tok/s; 4.0 GB peak    |
+| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed       | 391 prompt / 101 generated; 101 tok/s; 7.0 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed       | 2926 prompt / 109 generated; 65.2 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed       | 2926 prompt / 187 generated; 55.6 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed       | 2925 prompt / 102 generated; 181 tok/s; 7.8 GB peak   |
+| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed  | 4083 prompt / 84 generated; 137 tok/s; 3.9 GB peak    |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed        | 1289 prompt / 155 generated; 76.1 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed          | 1133 prompt / 107 generated; 55.1 tok/s; 9.3 GB peak  |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed        | 3116 prompt / 102 generated; 33.7 tok/s; 16 GB peak   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed        | 16549 prompt / 912 generated; 84.8 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed        | 16563 prompt / 97 generated; 74.0 tok/s; 25 GB peak   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed        | 16563 prompt / 86 generated; 89.8 tok/s; 11 GB peak   |
+| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed        | 16563 prompt / 124 generated; 28.1 tok/s; 21 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed        | 1426 prompt / 98 generated; 124 tok/s; 5.6 GB peak    |
+| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed        | 3491 prompt / 121 generated; 46.7 tok/s; 92 GB peak   |
+| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed     | 16558 prompt / 136 generated; 57.5 tok/s; 14 GB peak  |
 
 </details>
 
@@ -2297,17 +2411,18 @@ Write:
 Return exactly these three sections and nothing else:
 Title:
 Description:
-Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --trust-remote-code --prefill-step-size 2048
+Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --trust-remote-code --seed 0 --prefill-step-size 2048
 ```
 
 ### Highlighted model revisions
 
-| Model                                          | Resolved revision                        |
-|------------------------------------------------|------------------------------------------|
-| mlx-community/Mage-VL-OptiQ-4bit               | bde6c9c7146acff6af09e203245014f19306c5c5 |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit          | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/North-Micro-Vision-Instruct-4bit | 87466363e6c5f57adf91c18c3a62c3c74765f8df |
-| mlx-community/MiniCPM-V-4.6-4bit               | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
+| Model                                        | Resolved revision                        |
+|----------------------------------------------|------------------------------------------|
+| mlx-community/Mage-VL-OptiQ-4bit             | bde6c9c7146acff6af09e203245014f19306c5c5 |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit        | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit | 0555d34cb1ed80c0e61a5635194c70027b4c2ff3 |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit    | b4a74fa6001f1eca3b23eeeb702ffad2773a218f |
+| mlx-community/MiniCPM-V-4.6-4bit             | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
 
 ### Components and system
 
