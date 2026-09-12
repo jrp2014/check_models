@@ -275,6 +275,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The `torch` extra is back in `tools/update.sh`'s default install set (the
+  short-lived `INSTALL_TORCH=1` opt-in is reverted). mlx-vlm computes nothing
+  with torch, but transformers 5 constructs torch/torchvision-backed video
+  and image processors inside `AutoProcessor` for about half the roster, so
+  without the extra 16 of 33 cached models fail before any image is seen.
 - `tools/update.sh` parses conda's dry-run change lines again: conda prints
   `old --> new` with two dashes and the parser expected one, so it matched
   nothing and always reported the conda environment as already up to date.

@@ -624,6 +624,12 @@ pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly
 
 # Resolve project extras once; the install itself runs after MLX updates so
 # pyproject.toml performs the final dependency reconciliation.
+# The torch extra stays in the default set: mlx-vlm computes nothing with
+# torch, but transformers 5 builds torch/torchvision-backed video and image
+# processors inside AutoProcessor for about half the roster (Qwen3-VL,
+# Qwen3.5, GLM-4.6V, Ministral 3, Step, Pixtral, LFM2.5, Idefics3, SmolVLM2,
+# ...), so without it those processors fail to construct before any image is
+# seen. Verified 2026-09-12: 16 of 33 cached models failed to load without it.
 INSTALL_GROUPS=".[dev,extras,torch]"
 if [[ "${SKIP_TORCH:-0}" == "1" ]]; then
 	INSTALL_GROUPS=".[dev,extras]"
