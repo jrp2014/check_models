@@ -7,6 +7,11 @@ description: >
 
 # Add or Fix Type Checking
 
+Adapted from the transformers skill of the same name
+([`.ai/skills/add-or-fix-type-checking`](https://github.com/huggingface/transformers/tree/main/.ai/skills/add-or-fix-type-checking)),
+which targets ty alone; this version covers this repository's three checkers
+(mypy, ty, pyrefly), its conventions and its stub management, under conda + pip.
+
 ## Input
 
 - `<target>`: file or directory to type-check (defaults to `src/check_models.py`).

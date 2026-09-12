@@ -19,5 +19,6 @@ Key reminders:
   are fine
 - Keep `CHANGELOG.md` (`[Unreleased]`) up to date for maintainer-relevant changes, including refactors and tooling updates
 - For upstream mlx-vlm isolation/issues/cache discovery/fixes, read `.agents/skills/`
+  (also linked as `.claude/skills`)
   (`native-mlx-vlm-repro`, `upstream-mlx-vlm-issues`, `hf-cache-mlx-vlm-models`,
   `upstream-mlx-vlm-contributing`); use conda + pip only (never `uv`)

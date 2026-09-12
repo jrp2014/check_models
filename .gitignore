@@ -72,3 +72,6 @@ src/output/issues/test_*
 # All run artifacts are tracked and browsable on GitHub except the
 # append-only history, which grows without bound and stays local.
 src/output/results.history.jsonl
+
+# Claude Code session worktrees (the .claude/skills link is tracked)
+.claude/worktrees/

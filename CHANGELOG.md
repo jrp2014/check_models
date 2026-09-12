@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `.claude/skills` is a committed symlink to `.agents/skills` (transformers'
+  `make claude` pattern) so Claude Code discovers the project skills
+  natively from the one source; the skill-validation test checks the link,
+  and the type-checking skill now names its transformers origin.
 - `make clean` no longer deletes the untracked `output/results.history.jsonl`;
   the append-only cross-run history is the one output that must survive a
   clean, and it now has its own backup path in `tools/update.sh`.

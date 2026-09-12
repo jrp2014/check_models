@@ -224,7 +224,10 @@ The file is organized in this order — search for these exact landmark headers 
 ### 10. Agentic skills (`.agents/skills/`)
 
 Skills provide structured, step-by-step workflows for recurring tasks. Read the
-relevant `SKILL.md` **before** starting work of that kind.
+relevant `SKILL.md` **before** starting work of that kind. The same directory
+is linked as `.claude/skills` (a committed symlink, after transformers'
+`make claude` pattern) so Claude Code discovers the skills natively; edit only
+the `.agents/skills/` copy.
 
 | Skill | When to use | File |
 | ----- | ----------- | ---- |

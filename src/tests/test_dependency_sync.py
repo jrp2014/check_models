@@ -96,6 +96,8 @@ UPSTREAM_MLX_VLM_SKILLS = frozenset(
         "server-inference",
     }
 )
+# transformers keeps its skills under .ai/skills/ (linked into .agents and .claude).
+UPSTREAM_TRANSFORMERS_SKILLS = frozenset({"add-or-fix-type-checking"})
 SKYLOS_DANGER_ADVISORY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_danger_advisory.sh"
 SKYLOS_VERIFY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_verify.sh"
 
@@ -2283,3 +2285,10 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
                 assert not line.strip().startswith("uv "), f"{skill_dir.name}: uv command"
         for cited in re.findall(r"skills/skills/([a-z0-9-]+)", text):
             assert cited in UPSTREAM_MLX_VLM_SKILLS, f"{skill_dir.name} cites unknown {cited}"
+        for cited in re.findall(r"\.ai/skills/([a-z0-9-]+)", text):
+            assert cited in UPSTREAM_TRANSFORMERS_SKILLS, f"{skill_dir.name} cites unknown {cited}"
+    # Claude Code discovers project skills under .claude/skills; that path is a
+    # committed link to the single source of truth, never a second copy.
+    claude_skills = REPO_ROOT / ".claude" / "skills"
+    assert claude_skills.is_symlink(), ".claude/skills must be a symlink, not a copy"
+    assert claude_skills.resolve() == AGENT_SKILLS_DIR.resolve()

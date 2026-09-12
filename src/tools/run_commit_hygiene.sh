@@ -18,6 +18,11 @@ markdown_files=()
 needs_readme_sync=0
 
 while IFS= read -r -d '' file; do
+    # A staged symlink (e.g. .claude/skills -> ../.agents/skills) has no
+    # content of its own to check; its target's files are checked in place.
+    if [ -L "$file" ]; then
+        continue
+    fi
     staged_files+=("$file")
 
     case "$file" in
