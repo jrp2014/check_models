@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `make clean` no longer deletes the untracked `output/results.history.jsonl`;
+  the append-only cross-run history is the one output that must survive a
+  clean, and it now has its own backup path in `tools/update.sh`.
 - Cruft: the superseded cats.jpg preview asset (`source-image-c4aeb8d1…jpg`,
   referenced by no current report) is removed; the root `clean` target no
   longer names the long-gone `run.json`; two MLX-LM mentions left in the

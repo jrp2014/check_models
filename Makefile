@@ -91,7 +91,8 @@ clean: ## Remove generated files and caches
 	# Current retained run artifacts (issue drafts exist only after actionable crashes)
 	rm -f $(SRC)/output/reports/results.html $(SRC)/output/reports/model_gallery.md
 	rm -f $(SRC)/output/reports/diagnostics.md $(SRC)/output/index.md
-	rm -f $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
+	# results.history.jsonl is the append-only cross-run record; never cleaned here
+	rm -f $(SRC)/output/results.jsonl
 	rm -f $(SRC)/output/check_models.log $(SRC)/output/environment.log
 	rm -rf $(SRC)/output/issues
 	# Legacy pre-simplification outputs, retained here only for cleanup compatibility
