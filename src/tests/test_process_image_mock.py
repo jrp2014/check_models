@@ -2158,22 +2158,28 @@ class TestStreamObservations:
         """Special ids decode to names; EOS-like names are not leakage."""
 
         class _Tokenizer:
-            all_special_ids = (1, 2, 3)
+            all_special_ids = (1, 2, 3, 4)
+            # Upstream's StoppingCriteria: EOS plus generation_config stops
+            # such as a turn-end marker that is not the tokenizer's eos_token.
+            stopping_criteria = types.SimpleNamespace(eos_token_ids=[1, 4])
 
             @staticmethod
             def convert_ids_to_tokens(token_id: int) -> str:
-                return {1: "<|im_end|>", 2: "</think>", 3: "<|box|>"}[token_id]
+                return {1: "<|im_end|>", 2: "</think>", 3: "<|box|>", 4: "<turn|>"}[token_id]
 
         processor = types.SimpleNamespace(tokenizer=_Tokenizer())
         emitted = check_models._emitted_special_tokens(
-            [50, 2, 51, 3, 3, 1], processor, excluded={"<|im_end|>"}
+            [50, 2, 51, 3, 3, 4, 1], processor, excluded={"<|im_end|>"}
         )
         assert emitted == ("</think>", "<|box|>")
+        assert check_models._upstream_stop_token_ids(_Tokenizer()) == frozenset({1, 4})
+        assert check_models._upstream_stop_token_ids(object()) == frozenset()
         assert check_models._emitted_special_tokens([2], object(), excluded=()) == ()
 
     def test_success_result_reads_observations_off_the_output(self, test_image: Path) -> None:
         """Measured TTFT, first-token peak and id-detected tokens reach the result."""
         output = _FakeGenerationResult()
+        output.text = "Hello <|box|> world"  # reached the text, so it is leakage
         observations = check_models.StreamObservations(
             started_at=10.0, first_chunk_at=10.75, first_chunk_peak_memory_gb=3.25
         )

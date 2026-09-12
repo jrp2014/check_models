@@ -1425,16 +1425,25 @@ def test_duplicated_answer_is_not_flagged_for_a_removed_thinking_draft_or_repeti
 def test_id_detected_special_tokens_join_the_text_detected_ones() -> None:
     """A control token emitted by id is leakage unless it is a declared wrapper or a trace marker."""
     plain = check_models.analyze_generation_text(
-        "Title: A\nDescription: B.\nKeywords: c, d",
+        "Title: A [box]\nDescription: B.\nKeywords: c, d",
         generated_tokens=20,
         assessment_profile="metadata",
-        emitted_special_tokens=["<|box|>", "<|box|>"],
+        emitted_special_tokens=["[box]", "[box]"],
     )
-    assert plain.emitted_special_tokens == ["<|box|>"]
-    assert "<|box|>" in plain.unexpected_special_tokens
+    assert plain.emitted_special_tokens == ["[box]"]
+    assert "[box]" in plain.unexpected_special_tokens
     assert "unexpected_special_token" in check_models._quality_observations(
         text="Title: A", analysis=plain
     )
+    # Consumed by the processor before the text was returned: evidence, not leakage.
+    consumed = check_models.analyze_generation_text(
+        "Title: A\nDescription: B.\nKeywords: c, d",
+        generated_tokens=20,
+        assessment_profile="metadata",
+        emitted_special_tokens=["<|box|>"],
+    )
+    assert consumed.emitted_special_tokens == ["<|box|>"]
+    assert consumed.unexpected_special_tokens == []
     declared = check_models.analyze_generation_text(
         "Title: A\nDescription: B.\nKeywords: c, d",
         generated_tokens=20,
@@ -1446,7 +1455,7 @@ def test_id_detected_special_tokens_join_the_text_detected_ones() -> None:
     # The tokenizer vocabulary is the strip list for the analysis copy, not a
     # licence: a declared-but-unexpected control token emitted by id survives.
     vocabulary = check_models.analyze_generation_text(
-        "Title: A\nDescription: B.\nKeywords: c, d",
+        "Title: A <|box|>\nDescription: B.\nKeywords: c, d",
         generated_tokens=20,
         assessment_profile="metadata",
         known_special_tokens=["<|box|>", "<|im_end|>"],
@@ -1490,9 +1499,8 @@ def test_id_detected_token_evidence_survives_the_tokenizer_vocabulary(
 ) -> None:
     """Declaring a token special does not make it expected: id evidence reaches the result.
 
-    The output text has already been cleaned of the token, so only the id
-    detector saw it; the diagnostics-populated and diagnostics-free paths
-    must agree.
+    The token also reached the text, so it is leakage; the
+    diagnostics-populated and diagnostics-free paths must agree.
     """
     diagnostics = check_models.PromptDiagnostics(
         eos_token="<|im_end|>",  # noqa: S106 - tokenizer stop marker, not a secret
@@ -1503,7 +1511,9 @@ def test_id_detected_token_evidence_survives_the_tokenizer_vocabulary(
         model_name="example/vocabulary-declared",
         success=True,
         assessment_profile="metadata",
-        generation=_Generation("Title: A\nDescription: B.\nKeywords: c, d", generation_tokens=20),
+        generation=_Generation(
+            "Title: A <|box|>\nDescription: B.\nKeywords: c, d", generation_tokens=20
+        ),
         prompt_diagnostics=diagnostics if with_diagnostics else None,
         emitted_special_tokens=("<|box|>",),
     )
@@ -1511,6 +1521,18 @@ def test_id_detected_token_evidence_survives_the_tokenizer_vocabulary(
     assert populated.quality_analysis is not None
     assert populated.quality_analysis.emitted_special_tokens == ["<|box|>"]
     assert populated.quality_analysis.unexpected_special_tokens == ["<|box|>"]
+    # Cleaned text: the id evidence survives, the leakage verdict does not.
+    cleaned = check_models._populate_result_quality_analysis(
+        replace(
+            result,
+            generation=_Generation(
+                "Title: A\nDescription: B.\nKeywords: c, d", generation_tokens=20
+            ),
+        )
+    )
+    assert cleaned.quality_analysis is not None
+    assert cleaned.quality_analysis.emitted_special_tokens == ["<|box|>"]
+    assert cleaned.quality_analysis.unexpected_special_tokens == []
     assert "unexpected_special_token" in check_models._quality_observations(
         text="Title: A", analysis=populated.quality_analysis
     )

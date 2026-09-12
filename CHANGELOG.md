@@ -313,9 +313,14 @@ Notable changes to this project will be documented in this file.
   strip list for the analysis copy), so every id-detected token was
   discarded whenever prompt diagnostics were populated and no run ever
   reported `emitted_special_tokens`. Only the generation contract's own
-  wrappers (EOS, configured stops, thinking start/end) neutralise id
-  evidence now, and a recognised thinking trace still neutralises its own
-  markers.
+  wrappers neutralise id evidence now: the ids upstream's stopping criteria
+  stop on (tokenizer EOS plus generation_config stops such as `<turn|>` or
+  `<end_of_utterance>`), configured stops and thinking start/end; a
+  recognised thinking trace still neutralises its own markers. Id evidence
+  is reported as "Special tokens emitted (by token id)" and counts as
+  leakage only when the token also reached the returned text, so markers a
+  processor consumed (GLM's box markers under `clean_output`) are visible
+  facts without a usability penalty.
 - Checkpoint-declared sampling values that JSON parses to `inf` (`1e400`)
   or to an integer too wide for a float are rejected as invalid instead of
   being forwarded to generation or raising `OverflowError` during

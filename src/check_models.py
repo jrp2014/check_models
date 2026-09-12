@@ -4352,6 +4352,11 @@ def _id_detected_special_tokens(
     return [token for token in _dedupe_preserve_order(emitted) if token and token not in declared]
 
 
+def _tokens_reaching_text(tokens: Sequence[str], text: str) -> list[str]:
+    """Return the tokens whose decoded form is present in the returned text."""
+    return [token for token in tokens if token in text]
+
+
 def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over every prompt-contract knob  # skylos: ignore[SKY-C303]
     text: str,
     generated_tokens: int | None,
@@ -4450,11 +4455,14 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
     # start/end) neutralise them, never the tokenizer's whole special-token
     # vocabulary: every id-detected token is in that vocabulary by
     # construction, so filtering on it would discard the evidence outright.
+    # They count as leakage only when their decoded form reached the text;
+    # a token the processor consumed (e.g. box markers stripped by
+    # clean_output) stays reported as emitted evidence without penalty.
     # A legitimate thinking trace still neutralises its markers below.
     id_detected = _id_detected_special_tokens(
         emitted_special_tokens, configured_generation_wrappers
     )
-    unexpected_special_tokens.extend(id_detected)
+    unexpected_special_tokens.extend(_tokens_reaching_text(id_detected, text))
     if reasoning.has_thinking_trace:
         # A legitimate detected trace neutralises its own delimiters, including
         # <|...|>-style pairs where the generic control-token regex captures
@@ -13881,6 +13889,17 @@ def _observe_token(observations: StreamObservations | None, chunk: object) -> No
         observations.token_ids.append(token)
 
 
+def _upstream_stop_token_ids(tokenizer: object) -> frozenset[int]:
+    """Ids upstream's stopping criteria end a generation on (EOS plus generation_config stops)."""
+    criteria = getattr(tokenizer, "stopping_criteria", None)
+    raw_ids = getattr(criteria, "eos_token_ids", None)
+    if not isinstance(raw_ids, Sequence | set | frozenset):
+        return frozenset()
+    return frozenset(
+        ident for ident in raw_ids if isinstance(ident, int) and not isinstance(ident, bool)
+    )
+
+
 def _emitted_special_tokens(
     token_ids: Sequence[int],
     processor: object,
@@ -13890,8 +13909,10 @@ def _emitted_special_tokens(
     """Decode the special token ids the stream emitted, in first-seen order.
 
     Detection by id catches control tokens whose decoded form the text regex
-    does not recognise. ``excluded`` names (EOS and configured stop tokens)
-    are expected terminators, not leakage.
+    does not recognise. Expected terminators are not leakage: the ids
+    upstream's stopping criteria stop on (tokenizer EOS plus the checkpoint's
+    generation_config stops such as ``<turn|>`` or ``<end_of_utterance>``)
+    and the ``excluded`` names (EOS and configured stop tokens).
     """
     tokenizer = getattr(processor, "tokenizer", processor)
     raw_ids = getattr(tokenizer, "all_special_ids", None)
@@ -13899,6 +13920,7 @@ def _emitted_special_tokens(
     if not raw_ids or not callable(convert):
         return ()
     special = {ident for ident in raw_ids if isinstance(ident, int) and not isinstance(ident, bool)}
+    special -= _upstream_stop_token_ids(tokenizer)
     seen: list[str] = []
     for token_id in token_ids:
         if token_id not in special:
