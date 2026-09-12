@@ -2247,20 +2247,13 @@ def test_pip_show_helpers_survive_set_e_pipefail_with_chatty_pip(tmp_path: Path)
     assert "LOCATION: /tmp/mlx" in completed.stdout
 
 
-def _skill_frontmatter(text: str) -> dict[str, str]:
-    """Parse the YAML-ish frontmatter block, joining folded (`>`) continuation lines."""
+def _skill_frontmatter(text: str) -> dict[str, object]:
+    """Return a SKILL.md's YAML frontmatter as a mapping."""
     match = re.match(r"^---\n(.*?)\n---\n", text, re.DOTALL)
     assert match is not None, "SKILL.md must start with a frontmatter block"
-    fields: dict[str, str] = {}
-    current: str | None = None
-    for line in match.group(1).splitlines():
-        if line.startswith((" ", "\t")) and current is not None:
-            fields[current] = (fields[current] + " " + line.strip()).strip()
-            continue
-        key, _, value = line.partition(":")
-        current = key.strip()
-        fields[current] = value.strip().lstrip(">").strip()
-    return fields
+    frontmatter = yaml.safe_load(match.group(1))
+    assert isinstance(frontmatter, dict), "SKILL.md frontmatter must be a mapping"
+    return frontmatter
 
 
 def test_agent_skills_are_well_formed_and_listed() -> None:
@@ -2278,7 +2271,7 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
         text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
         frontmatter = _skill_frontmatter(text)
         assert frontmatter.get("name") == skill_dir.name, skill_dir.name
-        assert len(frontmatter.get("description", "")) >= 40, skill_dir.name
+        assert len(str(frontmatter.get("description", ""))) >= 40, skill_dir.name
         assert f"| `{skill_dir.name}` |" in copilot_text, f"{skill_dir.name} missing from table"
         for fence in re.findall(r"```[a-z]*\n(.*?)```", text, re.DOTALL):
             for line in fence.splitlines():
