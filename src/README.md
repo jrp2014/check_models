@@ -622,8 +622,9 @@ Left unset, `--temperature`, `--top-p`, `--top-k`, `--min-p` and
 the harness defaults apply only where the checkpoint declares nothing. Each
 result records where every setting came from (`sampling_sources` in
 `results.jsonl`, "Sampling settings source" in the diagnostics), and the run
-summary counts how many models sampled with checkpoint settings. Sampled
-outputs vary between runs unless `--seed` is given.
+summary counts how many models sampled with checkpoint settings. `--seed`
+defaults to 0 so sampled outputs reproduce from run to run on a given MLX
+version; pass a different seed for an independent draw.
 
 #### Generation Control
 
@@ -1216,7 +1217,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--top-p` | float | checkpoint value, else 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. Unset, taken from the checkpoint's `generation_config.json` when declared. |
 | `--min-p` | float | checkpoint value, else 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. Unset, taken from the checkpoint's `generation_config.json` when declared. |
 | `--top-k` | int | checkpoint value, else 0 | Top-k sampling limit. 0 disables top-k filtering. Unset, taken from the checkpoint's `generation_config.json` when declared. |
-| `--seed` | int | (none) | Seed forwarded to upstream generation sampling. |
+| `--seed` | int | 0 | Seed forwarded to upstream generation sampling. A fixed default keeps runs reproducible on a given MLX version now that models sample with their checkpoint-declared temperatures; pass another value for an independent draw. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
 | `--presence-penalty` | float | (none) | Additive penalty for tokens that already appeared in generated context. |

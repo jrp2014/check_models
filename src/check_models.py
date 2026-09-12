@@ -4445,11 +4445,14 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         for marker in (pair.start, pair.end)
     )
     unexpected_special_tokens.extend(empty_reported_markers)
-    # Ids the stream emitted are evidence in their own right; declared
-    # wrappers and the thinking markers below are neutralised exactly as for
-    # the text-detected tokens.
+    # Ids the stream emitted are evidence in their own right. Only the
+    # generation contract's own wrappers (EOS, configured stops, thinking
+    # start/end) neutralise them, never the tokenizer's whole special-token
+    # vocabulary: every id-detected token is in that vocabulary by
+    # construction, so filtering on it would discard the evidence outright.
+    # A legitimate thinking trace still neutralises its markers below.
     id_detected = _id_detected_special_tokens(
-        emitted_special_tokens, {*known_special_tokens, *configured_generation_wrappers}
+        emitted_special_tokens, configured_generation_wrappers
     )
     unexpected_special_tokens.extend(id_detected)
     if reasoning.has_thinking_trace:
@@ -11984,11 +11987,21 @@ _DECLARED_SAMPLING_BOUNDS: Final[dict[str, Callable[[float], bool]]] = {
 
 
 def _declared_sampling_value_is_valid(key: str, value: object) -> bool:
-    """Bound a checkpoint-declared sampling value to what upstream sampling accepts."""
+    """Bound a checkpoint-declared sampling value to what upstream sampling accepts.
+
+    JSON admits numbers Python parses to ``inf`` (``1e400``) or to integers too
+    wide for a float; both are rejected rather than forwarded or raised.
+    """
     if isinstance(value, bool) or not isinstance(value, int | float):
         return False
     within_bounds = _DECLARED_SAMPLING_BOUNDS.get(key)
-    return within_bounds is not None and within_bounds(float(value))
+    if within_bounds is None:
+        return False
+    try:
+        number = float(value)
+    except OverflowError:
+        return False
+    return math.isfinite(number) and within_bounds(number)
 
 
 def _apply_declared_sampling(
@@ -24144,10 +24157,11 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     server_group.add_argument(
         "--seed",
         type=int,
-        default=None,
+        default=0,
         help=(
-            "Seed forwarded to upstream generation sampling. "
-            "Matches the MLX-VLM server request field."
+            "Seed for upstream generation sampling. Default 0, so runs whose models sample "
+            "(checkpoint-declared temperatures) reproduce on a given MLX version; pass "
+            "another value for an independent draw."
         ),
     )
     server_group.add_argument(

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import math
 import types
 from argparse import Namespace
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pytest
@@ -1441,6 +1443,17 @@ def test_id_detected_special_tokens_join_the_text_detected_ones() -> None:
         emitted_special_tokens=["<|box|>"],
     )
     assert declared.emitted_special_tokens == []
+    # The tokenizer vocabulary is the strip list for the analysis copy, not a
+    # licence: a declared-but-unexpected control token emitted by id survives.
+    vocabulary = check_models.analyze_generation_text(
+        "Title: A\nDescription: B.\nKeywords: c, d",
+        generated_tokens=20,
+        assessment_profile="metadata",
+        known_special_tokens=["<|box|>", "<|im_end|>"],
+        emitted_special_tokens=["<|box|>"],
+    )
+    assert vocabulary.emitted_special_tokens == ["<|box|>"]
+    assert "<|box|>" in vocabulary.unexpected_special_tokens
     traced = check_models.analyze_generation_text(
         "<think>reasoning</think>\nTitle: A\nDescription: B.\nKeywords: c, d",
         generated_tokens=20,
@@ -1469,6 +1482,48 @@ def test_verified_image_token_count_requires_the_second_pass_to_match_generation
     assert check_models._verified_image_token_count(diagnostics, 274) == 256
     assert check_models._verified_image_token_count(diagnostics, 273) is None
     assert check_models._verified_image_token_count(None, 274) is None
+
+
+@pytest.mark.parametrize("with_diagnostics", [True, False])
+def test_id_detected_token_evidence_survives_the_tokenizer_vocabulary(
+    with_diagnostics: bool,
+) -> None:
+    """Declaring a token special does not make it expected: id evidence reaches the result.
+
+    The output text has already been cleaned of the token, so only the id
+    detector saw it; the diagnostics-populated and diagnostics-free paths
+    must agree.
+    """
+    diagnostics = check_models.PromptDiagnostics(
+        eos_token="<|im_end|>",  # noqa: S106 - tokenizer stop marker, not a secret
+        special_tokens=("<|im_start|>", "<|im_end|>", "<|box|>"),
+        generate_kwargs={"eos_tokens": ["<|im_end|>"]},
+    )
+    result = check_models.PerformanceResult(
+        model_name="example/vocabulary-declared",
+        success=True,
+        assessment_profile="metadata",
+        generation=_Generation("Title: A\nDescription: B.\nKeywords: c, d", generation_tokens=20),
+        prompt_diagnostics=diagnostics if with_diagnostics else None,
+        emitted_special_tokens=("<|box|>",),
+    )
+    populated = check_models._populate_result_quality_analysis(result)
+    assert populated.quality_analysis is not None
+    assert populated.quality_analysis.emitted_special_tokens == ["<|box|>"]
+    assert populated.quality_analysis.unexpected_special_tokens == ["<|box|>"]
+    assert "unexpected_special_token" in check_models._quality_observations(
+        text="Title: A", analysis=populated.quality_analysis
+    )
+    if not with_diagnostics:
+        return
+    # A configured stop that reached the stream by id stays neutral (the
+    # stream detector already drops EOS/stops; this pins the analysis side).
+    stopped = check_models._populate_result_quality_analysis(
+        replace(result, emitted_special_tokens=("<|im_end|>",))
+    )
+    assert stopped.quality_analysis is not None
+    assert stopped.quality_analysis.emitted_special_tokens == []
+    assert stopped.quality_analysis.unexpected_special_tokens == []
 
 
 def test_declared_sampling_defaults_read_generation_config(tmp_path: Path) -> None:
@@ -1556,6 +1611,26 @@ def test_declared_sampling_fills_only_what_the_cli_left_unset() -> None:
         check_models._CHECKPOINT_SAMPLING_DESTS, "default"
     )
     assert untouched == {"temperature": 0.0}
+
+
+def test_declared_sampling_rejects_non_finite_and_overflowing_numbers() -> None:
+    """A JSON number that parses to inf/nan or overflows float is ignored, not forwarded."""
+    valid = check_models._declared_sampling_value_is_valid
+    for key in ("temperature", "top_p", "min_p", "top_k", "repetition_penalty"):
+        assert valid(key, math.inf) is False
+        assert valid(key, -math.inf) is False
+        assert valid(key, math.nan) is False
+        assert valid(key, 10**401) is False
+    assert valid("temperature", 0.7) is True
+    payload = json.loads('{"temperature": 1e400, "top_k": ' + "9" * 401 + "}")
+    assert payload["temperature"] == math.inf
+    assert isinstance(payload["top_k"], int)
+    generate_kwargs = cast("check_models.GenerateKwargs", {"temperature": 0.0, "top_k": 0})
+    sources = check_models._apply_declared_sampling(generate_kwargs, payload, frozenset())
+    assert generate_kwargs["temperature"] == 0.0
+    assert generate_kwargs["top_k"] == 0
+    assert sources["temperature"] == "default"
+    assert sources["top_k"] == "default"
 
 
 def test_declared_sampling_values_are_bounded() -> None:

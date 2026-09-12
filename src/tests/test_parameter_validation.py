@@ -635,6 +635,7 @@ class TestUpstreamCliParity:
         "--max-tokens": "lane-resolved default (500/200/1000) vs upstream free-form 2048",
         "--prompt": "harness builds a metadata-cataloguing prompt when unset",
         "--revision": "None distinguishes requested vs resolved revisions in reports",
+        "--seed": "0 keeps sampled runs reproducible now that checkpoint temperatures apply",
         "--thinking-start-token": "None defers to the upstream default at call time",
         "--trust-remote-code": "harness defaults on, with a security warning and opt-out",
     }

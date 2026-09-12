@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `--seed` defaults to 0 instead of none: with sampling settings now taken from
+  each checkpoint, a fixed seed keeps sampled outputs reproducible from run to
+  run on a given MLX version. Native repro commands carry `--seed 0`.
 - Sampling settings left unset on the command line (`--temperature`,
   `--top-p`, `--top-k`, `--min-p`, `--repetition-penalty`) now take the
   values each checkpoint declares in its `generation_config.json`; a given
@@ -304,6 +307,19 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Token-id special-token evidence now survives analysis. The id detector
+  selects from the tokenizer's `all_special_ids`, but the analysis filtered
+  its output against the tokenizer's whole special-token vocabulary (the
+  strip list for the analysis copy), so every id-detected token was
+  discarded whenever prompt diagnostics were populated and no run ever
+  reported `emitted_special_tokens`. Only the generation contract's own
+  wrappers (EOS, configured stops, thinking start/end) neutralise id
+  evidence now, and a recognised thinking trace still neutralises its own
+  markers.
+- Checkpoint-declared sampling values that JSON parses to `inf` (`1e400`)
+  or to an integer too wide for a float are rejected as invalid instead of
+  being forwarded to generation or raising `OverflowError` during
+  preparation; the harness default and a `default` source are kept.
 - The `torch` extra is back in `tools/update.sh`'s default install set (the
   short-lived `INSTALL_TORCH=1` opt-in is reverted). mlx-vlm computes nothing
   with torch, but transformers 5 constructs torch/torchvision-backed video
