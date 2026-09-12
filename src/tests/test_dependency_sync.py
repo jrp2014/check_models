@@ -2252,3 +2252,35 @@ def test_agent_skills_are_well_formed_and_listed() -> None:
     claude_skills = REPO_ROOT / ".claude" / "skills"
     assert claude_skills.is_symlink(), ".claude/skills must be a symlink, not a copy"
     assert claude_skills.resolve() == AGENT_SKILLS_DIR.resolve()
+
+
+def test_update_script_parses_conda_change_lines_as_conda_prints_them() -> None:
+    """The conda dry-run parser must match real change lines, else updates never run.
+
+    Conda writes ``  name   old --> new`` with two dashes; the script once
+    expected a single dash, matched nothing, and always reported the
+    environment as already up to date. The pattern is read from the script so
+    the test exercises the real grep invocation.
+    """
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    match = re.search(
+        r"CONDA_CHANGES=\$\(echo \"\$DRY_RUN_OUTPUT\" \| grep -E '([^']+)'", update_script
+    )
+    assert match is not None
+    pattern = match.group(1)
+    sample = (
+        "The following packages will be UPDATED:\n"
+        "  python                          3.14.7-hedc06ab_101_cp314 --> 3.14.8-h80e0c04_101_cp314 \n"
+        "  tk           pkgs/main/osx-arm64::tk-9.0.4-h4792a3e_1 --> pkgs/main/osx-arm64::tk-9.0.5-h4792a3e_1 \n"
+        "  openssl                                       3.5.5-h7b0d5a0_0 -> 3.5.6-h7b0d5a0_0 \n"
+        "# All requested packages already installed.\n"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed /usr/bin/grep runs the script's own pattern on a literal sample
+        ["/usr/bin/grep", "-E", pattern],
+        input=sample,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    names = [line.split()[0] for line in result.stdout.splitlines()]
+    assert names == ["python", "tk", "openssl"], result.stdout

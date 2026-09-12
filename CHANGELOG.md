@@ -281,6 +281,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/update.sh` parses conda's dry-run change lines again: conda prints
+  `old --> new` with two dashes and the parser expected one, so it matched
+  nothing and always reported the conda environment as already up to date.
+  Python patch releases (the env pins `python 3.14.*`) were therefore never
+  adopted by the script. A test runs the real grep pattern against captured
+  conda output.
 - The diagnostics triage table's "Mechanical checks" column now shows the
   human gloss (no concerns detected / concerns detected / major concerns)
   like every other surface; it still printed the machine usability code.

@@ -146,8 +146,10 @@ if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
 		echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
 		DRY_RUN_OUTPUT=$(conda update --all --dry-run 2>&1) || true
 
-		# Extract package names conda wants to change
-		CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+->\s+\S+' | awk '{print $1}' 2>/dev/null || true)
+		# Extract package names conda wants to change. Conda prints change lines
+		# as "  name   old-build --> new-build" (two dashes); accept one or two so
+		# the parse cannot silently report "already up to date" on a format tweak.
+		CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+-{1,2}>\s+\S+' | awk '{print $1}' 2>/dev/null || true)
 
 		if [[ -z "$CONDA_CHANGES" ]]; then
 			echo "[update.sh] Conda environment is already up to date"
