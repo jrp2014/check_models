@@ -9,13 +9,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 8m 32s
+- Run duration: 9m 20s
 - Evaluation lane: assisted
+- Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- Input image: JPEG, 8,693 x 5,796 pixels (50.4 MP), 43.9 MB
-- Models attempted: 33 (completed 33, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 25, concerns detected 4, major concerns 4, not assessed 0
-- Top observations: Unrecognised model control tokens remain visible (1), Required labelled fields not detected (4), Response appears cut off at the token limit (1), Conversation-role control tokens remain visible (1), Repeated keyword entries (3)
+- Input image: JPEG, 9,984 x 6,656 pixels (66.5 MP), 44.7 MB
+- Models attempted: 38 (completed 37, crashed 1, indeterminate 0)
+- Mechanical checks: no concerns detected 28, concerns detected 4, major concerns 5, not assessed 1
+- Top observations: Response repeats the same text (2), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (1), Required labelled fields not detected (3), Response appears cut off at the token limit (1)
 
 ## Start here
 
@@ -23,9 +24,13 @@ establish fitness for other tasks.
 
 ## Artifacts
 
-- [results.html](https://github.com/jrp2014/check_models/blob/main/src/output/reports/results.html)
+- [results.html (self-contained page; download to view, GitHub shows its source)](https://github.com/jrp2014/check_models/blob/main/src/output/reports/results.html)
 - [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)
 - [diagnostics.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md)
 - [results.jsonl](https://github.com/jrp2014/check_models/blob/main/src/output/results.jsonl)
 - [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)
 - [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log)
+
+## Issue drafts
+
+- [mlx-community/Mage-VL-OptiQ-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Mage-VL-OptiQ-4bit.md)

@@ -1,72 +1,6 @@
-# Diagnostics
+# Crash: mlx-community/Mage-VL-OptiQ-4bit
 
-<!-- markdownlint-disable MD004 MD037 -->
-
-This run records model responses to one shared image and prompt (evaluation
-lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
-the image, prompt and final answers before choosing a model. Results do not
-establish fitness for other tasks.
-
-## Run Summary
-
-- *Evaluation lane:* assisted
-- *Prompt hints:* the image's description and keyword hints were included in
-  the prompt, so field content may be copied from them rather than seen
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 44.7 MB
-
-Outcome counts
-
-| Outcome             | Count |
-|---------------------|-------|
-| Attempted           | 38    |
-| Conclusive outcomes | 38    |
-| Completed           | 37    |
-| Crashed             | 1     |
-| Indeterminate       | 0     |
-
-Maintainer status counts
-
-| Maintainer status              | Count |
-|--------------------------------|-------|
-| actionable failure             | 1     |
-| none                           | 34    |
-| observation needs reproduction | 3     |
-
-Mechanical-check counts
-
-| Mechanical checks    | Count |
-|----------------------|-------|
-| not assessed         | 1     |
-| major concerns       | 5     |
-| no concerns detected | 28    |
-| concerns detected    | 4     |
-
-Observation counts
-
-| Observation                                                  | Count |
-|--------------------------------------------------------------|-------|
-| Response repeats the same text                               | 2     |
-| Generation was stopped early after sustained repeated output | 2     |
-| Unrecognised model control tokens remain visible             | 1     |
-| Required labelled fields not detected                        | 3     |
-| Response appears cut off at the token limit                  | 1     |
-| Internal reasoning block appears incomplete                  | 1     |
-| Repeated keyword entries                                     | 5     |
-
-## Triage
-
-| Model                                                                                                        | Execution | Mechanical checks | Maintainer status              | Observations                                                                                  |
-|--------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
-| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                             | crashed   | not assessed      | actionable_failure             | none                                                                                          |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                   | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
-| [mlx-community/North-Micro-Vision-Instruct-4bit](#diagnostic-mlx-community-north-micro-vision-instruct-4bit) | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                              | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                     |
-
-## Crashes requiring action
-
-<a id="diagnostic-mlx-community-mage-vl-optiq-4bit"></a>
+## Maintainer evidence
 
 ### mlx-community/Mage-VL-OptiQ-4bit
 
@@ -1992,236 +1926,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 [23:12:58] DEBUG    HF Cache Info for mlx-community/Mage-VL-OptiQ-4bit: size=3745.9 MB, files=11
 ```
 
-## Completed Runs with Observations
-
-<a id="diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit"></a>
-
-<details>
-<summary>mlx-community/llm-jp-4-vl-9b-mlx-4bit — unusable — repeated text; stopped early: repeating; control tokens visible; labelled fields not detected</summary>
-
-### mlx-community/llm-jp-4-vl-9b-mlx-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort,
-  missing_requested_sections, unexpected_special_token
-- *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Labelled fields not detected:* ["title", "description", "keywords"]
-- *Repeated fragment:* phrase: "a white swan swimming..."
-- *Unexpected special tokens:* ["&lt;|channel|&gt;", "&lt;|message|&gt;"]
-- *Resolved model revision:* 9c056d48b1e611dc586139a5deb927ae363cfe6f
-- *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5099616660008905
-- *Peak memory at first token (GB):* 6.72582142
-- *Post-cleanup active memory (GB):* 0.011863376
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2195
-- *Prompt composition:* 2,195 = 403 text/template + 1,792 image tokens (82%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 5.68
-- *Parameter count:* 9.00B (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
-- *Load active memory vs checkpoint:* 1.00x (5.69 GB vs 5.68 GB on disk)
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;|return|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<|channel|> analysis<|message|> The image shows a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-north-micro-vision-instruct-4bit"></a>
-
-<details>
-<summary>mlx-community/North-Micro-Vision-Instruct-4bit — unusable — repeated text; stopped early: repeating; duplicate keywords</summary>
-
-### mlx-community/North-Micro-Vision-Instruct-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Repeated fragment:* phrase: "water, swan in the..."
-- *Title word count:* 5
-- *Keyword count:* 40
-- *Duplicate keywords:* ["swan", "water", "foliage", "swan in the water",
-  "swan in the river"]
-- *Resolved model revision:* 87466363e6c5f57adf91c18c3a62c3c74765f8df
-- *Processor class:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
-- *Tokenizer class:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.74482895800611
-- *Peak memory at first token (GB):* 3.885618449
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 0.8; top_k 20; run used temperature 0.0
-- *Post-cleanup active memory (GB):* 0.00570289
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4083
-- *Prompt composition:* 4,083 = 333 text/template + 3,750 image tokens (92%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 2.17
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 500,000 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.18 GB vs 2.17 GB on disk)
-- *Generation tokens:* 200
-- *Configured EOS token ID:* 255001
-- *Configured EOS token:* &lt;|END_OF_TURN_TOKEN|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: Swan on River, Waterfront Scene
-
-Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery and leisure boats moored alongside riverside residential buildings. The scene captures a serene moment with the swan as the focal point, reflecting on the tranquil waterway and the architectural backdrop.
-
-Keywords: Swan, River, Waterfront, Marina, Leisure boats, Residential buildings, Greenery, Water, Aquatic bird, Architecture, Boat, Reflection, Calm, Tranquil, Nature, Wildlife, Waterfowl, Foliage, Foliage, Water, Swan, Riverbank, Swan on water, Swan gliding, Swan in water, Swan in the water, Swan in the river, Swan in the water, Swan in the river, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in the water, Swan in
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-minicpm-v-46-4bit"></a>
-
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-4bit — unusable — incomplete thinking block</summary>
-
-### mlx-community/MiniCPM-V-4.6-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 11
-- *Keyword count:* 19
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.572870874995715
-- *Peak memory at first token (GB):* 3.217850312
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0; run used
-  temperature 0.0
-- *Post-cleanup active memory (GB):* 0.00335984
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 932
-- *Prompt composition:* 932 = 343 text/template (tokenizer-exact) + 589
-  non-text (63%, image/audio expansion)
-- *Checkpoint weights (GB):* 2.16
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 262,144 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.16 GB vs 2.16 GB on disk)
-- *Generation tokens:* 122
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>
-Here's the structured output based on the provided context and hints:
-
-Title:
-A graceful swan glides among moored boats on a tranquil river.
-
-Description:
-The image shows a white swan moving through calm water, surrounded by leisure boats and greenery, with residential buildings in the background. The scene is peaceful and reflects the natural and man-made elements.
-
-Keywords: swan, river, boats, marina, greenery, reflection, water, architecture, trees, vegetation, waterway, aquatic, bird, leisure, residential, buildings, calm, peaceful, daylight
-```
-
-</details>
-
-## Indeterminate Attempts
-
-None.
-
-## Model Compliance Notes (not maintainer issues)
-
-Prompt-compliance observations (missing fields, constraint counts, hint
-copying, instruction echo, cap hits) inform model selection; complete evidence
-is in the model gallery.
-
-| Model                                            | Mechanical checks | Observations                                         |
-|--------------------------------------------------|-------------------|------------------------------------------------------|
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | major concerns    | labelled fields not detected; cut off at token limit |
-| mlx-community/nanoLLaVA-1.5-4bit                 | major concerns    | labelled fields not detected                         |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                 | concerns detected | duplicate keywords                                   |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | concerns detected | duplicate keywords                                   |
-| mlx-community/LFM2.5-VL-1.6B-bf16                | concerns detected | duplicate keywords                                   |
-| mlx-community/Molmo2-8B-4bit                     | concerns detected | duplicate keywords                                   |
-
-## Context for completions without detected concerns
-
-<details>
-<summary>Completions without detected concerns</summary>
-
-| Model                                                 | Runtime identity                                           | Performance                                           |
-|-------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2393 prompt / 159 generated; 30.4 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 591 prompt / 79 generated; 53.2 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 590 prompt / 152 generated; 29.7 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 595 prompt / 99 generated; 130 tok/s; 16 GB peak      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 595 prompt / 93 generated; 26.4 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed          | 591 prompt / 73 generated; 133 tok/s; 6.0 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed          | 6450 prompt / 106 generated; 77.9 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed       | 6450 prompt / 107 generated; 43.1 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1379 prompt / 65 generated; 179 tok/s; 4.7 GB peak    |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed        | 2612 prompt / 138 generated; 32.2 tok/s; 18 GB peak   |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2113 prompt / 77 generated; 34.4 tok/s; 17 GB peak    |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit          | rev e5abbe34cbfa; KimiVLProcessor; stop completed          | 1324 prompt / 807 generated; 66.3 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 12c5ae493041; Lfm2VlProcessor; stop completed          | 2103 prompt / 80 generated; 213 tok/s; 4.0 GB peak    |
-| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed        | 391 prompt / 98 generated; 111 tok/s; 7.0 GB peak     |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2926 prompt / 109 generated; 66.9 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed        | 2926 prompt / 187 generated; 64.0 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2925 prompt / 102 generated; 189 tok/s; 7.8 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed         | 1289 prompt / 135 generated; 105 tok/s; 24 GB peak    |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1133 prompt / 107 generated; 56.8 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed         | 3116 prompt / 102 generated; 39.1 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16549 prompt / 899 generated; 88.0 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16547 prompt / 171 generated; 83.0 tok/s; 23 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16563 prompt / 108 generated; 103 tok/s; 25 GB peak   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16563 prompt / 86 generated; 90.8 tok/s; 11 GB peak   |
-| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed         | 16563 prompt / 112 generated; 30.0 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed         | 1426 prompt / 98 generated; 125 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed         | 3491 prompt / 121 generated; 50.2 tok/s; 92 GB peak   |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed      | 16558 prompt / 136 generated; 59.1 tok/s; 14 GB peak  |
-
-</details>
-
-## Shared Reproduction and Provenance
-
-### Reproduction inputs
+## Reproduction inputs
 
 - *Image format:* JPEG
 - *Image dimensions:* 9,984 x 6,656 pixels
@@ -2257,94 +1962,33 @@ Keywords:
 
 </details>
 
-The original local input is not published, so this report does not claim a
-complete reproduction command. Use a shareable equivalent image or add the
-original image before filing.
-
-- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-57f7cdeb1b88952a.jpg>
-- *Preview dimensions:* 1,024 x 683 pixels
-- *Preview size:* 157,139 bytes
-- *Preview SHA-256:* 57f7cdeb1b88952a3eeb6f5aa7ba4587981131b5841d7f8f82911704c242125b
-
-Shareable stand-in: the retained gallery preview is a downscaled re-encoding
-of the original, so an observation reproduced on it must be reported as
-reproduced on the preview, not on the exact inference input. The asset is
-named by its digest, so later sweeps never replace it; the URL resolves once
-this run's artifacts are committed. Download and verify it, then run one
-native mlx-vlm process.
+The crash occurred during model load, before image decoding, so the exact
+input image is not required: substitute any local image for the placeholder
+path and run one native mlx-vlm process.
 
 ```bash
-set -euo pipefail
-curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-57f7cdeb1b88952a.jpg
-printf '%s\n' '57f7cdeb1b88952a3eeb6f5aa7ba4587981131b5841d7f8f82911704c242125b  repro-image.jpg' | shasum -a 256 --check
-python -m mlx_vlm.generate --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-09-12 17:41:02 UTC+01:00
-- GPS: 52.393850°N, 0.270830°E
-
-Descriptive hints:
-- Description hint: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-- Keyword hints: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --trust-remote-code --prefill-step-size 2048
+python -m mlx_vlm.generate --model mlx-community/Mage-VL-OptiQ-4bit --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision bde6c9c7146acff6af09e203245014f19306c5c5 --trust-remote-code
 ```
 
-### Highlighted model revisions
+## Provenance and Environment
 
-| Model                                          | Resolved revision                        |
-|------------------------------------------------|------------------------------------------|
-| mlx-community/Mage-VL-OptiQ-4bit               | bde6c9c7146acff6af09e203245014f19306c5c5 |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit          | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/North-Micro-Vision-Instruct-4bit | 87466363e6c5f57adf91c18c3a62c3c74765f8df |
-| mlx-community/MiniCPM-V-4.6-4bit               | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
+### Components
 
-### Components and system
+| Component       | Value                                                             |
+|-----------------|-------------------------------------------------------------------|
+| mlx-vlm         | 0.7.0                                                             |
+| mlx             | 0.32.3.dev20260912+229f5b430                                      |
+| transformers    | 5.17.0                                                            |
+| tokenizers      | 0.23.2                                                            |
+| huggingface-hub | 1.31.0                                                            |
+| Pillow          | 12.3.0                                                            |
+| Python Version  | 3.14.7                                                            |
+| macOS Version   | 26.6.2                                                            |
+| GPU/Chip        | Apple M5 Max                                                      |
+| check_models    | 0.17.21; revision de9c8fe4df56d1c3a52f092c08a7b9914fd3dec4; clean |
 
-| Component                  | Value                                                                                                                                           |
-|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.7.0                                                                                                                                           |
-| mlx-vlm source revision    | b5379f6978886851e4829dc1deb4f21241a2175d                                                                                                        |
-| mlx                        | 0.32.3.dev20260912+229f5b430                                                                                                                    |
-| mlx source revision        | 229f5b430df7926743c5b6ac62068cae2ebc8978                                                                                                        |
-| mlx-audio                  | 0.5.3                                                                                                                                           |
-| transformers               | 5.17.0                                                                                                                                          |
-| tokenizers                 | 0.23.2                                                                                                                                          |
-| huggingface-hub            | 1.31.0                                                                                                                                          |
-| Python Version             | 3.14.7                                                                                                                                          |
-| OS                         | Darwin 25.6.0                                                                                                                                   |
-| macOS Version              | 26.6.2                                                                                                                                          |
-| SDK Version                | 26.5                                                                                                                                            |
-| SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk                                              |
-| Xcode Version              | 26.6                                                                                                                                            |
-| Xcode Build                | 17F113                                                                                                                                          |
-| Active Developer Directory | /Applications/Xcode.app/Contents/Developer                                                                                                      |
-| Metal SDK                  | MacOSX26.5.sdk                                                                                                                                  |
-| Metal Compiler Version     | Apple metal version 32023.883 (metalfe-32023.883)                                                                                               |
-| Metallib Linker Version    | AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)                                                                  |
-| Apple Clang Version        | Apple clang version 21.0.0 (clang-2100.1.1.101)                                                                                                 |
-| GPU/Chip                   | Apple M5 Max                                                                                                                                    |
-| GPU Cores                  | 40                                                                                                                                              |
-| MLX Device                 | Apple M5 Max                                                                                                                                    |
-| GPU Architecture           | applegpu_g17s                                                                                                                                   |
-| Recommended Working Set    | 108 GB                                                                                                                                          |
-| Fused Attention            | Available                                                                                                                                       |
-| Metal Support              | Metal 4                                                                                                                                         |
-| MLX Install Type           | editable local source                                                                                                                           |
-| MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
-| mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
-| MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (189,439,120 bytes, sha256=3e940a8eda4eb7bc22bd545f335ba774b504258eb8817cc56b86d156a8b574df) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,488,288 bytes, sha256=ab77edac8a1ec78b4f4a24648706d4703110d3e401b64e74761dabb81bd7df83)  |
-| RAM                        | 128.0 GB                                                                                                                                        |
-<!-- markdownlint-enable MD004 MD037 -->
+### Full environment evidence
+
+| Evidence | Link |
+| --- | --- |
+| Complete dependency and toolchain inventory | [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log) |
