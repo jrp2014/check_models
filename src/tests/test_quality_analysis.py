@@ -1528,3 +1528,75 @@ def test_exact_prompt_composition_counts_image_ids_from_a_prepare_inputs_pass(
     assert (total, image) == (5, 3)
     assert check_models._flatten_token_ids([[1, [2, 3]], 4]) == [1, 2, 3, 4]
     assert check_models._flatten_token_ids([True]) is None
+
+
+def test_declared_sampling_fills_only_what_the_cli_left_unset() -> None:
+    """Checkpoint values apply to unset keys; CLI keys win; do_sample false stays greedy."""
+    kwargs = cast("Any", {"temperature": 0.0, "top_p": 1.0, "top_k": 0, "min_p": 0.0})
+    declared = {"do_sample": True, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "min_p": 2.0}
+    sources = check_models._apply_declared_sampling(kwargs, declared, explicit={"top_p"})
+    assert kwargs == {"temperature": 0.7, "top_p": 1.0, "top_k": 20, "min_p": 0.0}
+    assert sources == {
+        "temperature": "generation_config",
+        "top_p": "cli",
+        "top_k": "generation_config",
+        "min_p": "default",  # 2.0 is out of range and ignored
+        "repetition_penalty": "default",
+    }
+    greedy = cast("Any", {"temperature": 0.0, "top_p": 1.0, "top_k": 0, "min_p": 0.0})
+    sources = check_models._apply_declared_sampling(
+        greedy, {"do_sample": False, "temperature": 0.9, "repetition_penalty": 1.1}, explicit=()
+    )
+    assert greedy["temperature"] == 0.0
+    assert greedy["repetition_penalty"] == 1.1
+    assert sources["temperature"] == "default"
+    assert sources["repetition_penalty"] == "generation_config"
+    untouched = cast("Any", {"temperature": 0.0})
+    assert check_models._apply_declared_sampling(untouched, {}, explicit=()) == dict.fromkeys(
+        check_models._CHECKPOINT_SAMPLING_DESTS, "default"
+    )
+    assert untouched == {"temperature": 0.0}
+
+
+def test_declared_sampling_values_are_bounded() -> None:
+    """Out-of-range or non-numeric declared values are ignored, in range ones accepted."""
+    valid = check_models._declared_sampling_value_is_valid
+    accepted = [
+        ("temperature", 0.6),
+        ("top_p", 0.95),
+        ("top_k", 20),
+        ("top_k", 20.0),
+        ("repetition_penalty", 1.05),
+    ]
+    rejected = [
+        ("temperature", -1),
+        ("top_p", 0.0),
+        ("top_p", 1.5),
+        ("top_k", 2.5),
+        ("repetition_penalty", 0),
+        ("unknown", 1.0),
+    ]
+    assert all(valid(key, value) for key, value in accepted)
+    assert not any(valid(key, value) for key, value in rejected)
+    assert not valid("temperature", value=True)
+
+
+def test_run_issue_summary_sampling_note_counts_checkpoint_sampled_models() -> None:
+    def record(sources: dict[str, str] | None, execution: str = "completed") -> dict[str, object]:
+        return {
+            "assessment": {"execution": execution},
+            "prompt_diagnostics": {"sampling_sources": sources} if sources is not None else None,
+        }
+
+    rows = [
+        record({"temperature": "generation_config", "top_p": "default"}),
+        record({"temperature": "default"}),
+        record(None),
+        record({"temperature": "generation_config"}, execution="crashed"),
+    ]
+    note = check_models._run_issue_summary_sampling_note(cast("Any", rows))
+    assert note.startswith("checkpoint generation_config.json values for 1 of 3 completed models")
+    assert (
+        check_models._run_issue_summary_sampling_note(cast("Any", [record({"temperature": "cli"})]))
+        == "harness defaults (or command-line values) for every model"
+    )

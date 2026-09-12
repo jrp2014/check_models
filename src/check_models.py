@@ -1740,6 +1740,16 @@ class _LinkStyleState:
 
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
+# Sampling settings a checkpoint may declare in generation_config.json. Left
+# unset on the command line, each takes the checkpoint's value; given on the
+# command line, the CLI value wins for every model.
+_CHECKPOINT_SAMPLING_DESTS: Final[tuple[str, ...]] = (
+    "temperature",
+    "top_p",
+    "top_k",
+    "min_p",
+    "repetition_penalty",
+)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
@@ -1828,6 +1838,9 @@ class PromptDiagnostics:
     # model card recommends", recorded so a run's fixed settings can be read
     # against them. Never changes what the harness sends.
     declared_sampling: dict[str, JsonLike] = dataclass_field(default_factory=dict)
+    # Where each effective sampling setting came from: "cli", "generation_config"
+    # or "default" (see _apply_declared_sampling).
+    sampling_sources: dict[str, str] = dataclass_field(default_factory=dict)
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
     # usability; retained so a later failure can be traced to a snapshot that
@@ -3135,6 +3148,9 @@ class ProcessImageParams:
     kv_key_scheme: Literal["uniform", "turboquant"] | None = None
     kv_value_scheme: Literal["uniform", "turboquant"] | None = None
     seed: int | None = None
+    # Sampling dests the user gave explicitly (CLI or a per-run override);
+    # everything else may be filled from the checkpoint's generation_config.json.
+    explicit_sampling: frozenset[str] = frozenset()
     presence_penalty: float | None = None
     presence_context_size: int = DEFAULT_PENALTY_CONTEXT_SIZE
     frequency_penalty: float | None = None
@@ -9509,6 +9525,7 @@ def _diagnostics_result_facts(
             "Checkpoint-declared sampling (generation_config.json)",
             _declared_sampling_fact(prompt_diagnostics, generation_kwargs),
         ),
+        ("Sampling settings source", _sampling_sources_fact(prompt_diagnostics)),
         (
             "Post-cleanup active memory (GB)",
             runtime.post_cleanup_active_memory_gb if runtime is not None else None,
@@ -9643,6 +9660,15 @@ def _runtime_termination_facts(
             runtime.time_to_first_token_s,
         ),
         ("Peak memory at first token (GB)", runtime.first_token_peak_memory_gb),
+    )
+
+
+def _sampling_sources_fact(prompt_diagnostics: PromptDiagnostics | None) -> str | None:
+    """Render where each effective sampling setting came from, when recorded."""
+    if prompt_diagnostics is None or not prompt_diagnostics.sampling_sources:
+        return None
+    return "; ".join(
+        f"{key}: {source}" for key, source in prompt_diagnostics.sampling_sources.items()
     )
 
 
@@ -11948,6 +11974,54 @@ def _declared_sampling_defaults(snapshot_path: Path | None) -> dict[str, JsonLik
     return declared
 
 
+_DECLARED_SAMPLING_BOUNDS: Final[dict[str, Callable[[float], bool]]] = {
+    "temperature": lambda number: number >= 0.0,
+    "top_p": lambda number: 0.0 < number <= 1.0,
+    "min_p": lambda number: 0.0 <= number <= 1.0,
+    "top_k": lambda number: number >= 0.0 and number.is_integer(),
+    "repetition_penalty": lambda number: number > 0.0,
+}
+
+
+def _declared_sampling_value_is_valid(key: str, value: object) -> bool:
+    """Bound a checkpoint-declared sampling value to what upstream sampling accepts."""
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        return False
+    within_bounds = _DECLARED_SAMPLING_BOUNDS.get(key)
+    return within_bounds is not None and within_bounds(float(value))
+
+
+def _apply_declared_sampling(
+    generate_kwargs: GenerateKwargs,
+    declared: Mapping[str, JsonLike],
+    explicit: Collection[str],
+) -> dict[str, str]:
+    """Let the checkpoint's generation_config.json fill sampling settings left unset.
+
+    Returns the source of each sampling setting: ``cli`` (given on the command
+    line or pinned by a per-run override; always wins), ``generation_config``
+    (taken from the checkpoint) or ``default`` (the harness default). A
+    declared ``do_sample: false`` is the checkpoint asking for greedy decoding,
+    so its temperature, top_p, top_k and min_p are not applied while a
+    repetition penalty still is.
+    """
+    greedy_declared = declared.get("do_sample") is False
+    settings = cast("dict[str, object]", generate_kwargs)
+    sources: dict[str, str] = {}
+    for key in _CHECKPOINT_SAMPLING_DESTS:
+        if key in explicit:
+            sources[key] = "cli"
+            continue
+        value = declared.get(key)
+        blocked = greedy_declared and key != "repetition_penalty"
+        if value is None or blocked or not _declared_sampling_value_is_valid(key, value):
+            sources[key] = "default"
+            continue
+        settings[key] = int(cast("float", value)) if key == "top_k" else float(cast("float", value))
+        sources[key] = "generation_config"
+    return sources
+
+
 def _flatten_token_ids(value: object) -> list[int] | None:
     """Return prepared input ids as a flat int list, from an mx.array or nested lists."""
     to_list = getattr(value, "tolist", None)
@@ -12020,7 +12094,7 @@ def _exact_prompt_composition(
     return len(flat), sum(1 for ident in flat if ident == token_id)
 
 
-def _build_prompt_diagnostics(
+def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is an explicit keyword  # skylos: ignore[SKY-C303]
     *,
     params: ProcessImageParams,
     processor: ProcessorMixin,
@@ -12032,6 +12106,8 @@ def _build_prompt_diagnostics(
     snapshot_notes: tuple[str, ...] = (),
     prepared_input_token_count: int | None = None,
     image_token_count: int | None = None,
+    declared_sampling: Mapping[str, JsonLike] | None = None,
+    sampling_sources: Mapping[str, str] | None = None,
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -12066,7 +12142,12 @@ def _build_prompt_diagnostics(
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
         template_thinking_markers=_template_declares_thinking(snapshot_path),
-        declared_sampling=_declared_sampling_defaults(snapshot_path),
+        declared_sampling=(
+            dict(declared_sampling)
+            if declared_sampling is not None
+            else _declared_sampling_defaults(snapshot_path)
+        ),
+        sampling_sources=dict(sampling_sources or {}),
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
@@ -12139,6 +12220,8 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         payload["special_token_ids"] = list(diagnostics.special_token_ids)
     if diagnostics.declared_sampling:
         payload["declared_sampling"] = dict(diagnostics.declared_sampling)
+    if diagnostics.sampling_sources:
+        payload["sampling_sources"] = dict(diagnostics.sampling_sources)
     if diagnostics.special_tokens:
         payload["special_tokens"] = [
             _prompt_diag_json_value(item) for item in diagnostics.special_tokens
@@ -13647,6 +13730,20 @@ def _prepare_generation(
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
     generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
+    declared_sampling = _declared_sampling_defaults(
+        _resolve_model_snapshot_path(params.model_identifier, params.revision)
+    )
+    sampling_sources = _apply_declared_sampling(
+        generate_kwargs, declared_sampling, params.explicit_sampling
+    )
+    taken = [key for key, source in sampling_sources.items() if source == "generation_config"]
+    if taken:
+        effective = cast("Mapping[str, object]", generate_kwargs)
+        logger.info(
+            "Sampling for %s from its generation_config.json (unset on the command line): %s",
+            params.model_identifier,
+            ", ".join(f"{key} {effective.get(key)}" for key in taken),
+        )
     auto_budget_applied = _apply_auto_thinking_budget(params, formatted_prompt, generate_kwargs)
     if auto_budget_applied:
         thinking_budget_source: Literal["auto", "explicit"] | None = "auto"
@@ -13676,6 +13773,8 @@ def _prepare_generation(
         snapshot_notes=prepared_prompt.snapshot_notes,
         prepared_input_token_count=prepared_input_token_count,
         image_token_count=image_token_count,
+        declared_sampling=declared_sampling,
+        sampling_sources=sampling_sources,
     )
     return _PreparedGeneration(
         model=model,
@@ -14819,17 +14918,20 @@ def _isolated_worker_spec(
     adjacent and round-trip tested because a key that drifts between them
     fails every isolated model before inference starts.
     """
+    explicit_sampling: list[JsonLike] = [*sorted(params.explicit_sampling)]
+    overrides: dict[str, JsonLike] = {
+        "max_tokens": params.max_tokens,
+        "temperature": params.temperature,
+        "timeout": params.timeout,
+        "verbose": params.verbose,
+        "explicit_sampling": explicit_sampling,
+    }
     return {
         "args": _namespace_to_json(args),
         "model_identifier": params.model_identifier,
         "image_path": str(params.image_path),
         "prompt": params.prompt,
-        "overrides": {
-            "max_tokens": params.max_tokens,
-            "temperature": params.temperature,
-            "timeout": params.timeout,
-            "verbose": params.verbose,
-        },
+        "overrides": overrides,
     }
 
 
@@ -14842,6 +14944,7 @@ def _isolated_params_from_spec(
     temperature = overrides.get("temperature")
     timeout = overrides.get("timeout")
     verbose = overrides.get("verbose")
+    explicit_sampling = overrides.get("explicit_sampling")
     return _process_image_params_from_args(
         args,
         model_identifier=str(spec["model_identifier"]),
@@ -14857,6 +14960,11 @@ def _isolated_params_from_spec(
         if isinstance(timeout, (int, float)) and not isinstance(timeout, bool)
         else None,
         verbose=verbose if isinstance(verbose, bool) else None,
+        explicit_sampling=(
+            [str(item) for item in explicit_sampling]
+            if isinstance(explicit_sampling, list)
+            else None
+        ),
     )
 
 
@@ -17190,8 +17298,28 @@ def _process_image_params_from_args(
     temperature: float | None = None,
     timeout: float | None = None,
     verbose: bool | None = None,
+    explicit_sampling: Collection[str] | None = None,
 ) -> ProcessImageParams:
-    """Build inference parameters once, with explicit per-run overrides."""
+    """Build inference parameters once, with explicit per-run overrides.
+
+    ``explicit_sampling`` names the sampling dests that must not be replaced by
+    a checkpoint's generation_config.json: by default the ones the user gave on
+    the command line (``args.explicit_cli``), plus ``temperature`` whenever a
+    per-run override sets it (triage reruns pin it).
+    """
+    explicit: set[str]
+    if explicit_sampling is not None:
+        # A caller (the isolated-worker spec) that already resolved the set
+        # passes it verbatim; the spec also carries the parent's temperature
+        # as an override, which must not count as user-given here.
+        explicit = set(explicit_sampling)
+    else:
+        explicit = {str(dest) for dest in (getattr(args, "explicit_cli", None) or ())}
+        if temperature is not None:
+            # A per-run override (the triage rerun pins temperature 0) is
+            # deliberate and wins over a checkpoint's declared value.
+            explicit.add("temperature")
+    explicit &= set(_CHECKPOINT_SAMPLING_DESTS)
     return ProcessImageParams(
         model_identifier=model_identifier,
         image_path=image_path,
@@ -17239,6 +17367,7 @@ def _process_image_params_from_args(
         auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
         system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
         assessment_profile=getattr(args, "assessment_profile", None) or "general",
+        explicit_sampling=frozenset(explicit),
     )
 
 
@@ -21288,6 +21417,24 @@ def _count_observation(results: Sequence[JsonlResultRecord], code: str) -> int:
     return sum(1 for result in results if code in result["assessment"]["observations"])
 
 
+def _run_issue_summary_sampling_note(results: Sequence[JsonlResultRecord]) -> str:
+    """Say how many models sampled with their checkpoint's declared settings."""
+    completed = [r for r in results if r["assessment"]["execution"] == "completed"]
+    from_checkpoint = 0
+    for record in completed:
+        diagnostics = record.get("prompt_diagnostics") or {}
+        sources = diagnostics.get("sampling_sources") if isinstance(diagnostics, dict) else None
+        if isinstance(sources, dict) and "generation_config" in sources.values():
+            from_checkpoint += 1
+    if from_checkpoint:
+        return (
+            f"checkpoint generation_config.json values for {from_checkpoint} of "
+            f"{len(completed)} completed models where the command line left them unset; "
+            "harness defaults elsewhere"
+        )
+    return "harness defaults (or command-line values) for every model"
+
+
 def _count_stop_reason(results: Sequence[JsonlResultRecord], reason: str) -> int:
     """Count results whose recorded stop reason matches.
 
@@ -21870,6 +22017,7 @@ def generate_run_issue_summary_report(
                             ),
                         ),
                         ("Models attempted", str(len(source.results))),
+                        ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
                         ("Completed", str(counts["completed"])),
                         ("Crashed", str(counts["crashed"])),
                         ("Indeterminate", str(counts["indeterminate"])),
@@ -23439,6 +23587,24 @@ def finalize_execution(
 # =============================================================================
 
 
+def _explicit_cli_dests(argv: Sequence[str]) -> frozenset[str]:
+    """Return the argparse dests the user actually supplied on the command line.
+
+    A twin of the CLI parser with every default suppressed sees only the
+    options that were provided, so an explicit ``--temperature 0.0`` counts as
+    set even though it equals the default. The real parser has already
+    validated the same argv, so parse problems here simply yield an empty set.
+    """
+    parser = _build_cli_parser()
+    for action in parser._actions:  # noqa: SLF001 - argparse exposes no public action list
+        action.default = argparse.SUPPRESS
+    try:
+        namespace, _unknown = parser.parse_known_args(list(argv))
+    except SystemExit:
+        return frozenset()
+    return frozenset(vars(namespace)) - set(parser._defaults)  # noqa: SLF001 - see above
+
+
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     _LinkStyleState.value = getattr(args, "link_style", "github")
@@ -23632,6 +23798,9 @@ def main_cli() -> None:
 
     # Parse arguments
     args: argparse.Namespace = parser.parse_args()
+    # Which sampling options were given explicitly (the CLI value then wins
+    # over a checkpoint's generation_config.json for every model).
+    args.explicit_cli = sorted(_explicit_cli_dests(sys.argv[1:]))
 
     # If neither --folder nor --image is specified, assume default folder
     if getattr(args, "folder", None) is None and getattr(args, "image", None) is None:
@@ -23925,25 +24094,37 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         "--temperature",
         type=float,
         default=DEFAULT_TEMPERATURE,
-        help="Sampling temperature.",
+        help=(
+            "Sampling temperature. Unset: the checkpoint's generation_config.json value "
+            "when it declares one, else 0.0 (greedy). Given: applies to every model."
+        ),
     )
     generation_group.add_argument(
         "--top-p",
         type=float,
         default=1.0,
-        help="Nucleus sampling parameter (0.0-1.0). Lower values = more focused output.",
+        help=(
+            "Nucleus sampling parameter (0.0-1.0). Lower values = more focused output. "
+            "Unset: the checkpoint's generation_config.json value when declared."
+        ),
     )
     generation_group.add_argument(
         "--min-p",
         type=float,
         default=0.0,
-        help="Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering.",
+        help=(
+            "Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. "
+            "Unset: the checkpoint's generation_config.json value when declared."
+        ),
     )
     generation_group.add_argument(
         "--top-k",
         type=int,
         default=0,
-        help="Top-k sampling limit. 0 disables top-k filtering.",
+        help=(
+            "Top-k sampling limit. 0 disables top-k filtering. "
+            "Unset: the checkpoint's generation_config.json value when declared."
+        ),
     )
     generation_group.add_argument(
         "-r",

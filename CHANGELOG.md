@@ -6,6 +6,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Sampling settings left unset on the command line (`--temperature`,
+  `--top-p`, `--top-k`, `--min-p`, `--repetition-penalty`) now take the
+  values each checkpoint declares in its `generation_config.json`; a given
+  flag wins for every model, a declared `do_sample: false` keeps greedy
+  decoding, and out-of-range declared values are ignored. Triage reruns keep
+  pinning temperature 0. Every result records where each effective setting
+  came from (`sampling_sources`: cli / generation_config / default), the
+  console says which values a model took from its checkpoint, the
+  diagnostics carry a "Sampling settings source" row, and the run summary
+  counts models that sampled with checkpoint settings. Per-model settings
+  already feed history matching, so models whose settings changed fall back
+  to the default noise band until new history accumulates.
 - Four measurements replace estimates, all read from the stream the harness
   already consumes: the time to first token is now measured wall clock from
   the generate call to the first chunk (`time_to_first_token_s`; the chooser's

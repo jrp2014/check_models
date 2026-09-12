@@ -605,7 +605,8 @@ These control the sampling strategy during generation. Higher temperature increa
 **Example**:
 
 ```bash
-# Deterministic output (default)
+# Force greedy decoding for every model (the harness's own default when a
+# checkpoint declares no sampling settings)
 python -m check_models --image photo.jpg --temperature 0.0
 
 # Balanced creativity
@@ -614,6 +615,15 @@ python -m check_models --image photo.jpg --temperature 0.7 --top-p 0.9
 # Maximum diversity (risky)
 python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 ```
+
+Left unset, `--temperature`, `--top-p`, `--top-k`, `--min-p` and
+`--repetition-penalty` take the values a checkpoint declares in its
+`generation_config.json` (a declared `do_sample: false` keeps greedy decoding);
+the harness defaults apply only where the checkpoint declares nothing. Each
+result records where every setting came from (`sampling_sources` in
+`results.jsonl`, "Sampling settings source" in the diagnostics), and the run
+summary counts how many models sampled with checkpoint settings. Sampled
+outputs vary between runs unless `--seed` is given.
 
 #### Generation Control
 
@@ -1202,10 +1212,10 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--system-telemetry` | flag | snapshot | macOS thermal/memory-pressure telemetry via read-only `pmset -g` / `sysctl -n` probes (sudo-free, no system settings changed). Default: one snapshot probe pair per model taken outside timed inference. Pass `--system-telemetry` for opt-in continuous background sampling (subprocesses overlap timed inference), or `--no-system-telemetry` to disable entirely. Per-probe sample counts are recorded so an unavailable probe is reported as unavailable, never as clean. |
 | `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. The retired `stress`/`quality` inputs are rejected. |
 | `-x`, `--max-tokens` | int | lane default | Max new tokens to generate. When omitted, the resolved evaluation lane supplies the default (1000; `triage` 200); an explicit value always wins over the lane default. |
-| `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
-| `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
-| `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |
-| `--top-k` | int | 0 | Top-k sampling limit. 0 disables top-k filtering. |
+| `-t`, `--temperature` | float | checkpoint's `generation_config.json` value, else 0.0 | Sampling temperature. Unset, each model uses the temperature its checkpoint declares (a declared `do_sample: false` keeps greedy); given, the value applies to every model. |
+| `--top-p` | float | checkpoint value, else 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. Unset, taken from the checkpoint's `generation_config.json` when declared. |
+| `--min-p` | float | checkpoint value, else 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. Unset, taken from the checkpoint's `generation_config.json` when declared. |
+| `--top-k` | int | checkpoint value, else 0 | Top-k sampling limit. 0 disables top-k filtering. Unset, taken from the checkpoint's `generation_config.json` when declared. |
 | `--seed` | int | (none) | Seed forwarded to upstream generation sampling. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |

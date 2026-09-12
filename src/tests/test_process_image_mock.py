@@ -2194,3 +2194,50 @@ class TestStreamObservations:
         assert result.quality_analysis is not None
         assert "<|box|>" in result.quality_analysis.unexpected_special_tokens
         assert result.quality_analysis.emitted_special_tokens == ["<|box|>"]
+
+
+class TestExplicitSampling:
+    """Only sampling flags the user actually gave override a checkpoint's own settings."""
+
+    def test_explicit_cli_dests_sees_only_provided_options(self) -> None:
+        """A suppressed-defaults parse lists exactly the options given."""
+        dests = check_models._explicit_cli_dests(
+            ["--image", "x.jpg", "--temperature", "0.0", "--top-k=3", "--top-p", "0.9"]
+        )
+        assert {"temperature", "top_k", "top_p", "image"} <= dests
+        assert "min_p" not in dests
+        assert "repetition_penalty" not in dests
+        assert (
+            check_models._explicit_cli_dests(["--image", "x.jpg"])
+            & set(check_models._CHECKPOINT_SAMPLING_DESTS)
+            == set()
+        )
+
+    def test_params_carry_the_explicit_sampling_set(self, test_image: Path) -> None:
+        """CLI-given sampling dests, plus a temperature override, are pinned."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(["--image", str(test_image), "--top-p", "0.9"])
+        args.explicit_cli = ["image", "top_p"]
+        params = check_models._process_image_params_from_args(
+            args, model_identifier="org/m", image_path=test_image, prompt="p"
+        )
+        assert params.explicit_sampling == frozenset({"top_p"})
+        # A per-run temperature override (the triage rerun) pins temperature too.
+        pinned = check_models._process_image_params_from_args(
+            args, model_identifier="org/m", image_path=test_image, prompt="p", temperature=0.0
+        )
+        assert pinned.explicit_sampling == frozenset({"top_p", "temperature"})
+
+    def test_isolated_spec_round_trips_the_explicit_sampling_set(self, test_image: Path) -> None:
+        """The child rebuilds the same explicit set; the carried temperature is not one."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(["--image", str(test_image), "--top-k", "5"])
+        args.explicit_cli = ["image", "top_k"]
+        params = check_models._process_image_params_from_args(
+            args, model_identifier="org/m", image_path=test_image, prompt="p"
+        )
+        spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
+        rebuilt = check_models._isolated_params_from_spec(
+            spec, check_models._namespace_from_json(spec["args"])
+        )
+        assert rebuilt.explicit_sampling == frozenset({"top_k"})
