@@ -597,10 +597,26 @@ python -m check_models --image photo.jpg --max-kv-size 4096 --kv-bits 8
 
 #### Temperature and Sampling
 
-- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = high diversity, `>1.0` = more random. Default: `0.0`.
-- `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: `1.0` (disabled).
+- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = high diversity, `>1.0` = more random. Default: the checkpoint's declared value, else `0.0`.
+- `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: the checkpoint's declared value, else `1.0` (disabled).
 
 These control the sampling strategy during generation. Higher temperature increases variety but can produce less coherent outputs. Top-p sampling (nucleus sampling) focuses on the most probable tokens.
+
+**Greedy decoding versus sampling.** Temperature `0.0` is greedy decoding:
+at every step the model emits its single most probable next token, so the
+output is fully determined by the model and the prompt, and `--seed` has no
+effect. Any temperature above `0.0` is sampling: the next token is drawn from
+the model's probability distribution after temperature, top-p, top-k and
+min-p have reshaped it, so the output is one draw among many; `--seed` fixes
+which draw. Neither is simply better. Greedy is literal and repeatable but
+prone to repetition loops (a model that starts repeating a phrase has no
+randomness to escape it); sampling escapes loops more often but can wander,
+run a thinking trace to the token cap, or degrade a keyword list. Because
+the seed defaults to 0, a sampled failure is a stable property of that model
+at its declared settings, not run-to-run noise, and it reproduces on the
+same MLX version. A checkpoint that declares `do_sample: false` asks for
+greedy decoding whatever temperature it also lists, and the harness honours
+that. Pass `--temperature 0.0` to compare every model greedily.
 
 **Example**:
 

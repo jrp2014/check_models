@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `README.md` explains greedy decoding versus sampling next to the temperature
+  flags: what temperature 0 means, when `--seed` matters, and why neither mode
+  is simply better.
 - `--seed` defaults to 0 instead of none: with sampling settings now taken from
   each checkpoint, a fixed seed keeps sampled outputs reproducible from run to
   run on a given MLX version. Native repro commands carry `--seed 0`.
