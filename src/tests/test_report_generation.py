@@ -3614,7 +3614,7 @@ def test_markdown_and_html_choosers_share_metric_explanations(tmp_path: Path) ->
     )
 
     explanations = (
-        "Prefill/first is first-token latency when captured",
+        "Prefill/first is the measured time to first token",
         "For cross-attention architectures the token count reflects the tokenised text burden",
     )
     for report in (markdown_path.read_text(), html.unescape(html_path.read_text())):
@@ -7217,3 +7217,39 @@ def test_gallery_row_uses_the_field_aware_preview_only_for_the_metadata_profile(
     )
     assert "Keywords (3)" not in general_row.output_preview
     assert general_row.output_preview.startswith("Title: Stone mill\nDescription: A long")
+
+
+def test_diagnostics_facts_show_measured_first_token_and_declared_sampling() -> None:
+    """The facts name the measured TTFT, the prefill peak and the checkpoint's sampling."""
+    result = replace(
+        _make_success(),
+        runtime_diagnostics=RuntimeDiagnostics(
+            first_token_latency_s=0.2,
+            time_to_first_token_s=0.45,
+            first_token_peak_memory_gb=4.5,
+            stop_reason="completed",
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            declared_sampling={"do_sample": True, "temperature": 0.7, "top_p": 0.8},
+            generate_kwargs={"temperature": 0.0, "max_tokens": 100},
+        ),
+    )
+    assessment = check_models._assess_result(result)
+    facts = dict(
+        check_models._diagnostics_result_facts(
+            result, assessment, run_args=None, model_provenance=None
+        )
+    )
+    ttft_key = next(key for key in facts if key.startswith("Time to first token"))
+    assert facts[ttft_key] == "0.45"
+    assert facts["Peak memory at first token (GB)"] == "4.5"
+    assert (
+        facts["Checkpoint-declared sampling (generation_config.json)"]
+        == "do_sample True; temperature 0.7; top_p 0.8; run used temperature 0.0"
+    )
+    # The chooser prefers the measured value and falls back to the upstream proxy.
+    assert check_models._chooser_first_token_seconds(result.runtime_diagnostics) == 0.45
+    assert (
+        check_models._chooser_first_token_seconds(RuntimeDiagnostics(first_token_latency_s=0.2))
+        == 0.2
+    )

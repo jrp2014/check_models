@@ -7,6 +7,7 @@ import json
 import logging
 import subprocess
 import sys
+import time
 import types
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -2099,3 +2100,97 @@ class TestFileLogTimeline:
         assert continuation, "captured body missing"
         assert all(line.startswith("[org/model] ") for line in continuation), continuation
         assert "[org/model] Prefill: 100%" in continuation
+
+
+class TestStreamObservations:
+    """The streaming loop records first-chunk time and memory, and token ids."""
+
+    @staticmethod
+    def _chunks(texts: list[str]) -> list[types.SimpleNamespace]:
+        return [
+            types.SimpleNamespace(
+                text=text,
+                token=100 + index,
+                generation_tokens=index + 1,
+                finish_reason="stop" if index == len(texts) - 1 else None,
+                prompt_tokens=5,
+                generation_tps=10.0,
+                peak_memory=1.5 + index,
+            )
+            for index, text in enumerate(texts)
+        ]
+
+    def test_guard_fills_observations_from_the_stream(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """First-chunk time and peak, and the ids of retained chunks, are recorded."""
+        chunks = self._chunks(["a ", "b ", "c "])
+        chunks.insert(1, types.SimpleNamespace(text="draft", token=999, is_draft=True))
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
+        observations = check_models.StreamObservations()
+        observations.started_at = time.perf_counter()
+        check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+            observations=observations,
+        )
+        assert observations.first_chunk_at is not None
+        assert observations.time_to_first_token_s is not None
+        assert observations.time_to_first_token_s >= 0.0
+        # The first chunk's upstream peak is the prefill peak; drafts add no ids.
+        assert observations.first_chunk_peak_memory_gb == 1.5
+        assert observations.token_ids == [100, 101, 102]
+
+    def test_time_to_first_token_needs_both_timestamps(self) -> None:
+        """TTFT is only defined once both timestamps exist."""
+        assert check_models.StreamObservations().time_to_first_token_s is None
+        assert check_models.StreamObservations(started_at=1.0).time_to_first_token_s is None
+        assert (
+            check_models.StreamObservations(
+                started_at=2.0, first_chunk_at=2.5
+            ).time_to_first_token_s
+            == 0.5
+        )
+
+    def test_emitted_special_tokens_are_decoded_by_id_and_skip_expected_stops(self) -> None:
+        """Special ids decode to names; EOS-like names are not leakage."""
+
+        class _Tokenizer:
+            all_special_ids = (1, 2, 3)
+
+            @staticmethod
+            def convert_ids_to_tokens(token_id: int) -> str:
+                return {1: "<|im_end|>", 2: "</think>", 3: "<|box|>"}[token_id]
+
+        processor = types.SimpleNamespace(tokenizer=_Tokenizer())
+        emitted = check_models._emitted_special_tokens(
+            [50, 2, 51, 3, 3, 1], processor, excluded={"<|im_end|>"}
+        )
+        assert emitted == ("</think>", "<|box|>")
+        assert check_models._emitted_special_tokens([2], object(), excluded=()) == ()
+
+    def test_success_result_reads_observations_off_the_output(self, test_image: Path) -> None:
+        """Measured TTFT, first-token peak and id-detected tokens reach the result."""
+        output = _FakeGenerationResult()
+        observations = check_models.StreamObservations(
+            started_at=10.0, first_chunk_at=10.75, first_chunk_peak_memory_gb=3.25
+        )
+        observations.special_tokens = ("<|box|>",)
+        setattr(output, check_models._STREAM_OBSERVATIONS_ATTR, observations)
+        phase_timer = check_models.PhaseTimer()
+        result, _stop = check_models._build_success_process_result(
+            params=_build_params(test_image),
+            output=cast("Any", output),
+            phase_timer=phase_timer,
+            total_start_time=time.perf_counter(),
+            upstream_boundary="generation_started",
+        )
+        assert result.runtime_diagnostics is not None
+        assert result.runtime_diagnostics.time_to_first_token_s == 0.75
+        assert result.runtime_diagnostics.first_token_peak_memory_gb == 3.25
+        assert result.emitted_special_tokens == ("<|box|>",)
+        assert result.quality_analysis is not None
+        assert "<|box|>" in result.quality_analysis.unexpected_special_tokens
+        assert result.quality_analysis.emitted_special_tokens == ["<|box|>"]

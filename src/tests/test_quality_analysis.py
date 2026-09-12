@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import types
 from argparse import Namespace
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pytest
 
 import check_models
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 type ExpectedExecutionStatus = Literal["completed", "crashed", "indeterminate"]
 
@@ -1414,3 +1418,113 @@ def test_duplicated_answer_is_not_flagged_for_a_removed_thinking_draft_or_repeti
     )
     assert looping.is_repetitive is True
     assert looping.duplicated_answer_separator is None
+
+
+def test_id_detected_special_tokens_join_the_text_detected_ones() -> None:
+    """A control token emitted by id is leakage unless it is a declared wrapper or a trace marker."""
+    plain = check_models.analyze_generation_text(
+        "Title: A\nDescription: B.\nKeywords: c, d",
+        generated_tokens=20,
+        assessment_profile="metadata",
+        emitted_special_tokens=["<|box|>", "<|box|>"],
+    )
+    assert plain.emitted_special_tokens == ["<|box|>"]
+    assert "<|box|>" in plain.unexpected_special_tokens
+    assert "unexpected_special_token" in check_models._quality_observations(
+        text="Title: A", analysis=plain
+    )
+    declared = check_models.analyze_generation_text(
+        "Title: A\nDescription: B.\nKeywords: c, d",
+        generated_tokens=20,
+        assessment_profile="metadata",
+        configured_generation_wrappers=["<|box|>"],
+        emitted_special_tokens=["<|box|>"],
+    )
+    assert declared.emitted_special_tokens == []
+    traced = check_models.analyze_generation_text(
+        "<think>reasoning</think>\nTitle: A\nDescription: B.\nKeywords: c, d",
+        generated_tokens=20,
+        assessment_profile="metadata",
+        emitted_special_tokens=["</think>"],
+    )
+    assert traced.has_thinking_trace is True
+    assert "</think>" not in traced.unexpected_special_tokens
+
+
+def test_prompt_split_prefers_the_exact_image_token_count() -> None:
+    """An id-counted image total splits the prompt exactly; a bad count falls back."""
+    assert check_models._split_prompt_tokens(
+        prompt_tokens=16240, prompt="p", prompt_text_tokens=17, prompt_image_tokens=16224
+    ) == (16, 16224, "input_ids", None)
+    text, nontext, source, _rejected = check_models._split_prompt_tokens(
+        prompt_tokens=100, prompt="p", prompt_text_tokens=30, prompt_image_tokens=500
+    )
+    assert (text, nontext, source) == (30, 70, "tokenizer")
+
+
+def test_verified_image_token_count_requires_the_second_pass_to_match_generation() -> None:
+    diagnostics = check_models.PromptDiagnostics(
+        prepared_input_token_count=274, image_token_count=256
+    )
+    assert check_models._verified_image_token_count(diagnostics, 274) == 256
+    assert check_models._verified_image_token_count(diagnostics, 273) is None
+    assert check_models._verified_image_token_count(None, 274) is None
+
+
+def test_declared_sampling_defaults_read_generation_config(tmp_path: Path) -> None:
+    snapshot = tmp_path / "snap"
+    snapshot.mkdir()
+    check_models._write_text_file(
+        snapshot / "generation_config.json",
+        '{"do_sample": true, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "eos_token_id": [1, 2]}',
+    )
+    assert check_models._declared_sampling_defaults(snapshot) == {
+        "do_sample": True,
+        "temperature": 0.7,
+        "top_p": 0.8,
+        "top_k": 20,
+    }
+    assert check_models._declared_sampling_defaults(tmp_path / "missing") == {}
+    assert check_models._declared_sampling_defaults(None) == {}
+
+
+def test_exact_prompt_composition_counts_image_ids_from_a_prepare_inputs_pass(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def fake_prepare(_processor: object, **kwargs: object) -> dict[str, object]:
+        calls.append(kwargs)
+        return {"input_ids": [[7, 9, 9, 9, 8]], "image_token_id": 9}
+
+    def fake_attr(name: str) -> object:
+        return {"prepare_inputs": fake_prepare, "should_add_special_tokens": lambda *_a: True}[name]
+
+    monkeypatch.setattr(check_models, "_optional_mlx_vlm_utils_attribute", fake_attr)
+    params = cast(
+        "Any",
+        types.SimpleNamespace(
+            model_identifier="org/m", image_path=tmp_path / "i.jpg", resize_shape=None
+        ),
+    )
+    total, image = check_models._exact_prompt_composition(
+        processor=cast("Any", object()),
+        config={"model_type": "fake", "image_token_index": 9},
+        params=params,
+        formatted_prompt="rendered",
+        processor_passthrough_kwargs={},
+    )
+    assert (total, image) == (5, 3)
+    assert calls[0]["prompts"] == "rendered"
+    assert calls[0]["image_token_index"] == 9
+    # Without a configured image id, the processor's own image_token_id is used.
+    total, image = check_models._exact_prompt_composition(
+        processor=cast("Any", object()),
+        config={"model_type": "fake"},
+        params=params,
+        formatted_prompt="rendered",
+        processor_passthrough_kwargs={},
+    )
+    assert (total, image) == (5, 3)
+    assert check_models._flatten_token_ids([[1, [2, 3]], 4]) == [1, 2, 3, 4]
+    assert check_models._flatten_token_ids([True]) is None

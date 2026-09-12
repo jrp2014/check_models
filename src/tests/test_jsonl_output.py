@@ -2269,3 +2269,40 @@ def test_retained_run_round_trips_through_the_single_loader(tmp_path: Path) -> N
     schema2 = json.dumps({"_type": "metadata", "format_version": "2.0", "prompt": "x"}) + "\n"
     with pytest.raises(ValueError, match="format_version"):
         check_models._load_retained_run_text(schema2, "baseline")
+
+
+def test_jsonl_carries_measured_first_token_facts_and_declared_sampling(tmp_path: Path) -> None:
+    """Measured TTFT, first-token peak memory and declared sampling reach the row."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="org/observed",
+        generation=MockGeneration(text="Title: A\nDescription: B.\nKeywords: c, d"),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=2.0,
+        completed_at="2026-09-12 12:00:00 BST",
+        runtime_diagnostics=RuntimeDiagnostics(
+            decode_time_s=1.0,
+            first_token_latency_s=0.2,
+            time_to_first_token_s=0.35,
+            first_token_peak_memory_gb=4.5,
+            stop_reason="completed",
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            prepared_input_token_count=274,
+            image_token_count=256,
+            declared_sampling={"do_sample": True, "temperature": 0.7},
+        ),
+    )
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+    row = rows[0]
+    assert row["timing"]["first_token_latency_s"] == 0.2
+    assert row["timing"]["time_to_first_token_s"] == 0.35
+    assert row["metrics"]["first_token_peak_memory_gb"] == 4.5
+    diagnostics = row["prompt_diagnostics"]
+    assert diagnostics is not None
+    assert diagnostics["prepared_input_token_count"] == 274
+    assert diagnostics["image_token_count"] == 256
+    assert diagnostics["declared_sampling"] == {"do_sample": True, "temperature": 0.7}

@@ -66,7 +66,16 @@ import tomllib
 import traceback
 import types
 from collections import Counter
-from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence, Sized
+from collections.abc import (
+    Callable,
+    Collection,
+    Generator,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+    Sized,
+)
 from contextlib import (
     ContextDecorator,
     ExitStack,
@@ -977,6 +986,7 @@ class JsonlTimingRecord(TypedDict):
     prompt_prep_time_s: float | None
     cleanup_time_s: float | None
     first_token_latency_s: float | None
+    time_to_first_token_s: float | None
     stop_reason: str | None
 
 
@@ -994,6 +1004,7 @@ class JsonlMetricsRecord(TypedDict, total=False):
     cache_memory_gb: float
     model_load_active_memory_gb: float
     peak_memory_delta_gb: float
+    first_token_peak_memory_gb: float
     post_cleanup_active_memory_gb: float
     post_cleanup_cache_memory_gb: float
 
@@ -1229,6 +1240,7 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     token_cap_reasons: list[str]
     unchanged_draft_fields: list[str]
     duplicated_answer_separator: str
+    emitted_special_tokens: list[str]
 
 
 class JsonlFailureRecord(TypedDict, total=False):
@@ -1795,6 +1807,12 @@ class PromptDiagnostics:
     processed_image_width: int | None = None
     processed_image_height: int | None = None
     image_patch_count: int | None = None
+    # Exact composition from a second upstream prepare_inputs() pass: the
+    # prepared input length and how many of those ids are the model's image
+    # token. Trusted only when the length equals the prompt total reported by
+    # generation, which the analysis checks.
+    prepared_input_token_count: int | None = None
+    image_token_count: int | None = None
     eos_token_id: JsonLike = None
     eos_token: str | None = None
     special_token_ids: tuple[JsonLike, ...] = ()
@@ -1805,6 +1823,11 @@ class PromptDiagnostics:
     # "explicit" when the user passed thinking flags, None when no budget.
     thinking_budget_source: Literal["auto", "explicit"] | None = None
     template_thinking_markers: bool | None = None
+    # Sampling defaults the checkpoint itself declares in generation_config.json
+    # (do_sample, temperature, top_p, ...): a structured stand-in for "what the
+    # model card recommends", recorded so a run's fixed settings can be read
+    # against them. Never changes what the harness sends.
+    declared_sampling: dict[str, JsonLike] = dataclass_field(default_factory=dict)
     # Neutral legacy file-layout facts about the cached snapshot (e.g. missing
     # processor config). Evidence only: never an observation, never affects
     # usability; retained so a later failure can be traced to a snapshot that
@@ -1881,6 +1904,9 @@ class PerformanceResult:
     requested_revision: str | None = None
     model_burden: ModelBurdenFacts | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
+    # Decoded names of special token ids the stream emitted (EOS excluded),
+    # detected by id rather than by regex on the decoded text.
+    emitted_special_tokens: tuple[str, ...] = ()
     rerun_evidence: RerunEvidence | None = None
     # Thermal/memory-pressure facts sampled while this model ran (darwin only).
     system_telemetry: SystemTelemetryRecord | None = None
@@ -1912,6 +1938,12 @@ class RuntimeDiagnostics:
     cleanup_time_s: float | None = None
     # Upstream model-loop time through first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
+    # Wall clock from the harness's generate call to the first streamed chunk:
+    # input preparation, prefill and the first decode step, as a caller sees it.
+    time_to_first_token_s: float | None = None
+    # Upstream peak memory reported on the first streamed chunk (the prefill
+    # peak), against the final peak which also covers decode.
+    first_token_peak_memory_gb: float | None = None
     stop_reason: str | None = None
     # Allocator residue sampled after the per-model cleanup sequence.
     post_cleanup_active_memory_gb: float | None = None
@@ -2077,6 +2109,12 @@ def _prompt_composition_fact(result: PerformanceResult) -> str | None:
                 f"with total {total:,} and the word-ratio estimate also exceeded it"
             )
         return None
+    if analysis.prompt_tokens_text_source == "input_ids":
+        share = 100.0 * nontext / total
+        return (
+            f"{total:,} = {text:,} text/template + {nontext:,} image tokens "
+            f"({share:.0f}%; exact, counted by token id in the prepared input)"
+        )
     source = (
         "tokenizer-exact"
         if analysis.prompt_tokens_text_source == "tokenizer"
@@ -2112,7 +2150,7 @@ def _prompt_burden_for_result(
         nontext_est=nontext_est,
         ratio=ratio,
         placeholders=placeholders,
-        exact_text_tokens=text_source == "tokenizer",
+        exact_text_tokens=text_source in {"tokenizer", "input_ids"},
     )
 
     return PromptBurden(
@@ -2123,7 +2161,13 @@ def _prompt_burden_for_result(
         nontext_ratio=ratio,
         text_tokens_source=text_source,
         source=(
-            ("exact_text_tokens" if text_source == "tokenizer" else "estimated_nontext")
+            (
+                "exact_input_ids"
+                if text_source == "input_ids"
+                else "exact_text_tokens"
+                if text_source == "tokenizer"
+                else "estimated_nontext"
+            )
             if nontext_est is not None
             else "unavailable"
         ),
@@ -4192,7 +4236,7 @@ class GenerationQualityAnalysis:
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
-    prompt_tokens_text_source: Literal["tokenizer", "heuristic"] | None = None
+    prompt_tokens_text_source: Literal["tokenizer", "heuristic", "input_ids"] | None = None
     prompt_tokens_text_exact_rejected: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
     configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
@@ -4205,6 +4249,9 @@ class GenerationQualityAnalysis:
     # the separator is whatever sat between the copies (often a leaked
     # control token such as </think>), or "" for back-to-back copies.
     duplicated_answer_separator: str | None = None
+    # Special tokens the stream emitted, detected by token id (EOS and
+    # configured stops excluded); folded into unexpected_special_tokens.
+    emitted_special_tokens: list[str] = dataclass_field(default_factory=list)
 
 
 _DUPLICATED_ANSWER_MIN_CHARS: Final[int] = 80
@@ -4239,16 +4286,26 @@ def _split_prompt_tokens(
     prompt_tokens: int | None,
     prompt: str | None,
     prompt_text_tokens: int | None,
-) -> tuple[int | None, int | None, Literal["tokenizer", "heuristic"] | None, int | None]:
+    prompt_image_tokens: int | None = None,
+) -> tuple[
+    int | None, int | None, Literal["tokenizer", "heuristic", "input_ids"] | None, int | None
+]:
     """Split total prompt tokens into (text, non-text, source, rejected exact).
 
-    Prefers an exact tokenizer count; either count must satisfy
+    An exact image-token count from the prepared input ids wins outright;
+    otherwise prefers an exact tokenizer count; either count must satisfy
     ``0 <= text <= total`` or the split is unavailable. An exact count that
     fails the invariant is retained as the rejected evidence value — it would
     otherwise publish an impossible split (e.g. "5 = 7 text + 0 non-text").
     """
-    source: Literal["tokenizer", "heuristic"] | None
+    source: Literal["tokenizer", "heuristic", "input_ids"] | None
     rejected: int | None = None
+    if (
+        prompt_image_tokens is not None
+        and prompt_tokens is not None
+        and 0 <= prompt_image_tokens <= prompt_tokens
+    ):
+        return prompt_tokens - prompt_image_tokens, prompt_image_tokens, "input_ids", None
     exact_is_consistent = prompt_text_tokens is not None and (
         prompt_tokens is None or 0 <= prompt_text_tokens <= prompt_tokens
     )
@@ -4271,7 +4328,15 @@ def _split_prompt_tokens(
     return text_est, nontext_est, source, rejected
 
 
-def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every prompt-contract knob  # skylos: ignore[SKY-C303]
+def _id_detected_special_tokens(
+    emitted: Sequence[str],
+    declared: Collection[str],
+) -> list[str]:
+    """Keep the id-detected special tokens that no declared wrapper accounts for."""
+    return [token for token in _dedupe_preserve_order(emitted) if token and token not in declared]
+
+
+def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over every prompt-contract knob  # skylos: ignore[SKY-C303]
     text: str,
     generated_tokens: int | None,
     prompt_tokens: int | None = None,
@@ -4283,6 +4348,8 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
     seeded_thinking_text: str = "",
     prompt_text_tokens: int | None = None,
+    prompt_image_tokens: int | None = None,
+    emitted_special_tokens: Sequence[str] = (),
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts.
 
@@ -4332,7 +4399,10 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         prompt_tokens_text_source,
         prompt_tokens_text_exact_rejected,
     ) = _split_prompt_tokens(
-        prompt_tokens=prompt_tokens, prompt=prompt, prompt_text_tokens=prompt_text_tokens
+        prompt_tokens=prompt_tokens,
+        prompt=prompt,
+        prompt_text_tokens=prompt_text_tokens,
+        prompt_image_tokens=prompt_image_tokens,
     )
     likely_capped, cutoff_reasons = _detect_likely_cutoff(
         analysis_text,
@@ -4359,6 +4429,13 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         for marker in (pair.start, pair.end)
     )
     unexpected_special_tokens.extend(empty_reported_markers)
+    # Ids the stream emitted are evidence in their own right; declared
+    # wrappers and the thinking markers below are neutralised exactly as for
+    # the text-detected tokens.
+    id_detected = _id_detected_special_tokens(
+        emitted_special_tokens, {*known_special_tokens, *configured_generation_wrappers}
+    )
+    unexpected_special_tokens.extend(id_detected)
     if reasoning.has_thinking_trace:
         # A legitimate detected trace neutralises its own delimiters, including
         # <|...|>-style pairs where the generic control-token regex captures
@@ -4407,6 +4484,7 @@ def analyze_generation_text(  # noqa: PLR0913 - one analysis pass over every pro
         duplicated_answer_separator=_detect_duplicated_answer(
             analysis_text, is_repetitive=is_repetitive
         ),
+        emitted_special_tokens=id_detected,
     )
 
 
@@ -5475,7 +5553,7 @@ def _parse_public_image_source_url(value: str) -> str:
     return value
 
 
-def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> Image.Image:
+def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> PILImage:
     """Open an image for EXIF extraction from a local path or HTTP(S) URL."""
     if not is_url:
         return Image.open(Path(image_path))
@@ -7721,6 +7799,15 @@ def _field_aware_preview(answer: str, *, max_chars: int) -> str | None:
     return f"{title_part} | {description_part} | {keywords_part}"
 
 
+def _chooser_first_token_seconds(runtime: RuntimeDiagnostics | None) -> float | None:
+    """Measured time to first token when captured, else upstream's model-loop proxy."""
+    if runtime is None:
+        return None
+    if runtime.time_to_first_token_s is not None:
+        return runtime.time_to_first_token_s
+    return runtime.first_token_latency_s
+
+
 def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> GalleryRow:
     """Build one chooser row from cached assessment and captured facts only."""
     generation = result.generation
@@ -7759,11 +7846,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
             result.total_time if result.total_time is not None and result.total_time >= 0 else None
         ),
         generation_tps=_valid_generation_tps(result),
-        first_token_latency_s=(
-            result.runtime_diagnostics.first_token_latency_s
-            if result.runtime_diagnostics is not None
-            else None
-        ),
+        first_token_latency_s=_chooser_first_token_seconds(result.runtime_diagnostics),
         peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
         prompt_tokens=_generation_int_metric(generation, "prompt_tokens"),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
@@ -8224,7 +8307,9 @@ def _gallery_chooser_explanation() -> str:
         "or described the image accurately. Consult the assessment scope above. Total time is end-to-end; "
         "throughput covers generation only and requires "
         f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
-        "Prefill/first is first-token latency when captured; Prompt tok is the full "
+        "Prefill/first is the measured time to first token (input preparation, prefill "
+        "and the first decode step) when captured, else upstream's model-loop first-token "
+        "time; Prompt tok is the full "
         "rendered prompt including image tokens, which drives prefill cost. "
         "For cross-attention architectures the token count reflects the tokenised "
         "text burden only, not total vision prefill compute."
@@ -8602,6 +8687,8 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
     if analysis.duplicated_answer_separator is not None:
         details["duplicated_answer_separator"] = analysis.duplicated_answer_separator
+    if analysis.emitted_special_tokens:
+        details["emitted_special_tokens"] = list(analysis.emitted_special_tokens)
     return details
 
 
@@ -9385,6 +9472,7 @@ def _diagnostics_result_facts(
         "token_cap_reasons": "Token-cap degradation evidence",
         "unchanged_draft_fields": "Draft fields returned unchanged",
         "duplicated_answer_separator": "Text between the two answer copies",
+        "emitted_special_tokens": "Special tokens emitted (by token id)",
     }
     rows.extend(
         (detail_labels.get(key, key.replace("_", " ").capitalize()), _diagnostics_fact(value))
@@ -9416,7 +9504,11 @@ def _diagnostics_result_facts(
         ("Requested model revision", requested_revision),
         ("Processor class", processor),
         ("Tokenizer class", tokenizer),
-        ("Stop reason", runtime.stop_reason if runtime is not None else None),
+        *_runtime_termination_facts(runtime),
+        (
+            "Checkpoint-declared sampling (generation_config.json)",
+            _declared_sampling_fact(prompt_diagnostics, generation_kwargs),
+        ),
         (
             "Post-cleanup active memory (GB)",
             runtime.post_cleanup_active_memory_gb if runtime is not None else None,
@@ -9536,6 +9628,42 @@ def _oom_capacity_rows(
             ("Upstream memory estimate", f"model {match.group(0).strip()} (mlx-vlm warning)")
         )
     return tuple(rows)
+
+
+def _runtime_termination_facts(
+    runtime: RuntimeDiagnostics | None,
+) -> tuple[tuple[str, object], ...]:
+    """Stop reason and first-token facts from the runtime diagnostics, when captured."""
+    if runtime is None:
+        return ()
+    return (
+        ("Stop reason", runtime.stop_reason),
+        (
+            "Time to first token (s; measured: input preparation, prefill, first decode step)",
+            runtime.time_to_first_token_s,
+        ),
+        ("Peak memory at first token (GB)", runtime.first_token_peak_memory_gb),
+    )
+
+
+def _declared_sampling_fact(
+    prompt_diagnostics: PromptDiagnostics | None,
+    generation_kwargs: Mapping[str, object],
+) -> str | None:
+    """Render the checkpoint's declared sampling defaults against the run's settings."""
+    if prompt_diagnostics is None or not prompt_diagnostics.declared_sampling:
+        return None
+    declared = prompt_diagnostics.declared_sampling
+    parts = [f"{key} {value}" for key, value in declared.items()]
+    effective = generation_kwargs.get("temperature")
+    declared_temperature = declared.get("temperature")
+    if (
+        isinstance(effective, int | float)
+        and isinstance(declared_temperature, int | float)
+        and float(effective) != float(declared_temperature)
+    ):
+        parts.append(f"run used temperature {effective}")
+    return "; ".join(parts)
 
 
 def _diagnostics_model_anchor(model_name: str) -> str:
@@ -11790,6 +11918,108 @@ def _optional_mlx_vlm_utils_attribute(name: str) -> object | None:
     return getattr(utils_module, name, None)
 
 
+_DECLARED_SAMPLING_KEYS: Final[tuple[str, ...]] = (
+    "do_sample",
+    "temperature",
+    "top_p",
+    "top_k",
+    "min_p",
+    "repetition_penalty",
+)
+
+
+def _declared_sampling_defaults(snapshot_path: Path | None) -> dict[str, JsonLike]:
+    """Return the sampling defaults a checkpoint's generation_config.json declares.
+
+    This is the structured form of a model card's "recommended settings":
+    authors ship them in the snapshot, so no prose parsing is needed. Facts
+    only; the harness keeps its own fixed settings.
+    """
+    if snapshot_path is None:
+        return {}
+    payload = _read_snapshot_json(snapshot_path, "generation_config.json")
+    if not isinstance(payload, dict):
+        return {}
+    declared: dict[str, JsonLike] = {}
+    for key in _DECLARED_SAMPLING_KEYS:
+        value = payload.get(key)
+        if isinstance(value, bool | int | float):
+            declared[key] = value
+    return declared
+
+
+def _flatten_token_ids(value: object) -> list[int] | None:
+    """Return prepared input ids as a flat int list, from an mx.array or nested lists."""
+    to_list = getattr(value, "tolist", None)
+    raw = to_list() if callable(to_list) else value
+    flat: list[int] = []
+    stack: list[object] = [raw]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, bool):
+            return None
+        if isinstance(item, int):
+            flat.append(item)
+        elif isinstance(item, list | tuple):
+            stack.extend(reversed(item))
+        else:
+            return None
+    return flat
+
+
+def _exact_prompt_composition(
+    *,
+    processor: ProcessorMixin,
+    config: PreTrainedConfig | Mapping[str, object] | None,
+    params: ProcessImageParams,
+    formatted_prompt: str,
+    processor_passthrough_kwargs: Mapping[str, object],
+) -> tuple[int | None, int | None]:
+    """Count the prepared input ids and the model's image tokens among them.
+
+    Runs upstream ``prepare_inputs`` once more, with the same arguments
+    ``stream_generate`` passes, purely to read the ids (about half a second
+    for a 50 MP image). The count is only trusted downstream when its length
+    equals the prompt total the generation reports. Best effort: never raises.
+    """
+    prepare = _optional_mlx_vlm_utils_attribute("prepare_inputs")
+    should_add = _optional_mlx_vlm_utils_attribute("should_add_special_tokens")
+    if not callable(prepare) or not callable(should_add):
+        return None, None
+    model_type = _get_config_value(config, "model_type")
+    image_token_index = _get_config_value(config, "image_token_index")
+    if image_token_index is None:
+        image_token_index = _get_config_value(config, "image_token_id")
+    try:
+        inputs = prepare(
+            processor,
+            images=str(params.image_path),
+            prompts=formatted_prompt,
+            image_token_index=image_token_index,
+            resize_shape=params.resize_shape,
+            add_special_tokens=should_add(model_type, processor),
+            **processor_passthrough_kwargs,
+        )
+    except Exception:  # diagnostics only; the real call reports its own failure
+        logger.debug(
+            "Exact prompt composition unavailable for %s", params.model_identifier, exc_info=True
+        )
+        return None, None
+    if not isinstance(inputs, Mapping):
+        return None, None
+    flat = _flatten_token_ids(inputs.get("input_ids"))
+    if flat is None:
+        return None, None
+    token_id: object = image_token_index
+    if token_id is None:
+        raw_id = inputs.get("image_token_id")
+        item = getattr(raw_id, "item", None)
+        token_id = item() if callable(item) else raw_id
+    if isinstance(token_id, bool) or not isinstance(token_id, int):
+        return len(flat), None
+    return len(flat), sum(1 for ident in flat if ident == token_id)
+
+
 def _build_prompt_diagnostics(
     *,
     params: ProcessImageParams,
@@ -11800,6 +12030,8 @@ def _build_prompt_diagnostics(
     processor_passthrough_kwargs: Mapping[str, object],
     thinking_budget_source: Literal["auto", "explicit"] | None = None,
     snapshot_notes: tuple[str, ...] = (),
+    prepared_input_token_count: int | None = None,
+    image_token_count: int | None = None,
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -11808,6 +12040,7 @@ def _build_prompt_diagnostics(
     eos_token = getattr(tokenizer, "eos_token", None)
     processed_height = params.resize_shape[0] if params.resize_shape is not None else None
     processed_width = params.resize_shape[1] if params.resize_shape is not None else None
+    snapshot_path = _resolve_model_snapshot_path(params.model_identifier, params.revision)
     return PromptDiagnostics(
         model_type=model_type,
         processor_class=_qualified_class_name(processor),
@@ -11825,14 +12058,15 @@ def _build_prompt_diagnostics(
         ),
         processed_image_width=processed_width,
         processed_image_height=processed_height,
+        prepared_input_token_count=prepared_input_token_count,
+        image_token_count=image_token_count,
         eos_token_id=_prompt_diag_json_value(getattr(tokenizer, "eos_token_id", None)),
         eos_token=str(eos_token) if eos_token is not None else None,
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         thinking_budget_source=thinking_budget_source,
-        template_thinking_markers=_template_declares_thinking(
-            _resolve_model_snapshot_path(params.model_identifier, params.revision)
-        ),
+        template_thinking_markers=_template_declares_thinking(snapshot_path),
+        declared_sampling=_declared_sampling_defaults(snapshot_path),
         snapshot_notes=snapshot_notes,
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
             generate_kwargs=generate_kwargs,
@@ -11887,6 +12121,8 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "processed_image_width",
         "processed_image_height",
         "image_patch_count",
+        "prepared_input_token_count",
+        "image_token_count",
         "eos_token_id",
         "eos_token",
         "thinking_budget_source",
@@ -11901,6 +12137,8 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
             payload[key] = _prompt_diag_json_value(value)
     if diagnostics.special_token_ids:
         payload["special_token_ids"] = list(diagnostics.special_token_ids)
+    if diagnostics.declared_sampling:
+        payload["declared_sampling"] = dict(diagnostics.declared_sampling)
     if diagnostics.special_tokens:
         payload["special_tokens"] = [
             _prompt_diag_json_value(item) for item in diagnostics.special_tokens
@@ -13094,6 +13332,8 @@ def _build_runtime_diagnostics(
     *,
     stop_reason: str | None,
     first_token_latency_s: float | None = None,
+    time_to_first_token_s: float | None = None,
+    first_token_peak_memory_gb: float | None = None,
     model_load_active_memory_gb: float | None = None,
     post_cleanup_active_memory_gb: float | None = None,
     post_cleanup_cache_memory_gb: float | None = None,
@@ -13107,6 +13347,8 @@ def _build_runtime_diagnostics(
         decode_time_s=phase_timer.duration("decode"),
         cleanup_time_s=phase_timer.duration("cleanup"),
         first_token_latency_s=first_token_latency_s,
+        time_to_first_token_s=time_to_first_token_s,
+        first_token_peak_memory_gb=first_token_peak_memory_gb,
         stop_reason=stop_reason,
         post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
         post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
@@ -13309,6 +13551,16 @@ def _finalize_process_result(
             if result_payload is not None and result_payload.runtime_diagnostics is not None
             else None
         ),
+        time_to_first_token_s=(
+            result_payload.runtime_diagnostics.time_to_first_token_s
+            if result_payload is not None and result_payload.runtime_diagnostics is not None
+            else None
+        ),
+        first_token_peak_memory_gb=(
+            result_payload.runtime_diagnostics.first_token_peak_memory_gb
+            if result_payload is not None and result_payload.runtime_diagnostics is not None
+            else None
+        ),
         model_load_active_memory_gb=(
             result_payload.runtime_diagnostics.model_load_active_memory_gb
             if result_payload is not None and result_payload.runtime_diagnostics is not None
@@ -13402,6 +13654,17 @@ def _prepare_generation(
         thinking_budget_source = "explicit"
     else:
         thinking_budget_source = None
+    composition_scope = (
+        phase_timer.track("prompt_prep") if phase_timer is not None else nullcontext()
+    )
+    with composition_scope:
+        prepared_input_token_count, image_token_count = _exact_prompt_composition(
+            processor=processor,
+            config=config,
+            params=params,
+            formatted_prompt=formatted_prompt,
+            processor_passthrough_kwargs=processor_passthrough_kwargs,
+        )
     prompt_diagnostics = _build_prompt_diagnostics(
         params=params,
         processor=processor,
@@ -13411,6 +13674,8 @@ def _prepare_generation(
         processor_passthrough_kwargs=processor_passthrough_kwargs,
         thinking_budget_source=thinking_budget_source,
         snapshot_notes=prepared_prompt.snapshot_notes,
+        prepared_input_token_count=prepared_input_token_count,
+        image_token_count=image_token_count,
     )
     return _PreparedGeneration(
         model=model,
@@ -13450,12 +13715,98 @@ def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int)
     return _detect_streaming_repetition("".join(pieces)[-_REPETITION_ABORT_TAIL_CHARS:])
 
 
+@dataclass
+class StreamObservations:
+    """Facts only the streaming loop can see; attached to the generation result.
+
+    ``started_at`` is set by the caller right before the upstream call;
+    ``first_chunk_at`` by the loop when the first chunk arrives, so their
+    difference is the time to first token as a caller experiences it (input
+    preparation, prefill and the first decode step). ``token_ids`` are the
+    retained (non-draft) generated ids, from which special tokens are
+    detected by id rather than by regex on the decoded text.
+    """
+
+    started_at: float | None = None
+    first_chunk_at: float | None = None
+    first_chunk_peak_memory_gb: float | None = None
+    token_ids: list[int] = dataclass_field(default_factory=list)
+    special_tokens: tuple[str, ...] = ()
+
+    @property
+    def time_to_first_token_s(self) -> float | None:
+        """Wall-clock seconds from the generate call to the first chunk, if both seen."""
+        if self.started_at is None or self.first_chunk_at is None:
+            return None
+        return max(self.first_chunk_at - self.started_at, 0.0)
+
+
+_STREAM_OBSERVATIONS_ATTR: Final[str] = "_check_models_stream_observations"
+
+
+def _object_stream_observations(value: object | None) -> StreamObservations | None:
+    """Return the stream observations attached to a generation result, if any."""
+    observations = getattr(value, _STREAM_OBSERVATIONS_ATTR, None)
+    return observations if isinstance(observations, StreamObservations) else None
+
+
+def _observe_first_chunk(observations: StreamObservations | None, chunk: object) -> None:
+    """Record the first chunk's arrival time and upstream peak memory."""
+    if observations is None:
+        return
+    observations.first_chunk_at = time.perf_counter()
+    peak = getattr(chunk, "peak_memory", None)
+    if isinstance(peak, int | float) and not isinstance(peak, bool) and peak >= 0:
+        observations.first_chunk_peak_memory_gb = float(peak)
+
+
+def _observe_token(observations: StreamObservations | None, chunk: object) -> None:
+    """Append a retained chunk's token id, when the chunk carries one."""
+    if observations is None:
+        return
+    token = getattr(chunk, "token", None)
+    if isinstance(token, int) and not isinstance(token, bool):
+        observations.token_ids.append(token)
+
+
+def _emitted_special_tokens(
+    token_ids: Sequence[int],
+    processor: object,
+    *,
+    excluded: Collection[str],
+) -> tuple[str, ...]:
+    """Decode the special token ids the stream emitted, in first-seen order.
+
+    Detection by id catches control tokens whose decoded form the text regex
+    does not recognise. ``excluded`` names (EOS and configured stop tokens)
+    are expected terminators, not leakage.
+    """
+    tokenizer = getattr(processor, "tokenizer", processor)
+    raw_ids = getattr(tokenizer, "all_special_ids", None)
+    convert = getattr(tokenizer, "convert_ids_to_tokens", None)
+    if not raw_ids or not callable(convert):
+        return ()
+    special = {ident for ident in raw_ids if isinstance(ident, int) and not isinstance(ident, bool)}
+    seen: list[str] = []
+    for token_id in token_ids:
+        if token_id not in special:
+            continue
+        try:
+            name = convert(token_id)
+        except (IndexError, KeyError, TypeError, ValueError):
+            continue
+        if isinstance(name, str) and name not in excluded and name not in seen:
+            seen.append(name)
+    return tuple(seen)
+
+
 def _generate_with_repetition_guard(
     model: nn.Module,
     processor: ProcessorLike | PreTrainedTokenizer,
     prompt: str,
     image: str | list[str] | None = None,
     on_first_token: Callable[[], None] | None = None,
+    observations: StreamObservations | None = None,
     **kwargs: object,
 ) -> GenerationResult | SupportsGenerationResult:
     """Upstream ``generate`` semantics with an early stop on degenerate loops.
@@ -13480,7 +13831,9 @@ def _generate_with_repetition_guard(
 
     ``on_first_token`` fires once, when the first chunk arrives; a failure
     escaping the stream is tagged with that boundary (before/after the first
-    token) unless a deeper phase is already on it.
+    token) unless a deeper phase is already on it. ``observations``, when
+    given, receives the first chunk's time and peak memory and every retained
+    chunk's token id.
     """
     tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
     stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
@@ -13499,14 +13852,17 @@ def _generate_with_repetition_guard(
         for chunk in stream_generate(
             model=model, processor=processor, prompt=prompt, image=image, **kwargs
         ):
-            if last is None and on_first_token is not None:
-                on_first_token()
+            if last is None:
+                _observe_first_chunk(observations, chunk)
+                if on_first_token is not None:
+                    on_first_token()
             last = chunk
             if getattr(chunk, "is_draft", False):
                 # Speculative/diffusion draft chunks are progress display only;
                 # upstream generate() excludes their text from the final answer,
                 # so they are neither echoed nor retained.
                 continue
+            _observe_token(observations, chunk)
             pieces.append(chunk.text)
             if (
                 echo is not None
@@ -13554,6 +13910,18 @@ def _generate_with_repetition_guard(
         raise
 
 
+def _expected_stop_token_names(prepared: _PreparedGeneration) -> frozenset[str]:
+    """Names of the tokens that legitimately end a generation (EOS, configured stops)."""
+    names: set[str] = set()
+    eos = prepared.prompt_diagnostics.eos_token
+    if isinstance(eos, str) and eos:
+        names.add(eos)
+    configured = prepared.generate_kwargs.get("eos_tokens")
+    if isinstance(configured, list | tuple):
+        names.update(str(token) for token in configured if token)
+    return frozenset(names)
+
+
 def _execute_prepared_generation(
     params: ProcessImageParams,
     prepared: _PreparedGeneration,
@@ -13567,6 +13935,7 @@ def _execute_prepared_generation(
     timing, MLX synchronisation, and exception tagging with prompt
     diagnostics. Metric attachment stays with the caller.
     """
+    observations = StreamObservations()
 
     def _note_first_token() -> None:
         _set_failure_phase(phase_callback, "generation_after_first_token")
@@ -13575,7 +13944,9 @@ def _execute_prepared_generation(
         if prepared.processor_passthrough_kwargs:
             return _generate_with_processor_passthrough(
                 generate_fn=functools.partial(
-                    _generate_with_repetition_guard, on_first_token=_note_first_token
+                    _generate_with_repetition_guard,
+                    on_first_token=_note_first_token,
+                    observations=observations,
                 ),
                 model=prepared.model,
                 processor=prepared.generation_processor,
@@ -13589,6 +13960,7 @@ def _execute_prepared_generation(
             prompt=prepared.formatted_prompt,
             image=str(params.image_path),
             on_first_token=_note_first_token,
+            observations=observations,
             **prepared.generate_kwargs,
         )
 
@@ -13600,6 +13972,7 @@ def _execute_prepared_generation(
     # Failure phase (not the timer phase): a crash before any chunk arrives is
     # reported as exactly that, never assumed to be prefill.
     _set_failure_phase(phase_callback, "generation_before_first_token")
+    observations.started_at = time.perf_counter()
     try:
         output = _run_generation_guarded(
             params=params,
@@ -13610,6 +13983,12 @@ def _execute_prepared_generation(
         # pending GPU work and agree with each other.
         mx.synchronize()
         duration = timer.stop()
+        observations.special_tokens = _emitted_special_tokens(
+            observations.token_ids,
+            prepared.generation_processor,
+            excluded=_expected_stop_token_names(prepared),
+        )
+        setattr(cast("Any", output), _STREAM_OBSERVATIONS_ATTR, observations)
     except (TimeoutError, ValueError) as generation_err:
         _tag_exception_prompt_diagnostics(generation_err, prepared.prompt_diagnostics)
         raise
@@ -13882,6 +14261,7 @@ def _build_success_process_result(
 ) -> tuple[PerformanceResult, str | None]:
     """Build the successful PerformanceResult and resolved stop reason."""
     performance_data = _extract_generation_performance_data(output)
+    observations = _object_stream_observations(output)
     generation_time = performance_data.generation_time_s or phase_timer.duration("decode")
     total_time = time.perf_counter() - total_start_time
     model_load_time = phase_timer.duration("model_load")
@@ -13909,12 +14289,19 @@ def _build_success_process_result(
         runtime_diagnostics=_build_runtime_diagnostics(
             phase_timer,
             first_token_latency_s=first_token_latency_s,
+            time_to_first_token_s=(
+                observations.time_to_first_token_s if observations is not None else None
+            ),
+            first_token_peak_memory_gb=(
+                observations.first_chunk_peak_memory_gb if observations is not None else None
+            ),
             model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
             stop_reason=stop_reason,
         ),
         requested_max_tokens=params.max_tokens,
         prompt_diagnostics=_object_prompt_diagnostics(output),
         assessment_profile=params.assessment_profile,
+        emitted_special_tokens=observations.special_tokens if observations is not None else (),
     )
     result_payload = _populate_result_quality_analysis(
         result_payload,
@@ -15241,6 +15628,12 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
         _append_phase_entry(
             label="Upstream model prefill / first token:",
             value=runtime.first_token_latency_s,
+            field_name="total_time",
+            include_pct=False,
+        )
+        _append_phase_entry(
+            label="Time to first token (measured):",
+            value=runtime.time_to_first_token_s,
             field_name="total_time",
             include_pct=False,
         )
@@ -17249,8 +17642,27 @@ def _populate_result_quality_analysis(
         prompt_text_tokens=(
             diagnostics.rendered_prompt_token_count if diagnostics is not None else None
         ),
+        prompt_image_tokens=_verified_image_token_count(diagnostics, prompt_tokens),
+        emitted_special_tokens=result.emitted_special_tokens,
     )
     return replace(result, quality_analysis=analysis)
+
+
+def _verified_image_token_count(
+    diagnostics: PromptDiagnostics | None,
+    prompt_tokens: int | None,
+) -> int | None:
+    """Return the id-counted image tokens only when the second pass matched generation.
+
+    The count comes from a separate ``prepare_inputs`` call; it is trusted
+    only when that call produced exactly as many ids as the generation
+    reported as its prompt, which rules out a divergent preprocessing path.
+    """
+    if diagnostics is None or diagnostics.image_token_count is None:
+        return None
+    if prompt_tokens is None or diagnostics.prepared_input_token_count != prompt_tokens:
+        return None
+    return diagnostics.image_token_count
 
 
 # =============================================================================
@@ -18042,6 +18454,9 @@ def _build_jsonl_metrics_record(
     peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
     if peak_memory_delta_gb is not None:
         metrics["peak_memory_delta_gb"] = peak_memory_delta_gb
+    first_token_peak = runtime.first_token_peak_memory_gb if runtime is not None else None
+    if first_token_peak is not None:
+        metrics["first_token_peak_memory_gb"] = first_token_peak
     working_set_pct = _peak_memory_working_set_pct(
         performance_data.peak_memory_gb,
         recommended_working_set_bytes,
@@ -18134,6 +18549,9 @@ def _build_jsonl_result_record(
             "cleanup_time_s": runtime.cleanup_time_s if runtime is not None else None,
             "first_token_latency_s": (
                 runtime.first_token_latency_s if runtime is not None else None
+            ),
+            "time_to_first_token_s": (
+                runtime.time_to_first_token_s if runtime is not None else None
             ),
             "stop_reason": runtime.stop_reason if runtime is not None else None,
         },

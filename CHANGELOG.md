@@ -6,6 +6,23 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Four measurements replace estimates, all read from the stream the harness
+  already consumes: the time to first token is now measured wall clock from
+  the generate call to the first chunk (`time_to_first_token_s`; the chooser's
+  "Prefill/first" column prefers it and falls back to upstream's model-loop
+  proxy); peak memory is recorded on the first chunk
+  (`first_token_peak_memory_gb`) so the prefill peak is separable from the
+  decode peak; special tokens the stream emits are detected by token id
+  (EOS and configured stops excluded) and folded into the existing
+  control-token observation; and the prompt's image-token count is exact,
+  from a second upstream `prepare_inputs` pass (about half a second on a
+  50 MP image, inside the prompt-prep phase) that is trusted only when it
+  yields exactly the prompt total generation reports.
+- Each result records the checkpoint's own sampling defaults from
+  `generation_config.json` (`declared_sampling`: do_sample, temperature,
+  top_p, top_k, min_p, repetition_penalty) and the diagnostics say when the
+  run's temperature differed. Facts only; the harness keeps its fixed
+  settings.
 - Reorganised the implementation guide into a task-oriented reference with a
   code/test navigation map and concise generation, assessment and evidence
   contracts. Removed duplicated setup/dependency recipes, stale examples and
