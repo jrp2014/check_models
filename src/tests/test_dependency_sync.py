@@ -1358,8 +1358,9 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "HISTORY_BACKUP_DIR" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
     assert "mlx.metallib" in update_script
     assert "MLX runtime backend provenance" in update_script
-    assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
-    assert "# Skip PyTorch support" in contributing
+    assert "INSTALL_TORCH=1 bash tools/update.sh" in contributing
+    assert "# Include the optional PyTorch extra" in contributing
+    assert "SKIP_TORCH" not in update_script
     assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
 
 
