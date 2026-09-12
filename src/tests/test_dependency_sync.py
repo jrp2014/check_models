@@ -135,28 +135,6 @@ IMPORT_NAME_BY_REQUIREMENT = {
 }
 
 
-def _dependency_key(requirement: Requirement) -> str:
-    extras = f"[{','.join(sorted(requirement.extras))}]" if requirement.extras else ""
-    return f"{requirement.name}{extras}"
-
-
-def _dependency_spec(requirement: Requirement) -> str:
-    marker = f"; {requirement.marker}" if requirement.marker else ""
-    return f"{requirement.specifier}{marker}"
-
-
-def _parse_runtime_deps(text: str) -> dict[str, str]:
-    data = tomllib.loads(text)
-    # project.dependencies is a list of strings
-    deps_list = data.get("project", {}).get("dependencies", [])
-
-    deps: dict[str, str] = {}
-    for line in deps_list:
-        requirement = Requirement(line)
-        deps[_dependency_key(requirement)] = _dependency_spec(requirement)
-    return deps
-
-
 def _extract_manual_block(readme: str) -> str:
     start, end = MANUAL_MARKERS
     pattern = re.compile(rf"{re.escape(start)}(.*?){re.escape(end)}", re.DOTALL)
@@ -189,9 +167,8 @@ def test_safe_io_read_text_no_follow_enforces_byte_cap(tmp_path: Path) -> None:
 
 def test_readme_runtime_block_matches_pyproject() -> None:
     """Ensure the runtime dependencies in README match pyproject.toml."""
-    py_text = PYPROJECT.read_text(encoding="utf-8")
     rd_text = README.read_text(encoding="utf-8")
-    runtime_deps = _parse_runtime_deps(py_text)
+    runtime_deps = update_readme_deps.parse_pyproject(PYPROJECT)
 
     manual_block = _extract_manual_block(rd_text)
     # Pull quoted specs from pip install line
@@ -202,8 +179,8 @@ def test_readme_runtime_block_matches_pyproject() -> None:
 
     seen: dict[str, str] = {}
     for q in quoted:
-        requirement = Requirement(q)
-        seen[_dependency_key(requirement)] = _dependency_spec(requirement)
+        key, spec = update_readme_deps._parse_requirement(q)
+        seen[key] = spec
 
     # All runtime deps must exist
     missing = [k for k in runtime_deps if k not in seen]
@@ -1378,7 +1355,7 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "MLX_LOCAL_BUILD_SMOKE" in update_script
     assert "backup_run_history" in update_script
     assert "HISTORY_BACKUP_DIR" in update_script
-    assert "HISTORY_BACKUP_DIR" in contributing
+    assert "HISTORY_BACKUP_DIR" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
     assert "mlx.metallib" in update_script
     assert "MLX runtime backend provenance" in update_script
     assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
@@ -1417,9 +1394,9 @@ def test_update_script_updates_system_packages_by_default_and_node_latest_opt_in
         "`UPDATE_SYSTEM_PACKAGES` | `tools/update.sh` conda base/env and Homebrew updates | `1` (run system updates)"
         in readme
     )
-    assert "`UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew" in (
-        contributing
-    )
+    # The contributor guide no longer repeats README table rows; it points at the table.
+    assert "`UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade" in readme
+    assert "environment table (`src/README.md`)" in contributing
 
     package_latest = "markdownlint-cli2@latest"
     assert package_latest in update_script
@@ -1853,20 +1830,11 @@ def test_run_for_finding_uses_active_python_for_ruff(
     assert recorded_args[:4] == [sys.executable, "-m", "ruff", "check"]
 
 
-def test_agents_and_claude_docs_stay_in_sync() -> None:
-    """AGENTS.md and CLAUDE.md must stay byte-identical below their H1 titles."""
-
-    def body_below_title(path: Path) -> str:
-        lines = safe_io.read_text_no_follow(path).splitlines()
-        return "\n".join(lines[1:])
-
-    agents = REPO_ROOT / "AGENTS.md"
+def test_claude_instructions_are_a_link_to_agents_instructions() -> None:
+    """One instruction file: CLAUDE.md is a symlink to AGENTS.md, never a mirrored copy."""
     claude = REPO_ROOT / "CLAUDE.md"
-    assert agents.is_file()
-    assert claude.is_file()
-    assert body_below_title(agents) == body_below_title(claude), (
-        "AGENTS.md and CLAUDE.md have drifted; apply edits to both files"
-    )
+    assert claude.is_symlink(), "CLAUDE.md must be a symlink to AGENTS.md"
+    assert claude.resolve() == (REPO_ROOT / "AGENTS.md").resolve()
 
 
 def test_precommit_framework_config_installs_both_hooks() -> None:
@@ -1917,7 +1885,7 @@ def test_python_floor_is_single_sourced() -> None:
 
 
 def test_update_smoke_defaults_are_documented() -> None:
-    """The smoke model and expected output are mirrored into docs by hand."""
+    """The smoke model and expected output are documented once, in the README table."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     model_match = re.search(r"MLX_LOCAL_BUILD_SMOKE_MODEL:-([^}]+)\}", update_script)
     expected_match = re.search(r"MLX_LOCAL_BUILD_SMOKE_EXPECTED:-([^}]+)\}", update_script)
@@ -1927,10 +1895,8 @@ def test_update_smoke_defaults_are_documented() -> None:
     expected = expected_match.group(1)
 
     package_readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
-    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
-    for text, name in ((package_readme, "src/README.md"), (contributing, "CONTRIBUTING.md")):
-        assert model in text, f"smoke model not documented in {name}"
-        assert expected in text, f"smoke expected output not documented in {name}"
+    assert model in package_readme, "smoke model not documented in src/README.md"
+    assert expected in package_readme, "smoke expected output not documented in src/README.md"
 
 
 def test_section_banners_match_copilot_instructions() -> None:

@@ -7925,12 +7925,38 @@ _INTEGRATION_SIGNAL_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
     spec.code for spec in _OBSERVATION_DISPLAY_SPECS if spec.integration_signal
 )
 _RANGE_ENDPOINT_COUNT: Final[int] = 2
-_USABILITY_DISPLAY_PRIORITY: Final[dict[ModelUsability, int]] = {
-    "unusable": 0,
-    "usable_with_caveats": 1,
-    "usable": 2,
-    "not_evaluated": 3,
+# The one ordering of the usability statuses (best first, unassessed last) and
+# the one set of human glosses; every surface, sort key and count derives from
+# these two so no report can disagree with another about what "usable" means.
+_USABILITY_ORDER: Final[tuple[ModelUsability, ...]] = (
+    "usable",
+    "usable_with_caveats",
+    "unusable",
+    "not_evaluated",
+)
+_USABILITY_GLOSS: Final[dict[str, str]] = {
+    "usable": "no concerns detected",
+    "usable_with_caveats": "concerns detected",
+    "unusable": "major concerns",
+    "not_evaluated": "not assessed",
 }
+
+
+def _usability_rank(usability: str) -> int:
+    """Best-first position in the canonical order; foreign values sort last."""
+    return (
+        _USABILITY_ORDER.index(usability)
+        if usability in _USABILITY_ORDER
+        else len(_USABILITY_ORDER)
+    )
+
+
+def _usability_severity(usability: ModelUsability) -> int:
+    """Worst-first among the assessed statuses, with not_evaluated after them all."""
+    assessed = _USABILITY_ORDER[:-1]
+    if usability not in assessed:
+        return len(assessed)
+    return len(assessed) - 1 - assessed.index(usability)
 
 
 def _literal_values(alias: object) -> frozenset[str]:
@@ -7969,17 +7995,12 @@ def _assessment_actionability_key(
         ),
         default=len(_OBSERVATION_DISPLAY_RANK),
     )
-    return severity, _USABILITY_DISPLAY_PRIORITY[usability], model_name.casefold()
+    return severity, _usability_severity(usability), model_name.casefold()
 
 
 def _human_status_label(status: str) -> str:
     """Render a stable machine status for human-facing report surfaces."""
-    return {
-        "usable": "no concerns detected",
-        "usable_with_caveats": "concerns detected",
-        "unusable": "major concerns",
-        "not_evaluated": "not assessed",
-    }.get(status, status.replace("_", " "))
+    return _USABILITY_GLOSS.get(status, status.replace("_", " "))
 
 
 def _constraint_violation_labels(details: JsonlObservationDetailsRecord) -> list[str]:
@@ -8070,16 +8091,6 @@ def _gallery_observation_labels(observations: Sequence[ObservationCode]) -> str:
     return "; ".join(glosses) or "none"
 
 
-def _gallery_usability_sort_key(usability: ModelUsability) -> int:
-    """Order selector evidence from directly usable to not evaluated."""
-    return {
-        "usable": 0,
-        "usable_with_caveats": 1,
-        "unusable": 2,
-        "not_evaluated": 3,
-    }[usability]
-
-
 def _gallery_metric(field_name: str, value: MetricValue) -> str:
     """Format one captured metric, using a dash when unavailable."""
     return format_field_value(field_name, value) or "-"
@@ -8162,9 +8173,7 @@ def _gallery_chooser_data(rows: Sequence[GalleryRow]) -> GalleryChooserData:
     reasoning lengths differ so much across models that a tok/s ranking or
     a cross-model average carries little decision value.
     """
-    ordered = tuple(
-        sorted(rows, key=lambda row: (_gallery_usability_sort_key(row.usability), row.model))
-    )
+    ordered = tuple(sorted(rows, key=lambda row: (_usability_rank(row.usability), row.model)))
     avoided = tuple(row for row in ordered if row.usability in {"unusable", "not_evaluated"})
     usable = [row for row in ordered if row.usability == "usable" and not row.observations]
     timed = [row for row in usable if row.total_time_s is not None]
@@ -10291,7 +10300,7 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
     ordered_results = sorted(
         report_context.result_set.results,
         key=lambda result: (
-            _gallery_usability_sort_key(rows_by_model[result.model_name].usability),
+            _usability_rank(rows_by_model[result.model_name].usability),
             result.model_name,
         ),
     )
@@ -10539,7 +10548,7 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
     ordered_results = sorted(
         results,
         key=lambda result: (
-            _gallery_usability_sort_key(rows_by_model[result.model_name].usability),
+            _usability_rank(rows_by_model[result.model_name].usability),
             result.model_name,
         ),
     )
@@ -17629,12 +17638,9 @@ def _log_completed_models_list(
 ) -> None:
     """Log completed models in compact actionability-ordered tables."""
     logger.info("Completed Models (%d):", len(completed))
-    groups: tuple[tuple[ModelUsability, str], ...] = (
-        ("unusable", "Major concerns"),
-        ("usable_with_caveats", "Concerns detected"),
-        ("usable", "No concerns detected"),
-    )
-    for usability, label in groups:
+    # Worst first, assessed statuses only; the console capitalises the gloss.
+    for usability in reversed(_USABILITY_ORDER[:-1]):
+        label = _human_status_label(usability).capitalize()
         grouped = sorted(
             (
                 result
@@ -21028,14 +21034,6 @@ def _run_issue_summary_observation_cluster_section(
     )
 
 
-_RUN_ISSUE_USABILITY_ORDER: Final[dict[ModelUsability, int]] = {
-    "usable": 0,
-    "usable_with_caveats": 1,
-    "unusable": 2,
-    "not_evaluated": 3,
-}
-
-
 def _run_issue_summary_quality_cells(result: JsonlResultRecord) -> tuple[str, str, str]:
     """Format captured per-model resource facts for the quality table."""
     metrics = result.get("metrics") or {}
@@ -21104,10 +21102,7 @@ def _run_issue_summary_quality_section(
     ordered = sorted(
         results,
         key=lambda result: (
-            _RUN_ISSUE_USABILITY_ORDER.get(
-                result["assessment"]["usability"],
-                len(_RUN_ISSUE_USABILITY_ORDER),
-            ),
+            _usability_rank(result["assessment"]["usability"]),
             result["model"].lower(),
         ),
     )
@@ -21629,7 +21624,7 @@ def _output_index_dashboard_lines(
             "- Mechanical checks: "
             + ", ".join(
                 f"{_human_status_label(label)} {usability_counter.get(label, 0)}"
-                for label in ("usable", "usable_with_caveats", "unusable", "not_evaluated")
+                for label in _USABILITY_ORDER
             )
         ),
     ]

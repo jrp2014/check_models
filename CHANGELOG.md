@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Compression: the four usability statuses have one canonical order and one
+  gloss map in the monolith (five parallel tables, sort keys and label copies
+  are gone); `CLAUDE.md` is a symlink to `AGENTS.md` instead of a hand-mirrored
+  copy; the dependency-sync test uses `update_readme_deps.parse_pyproject`
+  instead of its own copy of the tool's parser; and `update.sh` variables are
+  documented once, in the README table, with the contributor guide pointing at
+  it rather than repeating rows.
 - `.claude/skills` is a committed symlink to `.agents/skills` (transformers'
   `make claude` pattern) so Claude Code discovers the project skills
   natively from the one source; the skill-validation test checks the link,

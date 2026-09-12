@@ -479,28 +479,12 @@ bash tools/update.sh
 
 **Environment Variables**:
 
+Every `update.sh` variable, with its default, is listed in the README's
+environment table (`src/README.md`); the ones below are not in that table.
+
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
-- `HISTORY_BACKUP_DIR=/path` / `SKIP_HISTORY_BACKUP=1`: Where the dated snapshot of
-  the untracked `output/results.history.jsonl` goes (default `../../backups`
-  beside the local MLX repos), or skip it for one run. Older snapshots that
-  are byte-prefixes of the newest are pruned; every copy and deletion is
-  printed.
-- `UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew
-  update/upgrade. By default, `update.sh` refreshes system package managers.
-- `UPDATE_NODE_TOOLING=1`: Upgrade repo-local markdownlint tooling to the
-  latest npm release. By default, `update.sh` installs from `package-lock.json`.
 - `CLEAN_PIP_INVALID_DISTS=0`: Skip cleanup of stale pip `~package` backup
   directories that can produce "Ignoring invalid distribution" warnings.
-- `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
-  (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
-  `MLX_METAL_JIT=OFF` uses pre-built kernels)
-- `MLX_LOCAL_BUILD_SMOKE=auto|1|0`: Run the local MLX runtime smoke test.
-  `auto` is the default and runs only when the smoke model is already cached;
-  `1` forces the test and may download the model; `0` skips it.
-- `MLX_LOCAL_BUILD_SMOKE_MODEL`: Override the default smoke model
-  (`mlx-community/nanoLLaVA-1.5-4bit`).
-- `MLX_LOCAL_BUILD_SMOKE_EXPECTED`: Override the expected deterministic output
-  substring (`Hello! How can I help you today?`).
 
 `tools/update.sh` (what `make update` runs) auto-detects sibling `mlx`
 and `mlx-vlm` repositories and follows upstream MLX editable dev
