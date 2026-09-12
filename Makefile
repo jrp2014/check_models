@@ -90,7 +90,7 @@ clean: ## Remove generated files and caches
 	@$(MAKE) -C $(SRC) clean
 	# Current retained run artifacts (issue drafts exist only after actionable crashes)
 	rm -f $(SRC)/output/reports/results.html $(SRC)/output/reports/model_gallery.md
-	rm -f $(SRC)/output/reports/diagnostics.md $(SRC)/output/index.md $(SRC)/output/run.json
+	rm -f $(SRC)/output/reports/diagnostics.md $(SRC)/output/index.md
 	rm -f $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
 	rm -f $(SRC)/output/check_models.log $(SRC)/output/environment.log
 	rm -rf $(SRC)/output/issues

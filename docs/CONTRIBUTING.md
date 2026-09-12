@@ -446,7 +446,7 @@ bash tools/update.sh
 
 **When to use `make update` / `update.sh`**:
 
-- You have local development builds of MLX, MLX-LM, or MLX-VLM
+- You have local development builds of MLX or MLX-VLM
 - You want system package managers (conda/Homebrew) refreshed too
 - You need environment diagnostics, stub regeneration, and the runtime smoke
 

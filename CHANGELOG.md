@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cruft: the superseded cats.jpg preview asset (`source-image-c4aeb8d1…jpg`,
+  referenced by no current report) is removed; the root `clean` target no
+  longer names the long-gone `run.json`; two MLX-LM mentions left in the
+  contributor guide and CLI README are gone.
 - `tools/update.sh` starts by copying a dated snapshot of the untracked
   `output/results.history.jsonl` to `HISTORY_BACKUP_DIR` (default
   `../../backups` beside the local MLX repos; `SKIP_HISTORY_BACKUP=1` skips),
