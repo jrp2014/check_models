@@ -141,7 +141,7 @@ fi
 
 if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="
-    "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=8 -m "not slow and not e2e"
+    "$QUALITY_PYTHON" -m pytest -q -n auto --maxprocesses=10 -m "not slow and not e2e"
 
     run_markdownlint_step
 
@@ -151,7 +151,7 @@ if [ "$QUALITY_MODE" = "fast" ]; then
 fi
 
 echo "=== Pytest ==="
-"$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=8
+"$QUALITY_PYTHON" -m pytest -v -n auto --maxprocesses=10
 
 echo "=== ShellCheck ==="
 shell_scripts=()

@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The pytest worker cap is 10 (`-n auto --maxprocesses=10`) in the quality
+  gate and the `Makefile` test targets: measured fastest on the 6P+12E-core
+  laptop (18.6 s versus 20.3 s at 8), with the curve flat because each worker
+  pays about 1.8 s to import the monolith before its first test.
 - `README.md` explains greedy decoding versus sampling next to the temperature
   flags: what temperature 0 means, when `--seed` matters, and why neither mode
   is simply better.
