@@ -112,10 +112,10 @@ quality_run_python_tool vulture
 # wizard that pushes commits. </dev/null alone does NOT prevent that: 4.33.x
 # decides from stdout.isatty(), not stdin, so a terminal run gets the prompt and
 # then aborts on the EOF. Only calls reaching run_gate_interaction can prompt —
-# `skylos cicd gate` and a bare `--gate` scan with no `--format`. Both calls
-# below are safe by construction: `--format concise --gate` routes to skylos's
-# quiet gate path, and `-a` without `--gate` never gates at all. </dev/null
-# stays as defence in depth. If you add a skylos call that can prompt, pipe its
+# `skylos cicd gate` and a bare `--gate` scan with no `--format`. The call
+# below is safe by construction: `--format concise --gate` routes to skylos's
+# quiet gate path. </dev/null stays as defence in depth. If you add a skylos
+# call that can prompt, pipe its
 # stdout and read the status from PIPESTATUS (see run_skylos_danger_advisory.sh)
 # rather than reaching for --strict, which discards the configured
 # [tool.skylos.gate] thresholds in favour of fail-on-any-finding.
@@ -126,13 +126,13 @@ quality_run_python_tool vulture
 # machinery than the ~15 s it saved. With nothing scanning the tree during
 # pytest, its ordinary gitignored caches (.pytest_cache, __pycache__) stay in
 # place, so `pytest --lf` sees the same last-failed set as the gate.
+# One gated scan carries every check the former ungated `-a` audit pass
+# added (ai-defects); the audit pass only printed a grade card over the same
+# files, at the cost of a second full analysis (~9 s). Danger stays in its
+# own advisory wrapper below, which post-filters the JSON report.
 echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . --quality --secrets --sca --gate --no-upload --format concise </dev/null
-
-echo "=== Skylos Audit Gate ==="
-TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-    quality_run_skylos . -a </dev/null
+    quality_run_skylos . --quality --secrets --sca --ai-defects --gate --no-upload --format concise </dev/null
 
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="

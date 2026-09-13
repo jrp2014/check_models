@@ -1016,7 +1016,9 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
         in quality_script
     )
     assert 'echo "=== Skylos Quality Gate ==="' in quality_script
-    assert 'echo "=== Skylos Audit Gate ==="' in quality_script
+    # The ungated `-a` audit pass is gone: it rescanned the same tree for a
+    # grade card; its one extra check (ai-defects) rides on the gated pass.
+    assert 'echo "=== Skylos Audit Gate ==="' not in quality_script
     assert "SKYLOS_JOBS" not in quality_script
     # Every Skylos call goes through the wrapper, which raises the 4.36+ grep
     # verification cap (default 30 s) so the slower CI runner does not turn a
@@ -1039,15 +1041,11 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     )
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_skylos \. --quality --secrets --sca --gate --no-upload "
+        r"quality_run_skylos \. --quality --secrets --sca --ai-defects --gate --no-upload "
         r"--format concise",
         quality_script,
     )
-    assert re.search(
-        r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
-        r"quality_run_skylos \. -a",
-        quality_script,
-    )
+    assert not re.search(r"quality_run_skylos \. -a\b", quality_script)
 
 
 def test_skylos_danger_advisory_script_is_separate_and_agent_friendly() -> None:
@@ -2283,3 +2281,36 @@ def test_update_script_parses_conda_change_lines_as_conda_prints_them() -> None:
     )
     names = [line.split()[0] for line in result.stdout.splitlines()]
     assert names == ["python", "tk", "openssl"], result.stdout
+
+
+def test_batched_noqa_audit_slices_ruff_output_per_finding(tmp_path: Path) -> None:
+    """One ruff run over every noqa variant returns each finding only its own lines."""
+    first = tmp_path / "first.py"
+    second = tmp_path / "second.py"
+    safe_io.write_text_no_follow(first, "import os  # noqa: F401 - kept for the audit\n")
+    safe_io.write_text_no_follow(
+        second, "value = 1\nother = missing_name  # noqa: F821 - kept for the audit\n"
+    )
+    findings = [
+        *check_suppressions.find_suppressions(first),
+        *check_suppressions.find_suppressions(second),
+    ]
+    assert [finding.kind for finding in findings] == ["noqa", "noqa"]
+
+    outputs = check_suppressions._batch_noqa_audit_outputs(findings, src_root=tmp_path)
+
+    assert set(outputs) == {(first, 1), (second, 2)}
+    assert "F401" in outputs[first, 1]
+    assert "F821" in outputs[second, 2]
+    assert "F401" not in outputs[second, 2]
+    assert "second" not in outputs[first, 1]
+    assert "first" not in outputs[second, 2]
+    assert list(tmp_path.glob("*.suppression-audit.*")) == []
+    for finding in findings:
+        needed, reason = check_suppressions.check_if_needed(
+            finding,
+            repo_root=tmp_path,
+            src_root=tmp_path,
+            audit_output=outputs[finding.file_path, finding.line_num],
+        )
+        assert needed is True, reason

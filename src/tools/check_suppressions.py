@@ -11,6 +11,7 @@ and ``.markdownlint.jsonc``; review those by hand when they change.
 from __future__ import annotations
 
 import io
+import json
 import re
 import shutil
 import subprocess
@@ -19,7 +20,10 @@ import tempfile
 import tokenize
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, Literal
+from typing import TYPE_CHECKING, Final, Literal
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 try:
     from tools.safe_io import read_text_no_follow
@@ -283,6 +287,66 @@ def _run_for_finding(
         temp_path.unlink(missing_ok=True)
 
 
+def _batch_noqa_audit_outputs(
+    findings: Sequence[SuppressionFinding],
+    *,
+    src_root: Path,
+) -> dict[tuple[Path, int], str]:
+    """Audit every noqa suppression in one ruff run; return each finding's own output.
+
+    One temp variant per finding, one ``ruff check`` over all of them (ruff
+    parallelises internally), then the JSON diagnostics are regrouped per
+    variant as ``path:line:col: CODE message`` lines, the shape the
+    per-finding runner's concise output has. Replaces one interpreter start
+    per suppression.
+    """
+    variants: dict[tuple[Path, int], Path] = {}
+    try:
+        for finding in findings:
+            if finding.kind != "noqa" or not finding.codes:
+                continue
+            variants[finding.file_path, finding.line_num] = _write_temp_variant(
+                finding.file_path, finding.line_num, finding.kind
+            )
+        if not variants:
+            return {}
+        completed = subprocess.run(  # noqa: S603 - fixed interpreter over repo-local temp files
+            [
+                sys.executable,
+                "-m",
+                "ruff",
+                "check",
+                "--output-format",
+                "json",
+                *(str(path) for path in variants.values()),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            cwd=src_root,
+        )
+    finally:
+        for path in variants.values():
+            path.unlink(missing_ok=True)
+    lines_by_variant: dict[Path, list[str]] = {path.resolve(): [] for path in variants.values()}
+    try:
+        diagnostics = json.loads(completed.stdout or "[]")
+    except json.JSONDecodeError:
+        diagnostics = []
+    for item in diagnostics if isinstance(diagnostics, list) else []:
+        if not isinstance(item, dict):
+            continue
+        filename = Path(str(item.get("filename", ""))).resolve()
+        if filename not in lines_by_variant:
+            continue
+        location = item.get("location") if isinstance(item.get("location"), dict) else {}
+        lines_by_variant[filename].append(
+            f"{filename}:{location.get('row', 0)}:{location.get('column', 0)}: "
+            f"{item.get('code', '')} {item.get('message', '')}"
+        )
+    return {key: "\n".join(lines_by_variant[path.resolve()]) for key, path in variants.items()}
+
+
 def _suppression_rationale(finding: SuppressionFinding) -> str:
     """Return the human justification text that follows the suppression codes."""
     if finding.kind == "noqa":
@@ -303,8 +367,14 @@ def check_if_needed(
     *,
     repo_root: Path,
     src_root: Path,
+    audit_output: str | None = None,
 ) -> tuple[bool, str]:
-    """Check whether one suppression is still required."""
+    """Check whether one suppression is still required.
+
+    ``audit_output`` is this finding's slice of a batched linter run
+    (``_batch_noqa_audit_outputs``); without it the linter runs for this
+    finding alone.
+    """
     invalid_reason: str | None = None
     if finding.kind == "bare-noqa":
         invalid_reason = "Bare # noqa is not allowed; use explicit codes"
@@ -321,13 +391,15 @@ def check_if_needed(
     if invalid_reason is not None:
         return False, invalid_reason
 
-    result = _run_for_finding(finding, repo_root=repo_root, src_root=src_root)
-    if result is None and finding.kind == "shellcheck":
-        return True, "Skipped shellcheck audit because shellcheck is unavailable"
-    if result is None:
-        return False, "No audit runner available for suppression"
-
-    output: str = f"{result.stdout}\n{result.stderr}"
+    if audit_output is not None:
+        output: str = audit_output
+    else:
+        result = _run_for_finding(finding, repo_root=repo_root, src_root=src_root)
+        if result is None and finding.kind == "shellcheck":
+            return True, "Skipped shellcheck audit because shellcheck is unavailable"
+        if result is None:
+            return False, "No audit runner available for suppression"
+        output = f"{result.stdout}\n{result.stderr}"
     missing_codes = tuple(
         code
         for code in finding.codes
@@ -355,6 +427,7 @@ def main() -> int:
 
     necessary: list[tuple[SuppressionFinding, str]] = []
     unnecessary: list[tuple[SuppressionFinding, str]] = []
+    batched_outputs = _batch_noqa_audit_outputs(findings, src_root=src_root)
 
     for finding in findings:
         relative_path: Path = finding.file_path.relative_to(repo_root)
@@ -362,7 +435,12 @@ def main() -> int:
         print(f"\n{relative_path}:{finding.line_num}: {code_display}")
         print(f"  {finding.line_text[:100]}...")
 
-        needed, reason = check_if_needed(finding, repo_root=repo_root, src_root=src_root)
+        needed, reason = check_if_needed(
+            finding,
+            repo_root=repo_root,
+            src_root=src_root,
+            audit_output=batched_outputs.get((finding.file_path, finding.line_num)),
+        )
         if needed:
             print(f"  ✓ NEEDED: {reason}")
             necessary.append((finding, reason))

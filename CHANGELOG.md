@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The quality gate runs one Skylos scan instead of two: the ungated `-a`
+  audit pass, which re-analysed the same tree for a grade card, is gone and
+  its one extra check (`--ai-defects`) rides on the gated pass. Saves about
+  8 s of the 46 s gate; the danger advisory wrapper is unchanged.
+- The suppression audit lints every noqa variant in one `ruff check` run and
+  slices the concise output per finding, instead of one interpreter start per
+  suppression (56 today).
 - The pytest worker cap is 10 (`-n auto --maxprocesses=10`) in the quality
   gate and the `Makefile` test targets: measured fastest on the 6P+12E-core
   laptop (18.6 s versus 20.3 s at 8), with the curve flat because each worker
