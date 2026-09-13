@@ -27,6 +27,7 @@ from check_models import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
+    from collections.abc import Callable, Sequence
     from pathlib import Path
 
     from rich.panel import Panel
@@ -1539,10 +1540,16 @@ class TestSystemTelemetry:
             [(None, None), (None, None)], mode="snapshot"
         )
 
-        assert record == {"mode": "snapshot", "cpu_samples": 0, "memory_samples": 0}
+        assert record == {
+            "mode": "snapshot",
+            "cpu_samples": 0,
+            "memory_samples": 0,
+            "power_samples": 0,
+        }
         status = check_models._telemetry_status_line(record)
         assert "thermal probe unavailable" in status
         assert "memory-pressure probe unavailable" in status
+        assert "power probe unavailable" in status
 
     def test_record_aggregates_min_max_and_per_probe_counts(self) -> None:
         """Aggregates keep the throttling floor, pressure ceiling, and counts."""
@@ -1561,6 +1568,7 @@ class TestSystemTelemetry:
             "cpu_throttled_samples": 1,
             "memory_pressure_level_max": 2,
             "memory_pressure_elevated_samples": 1,
+            "power_samples": 0,
         }
 
     def test_partial_probe_failure_stays_visible(self) -> None:
@@ -1614,7 +1622,9 @@ class TestSystemTelemetry:
     def test_sampler_snapshot_delegates_to_probe_aggregation(self) -> None:
         """The continuous sampler aggregates its probe list with its interval."""
         sampler = check_models._SystemTelemetrySampler(interval_s=1.5)
-        sampler._probes.extend([(100.0, 1), (80.0, 2)])
+        sampler._probes.extend(
+            [check_models._TelemetryProbe(100.0, 1), check_models._TelemetryProbe(80.0, 2)]
+        )
 
         snapshot = sampler.snapshot()
 
@@ -1691,3 +1701,94 @@ class TestSystemTelemetry:
         )
 
         assert record["system_telemetry"] == telemetry
+
+
+def _pmset_stub(*, drawing: str | None, powermode: str | None) -> Callable[..., str | None]:
+    """Return a _run_macos_toolchain_command stand-in for the two pmset reads."""
+
+    def _run(command: Sequence[str], **_kwargs: object) -> str | None:
+        if tuple(command) == ("/usr/bin/pmset", "-g", "batt"):
+            return None if drawing is None else f"Now drawing from '{drawing}'\n -InternalBattery-0"
+        if tuple(command) == ("/usr/bin/pmset", "-g"):
+            return (
+                None
+                if powermode is None
+                else f"System-wide power settings:\n powermode {powermode}"
+            )
+        return None
+
+    return _run
+
+
+def test_power_state_sample_parses_pmset_output(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Power source and pmset power mode are read from the two sudo-free pmset commands."""
+    monkeypatch.setattr(
+        check_models,
+        "_run_macos_toolchain_command",
+        _pmset_stub(drawing="Battery Power", powermode="1"),
+    )
+    assert check_models._sample_power_state() == ("battery", 1)
+    monkeypatch.setattr(
+        check_models, "_run_macos_toolchain_command", _pmset_stub(drawing="AC Power", powermode="0")
+    )
+    assert check_models._sample_power_state() == ("ac", 0)
+    monkeypatch.setattr(
+        check_models, "_run_macos_toolchain_command", _pmset_stub(drawing=None, powermode=None)
+    )
+    assert check_models._sample_power_state() == (None, None)
+
+
+def test_telemetry_record_aggregates_power_and_accepts_legacy_pairs() -> None:
+    """Power facts aggregate per probe; two-field probes from older callers still work."""
+    record = check_models._system_telemetry_record_from_probes(
+        [
+            (100.0, 1),
+            check_models._TelemetryProbe(100.0, 1, "battery", 1),
+            check_models._TelemetryProbe(100.0, 1, "ac", 0),
+        ],
+        mode="snapshot",
+    )
+    assert record["cpu_samples"] == 3
+    assert record["power_samples"] == 2
+    assert record["on_battery_samples"] == 1
+    assert record["power_mode_max"] == 1
+    status = check_models._telemetry_status_line(record)
+    assert "power: battery for 1 of 2 sample(s)" in status
+    assert "low power mode on" in status
+    # Battery power is a recorded fact, never a degradation verdict.
+    assert check_models._telemetry_degradation_note(record) is None
+    bare = check_models._system_telemetry_record_from_probes([(100.0, 1)], mode="snapshot")
+    assert bare["power_samples"] == 0
+    assert "power probe unavailable" in check_models._telemetry_status_line(bare)
+
+
+def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:
+    """A sleep mid-model shows as wall time outrunning process time; small drift is ignored."""
+    assert (
+        check_models._attach_wall_clock_gap(None, wall_elapsed_s=12.0, process_elapsed_s=9.8)
+        is None
+    )
+    slept = check_models._attach_wall_clock_gap(None, wall_elapsed_s=690.9, process_elapsed_s=9.8)
+    assert slept == {
+        "mode": "off",
+        "cpu_samples": 0,
+        "memory_samples": 0,
+        "wall_clock_gap_s": 681.1,
+    }
+    original: check_models.SystemTelemetryRecord = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+    }
+    enriched = check_models._attach_wall_clock_gap(
+        original, wall_elapsed_s=100.0, process_elapsed_s=10.0
+    )
+    assert enriched is not None
+    assert enriched["wall_clock_gap_s"] == 90.0
+    assert "wall_clock_gap_s" not in original
+    note = check_models._telemetry_degradation_note(enriched)
+    assert note is not None
+    assert "wall clock ran 90s ahead of the process clock" in note
+    assert "wall-clock gap 90s" in check_models._telemetry_status_line(enriched)
+    assert check_models._telemetry_wall_clock_gap(enriched) == 90.0
+    assert check_models._telemetry_wall_clock_gap(original) is None

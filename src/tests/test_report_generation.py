@@ -7253,3 +7253,55 @@ def test_diagnostics_facts_show_measured_first_token_and_declared_sampling() -> 
         check_models._chooser_first_token_seconds(RuntimeDiagnostics(first_token_latency_s=0.2))
         == 0.2
     )
+
+
+def test_comparison_excludes_slept_models_from_throughput_and_notes_environment() -> None:
+    """A wall-clock gap drops that model from ratios; power state is a note, not a withhold."""
+    baseline = _comparison_baseline(
+        [
+            _comparison_record("org/slept", tps=100.0),
+            _comparison_record("org/steady", tps=50.0),
+        ]
+    )
+    slept = _comparison_record("org/slept", tps=400.0)
+    slept["system_telemetry"] = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "power_samples": 2,
+        "on_battery_samples": 2,
+        "wall_clock_gap_s": 681.0,
+    }
+    steady = _comparison_record("org/steady", tps=55.0)
+    steady["system_telemetry"] = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "power_samples": 2,
+        "on_battery_samples": 2,
+    }
+    current = [
+        cast("check_models.JsonlResultRecord", slept),
+        cast("check_models.JsonlResultRecord", steady),
+    ]
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    )
+    assert comparison is not None
+    assert comparison.throughput_comparable is True
+    assert comparison.tps_ratio_median == pytest.approx(55.0 / 50.0)
+    assert all(flag.model != "org/slept" for flag in comparison.throughput_flags)
+    assert comparison.environment_notes == (
+        "current run on battery power for 2 of 2 models",
+        (
+            "current run slept or was suspended during 1 model(s) (org/slept); those are "
+            "excluded from throughput comparison"
+        ),
+    )
+    view = check_models._comparison_view(comparison)
+    assert view.environment_note is not None
+    assert view.environment_note.startswith("Run environment: current run on battery power")
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.environment_notes == comparison.environment_notes

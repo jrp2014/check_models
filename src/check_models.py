@@ -1029,6 +1029,16 @@ class SystemTelemetryRecord(TypedDict, total=False):
     memory_samples: int
     memory_pressure_level_max: int
     memory_pressure_elevated_samples: int
+    # Power source per probe (pmset -g batt): a recorded fact, not a
+    # degradation verdict; the comparison reports it and does not withhold.
+    power_samples: int
+    on_battery_samples: int
+    # pmset -g "powermode" (0 automatic, 1 low power, 2 high power), max seen.
+    power_mode_max: int
+    # Seconds the wall clock advanced beyond the process clock across this
+    # model (macOS perf_counter stops during sleep): a system sleep or
+    # suspend mid-model, so every timing for it is untrustworthy.
+    wall_clock_gap_s: float
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -11178,6 +11188,7 @@ def get_system_characteristics() -> dict[str, str]:
         # Concise psutil memory/swap context facts (environmental evidence,
         # not proof of an MLX or model defect); degrade gracefully.
         info.update(_get_psutil_memory_facts())
+        info.update(_get_power_facts())
 
         info.update(_get_mlx_backend_artifact_info())
 
@@ -11185,6 +11196,21 @@ def get_system_characteristics() -> dict[str, str]:
         logger.debug("Error gathering system characteristics: %s", err)
 
     return info
+
+
+def _get_power_facts() -> dict[str, str]:
+    """Return the power source and pmset power mode at run start (macOS only)."""
+    if sys.platform != "darwin":
+        return {}
+    facts: dict[str, str] = {}
+    source, mode = _sample_power_state()
+    if source is not None:
+        facts["Power Source (run start)"] = "Battery" if source == "battery" else "AC"
+    if mode is not None:
+        facts["Power Mode (run start)"] = {0: "automatic", 1: "low power", 2: "high power"}.get(
+            mode, str(mode)
+        )
+    return facts
 
 
 def _get_psutil_memory_facts() -> dict[str, str]:
@@ -14538,13 +14564,53 @@ def _sample_memory_pressure_level() -> int | None:
         return None
 
 
-def _system_telemetry_probe() -> tuple[float | None, int | None]:
-    """Take one (cpu_speed_limit_pct, memory_pressure_level) probe pair."""
-    return _sample_thermal_cpu_speed_limit_pct(), _sample_memory_pressure_level()
+_POWER_SOURCE_RE: Final[re.Pattern[str]] = re.compile(r"Now drawing from '([^']+)'")
+_POWER_MODE_RE: Final[re.Pattern[str]] = re.compile(r"^\s*powermode\s+(\d+)", re.MULTILINE)
+_WALL_CLOCK_GAP_THRESHOLD_S: Final[float] = 5.0
+
+
+def _sample_power_state() -> tuple[str | None, int | None]:
+    """Read the power source ("ac" / "battery") and pmset power mode (0 automatic, 1 low)."""
+    source: str | None = None
+    battery = _run_macos_toolchain_command(("/usr/bin/pmset", "-g", "batt"), timeout=3)
+    if battery is not None and (match := _POWER_SOURCE_RE.search(battery)):
+        drawing = match.group(1).lower()
+        source = "battery" if "battery" in drawing else "ac" if "ac" in drawing else None
+    mode: int | None = None
+    settings = _run_macos_toolchain_command(("/usr/bin/pmset", "-g"), timeout=3)
+    if settings is not None and (match := _POWER_MODE_RE.search(settings)):
+        mode = int(match.group(1))
+    return source, mode
+
+
+class _TelemetryProbe(NamedTuple):
+    """One telemetry sample; power fields default so legacy pairs still aggregate."""
+
+    cpu_speed_limit_pct: float | None
+    memory_pressure_level: int | None
+    power_source: str | None = None
+    power_mode: int | None = None
+
+
+def _as_telemetry_probe(
+    probe: tuple[float | None, int | None] | _TelemetryProbe,
+) -> _TelemetryProbe:
+    """Normalise a legacy (cpu, pressure) pair or a full probe into a _TelemetryProbe."""
+    if isinstance(probe, _TelemetryProbe):
+        return probe
+    return _TelemetryProbe(probe[0], probe[1])
+
+
+def _system_telemetry_probe() -> _TelemetryProbe:
+    """Take one probe: thermal CPU limit, memory pressure, power source and mode."""
+    cpu_limit = _sample_thermal_cpu_speed_limit_pct()
+    pressure = _sample_memory_pressure_level()
+    source, mode = _sample_power_state()
+    return _TelemetryProbe(cpu_limit, pressure, source, mode)
 
 
 def _system_telemetry_record_from_probes(
-    probes: Sequence[tuple[float | None, int | None]],
+    probes: Sequence[tuple[float | None, int | None] | _TelemetryProbe],
     *,
     mode: SystemTelemetryMode,
     interval_s: float | None = None,
@@ -14555,8 +14621,13 @@ def _system_telemetry_record_from_probes(
     diagnostics can distinguish "telemetry ran but probes were unavailable"
     from telemetry being disabled.
     """
-    cpu_limits = [cpu for cpu, _ in probes if cpu is not None]
-    pressure_levels = [level for _, level in probes if level is not None]
+    samples = [_as_telemetry_probe(probe) for probe in probes]
+    cpu_limits = [p.cpu_speed_limit_pct for p in samples if p.cpu_speed_limit_pct is not None]
+    pressure_levels = [
+        p.memory_pressure_level for p in samples if p.memory_pressure_level is not None
+    ]
+    sources = [p.power_source for p in samples if p.power_source is not None]
+    modes = [p.power_mode for p in samples if p.power_mode is not None]
     record: SystemTelemetryRecord = {
         "mode": mode,
         "cpu_samples": len(cpu_limits),
@@ -14574,7 +14645,43 @@ def _system_telemetry_record_from_probes(
         record["memory_pressure_elevated_samples"] = sum(
             level > _MEMORY_PRESSURE_NORMAL_LEVEL for level in pressure_levels
         )
+    record["power_samples"] = len(sources)
+    if sources:
+        record["on_battery_samples"] = sum(source == "battery" for source in sources)
+    if modes:
+        record["power_mode_max"] = max(modes)
     return record
+
+
+def _attach_wall_clock_gap(
+    telemetry: SystemTelemetryRecord | None,
+    *,
+    wall_elapsed_s: float,
+    process_elapsed_s: float,
+) -> SystemTelemetryRecord | None:
+    """Record a wall-clock gap when the wall clock outran the process clock.
+
+    ``time.perf_counter`` does not advance while macOS sleeps, so a model
+    whose wall time exceeds its process time by more than a few seconds sat
+    through a sleep or suspend; its timings are recorded but untrustworthy.
+    Detected even with telemetry off, since it needs no probe.
+    """
+    gap = wall_elapsed_s - process_elapsed_s
+    if gap < _WALL_CLOCK_GAP_THRESHOLD_S:
+        return telemetry
+    record: SystemTelemetryRecord = (
+        telemetry.copy()
+        if telemetry is not None
+        else {"mode": "off", "cpu_samples": 0, "memory_samples": 0}
+    )
+    record["wall_clock_gap_s"] = round(gap, 1)
+    return record
+
+
+def _telemetry_wall_clock_gap(telemetry: Mapping[str, object] | None) -> float | None:
+    """Return the recorded wall-clock gap for a model, if any."""
+    gap = telemetry.get("wall_clock_gap_s") if telemetry else None
+    return float(gap) if isinstance(gap, int | float) and not isinstance(gap, bool) else None
 
 
 class _SystemTelemetrySampler:
@@ -14590,7 +14697,7 @@ class _SystemTelemetrySampler:
         self._interval_s = interval_s
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
-        self._probes: list[tuple[float | None, int | None]] = []
+        self._probes: list[_TelemetryProbe] = []
 
     def start(self) -> None:
         """Begin sampling until stop() is called."""
@@ -14612,9 +14719,12 @@ class _SystemTelemetrySampler:
         while not self._stop_event.is_set():
             cpu_limit = _sample_thermal_cpu_speed_limit_pct()
             if self._stop_event.is_set():
-                self._probes.append((cpu_limit, None))
+                self._probes.append(_TelemetryProbe(cpu_limit, None))
                 return
-            self._probes.append((cpu_limit, _sample_memory_pressure_level()))
+            source, mode = _sample_power_state()
+            self._probes.append(
+                _TelemetryProbe(cpu_limit, _sample_memory_pressure_level(), source, mode)
+            )
             self._stop_event.wait(self._interval_s)
 
     def snapshot(self) -> SystemTelemetryRecord:
@@ -14642,6 +14752,12 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
             f"memory pressure reached {label} for "
             f"{telemetry.get('memory_pressure_elevated_samples', 0)} sample(s)"
         )
+    gap = telemetry.get("wall_clock_gap_s")
+    if gap is not None:
+        notes.append(
+            f"wall clock ran {gap:.0f}s ahead of the process clock (system sleep or "
+            "suspend mid-model); every timing for this model is untrustworthy"
+        )
     return "; ".join(notes) if notes else None
 
 
@@ -14660,6 +14776,20 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
         parts.append(f"memory pressure max level {max_level} over {memory_samples} sample(s)")
     else:
         parts.append("memory-pressure probe unavailable")
+    power_samples = telemetry.get("power_samples", 0)
+    if power_samples:
+        on_battery = telemetry.get("on_battery_samples", 0)
+        parts.append(
+            f"power: battery for {on_battery} of {power_samples} sample(s)"
+            if on_battery
+            else f"power: AC over {power_samples} sample(s)"
+        )
+        if telemetry.get("power_mode_max", 0) >= 1:
+            parts.append("low power mode on")
+    else:
+        parts.append("power probe unavailable")
+    if (gap := telemetry.get("wall_clock_gap_s")) is not None:
+        parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
     parts.append(f"mode {telemetry.get('mode', 'unknown')}")
     return "; ".join(parts)
 
@@ -14675,7 +14805,7 @@ def _resolve_system_telemetry_mode(flag: bool | None) -> SystemTelemetryMode:
 
 def _start_system_telemetry(
     params: ProcessImageParams,
-) -> tuple[_SystemTelemetrySampler | None, list[tuple[float | None, int | None]]]:
+) -> tuple[_SystemTelemetrySampler | None, list[_TelemetryProbe]]:
     """Start opt-in continuous sampling or take the leading snapshot probe.
 
     Called before timing starts so the default snapshot probe stays outside
@@ -14699,7 +14829,7 @@ def _start_system_telemetry(
 
 def _finish_system_telemetry(
     sampler: _SystemTelemetrySampler | None,
-    probes: list[tuple[float | None, int | None]],
+    probes: list[_TelemetryProbe],
 ) -> SystemTelemetryRecord | None:
     """Stop sampling (or take the trailing snapshot probe) and aggregate.
 
@@ -15162,8 +15292,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     telemetry_sampler, telemetry_probes = _start_system_telemetry(params)
     telemetry: SystemTelemetryRecord | None = None
 
-    # Track overall timing
+    # Track overall timing; the wall clock alongside the process clock so a
+    # sleep or suspend mid-model (perf_counter stops, time.time does not) is
+    # detected and the model's timings marked untrustworthy.
     total_start_time = time.perf_counter()
+    wall_start_time = time.time()
     current_phase: str = "input_validation"
     phase_timer = PhaseTimer()
     result_payload: PerformanceResult | None = None
@@ -15249,7 +15382,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = (
             _sample_post_cleanup_memory_gb()
         )
-        telemetry = _finish_system_telemetry(telemetry_sampler, telemetry_probes)
+        telemetry = _attach_wall_clock_gap(
+            _finish_system_telemetry(telemetry_sampler, telemetry_probes),
+            wall_elapsed_s=time.time() - wall_start_time,
+            process_elapsed_s=time.perf_counter() - total_start_time,
+        )
 
     final_result = _finalize_process_result(
         result_payload=result_payload,
@@ -19147,6 +19284,9 @@ class RunComparison:
     unverified_facts: tuple[str, ...] = ()
     revision_changes: tuple[tuple[str, str, str], ...] = ()
     throughput_comparable: bool = True
+    # Recorded facts about each run's environment (battery power, sleep gaps)
+    # that qualify timing without withholding it.
+    environment_notes: tuple[str, ...] = ()
 
     @property
     def comparable(self) -> bool:
@@ -19498,6 +19638,36 @@ def _record_repetition_aborted(record: JsonlResultRecord) -> bool:
     return "repetition_abort" in record["assessment"]["observations"]
 
 
+def _record_wall_clock_gap(record: JsonlResultRecord) -> bool:
+    """Return whether a sleep/suspend gap was recorded around this model."""
+    telemetry = record.get("system_telemetry")
+    return _telemetry_wall_clock_gap(telemetry if isinstance(telemetry, dict) else None) is not None
+
+
+def _record_on_battery(record: JsonlResultRecord) -> bool:
+    """Return whether any power probe around this model read battery power."""
+    telemetry = record.get("system_telemetry")
+    if not isinstance(telemetry, dict):
+        return False
+    samples = telemetry.get("on_battery_samples")
+    return isinstance(samples, int) and samples > 0
+
+
+def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> list[str]:
+    """Describe power state and sleep gaps across one run's records, for the comparison."""
+    notes: list[str] = []
+    on_battery = sum(_record_on_battery(record) for record in records)
+    if on_battery:
+        notes.append(f"{label} run on battery power for {on_battery} of {len(records)} models")
+    gaps = [record["model"] for record in records if _record_wall_clock_gap(record)]
+    if gaps:
+        notes.append(
+            f"{label} run slept or was suspended during {len(gaps)} model(s) "
+            f"({', '.join(gaps)}); those are excluded from throughput comparison"
+        )
+    return notes
+
+
 def _result_generation_tps(record: JsonlResultRecord) -> float | None:
     metrics = record.get("metrics") or {}
     value = metrics.get("generation_tps") if isinstance(metrics, dict) else None
@@ -19607,6 +19777,10 @@ def _compare_model_performance(
         # not comparable with a full-length run; autoregressive throughput
         # varies with sequence length.
         return
+    if _record_wall_clock_gap(now) or _record_wall_clock_gap(before):
+        # The machine slept or was suspended during this model in one of the
+        # runs; its timings are recorded but not comparable.
+        return
     now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
     if now_tps is not None and before_tps is not None:
         ratios.append(now_tps / before_tps)
@@ -19695,9 +19869,14 @@ def compare_run_results(
             )
 
     ratios_sorted = sorted(ratios)
+    environment_notes = (
+        *_run_environment_notes("current", current),
+        *_run_environment_notes("baseline", baseline.results),
+    )
     return RunComparison(
         baseline_label=baseline.label,
         baseline_timestamp=baseline.metadata.get("timestamp"),
+        environment_notes=environment_notes,
         baseline_components=_comparison_component_rows(baseline.metadata),
         compared_models=len(shared),
         models_added=tuple(sorted(set(current_by) - set(baseline_by))),
@@ -19890,6 +20069,7 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "comparability": comparison.comparability,
         "unverified_facts": cast("JsonLike", list(comparison.unverified_facts)),
         "throughput_comparable": comparison.throughput_comparable,
+        "environment_notes": cast("JsonLike", list(comparison.environment_notes)),
         "revision_changes": [
             {"model": model, "baseline": before, "current": after}
             for model, before, after in comparison.revision_changes
@@ -20144,6 +20324,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             for entry in _comparison_rows(value.get("revision_changes"))
         ),
         throughput_comparable=_comparison_req_bool(value.get("throughput_comparable", True)),
+        environment_notes=_comparison_str_items(value.get("environment_notes") or []),
         **cast("dict[str, Any]", identity),
     )
 
@@ -20192,6 +20373,7 @@ class _ComparisonView:
     summary_rows: tuple[tuple[str, str], ...]
     banner: str | None
     revision_note: str | None
+    environment_note: str | None
     membership_items: tuple[str, ...]
     change_rows: tuple[tuple[str, str, str, str], ...]
     flag_rows: tuple[tuple[str, str, str, str, str], ...]
@@ -20323,11 +20505,17 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         )
         for memory_change in comparison.memory_changes
     )
+    environment_note = (
+        "Run environment: " + "; ".join(comparison.environment_notes) + "."
+        if comparison.environment_notes
+        else None
+    )
     return _ComparisonView(
         identity_rows=tuple(identity_rows),
         summary_rows=tuple(summary_rows),
         banner=banner,
         revision_note=revision_note,
+        environment_note=environment_note,
         membership_items=tuple(membership_items),
         change_rows=change_rows,
         flag_rows=flag_rows,
@@ -20349,6 +20537,8 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
         blocks.append(ReportParagraph(view.banner))
     if view.revision_note is not None:
         blocks.append(ReportParagraph(view.revision_note))
+    if view.environment_note is not None:
+        blocks.append(ReportParagraph(view.environment_note))
     if view.membership_items:
         blocks.append(ReportBulletList(view.membership_items))
     if view.change_rows:
@@ -20410,6 +20600,8 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("%s: %s", label, value)
     if view.revision_note is not None:
         logger.info("%s", _plain_log_text(view.revision_note))
+    if view.environment_note is not None:
+        logger.info("%s", _plain_log_text(view.environment_note))
     for item in view.membership_items:
         logger.info("%s", _plain_log_text(item))
     for model, execution, usability, observations in view.change_rows:

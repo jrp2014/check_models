@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- System telemetry records the power source and `pmset` power mode per probe
+  (`power_samples`, `on_battery_samples`, `power_mode_max`) and the run
+  header records both at run start. The run comparison reports them as
+  "Run environment" notes without withholding throughput: on Apple silicon
+  the battery effect is unproven and confounded with cold weight caches.
+- A model whose wall clock outran the process clock by more than 5 s (the
+  Mac slept or was suspended mid-model; `perf_counter` stops during sleep)
+  gets `wall_clock_gap_s` in its telemetry, a warning, a diagnostics note,
+  and is excluded from throughput comparison. Detected even with telemetry
+  off. Found when a sweep on battery slept for 11 minutes after one model
+  and the run total no longer matched the per-phase timers.
 - The quality gate runs one Skylos scan instead of two: the ungated `-a`
   audit pass, which re-analysed the same tree for a grade card, is gone and
   its one extra check (`--ai-defects`) rides on the gated pass. Saves about
