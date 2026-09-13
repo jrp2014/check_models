@@ -9,14 +9,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 9m 10s
+- Run duration: 23m 02s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - Input image: JPEG, 9,984 x 6,656 pixels (66.5 MP), 44.7 MB
-- Models attempted: 38 (completed 37, crashed 1, indeterminate 0)
-- Mechanical checks: no concerns detected 27, concerns detected 4, major concerns 6, not assessed 1
-- Top observations: Response repeats the same text (1), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (3), Response appears cut off at the token limit (2)
+- Models attempted: 41 (completed 38, crashed 3, indeterminate 0)
+- Mechanical checks: no concerns detected 28, concerns detected 4, major concerns 6, not assessed 3
+- Top observations: Response repeats the same text (1), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (3), Required labelled fields not detected (4), Response appears cut off at the token limit (2)
 
 ## Start here
 
@@ -33,4 +33,6 @@ establish fitness for other tasks.
 
 ## Issue drafts
 
+- [mlx-community/InternVL3_5-30B-A3B-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_InternVL3_5-30B-A3B-4bit.md)
+- [mlx-community/Llama-3.2-11B-Vision-Instruct-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Llama-3.2-11B-Vision-Instruct-4bit.md)
 - [mlx-community/Mage-VL-OptiQ-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Mage-VL-OptiQ-4bit.md)

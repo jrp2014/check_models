@@ -33,7 +33,7 @@ builtins.ValueError: Model loading failed: Received 904 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00286831
+- *Post-cleanup active memory (GB):* 0.00273725
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
@@ -1916,7 +1916,7 @@ model.norm.weight.
 ```text
 === STDERR ===
 Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2884.45it/s]
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
 ```
 
 ## Reproduction inputs
@@ -1978,7 +1978,7 @@ python -m mlx_vlm.generate --model mlx-community/Mage-VL-OptiQ-4bit --image any-
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 26.6.2                                                            |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.24; revision ad84f2cf2ebf2d249738bdcf12f6ea86552bda6b; clean |
+| check_models    | 0.17.24; revision 09b5430fd4adb1ca5f371bf11544425753636488; clean |
 
 ### Full environment evidence
 
