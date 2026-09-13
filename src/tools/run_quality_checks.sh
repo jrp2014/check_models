@@ -60,7 +60,8 @@ run_markdownlint_step() {
             "!src/node_modules/**" \
             "!**/node_modules/**" \
             "!**/.worktrees/**" \
-            "!**/.claude/**"
+            "!**/.claude/**" \
+            "!.agents/skills/hf-cli/**"
     )
 }
 

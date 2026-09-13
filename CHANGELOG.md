@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The generated `hf-cli` skill (`hf skills add`) is checked in under
+  `.agents/skills/hf-cli/` and listed in the Copilot skills table; the gate's
+  markdownlint skips that generated file (regenerate with `hf skills add
+  --force`, never hand-edit).
 - System telemetry records the power source and `pmset` power mode per probe
   (`power_samples`, `on_battery_samples`, `power_mode_max`) and the run
   header records both at run start. The run comparison reports them as
