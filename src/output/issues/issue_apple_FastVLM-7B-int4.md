@@ -1,14 +1,14 @@
-# Crash: mlx-community/InternVL3_5-30B-A3B-4bit
+# Crash: apple/FastVLM-7B-int4
 
 ## Maintainer evidence
 
-### mlx-community/InternVL3_5-30B-A3B-4bit
+### apple/FastVLM-7B-int4
 
 #### Root exception and chain
 
 ```text
-builtins.ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-builtins.ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+builtins.KeyError: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+builtins.ValueError: Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
 ```
 
 #### Execution and provenance
@@ -19,37 +19,37 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
   length limits and factual accuracy not assessed
 - *Maintainer status:* actionable_failure
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* no (model_type internvl)
+- *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
+  fastvlm)
 - *Phase:* model_load
-- *Stage:* Unsupported Arch
+- *Stage:* Model Error
 - *Package:* mlx-vlm
 - *Error type:* ValueError
-- *Error message:* Model loading failed: Model type internvl not supported.
-  Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-- *Root error type:* ValueError
-- *Root error message:* Model type internvl not supported. Error: No module
-  named 'mlx_vlm.speculative.drafters.internvl'
-- *Resolved model revision:* ed2ce3381528db1c5b70a2aad78a6390997e9250
+- *Error message:* Model loading failed:
+  'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+- *Root error type:* KeyError
+- *Root error message:* 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+- *Resolved model revision:* 1aeadbaaba011276f3dcda9582e5e64e2a90873a
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.001819698
+- *Post-cleanup active memory (GB):* 0.00013212
 - *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 17.79
-- *Parameter count:* 30.00B total, 3.00B active (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 40,960 (text_config.max_position_embeddings)
+- *Checkpoint weights (GB):* 4.30
+- *Parameter count:* 7.00B (name-estimate)
+- *Quantization:* 4-bit, group 64
+- *Declared context length:* 32,768 (max_position_embeddings)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 <details>
 <summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14168, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13080, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -71,17 +71,25 @@ Traceback (most recent call last):
     ^
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 964, in load_model
-    model_class, _ = get_model_and_args(config=config, model_path=model_path)
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 784, in get_model_and_args
-    raise ValueError(msg)
-ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1072, in load_model
+    weights = sanitize_weights(
+        model_class.VisionModel, weights, model_config.vision_config
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1241, in sanitize_weights
+    weights = model_obj.sanitize(weights)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/fastvlm/vision.py", line 650, in sanitize
+    W, C = weights[
+           ~~~~~~~^
+        "vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ].shape[-2:]
+    ^
+KeyError: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -92,9 +100,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14183, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+ValueError: Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
 
 ```
 
@@ -104,9 +112,8 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 3441.44it/s]
-ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 4166.87it/s]
 ```
 
 ## Reproduction inputs
@@ -150,7 +157,7 @@ input image is not required: substitute any local image for the placeholder
 path and run one native mlx-vlm process.
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/InternVL3_5-30B-A3B-4bit --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision ed2ce3381528db1c5b70a2aad78a6390997e9250 --trust-remote-code
+python -m mlx_vlm.generate --model apple/FastVLM-7B-int4 --image any-local-image.jpg --prompt x --max-tokens 8 --temperature 0.0 --revision 1aeadbaaba011276f3dcda9582e5e64e2a90873a --trust-remote-code
 ```
 
 ## Provenance and Environment
@@ -168,7 +175,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-30B-A3B-4bit --imag
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 26.6.2                                                            |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.24; revision 09b5430fd4adb1ca5f371bf11544425753636488; clean |
+| check_models    | 0.17.25; revision 11e6c82dc61f08eb3dc36a3188a789da1295093b; clean |
 
 ### Full environment evidence
 

@@ -20,27 +20,27 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 41    |
-| Conclusive outcomes | 41    |
-| Completed           | 38    |
-| Crashed             | 3     |
+| Attempted           | 51    |
+| Conclusive outcomes | 51    |
+| Completed           | 44    |
+| Crashed             | 7     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 3     |
-| none                           | 34    |
+| actionable failure             | 7     |
+| none                           | 40    |
 | observation needs reproduction | 4     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| not assessed         | 3     |
-| major concerns       | 6     |
-| no concerns detected | 28    |
+| not assessed         | 7     |
+| major concerns       | 8     |
+| no concerns detected | 32    |
 | concerns detected    | 4     |
 
 Observation counts
@@ -50,28 +50,148 @@ Observation counts
 | Response repeats the same text                               | 1     |
 | Generation was stopped early after sustained repeated output | 2     |
 | Unrecognised model control tokens remain visible             | 3     |
-| Required labelled fields not detected                        | 4     |
+| Required labelled fields not detected                        | 6     |
 | Response appears cut off at the token limit                  | 2     |
 | Conversation-role control tokens remain visible              | 1     |
 | Repeated keyword entries                                     | 4     |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
-|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
-| [mlx-community/InternVL3_5-30B-A3B-4bit](#diagnostic-mlx-community-internvl35-30b-a3b-4bit)                     | crashed   | not assessed      | actionable_failure             | none                                                                                              |
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-4bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-4bit) | crashed   | not assessed      | actionable_failure             | none                                                                                              |
-| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                                | crashed   | not assessed      | actionable_failure             | none                                                                                              |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected     |
-| [mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit](#diagnostic-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)        | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                      |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [mlx-community/aya-vision-8b-4bit](#diagnostic-mlx-community-aya-vision-8b-4bit)                                | completed | concerns detected | observation_needs_reproduction | control tokens visible                                                                            |
+| Model                                                                                                                        | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
+|------------------------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
+| [apple/FastVLM-7B-int4](#diagnostic-apple-fastvlm-7b-int4)                                                                   | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                                            | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-4bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-4bit)              | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit)              | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                                             | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit](#diagnostic-mlx-community-mistral-small-32-24b-instruct-2506-4bit)  | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit](#diagnostic-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | crashed   | not assessed      | actionable_failure             | none                                                                                              |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected     |
+| [mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit](#diagnostic-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                      |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)                           | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [mlx-community/aya-vision-8b-4bit](#diagnostic-mlx-community-aya-vision-8b-4bit)                                             | completed | concerns detected | observation_needs_reproduction | control tokens visible                                                                            |
 
 ## Crashes requiring action
 
-<a id="diagnostic-mlx-community-internvl35-30b-a3b-4bit"></a>
+<a id="diagnostic-apple-fastvlm-7b-int4"></a>
 
-### mlx-community/InternVL3_5-30B-A3B-4bit
+### apple/FastVLM-7B-int4
+
+#### Root exception and chain
+
+```text
+builtins.KeyError: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+builtins.ValueError: Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+```
+
+#### Execution and provenance
+
+- *Execution:* crashed
+- *Mechanical checks:* not assessed
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* actionable_failure
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
+  fastvlm)
+- *Phase:* model_load
+- *Stage:* Model Error
+- *Package:* mlx-vlm
+- *Error type:* ValueError
+- *Error message:* Model loading failed:
+  'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+- *Root error type:* KeyError
+- *Root error message:* 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+- *Resolved model revision:* 1aeadbaaba011276f3dcda9582e5e64e2a90873a
+- *Stop reason:* exception
+- *Post-cleanup active memory (GB):* 0.00013212
+- *Post-cleanup cache memory (GB):* 0.0
+- *Checkpoint weights (GB):* 4.30
+- *Parameter count:* 7.00B (name-estimate)
+- *Quantization:* 4-bit, group 64
+- *Declared context length:* 32,768 (max_position_embeddings)
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: AC over 2 sample(s); mode snapshot
+
+<details>
+<summary>Complete traceback</summary>
+
+```text
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+    model, processor, config = _load_model(params)
+                               ~~~~~~~~~~~^^^^^^^^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+    model, processor = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        quantize_activations=params.quantize_activations,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                                               ~~~~~~~~~~~~~^
+        path_or_hf_repo=path_or_hf_repo,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+    model = load_model(model_path, lazy, strict=strict, **kwargs)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1072, in load_model
+    weights = sanitize_weights(
+        model_class.VisionModel, weights, model_config.vision_config
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1241, in sanitize_weights
+    weights = model_obj.sanitize(weights)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/fastvlm/vision.py", line 650, in sanitize
+    W, C = weights[
+           ~~~~~~~^
+        "vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ].shape[-2:]
+    ^
+KeyError: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
+ValueError: Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
+
+```
+
+</details>
+
+#### Captured stdout/stderr
+
+```text
+=== STDERR ===
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 4166.87it/s]
+```
+
+<a id="diagnostic-mlx-community-internvl35-1b-4bit"></a>
+
+### mlx-community/InternVL3_5-1B-4bit
 
 #### Root exception and chain
 
@@ -98,27 +218,27 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
 - *Root error type:* ValueError
 - *Root error message:* Model type internvl not supported. Error: No module
   named 'mlx_vlm.speculative.drafters.internvl'
-- *Resolved model revision:* ed2ce3381528db1c5b70a2aad78a6390997e9250
+- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.001819698
+- *Post-cleanup active memory (GB):* 0.002114626
 - *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 17.79
-- *Parameter count:* 30.00B total, 3.00B active (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
+- *Checkpoint weights (GB):* 1.08
+- *Parameter count:* 1.00B (name-estimate)
+- *Quantization:* 4-bit, group 32, affine
 - *Declared context length:* 40,960 (text_config.max_position_embeddings)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 <details>
 <summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14168, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13080, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -150,7 +270,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -161,7 +281,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14183, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -173,8 +293,8 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 3441.44it/s]
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4551.25it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 ```
 
@@ -214,7 +334,7 @@ builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vis
 - *Stop reason:* exception
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.00273725
+- *Post-cleanup active memory (GB):* 0.003032178
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 6.01
 - *Parameter count:* 11.00B (name-estimate)
@@ -224,22 +344,22 @@ builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vis
 - *Configured EOS token:* &lt;|eot_id|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 <details>
 <summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13414, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14091, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
     ...<5 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13986, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -294,7 +414,7 @@ ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -305,7 +425,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14195, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -315,12 +435,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14111, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13423, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -335,19 +455,250 @@ ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instr
 ```text
 === STDERR ===
 Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 4797.15it/s]
-[02:14:11] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13414, in
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3714.33it/s]
+[21:49:05] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
            _run_generation_guarded
                return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14091, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
            _generate_once
                return _generate_with_repetition_guard(
                    model=prepared.model,
                ...<5 lines>...
                    **prepared.generate_kwargs,
                )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13986, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
+           _generate_with_repetition_guard
+               for chunk in stream_generate(
+                            ~~~~~~~~~~~~~~~^
+                   model=model, processor=processor, prompt=prompt, image=image, **kwargs
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               ):
+               ^
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in
+           stream_generate
+               for n, (token, logprobs) in enumerate(gen):
+                                           ~~~~~~~~~^^^^^
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in
+           generate_step
+               chunk_output = model.language_model(
+                   inputs=input_ids[:, :n_to_process],
+               ...<3 lines>...
+                   **chunk_kwargs,
+               )
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360,
+           in __call__
+               hidden_states = self.model(
+                   input_ids=inputs,
+               ...<5 lines>...
+                   cache=cache,
+               )
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321,
+           in __call__
+               layer_outputs = decoder_layer(
+                   hidden_states,
+               ...<3 lines>...
+                   cache=c,
+               )
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251,
+           in __call__
+               hidden_states = self.cross_attn(
+                   hidden_states=hidden_states,
+               ...<2 lines>...
+                   cache=cache,
+               )
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80,
+           in __call__
+               attn_output = scaled_dot_product_attention(
+                   query_states,
+               ...<4 lines>...
+                   mask=attention_mask,  # add a dim for batch processing
+               )
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in
+           scaled_dot_product_attention
+               return mx.fast.scaled_dot_product_attention(
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+                   queries,
+                   ^^^^^^^^
+               ...<4 lines>...
+                   sinks=sinks,
+                   ^^^^^^^^^^^^
+               )
+               ^
+           ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be
+           broadcast.
+```
+
+<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+#### Root exception and chain
+
+```text
+builtins.ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+```
+
+#### Execution and provenance
+
+- *Execution:* crashed
+- *Mechanical checks:* not assessed
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* actionable_failure
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Phase:* generation_before_first_token
+- *Stage:* Model Error
+- *Package:* mlx-vlm
+- *Error type:* ValueError
+- *Error message:* Model generation failed for
+  mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes
+  (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+- *Root error type:* ValueError
+- *Root error message:* [broadcast_shapes] Shapes (1,1,301,6404) and
+  (1,32,300,6404) cannot be broadcast.
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* exception
+- *Sampling settings source:* temperature: default; top_p: default; top_k:
+  default; min_p: default; repetition_penalty: default
+- *Post-cleanup active memory (GB):* 0.003032178
+- *Post-cleanup cache memory (GB):* 0.0
+- *Checkpoint weights (GB):* 11.34
+- *Parameter count:* 11.00B (name-estimate)
+- *Quantization:* 8-bit, group 64
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *Configured EOS token ID:* 128009
+- *Configured EOS token:* &lt;|eot_id|&gt;
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: AC over 2 sample(s); mode snapshot
+
+<details>
+<summary>Complete traceback</summary>
+
+```text
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
+    return generate_once()
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
+    return _generate_with_repetition_guard(
+        model=prepared.model,
+    ...<5 lines>...
+        **prepared.generate_kwargs,
+    )
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
+    for chunk in stream_generate(
+                 ~~~~~~~~~~~~~~~^
+        model=model, processor=processor, prompt=prompt, image=image, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in stream_generate
+    for n, (token, logprobs) in enumerate(gen):
+                                ~~~~~~~~~^^^^^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in generate_step
+    chunk_output = model.language_model(
+        inputs=input_ids[:, :n_to_process],
+    ...<3 lines>...
+        **chunk_kwargs,
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360, in __call__
+    hidden_states = self.model(
+        input_ids=inputs,
+    ...<5 lines>...
+        cache=cache,
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321, in __call__
+    layer_outputs = decoder_layer(
+        hidden_states,
+    ...<3 lines>...
+        cache=c,
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251, in __call__
+    hidden_states = self.cross_attn(
+        hidden_states=hidden_states,
+    ...<2 lines>...
+        cache=cache,
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80, in __call__
+    attn_output = scaled_dot_product_attention(
+        query_states,
+    ...<4 lines>...
+        mask=attention_mask,  # add a dim for batch processing
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in scaled_dot_product_attention
+    return mx.fast.scaled_dot_product_attention(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        queries,
+        ^^^^^^^^
+    ...<4 lines>...
+        sinks=sinks,
+        ^^^^^^^^^^^^
+    )
+    ^
+ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
+    output, duration = _execute_prepared_generation(
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        params,
+        ^^^^^^^
+    ...<2 lines>...
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
+    output = _run_generation_guarded(
+        params=params,
+        generate_once=_generate_once,
+    )
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
+    raise _tag_exception_failure_phase(
+        ValueError(msg), _generation_failure_phase(gen_known_err)
+    ) from gen_known_err
+ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+
+```
+
+</details>
+
+#### Captured stdout/stderr
+
+```text
+=== STDERR ===
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3483.35it/s]
+[21:49:08] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
+           _run_generation_guarded
+               return generate_once()
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
+           _generate_once
+               return _generate_with_repetition_guard(
+                   model=prepared.model,
+               ...<5 lines>...
+                   **prepared.generate_kwargs,
+               )
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
            _generate_with_repetition_guard
                for chunk in stream_generate(
                             ~~~~~~~~~~~~~~~^
@@ -442,24 +793,24 @@ builtins.ValueError: Model loading failed: Received 904 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00273725
+- *Post-cleanup active memory (GB):* 0.003032178
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 <details>
 <summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14168, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13080, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1397,7 +1748,7 @@ model.norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1408,7 +1759,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14183, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 904 parameters not in model: 
 model.embed_tokens.biases,
@@ -2325,7 +2676,1770 @@ model.norm.weight.
 ```text
 === STDERR ===
 Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2518.09it/s]
+```
+
+<a id="diagnostic-mlx-community-mistral-small-32-24b-instruct-2506-4bit"></a>
+
+### mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
+
+#### Root exception and chain
+
+```text
+builtins.TypeError: can only concatenate str (not "list") to str
+builtins.ValueError: Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate str (not "list") to str
+```
+
+#### Execution and provenance
+
+- *Execution:* crashed
+- *Mechanical checks:* not assessed
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* actionable_failure
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Phase:* prefill
+- *Stage:* Error
+- *Package:* transformers
+- *Error type:* ValueError
+- *Error message:* Prompt prefill failed for
+  mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate
+  str (not "list") to str
+- *Root error type:* TypeError
+- *Root error message:* can only concatenate str (not "list") to str
+- *Resolved model revision:* 2a1d5eabfc504747bdc24178394821a1efc0edde
+- *Stop reason:* exception
+- *Post-cleanup active memory (GB):* 0.004129908
+- *Post-cleanup cache memory (GB):* 0.0
+- *Checkpoint weights (GB):* 13.26
+- *Parameter count:* 24.00B (name-estimate)
+- *Quantization:* 4-bit, group 64
+- *Declared context length:* 131,072 (text_config.max_position_embeddings)
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: AC over 2 sample(s); mode snapshot
+
+<details>
+<summary>Complete traceback</summary>
+
+```text
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13521, in _prepare_generation_prompt
+    apply_chat_template(
+    ~~~~~~~~~~~~~~~~~~~^
+        processor=processor,
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **chat_template_kwargs,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ),
+    ^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 1026, in apply_chat_template
+    return get_chat_template(processor, messages, add_generation_prompt, **kwargs)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 824, in get_chat_template
+    return template_processor.apply_chat_template(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        messages,
+        ^^^^^^^^^
+    ...<2 lines>...
+        **template_kwargs,
+        ^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/tokenization_utils_base.py", line 3108, in apply_chat_template
+    rendered_chat, generation_indices = render_jinja_template(
+                                        ~~~~~~~~~~~~~~~~~~~~~^
+        conversations=conversations,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        **template_kwargs,
+        ^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/utils/chat_template_utils.py", line 581, in render_jinja_template
+    rendered_chat = compiled_template.render(
+        messages=chat,
+    ...<3 lines>...
+        **kwargs,
+    )
+  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 1, in top-level template code
+TypeError: can only concatenate str (not "list") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14216, in _run_model_generation
+    prepared = _prepare_generation(
+        params,
+    ...<4 lines>...
+        phase_timer=phase_timer,
+    )
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13767, in _prepare_generation
+    prepared_prompt = _prepare_generation_prompt(
+        params=params,
+    ...<3 lines>...
+        phase_timer=phase_timer,
+    )
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13540, in _prepare_generation_prompt
+    raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
+ValueError: Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate str (not "list") to str
+
+```
+
+</details>
+
+#### Captured stdout/stderr
+
+```text
+=== STDERR ===
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3538.60it/s]
+[21:49:34] Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13521, in
+           _prepare_generation_prompt
+               apply_chat_template(
+               ~~~~~~~~~~~~~~~~~~~^
+                   processor=processor,
+                   ^^^^^^^^^^^^^^^^^^^^
+               ...<3 lines>...
+                   **chat_template_kwargs,
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+               ),
+               ^
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 1026, in
+           apply_chat_template
+               return get_chat_template(processor, messages, add_generation_prompt, **kwargs)
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 824, in
+           get_chat_template
+               return template_processor.apply_chat_template(
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+                   messages,
+                   ^^^^^^^^^
+               ...<2 lines>...
+                   **template_kwargs,
+                   ^^^^^^^^^^^^^^^^^^
+               )
+               ^
+             File
+           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/tokenizatio
+           n_utils_base.py", line 3108, in apply_chat_template
+               rendered_chat, generation_indices = render_jinja_template(
+                                                   ~~~~~~~~~~~~~~~~~~~~~^
+                   conversations=conversations,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               ...<6 lines>...
+                   **template_kwargs,
+                   ^^^^^^^^^^^^^^^^^^
+               )
+               ^
+             File
+           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/utils/chat_
+           template_utils.py", line 581, in render_jinja_template
+               rendered_chat = compiled_template.render(
+                   messages=chat,
+               ...<3 lines>...
+                   **kwargs,
+               )
+             File
+           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py",
+           line 1295, in render
+               self.environment.handle_exception()
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+             File
+           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py",
+           line 942, in handle_exception
+               raise rewrite_traceback_stack(source=source)
+             File "<template>", line 1, in top-level template code
+           TypeError: can only concatenate str (not "list") to str
+```
+
+<a id="diagnostic-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit"></a>
+
+### mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit
+
+#### Root exception and chain
+
+```text
+builtins.ValueError: Received 729 parameters not in model; families: backbone, lm_head; representative parameters: backbone.embeddings.biases, backbone.embeddings.scales, backbone.embeddings.weight.
+builtins.ValueError: Model loading failed: Received 729 parameters not in model; families: backbone, lm_head; representative parameters: backbone.embeddings.biases, backbone.embeddings.scales, backbone.embeddings.weight.
+```
+
+#### Execution and provenance
+
+- *Execution:* crashed
+- *Mechanical checks:* not assessed
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* actionable_failure
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type
+  nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
+- *Phase:* model_load
+- *Stage:* Model Error
+- *Package:* mlx-vlm
+- *Error type:* ValueError
+- *Error message:* Model loading failed: Received 729 parameters not in model;
+  families: backbone, lm_head; representative parameters:
+  backbone.embeddings.biases, backbone.embeddings.scales,
+  backbone.embeddings.weight.
+- *Root error type:* ValueError
+- *Root error message:* Received 729 parameters not in model; families:
+  backbone, lm_head; representative parameters: backbone.embeddings.biases,
+  backbone.embeddings.scales, backbone.embeddings.weight.
+- *Resolved model revision:* 8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45
+- *Stop reason:* exception
+- *Post-cleanup active memory (GB):* 0.004850944
+- *Post-cleanup cache memory (GB):* 0.0
+- *Checkpoint weights (GB):* 20.65
+- *Parameter count:* 30.00B total, 3.00B active (name-estimate)
+- *Quantization:* 4-bit, group 64, affine
+- *Declared context length:* 131,072 (max_sequence_length)
+- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
+  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
+  sample(s); power: AC over 2 sample(s); mode snapshot
+
+<details>
+<summary>Complete traceback</summary>
+
+```text
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+    model, processor, config = _load_model(params)
+                               ~~~~~~~~~~~^^^^^^^^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+    model, processor = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        quantize_activations=params.quantize_activations,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                                               ~~~~~~~~~~~~~^
+        path_or_hf_repo=path_or_hf_repo,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+    model = load_model(model_path, lazy, strict=strict, **kwargs)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1171, in load_model
+    model.load_weights(list(weights.items()), strict=strict)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
+    raise ValueError(
+        f"Received {num_extra} parameters not in model: \n{extras}."
+    )
+ValueError: Received 729 parameters not in model: 
+backbone.embeddings.biases,
+backbone.embeddings.scales,
+backbone.embeddings.weight,
+backbone.layers.0.mixer.A_log,
+backbone.layers.0.mixer.D,
+backbone.layers.0.mixer.conv1d.bias,
+backbone.layers.0.mixer.conv1d.weight,
+backbone.layers.0.mixer.dt_bias,
+backbone.layers.0.mixer.in_proj.biases,
+backbone.layers.0.mixer.in_proj.scales,
+backbone.layers.0.mixer.in_proj.weight,
+backbone.layers.0.mixer.norm.weight,
+backbone.layers.0.mixer.out_proj.biases,
+backbone.layers.0.mixer.out_proj.scales,
+backbone.layers.0.mixer.out_proj.weight,
+backbone.layers.0.norm.weight,
+backbone.layers.1.mixer.gate.e_score_correction_bias,
+backbone.layers.1.mixer.gate.weight,
+backbone.layers.1.mixer.shared_experts.down_proj.biases,
+backbone.layers.1.mixer.shared_experts.down_proj.scales,
+backbone.layers.1.mixer.shared_experts.down_proj.weight,
+backbone.layers.1.mixer.shared_experts.up_proj.biases,
+backbone.layers.1.mixer.shared_experts.up_proj.scales,
+backbone.layers.1.mixer.shared_experts.up_proj.weight,
+backbone.layers.1.mixer.switch_mlp.fc1.biases,
+backbone.layers.1.mixer.switch_mlp.fc1.scales,
+backbone.layers.1.mixer.switch_mlp.fc1.weight,
+backbone.layers.1.mixer.switch_mlp.fc2.biases,
+backbone.layers.1.mixer.switch_mlp.fc2.scales,
+backbone.layers.1.mixer.switch_mlp.fc2.weight,
+backbone.layers.1.norm.weight,
+backbone.layers.10.mixer.gate.e_score_correction_bias,
+backbone.layers.10.mixer.gate.weight,
+backbone.layers.10.mixer.shared_experts.down_proj.biases,
+backbone.layers.10.mixer.shared_experts.down_proj.scales,
+backbone.layers.10.mixer.shared_experts.down_proj.weight,
+backbone.layers.10.mixer.shared_experts.up_proj.biases,
+backbone.layers.10.mixer.shared_experts.up_proj.scales,
+backbone.layers.10.mixer.shared_experts.up_proj.weight,
+backbone.layers.10.mixer.switch_mlp.fc1.biases,
+backbone.layers.10.mixer.switch_mlp.fc1.scales,
+backbone.layers.10.mixer.switch_mlp.fc1.weight,
+backbone.layers.10.mixer.switch_mlp.fc2.biases,
+backbone.layers.10.mixer.switch_mlp.fc2.scales,
+backbone.layers.10.mixer.switch_mlp.fc2.weight,
+backbone.layers.10.norm.weight,
+backbone.layers.11.mixer.A_log,
+backbone.layers.11.mixer.D,
+backbone.layers.11.mixer.conv1d.bias,
+backbone.layers.11.mixer.conv1d.weight,
+backbone.layers.11.mixer.dt_bias,
+backbone.layers.11.mixer.in_proj.biases,
+backbone.layers.11.mixer.in_proj.scales,
+backbone.layers.11.mixer.in_proj.weight,
+backbone.layers.11.mixer.norm.weight,
+backbone.layers.11.mixer.out_proj.biases,
+backbone.layers.11.mixer.out_proj.scales,
+backbone.layers.11.mixer.out_proj.weight,
+backbone.layers.11.norm.weight,
+backbone.layers.12.mixer.k_proj.biases,
+backbone.layers.12.mixer.k_proj.scales,
+backbone.layers.12.mixer.k_proj.weight,
+backbone.layers.12.mixer.o_proj.biases,
+backbone.layers.12.mixer.o_proj.scales,
+backbone.layers.12.mixer.o_proj.weight,
+backbone.layers.12.mixer.q_proj.biases,
+backbone.layers.12.mixer.q_proj.scales,
+backbone.layers.12.mixer.q_proj.weight,
+backbone.layers.12.mixer.v_proj.biases,
+backbone.layers.12.mixer.v_proj.scales,
+backbone.layers.12.mixer.v_proj.weight,
+backbone.layers.12.norm.weight,
+backbone.layers.13.mixer.gate.e_score_correction_bias,
+backbone.layers.13.mixer.gate.weight,
+backbone.layers.13.mixer.shared_experts.down_proj.biases,
+backbone.layers.13.mixer.shared_experts.down_proj.scales,
+backbone.layers.13.mixer.shared_experts.down_proj.weight,
+backbone.layers.13.mixer.shared_experts.up_proj.biases,
+backbone.layers.13.mixer.shared_experts.up_proj.scales,
+backbone.layers.13.mixer.shared_experts.up_proj.weight,
+backbone.layers.13.mixer.switch_mlp.fc1.biases,
+backbone.layers.13.mixer.switch_mlp.fc1.scales,
+backbone.layers.13.mixer.switch_mlp.fc1.weight,
+backbone.layers.13.mixer.switch_mlp.fc2.biases,
+backbone.layers.13.mixer.switch_mlp.fc2.scales,
+backbone.layers.13.mixer.switch_mlp.fc2.weight,
+backbone.layers.13.norm.weight,
+backbone.layers.14.mixer.A_log,
+backbone.layers.14.mixer.D,
+backbone.layers.14.mixer.conv1d.bias,
+backbone.layers.14.mixer.conv1d.weight,
+backbone.layers.14.mixer.dt_bias,
+backbone.layers.14.mixer.in_proj.biases,
+backbone.layers.14.mixer.in_proj.scales,
+backbone.layers.14.mixer.in_proj.weight,
+backbone.layers.14.mixer.norm.weight,
+backbone.layers.14.mixer.out_proj.biases,
+backbone.layers.14.mixer.out_proj.scales,
+backbone.layers.14.mixer.out_proj.weight,
+backbone.layers.14.norm.weight,
+backbone.layers.15.mixer.gate.e_score_correction_bias,
+backbone.layers.15.mixer.gate.weight,
+backbone.layers.15.mixer.shared_experts.down_proj.biases,
+backbone.layers.15.mixer.shared_experts.down_proj.scales,
+backbone.layers.15.mixer.shared_experts.down_proj.weight,
+backbone.layers.15.mixer.shared_experts.up_proj.biases,
+backbone.layers.15.mixer.shared_experts.up_proj.scales,
+backbone.layers.15.mixer.shared_experts.up_proj.weight,
+backbone.layers.15.mixer.switch_mlp.fc1.biases,
+backbone.layers.15.mixer.switch_mlp.fc1.scales,
+backbone.layers.15.mixer.switch_mlp.fc1.weight,
+backbone.layers.15.mixer.switch_mlp.fc2.biases,
+backbone.layers.15.mixer.switch_mlp.fc2.scales,
+backbone.layers.15.mixer.switch_mlp.fc2.weight,
+backbone.layers.15.norm.weight,
+backbone.layers.16.mixer.A_log,
+backbone.layers.16.mixer.D,
+backbone.layers.16.mixer.conv1d.bias,
+backbone.layers.16.mixer.conv1d.weight,
+backbone.layers.16.mixer.dt_bias,
+backbone.layers.16.mixer.in_proj.biases,
+backbone.layers.16.mixer.in_proj.scales,
+backbone.layers.16.mixer.in_proj.weight,
+backbone.layers.16.mixer.norm.weight,
+backbone.layers.16.mixer.out_proj.biases,
+backbone.layers.16.mixer.out_proj.scales,
+backbone.layers.16.mixer.out_proj.weight,
+backbone.layers.16.norm.weight,
+backbone.layers.17.mixer.gate.e_score_correction_bias,
+backbone.layers.17.mixer.gate.weight,
+backbone.layers.17.mixer.shared_experts.down_proj.biases,
+backbone.layers.17.mixer.shared_experts.down_proj.scales,
+backbone.layers.17.mixer.shared_experts.down_proj.weight,
+backbone.layers.17.mixer.shared_experts.up_proj.biases,
+backbone.layers.17.mixer.shared_experts.up_proj.scales,
+backbone.layers.17.mixer.shared_experts.up_proj.weight,
+backbone.layers.17.mixer.switch_mlp.fc1.biases,
+backbone.layers.17.mixer.switch_mlp.fc1.scales,
+backbone.layers.17.mixer.switch_mlp.fc1.weight,
+backbone.layers.17.mixer.switch_mlp.fc2.biases,
+backbone.layers.17.mixer.switch_mlp.fc2.scales,
+backbone.layers.17.mixer.switch_mlp.fc2.weight,
+backbone.layers.17.norm.weight,
+backbone.layers.18.mixer.A_log,
+backbone.layers.18.mixer.D,
+backbone.layers.18.mixer.conv1d.bias,
+backbone.layers.18.mixer.conv1d.weight,
+backbone.layers.18.mixer.dt_bias,
+backbone.layers.18.mixer.in_proj.biases,
+backbone.layers.18.mixer.in_proj.scales,
+backbone.layers.18.mixer.in_proj.weight,
+backbone.layers.18.mixer.norm.weight,
+backbone.layers.18.mixer.out_proj.biases,
+backbone.layers.18.mixer.out_proj.scales,
+backbone.layers.18.mixer.out_proj.weight,
+backbone.layers.18.norm.weight,
+backbone.layers.19.mixer.k_proj.biases,
+backbone.layers.19.mixer.k_proj.scales,
+backbone.layers.19.mixer.k_proj.weight,
+backbone.layers.19.mixer.o_proj.biases,
+backbone.layers.19.mixer.o_proj.scales,
+backbone.layers.19.mixer.o_proj.weight,
+backbone.layers.19.mixer.q_proj.biases,
+backbone.layers.19.mixer.q_proj.scales,
+backbone.layers.19.mixer.q_proj.weight,
+backbone.layers.19.mixer.v_proj.biases,
+backbone.layers.19.mixer.v_proj.scales,
+backbone.layers.19.mixer.v_proj.weight,
+backbone.layers.19.norm.weight,
+backbone.layers.2.mixer.A_log,
+backbone.layers.2.mixer.D,
+backbone.layers.2.mixer.conv1d.bias,
+backbone.layers.2.mixer.conv1d.weight,
+backbone.layers.2.mixer.dt_bias,
+backbone.layers.2.mixer.in_proj.biases,
+backbone.layers.2.mixer.in_proj.scales,
+backbone.layers.2.mixer.in_proj.weight,
+backbone.layers.2.mixer.norm.weight,
+backbone.layers.2.mixer.out_proj.biases,
+backbone.layers.2.mixer.out_proj.scales,
+backbone.layers.2.mixer.out_proj.weight,
+backbone.layers.2.norm.weight,
+backbone.layers.20.mixer.gate.e_score_correction_bias,
+backbone.layers.20.mixer.gate.weight,
+backbone.layers.20.mixer.shared_experts.down_proj.biases,
+backbone.layers.20.mixer.shared_experts.down_proj.scales,
+backbone.layers.20.mixer.shared_experts.down_proj.weight,
+backbone.layers.20.mixer.shared_experts.up_proj.biases,
+backbone.layers.20.mixer.shared_experts.up_proj.scales,
+backbone.layers.20.mixer.shared_experts.up_proj.weight,
+backbone.layers.20.mixer.switch_mlp.fc1.biases,
+backbone.layers.20.mixer.switch_mlp.fc1.scales,
+backbone.layers.20.mixer.switch_mlp.fc1.weight,
+backbone.layers.20.mixer.switch_mlp.fc2.biases,
+backbone.layers.20.mixer.switch_mlp.fc2.scales,
+backbone.layers.20.mixer.switch_mlp.fc2.weight,
+backbone.layers.20.norm.weight,
+backbone.layers.21.mixer.A_log,
+backbone.layers.21.mixer.D,
+backbone.layers.21.mixer.conv1d.bias,
+backbone.layers.21.mixer.conv1d.weight,
+backbone.layers.21.mixer.dt_bias,
+backbone.layers.21.mixer.in_proj.biases,
+backbone.layers.21.mixer.in_proj.scales,
+backbone.layers.21.mixer.in_proj.weight,
+backbone.layers.21.mixer.norm.weight,
+backbone.layers.21.mixer.out_proj.biases,
+backbone.layers.21.mixer.out_proj.scales,
+backbone.layers.21.mixer.out_proj.weight,
+backbone.layers.21.norm.weight,
+backbone.layers.22.mixer.gate.e_score_correction_bias,
+backbone.layers.22.mixer.gate.weight,
+backbone.layers.22.mixer.shared_experts.down_proj.biases,
+backbone.layers.22.mixer.shared_experts.down_proj.scales,
+backbone.layers.22.mixer.shared_experts.down_proj.weight,
+backbone.layers.22.mixer.shared_experts.up_proj.biases,
+backbone.layers.22.mixer.shared_experts.up_proj.scales,
+backbone.layers.22.mixer.shared_experts.up_proj.weight,
+backbone.layers.22.mixer.switch_mlp.fc1.biases,
+backbone.layers.22.mixer.switch_mlp.fc1.scales,
+backbone.layers.22.mixer.switch_mlp.fc1.weight,
+backbone.layers.22.mixer.switch_mlp.fc2.biases,
+backbone.layers.22.mixer.switch_mlp.fc2.scales,
+backbone.layers.22.mixer.switch_mlp.fc2.weight,
+backbone.layers.22.norm.weight,
+backbone.layers.23.mixer.A_log,
+backbone.layers.23.mixer.D,
+backbone.layers.23.mixer.conv1d.bias,
+backbone.layers.23.mixer.conv1d.weight,
+backbone.layers.23.mixer.dt_bias,
+backbone.layers.23.mixer.in_proj.biases,
+backbone.layers.23.mixer.in_proj.scales,
+backbone.layers.23.mixer.in_proj.weight,
+backbone.layers.23.mixer.norm.weight,
+backbone.layers.23.mixer.out_proj.biases,
+backbone.layers.23.mixer.out_proj.scales,
+backbone.layers.23.mixer.out_proj.weight,
+backbone.layers.23.norm.weight,
+backbone.layers.24.mixer.gate.e_score_correction_bias,
+backbone.layers.24.mixer.gate.weight,
+backbone.layers.24.mixer.shared_experts.down_proj.biases,
+backbone.layers.24.mixer.shared_experts.down_proj.scales,
+backbone.layers.24.mixer.shared_experts.down_proj.weight,
+backbone.layers.24.mixer.shared_experts.up_proj.biases,
+backbone.layers.24.mixer.shared_experts.up_proj.scales,
+backbone.layers.24.mixer.shared_experts.up_proj.weight,
+backbone.layers.24.mixer.switch_mlp.fc1.biases,
+backbone.layers.24.mixer.switch_mlp.fc1.scales,
+backbone.layers.24.mixer.switch_mlp.fc1.weight,
+backbone.layers.24.mixer.switch_mlp.fc2.biases,
+backbone.layers.24.mixer.switch_mlp.fc2.scales,
+backbone.layers.24.mixer.switch_mlp.fc2.weight,
+backbone.layers.24.norm.weight,
+backbone.layers.25.mixer.A_log,
+backbone.layers.25.mixer.D,
+backbone.layers.25.mixer.conv1d.bias,
+backbone.layers.25.mixer.conv1d.weight,
+backbone.layers.25.mixer.dt_bias,
+backbone.layers.25.mixer.in_proj.biases,
+backbone.layers.25.mixer.in_proj.scales,
+backbone.layers.25.mixer.in_proj.weight,
+backbone.layers.25.mixer.norm.weight,
+backbone.layers.25.mixer.out_proj.biases,
+backbone.layers.25.mixer.out_proj.scales,
+backbone.layers.25.mixer.out_proj.weight,
+backbone.layers.25.norm.weight,
+backbone.layers.26.mixer.k_proj.biases,
+backbone.layers.26.mixer.k_proj.scales,
+backbone.layers.26.mixer.k_proj.weight,
+backbone.layers.26.mixer.o_proj.biases,
+backbone.layers.26.mixer.o_proj.scales,
+backbone.layers.26.mixer.o_proj.weight,
+backbone.layers.26.mixer.q_proj.biases,
+backbone.layers.26.mixer.q_proj.scales,
+backbone.layers.26.mixer.q_proj.weight,
+backbone.layers.26.mixer.v_proj.biases,
+backbone.layers.26.mixer.v_proj.scales,
+backbone.layers.26.mixer.v_proj.weight,
+backbone.layers.26.norm.weight,
+backbone.layers.27.mixer.gate.e_score_correction_bias,
+backbone.layers.27.mixer.gate.weight,
+backbone.layers.27.mixer.shared_experts.down_proj.biases,
+backbone.layers.27.mixer.shared_experts.down_proj.scales,
+backbone.layers.27.mixer.shared_experts.down_proj.weight,
+backbone.layers.27.mixer.shared_experts.up_proj.biases,
+backbone.layers.27.mixer.shared_experts.up_proj.scales,
+backbone.layers.27.mixer.shared_experts.up_proj.weight,
+backbone.layers.27.mixer.switch_mlp.fc1.biases,
+backbone.layers.27.mixer.switch_mlp.fc1.scales,
+backbone.layers.27.mixer.switch_mlp.fc1.weight,
+backbone.layers.27.mixer.switch_mlp.fc2.biases,
+backbone.layers.27.mixer.switch_mlp.fc2.scales,
+backbone.layers.27.mixer.switch_mlp.fc2.weight,
+backbone.layers.27.norm.weight,
+backbone.layers.28.mixer.A_log,
+backbone.layers.28.mixer.D,
+backbone.layers.28.mixer.conv1d.bias,
+backbone.layers.28.mixer.conv1d.weight,
+backbone.layers.28.mixer.dt_bias,
+backbone.layers.28.mixer.in_proj.biases,
+backbone.layers.28.mixer.in_proj.scales,
+backbone.layers.28.mixer.in_proj.weight,
+backbone.layers.28.mixer.norm.weight,
+backbone.layers.28.mixer.out_proj.biases,
+backbone.layers.28.mixer.out_proj.scales,
+backbone.layers.28.mixer.out_proj.weight,
+backbone.layers.28.norm.weight,
+backbone.layers.29.mixer.gate.e_score_correction_bias,
+backbone.layers.29.mixer.gate.weight,
+backbone.layers.29.mixer.shared_experts.down_proj.biases,
+backbone.layers.29.mixer.shared_experts.down_proj.scales,
+backbone.layers.29.mixer.shared_experts.down_proj.weight,
+backbone.layers.29.mixer.shared_experts.up_proj.biases,
+backbone.layers.29.mixer.shared_experts.up_proj.scales,
+backbone.layers.29.mixer.shared_experts.up_proj.weight,
+backbone.layers.29.mixer.switch_mlp.fc1.biases,
+backbone.layers.29.mixer.switch_mlp.fc1.scales,
+backbone.layers.29.mixer.switch_mlp.fc1.weight,
+backbone.layers.29.mixer.switch_mlp.fc2.biases,
+backbone.layers.29.mixer.switch_mlp.fc2.scales,
+backbone.layers.29.mixer.switch_mlp.fc2.weight,
+backbone.layers.29.norm.weight,
+backbone.layers.3.mixer.gate.e_score_correction_bias,
+backbone.layers.3.mixer.gate.weight,
+backbone.layers.3.mixer.shared_experts.down_proj.biases,
+backbone.layers.3.mixer.shared_experts.down_proj.scales,
+backbone.layers.3.mixer.shared_experts.down_proj.weight,
+backbone.layers.3.mixer.shared_experts.up_proj.biases,
+backbone.layers.3.mixer.shared_experts.up_proj.scales,
+backbone.layers.3.mixer.shared_experts.up_proj.weight,
+backbone.layers.3.mixer.switch_mlp.fc1.biases,
+backbone.layers.3.mixer.switch_mlp.fc1.scales,
+backbone.layers.3.mixer.switch_mlp.fc1.weight,
+backbone.layers.3.mixer.switch_mlp.fc2.biases,
+backbone.layers.3.mixer.switch_mlp.fc2.scales,
+backbone.layers.3.mixer.switch_mlp.fc2.weight,
+backbone.layers.3.norm.weight,
+backbone.layers.30.mixer.A_log,
+backbone.layers.30.mixer.D,
+backbone.layers.30.mixer.conv1d.bias,
+backbone.layers.30.mixer.conv1d.weight,
+backbone.layers.30.mixer.dt_bias,
+backbone.layers.30.mixer.in_proj.biases,
+backbone.layers.30.mixer.in_proj.scales,
+backbone.layers.30.mixer.in_proj.weight,
+backbone.layers.30.mixer.norm.weight,
+backbone.layers.30.mixer.out_proj.biases,
+backbone.layers.30.mixer.out_proj.scales,
+backbone.layers.30.mixer.out_proj.weight,
+backbone.layers.30.norm.weight,
+backbone.layers.31.mixer.gate.e_score_correction_bias,
+backbone.layers.31.mixer.gate.weight,
+backbone.layers.31.mixer.shared_experts.down_proj.biases,
+backbone.layers.31.mixer.shared_experts.down_proj.scales,
+backbone.layers.31.mixer.shared_experts.down_proj.weight,
+backbone.layers.31.mixer.shared_experts.up_proj.biases,
+backbone.layers.31.mixer.shared_experts.up_proj.scales,
+backbone.layers.31.mixer.shared_experts.up_proj.weight,
+backbone.layers.31.mixer.switch_mlp.fc1.biases,
+backbone.layers.31.mixer.switch_mlp.fc1.scales,
+backbone.layers.31.mixer.switch_mlp.fc1.weight,
+backbone.layers.31.mixer.switch_mlp.fc2.biases,
+backbone.layers.31.mixer.switch_mlp.fc2.scales,
+backbone.layers.31.mixer.switch_mlp.fc2.weight,
+backbone.layers.31.norm.weight,
+backbone.layers.32.mixer.A_log,
+backbone.layers.32.mixer.D,
+backbone.layers.32.mixer.conv1d.bias,
+backbone.layers.32.mixer.conv1d.weight,
+backbone.layers.32.mixer.dt_bias,
+backbone.layers.32.mixer.in_proj.biases,
+backbone.layers.32.mixer.in_proj.scales,
+backbone.layers.32.mixer.in_proj.weight,
+backbone.layers.32.mixer.norm.weight,
+backbone.layers.32.mixer.out_proj.biases,
+backbone.layers.32.mixer.out_proj.scales,
+backbone.layers.32.mixer.out_proj.weight,
+backbone.layers.32.norm.weight,
+backbone.layers.33.mixer.k_proj.biases,
+backbone.layers.33.mixer.k_proj.scales,
+backbone.layers.33.mixer.k_proj.weight,
+backbone.layers.33.mixer.o_proj.biases,
+backbone.layers.33.mixer.o_proj.scales,
+backbone.layers.33.mixer.o_proj.weight,
+backbone.layers.33.mixer.q_proj.biases,
+backbone.layers.33.mixer.q_proj.scales,
+backbone.layers.33.mixer.q_proj.weight,
+backbone.layers.33.mixer.v_proj.biases,
+backbone.layers.33.mixer.v_proj.scales,
+backbone.layers.33.mixer.v_proj.weight,
+backbone.layers.33.norm.weight,
+backbone.layers.34.mixer.gate.e_score_correction_bias,
+backbone.layers.34.mixer.gate.weight,
+backbone.layers.34.mixer.shared_experts.down_proj.biases,
+backbone.layers.34.mixer.shared_experts.down_proj.scales,
+backbone.layers.34.mixer.shared_experts.down_proj.weight,
+backbone.layers.34.mixer.shared_experts.up_proj.biases,
+backbone.layers.34.mixer.shared_experts.up_proj.scales,
+backbone.layers.34.mixer.shared_experts.up_proj.weight,
+backbone.layers.34.mixer.switch_mlp.fc1.biases,
+backbone.layers.34.mixer.switch_mlp.fc1.scales,
+backbone.layers.34.mixer.switch_mlp.fc1.weight,
+backbone.layers.34.mixer.switch_mlp.fc2.biases,
+backbone.layers.34.mixer.switch_mlp.fc2.scales,
+backbone.layers.34.mixer.switch_mlp.fc2.weight,
+backbone.layers.34.norm.weight,
+backbone.layers.35.mixer.A_log,
+backbone.layers.35.mixer.D,
+backbone.layers.35.mixer.conv1d.bias,
+backbone.layers.35.mixer.conv1d.weight,
+backbone.layers.35.mixer.dt_bias,
+backbone.layers.35.mixer.in_proj.biases,
+backbone.layers.35.mixer.in_proj.scales,
+backbone.layers.35.mixer.in_proj.weight,
+backbone.layers.35.mixer.norm.weight,
+backbone.layers.35.mixer.out_proj.biases,
+backbone.layers.35.mixer.out_proj.scales,
+backbone.layers.35.mixer.out_proj.weight,
+backbone.layers.35.norm.weight,
+backbone.layers.36.mixer.gate.e_score_correction_bias,
+backbone.layers.36.mixer.gate.weight,
+backbone.layers.36.mixer.shared_experts.down_proj.biases,
+backbone.layers.36.mixer.shared_experts.down_proj.scales,
+backbone.layers.36.mixer.shared_experts.down_proj.weight,
+backbone.layers.36.mixer.shared_experts.up_proj.biases,
+backbone.layers.36.mixer.shared_experts.up_proj.scales,
+backbone.layers.36.mixer.shared_experts.up_proj.weight,
+backbone.layers.36.mixer.switch_mlp.fc1.biases,
+backbone.layers.36.mixer.switch_mlp.fc1.scales,
+backbone.layers.36.mixer.switch_mlp.fc1.weight,
+backbone.layers.36.mixer.switch_mlp.fc2.biases,
+backbone.layers.36.mixer.switch_mlp.fc2.scales,
+backbone.layers.36.mixer.switch_mlp.fc2.weight,
+backbone.layers.36.norm.weight,
+backbone.layers.37.mixer.A_log,
+backbone.layers.37.mixer.D,
+backbone.layers.37.mixer.conv1d.bias,
+backbone.layers.37.mixer.conv1d.weight,
+backbone.layers.37.mixer.dt_bias,
+backbone.layers.37.mixer.in_proj.biases,
+backbone.layers.37.mixer.in_proj.scales,
+backbone.layers.37.mixer.in_proj.weight,
+backbone.layers.37.mixer.norm.weight,
+backbone.layers.37.mixer.out_proj.biases,
+backbone.layers.37.mixer.out_proj.scales,
+backbone.layers.37.mixer.out_proj.weight,
+backbone.layers.37.norm.weight,
+backbone.layers.38.mixer.gate.e_score_correction_bias,
+backbone.layers.38.mixer.gate.weight,
+backbone.layers.38.mixer.shared_experts.down_proj.biases,
+backbone.layers.38.mixer.shared_experts.down_proj.scales,
+backbone.layers.38.mixer.shared_experts.down_proj.weight,
+backbone.layers.38.mixer.shared_experts.up_proj.biases,
+backbone.layers.38.mixer.shared_experts.up_proj.scales,
+backbone.layers.38.mixer.shared_experts.up_proj.weight,
+backbone.layers.38.mixer.switch_mlp.fc1.biases,
+backbone.layers.38.mixer.switch_mlp.fc1.scales,
+backbone.layers.38.mixer.switch_mlp.fc1.weight,
+backbone.layers.38.mixer.switch_mlp.fc2.biases,
+backbone.layers.38.mixer.switch_mlp.fc2.scales,
+backbone.layers.38.mixer.switch_mlp.fc2.weight,
+backbone.layers.38.norm.weight,
+backbone.layers.39.mixer.A_log,
+backbone.layers.39.mixer.D,
+backbone.layers.39.mixer.conv1d.bias,
+backbone.layers.39.mixer.conv1d.weight,
+backbone.layers.39.mixer.dt_bias,
+backbone.layers.39.mixer.in_proj.biases,
+backbone.layers.39.mixer.in_proj.scales,
+backbone.layers.39.mixer.in_proj.weight,
+backbone.layers.39.mixer.norm.weight,
+backbone.layers.39.mixer.out_proj.biases,
+backbone.layers.39.mixer.out_proj.scales,
+backbone.layers.39.mixer.out_proj.weight,
+backbone.layers.39.norm.weight,
+backbone.layers.4.mixer.A_log,
+backbone.layers.4.mixer.D,
+backbone.layers.4.mixer.conv1d.bias,
+backbone.layers.4.mixer.conv1d.weight,
+backbone.layers.4.mixer.dt_bias,
+backbone.layers.4.mixer.in_proj.biases,
+backbone.layers.4.mixer.in_proj.scales,
+backbone.layers.4.mixer.in_proj.weight,
+backbone.layers.4.mixer.norm.weight,
+backbone.layers.4.mixer.out_proj.biases,
+backbone.layers.4.mixer.out_proj.scales,
+backbone.layers.4.mixer.out_proj.weight,
+backbone.layers.4.norm.weight,
+backbone.layers.40.mixer.gate.e_score_correction_bias,
+backbone.layers.40.mixer.gate.weight,
+backbone.layers.40.mixer.shared_experts.down_proj.biases,
+backbone.layers.40.mixer.shared_experts.down_proj.scales,
+backbone.layers.40.mixer.shared_experts.down_proj.weight,
+backbone.layers.40.mixer.shared_experts.up_proj.biases,
+backbone.layers.40.mixer.shared_experts.up_proj.scales,
+backbone.layers.40.mixer.shared_experts.up_proj.weight,
+backbone.layers.40.mixer.switch_mlp.fc1.biases,
+backbone.layers.40.mixer.switch_mlp.fc1.scales,
+backbone.layers.40.mixer.switch_mlp.fc1.weight,
+backbone.layers.40.mixer.switch_mlp.fc2.biases,
+backbone.layers.40.mixer.switch_mlp.fc2.scales,
+backbone.layers.40.mixer.switch_mlp.fc2.weight,
+backbone.layers.40.norm.weight,
+backbone.layers.41.mixer.A_log,
+backbone.layers.41.mixer.D,
+backbone.layers.41.mixer.conv1d.bias,
+backbone.layers.41.mixer.conv1d.weight,
+backbone.layers.41.mixer.dt_bias,
+backbone.layers.41.mixer.in_proj.biases,
+backbone.layers.41.mixer.in_proj.scales,
+backbone.layers.41.mixer.in_proj.weight,
+backbone.layers.41.mixer.norm.weight,
+backbone.layers.41.mixer.out_proj.biases,
+backbone.layers.41.mixer.out_proj.scales,
+backbone.layers.41.mixer.out_proj.weight,
+backbone.layers.41.norm.weight,
+backbone.layers.42.mixer.k_proj.biases,
+backbone.layers.42.mixer.k_proj.scales,
+backbone.layers.42.mixer.k_proj.weight,
+backbone.layers.42.mixer.o_proj.biases,
+backbone.layers.42.mixer.o_proj.scales,
+backbone.layers.42.mixer.o_proj.weight,
+backbone.layers.42.mixer.q_proj.biases,
+backbone.layers.42.mixer.q_proj.scales,
+backbone.layers.42.mixer.q_proj.weight,
+backbone.layers.42.mixer.v_proj.biases,
+backbone.layers.42.mixer.v_proj.scales,
+backbone.layers.42.mixer.v_proj.weight,
+backbone.layers.42.norm.weight,
+backbone.layers.43.mixer.gate.e_score_correction_bias,
+backbone.layers.43.mixer.gate.weight,
+backbone.layers.43.mixer.shared_experts.down_proj.biases,
+backbone.layers.43.mixer.shared_experts.down_proj.scales,
+backbone.layers.43.mixer.shared_experts.down_proj.weight,
+backbone.layers.43.mixer.shared_experts.up_proj.biases,
+backbone.layers.43.mixer.shared_experts.up_proj.scales,
+backbone.layers.43.mixer.shared_experts.up_proj.weight,
+backbone.layers.43.mixer.switch_mlp.fc1.biases,
+backbone.layers.43.mixer.switch_mlp.fc1.scales,
+backbone.layers.43.mixer.switch_mlp.fc1.weight,
+backbone.layers.43.mixer.switch_mlp.fc2.biases,
+backbone.layers.43.mixer.switch_mlp.fc2.scales,
+backbone.layers.43.mixer.switch_mlp.fc2.weight,
+backbone.layers.43.norm.weight,
+backbone.layers.44.mixer.A_log,
+backbone.layers.44.mixer.D,
+backbone.layers.44.mixer.conv1d.bias,
+backbone.layers.44.mixer.conv1d.weight,
+backbone.layers.44.mixer.dt_bias,
+backbone.layers.44.mixer.in_proj.biases,
+backbone.layers.44.mixer.in_proj.scales,
+backbone.layers.44.mixer.in_proj.weight,
+backbone.layers.44.mixer.norm.weight,
+backbone.layers.44.mixer.out_proj.biases,
+backbone.layers.44.mixer.out_proj.scales,
+backbone.layers.44.mixer.out_proj.weight,
+backbone.layers.44.norm.weight,
+backbone.layers.45.mixer.gate.e_score_correction_bias,
+backbone.layers.45.mixer.gate.weight,
+backbone.layers.45.mixer.shared_experts.down_proj.biases,
+backbone.layers.45.mixer.shared_experts.down_proj.scales,
+backbone.layers.45.mixer.shared_experts.down_proj.weight,
+backbone.layers.45.mixer.shared_experts.up_proj.biases,
+backbone.layers.45.mixer.shared_experts.up_proj.scales,
+backbone.layers.45.mixer.shared_experts.up_proj.weight,
+backbone.layers.45.mixer.switch_mlp.fc1.biases,
+backbone.layers.45.mixer.switch_mlp.fc1.scales,
+backbone.layers.45.mixer.switch_mlp.fc1.weight,
+backbone.layers.45.mixer.switch_mlp.fc2.biases,
+backbone.layers.45.mixer.switch_mlp.fc2.scales,
+backbone.layers.45.mixer.switch_mlp.fc2.weight,
+backbone.layers.45.norm.weight,
+backbone.layers.46.mixer.A_log,
+backbone.layers.46.mixer.D,
+backbone.layers.46.mixer.conv1d.bias,
+backbone.layers.46.mixer.conv1d.weight,
+backbone.layers.46.mixer.dt_bias,
+backbone.layers.46.mixer.in_proj.biases,
+backbone.layers.46.mixer.in_proj.scales,
+backbone.layers.46.mixer.in_proj.weight,
+backbone.layers.46.mixer.norm.weight,
+backbone.layers.46.mixer.out_proj.biases,
+backbone.layers.46.mixer.out_proj.scales,
+backbone.layers.46.mixer.out_proj.weight,
+backbone.layers.46.norm.weight,
+backbone.layers.47.mixer.gate.e_score_correction_bias,
+backbone.layers.47.mixer.gate.weight,
+backbone.layers.47.mixer.shared_experts.down_proj.biases,
+backbone.layers.47.mixer.shared_experts.down_proj.scales,
+backbone.layers.47.mixer.shared_experts.down_proj.weight,
+backbone.layers.47.mixer.shared_experts.up_proj.biases,
+backbone.layers.47.mixer.shared_experts.up_proj.scales,
+backbone.layers.47.mixer.shared_experts.up_proj.weight,
+backbone.layers.47.mixer.switch_mlp.fc1.biases,
+backbone.layers.47.mixer.switch_mlp.fc1.scales,
+backbone.layers.47.mixer.switch_mlp.fc1.weight,
+backbone.layers.47.mixer.switch_mlp.fc2.biases,
+backbone.layers.47.mixer.switch_mlp.fc2.scales,
+backbone.layers.47.mixer.switch_mlp.fc2.weight,
+backbone.layers.47.norm.weight,
+backbone.layers.48.mixer.A_log,
+backbone.layers.48.mixer.D,
+backbone.layers.48.mixer.conv1d.bias,
+backbone.layers.48.mixer.conv1d.weight,
+backbone.layers.48.mixer.dt_bias,
+backbone.layers.48.mixer.in_proj.biases,
+backbone.layers.48.mixer.in_proj.scales,
+backbone.layers.48.mixer.in_proj.weight,
+backbone.layers.48.mixer.norm.weight,
+backbone.layers.48.mixer.out_proj.biases,
+backbone.layers.48.mixer.out_proj.scales,
+backbone.layers.48.mixer.out_proj.weight,
+backbone.layers.48.norm.weight,
+backbone.layers.49.mixer.gate.e_score_correction_bias,
+backbone.layers.49.mixer.gate.weight,
+backbone.layers.49.mixer.shared_experts.down_proj.biases,
+backbone.layers.49.mixer.shared_experts.down_proj.scales,
+backbone.layers.49.mixer.shared_experts.down_proj.weight,
+backbone.layers.49.mixer.shared_experts.up_proj.biases,
+backbone.layers.49.mixer.shared_experts.up_proj.scales,
+backbone.layers.49.mixer.shared_experts.up_proj.weight,
+backbone.layers.49.mixer.switch_mlp.fc1.biases,
+backbone.layers.49.mixer.switch_mlp.fc1.scales,
+backbone.layers.49.mixer.switch_mlp.fc1.weight,
+backbone.layers.49.mixer.switch_mlp.fc2.biases,
+backbone.layers.49.mixer.switch_mlp.fc2.scales,
+backbone.layers.49.mixer.switch_mlp.fc2.weight,
+backbone.layers.49.norm.weight,
+backbone.layers.5.mixer.k_proj.biases,
+backbone.layers.5.mixer.k_proj.scales,
+backbone.layers.5.mixer.k_proj.weight,
+backbone.layers.5.mixer.o_proj.biases,
+backbone.layers.5.mixer.o_proj.scales,
+backbone.layers.5.mixer.o_proj.weight,
+backbone.layers.5.mixer.q_proj.biases,
+backbone.layers.5.mixer.q_proj.scales,
+backbone.layers.5.mixer.q_proj.weight,
+backbone.layers.5.mixer.v_proj.biases,
+backbone.layers.5.mixer.v_proj.scales,
+backbone.layers.5.mixer.v_proj.weight,
+backbone.layers.5.norm.weight,
+backbone.layers.50.mixer.A_log,
+backbone.layers.50.mixer.D,
+backbone.layers.50.mixer.conv1d.bias,
+backbone.layers.50.mixer.conv1d.weight,
+backbone.layers.50.mixer.dt_bias,
+backbone.layers.50.mixer.in_proj.biases,
+backbone.layers.50.mixer.in_proj.scales,
+backbone.layers.50.mixer.in_proj.weight,
+backbone.layers.50.mixer.norm.weight,
+backbone.layers.50.mixer.out_proj.biases,
+backbone.layers.50.mixer.out_proj.scales,
+backbone.layers.50.mixer.out_proj.weight,
+backbone.layers.50.norm.weight,
+backbone.layers.51.mixer.gate.e_score_correction_bias,
+backbone.layers.51.mixer.gate.weight,
+backbone.layers.51.mixer.shared_experts.down_proj.biases,
+backbone.layers.51.mixer.shared_experts.down_proj.scales,
+backbone.layers.51.mixer.shared_experts.down_proj.weight,
+backbone.layers.51.mixer.shared_experts.up_proj.biases,
+backbone.layers.51.mixer.shared_experts.up_proj.scales,
+backbone.layers.51.mixer.shared_experts.up_proj.weight,
+backbone.layers.51.mixer.switch_mlp.fc1.biases,
+backbone.layers.51.mixer.switch_mlp.fc1.scales,
+backbone.layers.51.mixer.switch_mlp.fc1.weight,
+backbone.layers.51.mixer.switch_mlp.fc2.biases,
+backbone.layers.51.mixer.switch_mlp.fc2.scales,
+backbone.layers.51.mixer.switch_mlp.fc2.weight,
+backbone.layers.51.norm.weight,
+backbone.layers.6.mixer.gate.e_score_correction_bias,
+backbone.layers.6.mixer.gate.weight,
+backbone.layers.6.mixer.shared_experts.down_proj.biases,
+backbone.layers.6.mixer.shared_experts.down_proj.scales,
+backbone.layers.6.mixer.shared_experts.down_proj.weight,
+backbone.layers.6.mixer.shared_experts.up_proj.biases,
+backbone.layers.6.mixer.shared_experts.up_proj.scales,
+backbone.layers.6.mixer.shared_experts.up_proj.weight,
+backbone.layers.6.mixer.switch_mlp.fc1.biases,
+backbone.layers.6.mixer.switch_mlp.fc1.scales,
+backbone.layers.6.mixer.switch_mlp.fc1.weight,
+backbone.layers.6.mixer.switch_mlp.fc2.biases,
+backbone.layers.6.mixer.switch_mlp.fc2.scales,
+backbone.layers.6.mixer.switch_mlp.fc2.weight,
+backbone.layers.6.norm.weight,
+backbone.layers.7.mixer.A_log,
+backbone.layers.7.mixer.D,
+backbone.layers.7.mixer.conv1d.bias,
+backbone.layers.7.mixer.conv1d.weight,
+backbone.layers.7.mixer.dt_bias,
+backbone.layers.7.mixer.in_proj.biases,
+backbone.layers.7.mixer.in_proj.scales,
+backbone.layers.7.mixer.in_proj.weight,
+backbone.layers.7.mixer.norm.weight,
+backbone.layers.7.mixer.out_proj.biases,
+backbone.layers.7.mixer.out_proj.scales,
+backbone.layers.7.mixer.out_proj.weight,
+backbone.layers.7.norm.weight,
+backbone.layers.8.mixer.gate.e_score_correction_bias,
+backbone.layers.8.mixer.gate.weight,
+backbone.layers.8.mixer.shared_experts.down_proj.biases,
+backbone.layers.8.mixer.shared_experts.down_proj.scales,
+backbone.layers.8.mixer.shared_experts.down_proj.weight,
+backbone.layers.8.mixer.shared_experts.up_proj.biases,
+backbone.layers.8.mixer.shared_experts.up_proj.scales,
+backbone.layers.8.mixer.shared_experts.up_proj.weight,
+backbone.layers.8.mixer.switch_mlp.fc1.biases,
+backbone.layers.8.mixer.switch_mlp.fc1.scales,
+backbone.layers.8.mixer.switch_mlp.fc1.weight,
+backbone.layers.8.mixer.switch_mlp.fc2.biases,
+backbone.layers.8.mixer.switch_mlp.fc2.scales,
+backbone.layers.8.mixer.switch_mlp.fc2.weight,
+backbone.layers.8.norm.weight,
+backbone.layers.9.mixer.A_log,
+backbone.layers.9.mixer.D,
+backbone.layers.9.mixer.conv1d.bias,
+backbone.layers.9.mixer.conv1d.weight,
+backbone.layers.9.mixer.dt_bias,
+backbone.layers.9.mixer.in_proj.biases,
+backbone.layers.9.mixer.in_proj.scales,
+backbone.layers.9.mixer.in_proj.weight,
+backbone.layers.9.mixer.norm.weight,
+backbone.layers.9.mixer.out_proj.biases,
+backbone.layers.9.mixer.out_proj.scales,
+backbone.layers.9.mixer.out_proj.weight,
+backbone.layers.9.norm.weight,
+backbone.norm_f.weight,
+lm_head.biases,
+lm_head.scales,
+lm_head.weight.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
+ValueError: Model loading failed: Received 729 parameters not in model: 
+backbone.embeddings.biases,
+backbone.embeddings.scales,
+backbone.embeddings.weight,
+backbone.layers.0.mixer.A_log,
+backbone.layers.0.mixer.D,
+backbone.layers.0.mixer.conv1d.bias,
+backbone.layers.0.mixer.conv1d.weight,
+backbone.layers.0.mixer.dt_bias,
+backbone.layers.0.mixer.in_proj.biases,
+backbone.layers.0.mixer.in_proj.scales,
+backbone.layers.0.mixer.in_proj.weight,
+backbone.layers.0.mixer.norm.weight,
+backbone.layers.0.mixer.out_proj.biases,
+backbone.layers.0.mixer.out_proj.scales,
+backbone.layers.0.mixer.out_proj.weight,
+backbone.layers.0.norm.weight,
+backbone.layers.1.mixer.gate.e_score_correction_bias,
+backbone.layers.1.mixer.gate.weight,
+backbone.layers.1.mixer.shared_experts.down_proj.biases,
+backbone.layers.1.mixer.shared_experts.down_proj.scales,
+backbone.layers.1.mixer.shared_experts.down_proj.weight,
+backbone.layers.1.mixer.shared_experts.up_proj.biases,
+backbone.layers.1.mixer.shared_experts.up_proj.scales,
+backbone.layers.1.mixer.shared_experts.up_proj.weight,
+backbone.layers.1.mixer.switch_mlp.fc1.biases,
+backbone.layers.1.mixer.switch_mlp.fc1.scales,
+backbone.layers.1.mixer.switch_mlp.fc1.weight,
+backbone.layers.1.mixer.switch_mlp.fc2.biases,
+backbone.layers.1.mixer.switch_mlp.fc2.scales,
+backbone.layers.1.mixer.switch_mlp.fc2.weight,
+backbone.layers.1.norm.weight,
+backbone.layers.10.mixer.gate.e_score_correction_bias,
+backbone.layers.10.mixer.gate.weight,
+backbone.layers.10.mixer.shared_experts.down_proj.biases,
+backbone.layers.10.mixer.shared_experts.down_proj.scales,
+backbone.layers.10.mixer.shared_experts.down_proj.weight,
+backbone.layers.10.mixer.shared_experts.up_proj.biases,
+backbone.layers.10.mixer.shared_experts.up_proj.scales,
+backbone.layers.10.mixer.shared_experts.up_proj.weight,
+backbone.layers.10.mixer.switch_mlp.fc1.biases,
+backbone.layers.10.mixer.switch_mlp.fc1.scales,
+backbone.layers.10.mixer.switch_mlp.fc1.weight,
+backbone.layers.10.mixer.switch_mlp.fc2.biases,
+backbone.layers.10.mixer.switch_mlp.fc2.scales,
+backbone.layers.10.mixer.switch_mlp.fc2.weight,
+backbone.layers.10.norm.weight,
+backbone.layers.11.mixer.A_log,
+backbone.layers.11.mixer.D,
+backbone.layers.11.mixer.conv1d.bias,
+backbone.layers.11.mixer.conv1d.weight,
+backbone.layers.11.mixer.dt_bias,
+backbone.layers.11.mixer.in_proj.biases,
+backbone.layers.11.mixer.in_proj.scales,
+backbone.layers.11.mixer.in_proj.weight,
+backbone.layers.11.mixer.norm.weight,
+backbone.layers.11.mixer.out_proj.biases,
+backbone.layers.11.mixer.out_proj.scales,
+backbone.layers.11.mixer.out_proj.weight,
+backbone.layers.11.norm.weight,
+backbone.layers.12.mixer.k_proj.biases,
+backbone.layers.12.mixer.k_proj.scales,
+backbone.layers.12.mixer.k_proj.weight,
+backbone.layers.12.mixer.o_proj.biases,
+backbone.layers.12.mixer.o_proj.scales,
+backbone.layers.12.mixer.o_proj.weight,
+backbone.layers.12.mixer.q_proj.biases,
+backbone.layers.12.mixer.q_proj.scales,
+backbone.layers.12.mixer.q_proj.weight,
+backbone.layers.12.mixer.v_proj.biases,
+backbone.layers.12.mixer.v_proj.scales,
+backbone.layers.12.mixer.v_proj.weight,
+backbone.layers.12.norm.weight,
+backbone.layers.13.mixer.gate.e_score_correction_bias,
+backbone.layers.13.mixer.gate.weight,
+backbone.layers.13.mixer.shared_experts.down_proj.biases,
+backbone.layers.13.mixer.shared_experts.down_proj.scales,
+backbone.layers.13.mixer.shared_experts.down_proj.weight,
+backbone.layers.13.mixer.shared_experts.up_proj.biases,
+backbone.layers.13.mixer.shared_experts.up_proj.scales,
+backbone.layers.13.mixer.shared_experts.up_proj.weight,
+backbone.layers.13.mixer.switch_mlp.fc1.biases,
+backbone.layers.13.mixer.switch_mlp.fc1.scales,
+backbone.layers.13.mixer.switch_mlp.fc1.weight,
+backbone.layers.13.mixer.switch_mlp.fc2.biases,
+backbone.layers.13.mixer.switch_mlp.fc2.scales,
+backbone.layers.13.mixer.switch_mlp.fc2.weight,
+backbone.layers.13.norm.weight,
+backbone.layers.14.mixer.A_log,
+backbone.layers.14.mixer.D,
+backbone.layers.14.mixer.conv1d.bias,
+backbone.layers.14.mixer.conv1d.weight,
+backbone.layers.14.mixer.dt_bias,
+backbone.layers.14.mixer.in_proj.biases,
+backbone.layers.14.mixer.in_proj.scales,
+backbone.layers.14.mixer.in_proj.weight,
+backbone.layers.14.mixer.norm.weight,
+backbone.layers.14.mixer.out_proj.biases,
+backbone.layers.14.mixer.out_proj.scales,
+backbone.layers.14.mixer.out_proj.weight,
+backbone.layers.14.norm.weight,
+backbone.layers.15.mixer.gate.e_score_correction_bias,
+backbone.layers.15.mixer.gate.weight,
+backbone.layers.15.mixer.shared_experts.down_proj.biases,
+backbone.layers.15.mixer.shared_experts.down_proj.scales,
+backbone.layers.15.mixer.shared_experts.down_proj.weight,
+backbone.layers.15.mixer.shared_experts.up_proj.biases,
+backbone.layers.15.mixer.shared_experts.up_proj.scales,
+backbone.layers.15.mixer.shared_experts.up_proj.weight,
+backbone.layers.15.mixer.switch_mlp.fc1.biases,
+backbone.layers.15.mixer.switch_mlp.fc1.scales,
+backbone.layers.15.mixer.switch_mlp.fc1.weight,
+backbone.layers.15.mixer.switch_mlp.fc2.biases,
+backbone.layers.15.mixer.switch_mlp.fc2.scales,
+backbone.layers.15.mixer.switch_mlp.fc2.weight,
+backbone.layers.15.norm.weight,
+backbone.layers.16.mixer.A_log,
+backbone.layers.16.mixer.D,
+backbone.layers.16.mixer.conv1d.bias,
+backbone.layers.16.mixer.conv1d.weight,
+backbone.layers.16.mixer.dt_bias,
+backbone.layers.16.mixer.in_proj.biases,
+backbone.layers.16.mixer.in_proj.scales,
+backbone.layers.16.mixer.in_proj.weight,
+backbone.layers.16.mixer.norm.weight,
+backbone.layers.16.mixer.out_proj.biases,
+backbone.layers.16.mixer.out_proj.scales,
+backbone.layers.16.mixer.out_proj.weight,
+backbone.layers.16.norm.weight,
+backbone.layers.17.mixer.gate.e_score_correction_bias,
+backbone.layers.17.mixer.gate.weight,
+backbone.layers.17.mixer.shared_experts.down_proj.biases,
+backbone.layers.17.mixer.shared_experts.down_proj.scales,
+backbone.layers.17.mixer.shared_experts.down_proj.weight,
+backbone.layers.17.mixer.shared_experts.up_proj.biases,
+backbone.layers.17.mixer.shared_experts.up_proj.scales,
+backbone.layers.17.mixer.shared_experts.up_proj.weight,
+backbone.layers.17.mixer.switch_mlp.fc1.biases,
+backbone.layers.17.mixer.switch_mlp.fc1.scales,
+backbone.layers.17.mixer.switch_mlp.fc1.weight,
+backbone.layers.17.mixer.switch_mlp.fc2.biases,
+backbone.layers.17.mixer.switch_mlp.fc2.scales,
+backbone.layers.17.mixer.switch_mlp.fc2.weight,
+backbone.layers.17.norm.weight,
+backbone.layers.18.mixer.A_log,
+backbone.layers.18.mixer.D,
+backbone.layers.18.mixer.conv1d.bias,
+backbone.layers.18.mixer.conv1d.weight,
+backbone.layers.18.mixer.dt_bias,
+backbone.layers.18.mixer.in_proj.biases,
+backbone.layers.18.mixer.in_proj.scales,
+backbone.layers.18.mixer.in_proj.weight,
+backbone.layers.18.mixer.norm.weight,
+backbone.layers.18.mixer.out_proj.biases,
+backbone.layers.18.mixer.out_proj.scales,
+backbone.layers.18.mixer.out_proj.weight,
+backbone.layers.18.norm.weight,
+backbone.layers.19.mixer.k_proj.biases,
+backbone.layers.19.mixer.k_proj.scales,
+backbone.layers.19.mixer.k_proj.weight,
+backbone.layers.19.mixer.o_proj.biases,
+backbone.layers.19.mixer.o_proj.scales,
+backbone.layers.19.mixer.o_proj.weight,
+backbone.layers.19.mixer.q_proj.biases,
+backbone.layers.19.mixer.q_proj.scales,
+backbone.layers.19.mixer.q_proj.weight,
+backbone.layers.19.mixer.v_proj.biases,
+backbone.layers.19.mixer.v_proj.scales,
+backbone.layers.19.mixer.v_proj.weight,
+backbone.layers.19.norm.weight,
+backbone.layers.2.mixer.A_log,
+backbone.layers.2.mixer.D,
+backbone.layers.2.mixer.conv1d.bias,
+backbone.layers.2.mixer.conv1d.weight,
+backbone.layers.2.mixer.dt_bias,
+backbone.layers.2.mixer.in_proj.biases,
+backbone.layers.2.mixer.in_proj.scales,
+backbone.layers.2.mixer.in_proj.weight,
+backbone.layers.2.mixer.norm.weight,
+backbone.layers.2.mixer.out_proj.biases,
+backbone.layers.2.mixer.out_proj.scales,
+backbone.layers.2.mixer.out_proj.weight,
+backbone.layers.2.norm.weight,
+backbone.layers.20.mixer.gate.e_score_correction_bias,
+backbone.layers.20.mixer.gate.weight,
+backbone.layers.20.mixer.shared_experts.down_proj.biases,
+backbone.layers.20.mixer.shared_experts.down_proj.scales,
+backbone.layers.20.mixer.shared_experts.down_proj.weight,
+backbone.layers.20.mixer.shared_experts.up_proj.biases,
+backbone.layers.20.mixer.shared_experts.up_proj.scales,
+backbone.layers.20.mixer.shared_experts.up_proj.weight,
+backbone.layers.20.mixer.switch_mlp.fc1.biases,
+backbone.layers.20.mixer.switch_mlp.fc1.scales,
+backbone.layers.20.mixer.switch_mlp.fc1.weight,
+backbone.layers.20.mixer.switch_mlp.fc2.biases,
+backbone.layers.20.mixer.switch_mlp.fc2.scales,
+backbone.layers.20.mixer.switch_mlp.fc2.weight,
+backbone.layers.20.norm.weight,
+backbone.layers.21.mixer.A_log,
+backbone.layers.21.mixer.D,
+backbone.layers.21.mixer.conv1d.bias,
+backbone.layers.21.mixer.conv1d.weight,
+backbone.layers.21.mixer.dt_bias,
+backbone.layers.21.mixer.in_proj.biases,
+backbone.layers.21.mixer.in_proj.scales,
+backbone.layers.21.mixer.in_proj.weight,
+backbone.layers.21.mixer.norm.weight,
+backbone.layers.21.mixer.out_proj.biases,
+backbone.layers.21.mixer.out_proj.scales,
+backbone.layers.21.mixer.out_proj.weight,
+backbone.layers.21.norm.weight,
+backbone.layers.22.mixer.gate.e_score_correction_bias,
+backbone.layers.22.mixer.gate.weight,
+backbone.layers.22.mixer.shared_experts.down_proj.biases,
+backbone.layers.22.mixer.shared_experts.down_proj.scales,
+backbone.layers.22.mixer.shared_experts.down_proj.weight,
+backbone.layers.22.mixer.shared_experts.up_proj.biases,
+backbone.layers.22.mixer.shared_experts.up_proj.scales,
+backbone.layers.22.mixer.shared_experts.up_proj.weight,
+backbone.layers.22.mixer.switch_mlp.fc1.biases,
+backbone.layers.22.mixer.switch_mlp.fc1.scales,
+backbone.layers.22.mixer.switch_mlp.fc1.weight,
+backbone.layers.22.mixer.switch_mlp.fc2.biases,
+backbone.layers.22.mixer.switch_mlp.fc2.scales,
+backbone.layers.22.mixer.switch_mlp.fc2.weight,
+backbone.layers.22.norm.weight,
+backbone.layers.23.mixer.A_log,
+backbone.layers.23.mixer.D,
+backbone.layers.23.mixer.conv1d.bias,
+backbone.layers.23.mixer.conv1d.weight,
+backbone.layers.23.mixer.dt_bias,
+backbone.layers.23.mixer.in_proj.biases,
+backbone.layers.23.mixer.in_proj.scales,
+backbone.layers.23.mixer.in_proj.weight,
+backbone.layers.23.mixer.norm.weight,
+backbone.layers.23.mixer.out_proj.biases,
+backbone.layers.23.mixer.out_proj.scales,
+backbone.layers.23.mixer.out_proj.weight,
+backbone.layers.23.norm.weight,
+backbone.layers.24.mixer.gate.e_score_correction_bias,
+backbone.layers.24.mixer.gate.weight,
+backbone.layers.24.mixer.shared_experts.down_proj.biases,
+backbone.layers.24.mixer.shared_experts.down_proj.scales,
+backbone.layers.24.mixer.shared_experts.down_proj.weight,
+backbone.layers.24.mixer.shared_experts.up_proj.biases,
+backbone.layers.24.mixer.shared_experts.up_proj.scales,
+backbone.layers.24.mixer.shared_experts.up_proj.weight,
+backbone.layers.24.mixer.switch_mlp.fc1.biases,
+backbone.layers.24.mixer.switch_mlp.fc1.scales,
+backbone.layers.24.mixer.switch_mlp.fc1.weight,
+backbone.layers.24.mixer.switch_mlp.fc2.biases,
+backbone.layers.24.mixer.switch_mlp.fc2.scales,
+backbone.layers.24.mixer.switch_mlp.fc2.weight,
+backbone.layers.24.norm.weight,
+backbone.layers.25.mixer.A_log,
+backbone.layers.25.mixer.D,
+backbone.layers.25.mixer.conv1d.bias,
+backbone.layers.25.mixer.conv1d.weight,
+backbone.layers.25.mixer.dt_bias,
+backbone.layers.25.mixer.in_proj.biases,
+backbone.layers.25.mixer.in_proj.scales,
+backbone.layers.25.mixer.in_proj.weight,
+backbone.layers.25.mixer.norm.weight,
+backbone.layers.25.mixer.out_proj.biases,
+backbone.layers.25.mixer.out_proj.scales,
+backbone.layers.25.mixer.out_proj.weight,
+backbone.layers.25.norm.weight,
+backbone.layers.26.mixer.k_proj.biases,
+backbone.layers.26.mixer.k_proj.scales,
+backbone.layers.26.mixer.k_proj.weight,
+backbone.layers.26.mixer.o_proj.biases,
+backbone.layers.26.mixer.o_proj.scales,
+backbone.layers.26.mixer.o_proj.weight,
+backbone.layers.26.mixer.q_proj.biases,
+backbone.layers.26.mixer.q_proj.scales,
+backbone.layers.26.mixer.q_proj.weight,
+backbone.layers.26.mixer.v_proj.biases,
+backbone.layers.26.mixer.v_proj.scales,
+backbone.layers.26.mixer.v_proj.weight,
+backbone.layers.26.norm.weight,
+backbone.layers.27.mixer.gate.e_score_correction_bias,
+backbone.layers.27.mixer.gate.weight,
+backbone.layers.27.mixer.shared_experts.down_proj.biases,
+backbone.layers.27.mixer.shared_experts.down_proj.scales,
+backbone.layers.27.mixer.shared_experts.down_proj.weight,
+backbone.layers.27.mixer.shared_experts.up_proj.biases,
+backbone.layers.27.mixer.shared_experts.up_proj.scales,
+backbone.layers.27.mixer.shared_experts.up_proj.weight,
+backbone.layers.27.mixer.switch_mlp.fc1.biases,
+backbone.layers.27.mixer.switch_mlp.fc1.scales,
+backbone.layers.27.mixer.switch_mlp.fc1.weight,
+backbone.layers.27.mixer.switch_mlp.fc2.biases,
+backbone.layers.27.mixer.switch_mlp.fc2.scales,
+backbone.layers.27.mixer.switch_mlp.fc2.weight,
+backbone.layers.27.norm.weight,
+backbone.layers.28.mixer.A_log,
+backbone.layers.28.mixer.D,
+backbone.layers.28.mixer.conv1d.bias,
+backbone.layers.28.mixer.conv1d.weight,
+backbone.layers.28.mixer.dt_bias,
+backbone.layers.28.mixer.in_proj.biases,
+backbone.layers.28.mixer.in_proj.scales,
+backbone.layers.28.mixer.in_proj.weight,
+backbone.layers.28.mixer.norm.weight,
+backbone.layers.28.mixer.out_proj.biases,
+backbone.layers.28.mixer.out_proj.scales,
+backbone.layers.28.mixer.out_proj.weight,
+backbone.layers.28.norm.weight,
+backbone.layers.29.mixer.gate.e_score_correction_bias,
+backbone.layers.29.mixer.gate.weight,
+backbone.layers.29.mixer.shared_experts.down_proj.biases,
+backbone.layers.29.mixer.shared_experts.down_proj.scales,
+backbone.layers.29.mixer.shared_experts.down_proj.weight,
+backbone.layers.29.mixer.shared_experts.up_proj.biases,
+backbone.layers.29.mixer.shared_experts.up_proj.scales,
+backbone.layers.29.mixer.shared_experts.up_proj.weight,
+backbone.layers.29.mixer.switch_mlp.fc1.biases,
+backbone.layers.29.mixer.switch_mlp.fc1.scales,
+backbone.layers.29.mixer.switch_mlp.fc1.weight,
+backbone.layers.29.mixer.switch_mlp.fc2.biases,
+backbone.layers.29.mixer.switch_mlp.fc2.scales,
+backbone.layers.29.mixer.switch_mlp.fc2.weight,
+backbone.layers.29.norm.weight,
+backbone.layers.3.mixer.gate.e_score_correction_bias,
+backbone.layers.3.mixer.gate.weight,
+backbone.layers.3.mixer.shared_experts.down_proj.biases,
+backbone.layers.3.mixer.shared_experts.down_proj.scales,
+backbone.layers.3.mixer.shared_experts.down_proj.weight,
+backbone.layers.3.mixer.shared_experts.up_proj.biases,
+backbone.layers.3.mixer.shared_experts.up_proj.scales,
+backbone.layers.3.mixer.shared_experts.up_proj.weight,
+backbone.layers.3.mixer.switch_mlp.fc1.biases,
+backbone.layers.3.mixer.switch_mlp.fc1.scales,
+backbone.layers.3.mixer.switch_mlp.fc1.weight,
+backbone.layers.3.mixer.switch_mlp.fc2.biases,
+backbone.layers.3.mixer.switch_mlp.fc2.scales,
+backbone.layers.3.mixer.switch_mlp.fc2.weight,
+backbone.layers.3.norm.weight,
+backbone.layers.30.mixer.A_log,
+backbone.layers.30.mixer.D,
+backbone.layers.30.mixer.conv1d.bias,
+backbone.layers.30.mixer.conv1d.weight,
+backbone.layers.30.mixer.dt_bias,
+backbone.layers.30.mixer.in_proj.biases,
+backbone.layers.30.mixer.in_proj.scales,
+backbone.layers.30.mixer.in_proj.weight,
+backbone.layers.30.mixer.norm.weight,
+backbone.layers.30.mixer.out_proj.biases,
+backbone.layers.30.mixer.out_proj.scales,
+backbone.layers.30.mixer.out_proj.weight,
+backbone.layers.30.norm.weight,
+backbone.layers.31.mixer.gate.e_score_correction_bias,
+backbone.layers.31.mixer.gate.weight,
+backbone.layers.31.mixer.shared_experts.down_proj.biases,
+backbone.layers.31.mixer.shared_experts.down_proj.scales,
+backbone.layers.31.mixer.shared_experts.down_proj.weight,
+backbone.layers.31.mixer.shared_experts.up_proj.biases,
+backbone.layers.31.mixer.shared_experts.up_proj.scales,
+backbone.layers.31.mixer.shared_experts.up_proj.weight,
+backbone.layers.31.mixer.switch_mlp.fc1.biases,
+backbone.layers.31.mixer.switch_mlp.fc1.scales,
+backbone.layers.31.mixer.switch_mlp.fc1.weight,
+backbone.layers.31.mixer.switch_mlp.fc2.biases,
+backbone.layers.31.mixer.switch_mlp.fc2.scales,
+backbone.layers.31.mixer.switch_mlp.fc2.weight,
+backbone.layers.31.norm.weight,
+backbone.layers.32.mixer.A_log,
+backbone.layers.32.mixer.D,
+backbone.layers.32.mixer.conv1d.bias,
+backbone.layers.32.mixer.conv1d.weight,
+backbone.layers.32.mixer.dt_bias,
+backbone.layers.32.mixer.in_proj.biases,
+backbone.layers.32.mixer.in_proj.scales,
+backbone.layers.32.mixer.in_proj.weight,
+backbone.layers.32.mixer.norm.weight,
+backbone.layers.32.mixer.out_proj.biases,
+backbone.layers.32.mixer.out_proj.scales,
+backbone.layers.32.mixer.out_proj.weight,
+backbone.layers.32.norm.weight,
+backbone.layers.33.mixer.k_proj.biases,
+backbone.layers.33.mixer.k_proj.scales,
+backbone.layers.33.mixer.k_proj.weight,
+backbone.layers.33.mixer.o_proj.biases,
+backbone.layers.33.mixer.o_proj.scales,
+backbone.layers.33.mixer.o_proj.weight,
+backbone.layers.33.mixer.q_proj.biases,
+backbone.layers.33.mixer.q_proj.scales,
+backbone.layers.33.mixer.q_proj.weight,
+backbone.layers.33.mixer.v_proj.biases,
+backbone.layers.33.mixer.v_proj.scales,
+backbone.layers.33.mixer.v_proj.weight,
+backbone.layers.33.norm.weight,
+backbone.layers.34.mixer.gate.e_score_correction_bias,
+backbone.layers.34.mixer.gate.weight,
+backbone.layers.34.mixer.shared_experts.down_proj.biases,
+backbone.layers.34.mixer.shared_experts.down_proj.scales,
+backbone.layers.34.mixer.shared_experts.down_proj.weight,
+backbone.layers.34.mixer.shared_experts.up_proj.biases,
+backbone.layers.34.mixer.shared_experts.up_proj.scales,
+backbone.layers.34.mixer.shared_experts.up_proj.weight,
+backbone.layers.34.mixer.switch_mlp.fc1.biases,
+backbone.layers.34.mixer.switch_mlp.fc1.scales,
+backbone.layers.34.mixer.switch_mlp.fc1.weight,
+backbone.layers.34.mixer.switch_mlp.fc2.biases,
+backbone.layers.34.mixer.switch_mlp.fc2.scales,
+backbone.layers.34.mixer.switch_mlp.fc2.weight,
+backbone.layers.34.norm.weight,
+backbone.layers.35.mixer.A_log,
+backbone.layers.35.mixer.D,
+backbone.layers.35.mixer.conv1d.bias,
+backbone.layers.35.mixer.conv1d.weight,
+backbone.layers.35.mixer.dt_bias,
+backbone.layers.35.mixer.in_proj.biases,
+backbone.layers.35.mixer.in_proj.scales,
+backbone.layers.35.mixer.in_proj.weight,
+backbone.layers.35.mixer.norm.weight,
+backbone.layers.35.mixer.out_proj.biases,
+backbone.layers.35.mixer.out_proj.scales,
+backbone.layers.35.mixer.out_proj.weight,
+backbone.layers.35.norm.weight,
+backbone.layers.36.mixer.gate.e_score_correction_bias,
+backbone.layers.36.mixer.gate.weight,
+backbone.layers.36.mixer.shared_experts.down_proj.biases,
+backbone.layers.36.mixer.shared_experts.down_proj.scales,
+backbone.layers.36.mixer.shared_experts.down_proj.weight,
+backbone.layers.36.mixer.shared_experts.up_proj.biases,
+backbone.layers.36.mixer.shared_experts.up_proj.scales,
+backbone.layers.36.mixer.shared_experts.up_proj.weight,
+backbone.layers.36.mixer.switch_mlp.fc1.biases,
+backbone.layers.36.mixer.switch_mlp.fc1.scales,
+backbone.layers.36.mixer.switch_mlp.fc1.weight,
+backbone.layers.36.mixer.switch_mlp.fc2.biases,
+backbone.layers.36.mixer.switch_mlp.fc2.scales,
+backbone.layers.36.mixer.switch_mlp.fc2.weight,
+backbone.layers.36.norm.weight,
+backbone.layers.37.mixer.A_log,
+backbone.layers.37.mixer.D,
+backbone.layers.37.mixer.conv1d.bias,
+backbone.layers.37.mixer.conv1d.weight,
+backbone.layers.37.mixer.dt_bias,
+backbone.layers.37.mixer.in_proj.biases,
+backbone.layers.37.mixer.in_proj.scales,
+backbone.layers.37.mixer.in_proj.weight,
+backbone.layers.37.mixer.norm.weight,
+backbone.layers.37.mixer.out_proj.biases,
+backbone.layers.37.mixer.out_proj.scales,
+backbone.layers.37.mixer.out_proj.weight,
+backbone.layers.37.norm.weight,
+backbone.layers.38.mixer.gate.e_score_correction_bias,
+backbone.layers.38.mixer.gate.weight,
+backbone.layers.38.mixer.shared_experts.down_proj.biases,
+backbone.layers.38.mixer.shared_experts.down_proj.scales,
+backbone.layers.38.mixer.shared_experts.down_proj.weight,
+backbone.layers.38.mixer.shared_experts.up_proj.biases,
+backbone.layers.38.mixer.shared_experts.up_proj.scales,
+backbone.layers.38.mixer.shared_experts.up_proj.weight,
+backbone.layers.38.mixer.switch_mlp.fc1.biases,
+backbone.layers.38.mixer.switch_mlp.fc1.scales,
+backbone.layers.38.mixer.switch_mlp.fc1.weight,
+backbone.layers.38.mixer.switch_mlp.fc2.biases,
+backbone.layers.38.mixer.switch_mlp.fc2.scales,
+backbone.layers.38.mixer.switch_mlp.fc2.weight,
+backbone.layers.38.norm.weight,
+backbone.layers.39.mixer.A_log,
+backbone.layers.39.mixer.D,
+backbone.layers.39.mixer.conv1d.bias,
+backbone.layers.39.mixer.conv1d.weight,
+backbone.layers.39.mixer.dt_bias,
+backbone.layers.39.mixer.in_proj.biases,
+backbone.layers.39.mixer.in_proj.scales,
+backbone.layers.39.mixer.in_proj.weight,
+backbone.layers.39.mixer.norm.weight,
+backbone.layers.39.mixer.out_proj.biases,
+backbone.layers.39.mixer.out_proj.scales,
+backbone.layers.39.mixer.out_proj.weight,
+backbone.layers.39.norm.weight,
+backbone.layers.4.mixer.A_log,
+backbone.layers.4.mixer.D,
+backbone.layers.4.mixer.conv1d.bias,
+backbone.layers.4.mixer.conv1d.weight,
+backbone.layers.4.mixer.dt_bias,
+backbone.layers.4.mixer.in_proj.biases,
+backbone.layers.4.mixer.in_proj.scales,
+backbone.layers.4.mixer.in_proj.weight,
+backbone.layers.4.mixer.norm.weight,
+backbone.layers.4.mixer.out_proj.biases,
+backbone.layers.4.mixer.out_proj.scales,
+backbone.layers.4.mixer.out_proj.weight,
+backbone.layers.4.norm.weight,
+backbone.layers.40.mixer.gate.e_score_correction_bias,
+backbone.layers.40.mixer.gate.weight,
+backbone.layers.40.mixer.shared_experts.down_proj.biases,
+backbone.layers.40.mixer.shared_experts.down_proj.scales,
+backbone.layers.40.mixer.shared_experts.down_proj.weight,
+backbone.layers.40.mixer.shared_experts.up_proj.biases,
+backbone.layers.40.mixer.shared_experts.up_proj.scales,
+backbone.layers.40.mixer.shared_experts.up_proj.weight,
+backbone.layers.40.mixer.switch_mlp.fc1.biases,
+backbone.layers.40.mixer.switch_mlp.fc1.scales,
+backbone.layers.40.mixer.switch_mlp.fc1.weight,
+backbone.layers.40.mixer.switch_mlp.fc2.biases,
+backbone.layers.40.mixer.switch_mlp.fc2.scales,
+backbone.layers.40.mixer.switch_mlp.fc2.weight,
+backbone.layers.40.norm.weight,
+backbone.layers.41.mixer.A_log,
+backbone.layers.41.mixer.D,
+backbone.layers.41.mixer.conv1d.bias,
+backbone.layers.41.mixer.conv1d.weight,
+backbone.layers.41.mixer.dt_bias,
+backbone.layers.41.mixer.in_proj.biases,
+backbone.layers.41.mixer.in_proj.scales,
+backbone.layers.41.mixer.in_proj.weight,
+backbone.layers.41.mixer.norm.weight,
+backbone.layers.41.mixer.out_proj.biases,
+backbone.layers.41.mixer.out_proj.scales,
+backbone.layers.41.mixer.out_proj.weight,
+backbone.layers.41.norm.weight,
+backbone.layers.42.mixer.k_proj.biases,
+backbone.layers.42.mixer.k_proj.scales,
+backbone.layers.42.mixer.k_proj.weight,
+backbone.layers.42.mixer.o_proj.biases,
+backbone.layers.42.mixer.o_proj.scales,
+backbone.layers.42.mixer.o_proj.weight,
+backbone.layers.42.mixer.q_proj.biases,
+backbone.layers.42.mixer.q_proj.scales,
+backbone.layers.42.mixer.q_proj.weight,
+backbone.layers.42.mixer.v_proj.biases,
+backbone.layers.42.mixer.v_proj.scales,
+backbone.layers.42.mixer.v_proj.weight,
+backbone.layers.42.norm.weight,
+backbone.layers.43.mixer.gate.e_score_correction_bias,
+backbone.layers.43.mixer.gate.weight,
+backbone.layers.43.mixer.shared_experts.down_proj.biases,
+backbone.layers.43.mixer.shared_experts.down_proj.scales,
+backbone.layers.43.mixer.shared_experts.down_proj.weight,
+backbone.layers.43.mixer.shared_experts.up_proj.biases,
+backbone.layers.43.mixer.shared_experts.up_proj.scales,
+backbone.layers.43.mixer.shared_experts.up_proj.weight,
+backbone.layers.43.mixer.switch_mlp.fc1.biases,
+backbone.layers.43.mixer.switch_mlp.fc1.scales,
+backbone.layers.43.mixer.switch_mlp.fc1.weight,
+backbone.layers.43.mixer.switch_mlp.fc2.biases,
+backbone.layers.43.mixer.switch_mlp.fc2.scales,
+backbone.layers.43.mixer.switch_mlp.fc2.weight,
+backbone.layers.43.norm.weight,
+backbone.layers.44.mixer.A_log,
+backbone.layers.44.mixer.D,
+backbone.layers.44.mixer.conv1d.bias,
+backbone.layers.44.mixer.conv1d.weight,
+backbone.layers.44.mixer.dt_bias,
+backbone.layers.44.mixer.in_proj.biases,
+backbone.layers.44.mixer.in_proj.scales,
+backbone.layers.44.mixer.in_proj.weight,
+backbone.layers.44.mixer.norm.weight,
+backbone.layers.44.mixer.out_proj.biases,
+backbone.layers.44.mixer.out_proj.scales,
+backbone.layers.44.mixer.out_proj.weight,
+backbone.layers.44.norm.weight,
+backbone.layers.45.mixer.gate.e_score_correction_bias,
+backbone.layers.45.mixer.gate.weight,
+backbone.layers.45.mixer.shared_experts.down_proj.biases,
+backbone.layers.45.mixer.shared_experts.down_proj.scales,
+backbone.layers.45.mixer.shared_experts.down_proj.weight,
+backbone.layers.45.mixer.shared_experts.up_proj.biases,
+backbone.layers.45.mixer.shared_experts.up_proj.scales,
+backbone.layers.45.mixer.shared_experts.up_proj.weight,
+backbone.layers.45.mixer.switch_mlp.fc1.biases,
+backbone.layers.45.mixer.switch_mlp.fc1.scales,
+backbone.layers.45.mixer.switch_mlp.fc1.weight,
+backbone.layers.45.mixer.switch_mlp.fc2.biases,
+backbone.layers.45.mixer.switch_mlp.fc2.scales,
+backbone.layers.45.mixer.switch_mlp.fc2.weight,
+backbone.layers.45.norm.weight,
+backbone.layers.46.mixer.A_log,
+backbone.layers.46.mixer.D,
+backbone.layers.46.mixer.conv1d.bias,
+backbone.layers.46.mixer.conv1d.weight,
+backbone.layers.46.mixer.dt_bias,
+backbone.layers.46.mixer.in_proj.biases,
+backbone.layers.46.mixer.in_proj.scales,
+backbone.layers.46.mixer.in_proj.weight,
+backbone.layers.46.mixer.norm.weight,
+backbone.layers.46.mixer.out_proj.biases,
+backbone.layers.46.mixer.out_proj.scales,
+backbone.layers.46.mixer.out_proj.weight,
+backbone.layers.46.norm.weight,
+backbone.layers.47.mixer.gate.e_score_correction_bias,
+backbone.layers.47.mixer.gate.weight,
+backbone.layers.47.mixer.shared_experts.down_proj.biases,
+backbone.layers.47.mixer.shared_experts.down_proj.scales,
+backbone.layers.47.mixer.shared_experts.down_proj.weight,
+backbone.layers.47.mixer.shared_experts.up_proj.biases,
+backbone.layers.47.mixer.shared_experts.up_proj.scales,
+backbone.layers.47.mixer.shared_experts.up_proj.weight,
+backbone.layers.47.mixer.switch_mlp.fc1.biases,
+backbone.layers.47.mixer.switch_mlp.fc1.scales,
+backbone.layers.47.mixer.switch_mlp.fc1.weight,
+backbone.layers.47.mixer.switch_mlp.fc2.biases,
+backbone.layers.47.mixer.switch_mlp.fc2.scales,
+backbone.layers.47.mixer.switch_mlp.fc2.weight,
+backbone.layers.47.norm.weight,
+backbone.layers.48.mixer.A_log,
+backbone.layers.48.mixer.D,
+backbone.layers.48.mixer.conv1d.bias,
+backbone.layers.48.mixer.conv1d.weight,
+backbone.layers.48.mixer.dt_bias,
+backbone.layers.48.mixer.in_proj.biases,
+backbone.layers.48.mixer.in_proj.scales,
+backbone.layers.48.mixer.in_proj.weight,
+backbone.layers.48.mixer.norm.weight,
+backbone.layers.48.mixer.out_proj.biases,
+backbone.layers.48.mixer.out_proj.scales,
+backbone.layers.48.mixer.out_proj.weight,
+backbone.layers.48.norm.weight,
+backbone.layers.49.mixer.gate.e_score_correction_bias,
+backbone.layers.49.mixer.gate.weight,
+backbone.layers.49.mixer.shared_experts.down_proj.biases,
+backbone.layers.49.mixer.shared_experts.down_proj.scales,
+backbone.layers.49.mixer.shared_experts.down_proj.weight,
+backbone.layers.49.mixer.shared_experts.up_proj.biases,
+backbone.layers.49.mixer.shared_experts.up_proj.scales,
+backbone.layers.49.mixer.shared_experts.up_proj.weight,
+backbone.layers.49.mixer.switch_mlp.fc1.biases,
+backbone.layers.49.mixer.switch_mlp.fc1.scales,
+backbone.layers.49.mixer.switch_mlp.fc1.weight,
+backbone.layers.49.mixer.switch_mlp.fc2.biases,
+backbone.layers.49.mixer.switch_mlp.fc2.scales,
+backbone.layers.49.mixer.switch_mlp.fc2.weight,
+backbone.layers.49.norm.weight,
+backbone.layers.5.mixer.k_proj.biases,
+backbone.layers.5.mixer.k_proj.scales,
+backbone.layers.5.mixer.k_proj.weight,
+backbone.layers.5.mixer.o_proj.biases,
+backbone.layers.5.mixer.o_proj.scales,
+backbone.layers.5.mixer.o_proj.weight,
+backbone.layers.5.mixer.q_proj.biases,
+backbone.layers.5.mixer.q_proj.scales,
+backbone.layers.5.mixer.q_proj.weight,
+backbone.layers.5.mixer.v_proj.biases,
+backbone.layers.5.mixer.v_proj.scales,
+backbone.layers.5.mixer.v_proj.weight,
+backbone.layers.5.norm.weight,
+backbone.layers.50.mixer.A_log,
+backbone.layers.50.mixer.D,
+backbone.layers.50.mixer.conv1d.bias,
+backbone.layers.50.mixer.conv1d.weight,
+backbone.layers.50.mixer.dt_bias,
+backbone.layers.50.mixer.in_proj.biases,
+backbone.layers.50.mixer.in_proj.scales,
+backbone.layers.50.mixer.in_proj.weight,
+backbone.layers.50.mixer.norm.weight,
+backbone.layers.50.mixer.out_proj.biases,
+backbone.layers.50.mixer.out_proj.scales,
+backbone.layers.50.mixer.out_proj.weight,
+backbone.layers.50.norm.weight,
+backbone.layers.51.mixer.gate.e_score_correction_bias,
+backbone.layers.51.mixer.gate.weight,
+backbone.layers.51.mixer.shared_experts.down_proj.biases,
+backbone.layers.51.mixer.shared_experts.down_proj.scales,
+backbone.layers.51.mixer.shared_experts.down_proj.weight,
+backbone.layers.51.mixer.shared_experts.up_proj.biases,
+backbone.layers.51.mixer.shared_experts.up_proj.scales,
+backbone.layers.51.mixer.shared_experts.up_proj.weight,
+backbone.layers.51.mixer.switch_mlp.fc1.biases,
+backbone.layers.51.mixer.switch_mlp.fc1.scales,
+backbone.layers.51.mixer.switch_mlp.fc1.weight,
+backbone.layers.51.mixer.switch_mlp.fc2.biases,
+backbone.layers.51.mixer.switch_mlp.fc2.scales,
+backbone.layers.51.mixer.switch_mlp.fc2.weight,
+backbone.layers.51.norm.weight,
+backbone.layers.6.mixer.gate.e_score_correction_bias,
+backbone.layers.6.mixer.gate.weight,
+backbone.layers.6.mixer.shared_experts.down_proj.biases,
+backbone.layers.6.mixer.shared_experts.down_proj.scales,
+backbone.layers.6.mixer.shared_experts.down_proj.weight,
+backbone.layers.6.mixer.shared_experts.up_proj.biases,
+backbone.layers.6.mixer.shared_experts.up_proj.scales,
+backbone.layers.6.mixer.shared_experts.up_proj.weight,
+backbone.layers.6.mixer.switch_mlp.fc1.biases,
+backbone.layers.6.mixer.switch_mlp.fc1.scales,
+backbone.layers.6.mixer.switch_mlp.fc1.weight,
+backbone.layers.6.mixer.switch_mlp.fc2.biases,
+backbone.layers.6.mixer.switch_mlp.fc2.scales,
+backbone.layers.6.mixer.switch_mlp.fc2.weight,
+backbone.layers.6.norm.weight,
+backbone.layers.7.mixer.A_log,
+backbone.layers.7.mixer.D,
+backbone.layers.7.mixer.conv1d.bias,
+backbone.layers.7.mixer.conv1d.weight,
+backbone.layers.7.mixer.dt_bias,
+backbone.layers.7.mixer.in_proj.biases,
+backbone.layers.7.mixer.in_proj.scales,
+backbone.layers.7.mixer.in_proj.weight,
+backbone.layers.7.mixer.norm.weight,
+backbone.layers.7.mixer.out_proj.biases,
+backbone.layers.7.mixer.out_proj.scales,
+backbone.layers.7.mixer.out_proj.weight,
+backbone.layers.7.norm.weight,
+backbone.layers.8.mixer.gate.e_score_correction_bias,
+backbone.layers.8.mixer.gate.weight,
+backbone.layers.8.mixer.shared_experts.down_proj.biases,
+backbone.layers.8.mixer.shared_experts.down_proj.scales,
+backbone.layers.8.mixer.shared_experts.down_proj.weight,
+backbone.layers.8.mixer.shared_experts.up_proj.biases,
+backbone.layers.8.mixer.shared_experts.up_proj.scales,
+backbone.layers.8.mixer.shared_experts.up_proj.weight,
+backbone.layers.8.mixer.switch_mlp.fc1.biases,
+backbone.layers.8.mixer.switch_mlp.fc1.scales,
+backbone.layers.8.mixer.switch_mlp.fc1.weight,
+backbone.layers.8.mixer.switch_mlp.fc2.biases,
+backbone.layers.8.mixer.switch_mlp.fc2.scales,
+backbone.layers.8.mixer.switch_mlp.fc2.weight,
+backbone.layers.8.norm.weight,
+backbone.layers.9.mixer.A_log,
+backbone.layers.9.mixer.D,
+backbone.layers.9.mixer.conv1d.bias,
+backbone.layers.9.mixer.conv1d.weight,
+backbone.layers.9.mixer.dt_bias,
+backbone.layers.9.mixer.in_proj.biases,
+backbone.layers.9.mixer.in_proj.scales,
+backbone.layers.9.mixer.in_proj.weight,
+backbone.layers.9.mixer.norm.weight,
+backbone.layers.9.mixer.out_proj.biases,
+backbone.layers.9.mixer.out_proj.scales,
+backbone.layers.9.mixer.out_proj.weight,
+backbone.layers.9.norm.weight,
+backbone.norm_f.weight,
+lm_head.biases,
+lm_head.scales,
+lm_head.weight.
+
+```
+
+</details>
+
+#### Captured stdout/stderr
+
+```text
+=== STDERR ===
+Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 3080.69it/s]
 ```
 
 ## Completed Runs with Observations
@@ -2354,11 +4468,11 @@ Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4767209999845363
-- *Peak memory at first token (GB):* 6.726575134
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.6680391249828972
+- *Peak memory at first token (GB):* 6.728131628
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.01261709
+- *Post-cleanup active memory (GB):* 0.014173584
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2195
 - *Prompt composition:* 2,195 = 403 text/template + 1,792 image tokens (82%;
@@ -2372,7 +4486,7 @@ Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 #### Complete output
 
@@ -2405,14 +4519,14 @@ Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
 - *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 40.440120749990456
-- *Peak memory at first token (GB):* 23.302106954
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 38.8754675409873
+- *Peak memory at first token (GB):* 23.302713186
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.7; top_p 0.8; top_k 20; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: generation_config
-- *Post-cleanup active memory (GB):* 0.00627636
+- *Post-cleanup active memory (GB):* 0.006882592
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16547
 - *Prompt composition:* 16,547 = 323 text/template + 16,224 image tokens (98%;
@@ -2427,7 +4541,7 @@ Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
 - *Configured EOS token:* &lt;|im_end|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 #### Complete output
 
@@ -2467,14 +4581,14 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.097394791024271
-- *Peak memory at first token (GB):* 25.462830536
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.634217415994499
+- *Peak memory at first token (GB):* 25.463125464
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.004556016
+- *Post-cleanup active memory (GB):* 0.004850944
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4403
 - *Prompt composition:* 4,403 = 347 text/template + 4,056 image tokens (92%;
@@ -2491,7 +4605,7 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
   (preprocessor_config.json, processor_config.json)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 #### Complete output
 
@@ -2579,11 +4693,11 @@ Description should be
 - *Processor class:* transformers.models.aya_vision.processing_aya_vision.AyaVisionProcessor
 - *Tokenizer class:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.069792583002709
-- *Peak memory at first token (GB):* 6.460113054
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.579985290998593
+- *Peak memory at first token (GB):* 6.46114526
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.009340216
+- *Post-cleanup active memory (GB):* 0.010372422
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2090
 - *Prompt composition:* 2,090 = 907 text/template + 1,183 image tokens (57%;
@@ -2597,7 +4711,7 @@ Description should be
 - *Configured EOS token:* &lt;|END_OF_TURN_TOKEN|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 #### Complete output
 
@@ -2623,6 +4737,8 @@ is in the model gallery.
 |-----------------------------------------------|-------------------|------------------------------|
 | mlx-community/gemma-3n-E4B-it-4bit            | major concerns    | labelled fields not detected |
 | mlx-community/nanoLLaVA-1.5-4bit              | major concerns    | labelled fields not detected |
+| mlx-community/paligemma2-10b-mix-448-4bit     | major concerns    | labelled fields not detected |
+| mlx-community/SmolVLM-256M-Instruct-4bit      | major concerns    | labelled fields not detected |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-8bit  | major concerns    | cut off at token limit       |
 | LiquidAI/LFM2.5-VL-450M-MLX-bf16              | concerns detected | duplicate keywords           |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8 | concerns detected | duplicate keywords           |
@@ -2635,34 +4751,38 @@ is in the model gallery.
 
 | Model                                                 | Runtime identity                                          | Performance                                           |
 |-------------------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------|
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed       | 2393 prompt / 151 generated; 29.7 tok/s; 23 GB peak   |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit      | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed    | 1634 prompt / 997 generated; 74.0 tok/s; 19 GB peak   |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed         | 590 prompt / 152 generated; 30.2 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed         | 595 prompt / 96 generated; 105 tok/s; 16 GB peak      |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed         | 595 prompt / 89 generated; 26.0 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed         | 591 prompt / 73 generated; 122 tok/s; 5.9 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed         | 6450 prompt / 140 generated; 75.2 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed      | 6450 prompt / 103 generated; 40.9 tok/s; 78 GB peak   |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed       | 2393 prompt / 151 generated; 29.5 tok/s; 23 GB peak   |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit      | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed    | 1634 prompt / 997 generated; 78.8 tok/s; 19 GB peak   |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed         | 590 prompt / 152 generated; 30.7 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-12B-it-4bit                     | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed  | 595 prompt / 101 generated; 60.7 tok/s; 7.6 GB peak   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed         | 595 prompt / 96 generated; 104 tok/s; 16 GB peak      |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed         | 595 prompt / 89 generated; 25.8 tok/s; 20 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed         | 591 prompt / 73 generated; 123 tok/s; 5.9 GB peak     |
+| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed         | 6450 prompt / 140 generated; 74.9 tok/s; 8.7 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed      | 6450 prompt / 103 generated; 41.1 tok/s; 78 GB peak   |
 | mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed | 1379 prompt / 65 generated; 172 tok/s; 4.7 GB peak    |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed       | 2612 prompt / 138 generated; 32.6 tok/s; 18 GB peak   |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed   | 2113 prompt / 77 generated; 34.9 tok/s; 17 GB peak    |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 12c5ae493041; Lfm2VlProcessor; stop completed         | 2103 prompt / 80 generated; 205 tok/s; 4.0 GB peak    |
-| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed       | 391 prompt / 101 generated; 103 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed       | 2926 prompt / 109 generated; 67.1 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed       | 2926 prompt / 187 generated; 64.1 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed       | 2925 prompt / 102 generated; 190 tok/s; 7.8 GB peak   |
-| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed  | 4083 prompt / 84 generated; 159 tok/s; 3.9 GB peak    |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed        | 1289 prompt / 155 generated; 73.0 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed          | 1133 prompt / 107 generated; 36.6 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed        | 3116 prompt / 102 generated; 37.7 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed        | 16549 prompt / 912 generated; 69.8 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit               | rev defcdea7cc7a; Qwen3VLProcessor; stop completed        | 16547 prompt / 93 generated; 59.4 tok/s; 11 GB peak   |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed        | 16563 prompt / 97 generated; 74.4 tok/s; 25 GB peak   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed        | 16563 prompt / 86 generated; 88.2 tok/s; 11 GB peak   |
-| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed        | 16563 prompt / 124 generated; 14.4 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed        | 1426 prompt / 98 generated; 123 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed        | 3491 prompt / 121 generated; 48.6 tok/s; 92 GB peak   |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed     | 16558 prompt / 136 generated; 57.2 tok/s; 14 GB peak  |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | rev 8c2a30c48864; Idefics3Processor; stop completed       | 2612 prompt / 138 generated; 32.3 tok/s; 18 GB peak   |
+| mlx-community/InternVL3-14B-4bit                      | rev 26328eaab82c; InternVLChatProcessor; stop completed   | 2113 prompt / 126 generated; 55.4 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed   | 2113 prompt / 77 generated; 31.4 tok/s; 17 GB peak    |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 12c5ae493041; Lfm2VlProcessor; stop completed         | 2103 prompt / 80 generated; 206 tok/s; 4.0 GB peak    |
+| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed       | 391 prompt / 101 generated; 104 tok/s; 7.0 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed       | 2926 prompt / 109 generated; 64.7 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed       | 2926 prompt / 187 generated; 53.2 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed       | 2925 prompt / 102 generated; 181 tok/s; 7.8 GB peak   |
+| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed  | 4083 prompt / 84 generated; 166 tok/s; 3.9 GB peak    |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 5f31fcd089ce; Qwen3VLProcessor; stop completed        | 1289 prompt / 155 generated; 75.7 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed          | 1133 prompt / 107 generated; 55.0 tok/s; 9.3 GB peak  |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed        | 3116 prompt / 102 generated; 38.4 tok/s; 16 GB peak   |
+| mlx-community/Qwen2-VL-7B-Instruct-4bit               | rev 1c638e970be3; Qwen2VLProcessor; stop completed        | 16558 prompt / 117 generated; 90.6 tok/s; 9.3 GB peak |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed        | 16549 prompt / 912 generated; 85.9 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit              | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed        | 16547 prompt / 177 generated; 18.6 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit               | rev defcdea7cc7a; Qwen3VLProcessor; stop completed        | 16547 prompt / 93 generated; 70.5 tok/s; 11 GB peak   |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed        | 16563 prompt / 97 generated; 72.5 tok/s; 25 GB peak   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed        | 16563 prompt / 86 generated; 89.0 tok/s; 11 GB peak   |
+| mlx-community/Qwen3.8-27B-4bit                        | rev 3e6447f082e8; Qwen3VLProcessor; stop completed        | 16563 prompt / 124 generated; 27.5 tok/s; 21 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed        | 1426 prompt / 98 generated; 125 tok/s; 5.6 GB peak    |
+| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed        | 3491 prompt / 121 generated; 47.3 tok/s; 92 GB peak   |
+| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed     | 16558 prompt / 136 generated; 58.1 tok/s; 14 GB peak  |
 
 </details>
 
@@ -2749,15 +4869,19 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --tr
 
 ### Highlighted model revisions
 
-| Model                                            | Resolved revision                        |
-|--------------------------------------------------|------------------------------------------|
-| mlx-community/InternVL3_5-30B-A3B-4bit           | ed2ce3381528db1c5b70a2aad78a6390997e9250 |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-4bit | 82f31be9840fa0d4c7e99257fe2e28b59a46df97 |
-| mlx-community/Mage-VL-OptiQ-4bit                 | bde6c9c7146acff6af09e203245014f19306c5c5 |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit            | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit     | 0555d34cb1ed80c0e61a5635194c70027b4c2ff3 |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | b4a74fa6001f1eca3b23eeeb702ffad2773a218f |
-| mlx-community/aya-vision-8b-4bit                 | 3e679b3e08f04d741c8965ebf0cb258295e8acf7 |
+| Model                                                  | Resolved revision                        |
+|--------------------------------------------------------|------------------------------------------|
+| apple/FastVLM-7B-int4                                  | 1aeadbaaba011276f3dcda9582e5e64e2a90873a |
+| mlx-community/InternVL3_5-1B-4bit                      | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-4bit       | 82f31be9840fa0d4c7e99257fe2e28b59a46df97 |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit       | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
+| mlx-community/Mage-VL-OptiQ-4bit                       | bde6c9c7146acff6af09e203245014f19306c5c5 |
+| mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit | 2a1d5eabfc504747bdc24178394821a1efc0edde |
+| mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit | 8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45 |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit                  | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit           | 0555d34cb1ed80c0e61a5635194c70027b4c2ff3 |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit              | b4a74fa6001f1eca3b23eeeb702ffad2773a218f |
+| mlx-community/aya-vision-8b-4bit                       | 3e679b3e08f04d741c8965ebf0cb258295e8acf7 |
 
 ### Components and system
 

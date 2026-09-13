@@ -33,24 +33,24 @@ builtins.ValueError: Model loading failed: Received 904 parameters not in model;
   model.embed_tokens.scales, model.embed_tokens.weight.
 - *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00273725
+- *Post-cleanup active memory (GB):* 0.003032178
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
 - *Declared context length:* 262,144 (text_config.max_position_embeddings)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); mode snapshot
 
 <details>
 <summary>Complete traceback</summary>
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14168, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13080, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -988,7 +988,7 @@ model.norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15198, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -999,7 +999,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14183, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 904 parameters not in model: 
 model.embed_tokens.biases,
@@ -1916,7 +1916,7 @@ model.norm.weight.
 ```text
 === STDERR ===
 Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3483.32it/s]
+Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2518.09it/s]
 ```
 
 ## Reproduction inputs
@@ -1978,7 +1978,7 @@ python -m mlx_vlm.generate --model mlx-community/Mage-VL-OptiQ-4bit --image any-
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 26.6.2                                                            |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.24; revision 09b5430fd4adb1ca5f371bf11544425753636488; clean |
+| check_models    | 0.17.25; revision 11e6c82dc61f08eb3dc36a3188a789da1295093b; clean |
 
 ### Full environment evidence
 

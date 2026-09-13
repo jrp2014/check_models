@@ -1,14 +1,14 @@
-# Crash: mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
+# Crash: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 ## Maintainer evidence
 
-### mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 #### Root exception and chain
 
 ```text
 builtins.ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
 ```
 
 #### Execution and provenance
@@ -25,12 +25,12 @@ builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vis
 - *Package:* mlx-vlm
 - *Error type:* ValueError
 - *Error message:* Model generation failed for
-  mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes
+  mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes
   (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
 - *Root error type:* ValueError
 - *Root error message:* [broadcast_shapes] Shapes (1,1,301,6404) and
   (1,32,300,6404) cannot be broadcast.
-- *Resolved model revision:* 82f31be9840fa0d4c7e99257fe2e28b59a46df97
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* exception
@@ -38,9 +38,9 @@ builtins.ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vis
   default; min_p: default; repetition_penalty: default
 - *Post-cleanup active memory (GB):* 0.003032178
 - *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 6.01
+- *Checkpoint weights (GB):* 11.34
 - *Parameter count:* 11.00B (name-estimate)
-- *Quantization:* 4-bit, group 64
+- *Quantization:* 8-bit, group 64
 - *Declared context length:* 131,072 (text_config.max_position_embeddings)
 - *Configured EOS token ID:* 128009
 - *Configured EOS token:* &lt;|eot_id|&gt;
@@ -146,7 +146,7 @@ Traceback (most recent call last):
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
-ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
+ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
 
 ```
 
@@ -156,9 +156,9 @@ ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instr
 
 ```text
 === STDERR ===
-Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3714.33it/s]
-[21:49:05] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3483.35it/s]
+[21:49:08] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
              File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
            _run_generation_guarded
                return generate_once()
@@ -287,7 +287,7 @@ native mlx-vlm process.
 set -euo pipefail
 curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-57f7cdeb1b88952a.jpg
 printf '%s\n' '57f7cdeb1b88952a3eeb6f5aa7ba4587981131b5841d7f8f82911704c242125b  repro-image.jpg' | shasum -a 256 --check
-python -m mlx_vlm.generate --model mlx-community/Llama-3.2-11B-Vision-Instruct-4bit --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
+python -m mlx_vlm.generate --model mlx-community/Llama-3.2-11B-Vision-Instruct-8bit --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
@@ -307,7 +307,7 @@ Write:
 Return exactly these three sections and nothing else:
 Title:
 Description:
-Keywords:' --max-tokens 1000 --temperature 0.0 --revision 82f31be9840fa0d4c7e99257fe2e28b59a46df97 --trust-remote-code --seed 0 --prefill-step-size 2048
+Keywords:' --max-tokens 1000 --temperature 0.0 --revision 8451adc50203b50b8f4199e75e753fb9c06e2af6 --trust-remote-code --seed 0 --prefill-step-size 2048
 ```
 
 ## Provenance and Environment

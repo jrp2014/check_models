@@ -9,14 +9,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 23m 02s
+- Run duration: 12m 40s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
 - Input image: JPEG, 9,984 x 6,656 pixels (66.5 MP), 44.7 MB
-- Models attempted: 41 (completed 38, crashed 3, indeterminate 0)
-- Mechanical checks: no concerns detected 28, concerns detected 4, major concerns 6, not assessed 3
-- Top observations: Response repeats the same text (1), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (3), Required labelled fields not detected (4), Response appears cut off at the token limit (2)
+- Models attempted: 51 (completed 44, crashed 7, indeterminate 0)
+- Mechanical checks: no concerns detected 32, concerns detected 4, major concerns 8, not assessed 7
+- Top observations: Response repeats the same text (1), Generation was stopped early after sustained repeated output (2), Unrecognised model control tokens remain visible (3), Required labelled fields not detected (6), Response appears cut off at the token limit (2)
 
 ## Start here
 
@@ -33,6 +33,10 @@ establish fitness for other tasks.
 
 ## Issue drafts
 
-- [mlx-community/InternVL3_5-30B-A3B-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_InternVL3_5-30B-A3B-4bit.md)
+- [apple/FastVLM-7B-int4](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_apple_FastVLM-7B-int4.md)
+- [mlx-community/InternVL3_5-1B-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_InternVL3_5-1B-4bit.md)
 - [mlx-community/Llama-3.2-11B-Vision-Instruct-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Llama-3.2-11B-Vision-Instruct-4bit.md)
+- [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Llama-3.2-11B-Vision-Instruct-8bit.md)
 - [mlx-community/Mage-VL-OptiQ-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Mage-VL-OptiQ-4bit.md)
+- [mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Mistral-Small-3.2-24B-Instruct-2506-4bit.md)
+- [mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit.md)

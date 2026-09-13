@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-09-13 02:12:19 BST
+FULL ENVIRONMENT DUMP - 2026-09-13 21:47:09 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -8,7 +8,7 @@ Total packages: 164
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
-ast_serialize==0.11.1
+ast_serialize==0.11.2
 attrs==26.1.0
 blessed==1.49.0
 boolean.py==5.0
@@ -23,7 +23,7 @@ check_models==0.17.24
 check_models==0.17.24
 click==8.5.0
 cmake==4.4.3
-coverage==7.16.0
+coverage==7.16.1
 cryptography==50.0.1
 cyclonedx-python-lib==11.12.0
 defusedxml==0.7.1
@@ -126,7 +126,7 @@ scipy==1.18.1
 sentencepiece==0.2.2
 setuptools==84.0.0
 shellingham==1.5.4
-skylos==4.36.1
+skylos==4.37.0
 sortedcontainers==2.4.0
 sounddevice==0.5.6
 sse-starlette==3.4.11
@@ -172,5 +172,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-09-13 02:12:19 BST
+Environment dump completed at 2026-09-13 21:47:09 BST
 ================================================================================
