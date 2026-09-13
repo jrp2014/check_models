@@ -1751,10 +1751,15 @@ def test_telemetry_record_aggregates_power_and_accepts_legacy_pairs() -> None:
     assert record["cpu_samples"] == 3
     assert record["power_samples"] == 2
     assert record["on_battery_samples"] == 1
-    assert record["power_mode_max"] == 1
+    assert record["low_power_samples"] == 1
     status = check_models._telemetry_status_line(record)
     assert "power: battery for 1 of 2 sample(s)" in status
-    assert "low power mode on" in status
+    assert "low power mode for 1 of 2 sample(s)" in status
+    high = check_models._system_telemetry_record_from_probes(
+        [check_models._TelemetryProbe(100.0, 1, "ac", 2)], mode="snapshot"
+    )
+    assert high["low_power_samples"] == 0
+    assert "low power" not in check_models._telemetry_status_line(high)
     # Battery power is a recorded fact, never a degradation verdict.
     assert check_models._telemetry_degradation_note(record) is None
     bare = check_models._system_telemetry_record_from_probes([(100.0, 1)], mode="snapshot")

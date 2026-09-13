@@ -137,6 +137,11 @@ TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
 if [ "$QUALITY_MODE" = "full" ]; then
     echo "=== Skylos Danger Gate ==="
     bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate
+else
+    # Fast mode keeps the danger scan the former ungated `-a` audit pass
+    # provided, advisory only (findings are printed, never blocking here).
+    echo "=== Skylos Danger Advisory (fast, non-blocking) ==="
+    bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full
 fi
 
 if [ "$QUALITY_MODE" = "fast" ]; then

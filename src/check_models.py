@@ -957,6 +957,9 @@ class HistoryModelResultRecord(TypedDict):
     generation_time_s: NotRequired[float | None]
     model_load_time_s: NotRequired[float | None]
     total_time_s: NotRequired[float | None]
+    # Seconds the wall clock outran the process clock (sleep/suspend mid-model);
+    # such rows never shape a throughput noise band.
+    wall_clock_gap_s: NotRequired[float | None]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -1033,8 +1036,8 @@ class SystemTelemetryRecord(TypedDict, total=False):
     # degradation verdict; the comparison reports it and does not withhold.
     power_samples: int
     on_battery_samples: int
-    # pmset -g "powermode" (0 automatic, 1 low power, 2 high power), max seen.
-    power_mode_max: int
+    # Probes taken while pmset -g "powermode" read 1 (low power mode).
+    low_power_samples: int
     # Seconds the wall clock advanced beyond the process clock across this
     # model (macOS perf_counter stops during sleep): a system sleep or
     # suspend mid-model, so every timing for it is untrustworthy.
@@ -14567,6 +14570,7 @@ def _sample_memory_pressure_level() -> int | None:
 _POWER_SOURCE_RE: Final[re.Pattern[str]] = re.compile(r"Now drawing from '([^']+)'")
 _POWER_MODE_RE: Final[re.Pattern[str]] = re.compile(r"^\s*powermode\s+(\d+)", re.MULTILINE)
 _WALL_CLOCK_GAP_THRESHOLD_S: Final[float] = 5.0
+_PMSET_LOW_POWER_MODE: Final[int] = 1
 
 
 def _sample_power_state() -> tuple[str | None, int | None]:
@@ -14649,7 +14653,7 @@ def _system_telemetry_record_from_probes(
     if sources:
         record["on_battery_samples"] = sum(source == "battery" for source in sources)
     if modes:
-        record["power_mode_max"] = max(modes)
+        record["low_power_samples"] = sum(mode == _PMSET_LOW_POWER_MODE for mode in modes)
     return record
 
 
@@ -14784,8 +14788,8 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
             if on_battery
             else f"power: AC over {power_samples} sample(s)"
         )
-        if telemetry.get("power_mode_max", 0) >= 1:
-            parts.append("low power mode on")
+        if low_power := telemetry.get("low_power_samples", 0):
+            parts.append(f"low power mode for {low_power} of {power_samples} sample(s)")
     else:
         parts.append("power probe unavailable")
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
@@ -18571,6 +18575,9 @@ def _history_model_result_from_result(
         record["post_cleanup_cache_memory_gb"] = (
             result.runtime_diagnostics.post_cleanup_cache_memory_gb
         )
+    gap = _telemetry_wall_clock_gap(result.system_telemetry)
+    if gap is not None:
+        record["wall_clock_gap_s"] = gap
     return record
 
 
@@ -19454,10 +19461,13 @@ def _resolve_comparison_baseline(
 def _history_band_tps_sample(facts: object) -> float | None:
     """Return one usable throughput sample from a history facts dict.
 
-    Aborted generations carry rates over truncated sequences; they must not
+    Aborted generations carry rates over truncated sequences, and a model the
+    machine slept through carries a rate over a stopped clock; neither may
     shape the noise band.
     """
     if not isinstance(facts, dict) or facts.get("stop_reason") == "repetition_abort":
+        return None
+    if facts.get("wall_clock_gap_s") is not None:
         return None
     tps = facts.get("generation_tps")
     if isinstance(tps, (int, float)) and tps > 0:
@@ -19777,12 +19787,12 @@ def _compare_model_performance(
         # not comparable with a full-length run; autoregressive throughput
         # varies with sequence length.
         return
-    if _record_wall_clock_gap(now) or _record_wall_clock_gap(before):
-        # The machine slept or was suspended during this model in one of the
-        # runs; its timings are recorded but not comparable.
-        return
+    # A sleep or suspend mid-model in either run stops the process clock, so
+    # its rate is recorded but not comparable; peak memory is unaffected and
+    # still compared below.
+    slept = _record_wall_clock_gap(now) or _record_wall_clock_gap(before)
     now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
-    if now_tps is not None and before_tps is not None:
+    if not slept and now_tps is not None and before_tps is not None:
         ratios.append(now_tps / before_tps)
         flag = _model_throughput_flag(
             model, now_tps=now_tps, before_tps=before_tps, band=bands.get(model)

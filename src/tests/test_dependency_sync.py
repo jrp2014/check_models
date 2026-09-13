@@ -1029,6 +1029,9 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     # wrapper script (never a bare `skylos --danger` that would bypass the
     # worktree post-filter and non-interactive guards).
     assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full --gate' in quality_script
+    # Fast mode keeps an advisory (non-blocking) danger scan since the ungated
+    # `-a` audit pass, which used to provide it, is gone.
+    assert 'bash "$SCRIPT_DIR/run_skylos_danger_advisory.sh" --full\n' in quality_script
     assert "skylos . --danger" not in quality_script
     # One markdownlint step (with the worktree exclusion) serves both modes:
     # one definition plus one call in fast mode and one in full mode.
@@ -2314,3 +2317,22 @@ def test_batched_noqa_audit_slices_ruff_output_per_finding(tmp_path: Path) -> No
             audit_output=outputs[finding.file_path, finding.line_num],
         )
         assert needed is True, reason
+
+
+def test_batched_output_is_only_used_for_noqa_findings(tmp_path: Path) -> None:
+    """A line carrying both a noqa and a type: ignore must not feed mypy's finding ruff output."""
+    file_path = tmp_path / "mixed.py"
+    safe_io.write_text_no_follow(
+        file_path,
+        "import os  # noqa: F401 - kept  # type: ignore[attr-defined]  # kept\n",
+    )
+    findings = check_suppressions.find_suppressions(file_path)
+    kinds = {finding.kind for finding in findings}
+    assert kinds >= {"noqa", "type-ignore"}
+    outputs = {(file_path, 1): "mixed.py:1:8: F401 `os` imported but unused"}
+    for finding in findings:
+        chosen = check_suppressions._batched_output_for(finding, outputs)
+        if finding.kind == "noqa":
+            assert chosen is not None
+        else:
+            assert chosen is None

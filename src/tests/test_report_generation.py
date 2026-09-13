@@ -7305,3 +7305,48 @@ def test_comparison_excludes_slept_models_from_throughput_and_notes_environment(
     assert payload is not None
     restored = check_models._run_comparison_from_json(payload)
     assert restored.environment_notes == comparison.environment_notes
+
+
+def test_sleep_gap_keeps_memory_comparison_and_stays_out_of_history_bands(
+    tmp_path: Path,
+) -> None:
+    """A slept model still compares peak memory, and its history rows never shape a band."""
+    baseline = _comparison_baseline([_comparison_record("org/slept", tps=100.0, peak_gb=4.0)])
+    slept = _comparison_record("org/slept", tps=400.0, peak_gb=10.0)
+    slept["system_telemetry"] = {
+        "mode": "snapshot",
+        "cpu_samples": 2,
+        "memory_samples": 2,
+        "wall_clock_gap_s": 681.0,
+    }
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", slept)],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert comparison.tps_compared_models == 0
+    assert [change.model for change in comparison.memory_changes] == ["org/slept"]
+
+    healthy = {"generation_tps": 100.0, "stop_reason": "stop"}
+    slept_row = {"generation_tps": 400.0, "stop_reason": "stop", "wall_clock_gap_s": 681.0}
+    history = tmp_path / "results.history.jsonl"
+    rows = [
+        json.dumps(
+            {
+                "_type": "run",
+                "comparison_fingerprint": "h" * 8,
+                "model_results": {"org/m": slept_row if i % 2 else healthy},
+            }
+        )
+        for i in range(6)
+    ]
+    check_models._write_text_file(history, "\n".join(rows) + "\n")
+    assert check_models._history_band_tps_sample(slept_row) is None
+    bands, runs = check_models._history_tps_bands(history, fingerprint="h" * 8, exclude_last=False)
+    assert runs == 6
+    band = bands.get("org/m")
+    if band is not None:
+        _low, high, samples = band
+        assert samples == 3
+        assert high < 400.0

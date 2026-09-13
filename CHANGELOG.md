@@ -332,6 +332,16 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- A model the machine slept through (`wall_clock_gap_s`) keeps its peak-memory
+  comparison and its history rows are skipped when throughput noise bands
+  are built; only its rate is excluded.
+- Telemetry reports low power mode as a per-probe count
+  (`low_power_samples`) instead of a max over pmset power modes, which had
+  labelled high-power mode as low power.
+- The batched suppression audit hands ruff output only to noqa findings; a
+  line carrying both a noqa and a type: ignore audits the latter with mypy.
+- Fast quality checks run the Skylos danger advisory (non-blocking), which
+  the removed `-a` audit pass used to provide in that mode.
 - Token-id special-token evidence now survives analysis. The id detector
   selects from the tokenizer's `all_special_ids`, but the analysis filtered
   its output against the tokenizer's whole special-token vocabulary (the

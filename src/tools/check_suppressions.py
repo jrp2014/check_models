@@ -347,6 +347,19 @@ def _batch_noqa_audit_outputs(
     return {key: "\n".join(lines_by_variant[path.resolve()]) for key, path in variants.items()}
 
 
+def _batched_output_for(
+    finding: SuppressionFinding, outputs: dict[tuple[Path, int], str]
+) -> str | None:
+    """Return the batched ruff output for a noqa finding; other kinds run their own checker.
+
+    The batch is keyed by file and line, and a line may carry both a noqa and
+    a type: ignore, so the kind guard keeps mypy findings off ruff's output.
+    """
+    if finding.kind != "noqa":
+        return None
+    return outputs.get((finding.file_path, finding.line_num))
+
+
 def _suppression_rationale(finding: SuppressionFinding) -> str:
     """Return the human justification text that follows the suppression codes."""
     if finding.kind == "noqa":
@@ -439,7 +452,7 @@ def main() -> int:
             finding,
             repo_root=repo_root,
             src_root=src_root,
-            audit_output=batched_outputs.get((finding.file_path, finding.line_num)),
+            audit_output=_batched_output_for(finding, batched_outputs),
         )
         if needed:
             print(f"  ✓ NEEDED: {reason}")
