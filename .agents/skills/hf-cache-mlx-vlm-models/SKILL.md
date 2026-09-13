@@ -115,6 +115,38 @@ Live sites: `_installed_mlx_vlm_model_types`, `_mlx_vlm_model_remapping`,
 `_model_arch_precheck`, `_arch_precheck_for_model` in `src/check_models.py`;
 locked by `src/tests/test_model_discovery.py`.
 
+## Pre-download check (hub candidates)
+
+Judge a hub checkpoint **before** downloading it, from three small hub
+reads (file list, `config.json`, chat template), the way `check_models`
+will judge it once cached:
+
+```bash
+conda activate mlx-vlm
+cd src && python -m tools.hub_precheck mlx-community/Some-VLM-4bit org/Other-VLM-8bit
+```
+
+One line per repo: `OK`, `WARN` or `BLOCKED`, the download size, the
+resolved model type and the template shape, then the reasons. Exit status 1
+when anything is blocked. It checks:
+
+1. **Layout** — the server-style file rule above (Layer 1).
+2. **Architecture** — `model_type` resolved through `MODEL_REMAPPING` against
+   the installed `mlx_vlm/models/` packages, via the same
+   `arch_precheck_for_model_type` the cached-repo precheck uses. Caught
+   `InternVL3_5-*` (`model_type: internvl`, no package) before a 17 GB
+   download would have.
+3. **Chat template shape** — `iterates-content` (walks content parts or
+   branches on `content is string`), `string-only` (concatenates
+   `message['content']` as a string: fails at prefill for vision families,
+   which send list-content messages; the `Mistral-Small-3.2-24B-Instruct-2506`
+   conversion, mlx-vlm #2246), `absent`, or `unknown`.
+
+Nothing is written to the HF cache; gated repos use the logged-in token.
+All three are hints (a text-only template or a missing package is decisive,
+`OK` is not a generation proof). Live site: `src/tools/hub_precheck.py`,
+locked by `test_hub_precheck_*` in `src/tests/test_dependency_sync.py`.
+
 ## Prefer in-repo tools (do not fork cache logic)
 
 ```bash

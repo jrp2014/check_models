@@ -28,6 +28,7 @@ from check_models_data import dependency_policy
 from tools import (
     check_suppressions,
     filter_danger_report,
+    hub_precheck,
     quarantine_broken_pip_metadata,
     safe_io,
     update_readme_deps,
@@ -2336,3 +2337,128 @@ def test_batched_output_is_only_used_for_noqa_findings(tmp_path: Path) -> None:
             assert chosen is not None
         else:
             assert chosen is None
+
+
+_TEXT_ONLY_MISTRAL_TEMPLATE = (
+    "{{ bos_token }}{% for message in messages %}{% if message['role'] == 'user' %}"
+    "{{ '[INST]' + message['content'] + '[/INST]' }}{% elif message['role'] == 'system' %}"
+    "{{ '[SYSTEM_PROMPT]' + message['content'] + '[/SYSTEM_PROMPT]' }}{% endif %}{% endfor %}"
+)
+_MULTIMODAL_MISTRAL_TEMPLATE = (
+    "{%- for message in messages %}{%- if message['content'] is string %}{{ message['content'] }}"
+    "{%- else %}{%- for block in message['content'] %}{%- if block['type'] == 'text' %}"
+    "{{ block['text'] }}{%- endif %}{%- endfor %}{%- endif %}{%- endfor %}"
+)
+
+
+def test_hub_precheck_template_shape_separates_text_only_from_multimodal_templates() -> None:
+    """The Mistral-Small-3.2 conversion's template is the text-only shape; Ministral's is not."""
+    shape = hub_precheck.template_shape
+    assert shape(_TEXT_ONLY_MISTRAL_TEMPLATE) == "string-only"
+    assert shape(_MULTIMODAL_MISTRAL_TEMPLATE) == "iterates-content"
+    assert shape("{% if message.content is string %}{{ message.content }}{% endif %}") == (
+        "iterates-content"
+    )
+    assert shape("{% for item in message.content %}{{ item.text }}{% endfor %}") == (
+        "iterates-content"
+    )
+    assert shape("") == "absent"
+    assert shape(None) == "absent"
+    assert shape("{{ messages | tojson }}") == "unknown"
+
+
+def test_hub_precheck_reads_named_templates_from_tokenizer_config() -> None:
+    read = hub_precheck._template_from_tokenizer_config
+    assert read(json.dumps({"chat_template": _TEXT_ONLY_MISTRAL_TEMPLATE})) == (
+        _TEXT_ONLY_MISTRAL_TEMPLATE
+    )
+    named = json.dumps(
+        {"chat_template": [{"name": "default", "template": "{{ x }}"}, {"name": "tool_use"}]}
+    )
+    assert read(named) == "{{ x }}"
+    assert read(json.dumps({"model_max_length": 1})) is None
+    assert read("not json") is None
+    assert read(None) is None
+
+
+def test_hub_precheck_layout_rule_matches_the_server_style_filter() -> None:
+    assert (
+        hub_precheck.layout_missing(["config.json", "tokenizer_config.json", "model.safetensors"])
+        == []
+    )
+    assert (
+        hub_precheck.layout_missing(
+            ["config.json", "tokenizer_config.json", "model.safetensors.index.json"]
+        )
+        == []
+    )
+    assert hub_precheck.layout_missing(["config.json", "README.md"]) == [
+        "tokenizer_config.json",
+        "*.safetensors",
+    ]
+
+
+def _candidate(**overrides: object) -> hub_precheck.HubCandidate:
+    base: dict[str, object] = {
+        "repo_id": "org/model",
+        "files": ("config.json", "tokenizer_config.json", "model.safetensors"),
+        "size_gb": 4.2,
+        "model_type": "mistral3",
+        "resolved_model_type": "mistral3",
+        "arch_supported": True,
+        "template": "iterates-content",
+    }
+    base.update(overrides)
+    return hub_precheck.HubCandidate(**typing.cast("dict[str, typing.Any]", base))
+
+
+def test_hub_precheck_verdicts_block_layout_architecture_and_text_only_templates() -> None:
+    assert _candidate().verdict() == ("OK", [])
+    status, reasons = _candidate(template="string-only").verdict()
+    assert status == "BLOCKED"
+    assert any("text-only chat template" in reason for reason in reasons)
+    status, reasons = _candidate(
+        model_type="internvl", resolved_model_type="internvl", arch_supported=False
+    ).verdict()
+    assert status == "BLOCKED"
+    assert "no mlx-vlm package for model_type 'internvl'" in reasons[0]
+    status, reasons = _candidate(files=("config.json",)).verdict()
+    assert status == "BLOCKED"
+    assert "missing tokenizer_config.json, *.safetensors" in reasons[0]
+    status, reasons = _candidate(template="unknown", arch_supported=None).verdict()
+    assert status == "WARN"
+    assert len(reasons) == 2
+    status, reasons = _candidate(error="404 Client Error").verdict()
+    assert status == "BLOCKED"
+    assert reasons == ["hub read failed: 404 Client Error"]
+
+
+def test_hub_precheck_cli_renders_verdicts_and_exits_nonzero_when_blocked(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The CLI takes an injected fetcher so no network is touched."""
+    candidates = {
+        "org/good": _candidate(repo_id="org/good"),
+        "org/text-only": _candidate(repo_id="org/text-only", template="string-only"),
+    }
+    assert hub_precheck.main(["org/good"], fetch=candidates.__getitem__) == 0
+    out = capsys.readouterr().out
+    assert out.startswith("OK ")
+    assert "org/good" in out
+    assert hub_precheck.main(["org/good", "org/text-only"], fetch=candidates.__getitem__) == 1
+    out = capsys.readouterr().out
+    assert "BLOCKED" in out
+    assert "text-only chat template" in out
+    assert hub_precheck.main(["org/text-only", "--json"], fetch=candidates.__getitem__) == 1
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["status"] == "BLOCKED"
+    assert payload["repo_id"] == "org/text-only"
+
+
+def test_arch_precheck_for_model_type_resolves_aliases_and_rejects_empty() -> None:
+    """The hub pre-check and the cached-repo precheck share one resolution."""
+    assert check_models.arch_precheck_for_model_type(None) == (None, None, None)
+    assert check_models.arch_precheck_for_model_type("") == (None, None, None)
+    model_type, resolved, supported = check_models.arch_precheck_for_model_type("MISTRAL3")
+    assert (model_type, resolved) == ("mistral3", "mistral3")
+    assert supported in (True, None)

@@ -17114,7 +17114,20 @@ def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | N
     config = _read_cached_repo_json(repo, "config.json")
     if config is None:
         return None, None, None
-    raw_model_type = config.get("model_type") or config.get("speculators_model_type")
+    return arch_precheck_for_model_type(
+        config.get("model_type") or config.get("speculators_model_type")
+    )
+
+
+def arch_precheck_for_model_type(
+    raw_model_type: object,
+) -> tuple[str | None, str | None, bool | None]:
+    """Resolve a config ``model_type`` against the installed mlx-vlm model packages.
+
+    Shared by the cached-repo precheck and ``tools.hub_precheck`` (the
+    pre-download check), so a hub candidate is judged exactly as a cached
+    repo would be. Folder-name check only, never proof that generation works.
+    """
     if not isinstance(raw_model_type, str) or not raw_model_type:
         return None, None, None
     model_type = raw_model_type.lower()

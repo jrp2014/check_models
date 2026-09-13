@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- New `tools/hub_precheck.py` judges hub checkpoints before download from
+  three small hub reads: server-style layout, architecture through the
+  harness's own `arch_precheck_for_model_type` (factored out of the
+  cached-repo precheck), and chat-template shape (`string-only` templates
+  fail at prefill for vision families, as the Mistral-Small-3.2 conversion
+  did). Documented in the `hf-cache-mlx-vlm-models` skill.
 - The generated `hf-cli` skill (`hf skills add`) is checked in under
   `.agents/skills/hf-cli/` and listed in the Copilot skills table; the gate's
   markdownlint skips that generated file (regenerate with `hf skills add
