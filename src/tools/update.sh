@@ -309,6 +309,24 @@ pin_local_mlx_build() {
 	echo "[update.sh] Pinned local mlx $pinned_version for the rest of this run"
 }
 
+# A failed local mlx build must not leave the run unpinned. pip builds the
+# editable wheel before uninstalling anything, so a compile failure (a new
+# SDK rejecting a Metal kernel, say) usually leaves the previous local build
+# installed and working; without the pin, the later eager project reinstall
+# would swap it for the PyPI wheel as soon as a release overtakes the local
+# dev version. Pin the survivor when it still verifies as this checkout's
+# editable install; a PyPI fallback restore is not a local build and is left
+# unpinned.
+preserve_local_mlx_after_failed_build() {
+	local repo_path="$1"
+	if verify_expected_editable_install mlx "$repo_path" > /dev/null 2>&1; then
+		echo "[update.sh] mlx build failed, but the previous local build is still installed - pinning it"
+		pin_local_mlx_build
+	else
+		echo "[update.sh] mlx build failed and no local editable install survives; nothing to pin"
+	fi
+}
+
 # Shared eager-install invocation. Local-source preservation takes precedence
 # over FORCE_REINSTALL: once the local mlx build is pinned, forcing a
 # reinstall would demand the pinned dev version from PyPI (where it cannot
@@ -1050,6 +1068,9 @@ update_local_mlx_repos() {
 					pip install "${REPO_NAMES[idx]}" 2>/dev/null \
 						|| echo "❌ CRITICAL: Could not restore ${REPO_NAMES[idx]}. Run: pip install ${REPO_NAMES[idx]}"
 				fi
+			fi
+			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+				preserve_local_mlx_after_failed_build "${REPO_PATHS[idx]}"
 			fi
 		fi
 

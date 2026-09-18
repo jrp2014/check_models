@@ -342,6 +342,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools/update.sh` pins the surviving local mlx build when a rebuild fails.
+  The failure branch used to skip the pin, so the final eager project
+  reinstall ran unconstrained and would have replaced a working local build
+  with the PyPI wheel once a release overtook the local dev version. Found
+  when Xcode 27's Metal Performance Primitives header rejected mlx's
+  gated-delta NAX kernel and the build failed with the old build intact.
 - A model the machine slept through (`wall_clock_gap_s`) keeps its peak-memory
   comparison and its history rows are skipped when throughput noise bands
   are built; only its rate is excluded.

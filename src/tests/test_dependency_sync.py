@@ -2462,3 +2462,42 @@ def test_arch_precheck_for_model_type_resolves_aliases_and_rejects_empty() -> No
     model_type, resolved, supported = check_models.arch_precheck_for_model_type("MISTRAL3")
     assert (model_type, resolved) == ("mistral3", "mistral3")
     assert supported in (True, None)
+
+
+def test_update_failed_mlx_build_pins_the_surviving_local_install(tmp_path: Path) -> None:
+    """A compile failure leaves the old editable build installed; later installs stay pinned.
+
+    Regression: the failure branch set REPO_SKIP without pinning, so the final
+    eager project reinstall ran unconstrained and would have replaced the
+    working local build with the PyPI wheel once a release overtook the local
+    dev version.
+    """
+    survivor = """
+get_installed_distribution_version() { echo "0.32.3.dev20260912+229f5b430"; }
+verify_expected_editable_install() { return 0; }
+preserve_local_mlx_after_failed_build /repo/mlx
+pip_install somepkg
+"""
+    log = _run_update_pip_wrapper_harness(survivor, tmp_path)
+    assert "previous local build is still installed" in log
+    assert "Pinned local mlx 0.32.3.dev20260912+229f5b430" in log
+    assert "--constraint" in log
+
+    replaced = """
+get_installed_distribution_version() { echo "0.32.2"; }
+verify_expected_editable_install() { return 1; }
+preserve_local_mlx_after_failed_build /repo/mlx
+pip_install somepkg
+"""
+    # A separate directory: the harness appends to one pip log per directory.
+    replaced_dir = tmp_path / "replaced"
+    replaced_dir.mkdir()
+    log = _run_update_pip_wrapper_harness(replaced, replaced_dir)
+    assert "nothing to pin" in log
+    assert "--constraint" not in log
+
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    failure_branch = script[
+        script.index('echo "\u26a0\ufe0f  Failed to install ${REPO_NAMES[idx]}"') :
+    ]
+    assert 'preserve_local_mlx_after_failed_build "${REPO_PATHS[idx]}"' in failure_branch
