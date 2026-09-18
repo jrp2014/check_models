@@ -7350,3 +7350,30 @@ def test_sleep_gap_keeps_memory_comparison_and_stays_out_of_history_bands(
         _low, high, samples = band
         assert samples == 3
         assert high < 400.0
+
+
+def test_comparison_notes_an_os_version_change_between_runs() -> None:
+    """The first run after an OS upgrade has cold Metal caches; say so beside the diff."""
+    baseline = _comparison_baseline([_comparison_record("org/steady", tps=50.0)])
+    baseline_system = baseline.metadata["system"]
+    baseline_system["macOS Version"] = "26.6.2"
+    current_metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "system": {**baseline_system, "macOS Version": "27.0"}},
+    )
+    kwargs = {**_verified_comparison_kwargs(baseline), "current_metadata": current_metadata}
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/steady", tps=55.0))],
+        baseline,
+        **cast("dict[str, Any]", kwargs),
+    )
+    assert comparison is not None
+    assert len(comparison.environment_notes) == 1
+    assert comparison.environment_notes[0].startswith("macOS changed 26.6.2 -> 27.0")
+    unchanged = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", _comparison_record("org/steady", tps=55.0))],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert unchanged is not None
+    assert unchanged.environment_notes == ()

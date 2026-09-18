@@ -1697,3 +1697,46 @@ def test_run_issue_summary_sampling_note_counts_checkpoint_sampled_models() -> N
         check_models._run_issue_summary_sampling_note(cast("Any", [record({"temperature": "cli"})]))
         == "harness defaults (or command-line values) for every model"
     )
+
+
+def test_cap_landing_mid_keyword_list_is_truncation_even_without_a_trailing_comma() -> None:
+    """The token cap lands after a word as often as after a comma.
+
+    Regression: a reasoning model spent its budget on a hidden channel and its
+    visible answer stopped at "Keywords: mute swan, river"; with all three
+    labels present and no trailing comma it was rated usable with no
+    observations.
+    """
+    capped = check_models.analyze_generation_text(
+        "Title: Mute Swan on River\nDescription: A swan swims past moored boats.\n"
+        "Keywords: mute swan, river",
+        generated_tokens=1000,
+        requested_max_tokens=1000,
+        assessment_profile="metadata",
+    )
+    assert capped.likely_capped is True
+    assert "unfinished_list" in capped.token_cap_reasons
+    assert "token_cap_truncation" in check_models._quality_observations(
+        text="Title: Mute Swan on River", analysis=capped
+    )
+    # The same text from a model that stopped on its own is not truncated.
+    finished = check_models.analyze_generation_text(
+        "Title: Mute Swan on River\nDescription: A swan swims past moored boats.\n"
+        "Keywords: mute swan, river",
+        generated_tokens=120,
+        requested_max_tokens=1000,
+        assessment_profile="metadata",
+    )
+    assert finished.likely_capped is False
+    assert finished.token_cap_reasons == []
+    # A capped answer that closed with a sentence after its list is not an open list.
+    closed = check_models.analyze_generation_text(
+        "Title: Swan\nKeywords: swan, river\n\nThat completes the catalogue entry.",
+        generated_tokens=1000,
+        requested_max_tokens=1000,
+        assessment_profile="metadata",
+    )
+    assert "unfinished_list" not in closed.token_cap_reasons
+    assert check_models._ends_inside_keyword_list("**Keywords:** swan, river") is True
+    assert check_models._ends_inside_keyword_list("Keywords: swan, river.") is False
+    assert check_models._ends_inside_keyword_list("Title: Swan") is False

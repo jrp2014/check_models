@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The run comparison notes a macOS version change between runs. The first
+  sweep after the 26 to 27 upgrade read prefill throughput 2-5x lower with
+  identical outputs and returned to baseline on the next run: Metal
+  pipeline caches were cold, not mlx-vlm slower.
 - New `tools/hub_precheck.py` judges hub checkpoints before download from
   three small hub reads: server-style layout, architecture through the
   harness's own `arch_precheck_for_model_type` (factored out of the
@@ -342,6 +346,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- A token cap that lands mid keyword list is reported as truncation even
+  when it falls after a word rather than a comma. Muse Glimmer spent its
+  1000 tokens on a hidden reasoning channel, its visible answer stopped at
+  "Keywords: mute swan, river", and with all three labels present it was
+  rated usable with no observations.
 - `tools/update.sh` pins the surviving local mlx build when a rebuild fails.
   The failure branch used to skip the pin, so the final eager project
   reinstall ran unconstrained and would have replaced a working local build

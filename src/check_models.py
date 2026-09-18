@@ -4185,10 +4185,27 @@ def _detect_likely_cutoff(
         if re.search(r"(?:^|\n)\s*(?:[-+*]|\d+[.)])(?:\s+\*{1,3})?\s*$", tail):
             reasons.append("dangling_markdown")
         # A capped answer ending mid-list (e.g. "Keywords: ..., Clouds,") was
-        # still emitting comma-separated items when the budget ran out.
-        if re.search(r"[,;]\s*$", tail):
+        # still emitting comma-separated items when the budget ran out. The
+        # cap lands after a word as often as after a comma, so an answer that
+        # ends inside its keyword list counts too: a model that had finished
+        # the list would have stopped instead of reaching the cap.
+        if re.search(r"[,;]\s*$", tail) or _ends_inside_keyword_list(text):
             reasons.append("unfinished_list")
     return True, _dedupe_preserve_order(reasons)
+
+
+_KEYWORDS_LABEL_RE: Final[re.Pattern[str]] = re.compile(r"(?im)^[ \t>*_#-]*keywords[ \t*_]*:")
+
+
+def _ends_inside_keyword_list(text: str) -> bool:
+    """Return whether the text ends in an open keyword list (no closing sentence after it)."""
+    labels = list(_KEYWORDS_LABEL_RE.finditer(text))
+    if not labels:
+        return False
+    remainder = text[labels[-1].end() :].strip()
+    if not remainder or "\n\n" in remainder:
+        return False
+    return re.search(r"[.!?][\"')\]]*\s*$", remainder) is None
 
 
 # =============================================================================
@@ -19676,6 +19693,33 @@ def _record_on_battery(record: JsonlResultRecord) -> bool:
     return isinstance(samples, int) and samples > 0
 
 
+def _os_change_notes(
+    baseline_metadata: JsonlMetadataRecord | None,
+    current_metadata: JsonlMetadataRecord | None,
+) -> list[str]:
+    """Note an OS version change between runs: the first run after one has cold Metal caches.
+
+    Observed going from macOS 26 to 27: prefill throughput read 2-5x lower on
+    the first sweep and returned to baseline on the next, with identical
+    outputs. Decode ratios of short generations are dented the same way.
+    """
+
+    def _version(metadata: JsonlMetadataRecord | None) -> str | None:
+        system = metadata.get("system") if metadata is not None else None
+        value = system.get("macOS Version") if isinstance(system, dict) else None
+        return value if isinstance(value, str) and value else None
+
+    before, after = _version(baseline_metadata), _version(current_metadata)
+    if before is None or after is None or before == after:
+        return []
+    note = (
+        f"macOS changed {before} -> {after}: the first run after an OS upgrade compiles "
+        "Metal pipelines cold, so prefill, time-to-first-token and short-generation "
+        "throughput are not comparable until a second run"
+    )
+    return [note]
+
+
 def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> list[str]:
     """Describe power state and sleep gaps across one run's records, for the comparison."""
     notes: list[str] = []
@@ -19893,6 +19937,7 @@ def compare_run_results(
 
     ratios_sorted = sorted(ratios)
     environment_notes = (
+        *_os_change_notes(baseline.metadata, current_metadata),
         *_run_environment_notes("current", current),
         *_run_environment_notes("baseline", baseline.results),
     )
