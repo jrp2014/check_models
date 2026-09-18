@@ -356,6 +356,14 @@ content, its exact token is retained as a separate role-boundary observation.
 Control-wrapper syntax that appears in output without any of those declarations is
 retained as an `unexpected_special_token` observation; no model-name allowlist is
 used.
+Two observations compare the answer with the prompt itself. `prompt_hint_echoed`
+flags a Description that hands back the prompt's own "Description hint" (the
+assisted lane supplies one): such an answer passes every structural check
+without showing that the model looked at the image. `unverified_place_name`
+flags a place name in the prose that the prompt never supplied, which a model
+can only have inferred (from GPS coordinates, say) or guessed; the matched names
+are retained as evidence. Both are caveats, use no gazetteer or model-specific
+rule, and are silent when no prompt is available.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 

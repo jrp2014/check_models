@@ -499,6 +499,8 @@ class QualityThresholds:
     prompt_keyword_max_items: int = 20
     prompt_word_to_token_ratio: float = 1.3
     cutoff_tail_chars: int = 120
+    hint_echo_min_coverage: float = 0.8
+    hint_echo_min_words: int = 8
 
     def __post_init__(self) -> None:
         """Validate the retained detector thresholds."""
@@ -508,6 +510,7 @@ class QualityThresholds:
             "catalog_keyword_duplicate_ratio": self.catalog_keyword_duplicate_ratio,
             "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
             "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
+            "hint_echo_min_coverage": self.hint_echo_min_coverage,
         }
         for field_name, value in unit_interval_fields.items():
             if not 0.0 <= value <= 1.0:
@@ -1073,6 +1076,8 @@ type ObservationCode = Literal[
     "duplicate_keywords",
     "no_keyword_overlap",
     "draft_returned_unchanged",
+    "prompt_hint_echoed",
+    "unverified_place_name",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type MlxMemoryGetterName = Literal["get_active_memory", "get_cache_memory"]
@@ -1256,6 +1261,8 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     unchanged_draft_fields: list[str]
     duplicated_answer_separator: str
     emitted_special_tokens: list[str]
+    echoed_hint_fields: list[str]
+    unverified_place_names: list[str]
 
 
 class JsonlFailureRecord(TypedDict, total=False):
@@ -4210,6 +4217,163 @@ def _ends_inside_keyword_list(text: str) -> bool:
     return re.search(r"[.!?][\"')\]]*\s*$", remainder) is None
 
 
+_PROMPT_HINT_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^[ \t]*[-*][ \t]*(title|description)[ \t]+hint[ \t]*:[ \t]*(.+)$"
+)
+_HINT_ECHO_RUN_WORDS: Final[int] = 4
+
+
+def _match_words(text: str) -> list[str]:
+    return re.findall(r"[a-z0-9']+", text.lower())
+
+
+def _hint_coverage(candidate: str, hint: str) -> float | None:
+    """Share of the candidate's words lying inside a four-word run shared with the hint.
+
+    ``None`` when either side is too short to judge. A paraphrase that keeps a
+    phrase scores low; an answer that *is* the hint scores near 1.
+    """
+    candidate_words, hint_words = _match_words(candidate), _match_words(hint)
+    run = _HINT_ECHO_RUN_WORDS
+    if len(candidate_words) < QUALITY.hint_echo_min_words or len(hint_words) < run:
+        return None
+    hint_runs = {tuple(hint_words[i : i + run]) for i in range(len(hint_words) - run + 1)}
+    covered = [False] * len(candidate_words)
+    for start in range(len(candidate_words) - run + 1):
+        if tuple(candidate_words[start : start + run]) in hint_runs:
+            covered[start : start + run] = [True] * run
+    return sum(covered) / len(candidate_words)
+
+
+def _echoed_hint_fields(
+    prompt: str | None,
+    *,
+    sections: Mapping[str, str],
+    text: str,
+    assessment_profile: AssessmentProfile,
+) -> list[str]:
+    """Name the output fields that reproduce the prompt's own ``<Field> hint:`` text.
+
+    The assisted lane supplies a draft description as a hint; an answer that
+    hands it back passes every structural check without showing that the
+    model looked at the image. Keywords are not compared: reusing supplied
+    keywords is legitimate.
+    """
+    if not prompt:
+        return []
+
+    def _echoes(field: str, hint: str) -> bool:
+        candidate = sections.get(field, "") if assessment_profile == "metadata" else text
+        if field == "title":
+            return bool(candidate) and _match_words(candidate) == _match_words(hint)
+        coverage = _hint_coverage(candidate, hint)
+        return coverage is not None and coverage >= QUALITY.hint_echo_min_coverage
+
+    echoed = [
+        match.group(1).lower()
+        for match in _PROMPT_HINT_RE.finditer(prompt)
+        if _echoes(match.group(1).lower(), match.group(2).strip())
+    ]
+    return _dedupe_preserve_order(echoed)
+
+
+# Natural and landmark features only: street furniture ("New Road", "Road
+# Ahead") is as often sign text the model legitimately read.
+_PLACE_FEATURE: Final[str] = r"(?:River|Lake|Loch|Mount|Mt|Isle|Cathedral|Castle|Abbey)"
+_PLACE_NAME: Final[str] = r"[A-Z][a-zA-Z'\u2019-]+"
+_PLACE_FEATURE_FIRST_RE: Final[re.Pattern[str]] = re.compile(
+    rf"\b({_PLACE_FEATURE})\s+({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)"
+)
+_PLACE_NAME_FIRST_RE: Final[re.Pattern[str]] = re.compile(
+    rf"\b({_PLACE_NAME}(?:\s+{_PLACE_NAME})?)\s+({_PLACE_FEATURE})\b"
+)
+_PLACE_AFTER_PREPOSITION_RE: Final[re.Pattern[str]] = re.compile(
+    rf"\b(?:in|at|near|outside|around)\s+({_PLACE_NAME}(?:[ ,]+{_PLACE_NAME}){{0,2}})"
+)
+_PLACE_STOPWORDS: Final[frozenset[str]] = frozenset(
+    {
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+        "UTC",
+        "BST",
+        "GMT",
+        "The",
+        "A",
+        "An",
+        "I",
+        "It",
+        "Title",
+        "Description",
+        "Keywords",
+    }
+)
+# Demonyms and styles ("in Victorian dress", "in Gothic style") are adjectives.
+_PLACE_ADJECTIVE_SUFFIXES: Final[tuple[str, ...]] = ("ian", "ean", "ish", "ese", "ic")
+
+
+def _answer_place_names(sections: Mapping[str, str], text: str, prompt: str | None) -> list[str]:
+    """Scan the Description when the answer has one, else the whole text (both sentence case)."""
+    return _unverified_place_names(sections.get("description") or text, prompt)
+
+
+def _unverified_place_names(prose: str, prompt: str | None) -> list[str]:
+    """Return proper place names in the prose that the prompt never supplied.
+
+    A model given GPS coordinates or nothing at all can only *infer* a place
+    name, and sweeps show it guessing wrong (a river in Ely captioned "River
+    Cam, Cambridge" and, by another model, "River Thames, Lambeth"). Mechanical
+    and gazetteer-free: a capitalised name beside a natural or landmark feature
+    word, or after a locative preposition, none of whose words occur in the
+    prompt. Sentence-case prose only, so Title Case headings cannot match.
+    """
+    if not prompt or not prose:
+        return []
+    prompt_words = set(_match_words(prompt))
+
+    def _unsupplied(name: str) -> str | None:
+        tokens = [re.sub(r"['\u2019]s$", "", token) for token in re.split(r"[ ,]+", name)]
+        kept = [
+            token
+            for token in tokens
+            if token
+            and token not in _PLACE_STOPWORDS
+            and not token.lower().endswith(_PLACE_ADJECTIVE_SUFFIXES)
+            and token.lower() not in prompt_words
+        ]
+        return " ".join(kept) if kept else None
+
+    # (pattern, name group, rendering of the kept name) for the three constructions.
+    constructions: tuple[tuple[re.Pattern[str], int, Callable[[re.Match[str], str], str]], ...] = (
+        (_PLACE_FEATURE_FIRST_RE, 2, lambda match, name: f"{match.group(1)} {name}"),
+        (_PLACE_NAME_FIRST_RE, 1, lambda match, name: f"{name} {match.group(2)}"),
+        (_PLACE_AFTER_PREPOSITION_RE, 1, lambda _match, name: name),
+    )
+    found = [
+        render(match, name)
+        for pattern, group, render in constructions
+        for match in pattern.finditer(prose)
+        if (name := _unsupplied(match.group(group))) is not None
+    ]
+    return _dedupe_preserve_order(found)
+
+
 # =============================================================================
 # SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
@@ -4300,6 +4464,10 @@ class GenerationQualityAnalysis:
     # Special tokens the stream emitted, detected by token id (EOS and
     # configured stops excluded); folded into unexpected_special_tokens.
     emitted_special_tokens: list[str] = dataclass_field(default_factory=list)
+    # Output fields that reproduce the prompt's own "<Field> hint:" text.
+    echoed_hint_fields: list[str] = dataclass_field(default_factory=list)
+    # Proper place names in the prose that the prompt never supplied.
+    unverified_place_names: list[str] = dataclass_field(default_factory=list)
 
 
 _DUPLICATED_ANSWER_MIN_CHARS: Final[int] = 80
@@ -4544,6 +4712,10 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
             analysis_text, is_repetitive=is_repetitive
         ),
         emitted_special_tokens=id_detected,
+        echoed_hint_fields=_echoed_hint_fields(
+            prompt, sections=sections, text=analysis_text, assessment_profile=assessment_profile
+        ),
+        unverified_place_names=_answer_place_names(sections, analysis_text, prompt),
     )
 
 
@@ -8023,6 +8195,16 @@ _OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
         integration_signal=True,
     ),
     ObservationDisplaySpec("duplicate_keywords", "Repeated keyword entries", "duplicate keywords"),
+    ObservationDisplaySpec(
+        "prompt_hint_echoed",
+        "Output repeats the prompt's own hint text instead of describing the image",
+        "prompt hint repeated",
+    ),
+    ObservationDisplaySpec(
+        "unverified_place_name",
+        "Names a place the prompt did not supply",
+        "unsupplied place name",
+    ),
     # Legacy codes remain renderable for retained pre-0.17 evidence.
     ObservationDisplaySpec(
         "catalog_constraint_violation",
@@ -8215,6 +8397,12 @@ def _human_observation_labels(
             separator = details.get("duplicated_answer_separator")
             if isinstance(separator, str) and separator:
                 label = f"Final answer emitted twice, around {separator}"
+        elif code == "prompt_hint_echoed" and details is not None:
+            if echoed := details.get("echoed_hint_fields"):
+                label = f"Repeats the prompt's hint instead of describing the image: {', '.join(echoed)}"
+        elif code == "unverified_place_name" and details is not None:
+            if places := details.get("unverified_place_names"):
+                label = f"Names a place the prompt did not supply: {', '.join(places)}"
         elif code in {"catalog_constraint_violation", "duplicate_keywords"} and details is not None:
             if constraint_labels := _constraint_violation_labels(details):
                 label = "; ".join(constraint_labels)
@@ -8667,6 +8855,8 @@ def _quality_observations(
         (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
         (bool(analysis.duplicate_keywords), "duplicate_keywords"),
+        (bool(analysis.echoed_hint_fields), "prompt_hint_echoed"),
+        (bool(analysis.unverified_place_names), "unverified_place_name"),
     )
     observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
@@ -8741,6 +8931,10 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
     if analysis.role_boundary_tokens:
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
+    if analysis.echoed_hint_fields:
+        details["echoed_hint_fields"] = list(analysis.echoed_hint_fields)
+    if analysis.unverified_place_names:
+        details["unverified_place_names"] = list(analysis.unverified_place_names)
     details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
@@ -9505,6 +9699,8 @@ _OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
     "unchanged_draft_fields": "Draft fields returned unchanged",
     "duplicated_answer_separator": "Text between the two answer copies",
     "emitted_special_tokens": "Special tokens emitted (by token id)",
+    "echoed_hint_fields": "Fields repeating the prompt's hint",
+    "unverified_place_names": "Place names the prompt did not supply",
 }
 
 

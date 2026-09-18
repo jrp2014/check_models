@@ -1740,3 +1740,87 @@ def test_cap_landing_mid_keyword_list_is_truncation_even_without_a_trailing_comm
     assert check_models._ends_inside_keyword_list("**Keywords:** swan, river") is True
     assert check_models._ends_inside_keyword_list("Keywords: swan, river.") is False
     assert check_models._ends_inside_keyword_list("Title: Swan") is False
+
+
+_SWAN_HINT = (
+    "A solitary white swan glides gracefully across calm river waters framed by lush "
+    "foliage, with leisure boats and cruisers moored alongside riverside residential buildings."
+)
+_ASSISTED_PROMPT = (
+    "Create British-English catalogue metadata from the image and supplied context.\n\n"
+    "Context: Authoritative context:\n- Capture date/time: 2026-09-12 17:41:02 UTC+01:00\n"
+    "- GPS: 52.393850\u00b0N, 0.270830\u00b0E\n\nDescriptive hints:\n"
+    f"- Description hint: {_SWAN_HINT}\n\nReturn exactly these three sections:\n"
+    "Title:\nDescription:\nKeywords:"
+)
+
+
+def _assisted(text: str) -> check_models.GenerationQualityAnalysis:
+    return check_models.analyze_generation_text(
+        text,
+        generated_tokens=90,
+        prompt=_ASSISTED_PROMPT,
+        requested_max_tokens=1000,
+        assessment_profile="metadata",
+    )
+
+
+def test_description_that_hands_back_the_prompt_hint_is_flagged() -> None:
+    """An answer that is the supplied hint passes every structural check without seeing the image."""
+    echoed = _assisted(f"Title: Swan on River\nDescription: {_SWAN_HINT}\nKeywords: swan, river")
+    assert echoed.echoed_hint_fields == ["description"]
+    observations = check_models._quality_observations(text="Title: Swan", analysis=echoed)
+    assert "prompt_hint_echoed" in observations
+    assert check_models._completed_assessment(observations).usability == "usable_with_caveats"
+
+    # Borrowing a phrase while describing the image is not an echo.
+    paraphrase = _assisted(
+        "Title: Swan on River\nDescription: A mute swan swims past moored motor cruisers named "
+        "Samar II, beneath a brown-brick apartment block with balconies; a solitary white swan "
+        "glides gracefully here, framed by overhanging branches in soft daylight.\nKeywords: swan"
+    )
+    assert paraphrase.echoed_hint_fields == []
+    # Too short to judge, and no prompt at all, are both silent.
+    assert _assisted("Title: Swan\nDescription: A swan.\nKeywords: swan").echoed_hint_fields == []
+    unprompted = check_models.analyze_generation_text(
+        f"Title: Swan\nDescription: {_SWAN_HINT}\nKeywords: swan",
+        generated_tokens=90,
+        assessment_profile="metadata",
+    )
+    assert unprompted.echoed_hint_fields == []
+    assert check_models._hint_coverage(_SWAN_HINT, _SWAN_HINT) == 1.0
+
+
+def test_place_names_the_prompt_never_supplied_are_flagged() -> None:
+    """A place inferred from GPS or guessed outright is reported; supplied and visible facts are not."""
+    inferred = _assisted(
+        "Title: Swan on River Cam, Cambridge\nDescription: A white swan swims on the River Cam "
+        "at dusk; moored boats line the bank near Lambeth.\nKeywords: swan, river"
+    )
+    assert inferred.unverified_place_names == ["River Cam", "Lambeth"]
+    observations = check_models._quality_observations(text="Title: Swan", analysis=inferred)
+    assert "unverified_place_name" in observations
+    assert "River Cam" in check_models._human_observation_labels(
+        observations, details={"unverified_place_names": ["River Cam", "Lambeth"]}
+    )
+
+    places = check_models._unverified_place_names
+    bath_prompt = "Describe this photograph taken in Bath, Somerset, in September."
+    # Supplied names (even possessive), months, adjectives and Title Case headings stay silent.
+    assert places("The abbey dominates Bath's skyline in September.", bath_prompt) == []
+    assert places("Terraces in Georgian style line the crescent in Bath.", bath_prompt) == []
+    assert places("A sign reads New Road and Road Ahead Closed.", bath_prompt) == []
+    # A Title Case heading would match, which is why only sentence-case prose
+    # (the Description) is scanned and never the Title.
+    assert places("Serene River Scene with a Majestic White Swan", _ASSISTED_PROMPT) != []
+    assert (
+        _assisted(
+            "Title: Serene River Scene\nDescription: A swan swims.\nKeywords: swan"
+        ).unverified_place_names
+        == []
+    )
+    assert places("Boats moored near Ely on the Great Ouse River.", bath_prompt) == [
+        "Great Ouse River",
+        "Ely",
+    ]
+    assert places("A swan on the River Cam.", None) == []

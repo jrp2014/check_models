@@ -6,6 +6,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Two new mechanical observations, both caveats rather than failures.
+  `prompt_hint_echoed`: the Description reproduces the prompt's own
+  "Description hint" (share of its words inside four-word runs shared with
+  the hint at or above `hint_echo_min_coverage`, 0.8). On the retained swan
+  sweep six models handed the hint back and passed every structural check.
+  `unverified_place_name`: the prose names a place none of whose words the
+  prompt supplied (a capitalised name beside a natural or landmark feature
+  word, or after a locative preposition; no gazetteer). It found "River
+  Cam" and "River Thames, Lambeth" for a photograph taken at Ely, and
+  nothing on the Bath or cats sweeps.
 - Less hand-copying between representations of the same facts:
   `_process_image_params_from_args` copies the 35 same-named CLI values by
   dataclass field enumeration (only the 12 derived or overridable fields are

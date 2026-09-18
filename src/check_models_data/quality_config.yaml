@@ -17,3 +17,8 @@ thresholds:
   prompt_keyword_max_items: 20
   prompt_word_to_token_ratio: 1.3
   cutoff_tail_chars: 120
+  # A description counts as echoing the prompt's hint when this share of its
+  # words lies inside four-word runs shared with the hint (calibrated on a
+  # 46-output sweep: copies scored 0.90-1.00, the next output 0.68).
+  hint_echo_min_coverage: 0.8
+  hint_echo_min_words: 8
