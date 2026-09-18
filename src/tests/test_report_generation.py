@@ -7411,3 +7411,9 @@ def test_observation_detail_validator_groups_cover_every_declared_field() -> Non
             check_models._validate_run_issue_details(
                 cast("dict[str, check_models.JsonLike]", malformed), 3
             )
+
+
+def test_every_observation_detail_field_has_a_display_label() -> None:
+    """Labels are presentation, so they stay hand-written, but none may be missing or stale."""
+    declared = set(get_type_hints(check_models.JsonlObservationDetailsRecord))
+    assert set(check_models._OBSERVATION_DETAIL_LABELS) == declared

@@ -10,7 +10,7 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
-from typing import cast
+from typing import cast, get_type_hints
 from unittest.mock import patch
 
 import pytest
@@ -1664,6 +1664,7 @@ def test_append_history_record_contains_only_raw_execution_and_resource_facts(
         "prompt_tokens": 320,
         "generation_tokens": 64,
         "total_tokens": 30,
+        "prompt_tps": 2.0,
         "generation_tps": 5.0,
         "peak_memory_gb": 1.5,
         "active_memory_gb": 0.0,
@@ -2306,3 +2307,13 @@ def test_jsonl_carries_measured_first_token_facts_and_declared_sampling(tmp_path
     assert diagnostics["prepared_input_token_count"] == 274
     assert diagnostics["image_token_count"] == 256
     assert diagnostics["declared_sampling"] == {"do_sample": True, "temperature": 0.7}
+
+
+def test_history_and_jsonl_rows_share_one_generation_facts_projection() -> None:
+    """Both serialised forms carry the same facts from one projection, so they cannot disagree."""
+    shared = set(get_type_hints(check_models.GenerationFactsRecord))
+    assert shared <= set(get_type_hints(check_models.JsonlMetricsRecord))
+    assert shared <= set(get_type_hints(check_models.HistoryModelResultRecord))
+    failed = check_models.PerformanceResult(model_name="org/failed", success=False, generation=None)
+    assert check_models._generation_facts_record(failed) == {}
+    assert "generation_tps" not in check_models._history_model_result_from_result(failed)

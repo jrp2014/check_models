@@ -932,7 +932,24 @@ class SupportsGPSEnum(Protocol):
         ...
 
 
-class HistoryModelResultRecord(TypedDict):
+class GenerationFactsRecord(TypedDict, total=False):
+    """Token, throughput and memory facts of one generation.
+
+    The single declaration behind both serialised forms (the JSONL metrics and
+    the append-only history row), filled by ``_generation_facts_record``.
+    """
+
+    prompt_tokens: int
+    generation_tokens: int
+    total_tokens: int
+    prompt_tps: float
+    generation_tps: float
+    peak_memory_gb: float
+    active_memory_gb: float
+    cache_memory_gb: float
+
+
+class HistoryModelResultRecord(GenerationFactsRecord):
     """Per-model factual execution, timing, and resource data in raw history."""
 
     success: bool
@@ -945,13 +962,6 @@ class HistoryModelResultRecord(TypedDict):
     error_code: NotRequired[str | None]
     error_signature: NotRequired[str | None]
     stop_reason: NotRequired[str | None]
-    prompt_tokens: NotRequired[int | None]
-    generation_tokens: NotRequired[int | None]
-    total_tokens: NotRequired[int | None]
-    generation_tps: NotRequired[float | None]
-    peak_memory_gb: NotRequired[float | None]
-    active_memory_gb: NotRequired[float | None]
-    cache_memory_gb: NotRequired[float | None]
     post_cleanup_active_memory_gb: NotRequired[float | None]
     post_cleanup_cache_memory_gb: NotRequired[float | None]
     generation_time_s: NotRequired[float | None]
@@ -993,18 +1003,10 @@ class JsonlTimingRecord(TypedDict):
     stop_reason: str | None
 
 
-class JsonlMetricsRecord(TypedDict, total=False):
+class JsonlMetricsRecord(GenerationFactsRecord, total=False):
     """Performance metrics emitted for successful generations."""
 
-    prompt_tokens: int
-    generation_tokens: int
-    total_tokens: int
-    prompt_tps: float
-    generation_tps: float
-    peak_memory_gb: float
     peak_memory_working_set_pct: float
-    active_memory_gb: float
-    cache_memory_gb: float
     model_load_active_memory_gb: float
     peak_memory_delta_gb: float
     first_token_peak_memory_gb: float
@@ -9481,6 +9483,31 @@ def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
     return (_home_relative_report_text(f"{qualified_type}: {compacted}"),)
 
 
+# Display label for every observation-detail field; a test pins that the keys
+# match JsonlObservationDetailsRecord so a new field cannot go unlabelled.
+_OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
+    "missing_sections": "Labelled fields not detected",
+    "repeated_fragment": "Repeated fragment",
+    "instruction_echo_fragments": "Echoed instruction fragments",
+    "unexpected_catalog_preamble": "Unexpected text before Title",
+    "unexpected_special_tokens": "Unexpected special tokens",
+    "configured_generation_wrappers": "Declared generation wrappers in output",
+    "thinking_trace_markers": "Thinking trace markers",
+    "role_boundary_tokens": "Role-boundary tokens in output",
+    "title_word_count": "Title word count",
+    "title_word_range": "Requested title word range",
+    "description_sentence_count": "Description sentence count",
+    "description_sentence_range": "Requested description sentence range",
+    "keyword_count": "Keyword count",
+    "keyword_count_range": "Requested keyword count range",
+    "duplicate_keywords": "Duplicate keywords",
+    "token_cap_reasons": "Token-cap degradation evidence",
+    "unchanged_draft_fields": "Draft fields returned unchanged",
+    "duplicated_answer_separator": "Text between the two answer copies",
+    "emitted_special_tokens": "Special tokens emitted (by token id)",
+}
+
+
 def _diagnostics_result_facts(
     result: PerformanceResult,
     assessment: ResultAssessment,
@@ -9510,29 +9537,11 @@ def _diagnostics_result_facts(
     arch_summary = _arch_precheck_summary(result.model_name)
     if arch_summary is not None:
         rows.append(("Arch supported by installed mlx-vlm", arch_summary))
-    detail_labels = {
-        "missing_sections": "Labelled fields not detected",
-        "repeated_fragment": "Repeated fragment",
-        "instruction_echo_fragments": "Echoed instruction fragments",
-        "unexpected_catalog_preamble": "Unexpected text before Title",
-        "unexpected_special_tokens": "Unexpected special tokens",
-        "configured_generation_wrappers": "Declared generation wrappers in output",
-        "thinking_trace_markers": "Thinking trace markers",
-        "role_boundary_tokens": "Role-boundary tokens in output",
-        "title_word_count": "Title word count",
-        "title_word_range": "Requested title word range",
-        "description_sentence_count": "Description sentence count",
-        "description_sentence_range": "Requested description sentence range",
-        "keyword_count": "Keyword count",
-        "keyword_count_range": "Requested keyword count range",
-        "duplicate_keywords": "Duplicate keywords",
-        "token_cap_reasons": "Token-cap degradation evidence",
-        "unchanged_draft_fields": "Draft fields returned unchanged",
-        "duplicated_answer_separator": "Text between the two answer copies",
-        "emitted_special_tokens": "Special tokens emitted (by token id)",
-    }
     rows.extend(
-        (detail_labels.get(key, key.replace("_", " ").capitalize()), _diagnostics_fact(value))
+        (
+            _OBSERVATION_DETAIL_LABELS.get(key, key.replace("_", " ").capitalize()),
+            _diagnostics_fact(value),
+        )
         for key, value in _observation_details(result).items()
     )
     optional_facts = (
@@ -17484,6 +17493,27 @@ def apply_exclusions(
     return filtered
 
 
+# ProcessImageParams fields that are not the same-named CLI value: per-run
+# identity and overrides, a renamed flag (lazy_load), defaulted optionals, and
+# derived values. Everything else is copied from args by field enumeration.
+_PARAMS_NOT_COPIED_FROM_ARGS: Final[frozenset[str]] = frozenset(
+    {
+        "model_identifier",
+        "image_path",
+        "prompt",
+        "max_tokens",
+        "temperature",
+        "timeout",
+        "verbose",
+        "lazy",
+        "auto_thinking_budget",
+        "system_telemetry",
+        "assessment_profile",
+        "explicit_sampling",
+    }
+)
+
+
 def _process_image_params_from_args(
     args: argparse.Namespace,
     *,
@@ -17516,6 +17546,14 @@ def _process_image_params_from_args(
             # deliberate and wins over a checkpoint's declared value.
             explicit.add("temperature")
     explicit &= set(_CHECKPOINT_SAMPLING_DESTS)
+    # Every other field is the CLI value of the same name, copied by field
+    # enumeration so a new parameter cannot be forgotten here (the isolated
+    # worker rebuilds its parameters through this same function).
+    copied: dict[str, Any] = {
+        spec.name: getattr(args, spec.name)
+        for spec in fields(ProcessImageParams)
+        if spec.name not in _PARAMS_NOT_COPIED_FROM_ARGS
+    }
     return ProcessImageParams(
         model_identifier=model_identifier,
         image_path=image_path,
@@ -17524,46 +17562,12 @@ def _process_image_params_from_args(
         temperature=args.temperature if temperature is None else temperature,
         timeout=args.timeout if timeout is None else timeout,
         verbose=args.verbose if verbose is None else verbose,
-        trust_remote_code=args.trust_remote_code,
-        top_p=args.top_p,
-        min_p=args.min_p,
-        top_k=args.top_k,
-        repetition_penalty=args.repetition_penalty,
-        repetition_context_size=args.repetition_context_size,
-        seed=args.seed,
-        presence_penalty=args.presence_penalty,
-        presence_context_size=args.presence_context_size,
-        frequency_penalty=args.frequency_penalty,
-        frequency_context_size=args.frequency_context_size,
-        logit_bias=args.logit_bias,
         lazy=args.lazy_load,
-        max_kv_size=args.max_kv_size,
-        kv_bits=args.kv_bits,
-        kv_quant_scheme=args.kv_quant_scheme,
-        kv_group_size=args.kv_group_size,
-        quantized_kv_start=args.quantized_kv_start,
-        kv_key_bits=args.kv_key_bits,
-        kv_value_bits=args.kv_value_bits,
-        kv_key_scheme=args.kv_key_scheme,
-        kv_value_scheme=args.kv_value_scheme,
-        force_download=args.force_download,
-        quantize_activations=args.quantize_activations,
-        revision=args.revision,
-        adapter_path=args.adapter_path,
-        prefill_step_size=args.prefill_step_size,
-        resize_shape=args.resize_shape,
-        eos_tokens=args.eos_tokens,
-        skip_special_tokens=args.skip_special_tokens,
-        processor_kwargs=args.processor_kwargs,
-        enable_thinking=args.enable_thinking,
-        thinking_budget=args.thinking_budget,
-        thinking_mode=args.thinking_mode,
-        thinking_start_token=args.thinking_start_token,
-        thinking_end_token=args.thinking_end_token,
         auto_thinking_budget=getattr(args, "auto_thinking_budget", True),
         system_telemetry=_resolve_system_telemetry_mode(getattr(args, "system_telemetry", None)),
         assessment_profile=getattr(args, "assessment_profile", None) or "general",
         explicit_sampling=frozenset(explicit),
+        **copied,
     )
 
 
@@ -18548,6 +18552,27 @@ def _resolved_memory_deltas_gb(
     return active, cache
 
 
+def _generation_facts_record(result: PerformanceResult) -> GenerationFactsRecord:
+    """Project a result's generation into the facts both serialised forms carry.
+
+    Empty when the model produced no generation (a failure row).
+    """
+    if result.generation is None:
+        return {}
+    performance = _extract_generation_performance_data(result.generation)
+    active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance)
+    return {
+        "prompt_tokens": performance.prompt_tokens,
+        "generation_tokens": performance.generation_tokens,
+        "total_tokens": performance.total_tokens,
+        "prompt_tps": performance.prompt_tps,
+        "generation_tps": performance.generation_tps,
+        "peak_memory_gb": performance.peak_memory_gb,
+        "active_memory_gb": active_memory_gb,
+        "cache_memory_gb": cache_memory_gb,
+    }
+
+
 def _history_model_result_from_result(
     result: PerformanceResult,
     *,
@@ -18573,20 +18598,9 @@ def _history_model_result_from_result(
     diagnostics = result.prompt_diagnostics
     if diagnostics is not None and diagnostics.generate_kwargs:
         record["generation_settings"] = dict(diagnostics.generate_kwargs)
-    if result.generation is not None:
-        performance = _extract_generation_performance_data(result.generation)
-        active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance)
-        record.update(
-            {
-                "prompt_tokens": performance.prompt_tokens,
-                "generation_tokens": performance.generation_tokens,
-                "total_tokens": performance.total_tokens,
-                "generation_tps": performance.generation_tps,
-                "peak_memory_gb": performance.peak_memory_gb,
-                "active_memory_gb": active_memory_gb,
-                "cache_memory_gb": cache_memory_gb,
-            }
-        )
+    # pyrefly types update() against the subclass only; the shared facts are a
+    # valid partial of it (every shared key is optional in both records).
+    record.update(cast("HistoryModelResultRecord", _generation_facts_record(result)))
     if result.runtime_diagnostics is not None:
         record["stop_reason"] = result.runtime_diagnostics.stop_reason
         record["post_cleanup_active_memory_gb"] = (
@@ -18758,20 +18772,8 @@ def _build_jsonl_metrics_record(
     if generation is None:
         return metrics
 
-    performance_data = _extract_generation_performance_data(generation)
-    active_memory_gb, cache_memory_gb = _resolved_memory_deltas_gb(result, performance_data)
-    metrics.update(
-        {
-            "prompt_tokens": performance_data.prompt_tokens,
-            "generation_tokens": performance_data.generation_tokens,
-            "total_tokens": performance_data.total_tokens,
-            "prompt_tps": performance_data.prompt_tps,
-            "generation_tps": performance_data.generation_tps,
-            "peak_memory_gb": performance_data.peak_memory_gb,
-            "active_memory_gb": active_memory_gb,
-            "cache_memory_gb": cache_memory_gb,
-        }
-    )
+    facts = _generation_facts_record(result)
+    metrics.update(cast("JsonlMetricsRecord", facts))  # a valid partial; see the history builder
     model_load_active_memory_gb = (
         runtime.model_load_active_memory_gb
         if runtime is not None
@@ -18786,7 +18788,7 @@ def _build_jsonl_metrics_record(
     if first_token_peak is not None:
         metrics["first_token_peak_memory_gb"] = first_token_peak
     working_set_pct = _peak_memory_working_set_pct(
-        performance_data.peak_memory_gb,
+        facts.get("peak_memory_gb"),
         recommended_working_set_bytes,
     )
     if working_set_pct is not None:

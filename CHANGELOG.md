@@ -6,6 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Less hand-copying between representations of the same facts:
+  `_process_image_params_from_args` copies the 35 same-named CLI values by
+  dataclass field enumeration (only the 12 derived or overridable fields are
+  written out); the JSONL metrics and the history row share one
+  `GenerationFactsRecord` declaration and one `_generation_facts_record`
+  projection, so history rows now also carry `prompt_tps`; the observation
+  detail labels are a module constant pinned against the TypedDict; and the
+  isolated-worker round-trip test compares every parameter field with
+  non-default flags instead of seven.
 - Removed two leftovers: the telemetry record builder's legacy
   `(cpu, pressure)` pair normaliser, which only tests exercised (they build
   `_TelemetryProbe` now), and the output index's provisional job, which the

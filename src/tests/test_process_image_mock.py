@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import io
 import json
 import logging
@@ -1869,6 +1870,80 @@ class TestRepetitionGuard:
             "verbose",
         ):
             assert getattr(restored, field) == getattr(params, field), field
+
+    def test_isolated_spec_round_trips_every_parameter_field(self, tmp_path: Path) -> None:
+        """Whole-object equality with non-default flags: a field the child drops cannot hide.
+
+        The five-field check above would not notice a new ProcessImageParams
+        field that the worker rebuilds at its default (the explicit-sampling
+        set was lost exactly that way before it was carried in the spec).
+        """
+        image = tmp_path / "img.jpg"
+        image.write_bytes(b"not-a-jpeg")
+        args = check_models._build_cli_parser().parse_args(
+            [
+                "--image",
+                str(image),
+                "--models",
+                "org/m",
+                "--isolate",
+                "--trust-remote-code",
+                "--top-p",
+                "0.9",
+                "--top-k",
+                "40",
+                "--min-p",
+                "0.05",
+                "--repetition-penalty",
+                "1.1",
+                "--seed",
+                "7",
+                "--max-kv-size",
+                "4096",
+                "--revision",
+                "abc123",
+                "--prefill-step-size",
+                "1024",
+                "--resize-shape",
+                "512",
+                "384",
+                "--eos-tokens",
+                "<|end|>",
+                "--skip-special-tokens",
+                "--thinking-budget",
+                "256",
+                "--no-system-telemetry",
+                "--assessment-profile",
+                "metadata",
+            ]
+        )
+        args.explicit_cli = check_models._explicit_cli_dests(["--top-p", "0.9", "--top-k", "40"])
+        params = check_models._process_image_params_from_args(
+            args, model_identifier="org/m", image_path=image, prompt="describe", max_tokens=32
+        )
+        assert params.top_k == 40
+        assert params.system_telemetry == "off"
+        assert params.explicit_sampling == frozenset({"top_p", "top_k"})
+        spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
+        restored = check_models._isolated_params_from_spec(
+            spec, check_models._namespace_from_json(spec["args"])
+        )
+        differing = [
+            spec_field.name
+            for spec_field in dataclasses.fields(params)
+            if getattr(restored, spec_field.name) != getattr(params, spec_field.name)
+        ]
+        assert differing == []
+
+    def test_params_not_copied_from_args_names_only_real_fields(self) -> None:
+        """The exclusion set must track the dataclass, and every other field is a CLI dest."""
+        names = {
+            spec_field.name for spec_field in dataclasses.fields(check_models.ProcessImageParams)
+        }
+        assert names >= check_models._PARAMS_NOT_COPIED_FROM_ARGS
+        args = check_models._build_cli_parser().parse_args(["--models", "org/m"])
+        copied = names - check_models._PARAMS_NOT_COPIED_FROM_ARGS
+        assert [name for name in sorted(copied) if not hasattr(args, name)] == []
 
     def test_wrapper_echoes_stream_live_under_verbose(
         self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
