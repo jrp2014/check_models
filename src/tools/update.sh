@@ -829,12 +829,45 @@ check_mlx_build_requirements() {
 #   $2 unchanged  git pull left HEAD unchanged (0/1)
 #   $3 dirty      git status --porcelain was non-empty (0/1)
 #   $4 verified   the editable install points at this checkout (0/1)
+#   $5 toolchain  the Metal compiler matches the one the build recorded (0/1)
 mlx_repo_rebuild_decision() {
-	local force="$1" unchanged="$2" dirty="$3" verified="$4"
-	if [[ "$force" == "1" || "$unchanged" != "1" || "$dirty" == "1" || "$verified" != "1" ]]; then
+	local force="$1" unchanged="$2" dirty="$3" verified="$4" toolchain="$5"
+	if [[ "$force" == "1" || "$unchanged" != "1" || "$dirty" == "1" || "$verified" != "1" || "$toolchain" != "1" ]]; then
 		echo "rebuild"
 	else
 		echo "skip"
+	fi
+}
+
+# The compiled metallib is a product of the Metal compiler as much as of the
+# source: after an Xcode upgrade an unchanged, clean checkout still holds
+# kernels built by the old toolchain. The version that built the current
+# install is recorded inside the checkout's .git directory, where it is
+# invisible to `git status` (a file in the work tree would mark the checkout
+# dirty and force a rebuild every run).
+metal_compiler_version() {
+	xcrun metal --version 2>/dev/null | head -n 1 || true
+}
+
+mlx_build_toolchain_stamp() {
+	printf '%s\n' "$1/.git/check_models_build_toolchain"
+}
+
+# Prints 1 when the recorded compiler equals the current one. No Metal
+# compiler (not macOS) means nothing to compare, so 1; a missing stamp means
+# the build predates this record, so 0 and one rebuild writes it.
+mlx_build_toolchain_matches() {
+	local repo_path="$1" current stamp
+	current="$(metal_compiler_version)"
+	if [[ -z "$current" ]]; then
+		echo 1
+		return 0
+	fi
+	stamp="$(mlx_build_toolchain_stamp "$repo_path")"
+	if [[ -f "$stamp" && "$(cat "$stamp")" == "$current" ]]; then
+		echo 1
+	else
+		echo 0
 	fi
 }
 
@@ -981,7 +1014,15 @@ update_local_mlx_repos() {
 		if verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
 			editable_verified=1
 		fi
-		if [[ "$(mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" "${REPO_DIRTY[idx]}" "$editable_verified")" == "skip" ]]; then
+		# Only mlx compiles Metal kernels; mlx-vlm is pure Python.
+		local toolchain_matches=1
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			toolchain_matches="$(mlx_build_toolchain_matches "${REPO_PATHS[idx]}")"
+			if [[ "$toolchain_matches" != "1" ]]; then
+				echo "[update.sh] Metal compiler differs from the one recorded for this mlx build ($(metal_compiler_version)) — rebuild forced"
+			fi
+		fi
+		if [[ "$(mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" "${REPO_DIRTY[idx]}" "$editable_verified" "$toolchain_matches")" == "skip" ]]; then
 			echo "✓ ${REPO_NAMES[idx]} unchanged upstream, clean checkout; editable install verified — skipping rebuild"
 			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 				# The local build still needs its pin against PyPI releases.
@@ -1052,6 +1093,7 @@ update_local_mlx_repos() {
 		if "${INSTALL_CMD[@]}"; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
 			if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+				metal_compiler_version > "$(mlx_build_toolchain_stamp "${REPO_PATHS[idx]}")"
 				pin_local_mlx_build
 			fi
 		else

@@ -1287,19 +1287,22 @@ def _update_script_function(name: str) -> str:
 
 
 @pytest.mark.parametrize(
-    ("force", "unchanged", "dirty", "verified", "expected"),
+    ("inputs", "expected"),
     [
-        pytest.param("0", "1", "0", "1", "skip", id="unchanged-clean-verified"),
-        pytest.param("0", "1", "1", "1", "rebuild", id="unchanged-dirty"),
-        pytest.param("0", "0", "0", "1", "rebuild", id="changed-head"),
-        pytest.param("0", "1", "0", "0", "rebuild", id="wrong-editable-origin"),
-        pytest.param("1", "1", "0", "1", "rebuild", id="force-reinstall"),
+        pytest.param("0 1 0 1 1", "skip", id="unchanged-clean-verified"),
+        pytest.param("0 1 1 1 1", "rebuild", id="unchanged-dirty"),
+        pytest.param("0 0 0 1 1", "rebuild", id="changed-head"),
+        pytest.param("0 1 0 0 1", "rebuild", id="wrong-editable-origin"),
+        pytest.param("1 1 0 1 1", "rebuild", id="force-reinstall"),
+        pytest.param("0 1 0 1 0", "rebuild", id="metal-compiler-changed"),
     ],
 )
-def test_update_script_rebuild_decision(
-    force: str, unchanged: str, dirty: str, verified: str, expected: str
-) -> None:
+def test_update_script_rebuild_decision(inputs: str, expected: str) -> None:
     """A rebuild is skipped only for an unchanged, clean, verified checkout.
+
+    ``inputs`` is force, unchanged, dirty, verified, toolchain. The metallib is
+    also a product of the Metal compiler, so an Xcode upgrade
+    behind an unchanged HEAD must rebuild as well.
 
     A dirty checkout can leave modified C++, Metal, or packaging inputs
     behind an unchanged HEAD, so the compiled extension in use would predate
@@ -1310,7 +1313,7 @@ def test_update_script_rebuild_decision(
         [
             "/bin/bash",
             "-c",
-            f"{function}\nmlx_repo_rebuild_decision {force} {unchanged} {dirty} {verified}",
+            f"{function}\nmlx_repo_rebuild_decision {inputs}",
         ],
         capture_output=True,
         text=True,
@@ -1327,7 +1330,13 @@ def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
     assert "REPO_DIRTY[idx]=1" in update_script
     decision_call = (
         'mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" '
-        '"${REPO_DIRTY[idx]}" "$editable_verified"'
+        '"${REPO_DIRTY[idx]}" "$editable_verified" "$toolchain_matches"'
+    )
+    # The stamp lives under .git so it never dirties the checkout it describes,
+    # and it is written only after a successful mlx install.
+    assert '"$1/.git/check_models_build_toolchain"' in update_script
+    assert update_script.index("installed successfully") < update_script.index(
+        'metal_compiler_version > "$(mlx_build_toolchain_stamp'
     )
     assert decision_call in update_script
     assert update_script.index("REPO_DIRTY[idx]=1") < update_script.index(decision_call)

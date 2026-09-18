@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `tools/update.sh` rebuilds the local mlx checkout when the Metal compiler
+  differs from the one that built the current install, even if upstream is
+  unchanged and the checkout is clean: the metallib is a product of the
+  toolchain too, so an Xcode upgrade previously left old kernels in use. The
+  compiler version is recorded under the checkout's `.git/` after each
+  successful build (invisible to `git status`); a build with no record
+  rebuilds once to create it.
 - More recorded facts for evaluating a sweep, none of them judgments: the
   comparison names the models whose text changed, gives the prefill tok/s
   ratio beside the decode one, and lists the upstream commits between the
