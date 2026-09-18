@@ -14,7 +14,7 @@ import re
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast, get_args
+from typing import TYPE_CHECKING, Any, Literal, cast, get_args, get_type_hints
 from unittest.mock import patch
 
 import pytest
@@ -7377,3 +7377,37 @@ def test_comparison_notes_an_os_version_change_between_runs() -> None:
     )
     assert unchanged is not None
     assert unchanged.environment_notes == ()
+
+
+def test_observation_detail_validator_groups_cover_every_declared_field() -> None:
+    """The validator's groups are derived from the TypedDict, so none can be forgotten.
+
+    Regression: ``emitted_special_tokens`` and ``duplicated_answer_separator``
+    were written and displayed but absent from the hand-kept validator lists,
+    so a malformed value reached the renderers instead of raising.
+    """
+    groups = (
+        check_models._DETAIL_STRING_LIST_FIELDS,
+        check_models._DETAIL_TEXT_FIELDS,
+        check_models._DETAIL_COUNT_FIELDS,
+        check_models._DETAIL_RANGE_FIELDS,
+    )
+    grouped = [name for group in groups for name in group]
+    declared = set(get_type_hints(check_models.JsonlObservationDetailsRecord))
+    assert len(grouped) == len(set(grouped))
+    assert set(grouped) == declared
+    assert "emitted_special_tokens" in check_models._DETAIL_STRING_LIST_FIELDS
+    assert "duplicated_answer_separator" in check_models._DETAIL_TEXT_FIELDS
+
+    check_models._validate_run_issue_details(
+        {"emitted_special_tokens": ["<|box|>"], "duplicated_answer_separator": "---"}, 3
+    )
+    for malformed in (
+        {"emitted_special_tokens": "<|box|>"},
+        {"emitted_special_tokens": [1]},
+        {"duplicated_answer_separator": ["---"]},
+    ):
+        with pytest.raises(check_models.RunIssueSummaryValidationError, match="row 3"):
+            check_models._validate_run_issue_details(
+                cast("dict[str, check_models.JsonLike]", malformed), 3
+            )

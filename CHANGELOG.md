@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed two leftovers: the telemetry record builder's legacy
+  `(cpu, pressure)` pair normaliser, which only tests exercised (they build
+  `_TelemetryProbe` now), and the output index's provisional job, which the
+  orchestrator always replaced before anything ran it.
 - The run comparison notes a macOS version change between runs. The first
   sweep after the 26 to 27 upgrade read prefill throughput 2-5x lower with
   identical outputs and returned to baseline on the next run: Metal
@@ -346,6 +350,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- The retained-row validator checks `emitted_special_tokens` and
+  `duplicated_answer_separator`. Its four field groups were hand-kept lists
+  that lagged `JsonlObservationDetailsRecord`; they are now derived from the
+  TypedDict's declared types, and a test pins that every declared field is
+  in exactly one group.
 - A token cap that lands mid keyword list is reported as truncation even
   when it falls after a word rather than a comma. Muse Glimmer spent its
   1000 tokens on a hidden reasoning channel, its visible answer stopped at

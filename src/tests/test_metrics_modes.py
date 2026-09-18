@@ -1231,8 +1231,9 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     # diagnostics runs via its dedicated runner; log/environment are produced
     # by the run itself; the jsonl job is supplied by the orchestrator from
-    # the in-memory retained run.
-    joblessly_produced = {"diagnostics", "log", "environment", "jsonl"}
+    # the in-memory retained run; the output index is built last, from this
+    # run's outcomes.
+    joblessly_produced = {"diagnostics", "log", "environment", "jsonl", "output_index"}
     assert all(
         artifact.job is not None for artifact in artifacts if artifact.key not in joblessly_produced
     )
@@ -1537,7 +1538,7 @@ class TestSystemTelemetry:
     def test_total_probe_failure_yields_zero_count_record(self) -> None:
         """All-None probes still produce a record so the gap is visible."""
         record = check_models._system_telemetry_record_from_probes(
-            [(None, None), (None, None)], mode="snapshot"
+            [check_models._TelemetryProbe(None, None)] * 2, mode="snapshot"
         )
 
         assert record == {
@@ -1554,7 +1555,11 @@ class TestSystemTelemetry:
     def test_record_aggregates_min_max_and_per_probe_counts(self) -> None:
         """Aggregates keep the throttling floor, pressure ceiling, and counts."""
         record = check_models._system_telemetry_record_from_probes(
-            [(100.0, 1), (62.0, 2), (100.0, None)],
+            [
+                check_models._TelemetryProbe(100.0, 1),
+                check_models._TelemetryProbe(62.0, 2),
+                check_models._TelemetryProbe(100.0, None),
+            ],
             mode="continuous",
             interval_s=1.5,
         )
@@ -1574,7 +1579,7 @@ class TestSystemTelemetry:
     def test_partial_probe_failure_stays_visible(self) -> None:
         """A missing probe is reported as unavailable, never as clean."""
         record = check_models._system_telemetry_record_from_probes(
-            [(100.0, None), (100.0, None)], mode="snapshot"
+            [check_models._TelemetryProbe(100.0, None)] * 2, mode="snapshot"
         )
 
         assert record is not None
@@ -1738,11 +1743,11 @@ def test_power_state_sample_parses_pmset_output(monkeypatch: pytest.MonkeyPatch)
     assert check_models._sample_power_state() == (None, None)
 
 
-def test_telemetry_record_aggregates_power_and_accepts_legacy_pairs() -> None:
-    """Power facts aggregate per probe; two-field probes from older callers still work."""
+def test_telemetry_record_aggregates_power_per_probe() -> None:
+    """Power facts aggregate per probe; a probe without them counts as unavailable."""
     record = check_models._system_telemetry_record_from_probes(
         [
-            (100.0, 1),
+            check_models._TelemetryProbe(100.0, 1),
             check_models._TelemetryProbe(100.0, 1, "battery", 1),
             check_models._TelemetryProbe(100.0, 1, "ac", 0),
         ],
@@ -1762,7 +1767,9 @@ def test_telemetry_record_aggregates_power_and_accepts_legacy_pairs() -> None:
     assert "low power" not in check_models._telemetry_status_line(high)
     # Battery power is a recorded fact, never a degradation verdict.
     assert check_models._telemetry_degradation_note(record) is None
-    bare = check_models._system_telemetry_record_from_probes([(100.0, 1)], mode="snapshot")
+    bare = check_models._system_telemetry_record_from_probes(
+        [check_models._TelemetryProbe(100.0, 1)], mode="snapshot"
+    )
     assert bare["power_samples"] == 0
     assert "power probe unavailable" in check_models._telemetry_status_line(bare)
 

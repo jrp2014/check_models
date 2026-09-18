@@ -14605,21 +14605,12 @@ def _sample_power_state() -> tuple[str | None, int | None]:
 
 
 class _TelemetryProbe(NamedTuple):
-    """One telemetry sample; power fields default so legacy pairs still aggregate."""
+    """One telemetry sample; the power fields default to unavailable."""
 
     cpu_speed_limit_pct: float | None
     memory_pressure_level: int | None
     power_source: str | None = None
     power_mode: int | None = None
-
-
-def _as_telemetry_probe(
-    probe: tuple[float | None, int | None] | _TelemetryProbe,
-) -> _TelemetryProbe:
-    """Normalise a legacy (cpu, pressure) pair or a full probe into a _TelemetryProbe."""
-    if isinstance(probe, _TelemetryProbe):
-        return probe
-    return _TelemetryProbe(probe[0], probe[1])
 
 
 def _system_telemetry_probe() -> _TelemetryProbe:
@@ -14631,7 +14622,7 @@ def _system_telemetry_probe() -> _TelemetryProbe:
 
 
 def _system_telemetry_record_from_probes(
-    probes: Sequence[tuple[float | None, int | None] | _TelemetryProbe],
+    probes: Sequence[_TelemetryProbe],
     *,
     mode: SystemTelemetryMode,
     interval_s: float | None = None,
@@ -14642,13 +14633,12 @@ def _system_telemetry_record_from_probes(
     diagnostics can distinguish "telemetry ran but probes were unavailable"
     from telemetry being disabled.
     """
-    samples = [_as_telemetry_probe(probe) for probe in probes]
-    cpu_limits = [p.cpu_speed_limit_pct for p in samples if p.cpu_speed_limit_pct is not None]
+    cpu_limits = [p.cpu_speed_limit_pct for p in probes if p.cpu_speed_limit_pct is not None]
     pressure_levels = [
-        p.memory_pressure_level for p in samples if p.memory_pressure_level is not None
+        p.memory_pressure_level for p in probes if p.memory_pressure_level is not None
     ]
-    sources = [p.power_source for p in samples if p.power_source is not None]
-    modes = [p.power_mode for p in samples if p.power_mode is not None]
+    sources = [p.power_source for p in probes if p.power_source is not None]
+    modes = [p.power_mode for p in probes if p.power_mode is not None]
     record: SystemTelemetryRecord = {
         "mode": mode,
         "cpu_samples": len(cpu_limits),
@@ -20876,31 +20866,22 @@ _RUN_ISSUE_ASSESSMENT_VOCABULARIES: Final[tuple[tuple[str, frozenset[str]], ...]
 )
 
 
-_DETAIL_STRING_LIST_FIELDS: Final[tuple[str, ...]] = (
-    "missing_sections",
-    "instruction_echo_fragments",
-    "unexpected_special_tokens",
-    "configured_generation_wrappers",
-    "thinking_trace_markers",
-    "role_boundary_tokens",
-    "duplicate_keywords",
-    "token_cap_reasons",
-    "unchanged_draft_fields",
-)
-_DETAIL_TEXT_FIELDS: Final[tuple[str, ...]] = (
-    "repeated_fragment",
-    "unexpected_catalog_preamble",
-)
-_DETAIL_COUNT_FIELDS: Final[tuple[str, ...]] = (
-    "title_word_count",
-    "description_sentence_count",
-    "keyword_count",
-)
-_DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = (
-    "title_word_range",
-    "description_sentence_range",
-    "keyword_count_range",
-)
+def _detail_fields_declared_as(declared: object) -> tuple[str, ...]:
+    """Observation-detail keys the TypedDict declares with exactly this type.
+
+    The validator's groups are derived from ``JsonlObservationDetailsRecord``
+    rather than listed again: two hand-kept lists drifted once already
+    (``emitted_special_tokens`` and ``duplicated_answer_separator`` were
+    written and displayed but never validated).
+    """
+    hints = get_type_hints(JsonlObservationDetailsRecord)
+    return tuple(name for name, hint in hints.items() if hint == declared)
+
+
+_DETAIL_STRING_LIST_FIELDS: Final[tuple[str, ...]] = _detail_fields_declared_as(list[str])
+_DETAIL_TEXT_FIELDS: Final[tuple[str, ...]] = _detail_fields_declared_as(str)
+_DETAIL_COUNT_FIELDS: Final[tuple[str, ...]] = _detail_fields_declared_as(int)
+_DETAIL_RANGE_FIELDS: Final[tuple[str, ...]] = _detail_fields_declared_as(list[int])
 
 _DETAIL_RANGE_LENGTH: Final[int] = 2
 
@@ -23045,9 +23026,11 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
 
     Identity, public manifest key, log label, dashboard presentation, and the
     generation job live together so the manifest, logs, dashboard, and output
-    index cannot drift apart. Artifacts without a job (diagnostics runs via
-    its dedicated runner; log and environment are produced by the run itself)
-    receive their outcomes from the orchestrator.
+    index cannot drift apart. Artifacts without a job receive their outcomes
+    from the orchestrator: the output index is built last, from this run's
+    outcomes, so only artifacts that succeeded are linked; diagnostics and the
+    JSONL run through dedicated runners; log and environment are produced by
+    the run itself.
     """
     output_paths = inputs.output_paths
     return (
@@ -23058,13 +23041,6 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             path=output_paths.index,
             dashboard_label="Output Index",
             dashboard_purpose="Links to retained run artifacts",
-            job=lambda: generate_output_index_report(
-                output_paths.index,
-                artifacts=(),
-                assessments=inputs.report_context.assessments,
-                eval_mode=inputs.report_context.mode_policy.eval_mode,
-                run_duration_seconds=inputs.overall_time,
-            ),
         ),
         ReportArtifact(
             key="html",
