@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-09-13 21:59:50 BST
+Generated on: 2026-09-18 21:42:05 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -26,64 +26,62 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                     | Mechanical checks      | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
-|---------------------------------------------------------------------------------------------------------------------------|------------------------|---------|---------------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | 11.48s  | 29.5 tok/s          | 3.55            | 23      | 2,393      | 151     | none                                                                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | 16.26s  | 78.8 tok/s          | 1.36            | 19      | 1,634      | 997     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | 9.62s   | 74.9 tok/s          | 5.69            | 8.7     | 6,450      | 140     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `no concerns detected` | 21.87s  | 41.1 tok/s          | 12.56           | 78      | 6,450      | 103     | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | 9.01s   | 32.3 tok/s          | 1.87            | 18      | 2,612      | 138     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | 6.41s   | 55.4 tok/s          | 2.31            | 10      | 2,113      | 126     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | 6.39s   | 31.4 tok/s          | 1.60            | 17      | 2,113      | 77      | none                                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | 3.15s   | 206 tok/s           | 0.99            | 4.0     | 2,103      | 80      | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | 3.40s   | 104 tok/s           | 0.73            | 7.0     | 391        | 101     | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | 6.58s   | 64.7 tok/s          | 2.67            | 13      | 2,926      | 109     | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | 8.50s   | 53.2 tok/s          | 2.83            | 13      | 2,926      | 187     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | 3.90s   | 181 tok/s           | 1.60            | 7.8     | 2,925      | 102     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | 5.00s   | 166 tok/s           | 2.74            | 3.9     | 4,083      | 84      | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | 6.58s   | 75.7 tok/s          | 1.25            | 24      | 1,289      | 155     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | 4.20s   | 55.0 tok/s          | 0.79            | 9.3     | 1,133      | 107     | none                                                                                              |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `no concerns detected` | 45.84s  | 90.6 tok/s          | 42.87           | 9.3     | 16,558     | 117     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | 29.64s  | 85.9 tok/s          | 17.28           | 8.4     | 16,549     | 912     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | 76.75s  | 18.6 tok/s          | 64.23           | 26      | 16,547     | 177     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | 42.99s  | 70.5 tok/s          | 39.76           | 11      | 16,547     | 93      | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | 38.97s  | 72.5 tok/s          | 33.87           | 25      | 16,563     | 97      | none                                                                                              |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | 40.15s  | 89.0 tok/s          | 36.56           | 11      | 16,563     | 86      | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `no concerns detected` | 62.11s  | 27.5 tok/s          | 54.48           | 21      | 16,563     | 124     | none                                                                                              |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `no concerns detected` | 3.32s   | 125 tok/s           | 1.10            | 5.6     | 1,426      | 98      | none                                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | 40.68s  | 47.3 tok/s          | 23.62           | 92      | 3,491      | 121     | none                                                                                              |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | 18.87s  | 58.1 tok/s          | 14.41           | 14      | 16,558     | 136     | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `no concerns detected` | 9.38s   | 30.7 tok/s          | 1.48            | 17      | 590        | 152     | none                                                                                              |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | 5.33s   | 60.7 tok/s          | 1.12            | 7.6     | 595        | 101     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | 5.00s   | 104 tok/s           | 1.00            | 16      | 595        | 96      | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | 8.54s   | 25.8 tok/s          | 1.76            | 20      | 595        | 89      | none                                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | 3.67s   | 123 tok/s           | 0.76            | 5.9     | 591        | 73      | none                                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | 3.00s   | 172 tok/s           | 1.17            | 4.7     | 1,379      | 65      | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `no concerns detected` | 7.61s   | 38.4 tok/s          | 2.54            | 16      | 3,116      | 102     | none                                                                                              |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `concerns detected`    | 2.08s   | 475 tok/s           | 0.61            | 1.9     | 2,112      | 120     | duplicate keywords                                                                                |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | 6.44s   | 68.9 tok/s          | 1.41            | 8.1     | 1,524      | 216     | duplicate keywords                                                                                |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `concerns detected`    | 4.58s   | 102 tok/s           | 1.58            | 6.5     | 2,090      | 96      | control tokens visible                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | 7.22s   | 43.6 tok/s          | 2.94            | 28      | 591        | 80      | duplicate keywords                                                                                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | 22.86s  | 54.5 tok/s          | 1.48            | 20      | 1,324      | 1,000   | cut off at token limit                                                                            |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | 61.04s  | 21.4 tok/s          | 9.63            | 25      | 4,403      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | 44.51s  | 74.4 tok/s          | 38.88           | 23      | 16,547     | 200     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | 2.35s   | 315 tok/s           | 1.03            | 1.1     | 1,205      | 33      | labelled fields not detected                                                                      |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | 4.47s   | 70.5 tok/s          | 0.85            | 7.2     | 589        | 88      | labelled fields not detected                                                                      |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | 5.63s   | 99.5 tok/s          | 1.67            | 6.7     | 2,195      | 200     | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | 2.27s   | 202 tok/s           | 0.67            | 1.8     | 330        | 92      | labelled fields not detected                                                                      |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | 4.73s   | insufficient sample | 2.27            | 9.7     | 1,344      | 7       | labelled fields not detected                                                                      |
-| [`apple/FastVLM-7B-int4`](#model-apple-fastvlm-7b-int4)                                                                   | `not assessed`         | 0.14s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | 0.14s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `not assessed`         | 2.49s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `not assessed`         | 2.88s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | 0.25s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-mlx-community-mistral-small-32-24b-instruct-2506-4bit)  | `not assessed`         | 1.85s   | -                   | -               | -       | -          | -       | none                                                                                              |
-| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | 0.29s   | -                   | -               | -       | -          | -       | none                                                                                              |
+| Model                                                                                                                     | Mechanical checks      | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                  |
+|---------------------------------------------------------------------------------------------------------------------------|------------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------|
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | 12.43s  | 30.4 tok/s          | 4.51            | 23      | 2,393      | 151     | none                                                                                          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | 17.04s  | 82.2 tok/s          | 2.51            | 19      | 1,634      | 997     | none                                                                                          |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | 10.48s  | 75.8 tok/s          | 6.54            | 8.7     | 6,450      | 140     | none                                                                                          |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `no concerns detected` | 33.23s  | 41.2 tok/s          | 18.99           | 78      | 6,450      | 103     | none                                                                                          |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | 9.45s   | 35.2 tok/s          | 2.68            | 18      | 2,612      | 138     | none                                                                                          |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | 8.03s   | 54.1 tok/s          | 3.88            | 10      | 2,113      | 126     | none                                                                                          |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | 6.17s   | 36.4 tok/s          | 1.72            | 17      | 2,113      | 77      | none                                                                                          |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | 5.24s   | 182 tok/s           | 1.98            | 4.0     | 2,103      | 81      | none                                                                                          |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | 3.87s   | 102 tok/s           | 1.30            | 7.0     | 391        | 101     | none                                                                                          |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | 6.52s   | 64.3 tok/s          | 2.71            | 13      | 2,926      | 109     | none                                                                                          |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | 8.08s   | 60.2 tok/s          | 2.77            | 13      | 2,926      | 187     | none                                                                                          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | 3.91s   | 179 tok/s           | 1.63            | 7.8     | 2,925      | 102     | none                                                                                          |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `no concerns detected` | 58.62s  | 23.6 tok/s          | 11.75           | 25      | 4,403      | 1,000   | none                                                                                          |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | 5.13s   | 159 tok/s           | 2.81            | 3.9     | 4,083      | 84      | none                                                                                          |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | 8.16s   | 74.4 tok/s          | 2.15            | 24      | 1,289      | 155     | none                                                                                          |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | 4.50s   | 55.9 tok/s          | 1.13            | 9.3     | 1,133      | 107     | none                                                                                          |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `no concerns detected` | 43.44s  | 89.1 tok/s          | 40.30           | 9.3     | 16,558     | 117     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | 29.50s  | 86.1 tok/s          | 17.03           | 8.4     | 16,549     | 912     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | 74.99s  | 19.5 tok/s          | 62.91           | 26      | 16,547     | 177     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | 41.03s  | 69.7 tok/s          | 37.79           | 11      | 16,547     | 93      | none                                                                                          |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | 38.20s  | 73.6 tok/s          | 33.06           | 25      | 16,563     | 97      | none                                                                                          |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | 38.00s  | 89.6 tok/s          | 34.43           | 11      | 16,563     | 86      | none                                                                                          |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `no concerns detected` | 65.42s  | 26.8 tok/s          | 57.10           | 21      | 16,563     | 124     | none                                                                                          |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `no concerns detected` | 3.55s   | 129 tok/s           | 1.32            | 5.6     | 1,426      | 98      | none                                                                                          |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | 43.93s  | 47.8 tok/s          | 25.02           | 92      | 3,491      | 121     | none                                                                                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | 19.44s  | 56.8 tok/s          | 14.43           | 14      | 16,558     | 136     | none                                                                                          |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | 4.94s   | 101 tok/s           | 1.74            | 6.5     | 2,090      | 96      | none                                                                                          |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `no concerns detected` | 10.01s  | 30.2 tok/s          | 1.72            | 17      | 590        | 152     | none                                                                                          |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | 5.67s   | 59.5 tok/s          | 1.20            | 7.6     | 595        | 101     | none                                                                                          |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | 5.49s   | 106 tok/s           | 1.17            | 16      | 595        | 96      | none                                                                                          |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | 8.88s   | 25.8 tok/s          | 1.86            | 20      | 595        | 89      | none                                                                                          |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | 4.37s   | 122 tok/s           | 1.10            | 5.9     | 591        | 73      | none                                                                                          |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | 4.10s   | 168 tok/s           | 1.91            | 4.7     | 1,379      | 65      | none                                                                                          |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `no concerns detected` | 7.59s   | 38.7 tok/s          | 2.35            | 16      | 3,116      | 102     | none                                                                                          |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | 8.49s   | 71.5 tok/s          | 3.57            | 8.1     | 1,524      | 216     | duplicate keywords                                                                            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | 8.87s   | 37.5 tok/s          | 4.60            | 28      | 591        | 80      | duplicate keywords                                                                            |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | 2.41s   | 470 tok/s           | 0.76            | 1.9     | 2,112      | 200     | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | 23.62s  | 60.0 tok/s          | 3.87            | 20      | 1,324      | 1,000   | cut off at token limit                                                                        |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | 15.93s  | 26.1 tok/s          | 3.02            | 9.2     | 301        | 275     | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | 63.38s  | 17.0 tok/s          | 2.17            | 15      | 301        | 1,000   | repeated text; cut off at token limit                                                         |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | 40.50s  | 74.8 tok/s          | 34.86           | 23      | 16,547     | 200     | stopped early: repeating; duplicate keywords                                                  |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | 2.46s   | 314 tok/s           | 1.12            | 1.1     | 1,205      | 33      | labelled fields not detected                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | 5.98s   | 69.6 tok/s          | 2.12            | 6.9     | 589        | 88      | labelled fields not detected                                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | 5.51s   | 98.7 tok/s          | 1.59            | 6.7     | 2,195      | 200     | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | 2.73s   | 198 tok/s           | 0.95            | 1.5     | 330        | 92      | labelled fields not detected                                                                  |
+| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | 5.05s   | insufficient sample | 2.38            | 9.7     | 1,344      | 7       | labelled fields not detected                                                                  |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | 0.19s   | -                   | -               | -       | -          | -       | none                                                                                          |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | 2.79s   | -                   | -               | -       | -          | -       | none                                                                                          |
+| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | 0.25s   | -                   | -               | -       | -          | -       | none                                                                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/granite-4.0-3b-vision-4bit` at 3.00s
+Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/SmolVLM2-2.2B-Instruct-mlx` at 3.55s
 
 Lowest peak memory among completions without detected concerns: `mlx-community/North-Micro-Vision-Instruct-4bit` at 3.9 GB
 
@@ -93,23 +91,21 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                     | Mechanical checks | Observations                                                                                      |
-|---------------------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------|
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`  | cut off at token limit                                                                            |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`  | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`  | labelled fields not detected                                                                      |
-| [`apple/FastVLM-7B-int4`](#model-apple-fastvlm-7b-int4)                                                                   | `not assessed`    | none                                                                                              |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`    | none                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `not assessed`    | none                                                                                              |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `not assessed`    | none                                                                                              |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`    | none                                                                                              |
-| [`mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-mlx-community-mistral-small-32-24b-instruct-2506-4bit)  | `not assessed`    | none                                                                                              |
-| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`    | none                                                                                              |
+| Model                                                                                                                     | Mechanical checks | Observations                                                                                  |
+|---------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`  | cut off at token limit                                                                        |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`  | repeated text; cut off at token limit                                                         |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`  | stopped early: repeating; duplicate keywords                                                  |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`  | labelled fields not detected                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`  | labelled fields not detected                                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`  | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`  | labelled fields not detected                                                                  |
+| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`  | labelled fields not detected                                                                  |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`    | none                                                                                          |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`    | none                                                                                          |
+| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`    | none                                                                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -127,11 +123,12 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | Title: Solitary Swan on Calm River Waters with Moored Boats and Riverside Buildings. \| Description: A solitary white swan glides gracefully across the calm river wate... \| Keywords (20): swan, river, boats, moored, residential buildings, foliage, calm waters, leisure, cruisers, riverside, ...                                                                               |
 | [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | Title: Swan on Canal with Moored Boats \| Description: A white swan glides on a tranquil canal, surrounded by moored boats and riverside buildings, with lush greenery... \| Keywords (19): Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Reflection, Motorboat, Pier, ...                                                                               |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | Title: Swan on Calm River \| Description: A white swan glides on tranquil river waters near a marina with moored boats and residential buildings, captured at dusk. \| Keywords (15): swan, river, marina, boats, residential buildings, foliage, trees, water reflection, architecture, motorboat, ...                                                                               |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | Title: Swan gliding on river near moored boats and houses \| Description: A white swan swims gracefully on calm river waters framed by lush greenery, with leisure boats... \| Keywords (14): swan, river, boats, houses, greenery, water, reflection, leisure, architecture, waterfront, waterway, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | Title: Swan gliding past moored boats on tranquil riverbank \| Description: A white swan swims gracefully on calm river waters, framed by lush greenery, with leisur... \| Keywords (14): swan, river, boats, marina, greenery, water, reflection, architecture, leisure, waterfront, aquatic bird, ...                                                                               |
 | [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | Title: Swan Glides on Calm River Near Moored Boats \| Description: A white swan swims peacefully in a tranquil waterway, framed by greenery and moored leisure bo... \| Keywords (16): swan, river, waterway, mooring, motorboat, boats, greenery, trees, vegetation, waterfront, water reflection, ...                                                                               |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | Title: **Swan Gliding Past Moored Boats on a Serene River** \| Description: A solitary white swan swims calmly on a tranquil river, surrounded by reflections of... \| Keywords (16): swan, river, moored boats, marina, residential waterfront, greenery, calm water, reflections, leisure boats, ...                                                                                |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | Title: *Elegant Swan Glides Past Moored Boats on Serene River* \| Description: A solitary white swan gracefully swims across calm river waters on **September 12, 2026,... \| Keywords (20): swan, river, leisure boats, moored boats, riverside residential buildings, greenery, golden sunlight, ...                                                                                |
 | [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | Title: Swans by Riverside Marina \| Description: A white swan swims serenely in calm waters at dusk near a marina moored with leisure boats, framed by lush greenery... \| Keywords (17): swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, residential architecture, ...                                                                                |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `no concerns detected` | Title: Mute Swan on River with Moored Boats \| Description: Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar I... \| Keywords (2): mute swan, river                                                                               |
 | [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | Title: Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery. In the background, leisure boa... \| Keywords (13): Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, Architecture, Leisure Boats, Foliage, ...                                                                               |
 | [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | Title: White Swan Glides Past Moored Boats On Calm River \| Description: A solitary white swan glades across a calm river in the foreground, its reflection ripplin... \| Keywords (19): white swan, river, moored boats, motorboats, cruisers, marina, pontoon, water reflection, swan, waterfowl, ...                                                                               |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | Title: Serene Swan on the River \| Description: A white swan is seen swimming peacefully on a calm river, with boats and houses in the background, captured on S... \| Keywords (18): swan, river, calm, boats, houses, foliage, waterfront, mooring, leisure, tranquility, architecture, waterway, ...                                                                               |
@@ -145,6 +142,7 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `no concerns detected` | Title: Swan on River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers mo... \| Keywords (20): Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, ...                                                                               |
 | [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | Title: Swan glides past moored boats on a calm river \| Description: A solitary white swan swims across calm river waters, framed by lush foreground foliage and... \| Keywords (18): Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, canal, bird, swimming, trees, ...                                                                               |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | Title: Swan Gliding on Calm River with Moored Boats \| Description: A serene scene captures a solitary white swan gracefully swimming across calm river waters, frame... \| Keywords (23): Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Waterway, Motorboat, Pier, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | Title: Solitary Swan Glides on Tranquil River \| Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river,... \| Keywords (12): Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, ...                                                                               |
 | [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `no concerns detected` | Title: Swan on River Cam, Cambridge – September 2026 \| Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September... \| Keywords (18): Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, ...                                                                                |
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | Title: White Swan Gliding on a River Near Moored Boats \| Description: A solitary white swan glides across a calm river surface reflecting leisure boats and residential... \| Keywords (19): Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, Residential, Waterway, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | Title: White swan swimming on calm river with moored boats \| Description: A solitary white swan glides across calm river waters near a wooden pier, with several... \| Keywords (15): white swan, river, motorboat, waterfowl, waterfront, greenery, reflection, residential building, boat, pier, ...                                                                               |
@@ -152,37 +150,33 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | Title: Swan glides on calm water beneath residential buildings \| Description: A solitary white swan gracefully floats on the calm river water, framed by dense greenery... \| Keywords (16): swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, architecture, moored, peaceful, ...                                                                               |
 | [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | Title: "Swan on the Canal" \| Description: A white swan glides gracefully across a calm river, framed by lush foliage and moored boats, with a serene residential backdrop. \| Keywords (10): swan, canal, water, foliage, boats, mooring, residential, reflection, serene, waterway                                                                                                  |
 | [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `no concerns detected` | Title: Swan in River with Moored Boats \| Description: A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats... \| Keywords (18): Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, ...                                                                                |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `concerns detected`    | Title: Swans glide across calm river waters in a serene canal setting. \| Description: A solitary white swan glides gracefully across calm river waters framed by lu... \| Keywords (24): Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, reflection, waterfowl, ...                                                                               |
 | [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | Title: Serene River Scene with White Swan and Moored Boats \| Description: A tranquil riverside view features a solitary white swan gliding across calm water, surro... \| Keywords (42): swan, river, boats, mooring, canal, greenery, trees, vegetation, water reflection, waterfowl, waterfront, ...                                                                               |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `concerns detected`    | Title: (not detected) \| Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river, framed by lush greenery... \| Keywords (12): Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, ...                                                                               |
 | [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | Title: White Swan Gliding on River Near Moored Boats \| Description: A solitary white swan glides across calm river waters, with leisure boats and cruisers moored al... \| Keywords (16): swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pier, waterfront, waterway, greenery, ...                                                                               |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | Title: Swans glide across calm river waters in a serene canal setting. \| Description: A solitary white swan glides gracefully across calm river waters framed by l... \| Keywords (63): Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, architecture, waterway, ...                                                                               |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | Title: Swan on canal with moored boats at marina \| Description: A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E. \| Keywords (3): Swans, Canal, Motorboat[3,708 characters of reasoning omitted; complete output in the evidence block]         |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): We need title 5-10 words. Concrete. Maybe "Mute Swan on River with Moored Boats and Apartments". Count words. Mute(1) Swan(2) on(3) River(4) with(5) Moored(6) Boats(7) and(8) Apartments(9). Good 9 words.                                                                                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds with a solitary white swan gliding effortlessly across the... \| Keywords (48): riverside residential area, leisure boats, calm waters, serene atmosphere, lush foliage, white swan, riverside, ...                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds on September 12, 2026, at 17:41:02 UTC+01:00, near 52.393850°N, 0.27... \| Keywords (120): River, White Swan, Lush Greenery, Moored Boats, Riversid Residential Buildings, Tranquil Atmosphere, ...                                                                               |
 | [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | Title: Solitary swan on a calm river with moored boats \| Description: A white swan glides across the calm waters of a river, framed by green foliage in the foregrou... \| Keywords (57): swan, river, boats, mooring, motorboat, residential, building, balcony, trees, foliage, greenery, water, ...                                                                               |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | A solitary white swan gliding across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.                                                                                                                                                                                                    |
 | [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | A serene scene unfolds on a calm river, where a graceful swan glides across the water. Several boats, including motorboats and sailboats, are moored along the riverbank, nestled beneath a row of residential buildings. Lush greenery frames the scene, with trees and bushes linin...                                                                                              |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a...                                                                                          |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | "Amidst the Riverbank, a solitary white swan glides gracefully across calm waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background. The serene setting is complemented by the presence of greenery, archit...                                                                                              |
 | [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | - title, description, keywords                                                                                                                                                                                                                                                                                                                                                        |
-| [`apple/FastVLM-7B-int4`](#model-apple-fastvlm-7b-int4)                                                                   | `not assessed`         | Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'                                                                                                                                                                                                                                                                                            |
 | [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'                                                                                                                                                                                                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `not assessed`         | Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.                                                                                                                                                                                                                       |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `not assessed`         | Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.                                                                                                                                                                                                                       |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | Model loading failed: Received 904 parameters not in model:<br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.layers.0.input_layernorm.weight,<br>model.layers.0.mlp.down_proj.biases,<br>model.layers.0.mlp.down_proj.scales,<br>model.layers.0.mlp.down...                                                                         |
-| [`mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-mlx-community-mistral-small-32-24b-instruct-2506-4bit)  | `not assessed`         | Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate str (not "list") to str                                                                                                                                                                                                                                                        |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]                                                                                                                                                                                                                                              |
 | [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | Model loading failed: Received 729 parameters not in model:<br>backbone.embeddings.biases,<br>backbone.embeddings.scales,<br>backbone.embeddings.weight,<br>backbone.layers.0.mixer.A_log,<br>backbone.layers.0.mixer.D,<br>backbone.layers.0.mixer.conv1d.bias,<br>backbone.layers.0.mixer.conv1d.weight,...                                                                         |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.0`
+- `mlx-vlm`: `0.7.1`
 - `mlx`: `0.32.3.dev20260912+229f5b430`
 - `transformers`: `5.17.0`
 - `tokenizers`: `0.23.2`
-- `huggingface-hub`: `1.31.0`
+- `huggingface-hub`: `1.32.0`
 - *Python Version:* 3.14.7
-- *OS:* Darwin 25.6.0
-- *macOS Version:* 26.6.2
+- *OS:* Darwin 27.0.0
+- *macOS Version:* 27.0
 - *GPU/Chip:* Apple M5 Max
 - *MLX Device:* Apple M5 Max
 - *GPU Architecture:* applegpu_g17s
@@ -263,22 +257,22 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.29s
-- *Generation time:* 8.66s
-- *Total time:* 11.48s
-- *Prompt preparation time:* 0.521
-- *First-token latency:* 2.97
-- *Cleanup time:* 0.116
+- *Model load time:* 2.41s
+- *Generation time:* 9.49s
+- *Total time:* 12.43s
+- *Prompt preparation time:* 0.531
+- *First-token latency:* 3.93
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 2,393
 - *Generation tokens:* 151
 - *Total tokens:* 2,544
-- *Prompt throughput (raw):* 805 tok/s
-- *Generation throughput (raw):* 29.5 tok/s
+- *Prompt throughput (raw):* 609 tok/s
+- *Generation throughput (raw):* 30.4 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000394
+- *Post-cleanup active memory (GB):* 0.000412
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -323,22 +317,22 @@ Swan, river, boats, mooring, residential buildings, greenery, water reflection, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.61s
-- *Generation time:* 14.01s
-- *Total time:* 16.26s
-- *Prompt preparation time:* 0.635
-- *First-token latency:* 0.747
-- *Cleanup time:* 0.117
+- *Model load time:* 1.77s
+- *Generation time:* 14.64s
+- *Total time:* 17.04s
+- *Prompt preparation time:* 0.639
+- *First-token latency:* 1.91
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 1,634
 - *Generation tokens:* 997
 - *Total tokens:* 2,631
-- *Prompt throughput (raw):* 2,188 tok/s
-- *Generation throughput (raw):* 78.8 tok/s
+- *Prompt throughput (raw):* 855 tok/s
+- *Generation throughput (raw):* 82.2 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.18
 - *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000607
+- *Post-cleanup active memory (GB):* 0.000625
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -410,22 +404,22 @@ Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.49s
-- *Generation time:* 7.57s
-- *Total time:* 9.62s
-- *Prompt preparation time:* 0.564
-- *First-token latency:* 5.18
-- *Cleanup time:* 0.0976
+- *Model load time:* 1.54s
+- *Generation time:* 8.39s
+- *Total time:* 10.48s
+- *Prompt preparation time:* 0.537
+- *First-token latency:* 6.05
+- *Cleanup time:* 0.0944
 - *Prompt tokens:* 6,450
 - *Generation tokens:* 140
 - *Total tokens:* 6,590
-- *Prompt throughput (raw):* 1,244 tok/s
-- *Generation throughput (raw):* 74.9 tok/s
+- *Prompt throughput (raw):* 1,067 tok/s
+- *Generation throughput (raw):* 75.8 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.000919
+- *Post-cleanup active memory (GB):* 0.000936
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -466,22 +460,22 @@ Keywords: Swan, River, Marina, Leisure boats, Residential buildings, Calm waters
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.22s
-- *Generation time:* 15.07s
-- *Total time:* 21.87s
-- *Prompt preparation time:* 0.573
-- *First-token latency:* 11.6
-- *Cleanup time:* 0.276
+- *Model load time:* 11.09s
+- *Generation time:* 21.49s
+- *Total time:* 33.23s
+- *Prompt preparation time:* 0.645
+- *First-token latency:* 17.2
+- *Cleanup time:* 0.306
 - *Prompt tokens:* 6,450
 - *Generation tokens:* 103
 - *Total tokens:* 6,553
-- *Prompt throughput (raw):* 558 tok/s
-- *Generation throughput (raw):* 41.1 tok/s
+- *Prompt throughput (raw):* 374 tok/s
+- *Generation throughput (raw):* 41.2 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00123
+- *Post-cleanup active memory (GB):* 0.00125
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -522,22 +516,22 @@ Keywords: swan, river, water, foliage, boats, cruisers, residential buildings, m
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.12s
-- *Generation time:* 6.14s
-- *Total time:* 9.01s
-- *Prompt preparation time:* 0.746
-- *First-token latency:* 1.15
-- *Cleanup time:* 0.113
+- *Model load time:* 2.11s
+- *Generation time:* 6.61s
+- *Total time:* 9.45s
+- *Prompt preparation time:* 0.721
+- *First-token latency:* 1.99
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 2,612
 - *Generation tokens:* 138
 - *Total tokens:* 2,750
-- *Prompt throughput (raw):* 2,272 tok/s
-- *Generation throughput (raw):* 32.3 tok/s
+- *Prompt throughput (raw):* 1,312 tok/s
+- *Generation throughput (raw):* 35.2 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
 - *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.00149
+- *Post-cleanup active memory (GB):* 0.00151
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -580,22 +574,22 @@ Keywords: swan, river, boats, moored, residential buildings, foliage, calm water
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.14s
-- *Generation time:* 4.59s
-- *Total time:* 6.41s
-- *Prompt preparation time:* 0.668
-- *First-token latency:* 1.66
-- *Cleanup time:* 0.118
+- *Model load time:* 1.17s
+- *Generation time:* 6.21s
+- *Total time:* 8.03s
+- *Prompt preparation time:* 0.644
+- *First-token latency:* 3.25
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 2,113
 - *Generation tokens:* 126
 - *Total tokens:* 2,239
-- *Prompt throughput (raw):* 1,270 tok/s
-- *Generation throughput (raw):* 55.4 tok/s
+- *Prompt throughput (raw):* 649 tok/s
+- *Generation throughput (raw):* 54.1 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.0018
+- *Post-cleanup active memory (GB):* 0.00182
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -640,22 +634,22 @@ Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Refle
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.64s
-- *Generation time:* 4.05s
-- *Total time:* 6.39s
-- *Prompt preparation time:* 0.694
-- *First-token latency:* 0.945
-- *Cleanup time:* 0.121
+- *Model load time:* 1.66s
+- *Generation time:* 3.84s
+- *Total time:* 6.17s
+- *Prompt preparation time:* 0.661
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.098
 - *Prompt tokens:* 2,113
 - *Generation tokens:* 77
 - *Total tokens:* 2,190
-- *Prompt throughput (raw):* 2,237 tok/s
-- *Generation throughput (raw):* 31.4 tok/s
+- *Prompt throughput (raw):* 1,937 tok/s
+- *Generation throughput (raw):* 36.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00211
+- *Post-cleanup active memory (GB):* 0.00213
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -707,22 +701,22 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.20s
-- *Generation time:* 1.38s
-- *Total time:* 3.15s
-- *Prompt preparation time:* 0.566
-- *First-token latency:* 0.445
-- *Cleanup time:* 0.0894
+- *Model load time:* 2.03s
+- *Generation time:* 2.43s
+- *Total time:* 5.24s
+- *Prompt preparation time:* 0.78
+- *First-token latency:* 1.17
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 2,103
-- *Generation tokens:* 80
-- *Total tokens:* 2,183
-- *Prompt throughput (raw):* 4,727 tok/s
-- *Generation throughput (raw):* 206 tok/s
+- *Generation tokens:* 81
+- *Total tokens:* 2,184
+- *Prompt throughput (raw):* 1,805 tok/s
+- *Generation throughput (raw):* 182 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.08
+- *Cache memory (GB):* 0.07
 - *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00303
+- *Post-cleanup active memory (GB):* 0.00305
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -740,9 +734,9 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan gliding on river near moored boats and houses
-Description: A white swan swims gracefully on calm river waters framed by lush greenery, with leisure boats and residential buildings in the background.
-Keywords: swan, river, boats, houses, greenery, water, reflection, leisure, architecture, waterfront, waterway, aquatic bird, trees, vegetation
+Title: Swan gliding past moored boats on tranquil riverbank
+Description: A white swan swims gracefully on calm river waters, framed by lush greenery, with leisure boats and residential buildings in the background.
+Keywords: swan, river, boats, marina, greenery, water, reflection, architecture, leisure, waterfront, aquatic bird, trees, vegetation, canal
 </pre>
 
 </details>
@@ -763,22 +757,22 @@ Keywords: swan, river, boats, houses, greenery, water, reflection, leisure, arch
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.16s
-- *Generation time:* 1.71s
-- *Total time:* 3.40s
-- *Prompt preparation time:* 0.526
-- *First-token latency:* 0.244
-- *Cleanup time:* 0.101
+- *Model load time:* 1.05s
+- *Generation time:* 2.30s
+- *Total time:* 3.87s
+- *Prompt preparation time:* 0.51
+- *First-token latency:* 0.809
+- *Cleanup time:* 0.0986
 - *Prompt tokens:* 391
 - *Generation tokens:* 101
 - *Total tokens:* 492
-- *Prompt throughput (raw):* 1,599 tok/s
-- *Generation throughput (raw):* 104 tok/s
+- *Prompt throughput (raw):* 483 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.00334
+- *Post-cleanup active memory (GB):* 0.00441
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -821,22 +815,22 @@ Keywords: swan, river, waterway, mooring, motorboat, boats, greenery, trees, veg
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.65s
-- *Generation time:* 4.36s
-- *Total time:* 6.58s
-- *Prompt preparation time:* 0.565
-- *First-token latency:* 2.15
-- *Cleanup time:* 0.112
+- *Model load time:* 1.56s
+- *Generation time:* 4.41s
+- *Total time:* 6.52s
+- *Prompt preparation time:* 0.539
+- *First-token latency:* 2.21
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 2,926
 - *Generation tokens:* 109
 - *Total tokens:* 3,035
-- *Prompt throughput (raw):* 1,362 tok/s
-- *Generation throughput (raw):* 64.7 tok/s
+- *Prompt throughput (raw):* 1,327 tok/s
+- *Generation throughput (raw):* 64.3 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.56
-- *Model-load active memory (GB):* 8
-- *Post-cleanup active memory (GB):* 0.00361
+- *Model-load active memory (GB):* 8.01
+- *Post-cleanup active memory (GB):* 0.00467
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -881,22 +875,22 @@ swan, river, moored boats, marina, residential waterfront, greenery, calm water,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.60s
-- *Generation time:* 6.35s
-- *Total time:* 8.50s
-- *Prompt preparation time:* 0.547
-- *First-token latency:* 2.3
-- *Cleanup time:* 0.144
+- *Model load time:* 1.65s
+- *Generation time:* 5.88s
+- *Total time:* 8.08s
+- *Prompt preparation time:* 0.539
+- *First-token latency:* 2.26
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 2,926
 - *Generation tokens:* 187
 - *Total tokens:* 3,113
-- *Prompt throughput (raw):* 1,269 tok/s
-- *Generation throughput (raw):* 53.2 tok/s
+- *Prompt throughput (raw):* 1,296 tok/s
+- *Generation throughput (raw):* 60.2 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.4
 - *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.43
-- *Post-cleanup active memory (GB):* 0.00387
+- *Post-cleanup active memory (GB):* 0.00493
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -941,22 +935,22 @@ swan, river, leisure boats, moored boats, riverside residential buildings, green
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.18s
-- *Generation time:* 2.17s
-- *Total time:* 3.90s
-- *Prompt preparation time:* 0.551
-- *First-token latency:* 1.08
-- *Cleanup time:* 0.0924
+- *Model load time:* 1.17s
+- *Generation time:* 2.20s
+- *Total time:* 3.91s
+- *Prompt preparation time:* 0.539
+- *First-token latency:* 1.11
+- *Cleanup time:* 0.084
 - *Prompt tokens:* 2,925
 - *Generation tokens:* 102
 - *Total tokens:* 3,027
-- *Prompt throughput (raw):* 2,721 tok/s
-- *Generation throughput (raw):* 181 tok/s
+- *Prompt throughput (raw):* 2,628 tok/s
+- *Generation throughput (raw):* 179 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00413
+- *Post-cleanup active memory (GB):* 0.0052
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -987,6 +981,62 @@ swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, r
 
 ---
 
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 3.80s
+- *Generation time:* 54.12s
+- *Total time:* 58.62s
+- *Prompt preparation time:* 0.694
+- *First-token latency:* 11.1
+- *Cleanup time:* 0.163
+- *Prompt tokens:* 4,403
+- *Generation tokens:* 1,000
+- *Total tokens:* 5,403
+- *Prompt throughput (raw):* 396 tok/s
+- *Generation throughput (raw):* 23.6 tok/s
+- *Peak memory (GB):* 25
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 23.9
+- *Post-cleanup active memory (GB):* 0.00592
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1570
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/b4a74fa6001f1eca3b23eeeb702ffad2773a218f
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Mute Swan on River with Moored Boats
+Description:
+Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar II’ and ‘Magna Carta’ with red and blue covers at a wooden pier beneath a brown-brick apartment block with balconies, framed by overhanging tree branches and foreground foliage in soft daylight.
+Keywords: mute swan, river
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
 
 ### mlx-community/North-Micro-Vision-Instruct-4bit
@@ -1001,22 +1051,22 @@ swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, r
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.98s
-- *Generation time:* 3.25s
-- *Total time:* 5.00s
-- *Prompt preparation time:* 0.77
-- *First-token latency:* 2.01
-- *Cleanup time:* 0.0991
+- *Model load time:* 0.99s
+- *Generation time:* 3.34s
+- *Total time:* 5.13s
+- *Prompt preparation time:* 0.788
+- *First-token latency:* 2.08
+- *Cleanup time:* 0.0979
 - *Prompt tokens:* 4,083
 - *Generation tokens:* 84
 - *Total tokens:* 4,167
-- *Prompt throughput (raw):* 2,036 tok/s
-- *Generation throughput (raw):* 166 tok/s
+- *Prompt throughput (raw):* 1,959 tok/s
+- *Generation throughput (raw):* 159 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00538
+- *Post-cleanup active memory (GB):* 0.00644
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1058,22 +1108,22 @@ Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.61s
-- *Generation time:* 3.30s
-- *Total time:* 6.58s
-- *Prompt preparation time:* 0.661
-- *First-token latency:* 0.65
-- *Cleanup time:* 0.135
+- *Model load time:* 3.24s
+- *Generation time:* 4.23s
+- *Total time:* 8.16s
+- *Prompt preparation time:* 0.674
+- *First-token latency:* 1.54
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 1,289
 - *Generation tokens:* 155
 - *Total tokens:* 1,444
-- *Prompt throughput (raw):* 1,983 tok/s
-- *Generation throughput (raw):* 75.7 tok/s
+- *Prompt throughput (raw):* 838 tok/s
+- *Generation throughput (raw):* 74.4 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.00588
+- *Post-cleanup active memory (GB):* 0.00695
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1116,21 +1166,21 @@ Keywords: white swan, river, moored boats, motorboats, cruisers, marina, pontoon
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Model load time:* 0.94s
-- *Generation time:* 2.74s
-- *Total time:* 4.20s
-- *Prompt preparation time:* 0.508
-- *First-token latency:* 0.302
-- *Cleanup time:* 0.0863
+- *Generation time:* 3.05s
+- *Total time:* 4.50s
+- *Prompt preparation time:* 0.504
+- *First-token latency:* 0.642
+- *Cleanup time:* 0.0829
 - *Prompt tokens:* 1,133
 - *Generation tokens:* 107
 - *Total tokens:* 1,240
-- *Prompt throughput (raw):* 3,746 tok/s
-- *Generation throughput (raw):* 55.0 tok/s
+- *Prompt throughput (raw):* 1,764 tok/s
+- *Generation throughput (raw):* 55.9 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00595
+- *Post-cleanup active memory (GB):* 0.00702
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1173,22 +1223,22 @@ Keywords: swan, river, calm, boats, houses, foliage, waterfront, mooring, leisur
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.80s
-- *Generation time:* 44.17s
-- *Total time:* 45.84s
-- *Prompt preparation time:* 0.875
-- *First-token latency:* 42
-- *Cleanup time:* 0.105
+- *Model load time:* 0.95s
+- *Generation time:* 41.62s
+- *Total time:* 43.44s
+- *Prompt preparation time:* 0.867
+- *First-token latency:* 39.5
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 16,558
 - *Generation tokens:* 117
 - *Total tokens:* 16,675
-- *Prompt throughput (raw):* 394 tok/s
-- *Generation throughput (raw):* 90.6 tok/s
+- *Prompt throughput (raw):* 419 tok/s
+- *Generation throughput (raw):* 89.1 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 4.7
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00626
+- *Post-cleanup active memory (GB):* 0.00733
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1230,22 +1280,22 @@ Keywords: swan, river, calm water, lush foliage, leisure boats, cruisers, rivers
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.78s
-- *Generation time:* 27.89s
-- *Total time:* 29.64s
-- *Prompt preparation time:* 0.962
-- *First-token latency:* 16.4
-- *Cleanup time:* 0.153
+- *Model load time:* 0.88s
+- *Generation time:* 27.62s
+- *Total time:* 29.50s
+- *Prompt preparation time:* 0.992
+- *First-token latency:* 16.1
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 16,549
 - *Generation tokens:* 912
 - *Total tokens:* 17,461
-- *Prompt throughput (raw):* 1,009 tok/s
-- *Generation throughput (raw):* 85.9 tok/s
+- *Prompt throughput (raw):* 1,025 tok/s
+- *Generation throughput (raw):* 86.1 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
 - *Model-load active memory (GB):* 4.26
-- *Post-cleanup active memory (GB):* 0.00657
+- *Post-cleanup active memory (GB):* 0.00764
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1355,22 +1405,22 @@ Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.98s
-- *Generation time:* 73.76s
-- *Total time:* 76.75s
-- *Prompt preparation time:* 0.997
-- *First-token latency:* 63.3
-- *Cleanup time:* 0.154
+- *Model load time:* 2.01s
+- *Generation time:* 72.00s
+- *Total time:* 74.99s
+- *Prompt preparation time:* 0.979
+- *First-token latency:* 62
+- *Cleanup time:* 0.143
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 177
 - *Total tokens:* 16,724
-- *Prompt throughput (raw):* 261 tok/s
-- *Generation throughput (raw):* 18.6 tok/s
+- *Prompt throughput (raw):* 267 tok/s
+- *Generation throughput (raw):* 19.5 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
 - *Model-load active memory (GB):* 19.6
-- *Post-cleanup active memory (GB):* 0.00719
+- *Post-cleanup active memory (GB):* 0.00826
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1414,21 +1464,21 @@ Keywords: swan, river, moored boats, leisure craft, residential buildings, green
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.92s
-- *Generation time:* 41.08s
-- *Total time:* 42.99s
-- *Prompt preparation time:* 0.982
-- *First-token latency:* 38.9
-- *Cleanup time:* 0.108
+- *Generation time:* 39.13s
+- *Total time:* 41.03s
+- *Prompt preparation time:* 0.969
+- *First-token latency:* 36.9
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 93
 - *Total tokens:* 16,640
-- *Prompt throughput (raw):* 426 tok/s
-- *Generation throughput (raw):* 70.5 tok/s
+- *Prompt throughput (raw):* 448 tok/s
+- *Generation throughput (raw):* 69.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00751
+- *Post-cleanup active memory (GB):* 0.00857
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1471,22 +1521,22 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, water reflection,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.73s
-- *Generation time:* 35.21s
-- *Total time:* 38.97s
+- *Model load time:* 2.80s
+- *Generation time:* 34.38s
+- *Total time:* 38.20s
 - *Prompt preparation time:* 1.01
-- *First-token latency:* 33
-- *Cleanup time:* 0.141
+- *First-token latency:* 32.2
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 16,563
 - *Generation tokens:* 97
 - *Total tokens:* 16,660
-- *Prompt throughput (raw):* 502 tok/s
-- *Generation throughput (raw):* 72.5 tok/s
+- *Prompt throughput (raw):* 515 tok/s
+- *Generation throughput (raw):* 73.6 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.89
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00801
+- *Post-cleanup active memory (GB):* 0.00908
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1529,21 +1579,21 @@ Keywords: swan, river, moored boats, riverbank, vegetation, water reflection, cr
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
 - *Model load time:* 1.63s
-- *Generation time:* 37.53s
-- *Total time:* 40.15s
-- *Prompt preparation time:* 0.971
-- *First-token latency:* 35.7
-- *Cleanup time:* 0.131
+- *Generation time:* 35.40s
+- *Total time:* 38.00s
+- *Prompt preparation time:* 0.969
+- *First-token latency:* 33.5
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 16,563
 - *Generation tokens:* 86
 - *Total tokens:* 16,649
-- *Prompt throughput (raw):* 464 tok/s
-- *Generation throughput (raw):* 89.0 tok/s
+- *Prompt throughput (raw):* 494 tok/s
+- *Generation throughput (raw):* 89.6 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.96
-- *Post-cleanup active memory (GB):* 0.00854
+- *Post-cleanup active memory (GB):* 0.0096
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1585,22 +1635,22 @@ Keywords: swan, river, boats, mooring, residential buildings, water reflection, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.10s
-- *Generation time:* 58.99s
-- *Total time:* 62.11s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 53.6
-- *Cleanup time:* 0.177
+- *Model load time:* 2.67s
+- *Generation time:* 61.74s
+- *Total time:* 65.42s
+- *Prompt preparation time:* 0.992
+- *First-token latency:* 56.2
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 16,563
 - *Generation tokens:* 124
 - *Total tokens:* 16,687
-- *Prompt throughput (raw):* 309 tok/s
-- *Generation throughput (raw):* 27.5 tok/s
+- *Prompt throughput (raw):* 295 tok/s
+- *Generation throughput (raw):* 26.8 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.00905
+- *Post-cleanup active memory (GB):* 0.0101
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1645,22 +1695,22 @@ Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential bui
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.66s
-- *Generation time:* 1.89s
-- *Total time:* 3.32s
-- *Prompt preparation time:* 0.768
-- *First-token latency:* 0.377
-- *Cleanup time:* 0.0892
+- *Model load time:* 0.71s
+- *Generation time:* 2.09s
+- *Total time:* 3.55s
+- *Prompt preparation time:* 0.752
+- *First-token latency:* 0.6
+- *Cleanup time:* 0.088
 - *Prompt tokens:* 1,426
 - *Generation tokens:* 98
 - *Total tokens:* 1,524
-- *Prompt throughput (raw):* 3,782 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 2,377 tok/s
+- *Generation throughput (raw):* 129 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.00927
+- *Post-cleanup active memory (GB):* 0.0103
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1701,22 +1751,22 @@ Keywords: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 13.66s
-- *Generation time:* 26.18s
-- *Total time:* 40.68s
-- *Prompt preparation time:* 0.843
-- *First-token latency:* 21.9
-- *Cleanup time:* 0.366
+- *Model load time:* 15.41s
+- *Generation time:* 27.56s
+- *Total time:* 43.93s
+- *Prompt preparation time:* 0.96
+- *First-token latency:* 23
+- *Cleanup time:* 0.316
 - *Prompt tokens:* 3,491
 - *Generation tokens:* 121
 - *Total tokens:* 3,612
-- *Prompt throughput (raw):* 159 tok/s
-- *Generation throughput (raw):* 47.3 tok/s
+- *Prompt throughput (raw):* 152 tok/s
+- *Generation throughput (raw):* 47.8 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.00954
+- *Post-cleanup active memory (GB):* 0.0106
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1759,22 +1809,22 @@ Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.19s
-- *Generation time:* 16.76s
-- *Total time:* 18.87s
-- *Prompt preparation time:* 0.925
-- *First-token latency:* 13.6
-- *Cleanup time:* 0.103
+- *Model load time:* 1.24s
+- *Generation time:* 16.83s
+- *Total time:* 19.44s
+- *Prompt preparation time:* 1.38
+- *First-token latency:* 13.4
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 16,558
 - *Generation tokens:* 136
 - *Total tokens:* 16,694
-- *Prompt throughput (raw):* 1,219 tok/s
-- *Generation throughput (raw):* 58.1 tok/s
+- *Prompt throughput (raw):* 1,235 tok/s
+- *Generation throughput (raw):* 56.8 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.00985
+- *Post-cleanup active memory (GB):* 0.0109
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1821,6 +1871,62 @@ Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Wa
 
 ---
 
+<a id="model-mlx-community-aya-vision-8b-4bit"></a>
+
+### mlx-community/aya-vision-8b-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/aya-vision-8b-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
+- *Model load time:* 1.17s
+- *Generation time:* 2.70s
+- *Total time:* 4.94s
+- *Prompt preparation time:* 1.06
+- *First-token latency:* 0.842
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 2,090
+- *Generation tokens:* 96
+- *Total tokens:* 2,186
+- *Prompt throughput (raw):* 2,483 tok/s
+- *Generation throughput (raw):* 101 tok/s
+- *Peak memory (GB):* 6.5
+- *Active memory (GB):* 5.5
+- *Cache memory (GB):* 0.35
+- *Model-load active memory (GB):* 5.46
+- *Post-cleanup active memory (GB):* 0.0114
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 4270
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
+- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 3e679b3e08f04d741c8965ebf0cb258295e8acf7
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--aya-vision-8b-4bit/snapshots/3e679b3e08f04d741c8965ebf0cb258295e8acf7
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|END_OF_TURN_TOKEN\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Solitary Swan Glides on Tranquil River
+Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river, framed by lush greenery. Leisure boats and cruisers are moored alongside riverside residential buildings, creating a picturesque setting under the soft lighting of the late afternoon.
+Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, Waterway
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### mlx-community/gemma-3-27b-it-qat-4bit
@@ -1835,22 +1941,22 @@ Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Wa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.36s
-- *Generation time:* 6.43s
-- *Total time:* 9.38s
-- *Prompt preparation time:* 0.57
-- *First-token latency:* 0.93
-- *Cleanup time:* 0.137
+- *Model load time:* 2.54s
+- *Generation time:* 6.75s
+- *Total time:* 10.01s
+- *Prompt preparation time:* 0.697
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.143
 - *Prompt tokens:* 590
 - *Generation tokens:* 152
 - *Total tokens:* 742
-- *Prompt throughput (raw):* 635 tok/s
-- *Generation throughput (raw):* 30.7 tok/s
+- *Prompt throughput (raw):* 542 tok/s
+- *Generation throughput (raw):* 30.2 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.44
 - *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0109
+- *Post-cleanup active memory (GB):* 0.012
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1891,22 +1997,22 @@ Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverban
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.88s
-- *Generation time:* 2.79s
-- *Total time:* 5.33s
-- *Prompt preparation time:* 0.648
-- *First-token latency:* 0.52
-- *Cleanup time:* 0.134
+- *Model load time:* 2.00s
+- *Generation time:* 2.90s
+- *Total time:* 5.67s
+- *Prompt preparation time:* 0.759
+- *First-token latency:* 0.525
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 595
 - *Generation tokens:* 101
 - *Total tokens:* 696
-- *Prompt throughput (raw):* 1,144 tok/s
-- *Generation throughput (raw):* 60.7 tok/s
+- *Prompt throughput (raw):* 1,133 tok/s
+- *Generation throughput (raw):* 59.5 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
-- *Model-load active memory (GB):* 6.75
-- *Post-cleanup active memory (GB):* 0.012
+- *Model-load active memory (GB):* 6.76
+- *Post-cleanup active memory (GB):* 0.013
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1952,22 +2058,22 @@ Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, R
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.47s
-- *Generation time:* 1.92s
-- *Total time:* 5.00s
-- *Prompt preparation time:* 0.6
-- *First-token latency:* 0.412
-- *Cleanup time:* 0.152
+- *Model load time:* 2.67s
+- *Generation time:* 2.08s
+- *Total time:* 5.49s
+- *Prompt preparation time:* 0.742
+- *First-token latency:* 0.506
+- *Cleanup time:* 0.139
 - *Prompt tokens:* 595
 - *Generation tokens:* 96
 - *Total tokens:* 691
-- *Prompt throughput (raw):* 1,443 tok/s
-- *Generation throughput (raw):* 104 tok/s
+- *Prompt throughput (raw):* 1,177 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 15.4
-- *Post-cleanup active memory (GB):* 0.0125
+- *Post-cleanup active memory (GB):* 0.0136
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2008,22 +2114,22 @@ Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflect
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.70s
-- *Generation time:* 5.22s
-- *Total time:* 8.54s
-- *Prompt preparation time:* 0.614
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.176
+- *Model load time:* 2.82s
+- *Generation time:* 5.32s
+- *Total time:* 8.88s
+- *Prompt preparation time:* 0.73
+- *First-token latency:* 1.21
+- *Cleanup time:* 0.162
 - *Prompt tokens:* 595
 - *Generation tokens:* 89
 - *Total tokens:* 684
-- *Prompt throughput (raw):* 508 tok/s
+- *Prompt throughput (raw):* 492 tok/s
 - *Generation throughput (raw):* 25.8 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.79
 - *Model-load active memory (GB):* 18.4
-- *Post-cleanup active memory (GB):* 0.013
+- *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2064,22 +2170,22 @@ Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.70s
-- *Generation time:* 1.36s
-- *Total time:* 3.67s
-- *Prompt preparation time:* 0.604
-- *First-token latency:* 0.187
-- *Cleanup time:* 0.122
+- *Model load time:* 1.93s
+- *Generation time:* 1.70s
+- *Total time:* 4.37s
+- *Prompt preparation time:* 0.731
+- *First-token latency:* 0.421
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 591
 - *Generation tokens:* 73
 - *Total tokens:* 664
-- *Prompt throughput (raw):* 3,161 tok/s
-- *Generation throughput (raw):* 123 tok/s
+- *Prompt throughput (raw):* 1,405 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory (GB):* 5.9
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0136
+- *Post-cleanup active memory (GB):* 0.0146
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2120,22 +2226,22 @@ Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.61s
-- *Generation time:* 1.55s
-- *Total time:* 3.00s
-- *Prompt preparation time:* 0.829
-- *First-token latency:* 0.397
-- *Cleanup time:* 0.103
+- *Model load time:* 0.74s
+- *Generation time:* 2.30s
+- *Total time:* 4.10s
+- *Prompt preparation time:* 1.05
+- *First-token latency:* 1.03
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 1,379
 - *Generation tokens:* 65
 - *Total tokens:* 1,444
-- *Prompt throughput (raw):* 3,475 tok/s
-- *Generation throughput (raw):* 172 tok/s
+- *Prompt throughput (raw):* 1,339 tok/s
+- *Generation throughput (raw):* 168 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0138
+- *Post-cleanup active memory (GB):* 0.0148
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2176,22 +2282,22 @@ Keywords: swan, canal, water, foliage, boats, mooring, residential, reflection, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.86s
-- *Generation time:* 5.20s
-- *Total time:* 7.61s
-- *Prompt preparation time:* 0.553
-- *First-token latency:* 2.01
-- *Cleanup time:* 0.134
+- *Model load time:* 1.95s
+- *Generation time:* 4.99s
+- *Total time:* 7.59s
+- *Prompt preparation time:* 0.639
+- *First-token latency:* 1.77
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 3,116
 - *Generation tokens:* 102
 - *Total tokens:* 3,218
-- *Prompt throughput (raw):* 1,547 tok/s
-- *Generation throughput (raw):* 38.4 tok/s
+- *Prompt throughput (raw):* 1,758 tok/s
+- *Generation throughput (raw):* 38.7 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
 - *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0161
+- *Post-cleanup active memory (GB):* 0.0172
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2222,68 +2328,6 @@ Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Wa
 
 ---
 
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
-
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
-
-<details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: canal, water, architecture, waterway,
-  aquatic bird, waterfront
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.37s
-- *Generation time:* 0.87s
-- *Total time:* 2.08s
-- *Prompt preparation time:* 0.496
-- *First-token latency:* 0.121
-- *Cleanup time:* 0.0739
-- *Prompt tokens:* 2,112
-- *Generation tokens:* 120
-- *Total tokens:* 2,232
-- *Prompt throughput (raw):* 17,442 tok/s
-- *Generation throughput (raw):* 475 tok/s
-- *Peak memory (GB):* 1.9
-- *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.06
-- *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.000132
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1383
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Swans glide across calm river waters in a serene canal setting.
-
-Description:
-A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-
-Keywords:
-Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, reflection, waterfowl, architecture, riverbank, waterway, aquatic bird, canal, mooring, waterfront, waterway, aquatic bird, waterfront, architecture, boat
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-molmo2-8b-4bit"></a>
 
 ### mlx-community/Molmo2-8B-4bit
@@ -2300,21 +2344,21 @@ Swans, canal, water, serene, leisure, boats, water, architecture, greenery, wate
   souvenir booth, london eye souvenir kiosk
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
 - *Model load time:* 1.20s
-- *Generation time:* 4.55s
-- *Total time:* 6.44s
-- *Prompt preparation time:* 0.687
-- *First-token latency:* 0.766
-- *Cleanup time:* 0.106
+- *Generation time:* 6.60s
+- *Total time:* 8.49s
+- *Prompt preparation time:* 0.689
+- *First-token latency:* 2.93
+- *Cleanup time:* 0.0946
 - *Prompt tokens:* 1,524
 - *Generation tokens:* 216
 - *Total tokens:* 1,740
-- *Prompt throughput (raw):* 1,989 tok/s
-- *Generation throughput (raw):* 68.9 tok/s
+- *Prompt throughput (raw):* 521 tok/s
+- *Generation throughput (raw):* 71.5 tok/s
 - *Peak memory (GB):* 8.1
-- *Active memory (GB):* 6.4
+- *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
 - *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00444
+- *Post-cleanup active memory (GB):* 0.00551
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2343,73 +2387,6 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, vegetation, water
 
 ---
 
-<a id="model-mlx-community-aya-vision-8b-4bit"></a>
-
-### mlx-community/aya-vision-8b-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/aya-vision-8b-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.18s
-- *Generation time:* 2.53s
-- *Total time:* 4.58s
-- *Prompt preparation time:* 0.865
-- *First-token latency:* 0.734
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 2,090
-- *Generation tokens:* 96
-- *Total tokens:* 2,186
-- *Prompt throughput (raw):* 2,847 tok/s
-- *Generation throughput (raw):* 102 tok/s
-- *Peak memory (GB):* 6.5
-- *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0104
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4270
-- *Image placeholders:* 1
-- *Processor:* transformers.models.aya_vision.processing_aya_vision.AyaVisionProcessor
-- *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 3e679b3e08f04d741c8965ebf0cb258295e8acf7
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--aya-vision-8b-4bit/snapshots/3e679b3e08f04d741c8965ebf0cb258295e8acf7
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|END_OF_TURN_TOKEN\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|START_RESPONSE|&gt;Title: Solitary Swan Glides on Tranquil River
-Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river, framed by lush greenery. Leisure boats and cruisers are moored alongside riverside residential buildings, creating a picturesque setting under the soft lighting of the late afternoon.
-Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, Waterway&lt;|END_RESPONSE|&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|START_RESPONSE|>Title: Solitary Swan Glides on Tranquil River
-Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river, framed by lush greenery. Leisure boats and cruisers are moored alongside riverside residential buildings, creating a picturesque setting under the soft lighting of the late afternoon.
-Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, Waterway<|END_RESPONSE|>
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
@@ -2424,22 +2401,22 @@ Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: reflection
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.62s
-- *Generation time:* 2.95s
-- *Total time:* 7.22s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 0.331
-- *Cleanup time:* 0.145
+- *Model load time:* 3.50s
+- *Generation time:* 4.61s
+- *Total time:* 8.87s
+- *Prompt preparation time:* 0.749
+- *First-token latency:* 1.59
+- *Cleanup time:* 0.148
 - *Prompt tokens:* 591
 - *Generation tokens:* 80
 - *Total tokens:* 671
-- *Prompt throughput (raw):* 1,785 tok/s
-- *Generation throughput (raw):* 43.6 tok/s
+- *Prompt throughput (raw):* 371 tok/s
+- *Generation throughput (raw):* 37.5 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
 - *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup active memory (GB):* 0.0114
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2466,6 +2443,69 @@ Keywords: swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pie
 
 ---
 
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+
+<details>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: canal, water,
+  architecture, waterway, aquatic bird, waterfront
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.42s
+- *Generation time:* 1.18s
+- *Total time:* 2.41s
+- *Prompt preparation time:* 0.486
+- *First-token latency:* 0.276
+- *Cleanup time:* 0.0702
+- *Prompt tokens:* 2,112
+- *Generation tokens:* 200
+- *Total tokens:* 2,312
+- *Prompt throughput (raw):* 7,665 tok/s
+- *Generation throughput (raw):* 470 tok/s
+- *Peak memory (GB):* 1.9
+- *Active memory (GB):* 0.90
+- *Cache memory (GB):* 0.18
+- *Model-load active memory (GB):* 0.897
+- *Post-cleanup active memory (GB):* 0.00015
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1383
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Swans glide across calm river waters in a serene canal setting.
+
+Description:
+A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
+
+Keywords:
+Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, architecture, waterway, aquatic bird, waterfront, waterfront, waterway, aquatic bird, canal, water, architecture, water, waterway, waterway, water, aquatic bird, waterfront, water, waterway, waterway, water, water, waterway, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
@@ -2480,22 +2520,22 @@ Keywords: swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pie
 - *Maintainer status:* none
 - *Observations:* Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.43s
-- *Generation time:* 19.83s
-- *Total time:* 22.86s
-- *Prompt preparation time:* 0.601
-- *First-token latency:* 0.805
-- *Cleanup time:* 0.132
+- *Model load time:* 2.47s
+- *Generation time:* 20.53s
+- *Total time:* 23.62s
+- *Prompt preparation time:* 0.607
+- *First-token latency:* 3.21
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 1,324
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,324
-- *Prompt throughput (raw):* 1,645 tok/s
-- *Generation throughput (raw):* 54.5 tok/s
+- *Prompt throughput (raw):* 413 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 1.5
+- *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00277
+- *Post-cleanup active memory (GB):* 0.00279
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2548,173 +2588,121 @@ Keywords: Swans, Canal, Motorboat,
 
 ---
 
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-4bit"></a>
 
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+### mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible; Required
-  labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.89s
-- *Generation time:* 56.44s
-- *Total time:* 61.04s
-- *Prompt preparation time:* 0.692
-- *First-token latency:* 8.98
-- *Cleanup time:* 0.235
-- *Prompt tokens:* 4,403
-- *Generation tokens:* 1,000
-- *Total tokens:* 5,403
-- *Prompt throughput (raw):* 490 tok/s
-- *Generation throughput (raw):* 21.4 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.25
-- *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00485
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: riverside, riverside
+  scenery, riverside beauty, riverside charm, riverside tranquility, riverside
+  serenity, riverside calmness, riverside peacefulness
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.75s
+- *Generation time:* 13.56s
+- *Total time:* 15.93s
+- *Prompt preparation time:* 0.609
+- *First-token latency:* 2.48
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 301
+- *Generation tokens:* 275
+- *Total tokens:* 576
+- *Prompt throughput (raw):* 121 tok/s
+- *Generation throughput (raw):* 26.1 tok/s
+- *Peak memory (GB):* 9.2
+- *Active memory (GB):* 6.0
+- *Cache memory (GB):* 0.95
+- *Model-load active memory (GB):* 6.02
+- *Post-cleanup active memory (GB):* 0.00357
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
+- *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1570
-- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Rendered prompt characters:* 1436
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/b4a74fa6001f1eca3b23eeeb702ffad2773a218f
+- *Resolved model revision:* 82f31be9840fa0d4c7e99257fe2e28b59a46df97
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-4bit/snapshots/82f31be9840fa0d4c7e99257fe2e28b59a46df97
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* <\|end_of_text\|>
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
- to=self&lt;|message|&gt;Create British-English catalogue metadata from the image and supplied context.
+Title: Serene River Scene with a Majestic White Swan
 
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+Description: A tranquil river scene unfolds with a solitary white swan gliding effortlessly across the calm waters, surrounded by lush foliage and the serene atmosphere of a riverside residential area, where leisure boats and cruisers are moored, creating a picturesque scene with a sense of peace and harmony.
 
-Context: Authoritative context:
-- Capture date/time: 2026-09-12 17:41:02 UTC+01:00
-- GPS: 52.393850°N, 0.270830°E
-
-Descriptive hints:
-- Description hint: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-- Keyword hints: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:
-
-We need title 5-10 words. Concrete. Maybe "Mute Swan on River with Moored Boats and Apartments". Count words. Mute(1) Swan(2) on(3) River(4) with(5) Moored(6) Boats(7) and(8) Apartments(9). Good 9 words.
-
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time and GPS as authoritative facts but do not claim they are visible. So we can mention captured on 2026-09-12... at GPS...? Maybe include in description? It says combining relevant context with main visible subject, setting, action, lighting, and distinctive details. Context includes capture date/time and GPS. Should we include them in description? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention them as metadata in description? Possibly "Captured on 2026-09-12..." That is factual. Might be okay. Typically catalogue description includes date and location. Could incorporate. Must not claim they are visible. So we can say "Photographed on 12 September 2026 at 17:41 BST at 52.393850°N, 0.270830°E..."
-
-We need factual description. Main visible subject: solitary white swan gliding on calm water. Boats moored: white boat named 'Samar II' with blue stripe, boat 'Magna Carta' with red cover, etc. Riverside residential buildings with brown facade, tiled roof, balconies. Foliage framing. Water reflection. Lighting appears overcast daylight.
-
-Need 1-2 sentences. Let's craft one sentence: A mute swan swims on calm water in the foreground with moored motorboats and cruisers, including 'Samar II' and 'Magna Carta', along a riverbank with riverside apartments behind, framed by trees and foliage. The scene is captured on 2026-09-12 17:41:02 UTC+01:00 at 52.393850°N, 0.270830°E under overcast daylight with reflections on the water.
-
-That's a bit long but okay. Maybe two sentences.
-
-Make sure not claim date visible.
-
-Keywords: 10-18 unique comma-separated keywords. Cover relevant context and visible details. Use British English spelling? Probably fine.
-
-Keywords: mute swan, river, moored boats, motorboat, marina, riverbank, residential building, waterfront, water reflection, foliage, trees, vegetation, pier, mooring, waterfowl, aquatic bird, architecture
-
-Need 10-18. Let's count: mute swan(1), river(2), moored boats(3), motorboat(4), marina(5), riverbank(6), residential building(7), waterfront(8), water reflection(9), foliage(10), trees(11), vegetation(12), pier(13), mooring(14), waterfowl(15), aquatic bird(16), architecture(17). Good.
-
-Maybe include "Samar II", "Magna Carta"? Might be specific. Could include but maybe okay.
-
-Ensure keywords comma-separated.
-
-Return exactly these three sections and nothing else:
-
-Title:
-Description:
-Keywords:
-
-Let's produce.
-
-Potential issues: title 5-10 words. Ensure concrete.
-
-Description should be
+Keywords: riverside residential area, leisure boats, calm waters, serene atmosphere, lush foliage, white swan, riverside, moored boats, peaceful scene, picturesque scene, tranquil scene, riverside scene, riverside life, riverside living, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside
 </pre>
 
-<details>
-<summary>Exact raw output</summary>
-
-```text
- to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
-
-Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
-
-Context: Authoritative context:
-- Capture date/time: 2026-09-12 17:41:02 UTC+01:00
-- GPS: 52.393850°N, 0.270830°E
-
-Descriptive hints:
-- Description hint: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-- Keyword hints: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords covering relevant context and visible details.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:
-
-We need title 5-10 words. Concrete. Maybe "Mute Swan on River with Moored Boats and Apartments". Count words. Mute(1) Swan(2) on(3) River(4) with(5) Moored(6) Boats(7) and(8) Apartments(9). Good 9 words.
-
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Capture date/time and GPS as authoritative facts but do not claim they are visible. So we can mention captured on 2026-09-12... at GPS...? Maybe include in description? It says combining relevant context with main visible subject, setting, action, lighting, and distinctive details. Context includes capture date/time and GPS. Should we include them in description? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention them as metadata in description? Possibly "Captured on 2026-09-12..." That is factual. Might be okay. Typically catalogue description includes date and location. Could incorporate. Must not claim they are visible. So we can say "Photographed on 12 September 2026 at 17:41 BST at 52.393850°N, 0.270830°E..."
-
-We need factual description. Main visible subject: solitary white swan gliding on calm water. Boats moored: white boat named 'Samar II' with blue stripe, boat 'Magna Carta' with red cover, etc. Riverside residential buildings with brown facade, tiled roof, balconies. Foliage framing. Water reflection. Lighting appears overcast daylight.
-
-Need 1-2 sentences. Let's craft one sentence: A mute swan swims on calm water in the foreground with moored motorboats and cruisers, including 'Samar II' and 'Magna Carta', along a riverbank with riverside apartments behind, framed by trees and foliage. The scene is captured on 2026-09-12 17:41:02 UTC+01:00 at 52.393850°N, 0.270830°E under overcast daylight with reflections on the water.
-
-That's a bit long but okay. Maybe two sentences.
-
-Make sure not claim date visible.
-
-Keywords: 10-18 unique comma-separated keywords. Cover relevant context and visible details. Use British English spelling? Probably fine.
-
-Keywords: mute swan, river, moored boats, motorboat, marina, riverbank, residential building, waterfront, water reflection, foliage, trees, vegetation, pier, mooring, waterfowl, aquatic bird, architecture
-
-Need 10-18. Let's count: mute swan(1), river(2), moored boats(3), motorboat(4), marina(5), riverbank(6), residential building(7), waterfront(8), water reflection(9), foliage(10), trees(11), vegetation(12), pier(13), mooring(14), waterfowl(15), aquatic bird(16), architecture(17). Good.
-
-Maybe include "Samar II", "Magna Carta"? Might be specific. Could include but maybe okay.
-
-Ensure keywords comma-separated.
-
-Return exactly these three sections and nothing else:
-
-Title:
-Description:
-Keywords:
-
-Let's produce.
-
-Potential issues: title 5-10 words. Ensure concrete.
-
-Description should be 
-```
-
 </details>
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response repeats the same text; Response appears cut off at
+  the token limit
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.85s
+- *Generation time:* 60.93s
+- *Total time:* 63.38s
+- *Prompt preparation time:* 0.605
+- *First-token latency:* 1.59
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 301
+- *Generation tokens:* 1,000
+- *Total tokens:* 1,301
+- *Prompt throughput (raw):* 189 tok/s
+- *Generation throughput (raw):* 17.0 tok/s
+- *Peak memory (GB):* 15
+- *Active memory (GB):* 11
+- *Cache memory (GB):* 0.40
+- *Model-load active memory (GB):* 11.4
+- *Post-cleanup active memory (GB):* 0.0041
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1436
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Serene River Scene with a Majestic White Swan
+
+Description: A tranquil river scene unfolds on September 12, 2026, at 17:41:02 UTC+01:00, near 52.393850°N, 0.270830°E, featuring a solitary white swan gliding across the calm waters, surrounded by lush greenery and a backdrop of moored boats and riverside residential buildings.
+
+Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential Buildings, Tranquil Atmosphere, September Day, 2026, 17:41:02 UTC+01:00, 52.393850°N, 0.270830°E, Water Reflection, Waterfront, Waterway, Aquatic Bird, Architecture, Boat, Nature, Wildlife, Scenic View, Peaceful Scene, Calm Waters, Serene Environment, Outdoor Activity, Water Sports, Bird Watching, Wildlife Photography, Nature Photography, Scenic Photography, Landscape Photography, Riverbank, Riverbank Scene, Riverbank View, Riverbank Photography, Riverbank Landscape, Riverbank Nature, Riverbank Wildlife, Riverbank Scenic, Riverbank Peaceful, Riverbank Calm, Riverbank Serene, Riverbank Outdoor, Riverbank Water Sports, Riverbank Bird Watching, Riverbank Wildlife Photography, Riverbank Nature Photography, Riverbank Scenic Photography, Riverbank Landscape Photography, Riverbank Riverbank Scene, Riverbank Riverbank View, Riverbank Riverbank Photography, Riverbank Riverbank Landscape, Riverbank Riverbank Nature, Riverbank Riverbank Wildlife, Riverbank Riverbank Scenic, Riverbank Riverbank Peaceful, Riverbank Riverbank Calm, Riverbank Riverbank Serene, Riverbank Riverbank Outdoor, Riverbank Riverbank Water Sports, Riverbank Riverbank Bird Watching, Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Nature Photography, Riverbank Riverbank Scenic Photography, Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Landscape
+</pre>
 
 </details>
 
@@ -2735,22 +2723,22 @@ Description should be
 - *Observations:* Generation was stopped early after sustained repeated
   output; Duplicate keywords: wildlife, animal, bird
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.92s
-- *Generation time:* 41.57s
-- *Total time:* 44.51s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 38
-- *Cleanup time:* 0.146
+- *Model load time:* 1.98s
+- *Generation time:* 37.54s
+- *Total time:* 40.50s
+- *Prompt preparation time:* 0.977
+- *First-token latency:* 34
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 200
 - *Total tokens:* 16,747
-- *Prompt throughput (raw):* 436 tok/s
-- *Generation throughput (raw):* 74.4 tok/s
+- *Prompt throughput (raw):* 487 tok/s
+- *Generation throughput (raw):* 74.8 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 4.0
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00688
+- *Post-cleanup active memory (GB):* 0.00795
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2792,22 +2780,22 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.32s
-- *Generation time:* 1.14s
-- *Total time:* 2.35s
-- *Prompt preparation time:* 0.879
-- *First-token latency:* 0.205
-- *Cleanup time:* 0.0846
+- *Model load time:* 0.35s
+- *Generation time:* 1.22s
+- *Total time:* 2.46s
+- *Prompt preparation time:* 0.886
+- *First-token latency:* 0.305
+- *Cleanup time:* 0.0787
 - *Prompt tokens:* 1,205
 - *Generation tokens:* 33
 - *Total tokens:* 1,238
-- *Prompt throughput (raw):* 5,887 tok/s
-- *Generation throughput (raw):* 315 tok/s
+- *Prompt throughput (raw):* 3,952 tok/s
+- *Generation throughput (raw):* 314 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
-- *Model-load active memory (GB):* 0.159
-- *Post-cleanup active memory (GB):* 0.00916
+- *Model-load active memory (GB):* 0.16
+- *Post-cleanup active memory (GB):* 0.0102
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2847,22 +2835,22 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.79s
-- *Generation time:* 2.10s
-- *Total time:* 4.47s
-- *Prompt preparation time:* 0.568
-- *First-token latency:* 0.31
+- *Model load time:* 1.89s
+- *Generation time:* 3.38s
+- *Total time:* 5.98s
+- *Prompt preparation time:* 0.688
+- *First-token latency:* 1.48
 - *Cleanup time:* 0.126
 - *Prompt tokens:* 589
 - *Generation tokens:* 88
 - *Total tokens:* 677
-- *Prompt throughput (raw):* 1,900 tok/s
-- *Generation throughput (raw):* 70.5 tok/s
-- *Peak memory (GB):* 7.2
+- *Prompt throughput (raw):* 397 tok/s
+- *Generation throughput (raw):* 69.6 tok/s
+- *Peak memory (GB):* 6.9
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.04
 - *Model-load active memory (GB):* 5.83
-- *Post-cleanup active memory (GB):* 0.0115
+- *Post-cleanup active memory (GB):* 0.0125
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2903,22 +2891,22 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
   after sustained repeated output; Unrecognised model control tokens remain
   visible; Required labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.26s
-- *Generation time:* 3.68s
-- *Total time:* 5.63s
-- *Prompt preparation time:* 0.685
-- *First-token latency:* 1.01
-- *Cleanup time:* 0.179
+- *Model load time:* 1.15s
+- *Generation time:* 3.62s
+- *Total time:* 5.51s
+- *Prompt preparation time:* 0.737
+- *First-token latency:* 0.902
+- *Cleanup time:* 0.187
 - *Prompt tokens:* 2,195
 - *Generation tokens:* 200
 - *Total tokens:* 2,395
-- *Prompt throughput (raw):* 2,166 tok/s
-- *Generation throughput (raw):* 99.5 tok/s
+- *Prompt throughput (raw):* 2,434 tok/s
+- *Generation throughput (raw):* 98.7 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.70
-- *Model-load active memory (GB):* 5.69
-- *Post-cleanup active memory (GB):* 0.0142
+- *Model-load active memory (GB):* 5.7
+- *Post-cleanup active memory (GB):* 0.0152
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2968,22 +2956,22 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.51s
-- *Generation time:* 1.13s
-- *Total time:* 2.27s
-- *Prompt preparation time:* 0.63
-- *First-token latency:* 0.09
-- *Cleanup time:* 0.106
+- *Model load time:* 0.55s
+- *Generation time:* 1.42s
+- *Total time:* 2.73s
+- *Prompt preparation time:* 0.755
+- *First-token latency:* 0.284
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 330
 - *Generation tokens:* 92
 - *Total tokens:* 422
-- *Prompt throughput (raw):* 3,668 tok/s
-- *Generation throughput (raw):* 202 tok/s
-- *Peak memory (GB):* 1.8
+- *Prompt throughput (raw):* 1,162 tok/s
+- *Generation throughput (raw):* 198 tok/s
+- *Peak memory (GB):* 1.5
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.28
-- *Model-load active memory (GB):* 0.613
-- *Post-cleanup active memory (GB):* 0.0148
+- *Model-load active memory (GB):* 0.614
+- *Post-cleanup active memory (GB):* 0.0159
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3023,22 +3011,22 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.63s
-- *Generation time:* 2.48s
-- *Total time:* 4.73s
-- *Prompt preparation time:* 0.62
-- *First-token latency:* 1.69
-- *Cleanup time:* 0.135
+- *Model load time:* 1.72s
+- *Generation time:* 2.59s
+- *Total time:* 5.05s
+- *Prompt preparation time:* 0.737
+- *First-token latency:* 1.7
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 1,344
 - *Generation tokens:* 7
 - *Total tokens:* 1,351
-- *Prompt throughput (raw):* 794 tok/s
-- *Generation throughput (raw):* 35.8 tok/s
+- *Prompt throughput (raw):* 791 tok/s
+- *Generation throughput (raw):* 35.7 tok/s
 - *Peak memory (GB):* 9.7
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.8
 - *Model-load active memory (GB):* 6.05
-- *Post-cleanup active memory (GB):* 0.0158
+- *Post-cleanup active memory (GB):* 0.0169
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3058,135 +3046,6 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 <pre class="model-output-readable">
 - title, description, keywords
 </pre>
-
-</details>
-
----
-
-<a id="model-apple-fastvlm-7b-int4"></a>
-
-### apple/FastVLM-7B-int4
-
-<details>
-<summary>Complete evidence: apple/FastVLM-7B-int4</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed:
-  'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
-- *Root exception type:* KeyError
-- *Root exception module:* builtins
-- *Root exception message:* 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
-- *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
-  fastvlm)
-- *Model load time:* 0.14s
-- *Generation time:* -
-- *Total time:* 0.14s
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.0693
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.000132
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1aeadbaaba011276f3dcda9582e5e64e2a90873a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--apple--FastVLM-7B-int4/snapshots/1aeadbaaba011276f3dcda9582e5e64e2a90873a
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1072, in load_model
-    weights = sanitize_weights(
-        model_class.VisionModel, weights, model_config.vision_config
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1241, in sanitize_weights
-    weights = model_obj.sanitize(weights)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/fastvlm/vision.py", line 650, in sanitize
-    W, C = weights[
-           ~~~~~~~^
-        "vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight"
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ].shape[-2:]
-    ^
-KeyError: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: 'vision_tower.vision_model.patch_embed.blocks.1.reparam_conv.weight'
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 4166.87it/s]
-```
 
 </details>
 
@@ -3217,12 +3076,12 @@ Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 4166.87it/s]
 - *Root exception message:* Model type internvl not supported. Error: No
   module named 'mlx_vlm.speculative.drafters.internvl'
 - *Arch supported by installed mlx-vlm:* no (model_type internvl)
-- *Model load time:* 0.14s
+- *Model load time:* 0.19s
 - *Generation time:* -
-- *Total time:* 0.14s
+- *Total time:* 0.19s
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0776
+- *Cleanup time:* 0.0839
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3232,7 +3091,7 @@ Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 4166.87it/s]
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00211
+- *Post-cleanup active memory (GB):* 0.00213
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -3272,12 +3131,12 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 964, in load_model
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 965, in load_model
     model_class, _ = get_model_and_args(config=config, model_path=model_path)
                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 784, in get_model_and_args
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 785, in get_model_and_args
     raise ValueError(msg)
 ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -3306,488 +3165,8 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 ```text
 === STDERR ===
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4551.25it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 3388.16it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-```
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-4bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-4bit</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* generation_before_first_token
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_GENERATION_BEFORE_FIRST_TOKEN_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model generation failed for
-  mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes
-  (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* [broadcast_shapes] Shapes (1,1,301,6404) and
-  (1,32,300,6404) cannot be broadcast.
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.35s
-- *Generation time:* 0.54s
-- *Total time:* 2.49s
-- *Prompt preparation time:* 0.593
-- *First-token latency:* -
-- *Cleanup time:* 0.128
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00303
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 82f31be9840fa0d4c7e99257fe2e28b59a46df97
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-4bit/snapshots/82f31be9840fa0d4c7e99257fe2e28b59a46df97
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
-    return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
-    return _generate_with_repetition_guard(
-        model=prepared.model,
-    ...<5 lines>...
-        **prepared.generate_kwargs,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
-    for chunk in stream_generate(
-                 ~~~~~~~~~~~~~~~^
-        model=model, processor=processor, prompt=prompt, image=image, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in generate_step
-    chunk_output = model.language_model(
-        inputs=input_ids[:, :n_to_process],
-    ...<3 lines>...
-        **chunk_kwargs,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360, in __call__
-    hidden_states = self.model(
-        input_ids=inputs,
-    ...<5 lines>...
-        cache=cache,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321, in __call__
-    layer_outputs = decoder_layer(
-        hidden_states,
-    ...<3 lines>...
-        cache=c,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251, in __call__
-    hidden_states = self.cross_attn(
-        hidden_states=hidden_states,
-    ...<2 lines>...
-        cache=cache,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80, in __call__
-    attn_output = scaled_dot_product_attention(
-        query_states,
-    ...<4 lines>...
-        mask=attention_mask,  # add a dim for batch processing
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in scaled_dot_product_attention
-    return mx.fast.scaled_dot_product_attention(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        queries,
-        ^^^^^^^^
-    ...<4 lines>...
-        sinks=sinks,
-        ^^^^^^^^^^^^
-    )
-    ^
-ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
-    output, duration = _execute_prepared_generation(
-                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        params,
-        ^^^^^^^
-    ...<2 lines>...
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
-    output = _run_generation_guarded(
-        params=params,
-        generate_once=_generate_once,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
-    raise _tag_exception_failure_phase(
-        ValueError(msg), _generation_failure_phase(gen_known_err)
-    ) from gen_known_err
-ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 3714.33it/s]
-[21:49:05] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
-           _run_generation_guarded
-               return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
-           _generate_once
-               return _generate_with_repetition_guard(
-                   model=prepared.model,
-               ...<5 lines>...
-                   **prepared.generate_kwargs,
-               )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
-           _generate_with_repetition_guard
-               for chunk in stream_generate(
-                            ~~~~~~~~~~~~~~~^
-                   model=model, processor=processor, prompt=prompt, image=image, **kwargs
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-               ):
-               ^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in
-           stream_generate
-               for n, (token, logprobs) in enumerate(gen):
-                                           ~~~~~~~~~^^^^^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in
-           generate_step
-               chunk_output = model.language_model(
-                   inputs=input_ids[:, :n_to_process],
-               ...<3 lines>...
-                   **chunk_kwargs,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360,
-           in __call__
-               hidden_states = self.model(
-                   input_ids=inputs,
-               ...<5 lines>...
-                   cache=cache,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321,
-           in __call__
-               layer_outputs = decoder_layer(
-                   hidden_states,
-               ...<3 lines>...
-                   cache=c,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251,
-           in __call__
-               hidden_states = self.cross_attn(
-                   hidden_states=hidden_states,
-               ...<2 lines>...
-                   cache=cache,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80,
-           in __call__
-               attn_output = scaled_dot_product_attention(
-                   query_states,
-               ...<4 lines>...
-                   mask=attention_mask,  # add a dim for batch processing
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in
-           scaled_dot_product_attention
-               return mx.fast.scaled_dot_product_attention(
-                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-                   queries,
-                   ^^^^^^^^
-               ...<4 lines>...
-                   sinks=sinks,
-                   ^^^^^^^^^^^^
-               )
-               ^
-           ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be
-           broadcast.
-```
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* generation_before_first_token
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_GENERATION_BEFORE_FIRST_TOKEN_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model generation failed for
-  mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes
-  (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* [broadcast_shapes] Shapes (1,1,301,6404) and
-  (1,32,300,6404) cannot be broadcast.
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.77s
-- *Generation time:* 0.54s
-- *Total time:* 2.88s
-- *Prompt preparation time:* 0.57
-- *First-token latency:* -
-- *Cleanup time:* 0.176
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00303
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
-    return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
-    return _generate_with_repetition_guard(
-        model=prepared.model,
-    ...<5 lines>...
-        **prepared.generate_kwargs,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
-    for chunk in stream_generate(
-                 ~~~~~~~~~~~~~~~^
-        model=model, processor=processor, prompt=prompt, image=image, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in generate_step
-    chunk_output = model.language_model(
-        inputs=input_ids[:, :n_to_process],
-    ...<3 lines>...
-        **chunk_kwargs,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360, in __call__
-    hidden_states = self.model(
-        input_ids=inputs,
-    ...<5 lines>...
-        cache=cache,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321, in __call__
-    layer_outputs = decoder_layer(
-        hidden_states,
-    ...<3 lines>...
-        cache=c,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251, in __call__
-    hidden_states = self.cross_attn(
-        hidden_states=hidden_states,
-    ...<2 lines>...
-        cache=cache,
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80, in __call__
-    attn_output = scaled_dot_product_attention(
-        query_states,
-    ...<4 lines>...
-        mask=attention_mask,  # add a dim for batch processing
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in scaled_dot_product_attention
-    return mx.fast.scaled_dot_product_attention(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        queries,
-        ^^^^^^^^
-    ...<4 lines>...
-        sinks=sinks,
-        ^^^^^^^^^^^^
-    )
-    ^
-ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
-    output, duration = _execute_prepared_generation(
-                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        params,
-        ^^^^^^^
-    ...<2 lines>...
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
-    output = _run_generation_guarded(
-        params=params,
-        generate_once=_generate_once,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
-    raise _tag_exception_failure_phase(
-        ValueError(msg), _generation_failure_phase(gen_known_err)
-    ) from gen_known_err
-ValueError: Model generation failed for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be broadcast.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3483.35it/s]
-[21:49:08] Generation error for mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
-           _run_generation_guarded
-               return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
-           _generate_once
-               return _generate_with_repetition_guard(
-                   model=prepared.model,
-               ...<5 lines>...
-                   **prepared.generate_kwargs,
-               )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
-           _generate_with_repetition_guard
-               for chunk in stream_generate(
-                            ~~~~~~~~~~~~~~~^
-                   model=model, processor=processor, prompt=prompt, image=image, **kwargs
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-               ):
-               ^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1081, in
-           stream_generate
-               for n, (token, logprobs) in enumerate(gen):
-                                           ~~~~~~~~~^^^^^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 497, in
-           generate_step
-               chunk_output = model.language_model(
-                   inputs=input_ids[:, :n_to_process],
-               ...<3 lines>...
-                   **chunk_kwargs,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 360,
-           in __call__
-               hidden_states = self.model(
-                   input_ids=inputs,
-               ...<5 lines>...
-                   cache=cache,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 321,
-           in __call__
-               layer_outputs = decoder_layer(
-                   hidden_states,
-               ...<3 lines>...
-                   cache=c,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 251,
-           in __call__
-               hidden_states = self.cross_attn(
-                   hidden_states=hidden_states,
-               ...<2 lines>...
-                   cache=cache,
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mllama/language.py", line 80,
-           in __call__
-               attn_output = scaled_dot_product_attention(
-                   query_states,
-               ...<4 lines>...
-                   mask=attention_mask,  # add a dim for batch processing
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 418, in
-           scaled_dot_product_attention
-               return mx.fast.scaled_dot_product_attention(
-                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-                   queries,
-                   ^^^^^^^^
-               ...<4 lines>...
-                   sinks=sinks,
-                   ^^^^^^^^^^^^
-               )
-               ^
-           ValueError: [broadcast_shapes] Shapes (1,1,301,6404) and (1,32,300,6404) cannot be
-           broadcast.
 ```
 
 </details>
@@ -3807,24 +3186,25 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3483.35it/s]
   length limits and factual accuracy not assessed
 - *Maintainer status:* actionable_failure
 - *Observations:* none
-- *Failure phase:* model_load
+- *Failure phase:* generation_before_first_token
 - *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
+- *Error code:* MLX_VLM_GENERATION_BEFORE_FIRST_TOKEN_MODEL
 - *Error type:* ValueError
 - *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Received 904 parameters not in model:
-  <br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.layers.0.input_layernorm.weight,<br>model.layers.0.mlp.down_proj.biases,<br>model.layers.0.mlp.down_proj.scales,<br>model.layers.0.mlp.down_proj.weight,<br>model.layers.0.mlp.gate_proj.biases,<br>model.layers.0.mlp.gate_proj.scales,<br>model.layers.0.mlp.gate_proj.weight,<br>model.layers.0.mlp.up_proj.biases,<br>model.layers.0.mlp.up_proj.scales,<br>model.layers.0.mlp.up_proj.weight,<br>model.layers.0.post_attention_layernorm.weight,<br>model.layers.0.self_attn.k_norm.weight,<br>model.layers.0.self_attn.k_proj.biases,<br>model.layers.0.self_attn.k_proj.scales,<br>model.layers.0.self_attn.k_proj.weight,<br>model.layers.0.self_attn.o_proj.biases,<br>model.layers.0.self_attn.o_proj.scales,<br>model.layers.0.self_attn.o_proj.weight,<br>model.layers.0.self_attn.q_norm.weight,<br>model.layers.0.self_attn.q_proj.biases,<br>model.layers.0.self_attn.q_proj.scales,<br>model.layers.0.self_attn.q_proj.weight,<br>model.layers.0.self_attn.v_proj.biases,<br>model.layers.0.self_attn.v_proj.scales,<br>model.layers.0.self_attn.v_proj.weight,<br>model.layers.1.input_layernorm.weight,<br>model.layers.1.mlp.down_proj.biases,<br>model.layers.1.mlp.down_proj.scales,<br>model.layers.1.mlp.down_proj.weight,<br>model.layers.1.mlp.gate_proj.biases,<br>model.layers.1.mlp.gate_proj.scales,<br>model.layers.1.mlp.gate_proj.weight,<br>model.layers.1.mlp.up_proj.biases,<br>model.layers.1.mlp.up_proj.scales,<br>model.layers.1.mlp.up_proj.weight,<br>model.layers.1.post_attention_layernorm.weight,<br>model.layers.1.self_attn.k_norm.weight,<br>model.layers.1.self_attn.k_proj.biases,<br>model.layers.1.self_attn.k_proj.scales,<br>model.layers.1.self_attn.k_proj.weight,<br>model.layers.1.self_attn.o_proj.biases,<br>model.layers.1.self_attn.o_proj.scales,<br>model.layers.1.self_attn.o_proj.weight,<br>model.layers.1.self_attn.q_norm.weight,<br>model.layers.1.self_attn.q_proj.biases,<br>model.layers.1.self_attn.q_proj.scales,<br>model.layers.1.self_attn.q_proj.weight,<br>model.layers.1.self_attn.v_proj.biases,<br>model.layers.1.self_attn.v_proj.scales,<br>model.layers.1.self_attn.v_proj.weight,<br>model.layers.10.input_layernorm.weight,<br>model.layers.10.mlp.down_proj.biases,<br>model.layers.10.mlp.down_proj.scales,<br>model.layers.10.mlp.down_proj.weight,<br>model.layers.10.mlp.gate_proj.biases,<br>model.layers.10.mlp.gate_proj.scales,<br>model.layers.10.mlp.gate_proj.weight,<br>model.layers.10.mlp.up_proj.biases,<br>model.layers.10.mlp.up_proj.scales,<br>model.layers.10.mlp.up_proj.weight,<br>model.layers.10.post_attention_layernorm.weight,<br>model.layers.10.self_attn.k_norm.weight,<br>model.layers.10.self_attn.k_proj.biases,<br>model.layers.10.self_attn.k_proj.scales,<br>model.layers.10.self_attn.k_proj.weight,<br>model.layers.10.self_attn.o_proj.biases,<br>model.layers.10.self_attn.o_proj.scales,<br>model.layers.10.self_attn.o_proj.weight,<br>model.layers.10.self_attn.q_norm.weight,<br>model.layers.10.self_attn.q_proj.biases,<br>model.layers.10.self_attn.q_proj.scales,<br>model.layers.10.self_attn.q_proj.weight,<br>model.layers.10.self_attn.v_proj.biases,<br>model.layers.10.self_attn.v_proj.scales,<br>model.layers.10.self_attn.v_proj.weight,<br>model.layers.11.input_layernorm.weight,<br>model.layers.11.mlp.down_proj.biases,<br>model.layers.11.mlp.down_proj.scales,<br>model.layers.11.mlp.down_proj.weight,<br>model.layers.11.mlp.gate_proj.biases,<br>model.layers.11.mlp.gate_proj.scales,<br>model.layers.11.mlp.gate_proj.weight,<br>model.layers.11.mlp.up_proj.biases,<br>model.layers.11.mlp.up_proj.scales,<br>model.layers.11.mlp.up_proj.weight,<br>model.layers.11.post_attention_layernorm.weight,<br>model.layers.11.self_attn.k_norm.weight,<br>model.layers.11.self_attn.k_proj.biases,<br>model.layers.11.self_attn.k_proj.scales,<br>model.layers.11.self_attn.k_proj.weight,<br>model.layers.11.self_attn.o_proj.biases,<br>model.layers.11.self_attn.o_proj.scales,<br>model.layers.11.self_attn.o_proj.weight,<br>model.layers.11.self_attn.q_norm.weight,<br>model.layers.11.self_attn.q_proj.biases,<br>model.layers.11.self_attn.q_proj.scales,<br>model.layers.11.self_attn.q_proj.weight,<br>model.layers.11.self_attn.v_proj.biases,<br>model.layers.11.self_attn.v_proj.scales,<br>model.layers.11.self_attn.v_proj.weight,<br>model.layers.12.input_layernorm.weight,<br>model.layers.12.mlp.down_proj.biases,<br>model.layers.12.mlp.down_proj.scales,<br>model.layers.12.mlp.down_proj.weight,<br>model.layers.12.mlp.gate_proj.biases,<br>model.layers.12.mlp.gate_proj.scales,<br>model.layers.12.mlp.gate_proj.weight,<br>model.layers.12.mlp.up_proj.biases,<br>model.layers.12.mlp.up_proj.scales,<br>model.layers.12.mlp.up_proj.weight,<br>model.layers.12.post_attention_layernorm.weight,<br>model.layers.12.self_attn.k_norm.weight,<br>model.layers.12.self_attn.k_proj.biases,<br>model.layers.12.self_attn.k_proj.scales,<br>model.layers.12.self_attn.k_proj.weight,<br>model.layers.12.self_attn.o_proj.biases,<br>model.layers.12.self_attn.o_proj.scales,<br>model.layers.12.self_attn.o_proj.weight,<br>model.layers.12.self_attn.q_norm.weight,<br>model.layers.12.self_attn.q_proj.biases,<br>model.layers.12.self_attn.q_proj.scales,<br>model.layers.12.self_attn.q_proj.weight,<br>model.layers.12.self_attn.v_proj.biases,<br>model.layers.12.self_attn.v_proj.scales,<br>model.layers.12.self_attn.v_proj.weight,<br>model.layers.13.input_layernorm.weight,<br>model.layers.13.mlp.down_proj.biases,<br>model.layers.13.mlp.down_proj.scales,<br>model.layers.13.mlp.down_proj.weight,<br>model.layers.13.mlp.gate_proj.biases,<br>model.layers.13.mlp.gate_proj.scales,<br>model.layers.13.mlp.gate_proj.weight,<br>model.layers.13.mlp.up_proj.biases,<br>model.layers.13.mlp.up_proj.scales,<br>model.layers.13.mlp.up_proj.weight,<br>model.layers.13.post_attention_layernorm.weight,<br>model.layers.13.self_attn.k_norm.weight,<br>model.layers.13.self_attn.k_proj.biases,<br>model.layers.13.self_attn.k_proj.scales,<br>model.layers.13.self_attn.k_proj.weight,<br>model.layers.13.self_attn.o_proj.biases,<br>model.layers.13.self_attn.o_proj.scales,<br>model.layers.13.self_attn.o_proj.weight,<br>model.layers.13.self_attn.q_norm.weight,<br>model.layers.13.self_attn.q_proj.biases,<br>model.layers.13.self_attn.q_proj.scales,<br>model.layers.13.self_attn.q_proj.weight,<br>model.layers.13.self_attn.v_proj.biases,<br>model.layers.13.self_attn.v_proj.scales,<br>model.layers.13.self_attn.v_proj.weight,<br>model.layers.14.input_layernorm.weight,<br>model.layers.14.mlp.down_proj.biases,<br>model.layers.14.mlp.down_proj.scales,<br>model.layers.14.mlp.down_proj.weight,<br>model.layers.14.mlp.gate_proj.biases,<br>model.layers.14.mlp.gate_proj.scales,<br>model.layers.14.mlp.gate_proj.weight,<br>model.layers.14.mlp.up_proj.biases,<br>model.layers.14.mlp.up_proj.scales,<br>model.layers.14.mlp.up_proj.weight,<br>model.layers.14.post_attention_layernorm.weight,<br>model.layers.14.self_attn.k_norm.weight,<br>model.layers.14.self_attn.k_proj.biases,<br>model.layers.14.self_attn.k_proj.scales,<br>model.layers.14.self_attn.k_proj.weight,<br>model.layers.14.self_attn.o_proj.biases,<br>model.layers.14.self_attn.o_proj.scales,<br>model.layers.14.self_attn.o_proj.weight,<br>model.layers.14.self_attn.q_norm.weight,<br>model.layers.14.self_attn.q_proj.biases,<br>model.layers.14.self_attn.q_proj.scales,<br>model.layers.14.self_attn.q_proj.weight,<br>model.layers.14.self_attn.v_proj.biases,<br>model.layers.14.self_attn.v_proj.scales,<br>model.layers.14.self_attn.v_proj.weight,<br>model.layers.15.input_layernorm.weight,<br>model.layers.15.mlp.down_proj.biases,<br>model.layers.15.mlp.down_proj.scales,<br>model.layers.15.mlp.down_proj.weight,<br>model.layers.15.mlp.gate_proj.biases,<br>model.layers.15.mlp.gate_proj.scales,<br>model.layers.15.mlp.gate_proj.weight,<br>model.layers.15.mlp.up_proj.biases,<br>model.layers.15.mlp.up_proj.scales,<br>model.layers.15.mlp.up_proj.weight,<br>model.layers.15.post_attention_layernorm.weight,<br>model.layers.15.self_attn.k_norm.weight,<br>model.layers.15.self_attn.k_proj.biases,<br>model.layers.15.self_attn.k_proj.scales,<br>model.layers.15.self_attn.k_proj.weight,<br>model.layers.15.self_attn.o_proj.biases,<br>model.layers.15.self_attn.o_proj.scales,<br>model.layers.15.self_attn.o_proj.weight,<br>model.layers.15.self_attn.q_norm.weight,<br>model.layers.15.self_attn.q_proj.biases,<br>model.layers.15.self_attn.q_proj.scales,<br>model.layers.15.self_attn.q_proj.weight,<br>model.layers.15.self_attn.v_proj.biases,<br>model.layers.15.self_attn.v_proj.scales,<br>model.layers.15.self_attn.v_proj.weight,<br>model.layers.16.input_layernorm.weight,<br>model.layers.16.mlp.down_proj.biases,<br>model.layers.16.mlp.down_proj.scales,<br>model.layers.16.mlp.down_proj.weight,<br>model.layers.16.mlp.gate_proj.biases,<br>model.layers.16.mlp.gate_proj.scales,<br>model.layers.16.mlp.gate_proj.weight,<br>model.layers.16.mlp.up_proj.biases,<br>model.layers.16.mlp.up_proj.scales,<br>model.layers.16.mlp.up_proj.weight,<br>model.layers.16.post_attention_layernorm.weight,<br>model.layers.16.self_attn.k_norm.weight,<br>model.layers.16.self_attn.k_proj.biases,<br>model.layers.16.self_attn.k_proj.scales,<br>model.layers.16.self_attn.k_proj.weight,<br>model.layers.16.self_attn.o_proj.biases,<br>model.layers.16.self_attn.o_proj.scales,<br>model.layers.16.self_attn.o_proj.weight,<br>model.layers.16.self_attn.q_norm.weight,<br>model.layers.16.self_attn.q_proj.biases,<br>model.layers.16.self_attn.q_proj.scales,<br>model.layers.16.self_attn.q_proj.weight,<br>model.layers.16.self_attn.v_proj.biases,<br>model.layers.16.self_attn.v_proj.scales,<br>model.layers.16.self_attn.v_proj.weight,<br>model.layers.17.input_layernorm.weight,<br>model.layers.17.mlp.down_proj.biases,<br>model.layers.17.mlp.down_proj.scales,<br>model.layers.17.mlp.down_proj.weight,<br>model.layers.17.mlp.gate_proj.biases,<br>model.layers.17.mlp.gate_proj.scales,<br>model.layers.17.mlp.gate_proj.weight,<br>model.layers.17.mlp.up_proj.biases,<br>model.layers.17.mlp.up_proj.scales,<br>model.layers.17.mlp.up_proj.weight,<br>model.layers.17.post_attention_layernorm.weight,<br>model.layers.17.self_attn.k_norm.weight,<br>model.layers.17.self_attn.k_proj.biases,<br>model.layers.17.self_attn.k_proj.scales,<br>model.layers.17.self_attn.k_proj.weight,<br>model.layers.17.self_attn.o_proj.biases,<br>model.layers.17.self_attn.o_proj.scales,<br>model.layers.17.self_attn.o_proj.weight,<br>model.layers.17.self_attn.q_norm.weight,<br>model.layers.17.self_attn.q_proj.biases,<br>model.layers.17.self_attn.q_proj.scales,<br>model.layers.17.self_attn.q_proj.weight,<br>model.layers.17.self_attn.v_proj.biases,<br>model.layers.17.self_attn.v_proj.scales,<br>model.layers.17.self_attn.v_proj.weight,<br>model.layers.18.input_layernorm.weight,<br>model.layers.18.mlp.down_proj.biases,<br>model.layers.18.mlp.down_proj.scales,<br>model.layers.18.mlp.down_proj.weight,<br>model.layers.18.mlp.gate_proj.biases,<br>model.layers.18.mlp.gate_proj.scales,<br>model.layers.18.mlp.gate_proj.weight,<br>model.layers.18.mlp.up_proj.biases,<br>model.layers.18.mlp.up_proj.scales,<br>model.layers.18.mlp.up_proj.weight,<br>model.layers.18.post_attention_layernorm.weight,<br>model.layers.18.self_attn.k_norm.weight,<br>model.layers.18.self_attn.k_proj.biases,<br>model.layers.18.self_attn.k_proj.scales,<br>model.layers.18.self_attn.k_proj.weight,<br>model.layers.18.self_attn.o_proj.biases,<br>model.layers.18.self_attn.o_proj.scales,<br>model.layers.18.self_attn.o_proj.weight,<br>model.layers.18.self_attn.q_norm.weight,<br>model.layers.18.self_attn.q_proj.biases,<br>model.layers.18.self_attn.q_proj.scales,<br>model.layers.18.self_attn.q_proj.weight,<br>model.layers.18.self_attn.v_proj.biases,<br>model.layers.18.self_attn.v_proj.scales,<br>model.layers.18.self_attn.v_proj.weight,<br>model.layers.19.input_layernorm.weight,<br>model.layers.19.mlp.down_proj.biases,<br>model.layers.19.mlp.down_proj.scales,<br>model.layers.19.mlp.down_proj.weight,<br>model.layers.19.mlp.gate_proj.biases,<br>model.layers.19.mlp.gate_proj.scales,<br>model.layers.19.mlp.gate_proj.weight,<br>model.layers.19.mlp.up_proj.biases,<br>model.layers.19.mlp.up_proj.scales,<br>model.layers.19.mlp.up_proj.weight,<br>model.layers.19.post_attention_layernorm.weight,<br>model.layers.19.self_attn.k_norm.weight,<br>model.layers.19.self_attn.k_proj.biases,<br>model.layers.19.self_attn.k_proj.scales,<br>model.layers.19.self_attn.k_proj.weight,<br>model.layers.19.self_attn.o_proj.biases,<br>model.layers.19.self_attn.o_proj.scales,<br>model.layers.19.self_attn.o_proj.weight,<br>model.layers.19.self_attn.q_norm.weight,<br>model.layers.19.self_attn.q_proj.biases,<br>model.layers.19.self_attn.q_proj.scales,<br>model.layers.19.self_attn.q_proj.weight,<br>model.layers.19.self_attn.v_proj.biases,<br>model.layers.19.self_attn.v_proj.scales,<br>model.layers.19.self_attn.v_proj.weight,<br>model.layers.2.input_layernorm.weight,<br>model.layers.2.mlp.down_proj.biases,<br>model.layers.2.mlp.down_proj.scales,<br>model.layers.2.mlp.down_proj.weight,<br>model.layers.2.mlp.gate_proj.biases,<br>model.layers.2.mlp.gate_proj.scales,<br>model.layers.2.mlp.gate_proj.weight,<br>model.layers.2.mlp.up_proj.biases,<br>model.layers.2.mlp.up_proj.scales,<br>model.layers.2.mlp.up_proj.weight,<br>model.layers.2.post_attention_layernorm.weight,<br>model.layers.2.self_attn.k_norm.weight,<br>model.layers.2.self_attn.k_proj.biases,<br>model.layers.2.self_attn.k_proj.scales,<br>model.layers.2.self_attn.k_proj.weight,<br>model.layers.2.self_attn.o_proj.biases,<br>model.layers.2.self_attn.o_proj.scales,<br>model.layers.2.self_attn.o_proj.weight,<br>model.layers.2.self_attn.q_norm.weight,<br>model.layers.2.self_attn.q_proj.biases,<br>model.layers.2.self_attn.q_proj.scales,<br>model.layers.2.self_attn.q_proj.weight,<br>model.layers.2.self_attn.v_proj.biases,<br>model.layers.2.self_attn.v_proj.scales,<br>model.layers.2.self_attn.v_proj.weight,<br>model.layers.20.input_layernorm.weight,<br>model.layers.20.mlp.down_proj.biases,<br>model.layers.20.mlp.down_proj.scales,<br>model.layers.20.mlp.down_proj.weight,<br>model.layers.20.mlp.gate_proj.biases,<br>model.layers.20.mlp.gate_proj.scales,<br>model.layers.20.mlp.gate_proj.weight,<br>model.layers.20.mlp.up_proj.biases,<br>model.layers.20.mlp.up_proj.scales,<br>model.layers.20.mlp.up_proj.weight,<br>model.layers.20.post_attention_layernorm.weight,<br>model.layers.20.self_attn.k_norm.weight,<br>model.layers.20.self_attn.k_proj.biases,<br>model.layers.20.self_attn.k_proj.scales,<br>model.layers.20.self_attn.k_proj.weight,<br>model.layers.20.self_attn.o_proj.biases,<br>model.layers.20.self_attn.o_proj.scales,<br>model.layers.20.self_attn.o_proj.weight,<br>model.layers.20.self_attn.q_norm.weight,<br>model.layers.20.self_attn.q_proj.biases,<br>model.layers.20.self_attn.q_proj.scales,<br>model.layers.20.self_attn.q_proj.weight,<br>model.layers.20.self_attn.v_proj.biases,<br>model.layers.20.self_attn.v_proj.scales,<br>model.layers.20.self_attn.v_proj.weight,<br>model.layers.21.input_layernorm.weight,<br>model.layers.21.mlp.down_proj.biases,<br>model.layers.21.mlp.down_proj.scales,<br>model.layers.21.mlp.down_proj.weight,<br>model.layers.21.mlp.gate_proj.biases,<br>model.layers.21.mlp.gate_proj.scales,<br>model.layers.21.mlp.gate_proj.weight,<br>model.layers.21.mlp.up_proj.biases,<br>model.layers.21.mlp.up_proj.scales,<br>model.layers.21.mlp.up_proj.weight,<br>model.layers.21.post_attention_layernorm.weight,<br>model.layers.21.self_attn.k_norm.weight,<br>model.layers.21.self_attn.k_proj.biases,<br>model.layers.21.self_attn.k_proj.scales,<br>model.layers.21.self_attn.k_proj.weight,<br>model.layers.21.self_attn.o_proj.biases,<br>model.layers.21.self_attn.o_proj.scales,<br>model.layers.21.self_attn.o_proj.weight,<br>model.layers.21.self_attn.q_norm.weight,<br>model.layers.21.self_attn.q_proj.biases,<br>model.layers.21.self_attn.q_proj.scales,<br>model.layers.21.self_attn.q_proj.weight,<br>model.layers.21.self_attn.v_proj.biases,<br>model.layers.21.self_attn.v_proj.scales,<br>model.layers.21.self_attn.v_proj.weight,<br>model.layers.22.input_layernorm.weight,<br>model.layers.22.mlp.down_proj.biases,<br>model.layers.22.mlp.down_proj.scales,<br>model.layers.22.mlp.down_proj.weight,<br>model.layers.22.mlp.gate_proj.biases,<br>model.layers.22.mlp.gate_proj.scales,<br>model.layers.22.mlp.gate_proj.weight,<br>model.layers.22.mlp.up_proj.biases,<br>model.layers.22.mlp.up_proj.scales,<br>model.layers.22.mlp.up_proj.weight,<br>model.layers.22.post_attention_layernorm.weight,<br>model.layers.22.self_attn.k_norm.weight,<br>model.layers.22.self_attn.k_proj.biases,<br>model.layers.22.self_attn.k_proj.scales,<br>model.layers.22.self_attn.k_proj.weight,<br>model.layers.22.self_attn.o_proj.biases,<br>model.layers.22.self_attn.o_proj.scales,<br>model.layers.22.self_attn.o_proj.weight,<br>model.layers.22.self_attn.q_norm.weight,<br>model.layers.22.self_attn.q_proj.biases,<br>model.layers.22.self_attn.q_proj.scales,<br>model.layers.22.self_attn.q_proj.weight,<br>model.layers.22.self_attn.v_proj.biases,<br>model.layers.22.self_attn.v_proj.scales,<br>model.layers.22.self_attn.v_proj.weight,<br>model.layers.23.input_layernorm.weight,<br>model.layers.23.mlp.down_proj.biases,<br>model.layers.23.mlp.down_proj.scales,<br>model.layers.23.mlp.down_proj.weight,<br>model.layers.23.mlp.gate_proj.biases,<br>model.layers.23.mlp.gate_proj.scales,<br>model.layers.23.mlp.gate_proj.weight,<br>model.layers.23.mlp.up_proj.biases,<br>model.layers.23.mlp.up_proj.scales,<br>model.layers.23.mlp.up_proj.weight,<br>model.layers.23.post_attention_layernorm.weight,<br>model.layers.23.self_attn.k_norm.weight,<br>model.layers.23.self_attn.k_proj.biases,<br>model.layers.23.self_attn.k_proj.scales,<br>model.layers.23.self_attn.k_proj.weight,<br>model.layers.23.self_attn.o_proj.biases,<br>model.layers.23.self_attn.o_proj.scales,<br>model.layers.23.self_attn.o_proj.weight,<br>model.layers.23.self_attn.q_norm.weight,<br>model.layers.23.self_attn.q_proj.biases,<br>model.layers.23.self_attn.q_proj.scales,<br>model.layers.23.self_attn.q_proj.weight,<br>model.layers.23.self_attn.v_proj.biases,<br>model.layers.23.self_attn.v_proj.scales,<br>model.layers.23.self_attn.v_proj.weight,<br>model.layers.24.input_layernorm.weight,<br>model.layers.24.mlp.down_proj.biases,<br>model.layers.24.mlp.down_proj.scales,<br>model.layers.24.mlp.down_proj.weight,<br>model.layers.24.mlp.gate_proj.biases,<br>model.layers.24.mlp.gate_proj.scales,<br>model.layers.24.mlp.gate_proj.weight,<br>model.layers.24.mlp.up_proj.biases,<br>model.layers.24.mlp.up_proj.scales,<br>model.layers.24.mlp.up_proj.weight,<br>model.layers.24.post_attention_layernorm.weight,<br>model.layers.24.self_attn.k_norm.weight,<br>model.layers.24.self_attn.k_proj.biases,<br>model.layers.24.self_attn.k_proj.scales,<br>model.layers.24.self_attn.k_proj.weight,<br>model.layers.24.self_attn.o_proj.biases,<br>model.layers.24.self_attn.o_proj.scales,<br>model.layers.24.self_attn.o_proj.weight,<br>model.layers.24.self_attn.q_norm.weight,<br>model.layers.24.self_attn.q_proj.biases,<br>model.layers.24.self_attn.q_proj.scales,<br>model.layers.24.self_attn.q_proj.weight,<br>model.layers.24.self_attn.v_proj.biases,<br>model.layers.24.self_attn.v_proj.scales,<br>model.layers.24.self_attn.v_proj.weight,<br>model.layers.25.input_layernorm.weight,<br>model.layers.25.mlp.down_proj.biases,<br>model.layers.25.mlp.down_proj.scales,<br>model.layers.25.mlp.down_proj.weight,<br>model.layers.25.mlp.gate_proj.biases,<br>model.layers.25.mlp.gate_proj.scales,<br>model.layers.25.mlp.gate_proj.weight,<br>model.layers.25.mlp.up_proj.biases,<br>model.layers.25.mlp.up_proj.scales,<br>model.layers.25.mlp.up_proj.weight,<br>model.layers.25.post_attention_layernorm.weight,<br>model.layers.25.self_attn.k_norm.weight,<br>model.layers.25.self_attn.k_proj.biases,<br>model.layers.25.self_attn.k_proj.scales,<br>model.layers.25.self_attn.k_proj.weight,<br>model.layers.25.self_attn.o_proj.biases,<br>model.layers.25.self_attn.o_proj.scales,<br>model.layers.25.self_attn.o_proj.weight,<br>model.layers.25.self_attn.q_norm.weight,<br>model.layers.25.self_attn.q_proj.biases,<br>model.layers.25.self_attn.q_proj.scales,<br>model.layers.25.self_attn.q_proj.weight,<br>model.layers.25.self_attn.v_proj.biases,<br>model.layers.25.self_attn.v_proj.scales,<br>model.layers.25.self_attn.v_proj.weight,<br>model.layers.26.input_layernorm.weight,<br>model.layers.26.mlp.down_proj.biases,<br>model.layers.26.mlp.down_proj.scales,<br>model.layers.26.mlp.down_proj.weight,<br>model.layers.26.mlp.gate_proj.biases,<br>model.layers.26.mlp.gate_proj.scales,<br>model.layers.26.mlp.gate_proj.weight,<br>model.layers.26.mlp.up_proj.biases,<br>model.layers.26.mlp.up_proj.scales,<br>model.layers.26.mlp.up_proj.weight,<br>model.layers.26.post_attention_layernorm.weight,<br>model.layers.26.self_attn.k_norm.weight,<br>model.layers.26.self_attn.k_proj.biases,<br>model.layers.26.self_attn.k_proj.scales,<br>model.layers.26.self_attn.k_proj.weight,<br>model.layers.26.self_attn.o_proj.biases,<br>model.layers.26.self_attn.o_proj.scales,<br>model.layers.26.self_attn.o_proj.weight,<br>model.layers.26.self_attn.q_norm.weight,<br>model.layers.26.self_attn.q_proj.biases,<br>model.layers.26.self_attn.q_proj.scales,<br>model.layers.26.self_attn.q_proj.weight,<br>model.layers.26.self_attn.v_proj.biases,<br>model.layers.26.self_attn.v_proj.scales,<br>model.layers.26.self_attn.v_proj.weight,<br>model.layers.27.input_layernorm.weight,<br>model.layers.27.mlp.down_proj.biases,<br>model.layers.27.mlp.down_proj.scales,<br>model.layers.27.mlp.down_proj.weight,<br>model.layers.27.mlp.gate_proj.biases,<br>model.layers.27.mlp.gate_proj.scales,<br>model.layers.27.mlp.gate_proj.weight,<br>model.layers.27.mlp.up_proj.biases,<br>model.layers.27.mlp.up_proj.scales,<br>model.layers.27.mlp.up_proj.weight,<br>model.layers.27.post_attention_layernorm.weight,<br>model.layers.27.self_attn.k_norm.weight,<br>model.layers.27.self_attn.k_proj.biases,<br>model.layers.27.self_attn.k_proj.scales,<br>model.layers.27.self_attn.k_proj.weight,<br>model.layers.27.self_attn.o_proj.biases,<br>model.layers.27.self_attn.o_proj.scales,<br>model.layers.27.self_attn.o_proj.weight,<br>model.layers.27.self_attn.q_norm.weight,<br>model.layers.27.self_attn.q_proj.biases,<br>model.layers.27.self_attn.q_proj.scales,<br>model.layers.27.self_attn.q_proj.weight,<br>model.layers.27.self_attn.v_proj.biases,<br>model.layers.27.self_attn.v_proj.scales,<br>model.layers.27.self_attn.v_proj.weight,<br>model.layers.28.input_layernorm.weight,<br>model.layers.28.mlp.down_proj.biases,<br>model.layers.28.mlp.down_proj.scales,<br>model.layers.28.mlp.down_proj.weight,<br>model.layers.28.mlp.gate_proj.biases,<br>model.layers.28.mlp.gate_proj.scales,<br>model.layers.28.mlp.gate_proj.weight,<br>model.layers.28.mlp.up_proj.biases,<br>model.layers.28.mlp.up_proj.scales,<br>model.layers.28.mlp.up_proj.weight,<br>model.layers.28.post_attention_layernorm.weight,<br>model.layers.28.self_attn.k_norm.weight,<br>model.layers.28.self_attn.k_proj.biases,<br>model.layers.28.self_attn.k_proj.scales,<br>model.layers.28.self_attn.k_proj.weight,<br>model.layers.28.self_attn.o_proj.biases,<br>model.layers.28.self_attn.o_proj.scales,<br>model.layers.28.self_attn.o_proj.weight,<br>model.layers.28.self_attn.q_norm.weight,<br>model.layers.28.self_attn.q_proj.biases,<br>model.layers.28.self_attn.q_proj.scales,<br>model.layers.28.self_attn.q_proj.weight,<br>model.layers.28.self_attn.v_proj.biases,<br>model.layers.28.self_attn.v_proj.scales,<br>model.layers.28.self_attn.v_proj.weight,<br>model.layers.29.input_layernorm.weight,<br>model.layers.29.mlp.down_proj.biases,<br>model.layers.29.mlp.down_proj.scales,<br>model.layers.29.mlp.down_proj.weight,<br>model.layers.29.mlp.gate_proj.biases,<br>model.layers.29.mlp.gate_proj.scales,<br>model.layers.29.mlp.gate_proj.weight,<br>model.layers.29.mlp.up_proj.biases,<br>model.layers.29.mlp.up_proj.scales,<br>model.layers.29.mlp.up_proj.weight,<br>model.layers.29.post_attention_layernorm.weight,<br>model.layers.29.self_attn.k_norm.weight,<br>model.layers.29.self_attn.k_proj.biases,<br>model.layers.29.self_attn.k_proj.scales,<br>model.layers.29.self_attn.k_proj.weight,<br>model.layers.29.self_attn.o_proj.biases,<br>model.layers.29.self_attn.o_proj.scales,<br>model.layers.29.self_attn.o_proj.weight,<br>model.layers.29.self_attn.q_norm.weight,<br>model.layers.29.self_attn.q_proj.biases,<br>model.layers.29.self_attn.q_proj.scales,<br>model.layers.29.self_attn.q_proj.weight,<br>model.layers.29.self_attn.v_proj.biases,<br>model.layers.29.self_attn.v_proj.scales,<br>model.layers.29.self_attn.v_proj.weight,<br>model.layers.3.input_layernorm.weight,<br>model.layers.3.mlp.down_proj.biases,<br>model.layers.3.mlp.down_proj.scales,<br>model.layers.3.mlp.down_proj.weight,<br>model.layers.3.mlp.gate_proj.biases,<br>model.layers.3.mlp.gate_proj.scales,<br>model.layers.3.mlp.gate_proj.weight,<br>model.layers.3.mlp.up_proj.biases,<br>model.layers.3.mlp.up_proj.scales,<br>model.layers.3.mlp.up_proj.weight,<br>model.layers.3.post_attention_layernorm.weight,<br>model.layers.3.self_attn.k_norm.weight,<br>model.layers.3.self_attn.k_proj.biases,<br>model.layers.3.self_attn.k_proj.scales,<br>model.layers.3.self_attn.k_proj.weight,<br>model.layers.3.self_attn.o_proj.biases,<br>model.layers.3.self_attn.o_proj.scales,<br>model.layers.3.self_attn.o_proj.weight,<br>model.layers.3.self_attn.q_norm.weight,<br>model.layers.3.self_attn.q_proj.biases,<br>model.layers.3.self_attn.q_proj.scales,<br>model.layers.3.self_attn.q_proj.weight,<br>model.layers.3.self_attn.v_proj.biases,<br>model.layers.3.self_attn.v_proj.scales,<br>model.layers.3.self_attn.v_proj.weight,<br>model.layers.30.input_layernorm.weight,<br>model.layers.30.mlp.down_proj.biases,<br>model.layers.30.mlp.down_proj.scales,<br>model.layers.30.mlp.down_proj.weight,<br>model.layers.30.mlp.gate_proj.biases,<br>model.layers.30.mlp.gate_proj.scales,<br>model.layers.30.mlp.gate_proj.weight,<br>model.layers.30.mlp.up_proj.biases,<br>model.layers.30.mlp.up_proj.scales,<br>model.layers.30.mlp.up_proj.weight,<br>model.layers.30.post_attention_layernorm.weight,<br>model.layers.30.self_attn.k_norm.weight,<br>model.layers.30.self_attn.k_proj.biases,<br>model.layers.30.self_attn.k_proj.scales,<br>model.layers.30.self_attn.k_proj.weight,<br>model.layers.30.self_attn.o_proj.biases,<br>model.layers.30.self_attn.o_proj.scales,<br>model.layers.30.self_attn.o_proj.weight,<br>model.layers.30.self_attn.q_norm.weight,<br>model.layers.30.self_attn.q_proj.biases,<br>model.layers.30.self_attn.q_proj.scales,<br>model.layers.30.self_attn.q_proj.weight,<br>model.layers.30.self_attn.v_proj.biases,<br>model.layers.30.self_attn.v_proj.scales,<br>model.layers.30.self_attn.v_proj.weight,<br>model.layers.31.input_layernorm.weight,<br>model.layers.31.mlp.down_proj.biases,<br>model.layers.31.mlp.down_proj.scales,<br>model.layers.31.mlp.down_proj.weight,<br>model.layers.31.mlp.gate_proj.biases,<br>model.layers.31.mlp.gate_proj.scales,<br>model.layers.31.mlp.gate_proj.weight,<br>model.layers.31.mlp.up_proj.biases,<br>model.layers.31.mlp.up_proj.scales,<br>model.layers.31.mlp.up_proj.weight,<br>model.layers.31.post_attention_layernorm.weight,<br>model.layers.31.self_attn.k_norm.weight,<br>model.layers.31.self_attn.k_proj.biases,<br>model.layers.31.self_attn.k_proj.scales,<br>model.layers.31.self_attn.k_proj.weight,<br>model.layers.31.self_attn.o_proj.biases,<br>model.layers.31.self_attn.o_proj.scales,<br>model.layers.31.self_attn.o_proj.weight,<br>model.layers.31.self_attn.q_norm.weight,<br>model.layers.31.self_attn.q_proj.biases,<br>model.layers.31.self_attn.q_proj.scales,<br>model.layers.31.self_attn.q_proj.weight,<br>model.layers.31.self_attn.v_proj.biases,<br>model.layers.31.self_attn.v_proj.scales,<br>model.layers.31.self_attn.v_proj.weight,<br>model.layers.32.input_layernorm.weight,<br>model.layers.32.mlp.down_proj.biases,<br>model.layers.32.mlp.down_proj.scales,<br>model.layers.32.mlp.down_proj.weight,<br>model.layers.32.mlp.gate_proj.biases,<br>model.layers.32.mlp.gate_proj.scales,<br>model.layers.32.mlp.gate_proj.weight,<br>model.layers.32.mlp.up_proj.biases,<br>model.layers.32.mlp.up_proj.scales,<br>model.layers.32.mlp.up_proj.weight,<br>model.layers.32.post_attention_layernorm.weight,<br>model.layers.32.self_attn.k_norm.weight,<br>model.layers.32.self_attn.k_proj.biases,<br>model.layers.32.self_attn.k_proj.scales,<br>model.layers.32.self_attn.k_proj.weight,<br>model.layers.32.self_attn.o_proj.biases,<br>model.layers.32.self_attn.o_proj.scales,<br>model.layers.32.self_attn.o_proj.weight,<br>model.layers.32.self_attn.q_norm.weight,<br>model.layers.32.self_attn.q_proj.biases,<br>model.layers.32.self_attn.q_proj.scales,<br>model.layers.32.self_attn.q_proj.weight,<br>model.layers.32.self_attn.v_proj.biases,<br>model.layers.32.self_attn.v_proj.scales,<br>model.layers.32.self_attn.v_proj.weight,<br>model.layers.33.input_layernorm.weight,<br>model.layers.33.mlp.down_proj.biases,<br>model.layers.33.mlp.down_proj.scales,<br>model.layers.33.mlp.down_proj.weight,<br>model.layers.33.mlp.gate_proj.biases,<br>model.layers.33.mlp.gate_proj.scales,<br>model.layers.33.mlp.gate_proj.weight,<br>model.layers.33.mlp.up_proj.biases,<br>model.layers.33.mlp.up_proj.scales,<br>model.layers.33.mlp.up_proj.weight,<br>model.layers.33.post_attention_layernorm.weight,<br>model.layers.33.self_attn.k_norm.weight,<br>model.layers.33.self_attn.k_proj.biases,<br>model.layers.33.self_attn.k_proj.scales,<br>model.layers.33.self_attn.k_proj.weight,<br>model.layers.33.self_attn.o_proj.biases,<br>model.layers.33.self_attn.o_proj.scales,<br>model.layers.33.self_attn.o_proj.weight,<br>model.layers.33.self_attn.q_norm.weight,<br>model.layers.33.self_attn.q_proj.biases,<br>model.layers.33.self_attn.q_proj.scales,<br>model.layers.33.self_attn.q_proj.weight,<br>model.layers.33.self_attn.v_proj.biases,<br>model.layers.33.self_attn.v_proj.scales,<br>model.layers.33.self_attn.v_proj.weight,<br>model.layers.34.input_layernorm.weight,<br>model.layers.34.mlp.down_proj.biases,<br>model.layers.34.mlp.down_proj.scales,<br>model.layers.34.mlp.down_proj.weight,<br>model.layers.34.mlp.gate_proj.biases,<br>model.layers.34.mlp.gate_proj.scales,<br>model.layers.34.mlp.gate_proj.weight,<br>model.layers.34.mlp.up_proj.biases,<br>model.layers.34.mlp.up_proj.scales,<br>model.layers.34.mlp.up_proj.weight,<br>model.layers.34.post_attention_layernorm.weight,<br>model.layers.34.self_attn.k_norm.weight,<br>model.layers.34.self_attn.k_proj.biases,<br>model.layers.34.self_attn.k_proj.scales,<br>model.layers.34.self_attn.k_proj.weight,<br>model.layers.34.self_attn.o_proj.biases,<br>model.layers.34.self_attn.o_proj.scales,<br>model.layers.34.self_attn.o_proj.weight,<br>model.layers.34.self_attn.q_norm.weight,<br>model.layers.34.self_attn.q_proj.biases,<br>model.layers.34.self_attn.q_proj.scales,<br>model.layers.34.self_attn.q_proj.weight,<br>model.layers.34.self_attn.v_proj.biases,<br>model.layers.34.self_attn.v_proj.scales,<br>model.layers.34.self_attn.v_proj.weight,<br>model.layers.35.input_layernorm.weight,<br>model.layers.35.mlp.down_proj.biases,<br>model.layers.35.mlp.down_proj.scales,<br>model.layers.35.mlp.down_proj.weight,<br>model.layers.35.mlp.gate_proj.biases,<br>model.layers.35.mlp.gate_proj.scales,<br>model.layers.35.mlp.gate_proj.weight,<br>model.layers.35.mlp.up_proj.biases,<br>model.layers.35.mlp.up_proj.scales,<br>model.layers.35.mlp.up_proj.weight,<br>model.layers.35.post_attention_layernorm.weight,<br>model.layers.35.self_attn.k_norm.weight,<br>model.layers.35.self_attn.k_proj.biases,<br>model.layers.35.self_attn.k_proj.scales,<br>model.layers.35.self_attn.k_proj.weight,<br>model.layers.35.self_attn.o_proj.biases,<br>model.layers.35.self_attn.o_proj.scales,<br>model.layers.35.self_attn.o_proj.weight,<br>model.layers.35.self_attn.q_norm.weight,<br>model.layers.35.self_attn.q_proj.biases,<br>model.layers.35.self_attn.q_proj.scales,<br>model.layers.35.self_attn.q_proj.weight,<br>model.layers.35.self_attn.v_proj.biases,<br>model.layers.35.self_attn.v_proj.scales,<br>model.layers.35.self_attn.v_proj.weight,<br>model.layers.4.input_layernorm.weight,<br>model.layers.4.mlp.down_proj.biases,<br>model.layers.4.mlp.down_proj.scales,<br>model.layers.4.mlp.down_proj.weight,<br>model.layers.4.mlp.gate_proj.biases,<br>model.layers.4.mlp.gate_proj.scales,<br>model.layers.4.mlp.gate_proj.weight,<br>model.layers.4.mlp.up_proj.biases,<br>model.layers.4.mlp.up_proj.scales,<br>model.layers.4.mlp.up_proj.weight,<br>model.layers.4.post_attention_layernorm.weight,<br>model.layers.4.self_attn.k_norm.weight,<br>model.layers.4.self_attn.k_proj.biases,<br>model.layers.4.self_attn.k_proj.scales,<br>model.layers.4.self_attn.k_proj.weight,<br>model.layers.4.self_attn.o_proj.biases,<br>model.layers.4.self_attn.o_proj.scales,<br>model.layers.4.self_attn.o_proj.weight,<br>model.layers.4.self_attn.q_norm.weight,<br>model.layers.4.self_attn.q_proj.biases,<br>model.layers.4.self_attn.q_proj.scales,<br>model.layers.4.self_attn.q_proj.weight,<br>model.layers.4.self_attn.v_proj.biases,<br>model.layers.4.self_attn.v_proj.scales,<br>model.layers.4.self_attn.v_proj.weight,<br>model.layers.5.input_layernorm.weight,<br>model.layers.5.mlp.down_proj.biases,<br>model.layers.5.mlp.down_proj.scales,<br>model.layers.5.mlp.down_proj.weight,<br>model.layers.5.mlp.gate_proj.biases,<br>model.layers.5.mlp.gate_proj.scales,<br>model.layers.5.mlp.gate_proj.weight,<br>model.layers.5.mlp.up_proj.biases,<br>model.layers.5.mlp.up_proj.scales,<br>model.layers.5.mlp.up_proj.weight,<br>model.layers.5.post_attention_layernorm.weight,<br>model.layers.5.self_attn.k_norm.weight,<br>model.layers.5.self_attn.k_proj.biases,<br>model.layers.5.self_attn.k_proj.scales,<br>model.layers.5.self_attn.k_proj.weight,<br>model.layers.5.self_attn.o_proj.biases,<br>model.layers.5.self_attn.o_proj.scales,<br>model.layers.5.self_attn.o_proj.weight,<br>model.layers.5.self_attn.q_norm.weight,<br>model.layers.5.self_attn.q_proj.biases,<br>model.layers.5.self_attn.q_proj.scales,<br>model.layers.5.self_attn.q_proj.weight,<br>model.layers.5.self_attn.v_proj.biases,<br>model.layers.5.self_attn.v_proj.scales,<br>model.layers.5.self_attn.v_proj.weight,<br>model.layers.6.input_layernorm.weight,<br>model.layers.6.mlp.down_proj.biases,<br>model.layers.6.mlp.down_proj.scales,<br>model.layers.6.mlp.down_proj.weight,<br>model.layers.6.mlp.gate_proj.biases,<br>model.layers.6.mlp.gate_proj.scales,<br>model.layers.6.mlp.gate_proj.weight,<br>model.layers.6.mlp.up_proj.biases,<br>model.layers.6.mlp.up_proj.scales,<br>model.layers.6.mlp.up_proj.weight,<br>model.layers.6.post_attention_layernorm.weight,<br>model.layers.6.self_attn.k_norm.weight,<br>model.layers.6.self_attn.k_proj.biases,<br>model.layers.6.self_attn.k_proj.scales,<br>model.layers.6.self_attn.k_proj.weight,<br>model.layers.6.self_attn.o_proj.biases,<br>model.layers.6.self_attn.o_proj.scales,<br>model.layers.6.self_attn.o_proj.weight,<br>model.layers.6.self_attn.q_norm.weight,<br>model.layers.6.self_attn.q_proj.biases,<br>model.layers.6.self_attn.q_proj.scales,<br>model.layers.6.self_attn.q_proj.weight,<br>model.layers.6.self_attn.v_proj.biases,<br>model.layers.6.self_attn.v_proj.scales,<br>model.layers.6.self_attn.v_proj.weight,<br>model.layers.7.input_layernorm.weight,<br>model.layers.7.mlp.down_proj.biases,<br>model.layers.7.mlp.down_proj.scales,<br>model.layers.7.mlp.down_proj.weight,<br>model.layers.7.mlp.gate_proj.biases,<br>model.layers.7.mlp.gate_proj.scales,<br>model.layers.7.mlp.gate_proj.weight,<br>model.layers.7.mlp.up_proj.biases,<br>model.layers.7.mlp.up_proj.scales,<br>model.layers.7.mlp.up_proj.weight,<br>model.layers.7.post_attention_layernorm.weight,<br>model.layers.7.self_attn.k_norm.weight,<br>model.layers.7.self_attn.k_proj.biases,<br>model.layers.7.self_attn.k_proj.scales,<br>model.layers.7.self_attn.k_proj.weight,<br>model.layers.7.self_attn.o_proj.biases,<br>model.layers.7.self_attn.o_proj.scales,<br>model.layers.7.self_attn.o_proj.weight,<br>model.layers.7.self_attn.q_norm.weight,<br>model.layers.7.self_attn.q_proj.biases,<br>model.layers.7.self_attn.q_proj.scales,<br>model.layers.7.self_attn.q_proj.weight,<br>model.layers.7.self_attn.v_proj.biases,<br>model.layers.7.self_attn.v_proj.scales,<br>model.layers.7.self_attn.v_proj.weight,<br>model.layers.8.input_layernorm.weight,<br>model.layers.8.mlp.down_proj.biases,<br>model.layers.8.mlp.down_proj.scales,<br>model.layers.8.mlp.down_proj.weight,<br>model.layers.8.mlp.gate_proj.biases,<br>model.layers.8.mlp.gate_proj.scales,<br>model.layers.8.mlp.gate_proj.weight,<br>model.layers.8.mlp.up_proj.biases,<br>model.layers.8.mlp.up_proj.scales,<br>model.layers.8.mlp.up_proj.weight,<br>model.layers.8.post_attention_layernorm.weight,<br>model.layers.8.self_attn.k_norm.weight,<br>model.layers.8.self_attn.k_proj.biases,<br>model.layers.8.self_attn.k_proj.scales,<br>model.layers.8.self_attn.k_proj.weight,<br>model.layers.8.self_attn.o_proj.biases,<br>model.layers.8.self_attn.o_proj.scales,<br>model.layers.8.self_attn.o_proj.weight,<br>model.layers.8.self_attn.q_norm.weight,<br>model.layers.8.self_attn.q_proj.biases,<br>model.layers.8.self_attn.q_proj.scales,<br>model.layers.8.self_attn.q_proj.weight,<br>model.layers.8.self_attn.v_proj.biases,<br>model.layers.8.self_attn.v_proj.scales,<br>model.layers.8.self_attn.v_proj.weight,<br>model.layers.9.input_layernorm.weight,<br>model.layers.9.mlp.down_proj.biases,<br>model.layers.9.mlp.down_proj.scales,<br>model.layers.9.mlp.down_proj.weight,<br>model.layers.9.mlp.gate_proj.biases,<br>model.layers.9.mlp.gate_proj.scales,<br>model.layers.9.mlp.gate_proj.weight,<br>model.layers.9.mlp.up_proj.biases,<br>model.layers.9.mlp.up_proj.scales,<br>model.layers.9.mlp.up_proj.weight,<br>model.layers.9.post_attention_layernorm.weight,<br>model.layers.9.self_attn.k_norm.weight,<br>model.layers.9.self_attn.k_proj.biases,<br>model.layers.9.self_attn.k_proj.scales,<br>model.layers.9.self_attn.k_proj.weight,<br>model.layers.9.self_attn.o_proj.biases,<br>model.layers.9.self_attn.o_proj.scales,<br>model.layers.9.self_attn.o_proj.weight,<br>model.layers.9.self_attn.q_norm.weight,<br>model.layers.9.self_attn.q_proj.biases,<br>model.layers.9.self_attn.q_proj.scales,<br>model.layers.9.self_attn.q_proj.weight,<br>model.layers.9.self_attn.v_proj.biases,<br>model.layers.9.self_attn.v_proj.scales,<br>model.layers.9.self_attn.v_proj.weight,<br>model.norm.weight.
+- *Error message:* Model generation failed for
+  mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600
+  calculated=3800 grid=[(1, 50, 76)]
 - *Root exception type:* ValueError
 - *Root exception module:* builtins
-- *Root exception message:* Received 904 parameters not in model:
-  <br>model.embed_tokens.biases,<br>model.embed_tokens.scales,<br>model.embed_tokens.weight,<br>model.layers.0.input_layernorm.weight,<br>model.layers.0.mlp.down_proj.biases,<br>model.layers.0.mlp.down_proj.scales,<br>model.layers.0.mlp.down_proj.weight,<br>model.layers.0.mlp.gate_proj.biases,<br>model.layers.0.mlp.gate_proj.scales,<br>model.layers.0.mlp.gate_proj.weight,<br>model.layers.0.mlp.up_proj.biases,<br>model.layers.0.mlp.up_proj.scales,<br>model.layers.0.mlp.up_proj.weight,<br>model.layers.0.post_attention_layernorm.weight,<br>model.layers.0.self_attn.k_norm.weight,<br>model.layers.0.self_attn.k_proj.biases,<br>model.layers.0.self_attn.k_proj.scales,<br>model.layers.0.self_attn.k_proj.weight,<br>model.layers.0.self_attn.o_proj.biases,<br>model.layers.0.self_attn.o_proj.scales,<br>model.layers.0.self_attn.o_proj.weight,<br>model.layers.0.self_attn.q_norm.weight,<br>model.layers.0.self_attn.q_proj.biases,<br>model.layers.0.self_attn.q_proj.scales,<br>model.layers.0.self_attn.q_proj.weight,<br>model.layers.0.self_attn.v_proj.biases,<br>model.layers.0.self_attn.v_proj.scales,<br>model.layers.0.self_attn.v_proj.weight,<br>model.layers.1.input_layernorm.weight,<br>model.layers.1.mlp.down_proj.biases,<br>model.layers.1.mlp.down_proj.scales,<br>model.layers.1.mlp.down_proj.weight,<br>model.layers.1.mlp.gate_proj.biases,<br>model.layers.1.mlp.gate_proj.scales,<br>model.layers.1.mlp.gate_proj.weight,<br>model.layers.1.mlp.up_proj.biases,<br>model.layers.1.mlp.up_proj.scales,<br>model.layers.1.mlp.up_proj.weight,<br>model.layers.1.post_attention_layernorm.weight,<br>model.layers.1.self_attn.k_norm.weight,<br>model.layers.1.self_attn.k_proj.biases,<br>model.layers.1.self_attn.k_proj.scales,<br>model.layers.1.self_attn.k_proj.weight,<br>model.layers.1.self_attn.o_proj.biases,<br>model.layers.1.self_attn.o_proj.scales,<br>model.layers.1.self_attn.o_proj.weight,<br>model.layers.1.self_attn.q_norm.weight,<br>model.layers.1.self_attn.q_proj.biases,<br>model.layers.1.self_attn.q_proj.scales,<br>model.layers.1.self_attn.q_proj.weight,<br>model.layers.1.self_attn.v_proj.biases,<br>model.layers.1.self_attn.v_proj.scales,<br>model.layers.1.self_attn.v_proj.weight,<br>model.layers.10.input_layernorm.weight,<br>model.layers.10.mlp.down_proj.biases,<br>model.layers.10.mlp.down_proj.scales,<br>model.layers.10.mlp.down_proj.weight,<br>model.layers.10.mlp.gate_proj.biases,<br>model.layers.10.mlp.gate_proj.scales,<br>model.layers.10.mlp.gate_proj.weight,<br>model.layers.10.mlp.up_proj.biases,<br>model.layers.10.mlp.up_proj.scales,<br>model.layers.10.mlp.up_proj.weight,<br>model.layers.10.post_attention_layernorm.weight,<br>model.layers.10.self_attn.k_norm.weight,<br>model.layers.10.self_attn.k_proj.biases,<br>model.layers.10.self_attn.k_proj.scales,<br>model.layers.10.self_attn.k_proj.weight,<br>model.layers.10.self_attn.o_proj.biases,<br>model.layers.10.self_attn.o_proj.scales,<br>model.layers.10.self_attn.o_proj.weight,<br>model.layers.10.self_attn.q_norm.weight,<br>model.layers.10.self_attn.q_proj.biases,<br>model.layers.10.self_attn.q_proj.scales,<br>model.layers.10.self_attn.q_proj.weight,<br>model.layers.10.self_attn.v_proj.biases,<br>model.layers.10.self_attn.v_proj.scales,<br>model.layers.10.self_attn.v_proj.weight,<br>model.layers.11.input_layernorm.weight,<br>model.layers.11.mlp.down_proj.biases,<br>model.layers.11.mlp.down_proj.scales,<br>model.layers.11.mlp.down_proj.weight,<br>model.layers.11.mlp.gate_proj.biases,<br>model.layers.11.mlp.gate_proj.scales,<br>model.layers.11.mlp.gate_proj.weight,<br>model.layers.11.mlp.up_proj.biases,<br>model.layers.11.mlp.up_proj.scales,<br>model.layers.11.mlp.up_proj.weight,<br>model.layers.11.post_attention_layernorm.weight,<br>model.layers.11.self_attn.k_norm.weight,<br>model.layers.11.self_attn.k_proj.biases,<br>model.layers.11.self_attn.k_proj.scales,<br>model.layers.11.self_attn.k_proj.weight,<br>model.layers.11.self_attn.o_proj.biases,<br>model.layers.11.self_attn.o_proj.scales,<br>model.layers.11.self_attn.o_proj.weight,<br>model.layers.11.self_attn.q_norm.weight,<br>model.layers.11.self_attn.q_proj.biases,<br>model.layers.11.self_attn.q_proj.scales,<br>model.layers.11.self_attn.q_proj.weight,<br>model.layers.11.self_attn.v_proj.biases,<br>model.layers.11.self_attn.v_proj.scales,<br>model.layers.11.self_attn.v_proj.weight,<br>model.layers.12.input_layernorm.weight,<br>model.layers.12.mlp.down_proj.biases,<br>model.layers.12.mlp.down_proj.scales,<br>model.layers.12.mlp.down_proj.weight,<br>model.layers.12.mlp.gate_proj.biases,<br>model.layers.12.mlp.gate_proj.scales,<br>model.layers.12.mlp.gate_proj.weight,<br>model.layers.12.mlp.up_proj.biases,<br>model.layers.12.mlp.up_proj.scales,<br>model.layers.12.mlp.up_proj.weight,<br>model.layers.12.post_attention_layernorm.weight,<br>model.layers.12.self_attn.k_norm.weight,<br>model.layers.12.self_attn.k_proj.biases,<br>model.layers.12.self_attn.k_proj.scales,<br>model.layers.12.self_attn.k_proj.weight,<br>model.layers.12.self_attn.o_proj.biases,<br>model.layers.12.self_attn.o_proj.scales,<br>model.layers.12.self_attn.o_proj.weight,<br>model.layers.12.self_attn.q_norm.weight,<br>model.layers.12.self_attn.q_proj.biases,<br>model.layers.12.self_attn.q_proj.scales,<br>model.layers.12.self_attn.q_proj.weight,<br>model.layers.12.self_attn.v_proj.biases,<br>model.layers.12.self_attn.v_proj.scales,<br>model.layers.12.self_attn.v_proj.weight,<br>model.layers.13.input_layernorm.weight,<br>model.layers.13.mlp.down_proj.biases,<br>model.layers.13.mlp.down_proj.scales,<br>model.layers.13.mlp.down_proj.weight,<br>model.layers.13.mlp.gate_proj.biases,<br>model.layers.13.mlp.gate_proj.scales,<br>model.layers.13.mlp.gate_proj.weight,<br>model.layers.13.mlp.up_proj.biases,<br>model.layers.13.mlp.up_proj.scales,<br>model.layers.13.mlp.up_proj.weight,<br>model.layers.13.post_attention_layernorm.weight,<br>model.layers.13.self_attn.k_norm.weight,<br>model.layers.13.self_attn.k_proj.biases,<br>model.layers.13.self_attn.k_proj.scales,<br>model.layers.13.self_attn.k_proj.weight,<br>model.layers.13.self_attn.o_proj.biases,<br>model.layers.13.self_attn.o_proj.scales,<br>model.layers.13.self_attn.o_proj.weight,<br>model.layers.13.self_attn.q_norm.weight,<br>model.layers.13.self_attn.q_proj.biases,<br>model.layers.13.self_attn.q_proj.scales,<br>model.layers.13.self_attn.q_proj.weight,<br>model.layers.13.self_attn.v_proj.biases,<br>model.layers.13.self_attn.v_proj.scales,<br>model.layers.13.self_attn.v_proj.weight,<br>model.layers.14.input_layernorm.weight,<br>model.layers.14.mlp.down_proj.biases,<br>model.layers.14.mlp.down_proj.scales,<br>model.layers.14.mlp.down_proj.weight,<br>model.layers.14.mlp.gate_proj.biases,<br>model.layers.14.mlp.gate_proj.scales,<br>model.layers.14.mlp.gate_proj.weight,<br>model.layers.14.mlp.up_proj.biases,<br>model.layers.14.mlp.up_proj.scales,<br>model.layers.14.mlp.up_proj.weight,<br>model.layers.14.post_attention_layernorm.weight,<br>model.layers.14.self_attn.k_norm.weight,<br>model.layers.14.self_attn.k_proj.biases,<br>model.layers.14.self_attn.k_proj.scales,<br>model.layers.14.self_attn.k_proj.weight,<br>model.layers.14.self_attn.o_proj.biases,<br>model.layers.14.self_attn.o_proj.scales,<br>model.layers.14.self_attn.o_proj.weight,<br>model.layers.14.self_attn.q_norm.weight,<br>model.layers.14.self_attn.q_proj.biases,<br>model.layers.14.self_attn.q_proj.scales,<br>model.layers.14.self_attn.q_proj.weight,<br>model.layers.14.self_attn.v_proj.biases,<br>model.layers.14.self_attn.v_proj.scales,<br>model.layers.14.self_attn.v_proj.weight,<br>model.layers.15.input_layernorm.weight,<br>model.layers.15.mlp.down_proj.biases,<br>model.layers.15.mlp.down_proj.scales,<br>model.layers.15.mlp.down_proj.weight,<br>model.layers.15.mlp.gate_proj.biases,<br>model.layers.15.mlp.gate_proj.scales,<br>model.layers.15.mlp.gate_proj.weight,<br>model.layers.15.mlp.up_proj.biases,<br>model.layers.15.mlp.up_proj.scales,<br>model.layers.15.mlp.up_proj.weight,<br>model.layers.15.post_attention_layernorm.weight,<br>model.layers.15.self_attn.k_norm.weight,<br>model.layers.15.self_attn.k_proj.biases,<br>model.layers.15.self_attn.k_proj.scales,<br>model.layers.15.self_attn.k_proj.weight,<br>model.layers.15.self_attn.o_proj.biases,<br>model.layers.15.self_attn.o_proj.scales,<br>model.layers.15.self_attn.o_proj.weight,<br>model.layers.15.self_attn.q_norm.weight,<br>model.layers.15.self_attn.q_proj.biases,<br>model.layers.15.self_attn.q_proj.scales,<br>model.layers.15.self_attn.q_proj.weight,<br>model.layers.15.self_attn.v_proj.biases,<br>model.layers.15.self_attn.v_proj.scales,<br>model.layers.15.self_attn.v_proj.weight,<br>model.layers.16.input_layernorm.weight,<br>model.layers.16.mlp.down_proj.biases,<br>model.layers.16.mlp.down_proj.scales,<br>model.layers.16.mlp.down_proj.weight,<br>model.layers.16.mlp.gate_proj.biases,<br>model.layers.16.mlp.gate_proj.scales,<br>model.layers.16.mlp.gate_proj.weight,<br>model.layers.16.mlp.up_proj.biases,<br>model.layers.16.mlp.up_proj.scales,<br>model.layers.16.mlp.up_proj.weight,<br>model.layers.16.post_attention_layernorm.weight,<br>model.layers.16.self_attn.k_norm.weight,<br>model.layers.16.self_attn.k_proj.biases,<br>model.layers.16.self_attn.k_proj.scales,<br>model.layers.16.self_attn.k_proj.weight,<br>model.layers.16.self_attn.o_proj.biases,<br>model.layers.16.self_attn.o_proj.scales,<br>model.layers.16.self_attn.o_proj.weight,<br>model.layers.16.self_attn.q_norm.weight,<br>model.layers.16.self_attn.q_proj.biases,<br>model.layers.16.self_attn.q_proj.scales,<br>model.layers.16.self_attn.q_proj.weight,<br>model.layers.16.self_attn.v_proj.biases,<br>model.layers.16.self_attn.v_proj.scales,<br>model.layers.16.self_attn.v_proj.weight,<br>model.layers.17.input_layernorm.weight,<br>model.layers.17.mlp.down_proj.biases,<br>model.layers.17.mlp.down_proj.scales,<br>model.layers.17.mlp.down_proj.weight,<br>model.layers.17.mlp.gate_proj.biases,<br>model.layers.17.mlp.gate_proj.scales,<br>model.layers.17.mlp.gate_proj.weight,<br>model.layers.17.mlp.up_proj.biases,<br>model.layers.17.mlp.up_proj.scales,<br>model.layers.17.mlp.up_proj.weight,<br>model.layers.17.post_attention_layernorm.weight,<br>model.layers.17.self_attn.k_norm.weight,<br>model.layers.17.self_attn.k_proj.biases,<br>model.layers.17.self_attn.k_proj.scales,<br>model.layers.17.self_attn.k_proj.weight,<br>model.layers.17.self_attn.o_proj.biases,<br>model.layers.17.self_attn.o_proj.scales,<br>model.layers.17.self_attn.o_proj.weight,<br>model.layers.17.self_attn.q_norm.weight,<br>model.layers.17.self_attn.q_proj.biases,<br>model.layers.17.self_attn.q_proj.scales,<br>model.layers.17.self_attn.q_proj.weight,<br>model.layers.17.self_attn.v_proj.biases,<br>model.layers.17.self_attn.v_proj.scales,<br>model.layers.17.self_attn.v_proj.weight,<br>model.layers.18.input_layernorm.weight,<br>model.layers.18.mlp.down_proj.biases,<br>model.layers.18.mlp.down_proj.scales,<br>model.layers.18.mlp.down_proj.weight,<br>model.layers.18.mlp.gate_proj.biases,<br>model.layers.18.mlp.gate_proj.scales,<br>model.layers.18.mlp.gate_proj.weight,<br>model.layers.18.mlp.up_proj.biases,<br>model.layers.18.mlp.up_proj.scales,<br>model.layers.18.mlp.up_proj.weight,<br>model.layers.18.post_attention_layernorm.weight,<br>model.layers.18.self_attn.k_norm.weight,<br>model.layers.18.self_attn.k_proj.biases,<br>model.layers.18.self_attn.k_proj.scales,<br>model.layers.18.self_attn.k_proj.weight,<br>model.layers.18.self_attn.o_proj.biases,<br>model.layers.18.self_attn.o_proj.scales,<br>model.layers.18.self_attn.o_proj.weight,<br>model.layers.18.self_attn.q_norm.weight,<br>model.layers.18.self_attn.q_proj.biases,<br>model.layers.18.self_attn.q_proj.scales,<br>model.layers.18.self_attn.q_proj.weight,<br>model.layers.18.self_attn.v_proj.biases,<br>model.layers.18.self_attn.v_proj.scales,<br>model.layers.18.self_attn.v_proj.weight,<br>model.layers.19.input_layernorm.weight,<br>model.layers.19.mlp.down_proj.biases,<br>model.layers.19.mlp.down_proj.scales,<br>model.layers.19.mlp.down_proj.weight,<br>model.layers.19.mlp.gate_proj.biases,<br>model.layers.19.mlp.gate_proj.scales,<br>model.layers.19.mlp.gate_proj.weight,<br>model.layers.19.mlp.up_proj.biases,<br>model.layers.19.mlp.up_proj.scales,<br>model.layers.19.mlp.up_proj.weight,<br>model.layers.19.post_attention_layernorm.weight,<br>model.layers.19.self_attn.k_norm.weight,<br>model.layers.19.self_attn.k_proj.biases,<br>model.layers.19.self_attn.k_proj.scales,<br>model.layers.19.self_attn.k_proj.weight,<br>model.layers.19.self_attn.o_proj.biases,<br>model.layers.19.self_attn.o_proj.scales,<br>model.layers.19.self_attn.o_proj.weight,<br>model.layers.19.self_attn.q_norm.weight,<br>model.layers.19.self_attn.q_proj.biases,<br>model.layers.19.self_attn.q_proj.scales,<br>model.layers.19.self_attn.q_proj.weight,<br>model.layers.19.self_attn.v_proj.biases,<br>model.layers.19.self_attn.v_proj.scales,<br>model.layers.19.self_attn.v_proj.weight,<br>model.layers.2.input_layernorm.weight,<br>model.layers.2.mlp.down_proj.biases,<br>model.layers.2.mlp.down_proj.scales,<br>model.layers.2.mlp.down_proj.weight,<br>model.layers.2.mlp.gate_proj.biases,<br>model.layers.2.mlp.gate_proj.scales,<br>model.layers.2.mlp.gate_proj.weight,<br>model.layers.2.mlp.up_proj.biases,<br>model.layers.2.mlp.up_proj.scales,<br>model.layers.2.mlp.up_proj.weight,<br>model.layers.2.post_attention_layernorm.weight,<br>model.layers.2.self_attn.k_norm.weight,<br>model.layers.2.self_attn.k_proj.biases,<br>model.layers.2.self_attn.k_proj.scales,<br>model.layers.2.self_attn.k_proj.weight,<br>model.layers.2.self_attn.o_proj.biases,<br>model.layers.2.self_attn.o_proj.scales,<br>model.layers.2.self_attn.o_proj.weight,<br>model.layers.2.self_attn.q_norm.weight,<br>model.layers.2.self_attn.q_proj.biases,<br>model.layers.2.self_attn.q_proj.scales,<br>model.layers.2.self_attn.q_proj.weight,<br>model.layers.2.self_attn.v_proj.biases,<br>model.layers.2.self_attn.v_proj.scales,<br>model.layers.2.self_attn.v_proj.weight,<br>model.layers.20.input_layernorm.weight,<br>model.layers.20.mlp.down_proj.biases,<br>model.layers.20.mlp.down_proj.scales,<br>model.layers.20.mlp.down_proj.weight,<br>model.layers.20.mlp.gate_proj.biases,<br>model.layers.20.mlp.gate_proj.scales,<br>model.layers.20.mlp.gate_proj.weight,<br>model.layers.20.mlp.up_proj.biases,<br>model.layers.20.mlp.up_proj.scales,<br>model.layers.20.mlp.up_proj.weight,<br>model.layers.20.post_attention_layernorm.weight,<br>model.layers.20.self_attn.k_norm.weight,<br>model.layers.20.self_attn.k_proj.biases,<br>model.layers.20.self_attn.k_proj.scales,<br>model.layers.20.self_attn.k_proj.weight,<br>model.layers.20.self_attn.o_proj.biases,<br>model.layers.20.self_attn.o_proj.scales,<br>model.layers.20.self_attn.o_proj.weight,<br>model.layers.20.self_attn.q_norm.weight,<br>model.layers.20.self_attn.q_proj.biases,<br>model.layers.20.self_attn.q_proj.scales,<br>model.layers.20.self_attn.q_proj.weight,<br>model.layers.20.self_attn.v_proj.biases,<br>model.layers.20.self_attn.v_proj.scales,<br>model.layers.20.self_attn.v_proj.weight,<br>model.layers.21.input_layernorm.weight,<br>model.layers.21.mlp.down_proj.biases,<br>model.layers.21.mlp.down_proj.scales,<br>model.layers.21.mlp.down_proj.weight,<br>model.layers.21.mlp.gate_proj.biases,<br>model.layers.21.mlp.gate_proj.scales,<br>model.layers.21.mlp.gate_proj.weight,<br>model.layers.21.mlp.up_proj.biases,<br>model.layers.21.mlp.up_proj.scales,<br>model.layers.21.mlp.up_proj.weight,<br>model.layers.21.post_attention_layernorm.weight,<br>model.layers.21.self_attn.k_norm.weight,<br>model.layers.21.self_attn.k_proj.biases,<br>model.layers.21.self_attn.k_proj.scales,<br>model.layers.21.self_attn.k_proj.weight,<br>model.layers.21.self_attn.o_proj.biases,<br>model.layers.21.self_attn.o_proj.scales,<br>model.layers.21.self_attn.o_proj.weight,<br>model.layers.21.self_attn.q_norm.weight,<br>model.layers.21.self_attn.q_proj.biases,<br>model.layers.21.self_attn.q_proj.scales,<br>model.layers.21.self_attn.q_proj.weight,<br>model.layers.21.self_attn.v_proj.biases,<br>model.layers.21.self_attn.v_proj.scales,<br>model.layers.21.self_attn.v_proj.weight,<br>model.layers.22.input_layernorm.weight,<br>model.layers.22.mlp.down_proj.biases,<br>model.layers.22.mlp.down_proj.scales,<br>model.layers.22.mlp.down_proj.weight,<br>model.layers.22.mlp.gate_proj.biases,<br>model.layers.22.mlp.gate_proj.scales,<br>model.layers.22.mlp.gate_proj.weight,<br>model.layers.22.mlp.up_proj.biases,<br>model.layers.22.mlp.up_proj.scales,<br>model.layers.22.mlp.up_proj.weight,<br>model.layers.22.post_attention_layernorm.weight,<br>model.layers.22.self_attn.k_norm.weight,<br>model.layers.22.self_attn.k_proj.biases,<br>model.layers.22.self_attn.k_proj.scales,<br>model.layers.22.self_attn.k_proj.weight,<br>model.layers.22.self_attn.o_proj.biases,<br>model.layers.22.self_attn.o_proj.scales,<br>model.layers.22.self_attn.o_proj.weight,<br>model.layers.22.self_attn.q_norm.weight,<br>model.layers.22.self_attn.q_proj.biases,<br>model.layers.22.self_attn.q_proj.scales,<br>model.layers.22.self_attn.q_proj.weight,<br>model.layers.22.self_attn.v_proj.biases,<br>model.layers.22.self_attn.v_proj.scales,<br>model.layers.22.self_attn.v_proj.weight,<br>model.layers.23.input_layernorm.weight,<br>model.layers.23.mlp.down_proj.biases,<br>model.layers.23.mlp.down_proj.scales,<br>model.layers.23.mlp.down_proj.weight,<br>model.layers.23.mlp.gate_proj.biases,<br>model.layers.23.mlp.gate_proj.scales,<br>model.layers.23.mlp.gate_proj.weight,<br>model.layers.23.mlp.up_proj.biases,<br>model.layers.23.mlp.up_proj.scales,<br>model.layers.23.mlp.up_proj.weight,<br>model.layers.23.post_attention_layernorm.weight,<br>model.layers.23.self_attn.k_norm.weight,<br>model.layers.23.self_attn.k_proj.biases,<br>model.layers.23.self_attn.k_proj.scales,<br>model.layers.23.self_attn.k_proj.weight,<br>model.layers.23.self_attn.o_proj.biases,<br>model.layers.23.self_attn.o_proj.scales,<br>model.layers.23.self_attn.o_proj.weight,<br>model.layers.23.self_attn.q_norm.weight,<br>model.layers.23.self_attn.q_proj.biases,<br>model.layers.23.self_attn.q_proj.scales,<br>model.layers.23.self_attn.q_proj.weight,<br>model.layers.23.self_attn.v_proj.biases,<br>model.layers.23.self_attn.v_proj.scales,<br>model.layers.23.self_attn.v_proj.weight,<br>model.layers.24.input_layernorm.weight,<br>model.layers.24.mlp.down_proj.biases,<br>model.layers.24.mlp.down_proj.scales,<br>model.layers.24.mlp.down_proj.weight,<br>model.layers.24.mlp.gate_proj.biases,<br>model.layers.24.mlp.gate_proj.scales,<br>model.layers.24.mlp.gate_proj.weight,<br>model.layers.24.mlp.up_proj.biases,<br>model.layers.24.mlp.up_proj.scales,<br>model.layers.24.mlp.up_proj.weight,<br>model.layers.24.post_attention_layernorm.weight,<br>model.layers.24.self_attn.k_norm.weight,<br>model.layers.24.self_attn.k_proj.biases,<br>model.layers.24.self_attn.k_proj.scales,<br>model.layers.24.self_attn.k_proj.weight,<br>model.layers.24.self_attn.o_proj.biases,<br>model.layers.24.self_attn.o_proj.scales,<br>model.layers.24.self_attn.o_proj.weight,<br>model.layers.24.self_attn.q_norm.weight,<br>model.layers.24.self_attn.q_proj.biases,<br>model.layers.24.self_attn.q_proj.scales,<br>model.layers.24.self_attn.q_proj.weight,<br>model.layers.24.self_attn.v_proj.biases,<br>model.layers.24.self_attn.v_proj.scales,<br>model.layers.24.self_attn.v_proj.weight,<br>model.layers.25.input_layernorm.weight,<br>model.layers.25.mlp.down_proj.biases,<br>model.layers.25.mlp.down_proj.scales,<br>model.layers.25.mlp.down_proj.weight,<br>model.layers.25.mlp.gate_proj.biases,<br>model.layers.25.mlp.gate_proj.scales,<br>model.layers.25.mlp.gate_proj.weight,<br>model.layers.25.mlp.up_proj.biases,<br>model.layers.25.mlp.up_proj.scales,<br>model.layers.25.mlp.up_proj.weight,<br>model.layers.25.post_attention_layernorm.weight,<br>model.layers.25.self_attn.k_norm.weight,<br>model.layers.25.self_attn.k_proj.biases,<br>model.layers.25.self_attn.k_proj.scales,<br>model.layers.25.self_attn.k_proj.weight,<br>model.layers.25.self_attn.o_proj.biases,<br>model.layers.25.self_attn.o_proj.scales,<br>model.layers.25.self_attn.o_proj.weight,<br>model.layers.25.self_attn.q_norm.weight,<br>model.layers.25.self_attn.q_proj.biases,<br>model.layers.25.self_attn.q_proj.scales,<br>model.layers.25.self_attn.q_proj.weight,<br>model.layers.25.self_attn.v_proj.biases,<br>model.layers.25.self_attn.v_proj.scales,<br>model.layers.25.self_attn.v_proj.weight,<br>model.layers.26.input_layernorm.weight,<br>model.layers.26.mlp.down_proj.biases,<br>model.layers.26.mlp.down_proj.scales,<br>model.layers.26.mlp.down_proj.weight,<br>model.layers.26.mlp.gate_proj.biases,<br>model.layers.26.mlp.gate_proj.scales,<br>model.layers.26.mlp.gate_proj.weight,<br>model.layers.26.mlp.up_proj.biases,<br>model.layers.26.mlp.up_proj.scales,<br>model.layers.26.mlp.up_proj.weight,<br>model.layers.26.post_attention_layernorm.weight,<br>model.layers.26.self_attn.k_norm.weight,<br>model.layers.26.self_attn.k_proj.biases,<br>model.layers.26.self_attn.k_proj.scales,<br>model.layers.26.self_attn.k_proj.weight,<br>model.layers.26.self_attn.o_proj.biases,<br>model.layers.26.self_attn.o_proj.scales,<br>model.layers.26.self_attn.o_proj.weight,<br>model.layers.26.self_attn.q_norm.weight,<br>model.layers.26.self_attn.q_proj.biases,<br>model.layers.26.self_attn.q_proj.scales,<br>model.layers.26.self_attn.q_proj.weight,<br>model.layers.26.self_attn.v_proj.biases,<br>model.layers.26.self_attn.v_proj.scales,<br>model.layers.26.self_attn.v_proj.weight,<br>model.layers.27.input_layernorm.weight,<br>model.layers.27.mlp.down_proj.biases,<br>model.layers.27.mlp.down_proj.scales,<br>model.layers.27.mlp.down_proj.weight,<br>model.layers.27.mlp.gate_proj.biases,<br>model.layers.27.mlp.gate_proj.scales,<br>model.layers.27.mlp.gate_proj.weight,<br>model.layers.27.mlp.up_proj.biases,<br>model.layers.27.mlp.up_proj.scales,<br>model.layers.27.mlp.up_proj.weight,<br>model.layers.27.post_attention_layernorm.weight,<br>model.layers.27.self_attn.k_norm.weight,<br>model.layers.27.self_attn.k_proj.biases,<br>model.layers.27.self_attn.k_proj.scales,<br>model.layers.27.self_attn.k_proj.weight,<br>model.layers.27.self_attn.o_proj.biases,<br>model.layers.27.self_attn.o_proj.scales,<br>model.layers.27.self_attn.o_proj.weight,<br>model.layers.27.self_attn.q_norm.weight,<br>model.layers.27.self_attn.q_proj.biases,<br>model.layers.27.self_attn.q_proj.scales,<br>model.layers.27.self_attn.q_proj.weight,<br>model.layers.27.self_attn.v_proj.biases,<br>model.layers.27.self_attn.v_proj.scales,<br>model.layers.27.self_attn.v_proj.weight,<br>model.layers.28.input_layernorm.weight,<br>model.layers.28.mlp.down_proj.biases,<br>model.layers.28.mlp.down_proj.scales,<br>model.layers.28.mlp.down_proj.weight,<br>model.layers.28.mlp.gate_proj.biases,<br>model.layers.28.mlp.gate_proj.scales,<br>model.layers.28.mlp.gate_proj.weight,<br>model.layers.28.mlp.up_proj.biases,<br>model.layers.28.mlp.up_proj.scales,<br>model.layers.28.mlp.up_proj.weight,<br>model.layers.28.post_attention_layernorm.weight,<br>model.layers.28.self_attn.k_norm.weight,<br>model.layers.28.self_attn.k_proj.biases,<br>model.layers.28.self_attn.k_proj.scales,<br>model.layers.28.self_attn.k_proj.weight,<br>model.layers.28.self_attn.o_proj.biases,<br>model.layers.28.self_attn.o_proj.scales,<br>model.layers.28.self_attn.o_proj.weight,<br>model.layers.28.self_attn.q_norm.weight,<br>model.layers.28.self_attn.q_proj.biases,<br>model.layers.28.self_attn.q_proj.scales,<br>model.layers.28.self_attn.q_proj.weight,<br>model.layers.28.self_attn.v_proj.biases,<br>model.layers.28.self_attn.v_proj.scales,<br>model.layers.28.self_attn.v_proj.weight,<br>model.layers.29.input_layernorm.weight,<br>model.layers.29.mlp.down_proj.biases,<br>model.layers.29.mlp.down_proj.scales,<br>model.layers.29.mlp.down_proj.weight,<br>model.layers.29.mlp.gate_proj.biases,<br>model.layers.29.mlp.gate_proj.scales,<br>model.layers.29.mlp.gate_proj.weight,<br>model.layers.29.mlp.up_proj.biases,<br>model.layers.29.mlp.up_proj.scales,<br>model.layers.29.mlp.up_proj.weight,<br>model.layers.29.post_attention_layernorm.weight,<br>model.layers.29.self_attn.k_norm.weight,<br>model.layers.29.self_attn.k_proj.biases,<br>model.layers.29.self_attn.k_proj.scales,<br>model.layers.29.self_attn.k_proj.weight,<br>model.layers.29.self_attn.o_proj.biases,<br>model.layers.29.self_attn.o_proj.scales,<br>model.layers.29.self_attn.o_proj.weight,<br>model.layers.29.self_attn.q_norm.weight,<br>model.layers.29.self_attn.q_proj.biases,<br>model.layers.29.self_attn.q_proj.scales,<br>model.layers.29.self_attn.q_proj.weight,<br>model.layers.29.self_attn.v_proj.biases,<br>model.layers.29.self_attn.v_proj.scales,<br>model.layers.29.self_attn.v_proj.weight,<br>model.layers.3.input_layernorm.weight,<br>model.layers.3.mlp.down_proj.biases,<br>model.layers.3.mlp.down_proj.scales,<br>model.layers.3.mlp.down_proj.weight,<br>model.layers.3.mlp.gate_proj.biases,<br>model.layers.3.mlp.gate_proj.scales,<br>model.layers.3.mlp.gate_proj.weight,<br>model.layers.3.mlp.up_proj.biases,<br>model.layers.3.mlp.up_proj.scales,<br>model.layers.3.mlp.up_proj.weight,<br>model.layers.3.post_attention_layernorm.weight,<br>model.layers.3.self_attn.k_norm.weight,<br>model.layers.3.self_attn.k_proj.biases,<br>model.layers.3.self_attn.k_proj.scales,<br>model.layers.3.self_attn.k_proj.weight,<br>model.layers.3.self_attn.o_proj.biases,<br>model.layers.3.self_attn.o_proj.scales,<br>model.layers.3.self_attn.o_proj.weight,<br>model.layers.3.self_attn.q_norm.weight,<br>model.layers.3.self_attn.q_proj.biases,<br>model.layers.3.self_attn.q_proj.scales,<br>model.layers.3.self_attn.q_proj.weight,<br>model.layers.3.self_attn.v_proj.biases,<br>model.layers.3.self_attn.v_proj.scales,<br>model.layers.3.self_attn.v_proj.weight,<br>model.layers.30.input_layernorm.weight,<br>model.layers.30.mlp.down_proj.biases,<br>model.layers.30.mlp.down_proj.scales,<br>model.layers.30.mlp.down_proj.weight,<br>model.layers.30.mlp.gate_proj.biases,<br>model.layers.30.mlp.gate_proj.scales,<br>model.layers.30.mlp.gate_proj.weight,<br>model.layers.30.mlp.up_proj.biases,<br>model.layers.30.mlp.up_proj.scales,<br>model.layers.30.mlp.up_proj.weight,<br>model.layers.30.post_attention_layernorm.weight,<br>model.layers.30.self_attn.k_norm.weight,<br>model.layers.30.self_attn.k_proj.biases,<br>model.layers.30.self_attn.k_proj.scales,<br>model.layers.30.self_attn.k_proj.weight,<br>model.layers.30.self_attn.o_proj.biases,<br>model.layers.30.self_attn.o_proj.scales,<br>model.layers.30.self_attn.o_proj.weight,<br>model.layers.30.self_attn.q_norm.weight,<br>model.layers.30.self_attn.q_proj.biases,<br>model.layers.30.self_attn.q_proj.scales,<br>model.layers.30.self_attn.q_proj.weight,<br>model.layers.30.self_attn.v_proj.biases,<br>model.layers.30.self_attn.v_proj.scales,<br>model.layers.30.self_attn.v_proj.weight,<br>model.layers.31.input_layernorm.weight,<br>model.layers.31.mlp.down_proj.biases,<br>model.layers.31.mlp.down_proj.scales,<br>model.layers.31.mlp.down_proj.weight,<br>model.layers.31.mlp.gate_proj.biases,<br>model.layers.31.mlp.gate_proj.scales,<br>model.layers.31.mlp.gate_proj.weight,<br>model.layers.31.mlp.up_proj.biases,<br>model.layers.31.mlp.up_proj.scales,<br>model.layers.31.mlp.up_proj.weight,<br>model.layers.31.post_attention_layernorm.weight,<br>model.layers.31.self_attn.k_norm.weight,<br>model.layers.31.self_attn.k_proj.biases,<br>model.layers.31.self_attn.k_proj.scales,<br>model.layers.31.self_attn.k_proj.weight,<br>model.layers.31.self_attn.o_proj.biases,<br>model.layers.31.self_attn.o_proj.scales,<br>model.layers.31.self_attn.o_proj.weight,<br>model.layers.31.self_attn.q_norm.weight,<br>model.layers.31.self_attn.q_proj.biases,<br>model.layers.31.self_attn.q_proj.scales,<br>model.layers.31.self_attn.q_proj.weight,<br>model.layers.31.self_attn.v_proj.biases,<br>model.layers.31.self_attn.v_proj.scales,<br>model.layers.31.self_attn.v_proj.weight,<br>model.layers.32.input_layernorm.weight,<br>model.layers.32.mlp.down_proj.biases,<br>model.layers.32.mlp.down_proj.scales,<br>model.layers.32.mlp.down_proj.weight,<br>model.layers.32.mlp.gate_proj.biases,<br>model.layers.32.mlp.gate_proj.scales,<br>model.layers.32.mlp.gate_proj.weight,<br>model.layers.32.mlp.up_proj.biases,<br>model.layers.32.mlp.up_proj.scales,<br>model.layers.32.mlp.up_proj.weight,<br>model.layers.32.post_attention_layernorm.weight,<br>model.layers.32.self_attn.k_norm.weight,<br>model.layers.32.self_attn.k_proj.biases,<br>model.layers.32.self_attn.k_proj.scales,<br>model.layers.32.self_attn.k_proj.weight,<br>model.layers.32.self_attn.o_proj.biases,<br>model.layers.32.self_attn.o_proj.scales,<br>model.layers.32.self_attn.o_proj.weight,<br>model.layers.32.self_attn.q_norm.weight,<br>model.layers.32.self_attn.q_proj.biases,<br>model.layers.32.self_attn.q_proj.scales,<br>model.layers.32.self_attn.q_proj.weight,<br>model.layers.32.self_attn.v_proj.biases,<br>model.layers.32.self_attn.v_proj.scales,<br>model.layers.32.self_attn.v_proj.weight,<br>model.layers.33.input_layernorm.weight,<br>model.layers.33.mlp.down_proj.biases,<br>model.layers.33.mlp.down_proj.scales,<br>model.layers.33.mlp.down_proj.weight,<br>model.layers.33.mlp.gate_proj.biases,<br>model.layers.33.mlp.gate_proj.scales,<br>model.layers.33.mlp.gate_proj.weight,<br>model.layers.33.mlp.up_proj.biases,<br>model.layers.33.mlp.up_proj.scales,<br>model.layers.33.mlp.up_proj.weight,<br>model.layers.33.post_attention_layernorm.weight,<br>model.layers.33.self_attn.k_norm.weight,<br>model.layers.33.self_attn.k_proj.biases,<br>model.layers.33.self_attn.k_proj.scales,<br>model.layers.33.self_attn.k_proj.weight,<br>model.layers.33.self_attn.o_proj.biases,<br>model.layers.33.self_attn.o_proj.scales,<br>model.layers.33.self_attn.o_proj.weight,<br>model.layers.33.self_attn.q_norm.weight,<br>model.layers.33.self_attn.q_proj.biases,<br>model.layers.33.self_attn.q_proj.scales,<br>model.layers.33.self_attn.q_proj.weight,<br>model.layers.33.self_attn.v_proj.biases,<br>model.layers.33.self_attn.v_proj.scales,<br>model.layers.33.self_attn.v_proj.weight,<br>model.layers.34.input_layernorm.weight,<br>model.layers.34.mlp.down_proj.biases,<br>model.layers.34.mlp.down_proj.scales,<br>model.layers.34.mlp.down_proj.weight,<br>model.layers.34.mlp.gate_proj.biases,<br>model.layers.34.mlp.gate_proj.scales,<br>model.layers.34.mlp.gate_proj.weight,<br>model.layers.34.mlp.up_proj.biases,<br>model.layers.34.mlp.up_proj.scales,<br>model.layers.34.mlp.up_proj.weight,<br>model.layers.34.post_attention_layernorm.weight,<br>model.layers.34.self_attn.k_norm.weight,<br>model.layers.34.self_attn.k_proj.biases,<br>model.layers.34.self_attn.k_proj.scales,<br>model.layers.34.self_attn.k_proj.weight,<br>model.layers.34.self_attn.o_proj.biases,<br>model.layers.34.self_attn.o_proj.scales,<br>model.layers.34.self_attn.o_proj.weight,<br>model.layers.34.self_attn.q_norm.weight,<br>model.layers.34.self_attn.q_proj.biases,<br>model.layers.34.self_attn.q_proj.scales,<br>model.layers.34.self_attn.q_proj.weight,<br>model.layers.34.self_attn.v_proj.biases,<br>model.layers.34.self_attn.v_proj.scales,<br>model.layers.34.self_attn.v_proj.weight,<br>model.layers.35.input_layernorm.weight,<br>model.layers.35.mlp.down_proj.biases,<br>model.layers.35.mlp.down_proj.scales,<br>model.layers.35.mlp.down_proj.weight,<br>model.layers.35.mlp.gate_proj.biases,<br>model.layers.35.mlp.gate_proj.scales,<br>model.layers.35.mlp.gate_proj.weight,<br>model.layers.35.mlp.up_proj.biases,<br>model.layers.35.mlp.up_proj.scales,<br>model.layers.35.mlp.up_proj.weight,<br>model.layers.35.post_attention_layernorm.weight,<br>model.layers.35.self_attn.k_norm.weight,<br>model.layers.35.self_attn.k_proj.biases,<br>model.layers.35.self_attn.k_proj.scales,<br>model.layers.35.self_attn.k_proj.weight,<br>model.layers.35.self_attn.o_proj.biases,<br>model.layers.35.self_attn.o_proj.scales,<br>model.layers.35.self_attn.o_proj.weight,<br>model.layers.35.self_attn.q_norm.weight,<br>model.layers.35.self_attn.q_proj.biases,<br>model.layers.35.self_attn.q_proj.scales,<br>model.layers.35.self_attn.q_proj.weight,<br>model.layers.35.self_attn.v_proj.biases,<br>model.layers.35.self_attn.v_proj.scales,<br>model.layers.35.self_attn.v_proj.weight,<br>model.layers.4.input_layernorm.weight,<br>model.layers.4.mlp.down_proj.biases,<br>model.layers.4.mlp.down_proj.scales,<br>model.layers.4.mlp.down_proj.weight,<br>model.layers.4.mlp.gate_proj.biases,<br>model.layers.4.mlp.gate_proj.scales,<br>model.layers.4.mlp.gate_proj.weight,<br>model.layers.4.mlp.up_proj.biases,<br>model.layers.4.mlp.up_proj.scales,<br>model.layers.4.mlp.up_proj.weight,<br>model.layers.4.post_attention_layernorm.weight,<br>model.layers.4.self_attn.k_norm.weight,<br>model.layers.4.self_attn.k_proj.biases,<br>model.layers.4.self_attn.k_proj.scales,<br>model.layers.4.self_attn.k_proj.weight,<br>model.layers.4.self_attn.o_proj.biases,<br>model.layers.4.self_attn.o_proj.scales,<br>model.layers.4.self_attn.o_proj.weight,<br>model.layers.4.self_attn.q_norm.weight,<br>model.layers.4.self_attn.q_proj.biases,<br>model.layers.4.self_attn.q_proj.scales,<br>model.layers.4.self_attn.q_proj.weight,<br>model.layers.4.self_attn.v_proj.biases,<br>model.layers.4.self_attn.v_proj.scales,<br>model.layers.4.self_attn.v_proj.weight,<br>model.layers.5.input_layernorm.weight,<br>model.layers.5.mlp.down_proj.biases,<br>model.layers.5.mlp.down_proj.scales,<br>model.layers.5.mlp.down_proj.weight,<br>model.layers.5.mlp.gate_proj.biases,<br>model.layers.5.mlp.gate_proj.scales,<br>model.layers.5.mlp.gate_proj.weight,<br>model.layers.5.mlp.up_proj.biases,<br>model.layers.5.mlp.up_proj.scales,<br>model.layers.5.mlp.up_proj.weight,<br>model.layers.5.post_attention_layernorm.weight,<br>model.layers.5.self_attn.k_norm.weight,<br>model.layers.5.self_attn.k_proj.biases,<br>model.layers.5.self_attn.k_proj.scales,<br>model.layers.5.self_attn.k_proj.weight,<br>model.layers.5.self_attn.o_proj.biases,<br>model.layers.5.self_attn.o_proj.scales,<br>model.layers.5.self_attn.o_proj.weight,<br>model.layers.5.self_attn.q_norm.weight,<br>model.layers.5.self_attn.q_proj.biases,<br>model.layers.5.self_attn.q_proj.scales,<br>model.layers.5.self_attn.q_proj.weight,<br>model.layers.5.self_attn.v_proj.biases,<br>model.layers.5.self_attn.v_proj.scales,<br>model.layers.5.self_attn.v_proj.weight,<br>model.layers.6.input_layernorm.weight,<br>model.layers.6.mlp.down_proj.biases,<br>model.layers.6.mlp.down_proj.scales,<br>model.layers.6.mlp.down_proj.weight,<br>model.layers.6.mlp.gate_proj.biases,<br>model.layers.6.mlp.gate_proj.scales,<br>model.layers.6.mlp.gate_proj.weight,<br>model.layers.6.mlp.up_proj.biases,<br>model.layers.6.mlp.up_proj.scales,<br>model.layers.6.mlp.up_proj.weight,<br>model.layers.6.post_attention_layernorm.weight,<br>model.layers.6.self_attn.k_norm.weight,<br>model.layers.6.self_attn.k_proj.biases,<br>model.layers.6.self_attn.k_proj.scales,<br>model.layers.6.self_attn.k_proj.weight,<br>model.layers.6.self_attn.o_proj.biases,<br>model.layers.6.self_attn.o_proj.scales,<br>model.layers.6.self_attn.o_proj.weight,<br>model.layers.6.self_attn.q_norm.weight,<br>model.layers.6.self_attn.q_proj.biases,<br>model.layers.6.self_attn.q_proj.scales,<br>model.layers.6.self_attn.q_proj.weight,<br>model.layers.6.self_attn.v_proj.biases,<br>model.layers.6.self_attn.v_proj.scales,<br>model.layers.6.self_attn.v_proj.weight,<br>model.layers.7.input_layernorm.weight,<br>model.layers.7.mlp.down_proj.biases,<br>model.layers.7.mlp.down_proj.scales,<br>model.layers.7.mlp.down_proj.weight,<br>model.layers.7.mlp.gate_proj.biases,<br>model.layers.7.mlp.gate_proj.scales,<br>model.layers.7.mlp.gate_proj.weight,<br>model.layers.7.mlp.up_proj.biases,<br>model.layers.7.mlp.up_proj.scales,<br>model.layers.7.mlp.up_proj.weight,<br>model.layers.7.post_attention_layernorm.weight,<br>model.layers.7.self_attn.k_norm.weight,<br>model.layers.7.self_attn.k_proj.biases,<br>model.layers.7.self_attn.k_proj.scales,<br>model.layers.7.self_attn.k_proj.weight,<br>model.layers.7.self_attn.o_proj.biases,<br>model.layers.7.self_attn.o_proj.scales,<br>model.layers.7.self_attn.o_proj.weight,<br>model.layers.7.self_attn.q_norm.weight,<br>model.layers.7.self_attn.q_proj.biases,<br>model.layers.7.self_attn.q_proj.scales,<br>model.layers.7.self_attn.q_proj.weight,<br>model.layers.7.self_attn.v_proj.biases,<br>model.layers.7.self_attn.v_proj.scales,<br>model.layers.7.self_attn.v_proj.weight,<br>model.layers.8.input_layernorm.weight,<br>model.layers.8.mlp.down_proj.biases,<br>model.layers.8.mlp.down_proj.scales,<br>model.layers.8.mlp.down_proj.weight,<br>model.layers.8.mlp.gate_proj.biases,<br>model.layers.8.mlp.gate_proj.scales,<br>model.layers.8.mlp.gate_proj.weight,<br>model.layers.8.mlp.up_proj.biases,<br>model.layers.8.mlp.up_proj.scales,<br>model.layers.8.mlp.up_proj.weight,<br>model.layers.8.post_attention_layernorm.weight,<br>model.layers.8.self_attn.k_norm.weight,<br>model.layers.8.self_attn.k_proj.biases,<br>model.layers.8.self_attn.k_proj.scales,<br>model.layers.8.self_attn.k_proj.weight,<br>model.layers.8.self_attn.o_proj.biases,<br>model.layers.8.self_attn.o_proj.scales,<br>model.layers.8.self_attn.o_proj.weight,<br>model.layers.8.self_attn.q_norm.weight,<br>model.layers.8.self_attn.q_proj.biases,<br>model.layers.8.self_attn.q_proj.scales,<br>model.layers.8.self_attn.q_proj.weight,<br>model.layers.8.self_attn.v_proj.biases,<br>model.layers.8.self_attn.v_proj.scales,<br>model.layers.8.self_attn.v_proj.weight,<br>model.layers.9.input_layernorm.weight,<br>model.layers.9.mlp.down_proj.biases,<br>model.layers.9.mlp.down_proj.scales,<br>model.layers.9.mlp.down_proj.weight,<br>model.layers.9.mlp.gate_proj.biases,<br>model.layers.9.mlp.gate_proj.scales,<br>model.layers.9.mlp.gate_proj.weight,<br>model.layers.9.mlp.up_proj.biases,<br>model.layers.9.mlp.up_proj.scales,<br>model.layers.9.mlp.up_proj.weight,<br>model.layers.9.post_attention_layernorm.weight,<br>model.layers.9.self_attn.k_norm.weight,<br>model.layers.9.self_attn.k_proj.biases,<br>model.layers.9.self_attn.k_proj.scales,<br>model.layers.9.self_attn.k_proj.weight,<br>model.layers.9.self_attn.o_proj.biases,<br>model.layers.9.self_attn.o_proj.scales,<br>model.layers.9.self_attn.o_proj.weight,<br>model.layers.9.self_attn.q_norm.weight,<br>model.layers.9.self_attn.q_proj.biases,<br>model.layers.9.self_attn.q_proj.scales,<br>model.layers.9.self_attn.q_proj.weight,<br>model.layers.9.self_attn.v_proj.biases,<br>model.layers.9.self_attn.v_proj.scales,<br>model.layers.9.self_attn.v_proj.weight,<br>model.norm.weight.
+- *Root exception message:* cu_seqlens mismatch: total_patches=7600
+  calculated=3800 grid=[(1, 50, 76)]
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.25s
-- *Generation time:* -
-- *Total time:* 0.25s
-- *Prompt preparation time:* -
+- *Model load time:* 1.51s
+- *Generation time:* 0.64s
+- *Total time:* 2.79s
+- *Prompt preparation time:* 0.642
 - *First-token latency:* -
-- *Cleanup time:* 0.0726
+- *Cleanup time:* 0.0955
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3834,960 +3214,57 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3483.35it/s]
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00303
+- *Post-cleanup active memory (GB):* 0.0041
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
+- *Rendered prompt characters:* 1462
+- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
 - *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
 - *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mage-VL-OptiQ-4bit/snapshots/bde6c9c7146acff6af09e203245014f19306c5c5
-- *Generation settings:* not captured
-- *EOS token:* not captured
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
 
 #### Complete traceback
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
+    return generate_once()
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
+    return _generate_with_repetition_guard(
+        model=prepared.model,
     ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        **prepared.generate_kwargs,
     )
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
+    for chunk in stream_generate(
+                 ~~~~~~~~~~~~~~~^
+        model=model, processor=processor, prompt=prompt, image=image, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1083, in stream_generate
+    for n, (token, logprobs) in enumerate(gen):
+                                ~~~~~~~~~^^^^^
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 434, in generate_step
+    embedding_output = model.get_input_embeddings(
+        input_ids, pixel_values, mask=mask, **kwargs
     )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1171, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/mage_vl.py", line 66, in get_input_embeddings
+    hidden_states = self.vision_tower(
+        pixel_values.astype(inputs_embeds.dtype), patch_positions, grid_thw
+    )
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 381, in __call__
+    cu = build_cu_seqlens(grid_thw, total_patches, self.config.frame_windows_size)
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 309, in build_cu_seqlens
     raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
+        f"cu_seqlens mismatch: total_patches={total_patches} calculated={cu[-1]} grid={grid_thw}"
     )
-ValueError: Received 904 parameters not in model: 
-model.embed_tokens.biases,
-model.embed_tokens.scales,
-model.embed_tokens.weight,
-model.layers.0.input_layernorm.weight,
-model.layers.0.mlp.down_proj.biases,
-model.layers.0.mlp.down_proj.scales,
-model.layers.0.mlp.down_proj.weight,
-model.layers.0.mlp.gate_proj.biases,
-model.layers.0.mlp.gate_proj.scales,
-model.layers.0.mlp.gate_proj.weight,
-model.layers.0.mlp.up_proj.biases,
-model.layers.0.mlp.up_proj.scales,
-model.layers.0.mlp.up_proj.weight,
-model.layers.0.post_attention_layernorm.weight,
-model.layers.0.self_attn.k_norm.weight,
-model.layers.0.self_attn.k_proj.biases,
-model.layers.0.self_attn.k_proj.scales,
-model.layers.0.self_attn.k_proj.weight,
-model.layers.0.self_attn.o_proj.biases,
-model.layers.0.self_attn.o_proj.scales,
-model.layers.0.self_attn.o_proj.weight,
-model.layers.0.self_attn.q_norm.weight,
-model.layers.0.self_attn.q_proj.biases,
-model.layers.0.self_attn.q_proj.scales,
-model.layers.0.self_attn.q_proj.weight,
-model.layers.0.self_attn.v_proj.biases,
-model.layers.0.self_attn.v_proj.scales,
-model.layers.0.self_attn.v_proj.weight,
-model.layers.1.input_layernorm.weight,
-model.layers.1.mlp.down_proj.biases,
-model.layers.1.mlp.down_proj.scales,
-model.layers.1.mlp.down_proj.weight,
-model.layers.1.mlp.gate_proj.biases,
-model.layers.1.mlp.gate_proj.scales,
-model.layers.1.mlp.gate_proj.weight,
-model.layers.1.mlp.up_proj.biases,
-model.layers.1.mlp.up_proj.scales,
-model.layers.1.mlp.up_proj.weight,
-model.layers.1.post_attention_layernorm.weight,
-model.layers.1.self_attn.k_norm.weight,
-model.layers.1.self_attn.k_proj.biases,
-model.layers.1.self_attn.k_proj.scales,
-model.layers.1.self_attn.k_proj.weight,
-model.layers.1.self_attn.o_proj.biases,
-model.layers.1.self_attn.o_proj.scales,
-model.layers.1.self_attn.o_proj.weight,
-model.layers.1.self_attn.q_norm.weight,
-model.layers.1.self_attn.q_proj.biases,
-model.layers.1.self_attn.q_proj.scales,
-model.layers.1.self_attn.q_proj.weight,
-model.layers.1.self_attn.v_proj.biases,
-model.layers.1.self_attn.v_proj.scales,
-model.layers.1.self_attn.v_proj.weight,
-model.layers.10.input_layernorm.weight,
-model.layers.10.mlp.down_proj.biases,
-model.layers.10.mlp.down_proj.scales,
-model.layers.10.mlp.down_proj.weight,
-model.layers.10.mlp.gate_proj.biases,
-model.layers.10.mlp.gate_proj.scales,
-model.layers.10.mlp.gate_proj.weight,
-model.layers.10.mlp.up_proj.biases,
-model.layers.10.mlp.up_proj.scales,
-model.layers.10.mlp.up_proj.weight,
-model.layers.10.post_attention_layernorm.weight,
-model.layers.10.self_attn.k_norm.weight,
-model.layers.10.self_attn.k_proj.biases,
-model.layers.10.self_attn.k_proj.scales,
-model.layers.10.self_attn.k_proj.weight,
-model.layers.10.self_attn.o_proj.biases,
-model.layers.10.self_attn.o_proj.scales,
-model.layers.10.self_attn.o_proj.weight,
-model.layers.10.self_attn.q_norm.weight,
-model.layers.10.self_attn.q_proj.biases,
-model.layers.10.self_attn.q_proj.scales,
-model.layers.10.self_attn.q_proj.weight,
-model.layers.10.self_attn.v_proj.biases,
-model.layers.10.self_attn.v_proj.scales,
-model.layers.10.self_attn.v_proj.weight,
-model.layers.11.input_layernorm.weight,
-model.layers.11.mlp.down_proj.biases,
-model.layers.11.mlp.down_proj.scales,
-model.layers.11.mlp.down_proj.weight,
-model.layers.11.mlp.gate_proj.biases,
-model.layers.11.mlp.gate_proj.scales,
-model.layers.11.mlp.gate_proj.weight,
-model.layers.11.mlp.up_proj.biases,
-model.layers.11.mlp.up_proj.scales,
-model.layers.11.mlp.up_proj.weight,
-model.layers.11.post_attention_layernorm.weight,
-model.layers.11.self_attn.k_norm.weight,
-model.layers.11.self_attn.k_proj.biases,
-model.layers.11.self_attn.k_proj.scales,
-model.layers.11.self_attn.k_proj.weight,
-model.layers.11.self_attn.o_proj.biases,
-model.layers.11.self_attn.o_proj.scales,
-model.layers.11.self_attn.o_proj.weight,
-model.layers.11.self_attn.q_norm.weight,
-model.layers.11.self_attn.q_proj.biases,
-model.layers.11.self_attn.q_proj.scales,
-model.layers.11.self_attn.q_proj.weight,
-model.layers.11.self_attn.v_proj.biases,
-model.layers.11.self_attn.v_proj.scales,
-model.layers.11.self_attn.v_proj.weight,
-model.layers.12.input_layernorm.weight,
-model.layers.12.mlp.down_proj.biases,
-model.layers.12.mlp.down_proj.scales,
-model.layers.12.mlp.down_proj.weight,
-model.layers.12.mlp.gate_proj.biases,
-model.layers.12.mlp.gate_proj.scales,
-model.layers.12.mlp.gate_proj.weight,
-model.layers.12.mlp.up_proj.biases,
-model.layers.12.mlp.up_proj.scales,
-model.layers.12.mlp.up_proj.weight,
-model.layers.12.post_attention_layernorm.weight,
-model.layers.12.self_attn.k_norm.weight,
-model.layers.12.self_attn.k_proj.biases,
-model.layers.12.self_attn.k_proj.scales,
-model.layers.12.self_attn.k_proj.weight,
-model.layers.12.self_attn.o_proj.biases,
-model.layers.12.self_attn.o_proj.scales,
-model.layers.12.self_attn.o_proj.weight,
-model.layers.12.self_attn.q_norm.weight,
-model.layers.12.self_attn.q_proj.biases,
-model.layers.12.self_attn.q_proj.scales,
-model.layers.12.self_attn.q_proj.weight,
-model.layers.12.self_attn.v_proj.biases,
-model.layers.12.self_attn.v_proj.scales,
-model.layers.12.self_attn.v_proj.weight,
-model.layers.13.input_layernorm.weight,
-model.layers.13.mlp.down_proj.biases,
-model.layers.13.mlp.down_proj.scales,
-model.layers.13.mlp.down_proj.weight,
-model.layers.13.mlp.gate_proj.biases,
-model.layers.13.mlp.gate_proj.scales,
-model.layers.13.mlp.gate_proj.weight,
-model.layers.13.mlp.up_proj.biases,
-model.layers.13.mlp.up_proj.scales,
-model.layers.13.mlp.up_proj.weight,
-model.layers.13.post_attention_layernorm.weight,
-model.layers.13.self_attn.k_norm.weight,
-model.layers.13.self_attn.k_proj.biases,
-model.layers.13.self_attn.k_proj.scales,
-model.layers.13.self_attn.k_proj.weight,
-model.layers.13.self_attn.o_proj.biases,
-model.layers.13.self_attn.o_proj.scales,
-model.layers.13.self_attn.o_proj.weight,
-model.layers.13.self_attn.q_norm.weight,
-model.layers.13.self_attn.q_proj.biases,
-model.layers.13.self_attn.q_proj.scales,
-model.layers.13.self_attn.q_proj.weight,
-model.layers.13.self_attn.v_proj.biases,
-model.layers.13.self_attn.v_proj.scales,
-model.layers.13.self_attn.v_proj.weight,
-model.layers.14.input_layernorm.weight,
-model.layers.14.mlp.down_proj.biases,
-model.layers.14.mlp.down_proj.scales,
-model.layers.14.mlp.down_proj.weight,
-model.layers.14.mlp.gate_proj.biases,
-model.layers.14.mlp.gate_proj.scales,
-model.layers.14.mlp.gate_proj.weight,
-model.layers.14.mlp.up_proj.biases,
-model.layers.14.mlp.up_proj.scales,
-model.layers.14.mlp.up_proj.weight,
-model.layers.14.post_attention_layernorm.weight,
-model.layers.14.self_attn.k_norm.weight,
-model.layers.14.self_attn.k_proj.biases,
-model.layers.14.self_attn.k_proj.scales,
-model.layers.14.self_attn.k_proj.weight,
-model.layers.14.self_attn.o_proj.biases,
-model.layers.14.self_attn.o_proj.scales,
-model.layers.14.self_attn.o_proj.weight,
-model.layers.14.self_attn.q_norm.weight,
-model.layers.14.self_attn.q_proj.biases,
-model.layers.14.self_attn.q_proj.scales,
-model.layers.14.self_attn.q_proj.weight,
-model.layers.14.self_attn.v_proj.biases,
-model.layers.14.self_attn.v_proj.scales,
-model.layers.14.self_attn.v_proj.weight,
-model.layers.15.input_layernorm.weight,
-model.layers.15.mlp.down_proj.biases,
-model.layers.15.mlp.down_proj.scales,
-model.layers.15.mlp.down_proj.weight,
-model.layers.15.mlp.gate_proj.biases,
-model.layers.15.mlp.gate_proj.scales,
-model.layers.15.mlp.gate_proj.weight,
-model.layers.15.mlp.up_proj.biases,
-model.layers.15.mlp.up_proj.scales,
-model.layers.15.mlp.up_proj.weight,
-model.layers.15.post_attention_layernorm.weight,
-model.layers.15.self_attn.k_norm.weight,
-model.layers.15.self_attn.k_proj.biases,
-model.layers.15.self_attn.k_proj.scales,
-model.layers.15.self_attn.k_proj.weight,
-model.layers.15.self_attn.o_proj.biases,
-model.layers.15.self_attn.o_proj.scales,
-model.layers.15.self_attn.o_proj.weight,
-model.layers.15.self_attn.q_norm.weight,
-model.layers.15.self_attn.q_proj.biases,
-model.layers.15.self_attn.q_proj.scales,
-model.layers.15.self_attn.q_proj.weight,
-model.layers.15.self_attn.v_proj.biases,
-model.layers.15.self_attn.v_proj.scales,
-model.layers.15.self_attn.v_proj.weight,
-model.layers.16.input_layernorm.weight,
-model.layers.16.mlp.down_proj.biases,
-model.layers.16.mlp.down_proj.scales,
-model.layers.16.mlp.down_proj.weight,
-model.layers.16.mlp.gate_proj.biases,
-model.layers.16.mlp.gate_proj.scales,
-model.layers.16.mlp.gate_proj.weight,
-model.layers.16.mlp.up_proj.biases,
-model.layers.16.mlp.up_proj.scales,
-model.layers.16.mlp.up_proj.weight,
-model.layers.16.post_attention_layernorm.weight,
-model.layers.16.self_attn.k_norm.weight,
-model.layers.16.self_attn.k_proj.biases,
-model.layers.16.self_attn.k_proj.scales,
-model.layers.16.self_attn.k_proj.weight,
-model.layers.16.self_attn.o_proj.biases,
-model.layers.16.self_attn.o_proj.scales,
-model.layers.16.self_attn.o_proj.weight,
-model.layers.16.self_attn.q_norm.weight,
-model.layers.16.self_attn.q_proj.biases,
-model.layers.16.self_attn.q_proj.scales,
-model.layers.16.self_attn.q_proj.weight,
-model.layers.16.self_attn.v_proj.biases,
-model.layers.16.self_attn.v_proj.scales,
-model.layers.16.self_attn.v_proj.weight,
-model.layers.17.input_layernorm.weight,
-model.layers.17.mlp.down_proj.biases,
-model.layers.17.mlp.down_proj.scales,
-model.layers.17.mlp.down_proj.weight,
-model.layers.17.mlp.gate_proj.biases,
-model.layers.17.mlp.gate_proj.scales,
-model.layers.17.mlp.gate_proj.weight,
-model.layers.17.mlp.up_proj.biases,
-model.layers.17.mlp.up_proj.scales,
-model.layers.17.mlp.up_proj.weight,
-model.layers.17.post_attention_layernorm.weight,
-model.layers.17.self_attn.k_norm.weight,
-model.layers.17.self_attn.k_proj.biases,
-model.layers.17.self_attn.k_proj.scales,
-model.layers.17.self_attn.k_proj.weight,
-model.layers.17.self_attn.o_proj.biases,
-model.layers.17.self_attn.o_proj.scales,
-model.layers.17.self_attn.o_proj.weight,
-model.layers.17.self_attn.q_norm.weight,
-model.layers.17.self_attn.q_proj.biases,
-model.layers.17.self_attn.q_proj.scales,
-model.layers.17.self_attn.q_proj.weight,
-model.layers.17.self_attn.v_proj.biases,
-model.layers.17.self_attn.v_proj.scales,
-model.layers.17.self_attn.v_proj.weight,
-model.layers.18.input_layernorm.weight,
-model.layers.18.mlp.down_proj.biases,
-model.layers.18.mlp.down_proj.scales,
-model.layers.18.mlp.down_proj.weight,
-model.layers.18.mlp.gate_proj.biases,
-model.layers.18.mlp.gate_proj.scales,
-model.layers.18.mlp.gate_proj.weight,
-model.layers.18.mlp.up_proj.biases,
-model.layers.18.mlp.up_proj.scales,
-model.layers.18.mlp.up_proj.weight,
-model.layers.18.post_attention_layernorm.weight,
-model.layers.18.self_attn.k_norm.weight,
-model.layers.18.self_attn.k_proj.biases,
-model.layers.18.self_attn.k_proj.scales,
-model.layers.18.self_attn.k_proj.weight,
-model.layers.18.self_attn.o_proj.biases,
-model.layers.18.self_attn.o_proj.scales,
-model.layers.18.self_attn.o_proj.weight,
-model.layers.18.self_attn.q_norm.weight,
-model.layers.18.self_attn.q_proj.biases,
-model.layers.18.self_attn.q_proj.scales,
-model.layers.18.self_attn.q_proj.weight,
-model.layers.18.self_attn.v_proj.biases,
-model.layers.18.self_attn.v_proj.scales,
-model.layers.18.self_attn.v_proj.weight,
-model.layers.19.input_layernorm.weight,
-model.layers.19.mlp.down_proj.biases,
-model.layers.19.mlp.down_proj.scales,
-model.layers.19.mlp.down_proj.weight,
-model.layers.19.mlp.gate_proj.biases,
-model.layers.19.mlp.gate_proj.scales,
-model.layers.19.mlp.gate_proj.weight,
-model.layers.19.mlp.up_proj.biases,
-model.layers.19.mlp.up_proj.scales,
-model.layers.19.mlp.up_proj.weight,
-model.layers.19.post_attention_layernorm.weight,
-model.layers.19.self_attn.k_norm.weight,
-model.layers.19.self_attn.k_proj.biases,
-model.layers.19.self_attn.k_proj.scales,
-model.layers.19.self_attn.k_proj.weight,
-model.layers.19.self_attn.o_proj.biases,
-model.layers.19.self_attn.o_proj.scales,
-model.layers.19.self_attn.o_proj.weight,
-model.layers.19.self_attn.q_norm.weight,
-model.layers.19.self_attn.q_proj.biases,
-model.layers.19.self_attn.q_proj.scales,
-model.layers.19.self_attn.q_proj.weight,
-model.layers.19.self_attn.v_proj.biases,
-model.layers.19.self_attn.v_proj.scales,
-model.layers.19.self_attn.v_proj.weight,
-model.layers.2.input_layernorm.weight,
-model.layers.2.mlp.down_proj.biases,
-model.layers.2.mlp.down_proj.scales,
-model.layers.2.mlp.down_proj.weight,
-model.layers.2.mlp.gate_proj.biases,
-model.layers.2.mlp.gate_proj.scales,
-model.layers.2.mlp.gate_proj.weight,
-model.layers.2.mlp.up_proj.biases,
-model.layers.2.mlp.up_proj.scales,
-model.layers.2.mlp.up_proj.weight,
-model.layers.2.post_attention_layernorm.weight,
-model.layers.2.self_attn.k_norm.weight,
-model.layers.2.self_attn.k_proj.biases,
-model.layers.2.self_attn.k_proj.scales,
-model.layers.2.self_attn.k_proj.weight,
-model.layers.2.self_attn.o_proj.biases,
-model.layers.2.self_attn.o_proj.scales,
-model.layers.2.self_attn.o_proj.weight,
-model.layers.2.self_attn.q_norm.weight,
-model.layers.2.self_attn.q_proj.biases,
-model.layers.2.self_attn.q_proj.scales,
-model.layers.2.self_attn.q_proj.weight,
-model.layers.2.self_attn.v_proj.biases,
-model.layers.2.self_attn.v_proj.scales,
-model.layers.2.self_attn.v_proj.weight,
-model.layers.20.input_layernorm.weight,
-model.layers.20.mlp.down_proj.biases,
-model.layers.20.mlp.down_proj.scales,
-model.layers.20.mlp.down_proj.weight,
-model.layers.20.mlp.gate_proj.biases,
-model.layers.20.mlp.gate_proj.scales,
-model.layers.20.mlp.gate_proj.weight,
-model.layers.20.mlp.up_proj.biases,
-model.layers.20.mlp.up_proj.scales,
-model.layers.20.mlp.up_proj.weight,
-model.layers.20.post_attention_layernorm.weight,
-model.layers.20.self_attn.k_norm.weight,
-model.layers.20.self_attn.k_proj.biases,
-model.layers.20.self_attn.k_proj.scales,
-model.layers.20.self_attn.k_proj.weight,
-model.layers.20.self_attn.o_proj.biases,
-model.layers.20.self_attn.o_proj.scales,
-model.layers.20.self_attn.o_proj.weight,
-model.layers.20.self_attn.q_norm.weight,
-model.layers.20.self_attn.q_proj.biases,
-model.layers.20.self_attn.q_proj.scales,
-model.layers.20.self_attn.q_proj.weight,
-model.layers.20.self_attn.v_proj.biases,
-model.layers.20.self_attn.v_proj.scales,
-model.layers.20.self_attn.v_proj.weight,
-model.layers.21.input_layernorm.weight,
-model.layers.21.mlp.down_proj.biases,
-model.layers.21.mlp.down_proj.scales,
-model.layers.21.mlp.down_proj.weight,
-model.layers.21.mlp.gate_proj.biases,
-model.layers.21.mlp.gate_proj.scales,
-model.layers.21.mlp.gate_proj.weight,
-model.layers.21.mlp.up_proj.biases,
-model.layers.21.mlp.up_proj.scales,
-model.layers.21.mlp.up_proj.weight,
-model.layers.21.post_attention_layernorm.weight,
-model.layers.21.self_attn.k_norm.weight,
-model.layers.21.self_attn.k_proj.biases,
-model.layers.21.self_attn.k_proj.scales,
-model.layers.21.self_attn.k_proj.weight,
-model.layers.21.self_attn.o_proj.biases,
-model.layers.21.self_attn.o_proj.scales,
-model.layers.21.self_attn.o_proj.weight,
-model.layers.21.self_attn.q_norm.weight,
-model.layers.21.self_attn.q_proj.biases,
-model.layers.21.self_attn.q_proj.scales,
-model.layers.21.self_attn.q_proj.weight,
-model.layers.21.self_attn.v_proj.biases,
-model.layers.21.self_attn.v_proj.scales,
-model.layers.21.self_attn.v_proj.weight,
-model.layers.22.input_layernorm.weight,
-model.layers.22.mlp.down_proj.biases,
-model.layers.22.mlp.down_proj.scales,
-model.layers.22.mlp.down_proj.weight,
-model.layers.22.mlp.gate_proj.biases,
-model.layers.22.mlp.gate_proj.scales,
-model.layers.22.mlp.gate_proj.weight,
-model.layers.22.mlp.up_proj.biases,
-model.layers.22.mlp.up_proj.scales,
-model.layers.22.mlp.up_proj.weight,
-model.layers.22.post_attention_layernorm.weight,
-model.layers.22.self_attn.k_norm.weight,
-model.layers.22.self_attn.k_proj.biases,
-model.layers.22.self_attn.k_proj.scales,
-model.layers.22.self_attn.k_proj.weight,
-model.layers.22.self_attn.o_proj.biases,
-model.layers.22.self_attn.o_proj.scales,
-model.layers.22.self_attn.o_proj.weight,
-model.layers.22.self_attn.q_norm.weight,
-model.layers.22.self_attn.q_proj.biases,
-model.layers.22.self_attn.q_proj.scales,
-model.layers.22.self_attn.q_proj.weight,
-model.layers.22.self_attn.v_proj.biases,
-model.layers.22.self_attn.v_proj.scales,
-model.layers.22.self_attn.v_proj.weight,
-model.layers.23.input_layernorm.weight,
-model.layers.23.mlp.down_proj.biases,
-model.layers.23.mlp.down_proj.scales,
-model.layers.23.mlp.down_proj.weight,
-model.layers.23.mlp.gate_proj.biases,
-model.layers.23.mlp.gate_proj.scales,
-model.layers.23.mlp.gate_proj.weight,
-model.layers.23.mlp.up_proj.biases,
-model.layers.23.mlp.up_proj.scales,
-model.layers.23.mlp.up_proj.weight,
-model.layers.23.post_attention_layernorm.weight,
-model.layers.23.self_attn.k_norm.weight,
-model.layers.23.self_attn.k_proj.biases,
-model.layers.23.self_attn.k_proj.scales,
-model.layers.23.self_attn.k_proj.weight,
-model.layers.23.self_attn.o_proj.biases,
-model.layers.23.self_attn.o_proj.scales,
-model.layers.23.self_attn.o_proj.weight,
-model.layers.23.self_attn.q_norm.weight,
-model.layers.23.self_attn.q_proj.biases,
-model.layers.23.self_attn.q_proj.scales,
-model.layers.23.self_attn.q_proj.weight,
-model.layers.23.self_attn.v_proj.biases,
-model.layers.23.self_attn.v_proj.scales,
-model.layers.23.self_attn.v_proj.weight,
-model.layers.24.input_layernorm.weight,
-model.layers.24.mlp.down_proj.biases,
-model.layers.24.mlp.down_proj.scales,
-model.layers.24.mlp.down_proj.weight,
-model.layers.24.mlp.gate_proj.biases,
-model.layers.24.mlp.gate_proj.scales,
-model.layers.24.mlp.gate_proj.weight,
-model.layers.24.mlp.up_proj.biases,
-model.layers.24.mlp.up_proj.scales,
-model.layers.24.mlp.up_proj.weight,
-model.layers.24.post_attention_layernorm.weight,
-model.layers.24.self_attn.k_norm.weight,
-model.layers.24.self_attn.k_proj.biases,
-model.layers.24.self_attn.k_proj.scales,
-model.layers.24.self_attn.k_proj.weight,
-model.layers.24.self_attn.o_proj.biases,
-model.layers.24.self_attn.o_proj.scales,
-model.layers.24.self_attn.o_proj.weight,
-model.layers.24.self_attn.q_norm.weight,
-model.layers.24.self_attn.q_proj.biases,
-model.layers.24.self_attn.q_proj.scales,
-model.layers.24.self_attn.q_proj.weight,
-model.layers.24.self_attn.v_proj.biases,
-model.layers.24.self_attn.v_proj.scales,
-model.layers.24.self_attn.v_proj.weight,
-model.layers.25.input_layernorm.weight,
-model.layers.25.mlp.down_proj.biases,
-model.layers.25.mlp.down_proj.scales,
-model.layers.25.mlp.down_proj.weight,
-model.layers.25.mlp.gate_proj.biases,
-model.layers.25.mlp.gate_proj.scales,
-model.layers.25.mlp.gate_proj.weight,
-model.layers.25.mlp.up_proj.biases,
-model.layers.25.mlp.up_proj.scales,
-model.layers.25.mlp.up_proj.weight,
-model.layers.25.post_attention_layernorm.weight,
-model.layers.25.self_attn.k_norm.weight,
-model.layers.25.self_attn.k_proj.biases,
-model.layers.25.self_attn.k_proj.scales,
-model.layers.25.self_attn.k_proj.weight,
-model.layers.25.self_attn.o_proj.biases,
-model.layers.25.self_attn.o_proj.scales,
-model.layers.25.self_attn.o_proj.weight,
-model.layers.25.self_attn.q_norm.weight,
-model.layers.25.self_attn.q_proj.biases,
-model.layers.25.self_attn.q_proj.scales,
-model.layers.25.self_attn.q_proj.weight,
-model.layers.25.self_attn.v_proj.biases,
-model.layers.25.self_attn.v_proj.scales,
-model.layers.25.self_attn.v_proj.weight,
-model.layers.26.input_layernorm.weight,
-model.layers.26.mlp.down_proj.biases,
-model.layers.26.mlp.down_proj.scales,
-model.layers.26.mlp.down_proj.weight,
-model.layers.26.mlp.gate_proj.biases,
-model.layers.26.mlp.gate_proj.scales,
-model.layers.26.mlp.gate_proj.weight,
-model.layers.26.mlp.up_proj.biases,
-model.layers.26.mlp.up_proj.scales,
-model.layers.26.mlp.up_proj.weight,
-model.layers.26.post_attention_layernorm.weight,
-model.layers.26.self_attn.k_norm.weight,
-model.layers.26.self_attn.k_proj.biases,
-model.layers.26.self_attn.k_proj.scales,
-model.layers.26.self_attn.k_proj.weight,
-model.layers.26.self_attn.o_proj.biases,
-model.layers.26.self_attn.o_proj.scales,
-model.layers.26.self_attn.o_proj.weight,
-model.layers.26.self_attn.q_norm.weight,
-model.layers.26.self_attn.q_proj.biases,
-model.layers.26.self_attn.q_proj.scales,
-model.layers.26.self_attn.q_proj.weight,
-model.layers.26.self_attn.v_proj.biases,
-model.layers.26.self_attn.v_proj.scales,
-model.layers.26.self_attn.v_proj.weight,
-model.layers.27.input_layernorm.weight,
-model.layers.27.mlp.down_proj.biases,
-model.layers.27.mlp.down_proj.scales,
-model.layers.27.mlp.down_proj.weight,
-model.layers.27.mlp.gate_proj.biases,
-model.layers.27.mlp.gate_proj.scales,
-model.layers.27.mlp.gate_proj.weight,
-model.layers.27.mlp.up_proj.biases,
-model.layers.27.mlp.up_proj.scales,
-model.layers.27.mlp.up_proj.weight,
-model.layers.27.post_attention_layernorm.weight,
-model.layers.27.self_attn.k_norm.weight,
-model.layers.27.self_attn.k_proj.biases,
-model.layers.27.self_attn.k_proj.scales,
-model.layers.27.self_attn.k_proj.weight,
-model.layers.27.self_attn.o_proj.biases,
-model.layers.27.self_attn.o_proj.scales,
-model.layers.27.self_attn.o_proj.weight,
-model.layers.27.self_attn.q_norm.weight,
-model.layers.27.self_attn.q_proj.biases,
-model.layers.27.self_attn.q_proj.scales,
-model.layers.27.self_attn.q_proj.weight,
-model.layers.27.self_attn.v_proj.biases,
-model.layers.27.self_attn.v_proj.scales,
-model.layers.27.self_attn.v_proj.weight,
-model.layers.28.input_layernorm.weight,
-model.layers.28.mlp.down_proj.biases,
-model.layers.28.mlp.down_proj.scales,
-model.layers.28.mlp.down_proj.weight,
-model.layers.28.mlp.gate_proj.biases,
-model.layers.28.mlp.gate_proj.scales,
-model.layers.28.mlp.gate_proj.weight,
-model.layers.28.mlp.up_proj.biases,
-model.layers.28.mlp.up_proj.scales,
-model.layers.28.mlp.up_proj.weight,
-model.layers.28.post_attention_layernorm.weight,
-model.layers.28.self_attn.k_norm.weight,
-model.layers.28.self_attn.k_proj.biases,
-model.layers.28.self_attn.k_proj.scales,
-model.layers.28.self_attn.k_proj.weight,
-model.layers.28.self_attn.o_proj.biases,
-model.layers.28.self_attn.o_proj.scales,
-model.layers.28.self_attn.o_proj.weight,
-model.layers.28.self_attn.q_norm.weight,
-model.layers.28.self_attn.q_proj.biases,
-model.layers.28.self_attn.q_proj.scales,
-model.layers.28.self_attn.q_proj.weight,
-model.layers.28.self_attn.v_proj.biases,
-model.layers.28.self_attn.v_proj.scales,
-model.layers.28.self_attn.v_proj.weight,
-model.layers.29.input_layernorm.weight,
-model.layers.29.mlp.down_proj.biases,
-model.layers.29.mlp.down_proj.scales,
-model.layers.29.mlp.down_proj.weight,
-model.layers.29.mlp.gate_proj.biases,
-model.layers.29.mlp.gate_proj.scales,
-model.layers.29.mlp.gate_proj.weight,
-model.layers.29.mlp.up_proj.biases,
-model.layers.29.mlp.up_proj.scales,
-model.layers.29.mlp.up_proj.weight,
-model.layers.29.post_attention_layernorm.weight,
-model.layers.29.self_attn.k_norm.weight,
-model.layers.29.self_attn.k_proj.biases,
-model.layers.29.self_attn.k_proj.scales,
-model.layers.29.self_attn.k_proj.weight,
-model.layers.29.self_attn.o_proj.biases,
-model.layers.29.self_attn.o_proj.scales,
-model.layers.29.self_attn.o_proj.weight,
-model.layers.29.self_attn.q_norm.weight,
-model.layers.29.self_attn.q_proj.biases,
-model.layers.29.self_attn.q_proj.scales,
-model.layers.29.self_attn.q_proj.weight,
-model.layers.29.self_attn.v_proj.biases,
-model.layers.29.self_attn.v_proj.scales,
-model.layers.29.self_attn.v_proj.weight,
-model.layers.3.input_layernorm.weight,
-model.layers.3.mlp.down_proj.biases,
-model.layers.3.mlp.down_proj.scales,
-model.layers.3.mlp.down_proj.weight,
-model.layers.3.mlp.gate_proj.biases,
-model.layers.3.mlp.gate_proj.scales,
-model.layers.3.mlp.gate_proj.weight,
-model.layers.3.mlp.up_proj.biases,
-model.layers.3.mlp.up_proj.scales,
-model.layers.3.mlp.up_proj.weight,
-model.layers.3.post_attention_layernorm.weight,
-model.layers.3.self_attn.k_norm.weight,
-model.layers.3.self_attn.k_proj.biases,
-model.layers.3.self_attn.k_proj.scales,
-model.layers.3.self_attn.k_proj.weight,
-model.layers.3.self_attn.o_proj.biases,
-model.layers.3.self_attn.o_proj.scales,
-model.layers.3.self_attn.o_proj.weight,
-model.layers.3.self_attn.q_norm.weight,
-model.layers.3.self_attn.q_proj.biases,
-model.layers.3.self_attn.q_proj.scales,
-model.layers.3.self_attn.q_proj.weight,
-model.layers.3.self_attn.v_proj.biases,
-model.layers.3.self_attn.v_proj.scales,
-model.layers.3.self_attn.v_proj.weight,
-model.layers.30.input_layernorm.weight,
-model.layers.30.mlp.down_proj.biases,
-model.layers.30.mlp.down_proj.scales,
-model.layers.30.mlp.down_proj.weight,
-model.layers.30.mlp.gate_proj.biases,
-model.layers.30.mlp.gate_proj.scales,
-model.layers.30.mlp.gate_proj.weight,
-model.layers.30.mlp.up_proj.biases,
-model.layers.30.mlp.up_proj.scales,
-model.layers.30.mlp.up_proj.weight,
-model.layers.30.post_attention_layernorm.weight,
-model.layers.30.self_attn.k_norm.weight,
-model.layers.30.self_attn.k_proj.biases,
-model.layers.30.self_attn.k_proj.scales,
-model.layers.30.self_attn.k_proj.weight,
-model.layers.30.self_attn.o_proj.biases,
-model.layers.30.self_attn.o_proj.scales,
-model.layers.30.self_attn.o_proj.weight,
-model.layers.30.self_attn.q_norm.weight,
-model.layers.30.self_attn.q_proj.biases,
-model.layers.30.self_attn.q_proj.scales,
-model.layers.30.self_attn.q_proj.weight,
-model.layers.30.self_attn.v_proj.biases,
-model.layers.30.self_attn.v_proj.scales,
-model.layers.30.self_attn.v_proj.weight,
-model.layers.31.input_layernorm.weight,
-model.layers.31.mlp.down_proj.biases,
-model.layers.31.mlp.down_proj.scales,
-model.layers.31.mlp.down_proj.weight,
-model.layers.31.mlp.gate_proj.biases,
-model.layers.31.mlp.gate_proj.scales,
-model.layers.31.mlp.gate_proj.weight,
-model.layers.31.mlp.up_proj.biases,
-model.layers.31.mlp.up_proj.scales,
-model.layers.31.mlp.up_proj.weight,
-model.layers.31.post_attention_layernorm.weight,
-model.layers.31.self_attn.k_norm.weight,
-model.layers.31.self_attn.k_proj.biases,
-model.layers.31.self_attn.k_proj.scales,
-model.layers.31.self_attn.k_proj.weight,
-model.layers.31.self_attn.o_proj.biases,
-model.layers.31.self_attn.o_proj.scales,
-model.layers.31.self_attn.o_proj.weight,
-model.layers.31.self_attn.q_norm.weight,
-model.layers.31.self_attn.q_proj.biases,
-model.layers.31.self_attn.q_proj.scales,
-model.layers.31.self_attn.q_proj.weight,
-model.layers.31.self_attn.v_proj.biases,
-model.layers.31.self_attn.v_proj.scales,
-model.layers.31.self_attn.v_proj.weight,
-model.layers.32.input_layernorm.weight,
-model.layers.32.mlp.down_proj.biases,
-model.layers.32.mlp.down_proj.scales,
-model.layers.32.mlp.down_proj.weight,
-model.layers.32.mlp.gate_proj.biases,
-model.layers.32.mlp.gate_proj.scales,
-model.layers.32.mlp.gate_proj.weight,
-model.layers.32.mlp.up_proj.biases,
-model.layers.32.mlp.up_proj.scales,
-model.layers.32.mlp.up_proj.weight,
-model.layers.32.post_attention_layernorm.weight,
-model.layers.32.self_attn.k_norm.weight,
-model.layers.32.self_attn.k_proj.biases,
-model.layers.32.self_attn.k_proj.scales,
-model.layers.32.self_attn.k_proj.weight,
-model.layers.32.self_attn.o_proj.biases,
-model.layers.32.self_attn.o_proj.scales,
-model.layers.32.self_attn.o_proj.weight,
-model.layers.32.self_attn.q_norm.weight,
-model.layers.32.self_attn.q_proj.biases,
-model.layers.32.self_attn.q_proj.scales,
-model.layers.32.self_attn.q_proj.weight,
-model.layers.32.self_attn.v_proj.biases,
-model.layers.32.self_attn.v_proj.scales,
-model.layers.32.self_attn.v_proj.weight,
-model.layers.33.input_layernorm.weight,
-model.layers.33.mlp.down_proj.biases,
-model.layers.33.mlp.down_proj.scales,
-model.layers.33.mlp.down_proj.weight,
-model.layers.33.mlp.gate_proj.biases,
-model.layers.33.mlp.gate_proj.scales,
-model.layers.33.mlp.gate_proj.weight,
-model.layers.33.mlp.up_proj.biases,
-model.layers.33.mlp.up_proj.scales,
-model.layers.33.mlp.up_proj.weight,
-model.layers.33.post_attention_layernorm.weight,
-model.layers.33.self_attn.k_norm.weight,
-model.layers.33.self_attn.k_proj.biases,
-model.layers.33.self_attn.k_proj.scales,
-model.layers.33.self_attn.k_proj.weight,
-model.layers.33.self_attn.o_proj.biases,
-model.layers.33.self_attn.o_proj.scales,
-model.layers.33.self_attn.o_proj.weight,
-model.layers.33.self_attn.q_norm.weight,
-model.layers.33.self_attn.q_proj.biases,
-model.layers.33.self_attn.q_proj.scales,
-model.layers.33.self_attn.q_proj.weight,
-model.layers.33.self_attn.v_proj.biases,
-model.layers.33.self_attn.v_proj.scales,
-model.layers.33.self_attn.v_proj.weight,
-model.layers.34.input_layernorm.weight,
-model.layers.34.mlp.down_proj.biases,
-model.layers.34.mlp.down_proj.scales,
-model.layers.34.mlp.down_proj.weight,
-model.layers.34.mlp.gate_proj.biases,
-model.layers.34.mlp.gate_proj.scales,
-model.layers.34.mlp.gate_proj.weight,
-model.layers.34.mlp.up_proj.biases,
-model.layers.34.mlp.up_proj.scales,
-model.layers.34.mlp.up_proj.weight,
-model.layers.34.post_attention_layernorm.weight,
-model.layers.34.self_attn.k_norm.weight,
-model.layers.34.self_attn.k_proj.biases,
-model.layers.34.self_attn.k_proj.scales,
-model.layers.34.self_attn.k_proj.weight,
-model.layers.34.self_attn.o_proj.biases,
-model.layers.34.self_attn.o_proj.scales,
-model.layers.34.self_attn.o_proj.weight,
-model.layers.34.self_attn.q_norm.weight,
-model.layers.34.self_attn.q_proj.biases,
-model.layers.34.self_attn.q_proj.scales,
-model.layers.34.self_attn.q_proj.weight,
-model.layers.34.self_attn.v_proj.biases,
-model.layers.34.self_attn.v_proj.scales,
-model.layers.34.self_attn.v_proj.weight,
-model.layers.35.input_layernorm.weight,
-model.layers.35.mlp.down_proj.biases,
-model.layers.35.mlp.down_proj.scales,
-model.layers.35.mlp.down_proj.weight,
-model.layers.35.mlp.gate_proj.biases,
-model.layers.35.mlp.gate_proj.scales,
-model.layers.35.mlp.gate_proj.weight,
-model.layers.35.mlp.up_proj.biases,
-model.layers.35.mlp.up_proj.scales,
-model.layers.35.mlp.up_proj.weight,
-model.layers.35.post_attention_layernorm.weight,
-model.layers.35.self_attn.k_norm.weight,
-model.layers.35.self_attn.k_proj.biases,
-model.layers.35.self_attn.k_proj.scales,
-model.layers.35.self_attn.k_proj.weight,
-model.layers.35.self_attn.o_proj.biases,
-model.layers.35.self_attn.o_proj.scales,
-model.layers.35.self_attn.o_proj.weight,
-model.layers.35.self_attn.q_norm.weight,
-model.layers.35.self_attn.q_proj.biases,
-model.layers.35.self_attn.q_proj.scales,
-model.layers.35.self_attn.q_proj.weight,
-model.layers.35.self_attn.v_proj.biases,
-model.layers.35.self_attn.v_proj.scales,
-model.layers.35.self_attn.v_proj.weight,
-model.layers.4.input_layernorm.weight,
-model.layers.4.mlp.down_proj.biases,
-model.layers.4.mlp.down_proj.scales,
-model.layers.4.mlp.down_proj.weight,
-model.layers.4.mlp.gate_proj.biases,
-model.layers.4.mlp.gate_proj.scales,
-model.layers.4.mlp.gate_proj.weight,
-model.layers.4.mlp.up_proj.biases,
-model.layers.4.mlp.up_proj.scales,
-model.layers.4.mlp.up_proj.weight,
-model.layers.4.post_attention_layernorm.weight,
-model.layers.4.self_attn.k_norm.weight,
-model.layers.4.self_attn.k_proj.biases,
-model.layers.4.self_attn.k_proj.scales,
-model.layers.4.self_attn.k_proj.weight,
-model.layers.4.self_attn.o_proj.biases,
-model.layers.4.self_attn.o_proj.scales,
-model.layers.4.self_attn.o_proj.weight,
-model.layers.4.self_attn.q_norm.weight,
-model.layers.4.self_attn.q_proj.biases,
-model.layers.4.self_attn.q_proj.scales,
-model.layers.4.self_attn.q_proj.weight,
-model.layers.4.self_attn.v_proj.biases,
-model.layers.4.self_attn.v_proj.scales,
-model.layers.4.self_attn.v_proj.weight,
-model.layers.5.input_layernorm.weight,
-model.layers.5.mlp.down_proj.biases,
-model.layers.5.mlp.down_proj.scales,
-model.layers.5.mlp.down_proj.weight,
-model.layers.5.mlp.gate_proj.biases,
-model.layers.5.mlp.gate_proj.scales,
-model.layers.5.mlp.gate_proj.weight,
-model.layers.5.mlp.up_proj.biases,
-model.layers.5.mlp.up_proj.scales,
-model.layers.5.mlp.up_proj.weight,
-model.layers.5.post_attention_layernorm.weight,
-model.layers.5.self_attn.k_norm.weight,
-model.layers.5.self_attn.k_proj.biases,
-model.layers.5.self_attn.k_proj.scales,
-model.layers.5.self_attn.k_proj.weight,
-model.layers.5.self_attn.o_proj.biases,
-model.layers.5.self_attn.o_proj.scales,
-model.layers.5.self_attn.o_proj.weight,
-model.layers.5.self_attn.q_norm.weight,
-model.layers.5.self_attn.q_proj.biases,
-model.layers.5.self_attn.q_proj.scales,
-model.layers.5.self_attn.q_proj.weight,
-model.layers.5.self_attn.v_proj.biases,
-model.layers.5.self_attn.v_proj.scales,
-model.layers.5.self_attn.v_proj.weight,
-model.layers.6.input_layernorm.weight,
-model.layers.6.mlp.down_proj.biases,
-model.layers.6.mlp.down_proj.scales,
-model.layers.6.mlp.down_proj.weight,
-model.layers.6.mlp.gate_proj.biases,
-model.layers.6.mlp.gate_proj.scales,
-model.layers.6.mlp.gate_proj.weight,
-model.layers.6.mlp.up_proj.biases,
-model.layers.6.mlp.up_proj.scales,
-model.layers.6.mlp.up_proj.weight,
-model.layers.6.post_attention_layernorm.weight,
-model.layers.6.self_attn.k_norm.weight,
-model.layers.6.self_attn.k_proj.biases,
-model.layers.6.self_attn.k_proj.scales,
-model.layers.6.self_attn.k_proj.weight,
-model.layers.6.self_attn.o_proj.biases,
-model.layers.6.self_attn.o_proj.scales,
-model.layers.6.self_attn.o_proj.weight,
-model.layers.6.self_attn.q_norm.weight,
-model.layers.6.self_attn.q_proj.biases,
-model.layers.6.self_attn.q_proj.scales,
-model.layers.6.self_attn.q_proj.weight,
-model.layers.6.self_attn.v_proj.biases,
-model.layers.6.self_attn.v_proj.scales,
-model.layers.6.self_attn.v_proj.weight,
-model.layers.7.input_layernorm.weight,
-model.layers.7.mlp.down_proj.biases,
-model.layers.7.mlp.down_proj.scales,
-model.layers.7.mlp.down_proj.weight,
-model.layers.7.mlp.gate_proj.biases,
-model.layers.7.mlp.gate_proj.scales,
-model.layers.7.mlp.gate_proj.weight,
-model.layers.7.mlp.up_proj.biases,
-model.layers.7.mlp.up_proj.scales,
-model.layers.7.mlp.up_proj.weight,
-model.layers.7.post_attention_layernorm.weight,
-model.layers.7.self_attn.k_norm.weight,
-model.layers.7.self_attn.k_proj.biases,
-model.layers.7.self_attn.k_proj.scales,
-model.layers.7.self_attn.k_proj.weight,
-model.layers.7.self_attn.o_proj.biases,
-model.layers.7.self_attn.o_proj.scales,
-model.layers.7.self_attn.o_proj.weight,
-model.layers.7.self_attn.q_norm.weight,
-model.layers.7.self_attn.q_proj.biases,
-model.layers.7.self_attn.q_proj.scales,
-model.layers.7.self_attn.q_proj.weight,
-model.layers.7.self_attn.v_proj.biases,
-model.layers.7.self_attn.v_proj.scales,
-model.layers.7.self_attn.v_proj.weight,
-model.layers.8.input_layernorm.weight,
-model.layers.8.mlp.down_proj.biases,
-model.layers.8.mlp.down_proj.scales,
-model.layers.8.mlp.down_proj.weight,
-model.layers.8.mlp.gate_proj.biases,
-model.layers.8.mlp.gate_proj.scales,
-model.layers.8.mlp.gate_proj.weight,
-model.layers.8.mlp.up_proj.biases,
-model.layers.8.mlp.up_proj.scales,
-model.layers.8.mlp.up_proj.weight,
-model.layers.8.post_attention_layernorm.weight,
-model.layers.8.self_attn.k_norm.weight,
-model.layers.8.self_attn.k_proj.biases,
-model.layers.8.self_attn.k_proj.scales,
-model.layers.8.self_attn.k_proj.weight,
-model.layers.8.self_attn.o_proj.biases,
-model.layers.8.self_attn.o_proj.scales,
-model.layers.8.self_attn.o_proj.weight,
-model.layers.8.self_attn.q_norm.weight,
-model.layers.8.self_attn.q_proj.biases,
-model.layers.8.self_attn.q_proj.scales,
-model.layers.8.self_attn.q_proj.weight,
-model.layers.8.self_attn.v_proj.biases,
-model.layers.8.self_attn.v_proj.scales,
-model.layers.8.self_attn.v_proj.weight,
-model.layers.9.input_layernorm.weight,
-model.layers.9.mlp.down_proj.biases,
-model.layers.9.mlp.down_proj.scales,
-model.layers.9.mlp.down_proj.weight,
-model.layers.9.mlp.gate_proj.biases,
-model.layers.9.mlp.gate_proj.scales,
-model.layers.9.mlp.gate_proj.weight,
-model.layers.9.mlp.up_proj.biases,
-model.layers.9.mlp.up_proj.scales,
-model.layers.9.mlp.up_proj.weight,
-model.layers.9.post_attention_layernorm.weight,
-model.layers.9.self_attn.k_norm.weight,
-model.layers.9.self_attn.k_proj.biases,
-model.layers.9.self_attn.k_proj.scales,
-model.layers.9.self_attn.k_proj.weight,
-model.layers.9.self_attn.o_proj.biases,
-model.layers.9.self_attn.o_proj.scales,
-model.layers.9.self_attn.o_proj.weight,
-model.layers.9.self_attn.q_norm.weight,
-model.layers.9.self_attn.q_proj.biases,
-model.layers.9.self_attn.q_proj.scales,
-model.layers.9.self_attn.q_proj.weight,
-model.layers.9.self_attn.v_proj.biases,
-model.layers.9.self_attn.v_proj.scales,
-model.layers.9.self_attn.v_proj.weight,
-model.norm.weight.
+ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
 
 The above exception was the direct cause of the following exception:
 
@@ -4803,1060 +3280,26 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 904 parameters not in model: 
-model.embed_tokens.biases,
-model.embed_tokens.scales,
-model.embed_tokens.weight,
-model.layers.0.input_layernorm.weight,
-model.layers.0.mlp.down_proj.biases,
-model.layers.0.mlp.down_proj.scales,
-model.layers.0.mlp.down_proj.weight,
-model.layers.0.mlp.gate_proj.biases,
-model.layers.0.mlp.gate_proj.scales,
-model.layers.0.mlp.gate_proj.weight,
-model.layers.0.mlp.up_proj.biases,
-model.layers.0.mlp.up_proj.scales,
-model.layers.0.mlp.up_proj.weight,
-model.layers.0.post_attention_layernorm.weight,
-model.layers.0.self_attn.k_norm.weight,
-model.layers.0.self_attn.k_proj.biases,
-model.layers.0.self_attn.k_proj.scales,
-model.layers.0.self_attn.k_proj.weight,
-model.layers.0.self_attn.o_proj.biases,
-model.layers.0.self_attn.o_proj.scales,
-model.layers.0.self_attn.o_proj.weight,
-model.layers.0.self_attn.q_norm.weight,
-model.layers.0.self_attn.q_proj.biases,
-model.layers.0.self_attn.q_proj.scales,
-model.layers.0.self_attn.q_proj.weight,
-model.layers.0.self_attn.v_proj.biases,
-model.layers.0.self_attn.v_proj.scales,
-model.layers.0.self_attn.v_proj.weight,
-model.layers.1.input_layernorm.weight,
-model.layers.1.mlp.down_proj.biases,
-model.layers.1.mlp.down_proj.scales,
-model.layers.1.mlp.down_proj.weight,
-model.layers.1.mlp.gate_proj.biases,
-model.layers.1.mlp.gate_proj.scales,
-model.layers.1.mlp.gate_proj.weight,
-model.layers.1.mlp.up_proj.biases,
-model.layers.1.mlp.up_proj.scales,
-model.layers.1.mlp.up_proj.weight,
-model.layers.1.post_attention_layernorm.weight,
-model.layers.1.self_attn.k_norm.weight,
-model.layers.1.self_attn.k_proj.biases,
-model.layers.1.self_attn.k_proj.scales,
-model.layers.1.self_attn.k_proj.weight,
-model.layers.1.self_attn.o_proj.biases,
-model.layers.1.self_attn.o_proj.scales,
-model.layers.1.self_attn.o_proj.weight,
-model.layers.1.self_attn.q_norm.weight,
-model.layers.1.self_attn.q_proj.biases,
-model.layers.1.self_attn.q_proj.scales,
-model.layers.1.self_attn.q_proj.weight,
-model.layers.1.self_attn.v_proj.biases,
-model.layers.1.self_attn.v_proj.scales,
-model.layers.1.self_attn.v_proj.weight,
-model.layers.10.input_layernorm.weight,
-model.layers.10.mlp.down_proj.biases,
-model.layers.10.mlp.down_proj.scales,
-model.layers.10.mlp.down_proj.weight,
-model.layers.10.mlp.gate_proj.biases,
-model.layers.10.mlp.gate_proj.scales,
-model.layers.10.mlp.gate_proj.weight,
-model.layers.10.mlp.up_proj.biases,
-model.layers.10.mlp.up_proj.scales,
-model.layers.10.mlp.up_proj.weight,
-model.layers.10.post_attention_layernorm.weight,
-model.layers.10.self_attn.k_norm.weight,
-model.layers.10.self_attn.k_proj.biases,
-model.layers.10.self_attn.k_proj.scales,
-model.layers.10.self_attn.k_proj.weight,
-model.layers.10.self_attn.o_proj.biases,
-model.layers.10.self_attn.o_proj.scales,
-model.layers.10.self_attn.o_proj.weight,
-model.layers.10.self_attn.q_norm.weight,
-model.layers.10.self_attn.q_proj.biases,
-model.layers.10.self_attn.q_proj.scales,
-model.layers.10.self_attn.q_proj.weight,
-model.layers.10.self_attn.v_proj.biases,
-model.layers.10.self_attn.v_proj.scales,
-model.layers.10.self_attn.v_proj.weight,
-model.layers.11.input_layernorm.weight,
-model.layers.11.mlp.down_proj.biases,
-model.layers.11.mlp.down_proj.scales,
-model.layers.11.mlp.down_proj.weight,
-model.layers.11.mlp.gate_proj.biases,
-model.layers.11.mlp.gate_proj.scales,
-model.layers.11.mlp.gate_proj.weight,
-model.layers.11.mlp.up_proj.biases,
-model.layers.11.mlp.up_proj.scales,
-model.layers.11.mlp.up_proj.weight,
-model.layers.11.post_attention_layernorm.weight,
-model.layers.11.self_attn.k_norm.weight,
-model.layers.11.self_attn.k_proj.biases,
-model.layers.11.self_attn.k_proj.scales,
-model.layers.11.self_attn.k_proj.weight,
-model.layers.11.self_attn.o_proj.biases,
-model.layers.11.self_attn.o_proj.scales,
-model.layers.11.self_attn.o_proj.weight,
-model.layers.11.self_attn.q_norm.weight,
-model.layers.11.self_attn.q_proj.biases,
-model.layers.11.self_attn.q_proj.scales,
-model.layers.11.self_attn.q_proj.weight,
-model.layers.11.self_attn.v_proj.biases,
-model.layers.11.self_attn.v_proj.scales,
-model.layers.11.self_attn.v_proj.weight,
-model.layers.12.input_layernorm.weight,
-model.layers.12.mlp.down_proj.biases,
-model.layers.12.mlp.down_proj.scales,
-model.layers.12.mlp.down_proj.weight,
-model.layers.12.mlp.gate_proj.biases,
-model.layers.12.mlp.gate_proj.scales,
-model.layers.12.mlp.gate_proj.weight,
-model.layers.12.mlp.up_proj.biases,
-model.layers.12.mlp.up_proj.scales,
-model.layers.12.mlp.up_proj.weight,
-model.layers.12.post_attention_layernorm.weight,
-model.layers.12.self_attn.k_norm.weight,
-model.layers.12.self_attn.k_proj.biases,
-model.layers.12.self_attn.k_proj.scales,
-model.layers.12.self_attn.k_proj.weight,
-model.layers.12.self_attn.o_proj.biases,
-model.layers.12.self_attn.o_proj.scales,
-model.layers.12.self_attn.o_proj.weight,
-model.layers.12.self_attn.q_norm.weight,
-model.layers.12.self_attn.q_proj.biases,
-model.layers.12.self_attn.q_proj.scales,
-model.layers.12.self_attn.q_proj.weight,
-model.layers.12.self_attn.v_proj.biases,
-model.layers.12.self_attn.v_proj.scales,
-model.layers.12.self_attn.v_proj.weight,
-model.layers.13.input_layernorm.weight,
-model.layers.13.mlp.down_proj.biases,
-model.layers.13.mlp.down_proj.scales,
-model.layers.13.mlp.down_proj.weight,
-model.layers.13.mlp.gate_proj.biases,
-model.layers.13.mlp.gate_proj.scales,
-model.layers.13.mlp.gate_proj.weight,
-model.layers.13.mlp.up_proj.biases,
-model.layers.13.mlp.up_proj.scales,
-model.layers.13.mlp.up_proj.weight,
-model.layers.13.post_attention_layernorm.weight,
-model.layers.13.self_attn.k_norm.weight,
-model.layers.13.self_attn.k_proj.biases,
-model.layers.13.self_attn.k_proj.scales,
-model.layers.13.self_attn.k_proj.weight,
-model.layers.13.self_attn.o_proj.biases,
-model.layers.13.self_attn.o_proj.scales,
-model.layers.13.self_attn.o_proj.weight,
-model.layers.13.self_attn.q_norm.weight,
-model.layers.13.self_attn.q_proj.biases,
-model.layers.13.self_attn.q_proj.scales,
-model.layers.13.self_attn.q_proj.weight,
-model.layers.13.self_attn.v_proj.biases,
-model.layers.13.self_attn.v_proj.scales,
-model.layers.13.self_attn.v_proj.weight,
-model.layers.14.input_layernorm.weight,
-model.layers.14.mlp.down_proj.biases,
-model.layers.14.mlp.down_proj.scales,
-model.layers.14.mlp.down_proj.weight,
-model.layers.14.mlp.gate_proj.biases,
-model.layers.14.mlp.gate_proj.scales,
-model.layers.14.mlp.gate_proj.weight,
-model.layers.14.mlp.up_proj.biases,
-model.layers.14.mlp.up_proj.scales,
-model.layers.14.mlp.up_proj.weight,
-model.layers.14.post_attention_layernorm.weight,
-model.layers.14.self_attn.k_norm.weight,
-model.layers.14.self_attn.k_proj.biases,
-model.layers.14.self_attn.k_proj.scales,
-model.layers.14.self_attn.k_proj.weight,
-model.layers.14.self_attn.o_proj.biases,
-model.layers.14.self_attn.o_proj.scales,
-model.layers.14.self_attn.o_proj.weight,
-model.layers.14.self_attn.q_norm.weight,
-model.layers.14.self_attn.q_proj.biases,
-model.layers.14.self_attn.q_proj.scales,
-model.layers.14.self_attn.q_proj.weight,
-model.layers.14.self_attn.v_proj.biases,
-model.layers.14.self_attn.v_proj.scales,
-model.layers.14.self_attn.v_proj.weight,
-model.layers.15.input_layernorm.weight,
-model.layers.15.mlp.down_proj.biases,
-model.layers.15.mlp.down_proj.scales,
-model.layers.15.mlp.down_proj.weight,
-model.layers.15.mlp.gate_proj.biases,
-model.layers.15.mlp.gate_proj.scales,
-model.layers.15.mlp.gate_proj.weight,
-model.layers.15.mlp.up_proj.biases,
-model.layers.15.mlp.up_proj.scales,
-model.layers.15.mlp.up_proj.weight,
-model.layers.15.post_attention_layernorm.weight,
-model.layers.15.self_attn.k_norm.weight,
-model.layers.15.self_attn.k_proj.biases,
-model.layers.15.self_attn.k_proj.scales,
-model.layers.15.self_attn.k_proj.weight,
-model.layers.15.self_attn.o_proj.biases,
-model.layers.15.self_attn.o_proj.scales,
-model.layers.15.self_attn.o_proj.weight,
-model.layers.15.self_attn.q_norm.weight,
-model.layers.15.self_attn.q_proj.biases,
-model.layers.15.self_attn.q_proj.scales,
-model.layers.15.self_attn.q_proj.weight,
-model.layers.15.self_attn.v_proj.biases,
-model.layers.15.self_attn.v_proj.scales,
-model.layers.15.self_attn.v_proj.weight,
-model.layers.16.input_layernorm.weight,
-model.layers.16.mlp.down_proj.biases,
-model.layers.16.mlp.down_proj.scales,
-model.layers.16.mlp.down_proj.weight,
-model.layers.16.mlp.gate_proj.biases,
-model.layers.16.mlp.gate_proj.scales,
-model.layers.16.mlp.gate_proj.weight,
-model.layers.16.mlp.up_proj.biases,
-model.layers.16.mlp.up_proj.scales,
-model.layers.16.mlp.up_proj.weight,
-model.layers.16.post_attention_layernorm.weight,
-model.layers.16.self_attn.k_norm.weight,
-model.layers.16.self_attn.k_proj.biases,
-model.layers.16.self_attn.k_proj.scales,
-model.layers.16.self_attn.k_proj.weight,
-model.layers.16.self_attn.o_proj.biases,
-model.layers.16.self_attn.o_proj.scales,
-model.layers.16.self_attn.o_proj.weight,
-model.layers.16.self_attn.q_norm.weight,
-model.layers.16.self_attn.q_proj.biases,
-model.layers.16.self_attn.q_proj.scales,
-model.layers.16.self_attn.q_proj.weight,
-model.layers.16.self_attn.v_proj.biases,
-model.layers.16.self_attn.v_proj.scales,
-model.layers.16.self_attn.v_proj.weight,
-model.layers.17.input_layernorm.weight,
-model.layers.17.mlp.down_proj.biases,
-model.layers.17.mlp.down_proj.scales,
-model.layers.17.mlp.down_proj.weight,
-model.layers.17.mlp.gate_proj.biases,
-model.layers.17.mlp.gate_proj.scales,
-model.layers.17.mlp.gate_proj.weight,
-model.layers.17.mlp.up_proj.biases,
-model.layers.17.mlp.up_proj.scales,
-model.layers.17.mlp.up_proj.weight,
-model.layers.17.post_attention_layernorm.weight,
-model.layers.17.self_attn.k_norm.weight,
-model.layers.17.self_attn.k_proj.biases,
-model.layers.17.self_attn.k_proj.scales,
-model.layers.17.self_attn.k_proj.weight,
-model.layers.17.self_attn.o_proj.biases,
-model.layers.17.self_attn.o_proj.scales,
-model.layers.17.self_attn.o_proj.weight,
-model.layers.17.self_attn.q_norm.weight,
-model.layers.17.self_attn.q_proj.biases,
-model.layers.17.self_attn.q_proj.scales,
-model.layers.17.self_attn.q_proj.weight,
-model.layers.17.self_attn.v_proj.biases,
-model.layers.17.self_attn.v_proj.scales,
-model.layers.17.self_attn.v_proj.weight,
-model.layers.18.input_layernorm.weight,
-model.layers.18.mlp.down_proj.biases,
-model.layers.18.mlp.down_proj.scales,
-model.layers.18.mlp.down_proj.weight,
-model.layers.18.mlp.gate_proj.biases,
-model.layers.18.mlp.gate_proj.scales,
-model.layers.18.mlp.gate_proj.weight,
-model.layers.18.mlp.up_proj.biases,
-model.layers.18.mlp.up_proj.scales,
-model.layers.18.mlp.up_proj.weight,
-model.layers.18.post_attention_layernorm.weight,
-model.layers.18.self_attn.k_norm.weight,
-model.layers.18.self_attn.k_proj.biases,
-model.layers.18.self_attn.k_proj.scales,
-model.layers.18.self_attn.k_proj.weight,
-model.layers.18.self_attn.o_proj.biases,
-model.layers.18.self_attn.o_proj.scales,
-model.layers.18.self_attn.o_proj.weight,
-model.layers.18.self_attn.q_norm.weight,
-model.layers.18.self_attn.q_proj.biases,
-model.layers.18.self_attn.q_proj.scales,
-model.layers.18.self_attn.q_proj.weight,
-model.layers.18.self_attn.v_proj.biases,
-model.layers.18.self_attn.v_proj.scales,
-model.layers.18.self_attn.v_proj.weight,
-model.layers.19.input_layernorm.weight,
-model.layers.19.mlp.down_proj.biases,
-model.layers.19.mlp.down_proj.scales,
-model.layers.19.mlp.down_proj.weight,
-model.layers.19.mlp.gate_proj.biases,
-model.layers.19.mlp.gate_proj.scales,
-model.layers.19.mlp.gate_proj.weight,
-model.layers.19.mlp.up_proj.biases,
-model.layers.19.mlp.up_proj.scales,
-model.layers.19.mlp.up_proj.weight,
-model.layers.19.post_attention_layernorm.weight,
-model.layers.19.self_attn.k_norm.weight,
-model.layers.19.self_attn.k_proj.biases,
-model.layers.19.self_attn.k_proj.scales,
-model.layers.19.self_attn.k_proj.weight,
-model.layers.19.self_attn.o_proj.biases,
-model.layers.19.self_attn.o_proj.scales,
-model.layers.19.self_attn.o_proj.weight,
-model.layers.19.self_attn.q_norm.weight,
-model.layers.19.self_attn.q_proj.biases,
-model.layers.19.self_attn.q_proj.scales,
-model.layers.19.self_attn.q_proj.weight,
-model.layers.19.self_attn.v_proj.biases,
-model.layers.19.self_attn.v_proj.scales,
-model.layers.19.self_attn.v_proj.weight,
-model.layers.2.input_layernorm.weight,
-model.layers.2.mlp.down_proj.biases,
-model.layers.2.mlp.down_proj.scales,
-model.layers.2.mlp.down_proj.weight,
-model.layers.2.mlp.gate_proj.biases,
-model.layers.2.mlp.gate_proj.scales,
-model.layers.2.mlp.gate_proj.weight,
-model.layers.2.mlp.up_proj.biases,
-model.layers.2.mlp.up_proj.scales,
-model.layers.2.mlp.up_proj.weight,
-model.layers.2.post_attention_layernorm.weight,
-model.layers.2.self_attn.k_norm.weight,
-model.layers.2.self_attn.k_proj.biases,
-model.layers.2.self_attn.k_proj.scales,
-model.layers.2.self_attn.k_proj.weight,
-model.layers.2.self_attn.o_proj.biases,
-model.layers.2.self_attn.o_proj.scales,
-model.layers.2.self_attn.o_proj.weight,
-model.layers.2.self_attn.q_norm.weight,
-model.layers.2.self_attn.q_proj.biases,
-model.layers.2.self_attn.q_proj.scales,
-model.layers.2.self_attn.q_proj.weight,
-model.layers.2.self_attn.v_proj.biases,
-model.layers.2.self_attn.v_proj.scales,
-model.layers.2.self_attn.v_proj.weight,
-model.layers.20.input_layernorm.weight,
-model.layers.20.mlp.down_proj.biases,
-model.layers.20.mlp.down_proj.scales,
-model.layers.20.mlp.down_proj.weight,
-model.layers.20.mlp.gate_proj.biases,
-model.layers.20.mlp.gate_proj.scales,
-model.layers.20.mlp.gate_proj.weight,
-model.layers.20.mlp.up_proj.biases,
-model.layers.20.mlp.up_proj.scales,
-model.layers.20.mlp.up_proj.weight,
-model.layers.20.post_attention_layernorm.weight,
-model.layers.20.self_attn.k_norm.weight,
-model.layers.20.self_attn.k_proj.biases,
-model.layers.20.self_attn.k_proj.scales,
-model.layers.20.self_attn.k_proj.weight,
-model.layers.20.self_attn.o_proj.biases,
-model.layers.20.self_attn.o_proj.scales,
-model.layers.20.self_attn.o_proj.weight,
-model.layers.20.self_attn.q_norm.weight,
-model.layers.20.self_attn.q_proj.biases,
-model.layers.20.self_attn.q_proj.scales,
-model.layers.20.self_attn.q_proj.weight,
-model.layers.20.self_attn.v_proj.biases,
-model.layers.20.self_attn.v_proj.scales,
-model.layers.20.self_attn.v_proj.weight,
-model.layers.21.input_layernorm.weight,
-model.layers.21.mlp.down_proj.biases,
-model.layers.21.mlp.down_proj.scales,
-model.layers.21.mlp.down_proj.weight,
-model.layers.21.mlp.gate_proj.biases,
-model.layers.21.mlp.gate_proj.scales,
-model.layers.21.mlp.gate_proj.weight,
-model.layers.21.mlp.up_proj.biases,
-model.layers.21.mlp.up_proj.scales,
-model.layers.21.mlp.up_proj.weight,
-model.layers.21.post_attention_layernorm.weight,
-model.layers.21.self_attn.k_norm.weight,
-model.layers.21.self_attn.k_proj.biases,
-model.layers.21.self_attn.k_proj.scales,
-model.layers.21.self_attn.k_proj.weight,
-model.layers.21.self_attn.o_proj.biases,
-model.layers.21.self_attn.o_proj.scales,
-model.layers.21.self_attn.o_proj.weight,
-model.layers.21.self_attn.q_norm.weight,
-model.layers.21.self_attn.q_proj.biases,
-model.layers.21.self_attn.q_proj.scales,
-model.layers.21.self_attn.q_proj.weight,
-model.layers.21.self_attn.v_proj.biases,
-model.layers.21.self_attn.v_proj.scales,
-model.layers.21.self_attn.v_proj.weight,
-model.layers.22.input_layernorm.weight,
-model.layers.22.mlp.down_proj.biases,
-model.layers.22.mlp.down_proj.scales,
-model.layers.22.mlp.down_proj.weight,
-model.layers.22.mlp.gate_proj.biases,
-model.layers.22.mlp.gate_proj.scales,
-model.layers.22.mlp.gate_proj.weight,
-model.layers.22.mlp.up_proj.biases,
-model.layers.22.mlp.up_proj.scales,
-model.layers.22.mlp.up_proj.weight,
-model.layers.22.post_attention_layernorm.weight,
-model.layers.22.self_attn.k_norm.weight,
-model.layers.22.self_attn.k_proj.biases,
-model.layers.22.self_attn.k_proj.scales,
-model.layers.22.self_attn.k_proj.weight,
-model.layers.22.self_attn.o_proj.biases,
-model.layers.22.self_attn.o_proj.scales,
-model.layers.22.self_attn.o_proj.weight,
-model.layers.22.self_attn.q_norm.weight,
-model.layers.22.self_attn.q_proj.biases,
-model.layers.22.self_attn.q_proj.scales,
-model.layers.22.self_attn.q_proj.weight,
-model.layers.22.self_attn.v_proj.biases,
-model.layers.22.self_attn.v_proj.scales,
-model.layers.22.self_attn.v_proj.weight,
-model.layers.23.input_layernorm.weight,
-model.layers.23.mlp.down_proj.biases,
-model.layers.23.mlp.down_proj.scales,
-model.layers.23.mlp.down_proj.weight,
-model.layers.23.mlp.gate_proj.biases,
-model.layers.23.mlp.gate_proj.scales,
-model.layers.23.mlp.gate_proj.weight,
-model.layers.23.mlp.up_proj.biases,
-model.layers.23.mlp.up_proj.scales,
-model.layers.23.mlp.up_proj.weight,
-model.layers.23.post_attention_layernorm.weight,
-model.layers.23.self_attn.k_norm.weight,
-model.layers.23.self_attn.k_proj.biases,
-model.layers.23.self_attn.k_proj.scales,
-model.layers.23.self_attn.k_proj.weight,
-model.layers.23.self_attn.o_proj.biases,
-model.layers.23.self_attn.o_proj.scales,
-model.layers.23.self_attn.o_proj.weight,
-model.layers.23.self_attn.q_norm.weight,
-model.layers.23.self_attn.q_proj.biases,
-model.layers.23.self_attn.q_proj.scales,
-model.layers.23.self_attn.q_proj.weight,
-model.layers.23.self_attn.v_proj.biases,
-model.layers.23.self_attn.v_proj.scales,
-model.layers.23.self_attn.v_proj.weight,
-model.layers.24.input_layernorm.weight,
-model.layers.24.mlp.down_proj.biases,
-model.layers.24.mlp.down_proj.scales,
-model.layers.24.mlp.down_proj.weight,
-model.layers.24.mlp.gate_proj.biases,
-model.layers.24.mlp.gate_proj.scales,
-model.layers.24.mlp.gate_proj.weight,
-model.layers.24.mlp.up_proj.biases,
-model.layers.24.mlp.up_proj.scales,
-model.layers.24.mlp.up_proj.weight,
-model.layers.24.post_attention_layernorm.weight,
-model.layers.24.self_attn.k_norm.weight,
-model.layers.24.self_attn.k_proj.biases,
-model.layers.24.self_attn.k_proj.scales,
-model.layers.24.self_attn.k_proj.weight,
-model.layers.24.self_attn.o_proj.biases,
-model.layers.24.self_attn.o_proj.scales,
-model.layers.24.self_attn.o_proj.weight,
-model.layers.24.self_attn.q_norm.weight,
-model.layers.24.self_attn.q_proj.biases,
-model.layers.24.self_attn.q_proj.scales,
-model.layers.24.self_attn.q_proj.weight,
-model.layers.24.self_attn.v_proj.biases,
-model.layers.24.self_attn.v_proj.scales,
-model.layers.24.self_attn.v_proj.weight,
-model.layers.25.input_layernorm.weight,
-model.layers.25.mlp.down_proj.biases,
-model.layers.25.mlp.down_proj.scales,
-model.layers.25.mlp.down_proj.weight,
-model.layers.25.mlp.gate_proj.biases,
-model.layers.25.mlp.gate_proj.scales,
-model.layers.25.mlp.gate_proj.weight,
-model.layers.25.mlp.up_proj.biases,
-model.layers.25.mlp.up_proj.scales,
-model.layers.25.mlp.up_proj.weight,
-model.layers.25.post_attention_layernorm.weight,
-model.layers.25.self_attn.k_norm.weight,
-model.layers.25.self_attn.k_proj.biases,
-model.layers.25.self_attn.k_proj.scales,
-model.layers.25.self_attn.k_proj.weight,
-model.layers.25.self_attn.o_proj.biases,
-model.layers.25.self_attn.o_proj.scales,
-model.layers.25.self_attn.o_proj.weight,
-model.layers.25.self_attn.q_norm.weight,
-model.layers.25.self_attn.q_proj.biases,
-model.layers.25.self_attn.q_proj.scales,
-model.layers.25.self_attn.q_proj.weight,
-model.layers.25.self_attn.v_proj.biases,
-model.layers.25.self_attn.v_proj.scales,
-model.layers.25.self_attn.v_proj.weight,
-model.layers.26.input_layernorm.weight,
-model.layers.26.mlp.down_proj.biases,
-model.layers.26.mlp.down_proj.scales,
-model.layers.26.mlp.down_proj.weight,
-model.layers.26.mlp.gate_proj.biases,
-model.layers.26.mlp.gate_proj.scales,
-model.layers.26.mlp.gate_proj.weight,
-model.layers.26.mlp.up_proj.biases,
-model.layers.26.mlp.up_proj.scales,
-model.layers.26.mlp.up_proj.weight,
-model.layers.26.post_attention_layernorm.weight,
-model.layers.26.self_attn.k_norm.weight,
-model.layers.26.self_attn.k_proj.biases,
-model.layers.26.self_attn.k_proj.scales,
-model.layers.26.self_attn.k_proj.weight,
-model.layers.26.self_attn.o_proj.biases,
-model.layers.26.self_attn.o_proj.scales,
-model.layers.26.self_attn.o_proj.weight,
-model.layers.26.self_attn.q_norm.weight,
-model.layers.26.self_attn.q_proj.biases,
-model.layers.26.self_attn.q_proj.scales,
-model.layers.26.self_attn.q_proj.weight,
-model.layers.26.self_attn.v_proj.biases,
-model.layers.26.self_attn.v_proj.scales,
-model.layers.26.self_attn.v_proj.weight,
-model.layers.27.input_layernorm.weight,
-model.layers.27.mlp.down_proj.biases,
-model.layers.27.mlp.down_proj.scales,
-model.layers.27.mlp.down_proj.weight,
-model.layers.27.mlp.gate_proj.biases,
-model.layers.27.mlp.gate_proj.scales,
-model.layers.27.mlp.gate_proj.weight,
-model.layers.27.mlp.up_proj.biases,
-model.layers.27.mlp.up_proj.scales,
-model.layers.27.mlp.up_proj.weight,
-model.layers.27.post_attention_layernorm.weight,
-model.layers.27.self_attn.k_norm.weight,
-model.layers.27.self_attn.k_proj.biases,
-model.layers.27.self_attn.k_proj.scales,
-model.layers.27.self_attn.k_proj.weight,
-model.layers.27.self_attn.o_proj.biases,
-model.layers.27.self_attn.o_proj.scales,
-model.layers.27.self_attn.o_proj.weight,
-model.layers.27.self_attn.q_norm.weight,
-model.layers.27.self_attn.q_proj.biases,
-model.layers.27.self_attn.q_proj.scales,
-model.layers.27.self_attn.q_proj.weight,
-model.layers.27.self_attn.v_proj.biases,
-model.layers.27.self_attn.v_proj.scales,
-model.layers.27.self_attn.v_proj.weight,
-model.layers.28.input_layernorm.weight,
-model.layers.28.mlp.down_proj.biases,
-model.layers.28.mlp.down_proj.scales,
-model.layers.28.mlp.down_proj.weight,
-model.layers.28.mlp.gate_proj.biases,
-model.layers.28.mlp.gate_proj.scales,
-model.layers.28.mlp.gate_proj.weight,
-model.layers.28.mlp.up_proj.biases,
-model.layers.28.mlp.up_proj.scales,
-model.layers.28.mlp.up_proj.weight,
-model.layers.28.post_attention_layernorm.weight,
-model.layers.28.self_attn.k_norm.weight,
-model.layers.28.self_attn.k_proj.biases,
-model.layers.28.self_attn.k_proj.scales,
-model.layers.28.self_attn.k_proj.weight,
-model.layers.28.self_attn.o_proj.biases,
-model.layers.28.self_attn.o_proj.scales,
-model.layers.28.self_attn.o_proj.weight,
-model.layers.28.self_attn.q_norm.weight,
-model.layers.28.self_attn.q_proj.biases,
-model.layers.28.self_attn.q_proj.scales,
-model.layers.28.self_attn.q_proj.weight,
-model.layers.28.self_attn.v_proj.biases,
-model.layers.28.self_attn.v_proj.scales,
-model.layers.28.self_attn.v_proj.weight,
-model.layers.29.input_layernorm.weight,
-model.layers.29.mlp.down_proj.biases,
-model.layers.29.mlp.down_proj.scales,
-model.layers.29.mlp.down_proj.weight,
-model.layers.29.mlp.gate_proj.biases,
-model.layers.29.mlp.gate_proj.scales,
-model.layers.29.mlp.gate_proj.weight,
-model.layers.29.mlp.up_proj.biases,
-model.layers.29.mlp.up_proj.scales,
-model.layers.29.mlp.up_proj.weight,
-model.layers.29.post_attention_layernorm.weight,
-model.layers.29.self_attn.k_norm.weight,
-model.layers.29.self_attn.k_proj.biases,
-model.layers.29.self_attn.k_proj.scales,
-model.layers.29.self_attn.k_proj.weight,
-model.layers.29.self_attn.o_proj.biases,
-model.layers.29.self_attn.o_proj.scales,
-model.layers.29.self_attn.o_proj.weight,
-model.layers.29.self_attn.q_norm.weight,
-model.layers.29.self_attn.q_proj.biases,
-model.layers.29.self_attn.q_proj.scales,
-model.layers.29.self_attn.q_proj.weight,
-model.layers.29.self_attn.v_proj.biases,
-model.layers.29.self_attn.v_proj.scales,
-model.layers.29.self_attn.v_proj.weight,
-model.layers.3.input_layernorm.weight,
-model.layers.3.mlp.down_proj.biases,
-model.layers.3.mlp.down_proj.scales,
-model.layers.3.mlp.down_proj.weight,
-model.layers.3.mlp.gate_proj.biases,
-model.layers.3.mlp.gate_proj.scales,
-model.layers.3.mlp.gate_proj.weight,
-model.layers.3.mlp.up_proj.biases,
-model.layers.3.mlp.up_proj.scales,
-model.layers.3.mlp.up_proj.weight,
-model.layers.3.post_attention_layernorm.weight,
-model.layers.3.self_attn.k_norm.weight,
-model.layers.3.self_attn.k_proj.biases,
-model.layers.3.self_attn.k_proj.scales,
-model.layers.3.self_attn.k_proj.weight,
-model.layers.3.self_attn.o_proj.biases,
-model.layers.3.self_attn.o_proj.scales,
-model.layers.3.self_attn.o_proj.weight,
-model.layers.3.self_attn.q_norm.weight,
-model.layers.3.self_attn.q_proj.biases,
-model.layers.3.self_attn.q_proj.scales,
-model.layers.3.self_attn.q_proj.weight,
-model.layers.3.self_attn.v_proj.biases,
-model.layers.3.self_attn.v_proj.scales,
-model.layers.3.self_attn.v_proj.weight,
-model.layers.30.input_layernorm.weight,
-model.layers.30.mlp.down_proj.biases,
-model.layers.30.mlp.down_proj.scales,
-model.layers.30.mlp.down_proj.weight,
-model.layers.30.mlp.gate_proj.biases,
-model.layers.30.mlp.gate_proj.scales,
-model.layers.30.mlp.gate_proj.weight,
-model.layers.30.mlp.up_proj.biases,
-model.layers.30.mlp.up_proj.scales,
-model.layers.30.mlp.up_proj.weight,
-model.layers.30.post_attention_layernorm.weight,
-model.layers.30.self_attn.k_norm.weight,
-model.layers.30.self_attn.k_proj.biases,
-model.layers.30.self_attn.k_proj.scales,
-model.layers.30.self_attn.k_proj.weight,
-model.layers.30.self_attn.o_proj.biases,
-model.layers.30.self_attn.o_proj.scales,
-model.layers.30.self_attn.o_proj.weight,
-model.layers.30.self_attn.q_norm.weight,
-model.layers.30.self_attn.q_proj.biases,
-model.layers.30.self_attn.q_proj.scales,
-model.layers.30.self_attn.q_proj.weight,
-model.layers.30.self_attn.v_proj.biases,
-model.layers.30.self_attn.v_proj.scales,
-model.layers.30.self_attn.v_proj.weight,
-model.layers.31.input_layernorm.weight,
-model.layers.31.mlp.down_proj.biases,
-model.layers.31.mlp.down_proj.scales,
-model.layers.31.mlp.down_proj.weight,
-model.layers.31.mlp.gate_proj.biases,
-model.layers.31.mlp.gate_proj.scales,
-model.layers.31.mlp.gate_proj.weight,
-model.layers.31.mlp.up_proj.biases,
-model.layers.31.mlp.up_proj.scales,
-model.layers.31.mlp.up_proj.weight,
-model.layers.31.post_attention_layernorm.weight,
-model.layers.31.self_attn.k_norm.weight,
-model.layers.31.self_attn.k_proj.biases,
-model.layers.31.self_attn.k_proj.scales,
-model.layers.31.self_attn.k_proj.weight,
-model.layers.31.self_attn.o_proj.biases,
-model.layers.31.self_attn.o_proj.scales,
-model.layers.31.self_attn.o_proj.weight,
-model.layers.31.self_attn.q_norm.weight,
-model.layers.31.self_attn.q_proj.biases,
-model.layers.31.self_attn.q_proj.scales,
-model.layers.31.self_attn.q_proj.weight,
-model.layers.31.self_attn.v_proj.biases,
-model.layers.31.self_attn.v_proj.scales,
-model.layers.31.self_attn.v_proj.weight,
-model.layers.32.input_layernorm.weight,
-model.layers.32.mlp.down_proj.biases,
-model.layers.32.mlp.down_proj.scales,
-model.layers.32.mlp.down_proj.weight,
-model.layers.32.mlp.gate_proj.biases,
-model.layers.32.mlp.gate_proj.scales,
-model.layers.32.mlp.gate_proj.weight,
-model.layers.32.mlp.up_proj.biases,
-model.layers.32.mlp.up_proj.scales,
-model.layers.32.mlp.up_proj.weight,
-model.layers.32.post_attention_layernorm.weight,
-model.layers.32.self_attn.k_norm.weight,
-model.layers.32.self_attn.k_proj.biases,
-model.layers.32.self_attn.k_proj.scales,
-model.layers.32.self_attn.k_proj.weight,
-model.layers.32.self_attn.o_proj.biases,
-model.layers.32.self_attn.o_proj.scales,
-model.layers.32.self_attn.o_proj.weight,
-model.layers.32.self_attn.q_norm.weight,
-model.layers.32.self_attn.q_proj.biases,
-model.layers.32.self_attn.q_proj.scales,
-model.layers.32.self_attn.q_proj.weight,
-model.layers.32.self_attn.v_proj.biases,
-model.layers.32.self_attn.v_proj.scales,
-model.layers.32.self_attn.v_proj.weight,
-model.layers.33.input_layernorm.weight,
-model.layers.33.mlp.down_proj.biases,
-model.layers.33.mlp.down_proj.scales,
-model.layers.33.mlp.down_proj.weight,
-model.layers.33.mlp.gate_proj.biases,
-model.layers.33.mlp.gate_proj.scales,
-model.layers.33.mlp.gate_proj.weight,
-model.layers.33.mlp.up_proj.biases,
-model.layers.33.mlp.up_proj.scales,
-model.layers.33.mlp.up_proj.weight,
-model.layers.33.post_attention_layernorm.weight,
-model.layers.33.self_attn.k_norm.weight,
-model.layers.33.self_attn.k_proj.biases,
-model.layers.33.self_attn.k_proj.scales,
-model.layers.33.self_attn.k_proj.weight,
-model.layers.33.self_attn.o_proj.biases,
-model.layers.33.self_attn.o_proj.scales,
-model.layers.33.self_attn.o_proj.weight,
-model.layers.33.self_attn.q_norm.weight,
-model.layers.33.self_attn.q_proj.biases,
-model.layers.33.self_attn.q_proj.scales,
-model.layers.33.self_attn.q_proj.weight,
-model.layers.33.self_attn.v_proj.biases,
-model.layers.33.self_attn.v_proj.scales,
-model.layers.33.self_attn.v_proj.weight,
-model.layers.34.input_layernorm.weight,
-model.layers.34.mlp.down_proj.biases,
-model.layers.34.mlp.down_proj.scales,
-model.layers.34.mlp.down_proj.weight,
-model.layers.34.mlp.gate_proj.biases,
-model.layers.34.mlp.gate_proj.scales,
-model.layers.34.mlp.gate_proj.weight,
-model.layers.34.mlp.up_proj.biases,
-model.layers.34.mlp.up_proj.scales,
-model.layers.34.mlp.up_proj.weight,
-model.layers.34.post_attention_layernorm.weight,
-model.layers.34.self_attn.k_norm.weight,
-model.layers.34.self_attn.k_proj.biases,
-model.layers.34.self_attn.k_proj.scales,
-model.layers.34.self_attn.k_proj.weight,
-model.layers.34.self_attn.o_proj.biases,
-model.layers.34.self_attn.o_proj.scales,
-model.layers.34.self_attn.o_proj.weight,
-model.layers.34.self_attn.q_norm.weight,
-model.layers.34.self_attn.q_proj.biases,
-model.layers.34.self_attn.q_proj.scales,
-model.layers.34.self_attn.q_proj.weight,
-model.layers.34.self_attn.v_proj.biases,
-model.layers.34.self_attn.v_proj.scales,
-model.layers.34.self_attn.v_proj.weight,
-model.layers.35.input_layernorm.weight,
-model.layers.35.mlp.down_proj.biases,
-model.layers.35.mlp.down_proj.scales,
-model.layers.35.mlp.down_proj.weight,
-model.layers.35.mlp.gate_proj.biases,
-model.layers.35.mlp.gate_proj.scales,
-model.layers.35.mlp.gate_proj.weight,
-model.layers.35.mlp.up_proj.biases,
-model.layers.35.mlp.up_proj.scales,
-model.layers.35.mlp.up_proj.weight,
-model.layers.35.post_attention_layernorm.weight,
-model.layers.35.self_attn.k_norm.weight,
-model.layers.35.self_attn.k_proj.biases,
-model.layers.35.self_attn.k_proj.scales,
-model.layers.35.self_attn.k_proj.weight,
-model.layers.35.self_attn.o_proj.biases,
-model.layers.35.self_attn.o_proj.scales,
-model.layers.35.self_attn.o_proj.weight,
-model.layers.35.self_attn.q_norm.weight,
-model.layers.35.self_attn.q_proj.biases,
-model.layers.35.self_attn.q_proj.scales,
-model.layers.35.self_attn.q_proj.weight,
-model.layers.35.self_attn.v_proj.biases,
-model.layers.35.self_attn.v_proj.scales,
-model.layers.35.self_attn.v_proj.weight,
-model.layers.4.input_layernorm.weight,
-model.layers.4.mlp.down_proj.biases,
-model.layers.4.mlp.down_proj.scales,
-model.layers.4.mlp.down_proj.weight,
-model.layers.4.mlp.gate_proj.biases,
-model.layers.4.mlp.gate_proj.scales,
-model.layers.4.mlp.gate_proj.weight,
-model.layers.4.mlp.up_proj.biases,
-model.layers.4.mlp.up_proj.scales,
-model.layers.4.mlp.up_proj.weight,
-model.layers.4.post_attention_layernorm.weight,
-model.layers.4.self_attn.k_norm.weight,
-model.layers.4.self_attn.k_proj.biases,
-model.layers.4.self_attn.k_proj.scales,
-model.layers.4.self_attn.k_proj.weight,
-model.layers.4.self_attn.o_proj.biases,
-model.layers.4.self_attn.o_proj.scales,
-model.layers.4.self_attn.o_proj.weight,
-model.layers.4.self_attn.q_norm.weight,
-model.layers.4.self_attn.q_proj.biases,
-model.layers.4.self_attn.q_proj.scales,
-model.layers.4.self_attn.q_proj.weight,
-model.layers.4.self_attn.v_proj.biases,
-model.layers.4.self_attn.v_proj.scales,
-model.layers.4.self_attn.v_proj.weight,
-model.layers.5.input_layernorm.weight,
-model.layers.5.mlp.down_proj.biases,
-model.layers.5.mlp.down_proj.scales,
-model.layers.5.mlp.down_proj.weight,
-model.layers.5.mlp.gate_proj.biases,
-model.layers.5.mlp.gate_proj.scales,
-model.layers.5.mlp.gate_proj.weight,
-model.layers.5.mlp.up_proj.biases,
-model.layers.5.mlp.up_proj.scales,
-model.layers.5.mlp.up_proj.weight,
-model.layers.5.post_attention_layernorm.weight,
-model.layers.5.self_attn.k_norm.weight,
-model.layers.5.self_attn.k_proj.biases,
-model.layers.5.self_attn.k_proj.scales,
-model.layers.5.self_attn.k_proj.weight,
-model.layers.5.self_attn.o_proj.biases,
-model.layers.5.self_attn.o_proj.scales,
-model.layers.5.self_attn.o_proj.weight,
-model.layers.5.self_attn.q_norm.weight,
-model.layers.5.self_attn.q_proj.biases,
-model.layers.5.self_attn.q_proj.scales,
-model.layers.5.self_attn.q_proj.weight,
-model.layers.5.self_attn.v_proj.biases,
-model.layers.5.self_attn.v_proj.scales,
-model.layers.5.self_attn.v_proj.weight,
-model.layers.6.input_layernorm.weight,
-model.layers.6.mlp.down_proj.biases,
-model.layers.6.mlp.down_proj.scales,
-model.layers.6.mlp.down_proj.weight,
-model.layers.6.mlp.gate_proj.biases,
-model.layers.6.mlp.gate_proj.scales,
-model.layers.6.mlp.gate_proj.weight,
-model.layers.6.mlp.up_proj.biases,
-model.layers.6.mlp.up_proj.scales,
-model.layers.6.mlp.up_proj.weight,
-model.layers.6.post_attention_layernorm.weight,
-model.layers.6.self_attn.k_norm.weight,
-model.layers.6.self_attn.k_proj.biases,
-model.layers.6.self_attn.k_proj.scales,
-model.layers.6.self_attn.k_proj.weight,
-model.layers.6.self_attn.o_proj.biases,
-model.layers.6.self_attn.o_proj.scales,
-model.layers.6.self_attn.o_proj.weight,
-model.layers.6.self_attn.q_norm.weight,
-model.layers.6.self_attn.q_proj.biases,
-model.layers.6.self_attn.q_proj.scales,
-model.layers.6.self_attn.q_proj.weight,
-model.layers.6.self_attn.v_proj.biases,
-model.layers.6.self_attn.v_proj.scales,
-model.layers.6.self_attn.v_proj.weight,
-model.layers.7.input_layernorm.weight,
-model.layers.7.mlp.down_proj.biases,
-model.layers.7.mlp.down_proj.scales,
-model.layers.7.mlp.down_proj.weight,
-model.layers.7.mlp.gate_proj.biases,
-model.layers.7.mlp.gate_proj.scales,
-model.layers.7.mlp.gate_proj.weight,
-model.layers.7.mlp.up_proj.biases,
-model.layers.7.mlp.up_proj.scales,
-model.layers.7.mlp.up_proj.weight,
-model.layers.7.post_attention_layernorm.weight,
-model.layers.7.self_attn.k_norm.weight,
-model.layers.7.self_attn.k_proj.biases,
-model.layers.7.self_attn.k_proj.scales,
-model.layers.7.self_attn.k_proj.weight,
-model.layers.7.self_attn.o_proj.biases,
-model.layers.7.self_attn.o_proj.scales,
-model.layers.7.self_attn.o_proj.weight,
-model.layers.7.self_attn.q_norm.weight,
-model.layers.7.self_attn.q_proj.biases,
-model.layers.7.self_attn.q_proj.scales,
-model.layers.7.self_attn.q_proj.weight,
-model.layers.7.self_attn.v_proj.biases,
-model.layers.7.self_attn.v_proj.scales,
-model.layers.7.self_attn.v_proj.weight,
-model.layers.8.input_layernorm.weight,
-model.layers.8.mlp.down_proj.biases,
-model.layers.8.mlp.down_proj.scales,
-model.layers.8.mlp.down_proj.weight,
-model.layers.8.mlp.gate_proj.biases,
-model.layers.8.mlp.gate_proj.scales,
-model.layers.8.mlp.gate_proj.weight,
-model.layers.8.mlp.up_proj.biases,
-model.layers.8.mlp.up_proj.scales,
-model.layers.8.mlp.up_proj.weight,
-model.layers.8.post_attention_layernorm.weight,
-model.layers.8.self_attn.k_norm.weight,
-model.layers.8.self_attn.k_proj.biases,
-model.layers.8.self_attn.k_proj.scales,
-model.layers.8.self_attn.k_proj.weight,
-model.layers.8.self_attn.o_proj.biases,
-model.layers.8.self_attn.o_proj.scales,
-model.layers.8.self_attn.o_proj.weight,
-model.layers.8.self_attn.q_norm.weight,
-model.layers.8.self_attn.q_proj.biases,
-model.layers.8.self_attn.q_proj.scales,
-model.layers.8.self_attn.q_proj.weight,
-model.layers.8.self_attn.v_proj.biases,
-model.layers.8.self_attn.v_proj.scales,
-model.layers.8.self_attn.v_proj.weight,
-model.layers.9.input_layernorm.weight,
-model.layers.9.mlp.down_proj.biases,
-model.layers.9.mlp.down_proj.scales,
-model.layers.9.mlp.down_proj.weight,
-model.layers.9.mlp.gate_proj.biases,
-model.layers.9.mlp.gate_proj.scales,
-model.layers.9.mlp.gate_proj.weight,
-model.layers.9.mlp.up_proj.biases,
-model.layers.9.mlp.up_proj.scales,
-model.layers.9.mlp.up_proj.weight,
-model.layers.9.post_attention_layernorm.weight,
-model.layers.9.self_attn.k_norm.weight,
-model.layers.9.self_attn.k_proj.biases,
-model.layers.9.self_attn.k_proj.scales,
-model.layers.9.self_attn.k_proj.weight,
-model.layers.9.self_attn.o_proj.biases,
-model.layers.9.self_attn.o_proj.scales,
-model.layers.9.self_attn.o_proj.weight,
-model.layers.9.self_attn.q_norm.weight,
-model.layers.9.self_attn.q_proj.biases,
-model.layers.9.self_attn.q_proj.scales,
-model.layers.9.self_attn.q_proj.weight,
-model.layers.9.self_attn.v_proj.biases,
-model.layers.9.self_attn.v_proj.scales,
-model.layers.9.self_attn.v_proj.weight,
-model.norm.weight.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]
-Fetching 9 files: 100%|##########| 9/9 [00:00<00:00, 2518.09it/s]
-```
-
-</details>
-
----
-
-<a id="model-mlx-community-mistral-small-32-24b-instruct-2506-4bit"></a>
-
-### mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* prefill
-- *Error stage:* Error
-- *Error code:* TRANSFORMERS_PREFILL_ERROR
-- *Error type:* ValueError
-- *Error package:* transformers
-- *Error message:* Prompt prefill failed for
-  mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate
-  str (not "list") to str
-- *Root exception type:* TypeError
-- *Root exception module:* builtins
-- *Root exception message:* can only concatenate str (not "list") to str
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.84s
-- *Generation time:* -
-- *Total time:* 1.85s
-- *Prompt preparation time:* 0.00411
-- *First-token latency:* -
-- *Cleanup time:* 0.184
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00413
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2a1d5eabfc504747bdc24178394821a1efc0edde
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mistral-Small-3.2-24B-Instruct-2506-4bit/snapshots/2a1d5eabfc504747bdc24178394821a1efc0edde
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13521, in _prepare_generation_prompt
-    apply_chat_template(
-    ~~~~~~~~~~~~~~~~~~~^
-        processor=processor,
-        ^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        **chat_template_kwargs,
-        ^^^^^^^^^^^^^^^^^^^^^^^
-    ),
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 1026, in apply_chat_template
-    return get_chat_template(processor, messages, add_generation_prompt, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 824, in get_chat_template
-    return template_processor.apply_chat_template(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        messages,
-        ^^^^^^^^^
-    ...<2 lines>...
-        **template_kwargs,
-        ^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/tokenization_utils_base.py", line 3108, in apply_chat_template
-    rendered_chat, generation_indices = render_jinja_template(
-                                        ~~~~~~~~~~~~~~~~~~~~~^
-        conversations=conversations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<6 lines>...
-        **template_kwargs,
-        ^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/utils/chat_template_utils.py", line 581, in render_jinja_template
-    rendered_chat = compiled_template.render(
-        messages=chat,
-    ...<3 lines>...
-        **kwargs,
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "<template>", line 1, in top-level template code
-TypeError: can only concatenate str (not "list") to str
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14216, in _run_model_generation
-    prepared = _prepare_generation(
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
+    output, duration = _execute_prepared_generation(
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
-    ...<4 lines>...
+        ^^^^^^^
+    ...<2 lines>...
         phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13767, in _prepare_generation
-    prepared_prompt = _prepare_generation_prompt(
+    ^
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
+    output = _run_generation_guarded(
         params=params,
-    ...<3 lines>...
-        phase_timer=phase_timer,
+        generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13540, in _prepare_generation_prompt
-    raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
-ValueError: Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit: can only concatenate str (not "list") to str
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
+    raise _tag_exception_failure_phase(
+        ValueError(msg), _generation_failure_phase(gen_known_err)
+    ) from gen_known_err
+ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
 
 ```
 
@@ -5865,64 +3308,52 @@ ValueError: Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instru
 ```text
 === STDERR ===
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3538.60it/s]
-[21:49:34] Prompt prefill failed for mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13521, in
-           _prepare_generation_prompt
-               apply_chat_template(
-               ~~~~~~~~~~~~~~~~~~~^
-                   processor=processor,
-                   ^^^^^^^^^^^^^^^^^^^^
-               ...<3 lines>...
-                   **chat_template_kwargs,
-                   ^^^^^^^^^^^^^^^^^^^^^^^
-               ),
-               ^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 1026, in
-           apply_chat_template
-               return get_chat_template(processor, messages, add_generation_prompt, **kwargs)
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/prompt_utils.py", line 824, in
-           get_chat_template
-               return template_processor.apply_chat_template(
-                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-                   messages,
-                   ^^^^^^^^^
-               ...<2 lines>...
-                   **template_kwargs,
-                   ^^^^^^^^^^^^^^^^^^
+Fetching 10 files:  40%|####      | 4/10 [00:00<00:00, 13.69it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23.34it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
+[21:31:24] Generation error for mlx-community/Mage-VL-OptiQ-4bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
+           _run_generation_guarded
+               return generate_once()
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
+           _generate_once
+               return _generate_with_repetition_guard(
+                   model=prepared.model,
+               ...<5 lines>...
+                   **prepared.generate_kwargs,
                )
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
+           _generate_with_repetition_guard
+               for chunk in stream_generate(
+                            ~~~~~~~~~~~~~~~^
+                   model=model, processor=processor, prompt=prompt, image=image, **kwargs
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               ):
                ^
-             File
-           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/tokenizatio
-           n_utils_base.py", line 3108, in apply_chat_template
-               rendered_chat, generation_indices = render_jinja_template(
-                                                   ~~~~~~~~~~~~~~~~~~~~~^
-                   conversations=conversations,
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-               ...<6 lines>...
-                   **template_kwargs,
-                   ^^^^^^^^^^^^^^^^^^
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1083, in
+           stream_generate
+               for n, (token, logprobs) in enumerate(gen):
+                                           ~~~~~~~~~^^^^^
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 434, in
+           generate_step
+               embedding_output = model.get_input_embeddings(
+                   input_ids, pixel_values, mask=mask, **kwargs
                )
-               ^
-             File
-           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/transformers/utils/chat_
-           template_utils.py", line 581, in render_jinja_template
-               rendered_chat = compiled_template.render(
-                   messages=chat,
-               ...<3 lines>...
-                   **kwargs,
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/mage_vl.py", line 66,
+           in get_input_embeddings
+               hidden_states = self.vision_tower(
+                   pixel_values.astype(inputs_embeds.dtype), patch_positions, grid_thw
                )
-             File
-           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py",
-           line 1295, in render
-               self.environment.handle_exception()
-               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-             File
-           "~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages/jinja2/environment.py",
-           line 942, in handle_exception
-               raise rewrite_traceback_stack(source=source)
-             File "<template>", line 1, in top-level template code
-           TypeError: can only concatenate str (not "list") to str
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 381,
+           in __call__
+               cu = build_cu_seqlens(grid_thw, total_patches, self.config.frame_windows_size)
+             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 309,
+           in build_cu_seqlens
+               raise ValueError(
+                   f"cu_seqlens mismatch: total_patches={total_patches} calculated={cu[-1]}
+           grid={grid_thw}"
+               )
+           ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
 ```
 
 </details>
@@ -5955,12 +3386,12 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3538.60it/s]
   <br>backbone.embeddings.biases,<br>backbone.embeddings.scales,<br>backbone.embeddings.weight,<br>backbone.layers.0.mixer.A_log,<br>backbone.layers.0.mixer.D,<br>backbone.layers.0.mixer.conv1d.bias,<br>backbone.layers.0.mixer.conv1d.weight,<br>backbone.layers.0.mixer.dt_bias,<br>backbone.layers.0.mixer.in_proj.biases,<br>backbone.layers.0.mixer.in_proj.scales,<br>backbone.layers.0.mixer.in_proj.weight,<br>backbone.layers.0.mixer.norm.weight,<br>backbone.layers.0.mixer.out_proj.biases,<br>backbone.layers.0.mixer.out_proj.scales,<br>backbone.layers.0.mixer.out_proj.weight,<br>backbone.layers.0.norm.weight,<br>backbone.layers.1.mixer.gate.e_score_correction_bias,<br>backbone.layers.1.mixer.gate.weight,<br>backbone.layers.1.mixer.shared_experts.down_proj.biases,<br>backbone.layers.1.mixer.shared_experts.down_proj.scales,<br>backbone.layers.1.mixer.shared_experts.down_proj.weight,<br>backbone.layers.1.mixer.shared_experts.up_proj.biases,<br>backbone.layers.1.mixer.shared_experts.up_proj.scales,<br>backbone.layers.1.mixer.shared_experts.up_proj.weight,<br>backbone.layers.1.mixer.switch_mlp.fc1.biases,<br>backbone.layers.1.mixer.switch_mlp.fc1.scales,<br>backbone.layers.1.mixer.switch_mlp.fc1.weight,<br>backbone.layers.1.mixer.switch_mlp.fc2.biases,<br>backbone.layers.1.mixer.switch_mlp.fc2.scales,<br>backbone.layers.1.mixer.switch_mlp.fc2.weight,<br>backbone.layers.1.norm.weight,<br>backbone.layers.10.mixer.gate.e_score_correction_bias,<br>backbone.layers.10.mixer.gate.weight,<br>backbone.layers.10.mixer.shared_experts.down_proj.biases,<br>backbone.layers.10.mixer.shared_experts.down_proj.scales,<br>backbone.layers.10.mixer.shared_experts.down_proj.weight,<br>backbone.layers.10.mixer.shared_experts.up_proj.biases,<br>backbone.layers.10.mixer.shared_experts.up_proj.scales,<br>backbone.layers.10.mixer.shared_experts.up_proj.weight,<br>backbone.layers.10.mixer.switch_mlp.fc1.biases,<br>backbone.layers.10.mixer.switch_mlp.fc1.scales,<br>backbone.layers.10.mixer.switch_mlp.fc1.weight,<br>backbone.layers.10.mixer.switch_mlp.fc2.biases,<br>backbone.layers.10.mixer.switch_mlp.fc2.scales,<br>backbone.layers.10.mixer.switch_mlp.fc2.weight,<br>backbone.layers.10.norm.weight,<br>backbone.layers.11.mixer.A_log,<br>backbone.layers.11.mixer.D,<br>backbone.layers.11.mixer.conv1d.bias,<br>backbone.layers.11.mixer.conv1d.weight,<br>backbone.layers.11.mixer.dt_bias,<br>backbone.layers.11.mixer.in_proj.biases,<br>backbone.layers.11.mixer.in_proj.scales,<br>backbone.layers.11.mixer.in_proj.weight,<br>backbone.layers.11.mixer.norm.weight,<br>backbone.layers.11.mixer.out_proj.biases,<br>backbone.layers.11.mixer.out_proj.scales,<br>backbone.layers.11.mixer.out_proj.weight,<br>backbone.layers.11.norm.weight,<br>backbone.layers.12.mixer.k_proj.biases,<br>backbone.layers.12.mixer.k_proj.scales,<br>backbone.layers.12.mixer.k_proj.weight,<br>backbone.layers.12.mixer.o_proj.biases,<br>backbone.layers.12.mixer.o_proj.scales,<br>backbone.layers.12.mixer.o_proj.weight,<br>backbone.layers.12.mixer.q_proj.biases,<br>backbone.layers.12.mixer.q_proj.scales,<br>backbone.layers.12.mixer.q_proj.weight,<br>backbone.layers.12.mixer.v_proj.biases,<br>backbone.layers.12.mixer.v_proj.scales,<br>backbone.layers.12.mixer.v_proj.weight,<br>backbone.layers.12.norm.weight,<br>backbone.layers.13.mixer.gate.e_score_correction_bias,<br>backbone.layers.13.mixer.gate.weight,<br>backbone.layers.13.mixer.shared_experts.down_proj.biases,<br>backbone.layers.13.mixer.shared_experts.down_proj.scales,<br>backbone.layers.13.mixer.shared_experts.down_proj.weight,<br>backbone.layers.13.mixer.shared_experts.up_proj.biases,<br>backbone.layers.13.mixer.shared_experts.up_proj.scales,<br>backbone.layers.13.mixer.shared_experts.up_proj.weight,<br>backbone.layers.13.mixer.switch_mlp.fc1.biases,<br>backbone.layers.13.mixer.switch_mlp.fc1.scales,<br>backbone.layers.13.mixer.switch_mlp.fc1.weight,<br>backbone.layers.13.mixer.switch_mlp.fc2.biases,<br>backbone.layers.13.mixer.switch_mlp.fc2.scales,<br>backbone.layers.13.mixer.switch_mlp.fc2.weight,<br>backbone.layers.13.norm.weight,<br>backbone.layers.14.mixer.A_log,<br>backbone.layers.14.mixer.D,<br>backbone.layers.14.mixer.conv1d.bias,<br>backbone.layers.14.mixer.conv1d.weight,<br>backbone.layers.14.mixer.dt_bias,<br>backbone.layers.14.mixer.in_proj.biases,<br>backbone.layers.14.mixer.in_proj.scales,<br>backbone.layers.14.mixer.in_proj.weight,<br>backbone.layers.14.mixer.norm.weight,<br>backbone.layers.14.mixer.out_proj.biases,<br>backbone.layers.14.mixer.out_proj.scales,<br>backbone.layers.14.mixer.out_proj.weight,<br>backbone.layers.14.norm.weight,<br>backbone.layers.15.mixer.gate.e_score_correction_bias,<br>backbone.layers.15.mixer.gate.weight,<br>backbone.layers.15.mixer.shared_experts.down_proj.biases,<br>backbone.layers.15.mixer.shared_experts.down_proj.scales,<br>backbone.layers.15.mixer.shared_experts.down_proj.weight,<br>backbone.layers.15.mixer.shared_experts.up_proj.biases,<br>backbone.layers.15.mixer.shared_experts.up_proj.scales,<br>backbone.layers.15.mixer.shared_experts.up_proj.weight,<br>backbone.layers.15.mixer.switch_mlp.fc1.biases,<br>backbone.layers.15.mixer.switch_mlp.fc1.scales,<br>backbone.layers.15.mixer.switch_mlp.fc1.weight,<br>backbone.layers.15.mixer.switch_mlp.fc2.biases,<br>backbone.layers.15.mixer.switch_mlp.fc2.scales,<br>backbone.layers.15.mixer.switch_mlp.fc2.weight,<br>backbone.layers.15.norm.weight,<br>backbone.layers.16.mixer.A_log,<br>backbone.layers.16.mixer.D,<br>backbone.layers.16.mixer.conv1d.bias,<br>backbone.layers.16.mixer.conv1d.weight,<br>backbone.layers.16.mixer.dt_bias,<br>backbone.layers.16.mixer.in_proj.biases,<br>backbone.layers.16.mixer.in_proj.scales,<br>backbone.layers.16.mixer.in_proj.weight,<br>backbone.layers.16.mixer.norm.weight,<br>backbone.layers.16.mixer.out_proj.biases,<br>backbone.layers.16.mixer.out_proj.scales,<br>backbone.layers.16.mixer.out_proj.weight,<br>backbone.layers.16.norm.weight,<br>backbone.layers.17.mixer.gate.e_score_correction_bias,<br>backbone.layers.17.mixer.gate.weight,<br>backbone.layers.17.mixer.shared_experts.down_proj.biases,<br>backbone.layers.17.mixer.shared_experts.down_proj.scales,<br>backbone.layers.17.mixer.shared_experts.down_proj.weight,<br>backbone.layers.17.mixer.shared_experts.up_proj.biases,<br>backbone.layers.17.mixer.shared_experts.up_proj.scales,<br>backbone.layers.17.mixer.shared_experts.up_proj.weight,<br>backbone.layers.17.mixer.switch_mlp.fc1.biases,<br>backbone.layers.17.mixer.switch_mlp.fc1.scales,<br>backbone.layers.17.mixer.switch_mlp.fc1.weight,<br>backbone.layers.17.mixer.switch_mlp.fc2.biases,<br>backbone.layers.17.mixer.switch_mlp.fc2.scales,<br>backbone.layers.17.mixer.switch_mlp.fc2.weight,<br>backbone.layers.17.norm.weight,<br>backbone.layers.18.mixer.A_log,<br>backbone.layers.18.mixer.D,<br>backbone.layers.18.mixer.conv1d.bias,<br>backbone.layers.18.mixer.conv1d.weight,<br>backbone.layers.18.mixer.dt_bias,<br>backbone.layers.18.mixer.in_proj.biases,<br>backbone.layers.18.mixer.in_proj.scales,<br>backbone.layers.18.mixer.in_proj.weight,<br>backbone.layers.18.mixer.norm.weight,<br>backbone.layers.18.mixer.out_proj.biases,<br>backbone.layers.18.mixer.out_proj.scales,<br>backbone.layers.18.mixer.out_proj.weight,<br>backbone.layers.18.norm.weight,<br>backbone.layers.19.mixer.k_proj.biases,<br>backbone.layers.19.mixer.k_proj.scales,<br>backbone.layers.19.mixer.k_proj.weight,<br>backbone.layers.19.mixer.o_proj.biases,<br>backbone.layers.19.mixer.o_proj.scales,<br>backbone.layers.19.mixer.o_proj.weight,<br>backbone.layers.19.mixer.q_proj.biases,<br>backbone.layers.19.mixer.q_proj.scales,<br>backbone.layers.19.mixer.q_proj.weight,<br>backbone.layers.19.mixer.v_proj.biases,<br>backbone.layers.19.mixer.v_proj.scales,<br>backbone.layers.19.mixer.v_proj.weight,<br>backbone.layers.19.norm.weight,<br>backbone.layers.2.mixer.A_log,<br>backbone.layers.2.mixer.D,<br>backbone.layers.2.mixer.conv1d.bias,<br>backbone.layers.2.mixer.conv1d.weight,<br>backbone.layers.2.mixer.dt_bias,<br>backbone.layers.2.mixer.in_proj.biases,<br>backbone.layers.2.mixer.in_proj.scales,<br>backbone.layers.2.mixer.in_proj.weight,<br>backbone.layers.2.mixer.norm.weight,<br>backbone.layers.2.mixer.out_proj.biases,<br>backbone.layers.2.mixer.out_proj.scales,<br>backbone.layers.2.mixer.out_proj.weight,<br>backbone.layers.2.norm.weight,<br>backbone.layers.20.mixer.gate.e_score_correction_bias,<br>backbone.layers.20.mixer.gate.weight,<br>backbone.layers.20.mixer.shared_experts.down_proj.biases,<br>backbone.layers.20.mixer.shared_experts.down_proj.scales,<br>backbone.layers.20.mixer.shared_experts.down_proj.weight,<br>backbone.layers.20.mixer.shared_experts.up_proj.biases,<br>backbone.layers.20.mixer.shared_experts.up_proj.scales,<br>backbone.layers.20.mixer.shared_experts.up_proj.weight,<br>backbone.layers.20.mixer.switch_mlp.fc1.biases,<br>backbone.layers.20.mixer.switch_mlp.fc1.scales,<br>backbone.layers.20.mixer.switch_mlp.fc1.weight,<br>backbone.layers.20.mixer.switch_mlp.fc2.biases,<br>backbone.layers.20.mixer.switch_mlp.fc2.scales,<br>backbone.layers.20.mixer.switch_mlp.fc2.weight,<br>backbone.layers.20.norm.weight,<br>backbone.layers.21.mixer.A_log,<br>backbone.layers.21.mixer.D,<br>backbone.layers.21.mixer.conv1d.bias,<br>backbone.layers.21.mixer.conv1d.weight,<br>backbone.layers.21.mixer.dt_bias,<br>backbone.layers.21.mixer.in_proj.biases,<br>backbone.layers.21.mixer.in_proj.scales,<br>backbone.layers.21.mixer.in_proj.weight,<br>backbone.layers.21.mixer.norm.weight,<br>backbone.layers.21.mixer.out_proj.biases,<br>backbone.layers.21.mixer.out_proj.scales,<br>backbone.layers.21.mixer.out_proj.weight,<br>backbone.layers.21.norm.weight,<br>backbone.layers.22.mixer.gate.e_score_correction_bias,<br>backbone.layers.22.mixer.gate.weight,<br>backbone.layers.22.mixer.shared_experts.down_proj.biases,<br>backbone.layers.22.mixer.shared_experts.down_proj.scales,<br>backbone.layers.22.mixer.shared_experts.down_proj.weight,<br>backbone.layers.22.mixer.shared_experts.up_proj.biases,<br>backbone.layers.22.mixer.shared_experts.up_proj.scales,<br>backbone.layers.22.mixer.shared_experts.up_proj.weight,<br>backbone.layers.22.mixer.switch_mlp.fc1.biases,<br>backbone.layers.22.mixer.switch_mlp.fc1.scales,<br>backbone.layers.22.mixer.switch_mlp.fc1.weight,<br>backbone.layers.22.mixer.switch_mlp.fc2.biases,<br>backbone.layers.22.mixer.switch_mlp.fc2.scales,<br>backbone.layers.22.mixer.switch_mlp.fc2.weight,<br>backbone.layers.22.norm.weight,<br>backbone.layers.23.mixer.A_log,<br>backbone.layers.23.mixer.D,<br>backbone.layers.23.mixer.conv1d.bias,<br>backbone.layers.23.mixer.conv1d.weight,<br>backbone.layers.23.mixer.dt_bias,<br>backbone.layers.23.mixer.in_proj.biases,<br>backbone.layers.23.mixer.in_proj.scales,<br>backbone.layers.23.mixer.in_proj.weight,<br>backbone.layers.23.mixer.norm.weight,<br>backbone.layers.23.mixer.out_proj.biases,<br>backbone.layers.23.mixer.out_proj.scales,<br>backbone.layers.23.mixer.out_proj.weight,<br>backbone.layers.23.norm.weight,<br>backbone.layers.24.mixer.gate.e_score_correction_bias,<br>backbone.layers.24.mixer.gate.weight,<br>backbone.layers.24.mixer.shared_experts.down_proj.biases,<br>backbone.layers.24.mixer.shared_experts.down_proj.scales,<br>backbone.layers.24.mixer.shared_experts.down_proj.weight,<br>backbone.layers.24.mixer.shared_experts.up_proj.biases,<br>backbone.layers.24.mixer.shared_experts.up_proj.scales,<br>backbone.layers.24.mixer.shared_experts.up_proj.weight,<br>backbone.layers.24.mixer.switch_mlp.fc1.biases,<br>backbone.layers.24.mixer.switch_mlp.fc1.scales,<br>backbone.layers.24.mixer.switch_mlp.fc1.weight,<br>backbone.layers.24.mixer.switch_mlp.fc2.biases,<br>backbone.layers.24.mixer.switch_mlp.fc2.scales,<br>backbone.layers.24.mixer.switch_mlp.fc2.weight,<br>backbone.layers.24.norm.weight,<br>backbone.layers.25.mixer.A_log,<br>backbone.layers.25.mixer.D,<br>backbone.layers.25.mixer.conv1d.bias,<br>backbone.layers.25.mixer.conv1d.weight,<br>backbone.layers.25.mixer.dt_bias,<br>backbone.layers.25.mixer.in_proj.biases,<br>backbone.layers.25.mixer.in_proj.scales,<br>backbone.layers.25.mixer.in_proj.weight,<br>backbone.layers.25.mixer.norm.weight,<br>backbone.layers.25.mixer.out_proj.biases,<br>backbone.layers.25.mixer.out_proj.scales,<br>backbone.layers.25.mixer.out_proj.weight,<br>backbone.layers.25.norm.weight,<br>backbone.layers.26.mixer.k_proj.biases,<br>backbone.layers.26.mixer.k_proj.scales,<br>backbone.layers.26.mixer.k_proj.weight,<br>backbone.layers.26.mixer.o_proj.biases,<br>backbone.layers.26.mixer.o_proj.scales,<br>backbone.layers.26.mixer.o_proj.weight,<br>backbone.layers.26.mixer.q_proj.biases,<br>backbone.layers.26.mixer.q_proj.scales,<br>backbone.layers.26.mixer.q_proj.weight,<br>backbone.layers.26.mixer.v_proj.biases,<br>backbone.layers.26.mixer.v_proj.scales,<br>backbone.layers.26.mixer.v_proj.weight,<br>backbone.layers.26.norm.weight,<br>backbone.layers.27.mixer.gate.e_score_correction_bias,<br>backbone.layers.27.mixer.gate.weight,<br>backbone.layers.27.mixer.shared_experts.down_proj.biases,<br>backbone.layers.27.mixer.shared_experts.down_proj.scales,<br>backbone.layers.27.mixer.shared_experts.down_proj.weight,<br>backbone.layers.27.mixer.shared_experts.up_proj.biases,<br>backbone.layers.27.mixer.shared_experts.up_proj.scales,<br>backbone.layers.27.mixer.shared_experts.up_proj.weight,<br>backbone.layers.27.mixer.switch_mlp.fc1.biases,<br>backbone.layers.27.mixer.switch_mlp.fc1.scales,<br>backbone.layers.27.mixer.switch_mlp.fc1.weight,<br>backbone.layers.27.mixer.switch_mlp.fc2.biases,<br>backbone.layers.27.mixer.switch_mlp.fc2.scales,<br>backbone.layers.27.mixer.switch_mlp.fc2.weight,<br>backbone.layers.27.norm.weight,<br>backbone.layers.28.mixer.A_log,<br>backbone.layers.28.mixer.D,<br>backbone.layers.28.mixer.conv1d.bias,<br>backbone.layers.28.mixer.conv1d.weight,<br>backbone.layers.28.mixer.dt_bias,<br>backbone.layers.28.mixer.in_proj.biases,<br>backbone.layers.28.mixer.in_proj.scales,<br>backbone.layers.28.mixer.in_proj.weight,<br>backbone.layers.28.mixer.norm.weight,<br>backbone.layers.28.mixer.out_proj.biases,<br>backbone.layers.28.mixer.out_proj.scales,<br>backbone.layers.28.mixer.out_proj.weight,<br>backbone.layers.28.norm.weight,<br>backbone.layers.29.mixer.gate.e_score_correction_bias,<br>backbone.layers.29.mixer.gate.weight,<br>backbone.layers.29.mixer.shared_experts.down_proj.biases,<br>backbone.layers.29.mixer.shared_experts.down_proj.scales,<br>backbone.layers.29.mixer.shared_experts.down_proj.weight,<br>backbone.layers.29.mixer.shared_experts.up_proj.biases,<br>backbone.layers.29.mixer.shared_experts.up_proj.scales,<br>backbone.layers.29.mixer.shared_experts.up_proj.weight,<br>backbone.layers.29.mixer.switch_mlp.fc1.biases,<br>backbone.layers.29.mixer.switch_mlp.fc1.scales,<br>backbone.layers.29.mixer.switch_mlp.fc1.weight,<br>backbone.layers.29.mixer.switch_mlp.fc2.biases,<br>backbone.layers.29.mixer.switch_mlp.fc2.scales,<br>backbone.layers.29.mixer.switch_mlp.fc2.weight,<br>backbone.layers.29.norm.weight,<br>backbone.layers.3.mixer.gate.e_score_correction_bias,<br>backbone.layers.3.mixer.gate.weight,<br>backbone.layers.3.mixer.shared_experts.down_proj.biases,<br>backbone.layers.3.mixer.shared_experts.down_proj.scales,<br>backbone.layers.3.mixer.shared_experts.down_proj.weight,<br>backbone.layers.3.mixer.shared_experts.up_proj.biases,<br>backbone.layers.3.mixer.shared_experts.up_proj.scales,<br>backbone.layers.3.mixer.shared_experts.up_proj.weight,<br>backbone.layers.3.mixer.switch_mlp.fc1.biases,<br>backbone.layers.3.mixer.switch_mlp.fc1.scales,<br>backbone.layers.3.mixer.switch_mlp.fc1.weight,<br>backbone.layers.3.mixer.switch_mlp.fc2.biases,<br>backbone.layers.3.mixer.switch_mlp.fc2.scales,<br>backbone.layers.3.mixer.switch_mlp.fc2.weight,<br>backbone.layers.3.norm.weight,<br>backbone.layers.30.mixer.A_log,<br>backbone.layers.30.mixer.D,<br>backbone.layers.30.mixer.conv1d.bias,<br>backbone.layers.30.mixer.conv1d.weight,<br>backbone.layers.30.mixer.dt_bias,<br>backbone.layers.30.mixer.in_proj.biases,<br>backbone.layers.30.mixer.in_proj.scales,<br>backbone.layers.30.mixer.in_proj.weight,<br>backbone.layers.30.mixer.norm.weight,<br>backbone.layers.30.mixer.out_proj.biases,<br>backbone.layers.30.mixer.out_proj.scales,<br>backbone.layers.30.mixer.out_proj.weight,<br>backbone.layers.30.norm.weight,<br>backbone.layers.31.mixer.gate.e_score_correction_bias,<br>backbone.layers.31.mixer.gate.weight,<br>backbone.layers.31.mixer.shared_experts.down_proj.biases,<br>backbone.layers.31.mixer.shared_experts.down_proj.scales,<br>backbone.layers.31.mixer.shared_experts.down_proj.weight,<br>backbone.layers.31.mixer.shared_experts.up_proj.biases,<br>backbone.layers.31.mixer.shared_experts.up_proj.scales,<br>backbone.layers.31.mixer.shared_experts.up_proj.weight,<br>backbone.layers.31.mixer.switch_mlp.fc1.biases,<br>backbone.layers.31.mixer.switch_mlp.fc1.scales,<br>backbone.layers.31.mixer.switch_mlp.fc1.weight,<br>backbone.layers.31.mixer.switch_mlp.fc2.biases,<br>backbone.layers.31.mixer.switch_mlp.fc2.scales,<br>backbone.layers.31.mixer.switch_mlp.fc2.weight,<br>backbone.layers.31.norm.weight,<br>backbone.layers.32.mixer.A_log,<br>backbone.layers.32.mixer.D,<br>backbone.layers.32.mixer.conv1d.bias,<br>backbone.layers.32.mixer.conv1d.weight,<br>backbone.layers.32.mixer.dt_bias,<br>backbone.layers.32.mixer.in_proj.biases,<br>backbone.layers.32.mixer.in_proj.scales,<br>backbone.layers.32.mixer.in_proj.weight,<br>backbone.layers.32.mixer.norm.weight,<br>backbone.layers.32.mixer.out_proj.biases,<br>backbone.layers.32.mixer.out_proj.scales,<br>backbone.layers.32.mixer.out_proj.weight,<br>backbone.layers.32.norm.weight,<br>backbone.layers.33.mixer.k_proj.biases,<br>backbone.layers.33.mixer.k_proj.scales,<br>backbone.layers.33.mixer.k_proj.weight,<br>backbone.layers.33.mixer.o_proj.biases,<br>backbone.layers.33.mixer.o_proj.scales,<br>backbone.layers.33.mixer.o_proj.weight,<br>backbone.layers.33.mixer.q_proj.biases,<br>backbone.layers.33.mixer.q_proj.scales,<br>backbone.layers.33.mixer.q_proj.weight,<br>backbone.layers.33.mixer.v_proj.biases,<br>backbone.layers.33.mixer.v_proj.scales,<br>backbone.layers.33.mixer.v_proj.weight,<br>backbone.layers.33.norm.weight,<br>backbone.layers.34.mixer.gate.e_score_correction_bias,<br>backbone.layers.34.mixer.gate.weight,<br>backbone.layers.34.mixer.shared_experts.down_proj.biases,<br>backbone.layers.34.mixer.shared_experts.down_proj.scales,<br>backbone.layers.34.mixer.shared_experts.down_proj.weight,<br>backbone.layers.34.mixer.shared_experts.up_proj.biases,<br>backbone.layers.34.mixer.shared_experts.up_proj.scales,<br>backbone.layers.34.mixer.shared_experts.up_proj.weight,<br>backbone.layers.34.mixer.switch_mlp.fc1.biases,<br>backbone.layers.34.mixer.switch_mlp.fc1.scales,<br>backbone.layers.34.mixer.switch_mlp.fc1.weight,<br>backbone.layers.34.mixer.switch_mlp.fc2.biases,<br>backbone.layers.34.mixer.switch_mlp.fc2.scales,<br>backbone.layers.34.mixer.switch_mlp.fc2.weight,<br>backbone.layers.34.norm.weight,<br>backbone.layers.35.mixer.A_log,<br>backbone.layers.35.mixer.D,<br>backbone.layers.35.mixer.conv1d.bias,<br>backbone.layers.35.mixer.conv1d.weight,<br>backbone.layers.35.mixer.dt_bias,<br>backbone.layers.35.mixer.in_proj.biases,<br>backbone.layers.35.mixer.in_proj.scales,<br>backbone.layers.35.mixer.in_proj.weight,<br>backbone.layers.35.mixer.norm.weight,<br>backbone.layers.35.mixer.out_proj.biases,<br>backbone.layers.35.mixer.out_proj.scales,<br>backbone.layers.35.mixer.out_proj.weight,<br>backbone.layers.35.norm.weight,<br>backbone.layers.36.mixer.gate.e_score_correction_bias,<br>backbone.layers.36.mixer.gate.weight,<br>backbone.layers.36.mixer.shared_experts.down_proj.biases,<br>backbone.layers.36.mixer.shared_experts.down_proj.scales,<br>backbone.layers.36.mixer.shared_experts.down_proj.weight,<br>backbone.layers.36.mixer.shared_experts.up_proj.biases,<br>backbone.layers.36.mixer.shared_experts.up_proj.scales,<br>backbone.layers.36.mixer.shared_experts.up_proj.weight,<br>backbone.layers.36.mixer.switch_mlp.fc1.biases,<br>backbone.layers.36.mixer.switch_mlp.fc1.scales,<br>backbone.layers.36.mixer.switch_mlp.fc1.weight,<br>backbone.layers.36.mixer.switch_mlp.fc2.biases,<br>backbone.layers.36.mixer.switch_mlp.fc2.scales,<br>backbone.layers.36.mixer.switch_mlp.fc2.weight,<br>backbone.layers.36.norm.weight,<br>backbone.layers.37.mixer.A_log,<br>backbone.layers.37.mixer.D,<br>backbone.layers.37.mixer.conv1d.bias,<br>backbone.layers.37.mixer.conv1d.weight,<br>backbone.layers.37.mixer.dt_bias,<br>backbone.layers.37.mixer.in_proj.biases,<br>backbone.layers.37.mixer.in_proj.scales,<br>backbone.layers.37.mixer.in_proj.weight,<br>backbone.layers.37.mixer.norm.weight,<br>backbone.layers.37.mixer.out_proj.biases,<br>backbone.layers.37.mixer.out_proj.scales,<br>backbone.layers.37.mixer.out_proj.weight,<br>backbone.layers.37.norm.weight,<br>backbone.layers.38.mixer.gate.e_score_correction_bias,<br>backbone.layers.38.mixer.gate.weight,<br>backbone.layers.38.mixer.shared_experts.down_proj.biases,<br>backbone.layers.38.mixer.shared_experts.down_proj.scales,<br>backbone.layers.38.mixer.shared_experts.down_proj.weight,<br>backbone.layers.38.mixer.shared_experts.up_proj.biases,<br>backbone.layers.38.mixer.shared_experts.up_proj.scales,<br>backbone.layers.38.mixer.shared_experts.up_proj.weight,<br>backbone.layers.38.mixer.switch_mlp.fc1.biases,<br>backbone.layers.38.mixer.switch_mlp.fc1.scales,<br>backbone.layers.38.mixer.switch_mlp.fc1.weight,<br>backbone.layers.38.mixer.switch_mlp.fc2.biases,<br>backbone.layers.38.mixer.switch_mlp.fc2.scales,<br>backbone.layers.38.mixer.switch_mlp.fc2.weight,<br>backbone.layers.38.norm.weight,<br>backbone.layers.39.mixer.A_log,<br>backbone.layers.39.mixer.D,<br>backbone.layers.39.mixer.conv1d.bias,<br>backbone.layers.39.mixer.conv1d.weight,<br>backbone.layers.39.mixer.dt_bias,<br>backbone.layers.39.mixer.in_proj.biases,<br>backbone.layers.39.mixer.in_proj.scales,<br>backbone.layers.39.mixer.in_proj.weight,<br>backbone.layers.39.mixer.norm.weight,<br>backbone.layers.39.mixer.out_proj.biases,<br>backbone.layers.39.mixer.out_proj.scales,<br>backbone.layers.39.mixer.out_proj.weight,<br>backbone.layers.39.norm.weight,<br>backbone.layers.4.mixer.A_log,<br>backbone.layers.4.mixer.D,<br>backbone.layers.4.mixer.conv1d.bias,<br>backbone.layers.4.mixer.conv1d.weight,<br>backbone.layers.4.mixer.dt_bias,<br>backbone.layers.4.mixer.in_proj.biases,<br>backbone.layers.4.mixer.in_proj.scales,<br>backbone.layers.4.mixer.in_proj.weight,<br>backbone.layers.4.mixer.norm.weight,<br>backbone.layers.4.mixer.out_proj.biases,<br>backbone.layers.4.mixer.out_proj.scales,<br>backbone.layers.4.mixer.out_proj.weight,<br>backbone.layers.4.norm.weight,<br>backbone.layers.40.mixer.gate.e_score_correction_bias,<br>backbone.layers.40.mixer.gate.weight,<br>backbone.layers.40.mixer.shared_experts.down_proj.biases,<br>backbone.layers.40.mixer.shared_experts.down_proj.scales,<br>backbone.layers.40.mixer.shared_experts.down_proj.weight,<br>backbone.layers.40.mixer.shared_experts.up_proj.biases,<br>backbone.layers.40.mixer.shared_experts.up_proj.scales,<br>backbone.layers.40.mixer.shared_experts.up_proj.weight,<br>backbone.layers.40.mixer.switch_mlp.fc1.biases,<br>backbone.layers.40.mixer.switch_mlp.fc1.scales,<br>backbone.layers.40.mixer.switch_mlp.fc1.weight,<br>backbone.layers.40.mixer.switch_mlp.fc2.biases,<br>backbone.layers.40.mixer.switch_mlp.fc2.scales,<br>backbone.layers.40.mixer.switch_mlp.fc2.weight,<br>backbone.layers.40.norm.weight,<br>backbone.layers.41.mixer.A_log,<br>backbone.layers.41.mixer.D,<br>backbone.layers.41.mixer.conv1d.bias,<br>backbone.layers.41.mixer.conv1d.weight,<br>backbone.layers.41.mixer.dt_bias,<br>backbone.layers.41.mixer.in_proj.biases,<br>backbone.layers.41.mixer.in_proj.scales,<br>backbone.layers.41.mixer.in_proj.weight,<br>backbone.layers.41.mixer.norm.weight,<br>backbone.layers.41.mixer.out_proj.biases,<br>backbone.layers.41.mixer.out_proj.scales,<br>backbone.layers.41.mixer.out_proj.weight,<br>backbone.layers.41.norm.weight,<br>backbone.layers.42.mixer.k_proj.biases,<br>backbone.layers.42.mixer.k_proj.scales,<br>backbone.layers.42.mixer.k_proj.weight,<br>backbone.layers.42.mixer.o_proj.biases,<br>backbone.layers.42.mixer.o_proj.scales,<br>backbone.layers.42.mixer.o_proj.weight,<br>backbone.layers.42.mixer.q_proj.biases,<br>backbone.layers.42.mixer.q_proj.scales,<br>backbone.layers.42.mixer.q_proj.weight,<br>backbone.layers.42.mixer.v_proj.biases,<br>backbone.layers.42.mixer.v_proj.scales,<br>backbone.layers.42.mixer.v_proj.weight,<br>backbone.layers.42.norm.weight,<br>backbone.layers.43.mixer.gate.e_score_correction_bias,<br>backbone.layers.43.mixer.gate.weight,<br>backbone.layers.43.mixer.shared_experts.down_proj.biases,<br>backbone.layers.43.mixer.shared_experts.down_proj.scales,<br>backbone.layers.43.mixer.shared_experts.down_proj.weight,<br>backbone.layers.43.mixer.shared_experts.up_proj.biases,<br>backbone.layers.43.mixer.shared_experts.up_proj.scales,<br>backbone.layers.43.mixer.shared_experts.up_proj.weight,<br>backbone.layers.43.mixer.switch_mlp.fc1.biases,<br>backbone.layers.43.mixer.switch_mlp.fc1.scales,<br>backbone.layers.43.mixer.switch_mlp.fc1.weight,<br>backbone.layers.43.mixer.switch_mlp.fc2.biases,<br>backbone.layers.43.mixer.switch_mlp.fc2.scales,<br>backbone.layers.43.mixer.switch_mlp.fc2.weight,<br>backbone.layers.43.norm.weight,<br>backbone.layers.44.mixer.A_log,<br>backbone.layers.44.mixer.D,<br>backbone.layers.44.mixer.conv1d.bias,<br>backbone.layers.44.mixer.conv1d.weight,<br>backbone.layers.44.mixer.dt_bias,<br>backbone.layers.44.mixer.in_proj.biases,<br>backbone.layers.44.mixer.in_proj.scales,<br>backbone.layers.44.mixer.in_proj.weight,<br>backbone.layers.44.mixer.norm.weight,<br>backbone.layers.44.mixer.out_proj.biases,<br>backbone.layers.44.mixer.out_proj.scales,<br>backbone.layers.44.mixer.out_proj.weight,<br>backbone.layers.44.norm.weight,<br>backbone.layers.45.mixer.gate.e_score_correction_bias,<br>backbone.layers.45.mixer.gate.weight,<br>backbone.layers.45.mixer.shared_experts.down_proj.biases,<br>backbone.layers.45.mixer.shared_experts.down_proj.scales,<br>backbone.layers.45.mixer.shared_experts.down_proj.weight,<br>backbone.layers.45.mixer.shared_experts.up_proj.biases,<br>backbone.layers.45.mixer.shared_experts.up_proj.scales,<br>backbone.layers.45.mixer.shared_experts.up_proj.weight,<br>backbone.layers.45.mixer.switch_mlp.fc1.biases,<br>backbone.layers.45.mixer.switch_mlp.fc1.scales,<br>backbone.layers.45.mixer.switch_mlp.fc1.weight,<br>backbone.layers.45.mixer.switch_mlp.fc2.biases,<br>backbone.layers.45.mixer.switch_mlp.fc2.scales,<br>backbone.layers.45.mixer.switch_mlp.fc2.weight,<br>backbone.layers.45.norm.weight,<br>backbone.layers.46.mixer.A_log,<br>backbone.layers.46.mixer.D,<br>backbone.layers.46.mixer.conv1d.bias,<br>backbone.layers.46.mixer.conv1d.weight,<br>backbone.layers.46.mixer.dt_bias,<br>backbone.layers.46.mixer.in_proj.biases,<br>backbone.layers.46.mixer.in_proj.scales,<br>backbone.layers.46.mixer.in_proj.weight,<br>backbone.layers.46.mixer.norm.weight,<br>backbone.layers.46.mixer.out_proj.biases,<br>backbone.layers.46.mixer.out_proj.scales,<br>backbone.layers.46.mixer.out_proj.weight,<br>backbone.layers.46.norm.weight,<br>backbone.layers.47.mixer.gate.e_score_correction_bias,<br>backbone.layers.47.mixer.gate.weight,<br>backbone.layers.47.mixer.shared_experts.down_proj.biases,<br>backbone.layers.47.mixer.shared_experts.down_proj.scales,<br>backbone.layers.47.mixer.shared_experts.down_proj.weight,<br>backbone.layers.47.mixer.shared_experts.up_proj.biases,<br>backbone.layers.47.mixer.shared_experts.up_proj.scales,<br>backbone.layers.47.mixer.shared_experts.up_proj.weight,<br>backbone.layers.47.mixer.switch_mlp.fc1.biases,<br>backbone.layers.47.mixer.switch_mlp.fc1.scales,<br>backbone.layers.47.mixer.switch_mlp.fc1.weight,<br>backbone.layers.47.mixer.switch_mlp.fc2.biases,<br>backbone.layers.47.mixer.switch_mlp.fc2.scales,<br>backbone.layers.47.mixer.switch_mlp.fc2.weight,<br>backbone.layers.47.norm.weight,<br>backbone.layers.48.mixer.A_log,<br>backbone.layers.48.mixer.D,<br>backbone.layers.48.mixer.conv1d.bias,<br>backbone.layers.48.mixer.conv1d.weight,<br>backbone.layers.48.mixer.dt_bias,<br>backbone.layers.48.mixer.in_proj.biases,<br>backbone.layers.48.mixer.in_proj.scales,<br>backbone.layers.48.mixer.in_proj.weight,<br>backbone.layers.48.mixer.norm.weight,<br>backbone.layers.48.mixer.out_proj.biases,<br>backbone.layers.48.mixer.out_proj.scales,<br>backbone.layers.48.mixer.out_proj.weight,<br>backbone.layers.48.norm.weight,<br>backbone.layers.49.mixer.gate.e_score_correction_bias,<br>backbone.layers.49.mixer.gate.weight,<br>backbone.layers.49.mixer.shared_experts.down_proj.biases,<br>backbone.layers.49.mixer.shared_experts.down_proj.scales,<br>backbone.layers.49.mixer.shared_experts.down_proj.weight,<br>backbone.layers.49.mixer.shared_experts.up_proj.biases,<br>backbone.layers.49.mixer.shared_experts.up_proj.scales,<br>backbone.layers.49.mixer.shared_experts.up_proj.weight,<br>backbone.layers.49.mixer.switch_mlp.fc1.biases,<br>backbone.layers.49.mixer.switch_mlp.fc1.scales,<br>backbone.layers.49.mixer.switch_mlp.fc1.weight,<br>backbone.layers.49.mixer.switch_mlp.fc2.biases,<br>backbone.layers.49.mixer.switch_mlp.fc2.scales,<br>backbone.layers.49.mixer.switch_mlp.fc2.weight,<br>backbone.layers.49.norm.weight,<br>backbone.layers.5.mixer.k_proj.biases,<br>backbone.layers.5.mixer.k_proj.scales,<br>backbone.layers.5.mixer.k_proj.weight,<br>backbone.layers.5.mixer.o_proj.biases,<br>backbone.layers.5.mixer.o_proj.scales,<br>backbone.layers.5.mixer.o_proj.weight,<br>backbone.layers.5.mixer.q_proj.biases,<br>backbone.layers.5.mixer.q_proj.scales,<br>backbone.layers.5.mixer.q_proj.weight,<br>backbone.layers.5.mixer.v_proj.biases,<br>backbone.layers.5.mixer.v_proj.scales,<br>backbone.layers.5.mixer.v_proj.weight,<br>backbone.layers.5.norm.weight,<br>backbone.layers.50.mixer.A_log,<br>backbone.layers.50.mixer.D,<br>backbone.layers.50.mixer.conv1d.bias,<br>backbone.layers.50.mixer.conv1d.weight,<br>backbone.layers.50.mixer.dt_bias,<br>backbone.layers.50.mixer.in_proj.biases,<br>backbone.layers.50.mixer.in_proj.scales,<br>backbone.layers.50.mixer.in_proj.weight,<br>backbone.layers.50.mixer.norm.weight,<br>backbone.layers.50.mixer.out_proj.biases,<br>backbone.layers.50.mixer.out_proj.scales,<br>backbone.layers.50.mixer.out_proj.weight,<br>backbone.layers.50.norm.weight,<br>backbone.layers.51.mixer.gate.e_score_correction_bias,<br>backbone.layers.51.mixer.gate.weight,<br>backbone.layers.51.mixer.shared_experts.down_proj.biases,<br>backbone.layers.51.mixer.shared_experts.down_proj.scales,<br>backbone.layers.51.mixer.shared_experts.down_proj.weight,<br>backbone.layers.51.mixer.shared_experts.up_proj.biases,<br>backbone.layers.51.mixer.shared_experts.up_proj.scales,<br>backbone.layers.51.mixer.shared_experts.up_proj.weight,<br>backbone.layers.51.mixer.switch_mlp.fc1.biases,<br>backbone.layers.51.mixer.switch_mlp.fc1.scales,<br>backbone.layers.51.mixer.switch_mlp.fc1.weight,<br>backbone.layers.51.mixer.switch_mlp.fc2.biases,<br>backbone.layers.51.mixer.switch_mlp.fc2.scales,<br>backbone.layers.51.mixer.switch_mlp.fc2.weight,<br>backbone.layers.51.norm.weight,<br>backbone.layers.6.mixer.gate.e_score_correction_bias,<br>backbone.layers.6.mixer.gate.weight,<br>backbone.layers.6.mixer.shared_experts.down_proj.biases,<br>backbone.layers.6.mixer.shared_experts.down_proj.scales,<br>backbone.layers.6.mixer.shared_experts.down_proj.weight,<br>backbone.layers.6.mixer.shared_experts.up_proj.biases,<br>backbone.layers.6.mixer.shared_experts.up_proj.scales,<br>backbone.layers.6.mixer.shared_experts.up_proj.weight,<br>backbone.layers.6.mixer.switch_mlp.fc1.biases,<br>backbone.layers.6.mixer.switch_mlp.fc1.scales,<br>backbone.layers.6.mixer.switch_mlp.fc1.weight,<br>backbone.layers.6.mixer.switch_mlp.fc2.biases,<br>backbone.layers.6.mixer.switch_mlp.fc2.scales,<br>backbone.layers.6.mixer.switch_mlp.fc2.weight,<br>backbone.layers.6.norm.weight,<br>backbone.layers.7.mixer.A_log,<br>backbone.layers.7.mixer.D,<br>backbone.layers.7.mixer.conv1d.bias,<br>backbone.layers.7.mixer.conv1d.weight,<br>backbone.layers.7.mixer.dt_bias,<br>backbone.layers.7.mixer.in_proj.biases,<br>backbone.layers.7.mixer.in_proj.scales,<br>backbone.layers.7.mixer.in_proj.weight,<br>backbone.layers.7.mixer.norm.weight,<br>backbone.layers.7.mixer.out_proj.biases,<br>backbone.layers.7.mixer.out_proj.scales,<br>backbone.layers.7.mixer.out_proj.weight,<br>backbone.layers.7.norm.weight,<br>backbone.layers.8.mixer.gate.e_score_correction_bias,<br>backbone.layers.8.mixer.gate.weight,<br>backbone.layers.8.mixer.shared_experts.down_proj.biases,<br>backbone.layers.8.mixer.shared_experts.down_proj.scales,<br>backbone.layers.8.mixer.shared_experts.down_proj.weight,<br>backbone.layers.8.mixer.shared_experts.up_proj.biases,<br>backbone.layers.8.mixer.shared_experts.up_proj.scales,<br>backbone.layers.8.mixer.shared_experts.up_proj.weight,<br>backbone.layers.8.mixer.switch_mlp.fc1.biases,<br>backbone.layers.8.mixer.switch_mlp.fc1.scales,<br>backbone.layers.8.mixer.switch_mlp.fc1.weight,<br>backbone.layers.8.mixer.switch_mlp.fc2.biases,<br>backbone.layers.8.mixer.switch_mlp.fc2.scales,<br>backbone.layers.8.mixer.switch_mlp.fc2.weight,<br>backbone.layers.8.norm.weight,<br>backbone.layers.9.mixer.A_log,<br>backbone.layers.9.mixer.D,<br>backbone.layers.9.mixer.conv1d.bias,<br>backbone.layers.9.mixer.conv1d.weight,<br>backbone.layers.9.mixer.dt_bias,<br>backbone.layers.9.mixer.in_proj.biases,<br>backbone.layers.9.mixer.in_proj.scales,<br>backbone.layers.9.mixer.in_proj.weight,<br>backbone.layers.9.mixer.norm.weight,<br>backbone.layers.9.mixer.out_proj.biases,<br>backbone.layers.9.mixer.out_proj.scales,<br>backbone.layers.9.mixer.out_proj.weight,<br>backbone.layers.9.norm.weight,<br>backbone.norm_f.weight,<br>lm_head.biases,<br>lm_head.scales,<br>lm_head.weight.
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 0.28s
+- *Model load time:* 0.25s
 - *Generation time:* -
-- *Total time:* 0.29s
+- *Total time:* 0.25s
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0956
+- *Cleanup time:* 0.0776
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -5970,7 +3401,7 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3538.60it/s]
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00485
+- *Post-cleanup active memory (GB):* 0.00592
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -6010,9 +3441,9 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1171, in load_model
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1172, in load_model
     model.load_weights(list(weights.items()), strict=strict)
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
@@ -7504,7 +4935,7 @@ lm_head.weight.
 ```text
 === STDERR ===
 Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 3080.69it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4788.46it/s]
 ```
 
 </details>

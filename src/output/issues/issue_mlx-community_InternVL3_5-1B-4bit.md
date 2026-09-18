@@ -31,7 +31,7 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
   named 'mlx_vlm.speculative.drafters.internvl'
 - *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002114626
+- *Post-cleanup active memory (GB):* 0.002132546
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 1.08
 - *Parameter count:* 1.00B (name-estimate)
@@ -69,12 +69,12 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 964, in load_model
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 965, in load_model
     model_class, _ = get_model_and_args(config=config, model_path=model_path)
                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 784, in get_model_and_args
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 785, in get_model_and_args
     raise ValueError(msg)
 ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -105,7 +105,7 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 ```text
 === STDERR ===
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4551.25it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 3388.16it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 ```
 
@@ -159,16 +159,16 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 
 | Component       | Value                                                             |
 |-----------------|-------------------------------------------------------------------|
-| mlx-vlm         | 0.7.0                                                             |
+| mlx-vlm         | 0.7.1                                                             |
 | mlx             | 0.32.3.dev20260912+229f5b430                                      |
 | transformers    | 5.17.0                                                            |
 | tokenizers      | 0.23.2                                                            |
-| huggingface-hub | 1.31.0                                                            |
+| huggingface-hub | 1.32.0                                                            |
 | Pillow          | 12.3.0                                                            |
 | Python Version  | 3.14.7                                                            |
-| macOS Version   | 26.6.2                                                            |
+| macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.25; revision 11e6c82dc61f08eb3dc36a3188a789da1295093b; clean |
+| check_models    | 0.17.26; revision e5d6baca2ad0c1dd4365a0738b6bbd9c1321ea00; clean |
 
 ### Full environment evidence
 

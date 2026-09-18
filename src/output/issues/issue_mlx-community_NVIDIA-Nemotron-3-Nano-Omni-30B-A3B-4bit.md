@@ -35,7 +35,7 @@ builtins.ValueError: Model loading failed: Received 729 parameters not in model;
   backbone.embeddings.scales, backbone.embeddings.weight.
 - *Resolved model revision:* 8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.004850944
+- *Post-cleanup active memory (GB):* 0.00591744
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 20.65
 - *Parameter count:* 30.00B total, 3.00B active (name-estimate)
@@ -73,9 +73,9 @@ Traceback (most recent call last):
         ^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1306, in load
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
     model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1171, in load_model
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1172, in load_model
     model.load_weights(list(weights.items()), strict=strict)
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
@@ -1569,7 +1569,7 @@ lm_head.weight.
 ```text
 === STDERR ===
 Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 3080.69it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4788.46it/s]
 ```
 
 ## Reproduction inputs
@@ -1622,16 +1622,16 @@ python -m mlx_vlm.generate --model mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B
 
 | Component       | Value                                                             |
 |-----------------|-------------------------------------------------------------------|
-| mlx-vlm         | 0.7.0                                                             |
+| mlx-vlm         | 0.7.1                                                             |
 | mlx             | 0.32.3.dev20260912+229f5b430                                      |
 | transformers    | 5.17.0                                                            |
 | tokenizers      | 0.23.2                                                            |
-| huggingface-hub | 1.31.0                                                            |
+| huggingface-hub | 1.32.0                                                            |
 | Pillow          | 12.3.0                                                            |
 | Python Version  | 3.14.7                                                            |
-| macOS Version   | 26.6.2                                                            |
+| macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.25; revision 11e6c82dc61f08eb3dc36a3188a789da1295093b; clean |
+| check_models    | 0.17.26; revision e5d6baca2ad0c1dd4365a0738b6bbd9c1321ea00; clean |
 
 ### Full environment evidence
 
