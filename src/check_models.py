@@ -1125,6 +1125,11 @@ class ComponentProvenanceRecord(TypedDict):
     source_revision: str | None
     direct_url: str | None
     vcs_revision: str | None
+    # Revision embedded in the version's local segment (0.32.3.dev...+229f5b430):
+    # the commit the installed binary was *built* from. An editable checkout can
+    # move ahead of its compiled extension when a rebuild fails or is skipped,
+    # and results reflect the build, not the checkout.
+    built_revision: NotRequired[str | None]
 
 
 class CheckModelsProvenanceRecord(TypedDict):
@@ -1155,6 +1160,9 @@ class JsonlMetadataRecord(TypedDict, total=False):
     # window never depends on subtracting a duration from the end.
     started_at: NotRequired[str]
     total_runtime_seconds: Required[float]
+    # Where the wall time went, summed over models; the remainder is start-up,
+    # cache discovery and report generation outside the per-model loop.
+    phase_totals_s: NotRequired[dict[str, float]]
     counts: Required[RunOutcomeCounts]
     artifacts: Required[dict[str, str]]
     producer: Required[CheckModelsProvenanceRecord]
@@ -5085,6 +5093,26 @@ def _direct_url_source_path(payload: DistributionDirectUrlRecord | None) -> Path
     return Path(unquote(parsed.path))
 
 
+_VERSION_BUILT_REVISION_RE: Final[re.Pattern[str]] = re.compile(r"\+(?:g)?([0-9a-f]{7,40})$")
+
+
+def _version_built_revision(version: str | None) -> str | None:
+    """Return the commit a version string says the binary was built from, if any."""
+    match = _VERSION_BUILT_REVISION_RE.search(version) if version else None
+    return match.group(1) if match else None
+
+
+def _build_lags_checkout(record: Mapping[str, object]) -> bool:
+    """Return whether an editable checkout has moved past its compiled build."""
+    built, checkout = record.get("built_revision"), record.get("source_revision")
+    return (
+        isinstance(built, str)
+        and isinstance(checkout, str)
+        and bool(built)
+        and not checkout.startswith(built)
+    )
+
+
 def _local_source_revision(path: Path) -> str | None:
     """Return the Git revision for an existing local source directory."""
     if not path.is_dir():
@@ -5156,6 +5184,8 @@ def _collect_component_provenance(
             ),
             "vcs_revision": vcs_revision,
         }
+        if (built_revision := _version_built_revision(component_version)) is not None:
+            provenance[name]["built_revision"] = built_revision
     _COMPONENT_PROVENANCE_CACHE[cache_key] = provenance
     return {name: record.copy() for name, record in provenance.items()}
 
@@ -7275,7 +7305,10 @@ def _component_source_revision(provenance: object, name: str) -> str | None:
     entry = provenance.get(name)
     if not isinstance(entry, dict):
         return None
-    revision = entry.get("source_revision") or entry.get("vcs_revision")
+    # The compiled build is what ran; an editable checkout may be ahead of it.
+    revision = (
+        entry.get("built_revision") or entry.get("source_revision") or entry.get("vcs_revision")
+    )
     return revision if isinstance(revision, str) and revision else None
 
 
@@ -9414,6 +9447,11 @@ def _diagnostics_environment_section(
         details: list[str] = [provenance["install_type"]]
         if provenance["source_revision"]:
             details.append(f"revision {provenance['source_revision'][:12]}")
+        if _build_lags_checkout(provenance):
+            details.append(
+                f"compiled build {provenance.get('built_revision')} is behind this checkout; "
+                "results reflect the build"
+            )
         if provenance["source_location"]:
             details.append(provenance["source_location"])
         table_rows.append(
@@ -18897,6 +18935,26 @@ def append_history_record(
     return record
 
 
+def _run_phase_totals(
+    results: Sequence[PerformanceResult], total_runtime_seconds: float
+) -> dict[str, float]:
+    """Sum each timed phase over the run's models, plus the time outside the model loop."""
+
+    def _total(values: Iterable[float | None]) -> float:
+        return round(sum(value for value in values if value is not None), 3)
+
+    runtimes = [result.runtime_diagnostics for result in results]
+    per_model = _total(result.total_time for result in results)
+    return {
+        "model_load": _total(result.model_load_time for result in results),
+        "prompt_prep": _total(r.prompt_prep_time_s for r in runtimes if r is not None),
+        "generation": _total(result.generation_time for result in results),
+        "cleanup": _total(r.cleanup_time_s for r in runtimes if r is not None),
+        "per_model_total": per_model,
+        "outside_model_loop": round(max(total_runtime_seconds - per_model, 0.0), 3),
+    }
+
+
 def _build_jsonl_metadata_record(  # noqa: PLR0913 - the schema-3 header names each retained field  # skylos: ignore[SKY-C303]
     *,
     prompt: str,
@@ -19172,6 +19230,7 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
         comparison=comparison,
         started_at=started_at,
     )
+    header["phase_totals_s"] = _run_phase_totals(results, total_runtime_seconds)
     records: list[JsonlResultRecord] = []
     for original_result in results:
         result = cached_results.get(original_result.model_name, original_result)
@@ -19480,6 +19539,16 @@ class RunComparisonMemoryChange:
     delta_gb: float
 
 
+class ComponentChange(NamedTuple):
+    """The upstream commits that separate two runs for one editable component."""
+
+    name: str
+    baseline_revision: str
+    current_revision: str
+    commit_count: int
+    subjects: tuple[str, ...]
+
+
 @dataclass(frozen=True)
 class RunComparison:
     """Mechanical diff of the current sweep against a retained baseline sweep."""
@@ -19512,6 +19581,16 @@ class RunComparison:
     # Recorded facts about each run's environment (battery power, sleep gaps)
     # that qualify timing without withholding it.
     environment_notes: tuple[str, ...] = ()
+    # Models that completed in both runs with different generated text.
+    text_changed_models: tuple[str, ...] = ()
+    # Upstream commits between the baseline's and this run's revision of each
+    # editable component: (name, baseline rev, current rev, count, subjects).
+    component_changes: tuple[ComponentChange, ...] = ()
+    # Prefill (prompt) tok/s ratio now/baseline over like-for-like models.
+    prompt_tps_ratio_median: float | None = None
+    prompt_tps_ratio_min: float | None = None
+    prompt_tps_ratio_max: float | None = None
+    prompt_tps_compared_models: int = 0
 
     @property
     def comparable(self) -> bool:
@@ -19866,6 +19945,45 @@ def _record_repetition_aborted(record: JsonlResultRecord) -> bool:
     return "repetition_abort" in record["assessment"]["observations"]
 
 
+def _generated_text_changes(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[int, list[str]]:
+    """Count the models completed in both runs and name those whose text differs."""
+    completed = [
+        (model, now, before)
+        for model, now, before in pairs
+        if now["assessment"]["execution"] == "completed"
+        and before["assessment"]["execution"] == "completed"
+    ]
+    changed = [
+        model
+        for model, now, before in completed
+        if now.get("generated_text", "") != before.get("generated_text", "")
+    ]
+    return len(completed), changed
+
+
+def _prefill_tps_ratios(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> list[float]:
+    """Sorted prefill tok/s ratios (now/baseline) over the pairs with clean rates on both sides."""
+    return sorted(
+        ratio
+        for _model, now, before in pairs
+        if (ratio := _prefill_tps_ratio(now, before)) is not None
+    )
+
+
+def _prefill_tps_ratio(now: JsonlResultRecord, before: JsonlResultRecord) -> float | None:
+    """Prefill tok/s now/baseline for one model, or None when either side lacks a clean rate."""
+    if _record_wall_clock_gap(now) or _record_wall_clock_gap(before):
+        return None
+    rates = [(record.get("metrics") or {}).get("prompt_tps") for record in (now, before)]
+    if not all(isinstance(rate, int | float) and rate > 0 for rate in rates):
+        return None
+    return float(cast("float", rates[0])) / float(cast("float", rates[1]))
+
+
 def _record_wall_clock_gap(record: JsonlResultRecord) -> bool:
     """Return whether a sleep/suspend gap was recorded around this model."""
     telemetry = record.get("system_telemetry")
@@ -20100,8 +20218,6 @@ def compare_run_results(
     )
 
     changes: list[RunComparisonModelChange] = []
-    identical_text = 0
-    text_compared = 0
     ratios: list[float] = []
     flags: list[RunComparisonThroughputFlag] = []
     memory: list[RunComparisonMemoryChange] = []
@@ -20112,18 +20228,16 @@ def compare_run_results(
             revision_changes.append(revision)
         if (change := _model_assessment_change(model, now, before)) is not None:
             changes.append(change)
-        if now["assessment"]["execution"] == "completed" and (
-            before["assessment"]["execution"] == "completed"
-        ):
-            text_compared += 1
-            if now.get("generated_text", "") == before.get("generated_text", ""):
-                identical_text += 1
         if throughput_comparable:
             _compare_model_performance(
                 model, now, before, bands=bands, ratios=ratios, flags=flags, memory=memory
             )
 
     ratios_sorted = sorted(ratios)
+    pairs = [(model, current_by[model], baseline_by[model]) for model in shared]
+    text_compared, text_changed = _generated_text_changes(pairs)
+    identical_text = text_compared - len(text_changed)
+    prefill_sorted = _prefill_tps_ratios(pairs) if throughput_comparable else []
     environment_notes = (
         *_os_change_notes(baseline.metadata, current_metadata),
         *_run_environment_notes("current", current),
@@ -20160,6 +20274,11 @@ def compare_run_results(
         unverified_facts=unverified_facts,
         revision_changes=tuple(revision_changes),
         throughput_comparable=throughput_comparable,
+        text_changed_models=tuple(text_changed),
+        prompt_tps_ratio_median=_quantile(prefill_sorted, 0.5) if prefill_sorted else None,
+        prompt_tps_ratio_min=prefill_sorted[0] if prefill_sorted else None,
+        prompt_tps_ratio_max=prefill_sorted[-1] if prefill_sorted else None,
+        prompt_tps_compared_models=len(prefill_sorted),
     )
 
 
@@ -20351,6 +20470,23 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
             "max": _r(comparison.tps_ratio_max),
             "compared_models": comparison.tps_compared_models,
         },
+        "prompt_tps_ratio": {
+            "median": _r(comparison.prompt_tps_ratio_median),
+            "min": _r(comparison.prompt_tps_ratio_min),
+            "max": _r(comparison.prompt_tps_ratio_max),
+            "compared_models": comparison.prompt_tps_compared_models,
+        },
+        "text_changed_models": cast("JsonLike", list(comparison.text_changed_models)),
+        "component_changes": [
+            {
+                "component": change.name,
+                "baseline": change.baseline_revision,
+                "current": change.current_revision,
+                "commits": change.commit_count,
+                "subjects": cast("JsonLike", list(change.subjects)),
+            }
+            for change in comparison.component_changes
+        ],
         "throughput_flags": [
             {
                 "model": flag.model,
@@ -20522,6 +20658,7 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
             **cast("dict[str, Any]", identity),
         )
     ratio = _comparison_mapping(value.get("generation_tps_ratio"))
+    prefill = _comparison_mapping(value.get("prompt_tps_ratio"))
     changes = tuple(
         RunComparisonModelChange(
             model=_comparison_req_str(change["model"]),
@@ -20581,6 +20718,21 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         ),
         throughput_comparable=_comparison_req_bool(value.get("throughput_comparable", True)),
         environment_notes=_comparison_str_items(value.get("environment_notes") or []),
+        text_changed_models=_comparison_str_items(value.get("text_changed_models") or []),
+        component_changes=tuple(
+            ComponentChange(
+                _comparison_req_str(entry["component"]),
+                _comparison_req_str(entry["baseline"]),
+                _comparison_req_str(entry["current"]),
+                _comparison_req_int(entry.get("commits", 0)),
+                _comparison_str_items(entry.get("subjects") or []),
+            )
+            for entry in _comparison_rows(value.get("component_changes"))
+        ),
+        prompt_tps_ratio_median=_comparison_opt_float(prefill.get("median")),
+        prompt_tps_ratio_min=_comparison_opt_float(prefill.get("min")),
+        prompt_tps_ratio_max=_comparison_opt_float(prefill.get("max")),
+        prompt_tps_compared_models=_comparison_req_int(prefill.get("compared_models", 0)),
         **cast("dict[str, Any]", identity),
     )
 
@@ -20636,6 +20788,25 @@ class _ComparisonView:
     memory_rows: tuple[tuple[str, str, str, str], ...]
 
 
+def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
+    """Name the models whose generated text changed, when any did."""
+    if not comparison.text_changed_models:
+        return []
+    return [("Generated text changed", ", ".join(comparison.text_changed_models))]
+
+
+def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
+    """Prefill throughput ratio row, withheld under the same rule as the decode ratio."""
+    if not comparison.throughput_comparable or comparison.prompt_tps_ratio_median is None:
+        return []
+    prefill_text = (
+        f"{comparison.prompt_tps_ratio_median:.3f} (range "
+        f"{comparison.prompt_tps_ratio_min:.2f}-{comparison.prompt_tps_ratio_max:.2f}, "
+        f"{comparison.prompt_tps_compared_models} models)"
+    )
+    return [("Prefill tok/s ratio (now/baseline)", prefill_text)]
+
+
 def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     """Derive every formatted row of the baseline diff exactly once."""
     if not comparison.throughput_comparable:
@@ -20679,6 +20850,8 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         ("Generation tok/s ratio (now/baseline)", ratio_text),
         ("Throughput noise band", band_text),
     ]
+    summary_rows[2:2] = _changed_text_summary_rows(comparison)
+    summary_rows[-1:-1] = _prefill_summary_rows(comparison)
     if comparison.current_execution_mode != comparison.baseline_execution_mode:
         mode_note = (
             f"{comparison.current_execution_mode} now vs "
@@ -20779,6 +20952,9 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     )
 
 
+_COMPONENT_CHANGE_SUMMARY_SUBJECTS: Final[int] = 15
+
+
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
@@ -20827,6 +21003,20 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 compact=True,
             )
         )
+    for change in comparison.component_changes:
+        shown = change.subjects[:_COMPONENT_CHANGE_SUMMARY_SUBJECTS]
+        more = change.commit_count - len(shown)
+        blocks.append(
+            ReportDetails(
+                f"{change.name}: {change.commit_count} upstream commit(s) since the baseline "
+                f"({change.baseline_revision}..{change.current_revision})",
+                (
+                    ReportBulletList(
+                        (*shown, f"... and {more} more (see results.jsonl)") if more > 0 else shown
+                    ),
+                ),
+            )
+        )
     blocks.append(
         ReportParagraph(
             "Mechanical diff only: one image, temperature as configured; single-observation "
@@ -20858,6 +21048,14 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("%s", _plain_log_text(view.revision_note))
     if view.environment_note is not None:
         logger.info("%s", _plain_log_text(view.environment_note))
+    for change in comparison.component_changes:
+        logger.info(
+            "%s: %d upstream commit(s) since the baseline (%s..%s)",
+            change.name,
+            change.commit_count,
+            change.baseline_revision,
+            change.current_revision,
+        )
     for item in view.membership_items:
         logger.info("%s", _plain_log_text(item))
     for model, execution, usability, observations in view.change_rows:
@@ -22131,6 +22329,23 @@ def _run_issue_summary_timing_rows(metadata: JsonlMetadataRecord) -> tuple[tuple
     runtime = metadata.get("total_runtime_seconds")
     if isinstance(runtime, int | float) and not isinstance(runtime, bool) and runtime >= 0:
         rows.append(("Run duration", format_overall_runtime(float(runtime))))
+    phases = metadata.get("phase_totals_s")
+    if isinstance(phases, dict) and phases:
+        labels = (
+            ("generation", "generation"),
+            ("model_load", "model load"),
+            ("prompt_prep", "prompt prep"),
+            ("cleanup", "cleanup"),
+            ("outside_model_loop", "outside the model loop"),
+        )
+        rows.append(
+            (
+                "Time by phase",
+                ", ".join(
+                    f"{label} {float(phases[key]):.0f}s" for key, label in labels if key in phases
+                ),
+            )
+        )
     return tuple(rows)
 
 
@@ -23445,6 +23660,60 @@ def _log_report_generation_outcomes(
         log_file_path(run_issue_summary, label="   Run Issue:       ")
 
 
+_COMPONENT_CHANGE_SUBJECT_LIMIT: Final[int] = 40
+
+
+def _component_commit_ranges(
+    baseline_metadata: JsonlMetadataRecord, current_metadata: JsonlMetadataRecord
+) -> tuple[ComponentChange, ...]:
+    """List the upstream commits between two runs for each editable git checkout.
+
+    Reads only the local checkouts (``git log A..B``), so it answers "what
+    changed upstream since the baseline" without a network call; a component
+    whose revisions match, or whose checkout is unavailable, is omitted.
+    """
+    baseline_provenance = baseline_metadata.get("component_provenance")
+    current_provenance = current_metadata.get("component_provenance")
+    if not isinstance(current_provenance, dict):
+        return ()
+    changes: list[ComponentChange] = []
+    for name, record in current_provenance.items():
+        before = _component_source_revision(baseline_provenance, name)
+        after = _component_source_revision(current_provenance, name)
+        location = record.get("source_location") if isinstance(record, dict) else None
+        if (
+            before is None
+            or after is None
+            or before.startswith(after)
+            or after.startswith(before)
+            or not isinstance(location, str)
+            or record.get("install_type") != "editable"
+        ):
+            continue
+        checkout = str(Path(location).expanduser())
+        count = _run_macos_toolchain_command(
+            ("git", "-C", checkout, "rev-list", "--count", f"{before}..{after}"), timeout=5
+        )
+        log = _run_macos_toolchain_command(
+            (
+                "git",
+                "-C",
+                checkout,
+                "log",
+                "--format=%h %s",
+                f"-n{_COMPONENT_CHANGE_SUBJECT_LIMIT}",
+                f"{before}..{after}",
+            ),
+            timeout=5,
+        )
+        if count is None or log is None or not count.isdigit():
+            continue
+        changes.append(
+            ComponentChange(name, before[:9], after[:9], int(count), tuple(log.splitlines()))
+        )
+    return tuple(changes)
+
+
 def _compute_run_comparison(
     inputs: ReportGenerationInputs, current: RetainedRun
 ) -> RunComparison | None:
@@ -23465,7 +23734,7 @@ def _compute_run_comparison(
             if inputs.image_path is not None
             else None
         )
-        return compare_run_results(
+        comparison = compare_run_results(
             current.results,
             baseline,
             history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
@@ -23478,6 +23747,12 @@ def _compute_run_comparison(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
                 for key, value in sorted(_common_generation_settings(inputs.results).items())
             ),
+        )
+        if comparison is None:
+            return None
+        return replace(
+            comparison,
+            component_changes=_component_commit_ranges(baseline.metadata, current.metadata),
         )
     except Exception as error:  # comparison must never cost the run's reports
         logger.warning("Comparison skipped: unexpected comparison failure (%s)", error)

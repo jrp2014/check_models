@@ -420,6 +420,7 @@ def test_retained_metadata_captures_public_snapshot_contract(
         "prompt_sha256",
         "metadata_exposed_to_prompt",
         "execution_mode",
+        "phase_totals_s",
         "total_runtime_seconds",
         "counts",
         "artifacts",
@@ -2317,3 +2318,36 @@ def test_history_and_jsonl_rows_share_one_generation_facts_projection() -> None:
     failed = check_models.PerformanceResult(model_name="org/failed", success=False, generation=None)
     assert check_models._generation_facts_record(failed) == {}
     assert "generation_tps" not in check_models._history_model_result_from_result(failed)
+
+
+def test_run_phase_totals_sum_models_and_leave_the_remainder_outside_the_loop() -> None:
+    results = [
+        check_models.PerformanceResult(
+            model_name=f"org/m{i}",
+            success=True,
+            generation=None,
+            model_load_time=2.0,
+            generation_time=5.0,
+            total_time=8.0,
+        )
+        for i in range(2)
+    ]
+    totals = check_models._run_phase_totals(results, 20.0)
+    assert totals["model_load"] == 4.0
+    assert totals["generation"] == 10.0
+    assert totals["per_model_total"] == 16.0
+    assert totals["outside_model_loop"] == 4.0
+
+
+def test_provenance_separates_the_compiled_build_from_the_checkout() -> None:
+    built = check_models._version_built_revision
+    assert built("0.32.3.dev20260912+229f5b430") == "229f5b430"
+    assert built("0.7.1") is None
+    assert built(None) is None
+    lagging = {"built_revision": "229f5b430", "source_revision": "59d600b5e64c2384"}
+    assert check_models._build_lags_checkout(lagging) is True
+    assert (
+        check_models._build_lags_checkout({**lagging, "source_revision": "229f5b430df7"}) is False
+    )
+    # The revision a run is labelled with is the build that ran, not the checkout.
+    assert check_models._component_source_revision({"mlx": lagging}, "mlx") == "229f5b430"

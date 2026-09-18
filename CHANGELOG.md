@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- More recorded facts for evaluating a sweep, none of them judgments: the
+  comparison names the models whose text changed, gives the prefill tok/s
+  ratio beside the decode one, and lists the upstream commits between the
+  two runs for each editable checkout (`git log A..B`, local only); the
+  header carries `phase_totals_s`; and provenance records the revision the
+  binary was *built* from (`built_revision`), labelling runs with it and
+  saying so when an editable checkout is ahead of its compiled build.
 - Two new mechanical observations, both caveats rather than failures.
   `prompt_hint_echoed`: the Description reproduces the prompt's own
   "Description hint" (share of its words inside four-word runs shared with

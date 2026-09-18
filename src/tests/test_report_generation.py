@@ -7417,3 +7417,40 @@ def test_every_observation_detail_field_has_a_display_label() -> None:
     """Labels are presentation, so they stay hand-written, but none may be missing or stale."""
     declared = set(get_type_hints(check_models.JsonlObservationDetailsRecord))
     assert set(check_models._OBSERVATION_DETAIL_LABELS) == declared
+
+
+def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -> None:
+    baseline = _comparison_baseline(
+        [_comparison_record("org/a", tps=50.0), _comparison_record("org/b", tps=50.0)]
+    )
+    for record in baseline.results:
+        cast("dict[str, Any]", record["metrics"])["prompt_tps"] = 1000.0
+    changed = _comparison_record("org/a", tps=50.0, text="different text")
+    same = _comparison_record("org/b", tps=50.0)
+    for record, rate in ((changed, 500.0), (same, 1000.0)):
+        cast("dict[str, Any]", record["metrics"])["prompt_tps"] = rate
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", r) for r in (changed, same)],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison is not None
+    assert comparison.text_changed_models == ("org/a",)
+    assert comparison.identical_text_models == 1
+    assert comparison.prompt_tps_ratio_min == pytest.approx(0.5)
+    assert comparison.prompt_tps_compared_models == 2
+    comparison = replace(
+        comparison,
+        component_changes=(
+            check_models.ComponentChange("mlx-vlm", "45d6e125a", "4774f3d7b", 33, ("abc fix x",)),
+        ),
+    )
+    rows = dict(check_models._comparison_view(comparison).summary_rows)
+    assert rows["Generated text changed"] == "org/a"
+    assert rows["Prefill tok/s ratio (now/baseline)"].startswith("0.750")
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.text_changed_models == ("org/a",)
+    assert restored.component_changes == comparison.component_changes
+    assert restored.prompt_tps_ratio_median == pytest.approx(0.75)
