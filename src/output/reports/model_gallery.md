@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-09-18 21:42:05 BST
+Generated on: 2026-09-18 23:43:35 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -28,60 +28,60 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 | Model                                                                                                                     | Mechanical checks      | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                  |
 |---------------------------------------------------------------------------------------------------------------------------|------------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | 12.43s  | 30.4 tok/s          | 4.51            | 23      | 2,393      | 151     | none                                                                                          |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | 17.04s  | 82.2 tok/s          | 2.51            | 19      | 1,634      | 997     | none                                                                                          |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | 10.48s  | 75.8 tok/s          | 6.54            | 8.7     | 6,450      | 140     | none                                                                                          |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `no concerns detected` | 33.23s  | 41.2 tok/s          | 18.99           | 78      | 6,450      | 103     | none                                                                                          |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | 9.45s   | 35.2 tok/s          | 2.68            | 18      | 2,612      | 138     | none                                                                                          |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | 8.03s   | 54.1 tok/s          | 3.88            | 10      | 2,113      | 126     | none                                                                                          |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | 6.17s   | 36.4 tok/s          | 1.72            | 17      | 2,113      | 77      | none                                                                                          |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | 5.24s   | 182 tok/s           | 1.98            | 4.0     | 2,103      | 81      | none                                                                                          |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | 3.87s   | 102 tok/s           | 1.30            | 7.0     | 391        | 101     | none                                                                                          |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | 6.52s   | 64.3 tok/s          | 2.71            | 13      | 2,926      | 109     | none                                                                                          |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | 8.08s   | 60.2 tok/s          | 2.77            | 13      | 2,926      | 187     | none                                                                                          |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | 3.91s   | 179 tok/s           | 1.63            | 7.8     | 2,925      | 102     | none                                                                                          |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `no concerns detected` | 58.62s  | 23.6 tok/s          | 11.75           | 25      | 4,403      | 1,000   | none                                                                                          |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | 5.13s   | 159 tok/s           | 2.81            | 3.9     | 4,083      | 84      | none                                                                                          |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | 8.16s   | 74.4 tok/s          | 2.15            | 24      | 1,289      | 155     | none                                                                                          |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | 4.50s   | 55.9 tok/s          | 1.13            | 9.3     | 1,133      | 107     | none                                                                                          |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `no concerns detected` | 43.44s  | 89.1 tok/s          | 40.30           | 9.3     | 16,558     | 117     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | 29.50s  | 86.1 tok/s          | 17.03           | 8.4     | 16,549     | 912     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | 74.99s  | 19.5 tok/s          | 62.91           | 26      | 16,547     | 177     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | 41.03s  | 69.7 tok/s          | 37.79           | 11      | 16,547     | 93      | none                                                                                          |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | 38.20s  | 73.6 tok/s          | 33.06           | 25      | 16,563     | 97      | none                                                                                          |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | 38.00s  | 89.6 tok/s          | 34.43           | 11      | 16,563     | 86      | none                                                                                          |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `no concerns detected` | 65.42s  | 26.8 tok/s          | 57.10           | 21      | 16,563     | 124     | none                                                                                          |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `no concerns detected` | 3.55s   | 129 tok/s           | 1.32            | 5.6     | 1,426      | 98      | none                                                                                          |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | 43.93s  | 47.8 tok/s          | 25.02           | 92      | 3,491      | 121     | none                                                                                          |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | 19.44s  | 56.8 tok/s          | 14.43           | 14      | 16,558     | 136     | none                                                                                          |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | 4.94s   | 101 tok/s           | 1.74            | 6.5     | 2,090      | 96      | none                                                                                          |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `no concerns detected` | 10.01s  | 30.2 tok/s          | 1.72            | 17      | 590        | 152     | none                                                                                          |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | 5.67s   | 59.5 tok/s          | 1.20            | 7.6     | 595        | 101     | none                                                                                          |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | 5.49s   | 106 tok/s           | 1.17            | 16      | 595        | 96      | none                                                                                          |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | 8.88s   | 25.8 tok/s          | 1.86            | 20      | 595        | 89      | none                                                                                          |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | 4.37s   | 122 tok/s           | 1.10            | 5.9     | 591        | 73      | none                                                                                          |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | 4.10s   | 168 tok/s           | 1.91            | 4.7     | 1,379      | 65      | none                                                                                          |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `no concerns detected` | 7.59s   | 38.7 tok/s          | 2.35            | 16      | 3,116      | 102     | none                                                                                          |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | 8.49s   | 71.5 tok/s          | 3.57            | 8.1     | 1,524      | 216     | duplicate keywords                                                                            |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | 8.87s   | 37.5 tok/s          | 4.60            | 28      | 591        | 80      | duplicate keywords                                                                            |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | 2.41s   | 470 tok/s           | 0.76            | 1.9     | 2,112      | 200     | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | 23.62s  | 60.0 tok/s          | 3.87            | 20      | 1,324      | 1,000   | cut off at token limit                                                                        |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | 15.93s  | 26.1 tok/s          | 3.02            | 9.2     | 301        | 275     | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | 63.38s  | 17.0 tok/s          | 2.17            | 15      | 301        | 1,000   | repeated text; cut off at token limit                                                         |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | 40.50s  | 74.8 tok/s          | 34.86           | 23      | 16,547     | 200     | stopped early: repeating; duplicate keywords                                                  |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | 2.46s   | 314 tok/s           | 1.12            | 1.1     | 1,205      | 33      | labelled fields not detected                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | 5.98s   | 69.6 tok/s          | 2.12            | 6.9     | 589        | 88      | labelled fields not detected                                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | 5.51s   | 98.7 tok/s          | 1.59            | 6.7     | 2,195      | 200     | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | 2.73s   | 198 tok/s           | 0.95            | 1.5     | 330        | 92      | labelled fields not detected                                                                  |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | 5.05s   | insufficient sample | 2.38            | 9.7     | 1,344      | 7       | labelled fields not detected                                                                  |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | 0.19s   | -                   | -               | -       | -          | -       | none                                                                                          |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | 2.79s   | -                   | -               | -       | -          | -       | none                                                                                          |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | 11.48s  | 29.6 tok/s          | 3.59            | 23      | 2,393      | 151     | none                                                                                          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | 16.34s  | 77.8 tok/s          | 1.31            | 19      | 1,634      | 997     | none                                                                                          |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | 9.76s   | 74.1 tok/s          | 5.84            | 8.8     | 6,450      | 140     | none                                                                                          |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | 8.50s   | 35.5 tok/s          | 1.79            | 18      | 2,612      | 138     | none                                                                                          |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | 6.02s   | 57.4 tok/s          | 2.02            | 10      | 2,113      | 126     | none                                                                                          |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | 5.78s   | 37.7 tok/s          | 1.43            | 17      | 2,113      | 77      | none                                                                                          |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | 3.36s   | 214 tok/s           | 1.12            | 4.0     | 2,103      | 81      | none                                                                                          |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | 3.23s   | 105 tok/s           | 0.72            | 7.0     | 391        | 101     | none                                                                                          |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | 6.77s   | 67.2 tok/s          | 3.09            | 13      | 2,926      | 109     | none                                                                                          |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | 7.77s   | 62.3 tok/s          | 2.66            | 13      | 2,926      | 187     | none                                                                                          |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | 3.75s   | 191 tok/s           | 1.53            | 7.8     | 2,925      | 102     | none                                                                                          |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | 4.87s   | 154 tok/s           | 2.62            | 3.9     | 4,083      | 84      | none                                                                                          |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | 6.73s   | 71.8 tok/s          | 1.28            | 24      | 1,289      | 155     | none                                                                                          |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | 4.21s   | 54.9 tok/s          | 0.78            | 9.3     | 1,133      | 107     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | 27.70s  | 86.3 tok/s          | 15.37           | 8.4     | 16,549     | 912     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | 77.47s  | 20.4 tok/s          | 65.80           | 26      | 16,547     | 177     | none                                                                                          |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | 39.47s  | 69.7 tok/s          | 35.72           | 11      | 16,547     | 93      | none                                                                                          |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | 39.73s  | 72.4 tok/s          | 34.63           | 25      | 16,563     | 97      | none                                                                                          |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | 44.16s  | 91.4 tok/s          | 40.63           | 11      | 16,563     | 86      | none                                                                                          |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | 36.64s  | 47.4 tok/s          | 20.49           | 92      | 3,491      | 121     | none                                                                                          |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | 18.44s  | 57.6 tok/s          | 13.94           | 14      | 16,558     | 136     | none                                                                                          |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | 4.62s   | 100 tok/s           | 1.56            | 6.5     | 2,090      | 96      | none                                                                                          |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | 5.10s   | 60.4 tok/s          | 0.93            | 7.6     | 595        | 101     | none                                                                                          |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | 5.04s   | 108 tok/s           | 0.99            | 16      | 595        | 96      | none                                                                                          |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | 8.45s   | 26.3 tok/s          | 1.69            | 20      | 595        | 89      | none                                                                                          |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | 3.74s   | 125 tok/s           | 0.77            | 6.0     | 591        | 73      | none                                                                                          |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | 2.91s   | 176 tok/s           | 1.14            | 4.7     | 1,379      | 65      | none                                                                                          |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `concerns detected`    | 23.56s  | 41.6 tok/s          | 13.67           | 78      | 6,450      | 103     | prompt hint repeated                                                                          |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | 6.16s   | 72.5 tok/s          | 1.35            | 8.6     | 1,524      | 216     | duplicate keywords                                                                            |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `concerns detected`    | 41.22s  | 91.3 tok/s          | 38.22           | 9.3     | 16,558     | 117     | prompt hint repeated                                                                          |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `concerns detected`    | 65.24s  | 29.8 tok/s          | 57.99           | 21      | 16,563     | 124     | unsupplied place name                                                                         |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `concerns detected`    | 3.33s   | 131 tok/s           | 1.07            | 5.6     | 1,426      | 98      | prompt hint repeated                                                                          |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | 6.81s   | 46.1 tok/s          | 2.85            | 28      | 591        | 80      | duplicate keywords; prompt hint repeated                                                      |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `concerns detected`    | 9.47s   | 30.3 tok/s          | 1.47            | 17      | 590        | 152     | unsupplied place name                                                                         |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `concerns detected`    | 7.12s   | 40.2 tok/s          | 2.17            | 16      | 3,116      | 102     | prompt hint repeated                                                                          |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | 2.26s   | 476 tok/s           | 0.60            | 1.9     | 2,112      | 200     | repeated text; stopped early: repeating; duplicate keywords; prompt hint repeated             |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | 20.21s  | 63.0 tok/s          | 1.38            | 20      | 1,324      | 1,000   | cut off at token limit                                                                        |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | 14.66s  | 25.7 tok/s          | 2.00            | 9.8     | 301        | 275     | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | 57.79s  | 18.8 tok/s          | 2.20            | 15      | 301        | 1,000   | repeated text; cut off at token limit                                                         |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | 53.04s  | 24.3 tok/s          | 7.92            | 25      | 4,403      | 1,000   | cut off at token limit                                                                        |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | 41.31s  | 74.7 tok/s          | 35.71           | 23      | 16,547     | 200     | stopped early: repeating; duplicate keywords                                                  |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | 2.21s   | 320 tok/s           | 0.92            | 1.1     | 1,205      | 33      | labelled fields not detected                                                                  |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | 4.43s   | 71.0 tok/s          | 0.83            | 7.2     | 589        | 88      | labelled fields not detected                                                                  |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | 5.26s   | 102 tok/s           | 1.51            | 6.7     | 2,195      | 200     | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | 2.34s   | 193 tok/s           | 0.66            | 1.8     | 330        | 92      | labelled fields not detected                                                                  |
+| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | 4.02s   | insufficient sample | 1.50            | 9.7     | 1,344      | 7       | labelled fields not detected                                                                  |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | 0.16s   | -                   | -               | -       | -          | -       | none                                                                                          |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | 2.13s   | -                   | -               | -       | -          | -       | none                                                                                          |
 | [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | 0.25s   | -                   | -               | -       | -          | -       | none                                                                                          |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/SmolVLM2-2.2B-Instruct-mlx` at 3.55s
+Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/granite-4.0-3b-vision-4bit` at 2.91s
 
 Lowest peak memory among completions without detected concerns: `mlx-community/North-Micro-Vision-Instruct-4bit` at 3.9 GB
 
@@ -93,10 +93,11 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 | Model                                                                                                                     | Mechanical checks | Observations                                                                                  |
 |---------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                   |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords; prompt hint repeated             |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`  | cut off at token limit                                                                        |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                   |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`  | repeated text; cut off at token limit                                                         |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`  | cut off at token limit                                                                        |
 | [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`  | stopped early: repeating; duplicate keywords                                                  |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`  | labelled fields not detected                                                                  |
 | [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`  | labelled fields not detected                                                                  |
@@ -119,7 +120,6 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | Title: Swan on a calm river with moored boats \| Description: A solitary white swan swims gracefully on a calm river, with leisure boats and cruisers moored alongside r... \| Keywords (20): Swan, river, boats, mooring, residential buildings, greenery, water reflection, aquatic bird, marina, ...                                                                               |
 | [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | Title: Solitary White Swan Glides on Calm River with Boats and Lush Foliage \| Description: On 12 September 2026 at 17:41 UTC+01 (52.393850°N, 0.270830°E), a solitary wh... \| Keywords (17): White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, ...[2,490 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | Title: Swan at River Marina \| Description: A white swan glides on calm river waters, with leisure boats moored alongside riverside residential buildings in the... \| Keywords (13): Swan, River, Marina, Leisure boats, Residential buildings, Calm waters, White swan, Riverbank, Boats moored, ...                                                                                |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `no concerns detected` | Title: Solitary swan glides on calm river waters \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisu... \| Keywords (17): swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, ...                                                                               |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | Title: Solitary Swan on Calm River Waters with Moored Boats and Riverside Buildings. \| Description: A solitary white swan glides gracefully across the calm river wate... \| Keywords (20): swan, river, boats, moored, residential buildings, foliage, calm waters, leisure, cruisers, riverside, ...                                                                               |
 | [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | Title: Swan on Canal with Moored Boats \| Description: A white swan glides on a tranquil canal, surrounded by moored boats and riverside buildings, with lush greenery... \| Keywords (19): Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Reflection, Motorboat, Pier, ...                                                                               |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | Title: Swan on Calm River \| Description: A white swan glides on tranquil river waters near a marina with moored boats and residential buildings, captured at dusk. \| Keywords (15): swan, river, marina, boats, residential buildings, foliage, trees, water reflection, architecture, motorboat, ...                                                                               |
@@ -128,34 +128,35 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | Title: **Swan Gliding Past Moored Boats on a Serene River** \| Description: A solitary white swan swims calmly on a tranquil river, surrounded by reflections of... \| Keywords (16): swan, river, moored boats, marina, residential waterfront, greenery, calm water, reflections, leisure boats, ...                                                                                |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | Title: *Elegant Swan Glides Past Moored Boats on Serene River* \| Description: A solitary white swan gracefully swims across calm river waters on **September 12, 2026,... \| Keywords (20): swan, river, leisure boats, moored boats, riverside residential buildings, greenery, golden sunlight, ...                                                                                |
 | [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | Title: Swans by Riverside Marina \| Description: A white swan swims serenely in calm waters at dusk near a marina moored with leisure boats, framed by lush greenery... \| Keywords (17): swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, residential architecture, ...                                                                                |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `no concerns detected` | Title: Mute Swan on River with Moored Boats \| Description: Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar I... \| Keywords (2): mute swan, river                                                                               |
 | [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | Title: Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery. In the background, leisure boa... \| Keywords (13): Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, Architecture, Leisure Boats, Foliage, ...                                                                               |
 | [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | Title: White Swan Glides Past Moored Boats On Calm River \| Description: A solitary white swan glades across a calm river in the foreground, its reflection ripplin... \| Keywords (19): white swan, river, moored boats, motorboats, cruisers, marina, pontoon, water reflection, swan, waterfowl, ...                                                                               |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | Title: Serene Swan on the River \| Description: A white swan is seen swimming peacefully on a calm river, with boats and houses in the background, captured on S... \| Keywords (18): swan, river, calm, boats, houses, foliage, waterfront, mooring, leisure, tranquility, architecture, waterway, ...                                                                               |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `no concerns detected` | Title: Graceful Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruis... \| Keywords (26): swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, ...                                                                               |
 | [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | Title: Solitary Swan on Riverfront Marina \| Description: A solitary white swan glides across calm river waters in a canal with moored leisure boats and reside... \| Keywords (15): Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, ...[2,859 characters of reasoning omitted; complete output in the evidence block] |
 | [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | Title: Swan Gliding on River Near Moored Boats \| Description: A solitary white swan glides across calm river waters, framed by overhanging green foliage, with se... \| Keywords (18): swan, river, moored boats, leisure craft, residential buildings, greenery, water reflection, foliage, pier, ...                                                                               |
 | [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | Title: Swan on River with Moored Boats \| Description: A solitary white swan glides calmly on a river, framed by green foliage, with moored leisure boats and resid... \| Keywords (17): swan, river, boats, mooring, canal, greenery, trees, water reflection, waterfront, residential, motorboat, ...                                                                               |
 | [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | Title: Swan Swimming Past Moored Boats \| Description: A solitary white swan glides across calm river waters near a riverside mooring of leisure cruisers and resid... \| Keywords (18): swan, river, moored boats, riverbank, vegetation, water reflection, cruiser, residential buildings, trees, ...                                                                               |
 | [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | Title: Swan Glides Past Moored Boats on Calm Riverbank \| Description: A solitary white swan swims peacefully on a reflective river, with leisure boats moored along t... \| Keywords (15): swan, river, boats, mooring, residential buildings, water reflection, foliage, trees, motorboat, canal, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `no concerns detected` | Title: Swan swimming near moored boats on the River Thames \| Description: A solitary white swan swims on the calm water of the River Thames at Lambeth, with its re... \| Keywords (15): Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, ...                                                                               |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `no concerns detected` | Title: Swan on River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers mo... \| Keywords (20): Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, ...                                                                               |
 | [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | Title: Swan glides past moored boats on a calm river \| Description: A solitary white swan swims across calm river waters, framed by lush foreground foliage and... \| Keywords (18): Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, canal, bird, swimming, trees, ...                                                                               |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | Title: Swan Gliding on Calm River with Moored Boats \| Description: A serene scene captures a solitary white swan gracefully swimming across calm river waters, frame... \| Keywords (23): Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Waterway, Motorboat, Pier, ...                                                                               |
 | [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | Title: Solitary Swan Glides on Tranquil River \| Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river,... \| Keywords (12): Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `no concerns detected` | Title: Swan on River Cam, Cambridge – September 2026 \| Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September... \| Keywords (18): Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, ...                                                                                |
 | [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | Title: White Swan Gliding on a River Near Moored Boats \| Description: A solitary white swan glides across a calm river surface reflecting leisure boats and residential... \| Keywords (19): Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, Residential, Waterway, ...                                                                               |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | Title: White swan swimming on calm river with moored boats \| Description: A solitary white swan glides across calm river waters near a wooden pier, with several... \| Keywords (15): white swan, river, motorboat, waterfowl, waterfront, greenery, reflection, residential building, boat, pier, ...                                                                               |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | Title: White Swan Swimming Past Moored River Boats \| Description: A single white swan swims across calm river waters in front of leisure boats moored beside rivers... \| Keywords (18): swan, river, boats, marina, moored, waterfront, waterway, residential, architecture, greenery, waterfowl, ...                                                                               |
 | [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | Title: Swan glides on calm water beneath residential buildings \| Description: A solitary white swan gracefully floats on the calm river water, framed by dense greenery... \| Keywords (16): swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, architecture, moored, peaceful, ...                                                                               |
 | [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | Title: "Swan on the Canal" \| Description: A white swan glides gracefully across a calm river, framed by lush foliage and moored boats, with a serene residential backdrop. \| Keywords (10): swan, canal, water, foliage, boats, mooring, residential, reflection, serene, waterway                                                                                                  |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `no concerns detected` | Title: Swan in River with Moored Boats \| Description: A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats... \| Keywords (18): Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, ...                                                                                |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `concerns detected`    | Title: Solitary swan glides on calm river waters \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisu... \| Keywords (17): swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, ...                                                                               |
 | [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | Title: Serene River Scene with White Swan and Moored Boats \| Description: A tranquil riverside view features a solitary white swan gliding across calm water, surro... \| Keywords (42): swan, river, boats, mooring, canal, greenery, trees, vegetation, water reflection, waterfowl, waterfront, ...                                                                               |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `concerns detected`    | Title: Graceful Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruis... \| Keywords (26): swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `concerns detected`    | Title: Swan swimming near moored boats on the River Thames \| Description: A solitary white swan swims on the calm water of the River Thames at Lambeth, with its re... \| Keywords (15): Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `concerns detected`    | Title: Swan on River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers mo... \| Keywords (20): Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, ...                                                                               |
 | [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | Title: White Swan Gliding on River Near Moored Boats \| Description: A solitary white swan glides across calm river waters, with leisure boats and cruisers moored al... \| Keywords (16): swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pier, waterfront, waterway, greenery, ...                                                                               |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `concerns detected`    | Title: Swan on River Cam, Cambridge – September 2026 \| Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September... \| Keywords (18): Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, ...                                                                                |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `concerns detected`    | Title: Swan in River with Moored Boats \| Description: A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats... \| Keywords (18): Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, ...                                                                                |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | Title: Swans glide across calm river waters in a serene canal setting. \| Description: A solitary white swan glides gracefully across calm river waters framed by l... \| Keywords (63): Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, architecture, waterway, ...                                                                               |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | Title: Swan on canal with moored boats at marina \| Description: A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E. \| Keywords (3): Swans, Canal, Motorboat[3,708 characters of reasoning omitted; complete output in the evidence block]         |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds with a solitary white swan gliding effortlessly across the... \| Keywords (48): riverside residential area, leisure boats, calm waters, serene atmosphere, lush foliage, white swan, riverside, ...                                                                               |
 | [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds on September 12, 2026, at 17:41:02 UTC+01:00, near 52.393850°N, 0.27... \| Keywords (120): River, White Swan, Lush Greenery, Moored Boats, Riversid Residential Buildings, Tranquil Atmosphere, ...                                                                               |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | Title: Mute Swan on River with Moored Boats \| Description: Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar I... \| Keywords (2): mute swan, river                                                                               |
 | [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | Title: Solitary swan on a calm river with moored boats \| Description: A white swan glides across the calm waters of a river, framed by green foliage in the foregrou... \| Keywords (57): swan, river, boats, mooring, motorboat, residential, building, balcony, trees, foliage, greenery, water, ...                                                                               |
 | [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | A solitary white swan gliding across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.                                                                                                                                                                                                    |
 | [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | A serene scene unfolds on a calm river, where a graceful swan glides across the water. Several boats, including motorboats and sailboats, are moored along the riverbank, nestled beneath a row of residential buildings. Lush greenery frames the scene, with trees and bushes linin...                                                                                              |
@@ -257,22 +258,22 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.41s
-- *Generation time:* 9.49s
-- *Total time:* 12.43s
-- *Prompt preparation time:* 0.531
-- *First-token latency:* 3.93
-- *Cleanup time:* 0.102
+- *Model load time:* 2.25s
+- *Generation time:* 8.70s
+- *Total time:* 11.48s
+- *Prompt preparation time:* 0.52
+- *First-token latency:* 3.04
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 2,393
 - *Generation tokens:* 151
 - *Total tokens:* 2,544
-- *Prompt throughput (raw):* 609 tok/s
-- *Generation throughput (raw):* 30.4 tok/s
+- *Prompt throughput (raw):* 788 tok/s
+- *Generation throughput (raw):* 29.6 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000412
+- *Post-cleanup active memory (GB):* 0.000396
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -317,22 +318,22 @@ Swan, river, boats, mooring, residential buildings, greenery, water reflection, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.77s
-- *Generation time:* 14.64s
-- *Total time:* 17.04s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 1.91
-- *Cleanup time:* 0.108
+- *Model load time:* 1.62s
+- *Generation time:* 14.12s
+- *Total time:* 16.34s
+- *Prompt preparation time:* 0.602
+- *First-token latency:* 0.731
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 1,634
 - *Generation tokens:* 997
 - *Total tokens:* 2,631
-- *Prompt throughput (raw):* 855 tok/s
-- *Generation throughput (raw):* 82.2 tok/s
+- *Prompt throughput (raw):* 2,234 tok/s
+- *Generation throughput (raw):* 77.8 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.18
 - *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000625
+- *Post-cleanup active memory (GB):* 0.000609
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -404,22 +405,22 @@ Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.54s
-- *Generation time:* 8.39s
-- *Total time:* 10.48s
-- *Prompt preparation time:* 0.537
-- *First-token latency:* 6.05
-- *Cleanup time:* 0.0944
+- *Model load time:* 1.49s
+- *Generation time:* 7.73s
+- *Total time:* 9.76s
+- *Prompt preparation time:* 0.532
+- *First-token latency:* 5.34
+- *Cleanup time:* 0.0933
 - *Prompt tokens:* 6,450
 - *Generation tokens:* 140
 - *Total tokens:* 6,590
-- *Prompt throughput (raw):* 1,067 tok/s
-- *Generation throughput (raw):* 75.8 tok/s
-- *Peak memory (GB):* 8.7
+- *Prompt throughput (raw):* 1,208 tok/s
+- *Generation throughput (raw):* 74.1 tok/s
+- *Peak memory (GB):* 8.8
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.000936
+- *Post-cleanup active memory (GB):* 0.00092
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -446,62 +447,6 @@ Keywords: Swan, River, Marina, Leisure boats, Residential buildings, Calm waters
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 11.09s
-- *Generation time:* 21.49s
-- *Total time:* 33.23s
-- *Prompt preparation time:* 0.645
-- *First-token latency:* 17.2
-- *Cleanup time:* 0.306
-- *Prompt tokens:* 6,450
-- *Generation tokens:* 103
-- *Total tokens:* 6,553
-- *Prompt throughput (raw):* 374 tok/s
-- *Generation throughput (raw):* 41.2 tok/s
-- *Peak memory (GB):* 78
-- *Active memory (GB):* 62
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00125
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1413
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Solitary swan glides on calm river waters
-Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background under overcast lighting.
-Keywords: swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, waterfowl, waterfront, waterway, aquatic bird, greenery, trees, vegetation
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### mlx-community/Idefics3-8B-Llama3-bf16
@@ -516,22 +461,22 @@ Keywords: swan, river, water, foliage, boats, cruisers, residential buildings, m
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.11s
-- *Generation time:* 6.61s
-- *Total time:* 9.45s
-- *Prompt preparation time:* 0.721
-- *First-token latency:* 1.99
-- *Cleanup time:* 0.107
+- *Model load time:* 2.09s
+- *Generation time:* 5.68s
+- *Total time:* 8.50s
+- *Prompt preparation time:* 0.725
+- *First-token latency:* 1.08
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,612
 - *Generation tokens:* 138
 - *Total tokens:* 2,750
-- *Prompt throughput (raw):* 1,312 tok/s
-- *Generation throughput (raw):* 35.2 tok/s
+- *Prompt throughput (raw):* 2,411 tok/s
+- *Generation throughput (raw):* 35.5 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
 - *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.00151
+- *Post-cleanup active memory (GB):* 0.00149
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -574,22 +519,22 @@ Keywords: swan, river, boats, moored, residential buildings, foliage, calm water
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.17s
-- *Generation time:* 6.21s
-- *Total time:* 8.03s
-- *Prompt preparation time:* 0.644
-- *First-token latency:* 3.25
-- *Cleanup time:* 0.103
+- *Model load time:* 1.15s
+- *Generation time:* 4.22s
+- *Total time:* 6.02s
+- *Prompt preparation time:* 0.64
+- *First-token latency:* 1.4
+- *Cleanup time:* 0.0997
 - *Prompt tokens:* 2,113
 - *Generation tokens:* 126
 - *Total tokens:* 2,239
-- *Prompt throughput (raw):* 649 tok/s
-- *Generation throughput (raw):* 54.1 tok/s
+- *Prompt throughput (raw):* 1,510 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00182
+- *Post-cleanup active memory (GB):* 0.0018
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -635,21 +580,21 @@ Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Refle
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.66s
-- *Generation time:* 3.84s
-- *Total time:* 6.17s
-- *Prompt preparation time:* 0.661
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.098
+- *Generation time:* 3.48s
+- *Total time:* 5.78s
+- *Prompt preparation time:* 0.637
+- *First-token latency:* 0.816
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 2,113
 - *Generation tokens:* 77
 - *Total tokens:* 2,190
-- *Prompt throughput (raw):* 1,937 tok/s
-- *Generation throughput (raw):* 36.4 tok/s
+- *Prompt throughput (raw):* 2,590 tok/s
+- *Generation throughput (raw):* 37.7 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00213
+- *Post-cleanup active memory (GB):* 0.00212
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -701,22 +646,22 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 2.03s
-- *Generation time:* 2.43s
-- *Total time:* 5.24s
-- *Prompt preparation time:* 0.78
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.14
+- *Model load time:* 1.17s
+- *Generation time:* 1.51s
+- *Total time:* 3.36s
+- *Prompt preparation time:* 0.684
+- *First-token latency:* 0.468
+- *Cleanup time:* 0.0924
 - *Prompt tokens:* 2,103
 - *Generation tokens:* 81
 - *Total tokens:* 2,184
-- *Prompt throughput (raw):* 1,805 tok/s
-- *Generation throughput (raw):* 182 tok/s
+- *Prompt throughput (raw):* 4,492 tok/s
+- *Generation throughput (raw):* 214 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.07
+- *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00305
+- *Post-cleanup active memory (GB):* 0.00303
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -725,8 +670,8 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 12c5ae49304158b0a133fcea9ba4486a6d6c8cad
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/12c5ae49304158b0a133fcea9ba4486a6d6c8cad
+- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -757,22 +702,22 @@ Keywords: swan, river, boats, marina, greenery, water, reflection, architecture,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.05s
-- *Generation time:* 2.30s
-- *Total time:* 3.87s
-- *Prompt preparation time:* 0.51
-- *First-token latency:* 0.809
-- *Cleanup time:* 0.0986
+- *Model load time:* 1.04s
+- *Generation time:* 1.68s
+- *Total time:* 3.23s
+- *Prompt preparation time:* 0.498
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.0979
 - *Prompt tokens:* 391
 - *Generation tokens:* 101
 - *Total tokens:* 492
-- *Prompt throughput (raw):* 483 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 1,634 tok/s
+- *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.00441
+- *Post-cleanup active memory (GB):* 0.00439
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -815,22 +760,22 @@ Keywords: swan, river, waterway, mooring, motorboat, boats, greenery, trees, veg
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.56s
-- *Generation time:* 4.41s
-- *Total time:* 6.52s
-- *Prompt preparation time:* 0.539
-- *First-token latency:* 2.21
-- *Cleanup time:* 0.104
+- *Model load time:* 1.52s
+- *Generation time:* 4.71s
+- *Total time:* 6.77s
+- *Prompt preparation time:* 0.53
+- *First-token latency:* 2.58
+- *Cleanup time:* 0.0973
 - *Prompt tokens:* 2,926
 - *Generation tokens:* 109
 - *Total tokens:* 3,035
-- *Prompt throughput (raw):* 1,327 tok/s
-- *Generation throughput (raw):* 64.3 tok/s
+- *Prompt throughput (raw):* 1,133 tok/s
+- *Generation throughput (raw):* 67.2 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.56
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00467
+- *Post-cleanup active memory (GB):* 0.00466
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -875,22 +820,22 @@ swan, river, moored boats, marina, residential waterfront, greenery, calm water,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.65s
-- *Generation time:* 5.88s
-- *Total time:* 8.08s
-- *Prompt preparation time:* 0.539
-- *First-token latency:* 2.26
-- *Cleanup time:* 0.103
+- *Model load time:* 1.57s
+- *Generation time:* 5.67s
+- *Total time:* 7.77s
+- *Prompt preparation time:* 0.523
+- *First-token latency:* 2.16
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 2,926
 - *Generation tokens:* 187
 - *Total tokens:* 3,113
-- *Prompt throughput (raw):* 1,296 tok/s
-- *Generation throughput (raw):* 60.2 tok/s
+- *Prompt throughput (raw):* 1,356 tok/s
+- *Generation throughput (raw):* 62.3 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.4
 - *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.43
-- *Post-cleanup active memory (GB):* 0.00493
+- *Post-cleanup active memory (GB):* 0.00492
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -935,22 +880,22 @@ swan, river, leisure boats, moored boats, riverside residential buildings, green
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.17s
-- *Generation time:* 2.20s
-- *Total time:* 3.91s
+- *Model load time:* 1.14s
+- *Generation time:* 2.06s
+- *Total time:* 3.75s
 - *Prompt preparation time:* 0.539
-- *First-token latency:* 1.11
-- *Cleanup time:* 0.084
+- *First-token latency:* 1.02
+- *Cleanup time:* 0.0855
 - *Prompt tokens:* 2,925
 - *Generation tokens:* 102
 - *Total tokens:* 3,027
-- *Prompt throughput (raw):* 2,628 tok/s
-- *Generation throughput (raw):* 179 tok/s
+- *Prompt throughput (raw):* 2,868 tok/s
+- *Generation throughput (raw):* 191 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.38
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.0052
+- *Post-cleanup active memory (GB):* 0.00518
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -981,62 +926,6 @@ swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, r
 
 ---
 
-<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
-
-### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.80s
-- *Generation time:* 54.12s
-- *Total time:* 58.62s
-- *Prompt preparation time:* 0.694
-- *First-token latency:* 11.1
-- *Cleanup time:* 0.163
-- *Prompt tokens:* 4,403
-- *Generation tokens:* 1,000
-- *Total tokens:* 5,403
-- *Prompt throughput (raw):* 396 tok/s
-- *Generation throughput (raw):* 23.6 tok/s
-- *Peak memory (GB):* 25
-- *Active memory (GB):* 24
-- *Cache memory (GB):* 0.23
-- *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00592
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1570
-- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/b4a74fa6001f1eca3b23eeeb702ffad2773a218f
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Mute Swan on River with Moored Boats
-Description:
-Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar II’ and ‘Magna Carta’ with red and blue covers at a wooden pier beneath a brown-brick apartment block with balconies, framed by overhanging tree branches and foreground foliage in soft daylight.
-Keywords: mute swan, river
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-north-micro-vision-instruct-4bit"></a>
 
 ### mlx-community/North-Micro-Vision-Instruct-4bit
@@ -1051,22 +940,22 @@ Keywords: mute swan, river
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.99s
-- *Generation time:* 3.34s
-- *Total time:* 5.13s
-- *Prompt preparation time:* 0.788
-- *First-token latency:* 2.08
-- *Cleanup time:* 0.0979
+- *Model load time:* 0.95s
+- *Generation time:* 3.17s
+- *Total time:* 4.87s
+- *Prompt preparation time:* 0.744
+- *First-token latency:* 1.9
+- *Cleanup time:* 0.0955
 - *Prompt tokens:* 4,083
 - *Generation tokens:* 84
 - *Total tokens:* 4,167
-- *Prompt throughput (raw):* 1,959 tok/s
-- *Generation throughput (raw):* 159 tok/s
+- *Prompt throughput (raw):* 2,149 tok/s
+- *Generation throughput (raw):* 154 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00644
+- *Post-cleanup active memory (GB):* 0.00643
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1108,22 +997,22 @@ Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 3.24s
-- *Generation time:* 4.23s
-- *Total time:* 8.16s
-- *Prompt preparation time:* 0.674
-- *First-token latency:* 1.54
-- *Cleanup time:* 0.137
+- *Model load time:* 2.61s
+- *Generation time:* 3.45s
+- *Total time:* 6.73s
+- *Prompt preparation time:* 0.664
+- *First-token latency:* 0.66
+- *Cleanup time:* 0.139
 - *Prompt tokens:* 1,289
 - *Generation tokens:* 155
 - *Total tokens:* 1,444
-- *Prompt throughput (raw):* 838 tok/s
-- *Generation throughput (raw):* 74.4 tok/s
+- *Prompt throughput (raw):* 1,953 tok/s
+- *Generation throughput (raw):* 71.8 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.00695
+- *Post-cleanup active memory (GB):* 0.00693
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1131,8 +1020,8 @@ Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, 
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/5f31fcd089ce6f47f1073d3ae43dcb3a0bd1869f
+- *Resolved model revision:* 4620fdbbd1e7a1f14f936d49f1aa012abcda4569
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit/snapshots/4620fdbbd1e7a1f14f936d49f1aa012abcda4569
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
 - *EOS token:* <\|im_end\|>
@@ -1165,22 +1054,22 @@ Keywords: white swan, river, moored boats, motorboats, cruisers, marina, pontoon
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.94s
-- *Generation time:* 3.05s
-- *Total time:* 4.50s
-- *Prompt preparation time:* 0.504
-- *First-token latency:* 0.642
-- *Cleanup time:* 0.0829
+- *Model load time:* 0.97s
+- *Generation time:* 2.73s
+- *Total time:* 4.21s
+- *Prompt preparation time:* 0.502
+- *First-token latency:* 0.3
+- *Cleanup time:* 0.0931
 - *Prompt tokens:* 1,133
 - *Generation tokens:* 107
 - *Total tokens:* 1,240
-- *Prompt throughput (raw):* 1,764 tok/s
-- *Generation throughput (raw):* 55.9 tok/s
+- *Prompt throughput (raw):* 3,774 tok/s
+- *Generation throughput (raw):* 54.9 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00702
+- *Post-cleanup active memory (GB):* 0.007
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1209,63 +1098,6 @@ Keywords: swan, river, calm, boats, houses, foliage, waterfront, mooring, leisur
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
-
-### mlx-community/Qwen2-VL-7B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.95s
-- *Generation time:* 41.62s
-- *Total time:* 43.44s
-- *Prompt preparation time:* 0.867
-- *First-token latency:* 39.5
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 16,558
-- *Generation tokens:* 117
-- *Total tokens:* 16,675
-- *Prompt throughput (raw):* 419 tok/s
-- *Generation throughput (raw):* 89.1 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 4.7
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00733
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1462
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Graceful Swan on the River
-
-Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-
-Keywords: swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, greenery, water reflection, aquatic bird, nature, tranquility, serene, peaceful, waterfowl, waterway, scenic, picturesque, boating, mooring, waterfront, trees, vegetation, architecture, boat.
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
 ### mlx-community/Qwen3-VL-2B-Thinking-bf16
@@ -1280,22 +1112,22 @@ Keywords: swan, river, calm water, lush foliage, leisure boats, cruisers, rivers
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.88s
-- *Generation time:* 27.62s
-- *Total time:* 29.50s
-- *Prompt preparation time:* 0.992
-- *First-token latency:* 16.1
-- *Cleanup time:* 0.114
+- *Model load time:* 0.79s
+- *Generation time:* 25.95s
+- *Total time:* 27.70s
+- *Prompt preparation time:* 0.957
+- *First-token latency:* 14.5
+- *Cleanup time:* 0.097
 - *Prompt tokens:* 16,549
 - *Generation tokens:* 912
 - *Total tokens:* 17,461
-- *Prompt throughput (raw):* 1,025 tok/s
-- *Generation throughput (raw):* 86.1 tok/s
+- *Prompt throughput (raw):* 1,140 tok/s
+- *Generation throughput (raw):* 86.3 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
 - *Model-load active memory (GB):* 4.26
-- *Post-cleanup active memory (GB):* 0.00764
+- *Post-cleanup active memory (GB):* 0.00762
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1405,22 +1237,22 @@ Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 2.01s
-- *Generation time:* 72.00s
-- *Total time:* 74.99s
-- *Prompt preparation time:* 0.979
-- *First-token latency:* 62
-- *Cleanup time:* 0.143
+- *Model load time:* 1.98s
+- *Generation time:* 74.51s
+- *Total time:* 77.47s
+- *Prompt preparation time:* 0.97
+- *First-token latency:* 64.9
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 177
 - *Total tokens:* 16,724
-- *Prompt throughput (raw):* 267 tok/s
-- *Generation throughput (raw):* 19.5 tok/s
+- *Prompt throughput (raw):* 255 tok/s
+- *Generation throughput (raw):* 20.4 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
 - *Model-load active memory (GB):* 19.6
-- *Post-cleanup active memory (GB):* 0.00826
+- *Post-cleanup active memory (GB):* 0.00824
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1463,22 +1295,22 @@ Keywords: swan, river, moored boats, leisure craft, residential buildings, green
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.92s
-- *Generation time:* 39.13s
-- *Total time:* 41.03s
-- *Prompt preparation time:* 0.969
-- *First-token latency:* 36.9
-- *Cleanup time:* 0.11
+- *Model load time:* 1.45s
+- *Generation time:* 37.06s
+- *Total time:* 39.47s
+- *Prompt preparation time:* 0.96
+- *First-token latency:* 34.9
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 93
 - *Total tokens:* 16,640
-- *Prompt throughput (raw):* 448 tok/s
+- *Prompt throughput (raw):* 475 tok/s
 - *Generation throughput (raw):* 69.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00857
+- *Post-cleanup active memory (GB):* 0.00856
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1521,22 +1353,22 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, water reflection,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.80s
-- *Generation time:* 34.38s
-- *Total time:* 38.20s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 32.2
-- *Cleanup time:* 0.14
+- *Model load time:* 2.76s
+- *Generation time:* 35.97s
+- *Total time:* 39.73s
+- *Prompt preparation time:* 0.986
+- *First-token latency:* 33.7
+- *Cleanup time:* 0.145
 - *Prompt tokens:* 16,563
 - *Generation tokens:* 97
 - *Total tokens:* 16,660
-- *Prompt throughput (raw):* 515 tok/s
-- *Generation throughput (raw):* 73.6 tok/s
+- *Prompt throughput (raw):* 491 tok/s
+- *Generation throughput (raw):* 72.4 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.89
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00908
+- *Post-cleanup active memory (GB):* 0.00906
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1579,21 +1411,21 @@ Keywords: swan, river, moored boats, riverbank, vegetation, water reflection, cr
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
 - *Model load time:* 1.63s
-- *Generation time:* 35.40s
-- *Total time:* 38.00s
-- *Prompt preparation time:* 0.969
-- *First-token latency:* 33.5
-- *Cleanup time:* 0.122
+- *Generation time:* 41.57s
+- *Total time:* 44.16s
+- *Prompt preparation time:* 0.946
+- *First-token latency:* 39.8
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 16,563
 - *Generation tokens:* 86
 - *Total tokens:* 16,649
-- *Prompt throughput (raw):* 494 tok/s
-- *Generation throughput (raw):* 89.6 tok/s
+- *Prompt throughput (raw):* 416 tok/s
+- *Generation throughput (raw):* 91.4 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.96
-- *Post-cleanup active memory (GB):* 0.0096
+- *Post-cleanup active memory (GB):* 0.00959
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1621,122 +1453,6 @@ Keywords: swan, river, boats, mooring, residential buildings, water reflection, 
 
 ---
 
-<a id="model-mlx-community-qwen38-27b-4bit"></a>
-
-### mlx-community/Qwen3.8-27B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.8-27B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.67s
-- *Generation time:* 61.74s
-- *Total time:* 65.42s
-- *Prompt preparation time:* 0.992
-- *First-token latency:* 56.2
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 16,563
-- *Generation tokens:* 124
-- *Total tokens:* 16,687
-- *Prompt throughput (raw):* 295 tok/s
-- *Generation throughput (raw):* 26.8 tok/s
-- *Peak memory (GB):* 21
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 1.9
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0101
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 3e6447f082e89cc7f0bc6e5441afd38dfce760ff
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-4bit/snapshots/3e6447f082e89cc7f0bc6e5441afd38dfce760ff
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Swan swimming near moored boats on the River Thames
-
-Description:
-A solitary white swan swims on the calm water of the River Thames at Lambeth, with its reflection visible on the surface. In the background, several leisure boats and cruisers are moored along the riverbank in front of brown residential buildings, framed by overhanging green foliage.
-
-Keywords:
-Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, Calm water, Leisure boat, Canopy, Urban river, Nature
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.71s
-- *Generation time:* 2.09s
-- *Total time:* 3.55s
-- *Prompt preparation time:* 0.752
-- *First-token latency:* 0.6
-- *Cleanup time:* 0.088
-- *Prompt tokens:* 1,426
-- *Generation tokens:* 98
-- *Total tokens:* 1,524
-- *Prompt throughput (raw):* 2,377 tok/s
-- *Generation throughput (raw):* 129 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0103
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1364
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Swan on River
-Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-Keywords: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-step-37-flash-oq3e"></a>
 
 ### mlx-community/Step-3.7-Flash-oQ3e
@@ -1751,17 +1467,17 @@ Keywords: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motor
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 15.41s
-- *Generation time:* 27.56s
-- *Total time:* 43.93s
-- *Prompt preparation time:* 0.96
-- *First-token latency:* 23
-- *Cleanup time:* 0.316
+- *Model load time:* 12.73s
+- *Generation time:* 23.05s
+- *Total time:* 36.64s
+- *Prompt preparation time:* 0.847
+- *First-token latency:* 19
+- *Cleanup time:* 0.313
 - *Prompt tokens:* 3,491
 - *Generation tokens:* 121
 - *Total tokens:* 3,612
-- *Prompt throughput (raw):* 152 tok/s
-- *Generation throughput (raw):* 47.8 tok/s
+- *Prompt throughput (raw):* 183 tok/s
+- *Generation throughput (raw):* 47.4 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
@@ -1809,17 +1525,17 @@ Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.24s
-- *Generation time:* 16.83s
-- *Total time:* 19.44s
-- *Prompt preparation time:* 1.38
-- *First-token latency:* 13.4
-- *Cleanup time:* 0.107
+- *Model load time:* 1.21s
+- *Generation time:* 16.31s
+- *Total time:* 18.44s
+- *Prompt preparation time:* 0.921
+- *First-token latency:* 13.1
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 16,558
 - *Generation tokens:* 136
 - *Total tokens:* 16,694
-- *Prompt throughput (raw):* 1,235 tok/s
-- *Generation throughput (raw):* 56.8 tok/s
+- *Prompt throughput (raw):* 1,263 tok/s
+- *Generation throughput (raw):* 57.6 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 1.4
@@ -1885,17 +1601,17 @@ Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Wa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.17s
-- *Generation time:* 2.70s
-- *Total time:* 4.94s
-- *Prompt preparation time:* 1.06
-- *First-token latency:* 0.842
+- *Model load time:* 1.16s
+- *Generation time:* 2.52s
+- *Total time:* 4.62s
+- *Prompt preparation time:* 0.928
+- *First-token latency:* 0.735
 - *Cleanup time:* 0.113
 - *Prompt tokens:* 2,090
 - *Generation tokens:* 96
 - *Total tokens:* 2,186
-- *Prompt throughput (raw):* 2,483 tok/s
-- *Generation throughput (raw):* 101 tok/s
+- *Prompt throughput (raw):* 2,842 tok/s
+- *Generation throughput (raw):* 100 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.35
@@ -1927,62 +1643,6 @@ Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.54s
-- *Generation time:* 6.75s
-- *Total time:* 10.01s
-- *Prompt preparation time:* 0.697
-- *First-token latency:* 1.09
-- *Cleanup time:* 0.143
-- *Prompt tokens:* 590
-- *Generation tokens:* 152
-- *Total tokens:* 742
-- *Prompt throughput (raw):* 542 tok/s
-- *Generation throughput (raw):* 30.2 tok/s
-- *Peak memory (GB):* 17
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 0.44
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.012
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Swan on River Cam, Cambridge – September 2026
-Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September 2026 at 17:41 UTC+01:00; moored leisure boats and residential buildings line the riverbank under overcast conditions. The calm water reflects the boats and surrounding greenery.
-Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, Vegetation, Water reflection, Leisure boat, Cruiser, September, Aquatic bird, Overcast sky
-</pre>
-
-</details>
-
----
-
 <a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
 
 ### mlx-community/gemma-4-12B-it-4bit
@@ -1997,17 +1657,17 @@ Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverban
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 2.00s
-- *Generation time:* 2.90s
-- *Total time:* 5.67s
-- *Prompt preparation time:* 0.759
-- *First-token latency:* 0.525
-- *Cleanup time:* 0.122
+- *Model load time:* 1.86s
+- *Generation time:* 2.61s
+- *Total time:* 5.10s
+- *Prompt preparation time:* 0.62
+- *First-token latency:* 0.359
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 595
 - *Generation tokens:* 101
 - *Total tokens:* 696
-- *Prompt throughput (raw):* 1,133 tok/s
-- *Generation throughput (raw):* 59.5 tok/s
+- *Prompt throughput (raw):* 1,659 tok/s
+- *Generation throughput (raw):* 60.4 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
@@ -2058,17 +1718,17 @@ Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, R
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.67s
-- *Generation time:* 2.08s
-- *Total time:* 5.49s
-- *Prompt preparation time:* 0.742
-- *First-token latency:* 0.506
-- *Cleanup time:* 0.139
+- *Model load time:* 2.55s
+- *Generation time:* 1.88s
+- *Total time:* 5.04s
+- *Prompt preparation time:* 0.599
+- *First-token latency:* 0.416
+- *Cleanup time:* 0.144
 - *Prompt tokens:* 595
 - *Generation tokens:* 96
 - *Total tokens:* 691
-- *Prompt throughput (raw):* 1,177 tok/s
-- *Generation throughput (raw):* 106 tok/s
+- *Prompt throughput (raw):* 1,431 tok/s
+- *Generation throughput (raw):* 108 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -2114,17 +1774,17 @@ Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflect
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.82s
-- *Generation time:* 5.32s
-- *Total time:* 8.88s
-- *Prompt preparation time:* 0.73
-- *First-token latency:* 1.21
-- *Cleanup time:* 0.162
+- *Model load time:* 2.74s
+- *Generation time:* 5.08s
+- *Total time:* 8.45s
+- *Prompt preparation time:* 0.622
+- *First-token latency:* 1.12
+- *Cleanup time:* 0.154
 - *Prompt tokens:* 595
 - *Generation tokens:* 89
 - *Total tokens:* 684
-- *Prompt throughput (raw):* 492 tok/s
-- *Generation throughput (raw):* 25.8 tok/s
+- *Prompt throughput (raw):* 529 tok/s
+- *Generation throughput (raw):* 26.3 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.79
@@ -2170,18 +1830,18 @@ Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.93s
-- *Generation time:* 1.70s
-- *Total time:* 4.37s
-- *Prompt preparation time:* 0.731
-- *First-token latency:* 0.421
-- *Cleanup time:* 0.12
+- *Model load time:* 1.76s
+- *Generation time:* 1.35s
+- *Total time:* 3.74s
+- *Prompt preparation time:* 0.615
+- *First-token latency:* 0.189
+- *Cleanup time:* 0.117
 - *Prompt tokens:* 591
 - *Generation tokens:* 73
 - *Total tokens:* 664
-- *Prompt throughput (raw):* 1,405 tok/s
-- *Generation throughput (raw):* 122 tok/s
-- *Peak memory (GB):* 5.9
+- *Prompt throughput (raw):* 3,128 tok/s
+- *Generation throughput (raw):* 125 tok/s
+- *Peak memory (GB):* 6.0
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
@@ -2226,17 +1886,17 @@ Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.74s
-- *Generation time:* 2.30s
-- *Total time:* 4.10s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 1.03
-- *Cleanup time:* 0.106
+- *Model load time:* 0.61s
+- *Generation time:* 1.51s
+- *Total time:* 2.91s
+- *Prompt preparation time:* 0.792
+- *First-token latency:* 0.392
+- *Cleanup time:* 0.097
 - *Prompt tokens:* 1,379
 - *Generation tokens:* 65
 - *Total tokens:* 1,444
-- *Prompt throughput (raw):* 1,339 tok/s
-- *Generation throughput (raw):* 168 tok/s
+- *Prompt throughput (raw):* 3,519 tok/s
+- *Generation throughput (raw):* 176 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.22
@@ -2268,60 +1928,57 @@ Keywords: swan, canal, water, foliage, boats, mooring, residential, reflection, 
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
 
-### mlx-community/pixtral-12b-8bit
+### mlx-community/GLM-4.6V-nvfp4
 
 <details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* no concerns detected
+- *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.95s
-- *Generation time:* 4.99s
-- *Total time:* 7.59s
-- *Prompt preparation time:* 0.639
-- *First-token latency:* 1.77
-- *Cleanup time:* 0.137
-- *Prompt tokens:* 3,116
-- *Generation tokens:* 102
-- *Total tokens:* 3,218
-- *Prompt throughput (raw):* 1,758 tok/s
-- *Generation throughput (raw):* 38.7 tok/s
-- *Peak memory (GB):* 16
-- *Active memory (GB):* 13
-- *Cache memory (GB):* 0.59
-- *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0172
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 6.82s
+- *Generation time:* 16.15s
+- *Total time:* 23.56s
+- *Prompt preparation time:* 0.59
+- *First-token latency:* 12.4
+- *Cleanup time:* 0.268
+- *Prompt tokens:* 6,450
+- *Generation tokens:* 103
+- *Total tokens:* 6,553
+- *Prompt throughput (raw):* 520 tok/s
+- *Generation throughput (raw):* 41.6 tok/s
+- *Peak memory (GB):* 78
+- *Active memory (GB):* 62
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 61.9
+- *Post-cleanup active memory (GB):* 0.00123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1332
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Rendered prompt characters:* 1413
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-### Title:
-Swan in River with Moored Boats
-
-### Description:
-A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats and residential buildings in the background.
-
-### Keywords:
-Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, Reflection, Waterfowl, Architecture, Calm, Leisure, Riverbank
+Title: Solitary swan glides on calm river waters
+Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background under overcast lighting.
+Keywords: swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, waterfowl, waterfront, waterway, aquatic bird, greenery, trees, vegetation
 </pre>
 
 </details>
@@ -2343,22 +2000,22 @@ Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Wa
 - *Observations:* Duplicate keywords: london eye souvenir stall, london eye
   souvenir booth, london eye souvenir kiosk
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.20s
-- *Generation time:* 6.60s
-- *Total time:* 8.49s
-- *Prompt preparation time:* 0.689
-- *First-token latency:* 2.93
-- *Cleanup time:* 0.0946
+- *Model load time:* 1.17s
+- *Generation time:* 4.33s
+- *Total time:* 6.16s
+- *Prompt preparation time:* 0.651
+- *First-token latency:* 0.731
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 1,524
 - *Generation tokens:* 216
 - *Total tokens:* 1,740
-- *Prompt throughput (raw):* 521 tok/s
-- *Generation throughput (raw):* 71.5 tok/s
-- *Peak memory (GB):* 8.1
+- *Prompt throughput (raw):* 2,084 tok/s
+- *Generation throughput (raw):* 72.5 tok/s
+- *Peak memory (GB):* 8.6
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 0.31
 - *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00551
+- *Post-cleanup active memory (GB):* 0.00549
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2387,6 +2044,182 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, vegetation, water
 
 ---
 
+<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
+
+### mlx-community/Qwen2-VL-7B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.81s
+- *Generation time:* 39.51s
+- *Total time:* 41.22s
+- *Prompt preparation time:* 0.897
+- *First-token latency:* 37.4
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 16,558
+- *Generation tokens:* 117
+- *Total tokens:* 16,675
+- *Prompt throughput (raw):* 443 tok/s
+- *Generation throughput (raw):* 91.3 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 4.7
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 4.68
+- *Post-cleanup active memory (GB):* 0.00731
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1462
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Graceful Swan on the River
+
+Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
+
+Keywords: swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, greenery, water reflection, aquatic bird, nature, tranquility, serene, peaceful, waterfowl, waterway, scenic, picturesque, boating, mooring, waterfront, trees, vegetation, architecture, boat.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen38-27b-4bit"></a>
+
+### mlx-community/Qwen3.8-27B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.8-27B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Names a place the prompt did not supply: River Thames,
+  Lambeth
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 2.12s
+- *Generation time:* 62.16s
+- *Total time:* 65.24s
+- *Prompt preparation time:* 0.954
+- *First-token latency:* 57.1
+- *Cleanup time:* 0.133
+- *Prompt tokens:* 16,563
+- *Generation tokens:* 124
+- *Total tokens:* 16,687
+- *Prompt throughput (raw):* 290 tok/s
+- *Generation throughput (raw):* 29.8 tok/s
+- *Peak memory (GB):* 21
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 1.9
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.0101
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1423
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 10c35caafbb80f7dc6a7a432cdd11af10a6d4818
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-4bit/snapshots/10c35caafbb80f7dc6a7a432cdd11af10a6d4818
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Swan swimming near moored boats on the River Thames
+
+Description:
+A solitary white swan swims on the calm water of the River Thames at Lambeth, with its reflection visible on the surface. In the background, several leisure boats and cruisers are moored along the riverbank in front of brown residential buildings, framed by overhanging green foliage.
+
+Keywords:
+Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, Calm water, Leisure boat, Canopy, Urban river, Nature
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.78s
+- *Generation time:* 1.82s
+- *Total time:* 3.33s
+- *Prompt preparation time:* 0.728
+- *First-token latency:* 0.374
+- *Cleanup time:* 0.081
+- *Prompt tokens:* 1,426
+- *Generation tokens:* 98
+- *Total tokens:* 1,524
+- *Prompt throughput (raw):* 3,817 tok/s
+- *Generation throughput (raw):* 131 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.35
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0103
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1364
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Swan on River
+Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
+Keywords: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
@@ -2399,19 +2232,20 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, vegetation, water
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: reflection
+- *Observations:* Duplicate keywords: reflection; Repeats the prompt's hint
+  instead of describing the image: description
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.50s
-- *Generation time:* 4.61s
-- *Total time:* 8.87s
-- *Prompt preparation time:* 0.749
-- *First-token latency:* 1.59
-- *Cleanup time:* 0.148
+- *Model load time:* 3.32s
+- *Generation time:* 2.85s
+- *Total time:* 6.81s
+- *Prompt preparation time:* 0.627
+- *First-token latency:* 0.333
+- *Cleanup time:* 0.151
 - *Prompt tokens:* 591
 - *Generation tokens:* 80
 - *Total tokens:* 671
-- *Prompt throughput (raw):* 371 tok/s
-- *Generation throughput (raw):* 37.5 tok/s
+- *Prompt throughput (raw):* 1,775 tok/s
+- *Generation throughput (raw):* 46.1 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -2443,6 +2277,123 @@ Keywords: swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pie
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Names a place the prompt did not supply: River Cam
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.39s
+- *Generation time:* 6.49s
+- *Total time:* 9.47s
+- *Prompt preparation time:* 0.571
+- *First-token latency:* 0.933
+- *Cleanup time:* 0.151
+- *Prompt tokens:* 590
+- *Generation tokens:* 152
+- *Total tokens:* 742
+- *Prompt throughput (raw):* 632 tok/s
+- *Generation throughput (raw):* 30.3 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 0.44
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1387
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Swan on River Cam, Cambridge – September 2026
+Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September 2026 at 17:41 UTC+01:00; moored leisure boats and residential buildings line the riverbank under overcast conditions. The calm water reflects the boats and surrounding greenery.
+Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, Vegetation, Water reflection, Leisure boat, Cruiser, September, Aquatic bird, Overcast sky
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### mlx-community/pixtral-12b-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.84s
+- *Generation time:* 4.71s
+- *Total time:* 7.12s
+- *Prompt preparation time:* 0.566
+- *First-token latency:* 1.65
+- *Cleanup time:* 0.126
+- *Prompt tokens:* 3,116
+- *Generation tokens:* 102
+- *Total tokens:* 3,218
+- *Prompt throughput (raw):* 1,883 tok/s
+- *Generation throughput (raw):* 40.2 tok/s
+- *Peak memory (GB):* 16
+- *Active memory (GB):* 13
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 13.5
+- *Post-cleanup active memory (GB):* 0.0171
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1332
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+### Title:
+Swan in River with Moored Boats
+
+### Description:
+A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats and residential buildings in the background.
+
+### Keywords:
+Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, Reflection, Waterfowl, Architecture, Calm, Leisure, Riverbank
+</pre>
+
+</details>
+
+---
+
 <a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
 
 ### LiquidAI/LFM2.5-VL-450M-MLX-bf16
@@ -2457,24 +2408,25 @@ Keywords: swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pie
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Generation was stopped early
   after sustained repeated output; Duplicate keywords: canal, water,
-  architecture, waterway, aquatic bird, waterfront
+  architecture, waterway, aquatic bird, waterfront; Repeats the prompt's hint
+  instead of describing the image: description
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.42s
-- *Generation time:* 1.18s
-- *Total time:* 2.41s
-- *Prompt preparation time:* 0.486
-- *First-token latency:* 0.276
-- *Cleanup time:* 0.0702
+- *Model load time:* 0.41s
+- *Generation time:* 1.02s
+- *Total time:* 2.26s
+- *Prompt preparation time:* 0.496
+- *First-token latency:* 0.116
+- *Cleanup time:* 0.0727
 - *Prompt tokens:* 2,112
 - *Generation tokens:* 200
 - *Total tokens:* 2,312
-- *Prompt throughput (raw):* 7,665 tok/s
-- *Generation throughput (raw):* 470 tok/s
+- *Prompt throughput (raw):* 18,197 tok/s
+- *Generation throughput (raw):* 476 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.18
 - *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.00015
+- *Post-cleanup active memory (GB):* 0.000134
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2520,22 +2472,22 @@ Swans, canal, water, serene, leisure, boats, water, architecture, greenery, wate
 - *Maintainer status:* none
 - *Observations:* Response appears cut off at the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.47s
-- *Generation time:* 20.53s
-- *Total time:* 23.62s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 3.21
-- *Cleanup time:* 0.128
+- *Model load time:* 2.37s
+- *Generation time:* 17.25s
+- *Total time:* 20.21s
+- *Prompt preparation time:* 0.587
+- *First-token latency:* 0.727
+- *Cleanup time:* 0.119
 - *Prompt tokens:* 1,324
 - *Generation tokens:* 1,000
 - *Total tokens:* 2,324
-- *Prompt throughput (raw):* 413 tok/s
-- *Generation throughput (raw):* 60.0 tok/s
+- *Prompt throughput (raw):* 1,822 tok/s
+- *Generation throughput (raw):* 63.0 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00279
+- *Post-cleanup active memory (GB):* 0.00277
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2605,22 +2557,22 @@ Keywords: Swans, Canal, Motorboat,
   scenery, riverside beauty, riverside charm, riverside tranquility, riverside
   serenity, riverside calmness, riverside peacefulness
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.75s
-- *Generation time:* 13.56s
-- *Total time:* 15.93s
-- *Prompt preparation time:* 0.609
-- *First-token latency:* 2.48
-- *Cleanup time:* 0.113
+- *Model load time:* 1.36s
+- *Generation time:* 12.72s
+- *Total time:* 14.66s
+- *Prompt preparation time:* 0.567
+- *First-token latency:* 1.47
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 301
 - *Generation tokens:* 275
 - *Total tokens:* 576
-- *Prompt throughput (raw):* 121 tok/s
-- *Generation throughput (raw):* 26.1 tok/s
-- *Peak memory (GB):* 9.2
+- *Prompt throughput (raw):* 205 tok/s
+- *Generation throughput (raw):* 25.7 tok/s
+- *Peak memory (GB):* 9.8
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 0.95
 - *Model-load active memory (GB):* 6.02
-- *Post-cleanup active memory (GB):* 0.00357
+- *Post-cleanup active memory (GB):* 0.00356
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2664,22 +2616,22 @@ Keywords: riverside residential area, leisure boats, calm waters, serene atmosph
 - *Observations:* Response repeats the same text; Response appears cut off at
   the token limit
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.85s
-- *Generation time:* 60.93s
-- *Total time:* 63.38s
-- *Prompt preparation time:* 0.605
-- *First-token latency:* 1.59
-- *Cleanup time:* 0.11
+- *Model load time:* 1.83s
+- *Generation time:* 55.34s
+- *Total time:* 57.79s
+- *Prompt preparation time:* 0.608
+- *First-token latency:* 1.63
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 301
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,301
-- *Prompt throughput (raw):* 189 tok/s
-- *Generation throughput (raw):* 17.0 tok/s
+- *Prompt throughput (raw):* 185 tok/s
+- *Generation throughput (raw):* 18.8 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.40
 - *Model-load active memory (GB):* 11.4
-- *Post-cleanup active memory (GB):* 0.0041
+- *Post-cleanup active memory (GB):* 0.00408
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2708,6 +2660,62 @@ Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential B
 
 ---
 
+<a id="model-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
+
+### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Muse-Glimmer-30B-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Response appears cut off at the token limit
+- *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Model load time:* 3.25s
+- *Generation time:* 49.12s
+- *Total time:* 53.04s
+- *Prompt preparation time:* 0.664
+- *First-token latency:* 7.3
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 4,403
+- *Generation tokens:* 1,000
+- *Total tokens:* 5,403
+- *Prompt throughput (raw):* 603 tok/s
+- *Generation throughput (raw):* 24.3 tok/s
+- *Peak memory (GB):* 25
+- *Active memory (GB):* 24
+- *Cache memory (GB):* 0.23
+- *Model-load active memory (GB):* 23.9
+- *Post-cleanup active memory (GB):* 0.0059
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1570
+- *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 98377360cbc84f982e90336f956b08adb46cad88
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Muse-Glimmer-30B-OptiQ-4bit/snapshots/98377360cbc84f982e90336f956b08adb46cad88
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Mute Swan on River with Moored Boats
+Description:
+Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar II’ and ‘Magna Carta’ with red and blue covers at a wooden pier beneath a brown-brick apartment block with balconies, framed by overhanging tree branches and foreground foliage in soft daylight.
+Keywords: mute swan, river
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
 
 ### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
@@ -2723,22 +2731,22 @@ Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential B
 - *Observations:* Generation was stopped early after sustained repeated
   output; Duplicate keywords: wildlife, animal, bird
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.98s
-- *Generation time:* 37.54s
-- *Total time:* 40.50s
-- *Prompt preparation time:* 0.977
-- *First-token latency:* 34
+- *Model load time:* 1.95s
+- *Generation time:* 38.39s
+- *Total time:* 41.31s
+- *Prompt preparation time:* 0.969
+- *First-token latency:* 34.9
 - *Cleanup time:* 0.137
 - *Prompt tokens:* 16,547
 - *Generation tokens:* 200
 - *Total tokens:* 16,747
-- *Prompt throughput (raw):* 487 tok/s
-- *Generation throughput (raw):* 74.8 tok/s
+- *Prompt throughput (raw):* 475 tok/s
+- *Generation throughput (raw):* 74.7 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 4.0
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00795
+- *Post-cleanup active memory (GB):* 0.00793
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2780,17 +2788,17 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.35s
-- *Generation time:* 1.22s
-- *Total time:* 2.46s
-- *Prompt preparation time:* 0.886
-- *First-token latency:* 0.305
-- *Cleanup time:* 0.0787
+- *Model load time:* 0.34s
+- *Generation time:* 1.02s
+- *Total time:* 2.21s
+- *Prompt preparation time:* 0.84
+- *First-token latency:* 0.122
+- *Cleanup time:* 0.0747
 - *Prompt tokens:* 1,205
 - *Generation tokens:* 33
 - *Total tokens:* 1,238
-- *Prompt throughput (raw):* 3,952 tok/s
-- *Generation throughput (raw):* 314 tok/s
+- *Prompt throughput (raw):* 9,864 tok/s
+- *Generation throughput (raw):* 320 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -2835,20 +2843,20 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.89s
-- *Generation time:* 3.38s
-- *Total time:* 5.98s
-- *Prompt preparation time:* 0.688
-- *First-token latency:* 1.48
+- *Model load time:* 1.78s
+- *Generation time:* 2.07s
+- *Total time:* 4.43s
+- *Prompt preparation time:* 0.551
+- *First-token latency:* 0.302
 - *Cleanup time:* 0.126
 - *Prompt tokens:* 589
 - *Generation tokens:* 88
 - *Total tokens:* 677
-- *Prompt throughput (raw):* 397 tok/s
-- *Generation throughput (raw):* 69.6 tok/s
-- *Peak memory (GB):* 6.9
+- *Prompt throughput (raw):* 1,952 tok/s
+- *Generation throughput (raw):* 71.0 tok/s
+- *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
-- *Cache memory (GB):* 0.04
+- *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
 - *Post-cleanup active memory (GB):* 0.0125
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2891,17 +2899,17 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
   after sustained repeated output; Unrecognised model control tokens remain
   visible; Required labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.15s
-- *Generation time:* 3.62s
-- *Total time:* 5.51s
-- *Prompt preparation time:* 0.737
-- *First-token latency:* 0.902
-- *Cleanup time:* 0.187
+- *Model load time:* 1.12s
+- *Generation time:* 3.47s
+- *Total time:* 5.26s
+- *Prompt preparation time:* 0.665
+- *First-token latency:* 0.877
+- *Cleanup time:* 0.169
 - *Prompt tokens:* 2,195
 - *Generation tokens:* 200
 - *Total tokens:* 2,395
-- *Prompt throughput (raw):* 2,434 tok/s
-- *Generation throughput (raw):* 98.7 tok/s
+- *Prompt throughput (raw):* 2,504 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.70
@@ -2956,22 +2964,22 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.55s
-- *Generation time:* 1.42s
-- *Total time:* 2.73s
-- *Prompt preparation time:* 0.755
-- *First-token latency:* 0.284
-- *Cleanup time:* 0.11
+- *Model load time:* 0.59s
+- *Generation time:* 1.14s
+- *Total time:* 2.34s
+- *Prompt preparation time:* 0.607
+- *First-token latency:* 0.0877
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 330
 - *Generation tokens:* 92
 - *Total tokens:* 422
-- *Prompt throughput (raw):* 1,162 tok/s
-- *Generation throughput (raw):* 198 tok/s
-- *Peak memory (GB):* 1.5
+- *Prompt throughput (raw):* 3,762 tok/s
+- *Generation throughput (raw):* 193 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 0.614
-- *Post-cleanup active memory (GB):* 0.0159
+- *Post-cleanup active memory (GB):* 0.0158
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3011,17 +3019,17 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.72s
-- *Generation time:* 2.59s
-- *Total time:* 5.05s
-- *Prompt preparation time:* 0.737
-- *First-token latency:* 1.7
-- *Cleanup time:* 0.131
+- *Model load time:* 1.62s
+- *Generation time:* 1.70s
+- *Total time:* 4.02s
+- *Prompt preparation time:* 0.688
+- *First-token latency:* 0.911
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 1,344
 - *Generation tokens:* 7
 - *Total tokens:* 1,351
-- *Prompt throughput (raw):* 791 tok/s
-- *Generation throughput (raw):* 35.7 tok/s
+- *Prompt throughput (raw):* 1,475 tok/s
+- *Generation throughput (raw):* 36.5 tok/s
 - *Peak memory (GB):* 9.7
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.8
@@ -3076,12 +3084,12 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Root exception message:* Model type internvl not supported. Error: No
   module named 'mlx_vlm.speculative.drafters.internvl'
 - *Arch supported by installed mlx-vlm:* no (model_type internvl)
-- *Model load time:* 0.19s
+- *Model load time:* 0.16s
 - *Generation time:* -
-- *Total time:* 0.19s
+- *Total time:* 0.16s
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0839
+- *Cleanup time:* 0.0649
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3091,7 +3099,7 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00213
+- *Post-cleanup active memory (GB):* 0.00212
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -3108,10 +3116,10 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3121,7 +3129,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -3143,7 +3151,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3154,7 +3162,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -3165,7 +3173,7 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 ```text
 === STDERR ===
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 3388.16it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4711.94it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 ```
 
@@ -3199,12 +3207,12 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Root exception message:* cu_seqlens mismatch: total_patches=7600
   calculated=3800 grid=[(1, 50, 76)]
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 1.51s
+- *Model load time:* 0.84s
 - *Generation time:* 0.64s
-- *Total time:* 2.79s
-- *Prompt preparation time:* 0.642
+- *Total time:* 2.13s
+- *Prompt preparation time:* 0.646
 - *First-token latency:* -
-- *Cleanup time:* 0.0955
+- *Cleanup time:* 0.0932
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3214,7 +3222,7 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.0041
+- *Post-cleanup active memory (GB):* 0.00408
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -3222,8 +3230,8 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mage-VL-OptiQ-4bit/snapshots/bde6c9c7146acff6af09e203245014f19306c5c5
+- *Resolved model revision:* c98dad5f92f13334cc679c93fb9f185ab49ed626
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Mage-VL-OptiQ-4bit/snapshots/c98dad5f92f13334cc679c93fb9f185ab49ed626
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -3232,15 +3240,15 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
     ...<5 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -3269,7 +3277,7 @@ ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3280,7 +3288,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14484, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -3290,12 +3298,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14400, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13712, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -3308,21 +3316,19 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 ```text
 === STDERR ===
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files:  40%|####      | 4/10 [00:00<00:00, 13.69it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23.34it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
-[21:31:24] Generation error for mlx-community/Mage-VL-OptiQ-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3074.10it/s]
+[23:33:20] Generation error for mlx-community/Mage-VL-OptiQ-4bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in
            _run_generation_guarded
                return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in
            _generate_once
                return _generate_with_repetition_guard(
                    model=prepared.model,
                ...<5 lines>...
                    **prepared.generate_kwargs,
                )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in
            _generate_with_repetition_guard
                for chunk in stream_generate(
                             ~~~~~~~~~~~~~~~^
@@ -3391,7 +3397,7 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
 - *Total time:* 0.25s
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0776
+- *Cleanup time:* 0.0671
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3401,7 +3407,7 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00592
+- *Post-cleanup active memory (GB):* 0.0059
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -3418,10 +3424,10 @@ Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3431,7 +3437,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -4184,7 +4190,7 @@ lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -4195,7 +4201,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 729 parameters not in model: 
 backbone.embeddings.biases,
@@ -4935,7 +4941,7 @@ lm_head.weight.
 ```text
 === STDERR ===
 Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4788.46it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4387.35it/s]
 ```
 
 </details>

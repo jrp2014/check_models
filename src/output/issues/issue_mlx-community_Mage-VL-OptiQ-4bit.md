@@ -30,13 +30,13 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 - *Root error type:* ValueError
 - *Root error message:* cu_seqlens mismatch: total_patches=7600
   calculated=3800 grid=[(1, 50, 76)]
-- *Resolved model revision:* bde6c9c7146acff6af09e203245014f19306c5c5
+- *Resolved model revision:* c98dad5f92f13334cc679c93fb9f185ab49ed626
 - *Processor class:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* exception
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.004098674
+- *Post-cleanup active memory (GB):* 0.00408229
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
@@ -54,15 +54,15 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
     ...<5 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -91,7 +91,7 @@ ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -102,7 +102,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14224, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14484, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -112,12 +112,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14140, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14400, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13452, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13712, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -132,21 +132,19 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 ```text
 === STDERR ===
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files:  40%|####      | 4/10 [00:00<00:00, 13.69it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23.34it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 21.49it/s]
-[21:31:24] Generation error for mlx-community/Mage-VL-OptiQ-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13443, in
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3074.10it/s]
+[23:33:20] Generation error for mlx-community/Mage-VL-OptiQ-4bit
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in
            _run_generation_guarded
                return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14120, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in
            _generate_once
                return _generate_with_repetition_guard(
                    model=prepared.model,
                ...<5 lines>...
                    **prepared.generate_kwargs,
                )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14015, in
+             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in
            _generate_with_repetition_guard
                for chunk in stream_generate(
                             ~~~~~~~~~~~~~~~^
@@ -256,7 +254,7 @@ Write:
 Return exactly these three sections and nothing else:
 Title:
 Description:
-Keywords:' --max-tokens 1000 --temperature 0.0 --revision bde6c9c7146acff6af09e203245014f19306c5c5 --trust-remote-code --seed 0 --prefill-step-size 2048
+Keywords:' --max-tokens 1000 --temperature 0.0 --revision c98dad5f92f13334cc679c93fb9f185ab49ed626 --trust-remote-code --seed 0 --prefill-step-size 2048
 ```
 
 ## Provenance and Environment
@@ -274,7 +272,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision bde6c9c7146acff6af09e2
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.26; revision e5d6baca2ad0c1dd4365a0738b6bbd9c1321ea00; clean |
+| check_models    | 0.17.31; revision 44d15af188596e99645f997ef7551bdd95ce39b1; dirty |
 
 ### Full environment evidence
 

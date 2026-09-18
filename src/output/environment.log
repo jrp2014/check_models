@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-09-18 21:27:50 BST
+FULL ENVIRONMENT DUMP - 2026-09-18 23:30:14 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 164
+Total packages: 169
 
 annotated-doc==0.0.5
 annotated-types==0.8.0
@@ -38,8 +38,10 @@ fsspec==2026.9.0
 h11==0.16.0
 hf-xet==1.6.0
 httpcore==1.0.9
+httpcore2==2.13.0
 httpx==0.28.1
 httpx-sse==0.4.3
+httpx2==2.13.0
 huggingface_hub==1.32.0
 identify==2.6.19
 idna==3.20
@@ -61,6 +63,7 @@ llguidance==1.8.0
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
 mcp==1.30.0
+mcp-types==2.2.0
 mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
@@ -82,6 +85,7 @@ nodeenv==1.10.0
 num2words==0.5.14
 numpy==2.5.3
 opencv-python==5.0.0.93
+opentelemetry-api==1.44.0
 packageurl-python==0.17.6
 packaging==26.3
 pathspec==1.1.1
@@ -93,7 +97,7 @@ pip_audit==2.10.1
 platformdirs==4.11.10
 pluggy==1.6.0
 pre_commit==4.6.2
-protobuf==7.36.1
+protobuf==7.36.2
 psutil==7.2.2
 py-serializable==2.1.0
 pycparser==3.0
@@ -104,7 +108,7 @@ Pygments==2.21.0
 PyJWT==2.14.0
 pyparsing==3.3.2
 pyperclip==1.11.0
-pyproject_hooks==1.2.0
+pyproject_hooks==1.3.3
 pyrefly==1.3.1
 pytest==9.1.1
 pytest-cov==7.1.0
@@ -149,6 +153,7 @@ tree-sitter-java==0.23.5
 tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
+truststore==0.10.4
 ty==0.0.82
 typer==0.27.2
 types-defusedxml==0.7.0.20260504
@@ -172,5 +177,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-09-18 21:27:50 BST
+Environment dump completed at 2026-09-18 23:30:14 BST
 ================================================================================

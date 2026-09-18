@@ -35,7 +35,7 @@ builtins.ValueError: Model loading failed: Received 729 parameters not in model;
   backbone.embeddings.scales, backbone.embeddings.weight.
 - *Resolved model revision:* 8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00591744
+- *Post-cleanup active memory (GB):* 0.005901056
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 20.65
 - *Parameter count:* 30.00B total, 3.00B active (name-estimate)
@@ -50,10 +50,10 @@ builtins.ValueError: Model loading failed: Received 729 parameters not in model;
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -63,7 +63,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -816,7 +816,7 @@ lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -827,7 +827,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 729 parameters not in model: 
 backbone.embeddings.biases,
@@ -1569,7 +1569,7 @@ lm_head.weight.
 ```text
 === STDERR ===
 Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4788.46it/s]
+Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4387.35it/s]
 ```
 
 ## Reproduction inputs
@@ -1631,7 +1631,7 @@ python -m mlx_vlm.generate --model mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.26; revision e5d6baca2ad0c1dd4365a0738b6bbd9c1321ea00; clean |
+| check_models    | 0.17.31; revision 44d15af188596e99645f997ef7551bdd95ce39b1; dirty |
 
 ### Full environment evidence
 

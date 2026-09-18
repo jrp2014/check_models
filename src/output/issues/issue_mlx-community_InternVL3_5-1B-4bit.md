@@ -31,7 +31,7 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
   named 'mlx_vlm.speculative.drafters.internvl'
 - *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002132546
+- *Post-cleanup active memory (GB):* 0.002116162
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 1.08
 - *Parameter count:* 1.00B (name-estimate)
@@ -46,10 +46,10 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14197, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13109, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -59,7 +59,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 823, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -81,7 +81,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15335, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -92,7 +92,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14212, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -105,7 +105,7 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 ```text
 === STDERR ===
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 3388.16it/s]
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4711.94it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 ```
 
@@ -168,7 +168,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.26; revision e5d6baca2ad0c1dd4365a0738b6bbd9c1321ea00; clean |
+| check_models    | 0.17.31; revision 44d15af188596e99645f997ef7551bdd95ce39b1; dirty |
 
 ### Full environment evidence
 
