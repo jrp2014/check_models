@@ -13840,31 +13840,6 @@ def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
     _run_cleanup_step("mx.reset_peak_memory", reset_peak_memory_fn)
 
 
-def _generate_with_processor_passthrough(
-    *,
-    generate_fn: Callable[..., GenerationResult | SupportsGenerationResult],
-    model: nn.Module,
-    processor: ProcessorLike | PreTrainedTokenizer,
-    params: ProcessImageParams,
-    formatted_prompt: str,
-    generate_kwargs: GenerateKwargs,
-) -> GenerationResult | SupportsGenerationResult:
-    """Call upstream generate() with user-provided passthrough kwargs.
-
-    This branch is intentionally dynamic because ``processor_kwargs`` is a
-    user-supplied JSON object whose keys depend on the active upstream model.
-    """
-    processor_kwargs = params.processor_kwargs or {}
-    return generate_fn(
-        model=model,
-        processor=processor,
-        prompt=formatted_prompt,
-        image=str(params.image_path),
-        **processor_kwargs,
-        **generate_kwargs,
-    )
-
-
 def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
     """Best-effort sample one non-negative MLX allocator metric in decimal GB."""
     getter = cast("Callable[[], object] | None", getattr(mx, getter_name, None))
@@ -13932,36 +13907,24 @@ def _finalize_process_result(
     post_cleanup_cache_memory_gb: float | None = None,
 ) -> PerformanceResult:
     """Attach final runtime diagnostics after cleanup has completed."""
-    runtime_diagnostics = _build_runtime_diagnostics(
-        phase_timer,
-        stop_reason=(
-            result_payload.runtime_diagnostics.stop_reason
-            if result_payload is not None and result_payload.runtime_diagnostics is not None
-            else stop_reason
-        ),
-        first_token_latency_s=(
-            result_payload.runtime_diagnostics.first_token_latency_s
-            if result_payload is not None and result_payload.runtime_diagnostics is not None
-            else None
-        ),
-        time_to_first_token_s=(
-            result_payload.runtime_diagnostics.time_to_first_token_s
-            if result_payload is not None and result_payload.runtime_diagnostics is not None
-            else None
-        ),
-        first_token_peak_memory_gb=(
-            result_payload.runtime_diagnostics.first_token_peak_memory_gb
-            if result_payload is not None and result_payload.runtime_diagnostics is not None
-            else None
-        ),
-        model_load_active_memory_gb=(
-            result_payload.runtime_diagnostics.model_load_active_memory_gb
-            if result_payload is not None and result_payload.runtime_diagnostics is not None
-            else None
-        ),
-        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
-        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
-    )
+    existing = result_payload.runtime_diagnostics if result_payload is not None else None
+    if existing is None:
+        runtime_diagnostics = _build_runtime_diagnostics(
+            phase_timer,
+            stop_reason=stop_reason,
+            post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+            post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
+        )
+    else:
+        # Cleanup is the only phase that ran since the record was built, so
+        # only its facts are added; every other field, including any added
+        # later, survives finalization untouched.
+        runtime_diagnostics = replace(
+            existing,
+            cleanup_time_s=phase_timer.duration("cleanup"),
+            post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+            post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
+        )
     if result_payload is None:
         fallback_error = RuntimeError(
             "process_image_with_model completed without producing a result",
@@ -14364,19 +14327,11 @@ def _execute_prepared_generation(
         _set_failure_phase(phase_callback, "generation_after_first_token")
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
-        if prepared.processor_passthrough_kwargs:
-            return _generate_with_processor_passthrough(
-                generate_fn=functools.partial(
-                    _generate_with_repetition_guard,
-                    on_first_token=_note_first_token,
-                    observations=observations,
-                ),
-                model=prepared.model,
-                processor=prepared.generation_processor,
-                params=params,
-                formatted_prompt=prepared.formatted_prompt,
-                generate_kwargs=prepared.generate_kwargs,
-            )
+        # ``processor_passthrough_kwargs`` is a user-supplied JSON object whose
+        # keys depend on the active upstream model (usually empty). A key that
+        # collides with a harness argument or a generate kwarg raises
+        # TypeError here, which the guarded caller reports as a generation
+        # failure rather than letting one silently win.
         return _generate_with_repetition_guard(
             model=prepared.model,
             processor=prepared.generation_processor,
@@ -14384,6 +14339,7 @@ def _execute_prepared_generation(
             image=str(params.image_path),
             on_first_token=_note_first_token,
             observations=observations,
+            **prepared.processor_passthrough_kwargs,
             **prepared.generate_kwargs,
         )
 
@@ -16867,30 +16823,32 @@ def _hf_cache_revision_files(revision: object) -> frozenset[str]:
     )
 
 
-def _hf_cache_main_revision_files(repo: object) -> frozenset[str] | None:
-    """Return cached files for the repo's main revision, if present."""
+def _hf_cache_main_revision(repo: object) -> object | None:
+    """Return the cached revision that ``main`` points at, if any.
+
+    Discovery only: runtime snapshot resolution has its own, deliberately
+    different, fallback policy and does not go through here.
+    """
     refs = getattr(repo, "refs", None)
     if isinstance(refs, Mapping) and "main" in refs:
-        return _hf_cache_revision_files(refs["main"])
-
-    for revision in getattr(repo, "revisions", ()):
-        revision_refs = getattr(revision, "refs", ())
-        if "main" in revision_refs:
-            return _hf_cache_revision_files(revision)
+        return cast("object", refs["main"])
+    revisions: Iterable[object] = getattr(repo, "revisions", ())
+    for revision in revisions:
+        if "main" in getattr(revision, "refs", ()):
+            return revision
     return None
+
+
+def _hf_cache_main_revision_files(repo: object) -> frozenset[str] | None:
+    """Return cached files for the repo's main revision, if present."""
+    revision = _hf_cache_main_revision(repo)
+    return None if revision is None else _hf_cache_revision_files(revision)
 
 
 def _hf_cache_main_snapshot_path(repo: object) -> Path | None:
     """Return the snapshot directory for the repo's main revision, if present."""
-    refs = getattr(repo, "refs", None)
-    if isinstance(refs, Mapping) and "main" in refs:
-        snapshot = getattr(refs["main"], "snapshot_path", None)
-        return Path(str(snapshot)) if snapshot else None
-    for revision in getattr(repo, "revisions", ()):
-        if "main" in getattr(revision, "refs", ()):
-            snapshot = getattr(revision, "snapshot_path", None)
-            return Path(str(snapshot)) if snapshot else None
-    return None
+    snapshot = getattr(_hf_cache_main_revision(repo), "snapshot_path", None)
+    return Path(str(snapshot)) if snapshot else None
 
 
 def _mlx_vlm_package_root() -> Path | None:
@@ -19687,7 +19645,16 @@ def _baseline_from_jsonl_text(text: str, label: str) -> ComparisonBaseline:
     A schema-2 baseline fails the single loader's format check; the caller
     logs that one-time incomparability instead of keeping an adapter.
     """
-    run = _load_retained_run_text(text, label)
+    return _comparison_side(_load_retained_run_text(text, label), label)
+
+
+def _comparison_side(run: RetainedRun, label: str) -> ComparisonBaseline:
+    """Project one retained run into the facts a comparison reads.
+
+    Both sides of a comparison go through here, so the current run is judged
+    on exactly the image and generation settings it persists, never on a
+    separate reading of live inputs that could disagree with the record.
+    """
     source = _run_issue_summary_source_from_run(run)
     return ComparisonBaseline(
         label=label,
@@ -21185,6 +21152,11 @@ def _validate_schema3_metadata_fields(metadata_value: dict[str, JsonLike]) -> No
         raise RunIssueSummaryValidationError(message)
 
 
+# =============================================================================
+# SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)
+# =============================================================================
+
+
 class RunIssueSummaryValidationError(ValueError):
     """Type-shape violation in retained inputs.
 
@@ -21604,6 +21576,11 @@ def _github_issue_report_paths(
         used_filenames.add(filename)
         paths[model_name] = issues_dir / filename
     return paths
+
+
+# =============================================================================
+# SECTION: RUN ISSUE SUMMARY (paste-ready whole-run report)
+# =============================================================================
 
 
 def _reproduction_image_format(image: RunImageRecord) -> str:
@@ -22833,6 +22810,11 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     )
 
 
+# =============================================================================
+# SECTION: OUTPUT INDEX
+# =============================================================================
+
+
 def _output_index_dashboard_lines(
     assessments: Sequence[tuple[str, ResultAssessment]],
     run_duration_seconds: float | None = None,
@@ -22970,6 +22952,11 @@ def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
         *lines,
         f"<!-- markdownlint-enable {rules} -->",
     ]
+
+
+# =============================================================================
+# SECTION: NATIVE REPRODUCTION COMMANDS & ISSUE DRAFTS
+# =============================================================================
 
 
 def _issue_repro_portable_path_ref(raw_ref: str, *, fallback: str) -> str:
@@ -23351,6 +23338,11 @@ def _generate_github_issue_reports(
     return generated
 
 
+# =============================================================================
+# SECTION: REPORT PUBLICATION (artifact plan, retained run, comparison wiring)
+# =============================================================================
+
+
 def _write_diagnostics_artifacts(
     *,
     args: argparse.Namespace,
@@ -23729,24 +23721,17 @@ def _compute_run_comparison(
         baseline = _resolve_comparison_baseline(spec, inputs.output_paths.jsonl)
         if baseline is None:
             return None
-        current_image = (
-            _run_image_record(inputs.image_path, inputs.report_context.image_profile)
-            if inputs.image_path is not None
-            else None
-        )
+        side = _comparison_side(current, "current run")
         comparison = compare_run_results(
-            current.results,
+            side.results,
             baseline,
             history_path=_history_path_for_jsonl(inputs.output_paths.jsonl),
-            comparison_fingerprint=_comparison_fingerprint_from_metadata(current.metadata),
+            comparison_fingerprint=_comparison_fingerprint_from_metadata(side.metadata),
             history_excludes_current=inputs.history_appended,
-            current_execution_mode=str(current.metadata.get("execution_mode", "in_process")),
-            current_metadata=current.metadata,
-            current_image=current_image,
-            current_generation_settings=tuple(
-                (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
-                for key, value in sorted(_common_generation_settings(inputs.results).items())
-            ),
+            current_execution_mode=str(side.metadata.get("execution_mode", "in_process")),
+            current_metadata=side.metadata,
+            current_image=side.image,
+            current_generation_settings=side.generation_settings,
         )
         if comparison is None:
             return None
@@ -24025,7 +24010,9 @@ def _generate_reports_and_log_outputs(
     return tuple(outcomes)
 
 
-# ---------- Phase 5: Automatic Differential Reruns ----------
+# =============================================================================
+# SECTION: TRIAGE RERUNS, DASHBOARD & FINALIZATION
+# =============================================================================
 
 RERUN_TRIAGE_MAX_TOKENS: Final[int] = 100
 RERUN_TRIAGE_TIMEOUT: Final[float] = 60.0

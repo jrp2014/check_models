@@ -1335,6 +1335,11 @@ def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
     # The stamp lives under .git so it never dirties the checkout it describes,
     # and it is written only after a successful mlx install.
     assert '"$1/.git/check_models_build_toolchain"' in update_script
+    # A changed compiler only warns unless the rebuild is asked for: upstream
+    # main may not compile under a new Xcode, and a failed build would swap
+    # the working local build for a PyPI wheel.
+    assert 'if [[ "${MLX_REBUILD_ON_TOOLCHAIN_CHANGE:-0}" == "1" ]]; then' in update_script
+    assert "MLX_REBUILD_ON_TOOLCHAIN_CHANGE" in (PKG_ROOT / "README.md").read_text(encoding="utf-8")
     assert update_script.index("installed successfully") < update_script.index(
         'metal_compiler_version > "$(mlx_build_toolchain_stamp'
     )

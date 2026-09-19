@@ -57,7 +57,13 @@ The file is organized in this order — search for these exact landmark headers 
 | Isolated model execution | `--isolate` child-interpreter worker: `_run_model_isolated`, `_run_isolated_worker`, JSON round-trip of `PerformanceResult` | `SECTION: ISOLATED MODEL EXECUTION (one child interpreter per model)` |
 | CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
 | Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
-| Run comparison | `--compare-with` baseline resolution, `compare_run_results`, history noise bands, summary section | `SECTION: RUN COMPARISON (current sweep vs a retained baseline)` |
+| Run comparison | `--compare-with` baseline resolution, `compare_run_results`, history noise bands, comparison JSON and summary section | `SECTION: RUN COMPARISON (current sweep vs a retained baseline)` |
+| Retained run validation | `RunIssueSummaryValidationError`, `_validate_run_issue_result`, `_run_issue_summary_source_from_run` | `SECTION: RETAINED RUN VALIDATION (results.jsonl to summary source)` |
+| Run issue summary | reproduction facts, quality table, clusters, `generate_run_issue_summary_report`, `regenerate_run_issue_summary` | `SECTION: RUN ISSUE SUMMARY (paste-ready whole-run report)` |
+| Output index | `_output_index_dashboard_lines`, `generate_output_index_report` | `SECTION: OUTPUT INDEX` |
+| Native reproduction commands & issue drafts | `build_native_mlx_vlm_repro_command_spec`, `_generate_github_issue_reports` | `SECTION: NATIVE REPRODUCTION COMMANDS & ISSUE DRAFTS` |
+| Report publication | `_build_report_artifacts`, `_compute_run_comparison`, `_build_retained_run_guarded`, `_generate_reports_and_log_outputs` | `SECTION: REPORT PUBLICATION (artifact plan, retained run, comparison wiring)` |
+| Triage reruns, dashboard & finalization | `_run_differential_reruns`, `_print_reports_dashboard`, `finalize_execution` | `SECTION: TRIAGE RERUNS, DASHBOARD & FINALIZATION` |
 | Main orchestration & argparse | `main()`, `main_cli()`, `_build_cli_parser()` | `SECTION: MAIN ORCHESTRATION & ARGPARSE` |
 
 ### 4. Architecture & patterns

@@ -6,6 +6,23 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Less repeated data plumbing in the monolith, no behaviour change intended:
+  one generation call instead of two branches and a passthrough adapter
+  (processor kwargs are splatted into the same call, so a key colliding with
+  a harness or generate argument still raises); finalization updates the
+  existing runtime diagnostics with cleanup facts via `dataclasses.replace`
+  instead of copying five fields by hand, so later fields cannot be dropped;
+  cache discovery selects the `main` revision once; and the current run's
+  comparison inputs come from the same retained-run projection as the
+  baseline's rather than from a second reading of live inputs.
+- The 4,838-line "RUN COMPARISON" section is split by accurate banners into
+  run comparison, retained-run validation, run issue summary, output index,
+  native reproduction commands and issue drafts, report publication, and
+  triage reruns/finalization; the Copilot section map lists all seven.
+- `tools/update.sh` only warns when the Metal compiler differs from the one
+  recorded for the local mlx build; `MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1` opts
+  into the rebuild. Upstream `main` may not compile under a brand-new Xcode,
+  and a failed build would replace the working local build with a PyPI wheel.
 - `tools/update.sh` rebuilds the local mlx checkout when the Metal compiler
   differs from the one that built the current install, even if upstream is
   unchanged and the checkout is clean: the metallib is a product of the

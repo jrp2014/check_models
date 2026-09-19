@@ -1019,7 +1019,16 @@ update_local_mlx_repos() {
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			toolchain_matches="$(mlx_build_toolchain_matches "${REPO_PATHS[idx]}")"
 			if [[ "$toolchain_matches" != "1" ]]; then
-				echo "[update.sh] Metal compiler differs from the one recorded for this mlx build ($(metal_compiler_version)) — rebuild forced"
+				if [[ "${MLX_REBUILD_ON_TOOLCHAIN_CHANGE:-0}" == "1" ]]; then
+					echo "[update.sh] Metal compiler differs from the one recorded for this mlx build ($(metal_compiler_version)) — rebuild forced (MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1)"
+				else
+					# Advisory by default: upstream main may not compile under a
+					# brand-new Xcode, and a failed build would replace the
+					# working local build with a PyPI wheel.
+					echo "⚠️  Metal compiler ($(metal_compiler_version)) differs from the one recorded for this mlx build, or none is recorded."
+					echo "   Kernels built by the old toolchain stay in use. To rebuild: MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1 bash tools/update.sh"
+					toolchain_matches=1
+				fi
 			fi
 		fi
 		if [[ "$(mlx_repo_rebuild_decision "${FORCE_REINSTALL:-0}" "${REPO_UNCHANGED[idx]}" "${REPO_DIRTY[idx]}" "$editable_verified" "$toolchain_matches")" == "skip" ]]; then
