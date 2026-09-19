@@ -418,6 +418,13 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Default discovery no longer skips models downloaded by huggingface_hub 1.32+
+  as "weight shards missing" (0.17.35). That release keeps weights in a
+  hub-wide, content-addressed `blobs/<xx>/<hash>` directory and makes each
+  repo's blob a link into it; the snapshot-file containment rule only trusted
+  the per-repo store, so complete, readable models were rejected. In the
+  standard cache layout it now also accepts that one sibling directory, and
+  nothing else.
 - The retained-row validator checks `emitted_special_tokens` and
   `duplicated_answer_separator`. Its four field groups were hand-kept lists
   that lagged `JsonlObservationDetailsRecord`; they are now derived from the

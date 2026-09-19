@@ -7447,18 +7447,25 @@ def _resolve_snapshot_file(snapshot_path: Path, file_name: str) -> Path | None:
     follows the link but requires the target to remain inside the repo's
     cache directory (``models--*``, when the snapshot sits in the standard
     ``snapshots/`` layout) or inside the snapshot directory itself (a plain
-    local model directory). Returns None when absent, escaping, or not a
-    regular file.
+    local model directory). huggingface_hub 1.32 added a hub-wide,
+    content-addressed store: a repo's blob is itself a link into
+    ``<hub>/blobs/<xx>/<hash>``, shared between repos, so in the standard
+    layout that one sibling directory is accepted too. Returns None when
+    absent, escaping, or not a regular file.
     """
     candidate = snapshot_path / file_name
     try:
-        root = (
-            snapshot_path.parent.parent
-            if snapshot_path.parent.name == "snapshots"
-            else snapshot_path
-        ).resolve(strict=True)
+        standard_layout = snapshot_path.parent.name == "snapshots"
+        root = (snapshot_path.parent.parent if standard_layout else snapshot_path).resolve(
+            strict=True
+        )
         resolved = candidate.resolve(strict=True)
-        if not resolved.is_file() or not resolved.is_relative_to(root):
+        if not resolved.is_file():
+            return None
+        contained = resolved.is_relative_to(root) or (
+            standard_layout and resolved.is_relative_to(root.parent / "blobs")
+        )
+        if not contained:
             return None
     except OSError:
         return None

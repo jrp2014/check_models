@@ -971,6 +971,40 @@ class TestWeightShardValidation:
         assert status.index_error is None
         assert (status.missing, status.total) == (0, 2)
 
+    def test_hub_wide_shared_blob_store_validates_clean(self, tmp_path: Path) -> None:
+        """huggingface_hub 1.32: repo blobs are links into ``<hub>/blobs/<xx>/<hash>``.
+
+        Regression: the containment rule only knew the per-repo blob store, so
+        every model downloaded with the new layout was skipped as "weight
+        shards missing" although its weights were complete and readable.
+        """
+        hub = tmp_path / "hub"
+        shared = hub / "blobs" / "35"
+        repo_root = hub / "models--org--m"
+        snapshot = repo_root / "snapshots" / "abc"
+        for directory in (shared, repo_root / "blobs", snapshot):
+            directory.mkdir(parents=True)
+        index = {"weight_map": {"layer0": "model.safetensors"}}
+        safe_io.write_text_no_follow(repo_root / "blobs" / "indexblob", json.dumps(index))
+        (snapshot / "model.safetensors.index.json").symlink_to(repo_root / "blobs" / "indexblob")
+        safe_io.write_text_no_follow(shared / "35d615", "weights")
+        (repo_root / "blobs" / "cf7eaf").symlink_to(shared / "35d615")
+        (snapshot / "model.safetensors").symlink_to(repo_root / "blobs" / "cf7eaf")
+
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert (status.missing, status.total) == (0, 1)
+
+        # Only the hub's own ``blobs`` sibling is trusted, not any neighbour.
+        elsewhere = hub / "other"
+        elsewhere.mkdir()
+        safe_io.write_text_no_follow(elsewhere / "weights", "weights")
+        (snapshot / "model.safetensors").unlink()
+        (snapshot / "model.safetensors").symlink_to(elsewhere / "weights")
+        status = check_models._weight_shard_status(snapshot)
+        assert status is not None
+        assert (status.missing, status.total) == (1, 1)
+
     def test_shard_symlink_escaping_the_repo_counts_as_missing(self, tmp_path: Path) -> None:
         """Containment still holds: a shard resolving outside the repo is missing."""
         snapshot = self._snapshot_with_shards(tmp_path, missing=1)
