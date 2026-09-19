@@ -20,11 +20,14 @@ Notable changes to this project will be documented in this file.
   no job reads it.
 - Less repeated data plumbing in the monolith, no behaviour change intended:
   one generation call instead of two branches and a passthrough adapter
-  (one deliberate behaviour change: `--processor-kwargs` keys naming the
-  guarded call's own arguments, such as `model`, `on_first_token` or
-  `observations`, used to replace the harness's values silently and are now
-  rejected at argument validation, with the names taken from the call's
-  signature); finalization updates the
+  (one deliberate behaviour change: `--processor-kwargs` keys named
+  `on_first_token` or `observations` used to replace the harness's values
+  silently, because the old path bound them with `functools.partial`; every
+  key naming one of the guarded call's own arguments is now rejected at
+  argument validation, with the names taken from the call's signature. A key
+  such as `model` already failed, as a duplicate-keyword `TypeError` at
+  generation time; it now fails earlier and more clearly); finalization
+  updates the
   existing runtime diagnostics with cleanup facts via `dataclasses.replace`
   instead of copying five fields by hand, so later fields cannot be dropped;
   cache discovery selects the `main` revision once; and the current run's
