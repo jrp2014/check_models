@@ -11828,7 +11828,14 @@ def _decode_cli_eos_tokens(raw_tokens: Sequence[str] | None) -> tuple[str, ...] 
 def _validate_processor_kwargs(
     processor_kwargs: Mapping[str, JsonLike] | None,
 ) -> dict[str, JsonLike] | None:
-    """Reject processor kwargs that would collide with dedicated CLI flags."""
+    """Reject processor kwargs that would collide with dedicated CLI flags.
+
+    They are splatted into the one guarded generation call, so a key naming
+    one of that call's own arguments (``model``, ``on_first_token``,
+    ``observations``...) would otherwise surface as a per-model ``TypeError``
+    at generation time. The names come from the call's signature, so a new
+    harness argument is reserved without anyone remembering to list it.
+    """
     if processor_kwargs is None:
         return None
 
@@ -11837,7 +11844,20 @@ def _validate_processor_kwargs(
         overlap_str = ", ".join(overlap)
         msg = f"processor_kwargs cannot override dedicated CLI arguments: {overlap_str}"
         raise ValueError(msg)
+    harness = sorted(set(processor_kwargs).intersection(_harness_generation_argument_names()))
+    if harness:
+        msg = f"processor_kwargs cannot name harness generation arguments: {', '.join(harness)}"
+        raise ValueError(msg)
     return dict(processor_kwargs)
+
+
+def _harness_generation_argument_names() -> frozenset[str]:
+    """Named parameters of the guarded generation call that passthrough kwargs would hit."""
+    return frozenset(
+        name
+        for name, parameter in inspect.signature(_generate_with_repetition_guard).parameters.items()
+        if parameter.kind is not inspect.Parameter.VAR_KEYWORD
+    )
 
 
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
@@ -14331,10 +14351,9 @@ def _execute_prepared_generation(
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
         # ``processor_passthrough_kwargs`` is a user-supplied JSON object whose
-        # keys depend on the active upstream model (usually empty). A key that
-        # collides with a harness argument or a generate kwarg raises
-        # TypeError here, which the guarded caller reports as a generation
-        # failure rather than letting one silently win.
+        # keys depend on the active upstream model (usually empty). Argument
+        # validation already rejects keys naming a dedicated CLI flag or one
+        # of this call's own arguments, so nothing here can collide.
         return _generate_with_repetition_guard(
             model=prepared.model,
             processor=prepared.generation_processor,

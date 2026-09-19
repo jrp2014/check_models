@@ -20,8 +20,11 @@ Notable changes to this project will be documented in this file.
   no job reads it.
 - Less repeated data plumbing in the monolith, no behaviour change intended:
   one generation call instead of two branches and a passthrough adapter
-  (processor kwargs are splatted into the same call, so a key colliding with
-  a harness or generate argument still raises); finalization updates the
+  (one deliberate behaviour change: `--processor-kwargs` keys naming the
+  guarded call's own arguments, such as `model`, `on_first_token` or
+  `observations`, used to replace the harness's values silently and are now
+  rejected at argument validation, with the names taken from the call's
+  signature); finalization updates the
   existing runtime diagnostics with cleanup facts via `dataclasses.replace`
   instead of copying five fields by hand, so later fields cannot be dropped;
   cache discovery selects the `main` revision once; and the current run's

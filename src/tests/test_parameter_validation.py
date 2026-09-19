@@ -377,6 +377,24 @@ class TestCliArgumentNormalization:
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
             validate_cli_arguments(args)
 
+    def test_processor_kwargs_cannot_name_harness_generation_arguments(self) -> None:
+        """Keys naming the guarded call's own arguments are refused at validation time.
+
+        They are splatted into that one call, so ``on_first_token`` or
+        ``observations`` would otherwise raise a per-model TypeError during
+        generation (and, before the two call paths were merged, silently
+        replaced the harness's own callback).
+        """
+        names = check_models._harness_generation_argument_names()
+        assert {"model", "on_first_token", "observations"} <= names
+        assert "kwargs" not in names
+        for name in sorted(names - check_models._RESERVED_PROCESSOR_KWARG_KEYS):
+            with pytest.raises(ValueError, match="cannot name harness generation arguments"):
+                check_models._validate_processor_kwargs({name: 1})
+        assert check_models._validate_processor_kwargs({"crop_to_patches": True}) == {
+            "crop_to_patches": True
+        }
+
     def test_per_tensor_kv_flags_parse_and_validate(self) -> None:
         """The per-tensor KV override flags should parse and pass CLI validation."""
         parser = check_models._build_cli_parser()

@@ -1194,6 +1194,55 @@ class TestProcessImageWithModelMock:
 
         assert ("Cache Δ:", " 0.30 GB") in logged_values
 
+    def test_finalize_process_result_preserves_every_non_cleanup_field(
+        self, test_image: Path
+    ) -> None:
+        """Finalization adds cleanup facts and leaves every other diagnostic untouched.
+
+        The field list is enumerated from the dataclass, so a diagnostic added
+        later is covered without editing this test.
+        """
+        cleanup_fields = {
+            "cleanup_time_s",
+            "post_cleanup_active_memory_gb",
+            "post_cleanup_cache_memory_gb",
+        }
+        distinct: dict[str, Any] = {
+            spec.name: ("exception" if spec.name == "stop_reason" else 1.0 + index / 10)
+            for index, spec in enumerate(dataclasses.fields(check_models.RuntimeDiagnostics))
+        }
+        before = check_models.RuntimeDiagnostics(**distinct)
+        phase_timer = check_models.PhaseTimer()
+        with phase_timer.track("cleanup"):
+            pass
+        finalized = check_models._finalize_process_result(
+            result_payload=check_models.PerformanceResult(
+                model_name="test/fake-model",
+                success=True,
+                generation=_FakeGenerationResult(),
+                runtime_diagnostics=before,
+            ),
+            params=_build_params(test_image),
+            phase_timer=phase_timer,
+            stop_reason="completed",
+            current_phase="cleanup",
+            total_start_time=0.0,
+            post_cleanup_active_memory_gb=7.5,
+            post_cleanup_cache_memory_gb=8.5,
+        )
+        after = finalized.runtime_diagnostics
+        assert after is not None
+        for spec in dataclasses.fields(before):
+            if spec.name not in cleanup_fields:
+                assert getattr(after, spec.name) == getattr(before, spec.name), spec.name
+        # The record's own stop reason wins over the caller's fallback.
+        assert after.stop_reason == "exception"
+        assert after.cleanup_time_s == phase_timer.duration("cleanup")
+        assert (after.post_cleanup_active_memory_gb, after.post_cleanup_cache_memory_gb) == (
+            7.5,
+            8.5,
+        )
+
     def test_finalize_process_result_preserves_first_token_latency(self, test_image: Path) -> None:
         """Final cleanup should not discard previously derived first-token latency."""
         phase_timer = check_models.PhaseTimer()
