@@ -1443,6 +1443,9 @@ class ReportGenerationInputs:
     overall_start_time: float | None = None
 
 
+_RUN_ISSUE_SUMMARY_KEY: Final[str] = "run_issue_summary"
+
+
 @dataclass(frozen=True)
 class ReportArtifact:
     """One retained artifact: identity, presentation, and optional job."""
@@ -15161,28 +15164,6 @@ def _json_safe(value: object) -> JsonLike:
     return str(value)
 
 
-def _namespace_to_json(args: argparse.Namespace) -> dict[str, JsonLike]:
-    """Serialise parsed CLI arguments, tagging Path values so the child restores them."""
-    payload: dict[str, JsonLike] = {}
-    for key, value in vars(args).items():
-        if isinstance(value, Path):
-            payload[key] = {"__path__": str(value)}
-        else:
-            payload[key] = _json_safe(value)
-    return payload
-
-
-def _namespace_from_json(payload: Mapping[str, JsonLike]) -> argparse.Namespace:
-    """Rebuild an argparse Namespace from ``_namespace_to_json`` output."""
-    restored: dict[str, object] = {}
-    for key, value in payload.items():
-        if isinstance(value, dict) and set(value) == {"__path__"}:
-            restored[key] = Path(str(value["__path__"]))
-        else:
-            restored[key] = value
-    return argparse.Namespace(**restored)
-
-
 def _dataclass_from_json[T](cls: type[T], data: object) -> T:
     """Rebuild a dataclass (recursively) from JSON produced by ``_json_safe``."""
     if not isinstance(data, Mapping):
@@ -15220,10 +15201,22 @@ def _coerce_tuple_json_value(annotation: object, value: list[object]) -> tuple[o
     )
 
 
+def _coerce_json_container(origin: object, annotation: object, value: object) -> object:
+    """Restore the container types JSON cannot express: frozensets and int-keyed dicts."""
+    if origin is frozenset and isinstance(value, list):
+        return frozenset(value)
+    if origin is dict and isinstance(value, Mapping) and get_args(annotation)[:1] == (int,):
+        # JSON object keys are always strings; restore integer keys (logit_bias).
+        return {int(key): item for key, item in value.items()}
+    return value
+
+
 def _coerce_json_value(annotation: object, value: object) -> object:
     """Coerce one JSON value toward ``annotation`` (dataclasses, tuples, unions)."""
     if value is None or annotation is None:
         return value
+    # PEP 695 aliases (``type LogitBiasDict = dict[int, float]``) hide their origin.
+    annotation = getattr(annotation, "__value__", annotation)
     origin = get_origin(annotation)
     if origin in (types.UnionType, Union):
         return _coerce_union_json_value(annotation, value)
@@ -15234,7 +15227,7 @@ def _coerce_json_value(annotation: object, value: object) -> object:
     if origin is list and isinstance(value, list):
         (item_type,) = get_args(annotation) or (None,)
         return [_coerce_json_value(item_type, item) for item in value]
-    return value
+    return _coerce_json_container(origin, annotation, value)
 
 
 def _performance_result_to_json(result: PerformanceResult) -> dict[str, JsonLike]:
@@ -15284,63 +15277,43 @@ def _performance_result_from_json(payload: Mapping[str, JsonLike]) -> Performanc
     return result
 
 
+_SPEC_PATH_TAG: Final[str] = "__path__"
+
+
 def _isolated_worker_spec(
     args: argparse.Namespace, params: ProcessImageParams
 ) -> dict[str, JsonLike]:
     """Serialise one model request for a child interpreter.
 
-    ``_isolated_params_from_spec`` is the exact inverse; the two are kept
-    adjacent and round-trip tested because a key that drifts between them
-    fails every isolated model before inference starts.
+    The child receives the parameters the parent already resolved, never the
+    CLI namespace: a second interpretation of CLI state in the child is a
+    second place for the two to disagree. The only other things it needs are
+    its logging level (``params.verbose``) and the quality-config path.
+    ``_isolated_params_from_spec`` is the exact inverse and is round-trip
+    tested over every field.
     """
-    explicit_sampling: list[JsonLike] = [*sorted(params.explicit_sampling)]
-    overrides: dict[str, JsonLike] = {
-        "max_tokens": params.max_tokens,
-        "temperature": params.temperature,
-        "timeout": params.timeout,
-        "verbose": params.verbose,
-        "explicit_sampling": explicit_sampling,
-    }
+    payload = cast("dict[str, JsonLike]", _json_safe(params))
+    if isinstance(params.image_path, Path):
+        # ``str | Path`` cannot be told apart after JSON; tag the Path case.
+        payload["image_path"] = {_SPEC_PATH_TAG: str(params.image_path)}
+    quality_config = getattr(args, "quality_config", None)
     return {
-        "args": _namespace_to_json(args),
-        "model_identifier": params.model_identifier,
-        "image_path": str(params.image_path),
-        "prompt": params.prompt,
-        "overrides": overrides,
+        "params": payload,
+        "quality_config": None if quality_config is None else str(quality_config),
     }
 
 
-def _isolated_params_from_spec(
-    spec: Mapping[str, JsonLike], args: argparse.Namespace
-) -> ProcessImageParams:
+def _isolated_params_from_spec(spec: Mapping[str, JsonLike]) -> ProcessImageParams:
     """Rebuild the child's ``ProcessImageParams`` from ``_isolated_worker_spec`` output."""
-    overrides = cast("Mapping[str, JsonLike]", spec.get("overrides") or {})
-    max_tokens = overrides.get("max_tokens")
-    temperature = overrides.get("temperature")
-    timeout = overrides.get("timeout")
-    verbose = overrides.get("verbose")
-    explicit_sampling = overrides.get("explicit_sampling")
-    return _process_image_params_from_args(
-        args,
-        model_identifier=str(spec["model_identifier"]),
-        image_path=Path(str(spec["image_path"])),
-        prompt=str(spec["prompt"]),
-        max_tokens=max_tokens
-        if isinstance(max_tokens, int) and not isinstance(max_tokens, bool)
-        else None,
-        temperature=float(temperature)
-        if isinstance(temperature, (int, float)) and not isinstance(temperature, bool)
-        else None,
-        timeout=float(timeout)
-        if isinstance(timeout, (int, float)) and not isinstance(timeout, bool)
-        else None,
-        verbose=verbose if isinstance(verbose, bool) else None,
-        explicit_sampling=(
-            [str(item) for item in explicit_sampling]
-            if isinstance(explicit_sampling, list)
-            else None
-        ),
-    )
+    payload = dict(cast("Mapping[str, JsonLike]", spec["params"]))
+    image = payload.get("image_path")
+    if isinstance(image, dict) and set(image) == {_SPEC_PATH_TAG}:
+        payload["image_path"] = str(image[_SPEC_PATH_TAG])
+        return replace(
+            _dataclass_from_json(ProcessImageParams, payload),
+            image_path=Path(str(image[_SPEC_PATH_TAG])),
+        )
+    return _dataclass_from_json(ProcessImageParams, payload)
 
 
 def _run_model_isolated(args: argparse.Namespace, params: ProcessImageParams) -> PerformanceResult:
@@ -15468,11 +15441,11 @@ def _run_isolated_worker(spec_path: Path) -> int:
     # sibling files there, never paths named inside the spec.
     worker_dir = spec_path.resolve().parent
     spec = json.loads(_read_text_file(spec_path))
-    args = _namespace_from_json(spec["args"])
+    params = _isolated_params_from_spec(spec)
     phase_path = worker_dir / "phase.txt"
     result_path = worker_dir / "result.json"
     logging.basicConfig(
-        level=logging.DEBUG if getattr(args, "verbose", False) else logging.INFO,
+        level=logging.DEBUG if params.verbose else logging.INFO,
         stream=sys.stderr,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
@@ -15485,12 +15458,13 @@ def _run_isolated_worker(spec_path: Path) -> int:
 
     _ISOLATION_PHASE_SINK = _record_phase
     crash_model = os.environ.get(ISOLATION_CRASH_TEST_ENV)
-    if crash_model and crash_model == str(spec["model_identifier"]):
+    if crash_model and crash_model == params.model_identifier:
         # Test seam: prove a native abort in a child becomes a per-model record.
         _record_phase("decode")
         os.abort()
-    load_quality_config(getattr(args, "quality_config", None))
-    result = process_image_with_model(_isolated_params_from_spec(spec, args))
+    quality_config = spec.get("quality_config")
+    load_quality_config(Path(quality_config) if isinstance(quality_config, str) else None)
+    result = process_image_with_model(params)
     _write_text_file(result_path, json.dumps(_performance_result_to_json(result)))
     return 0
 
@@ -17739,10 +17713,11 @@ def _process_image_params_from_args(
             explicit.add("temperature")
     explicit &= set(_CHECKPOINT_SAMPLING_DESTS)
     # Every other field is the CLI value of the same name, copied by field
-    # enumeration so a new parameter cannot be forgotten here (the isolated
-    # worker rebuilds its parameters through this same function).
+    # enumeration so a new parameter cannot be forgotten here. argparse yields
+    # lists for ``nargs`` options; the dataclass declares tuples, and the
+    # isolated worker's JSON round trip restores the declared type.
     copied: dict[str, Any] = {
-        spec.name: getattr(args, spec.name)
+        spec.name: tuple(value) if isinstance(value := getattr(args, spec.name), list) else value
         for spec in fields(ProcessImageParams)
         if spec.name not in _PARAMS_NOT_COPIED_FROM_ARGS
     }
@@ -22904,7 +22879,7 @@ def generate_output_index_report(
     links = tuple(
         (artifact.path, _output_index_artifact_label(artifact.path))
         for artifact in artifacts
-        if artifact.key != "output_index"
+        if artifact.key not in {"output_index", _RUN_ISSUE_SUMMARY_KEY}
     )
     md = [
         "# Check Models Output Index",
@@ -23514,6 +23489,25 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             dashboard_label="Environment Log",
             dashboard_purpose="Pip freeze & conda env config log",
         ),
+        # Scheduled explicitly (it needs the JSONL, diagnostics and gallery
+        # outcomes first), but identified here so the manifest, log, dashboard
+        # and index treat it like every other artifact: by its outcome.
+        ReportArtifact(
+            key=_RUN_ISSUE_SUMMARY_KEY,
+            public_key=_RUN_ISSUE_SUMMARY_KEY,
+            label="   Run Issue:       ",
+            path=_run_issue_summary_path(output_paths),
+            dashboard_label="Run Issue Summary",
+            dashboard_purpose="Start here: model-quality ranking and paste-ready GitHub issue body",
+        ),
+    )
+
+
+def _run_issue_summary_required(inputs: ReportGenerationInputs) -> bool:
+    """A summary is written only when something needs a maintainer's attention."""
+    return any(
+        assessment.maintainer_status != "none" or assessment.execution == "indeterminate"
+        for _, assessment in inputs.report_context.assessments
     )
 
 
@@ -23523,7 +23517,7 @@ def _run_issue_summary_failure(
 ) -> tuple[Path | None, ReportArtifactOutcome]:
     """Describe one failed or skipped run-issue-summary artifact outcome."""
     return None, ReportArtifactOutcome(
-        key="run_issue_summary",
+        key=_RUN_ISSUE_SUMMARY_KEY,
         path=summary_path,
         succeeded=False,
         error_message=error_message,
@@ -23546,11 +23540,7 @@ def _generate_run_issue_summary_output(
         if cleanup_error is not None:
             error_message += f" Stale summary cleanup failed: {cleanup_error}"
         return _run_issue_summary_failure(summary_path, error_message)
-    summary_required = any(
-        assessment.maintainer_status != "none" or assessment.execution == "indeterminate"
-        for _, assessment in inputs.report_context.assessments
-    )
-    if not summary_required:
+    if not _run_issue_summary_required(inputs):
         cleanup_error = _remove_run_issue_summary(inputs.output_paths)
         if cleanup_error is None:
             return None, None
@@ -23580,7 +23570,7 @@ def _generate_run_issue_summary_output(
         return _run_issue_summary_failure(summary_path, error_message)
     outcome = (
         ReportArtifactOutcome(
-            key="run_issue_summary",
+            key=_RUN_ISSUE_SUMMARY_KEY,
             path=generated,
             succeeded=True,
         )
@@ -23633,7 +23623,6 @@ def _log_report_generation_outcomes(
     *,
     artifacts: Sequence[ReportArtifact],
     outcomes: Sequence[ReportArtifactOutcome],
-    run_issue_summary: Path | None,
 ) -> None:
     """Log the report-generation verdict and every successfully written path."""
     failures = [outcome for outcome in outcomes if not outcome.succeeded]
@@ -23648,8 +23637,6 @@ def _log_report_generation_outcomes(
     for artifact in artifacts:
         if artifact.key in successful_keys:
             log_file_path(artifact.path, label=artifact.label)
-    if run_issue_summary is not None:
-        log_file_path(run_issue_summary, label="   Run Issue:       ")
 
 
 _COMPONENT_CHANGE_SUBJECT_LIMIT: Final[int] = 40
@@ -23749,12 +23736,12 @@ def _build_retained_run_guarded(
     inputs: ReportGenerationInputs, artifacts: Sequence[ReportArtifact]
 ) -> RetainedRun | None:
     """Build the retained run behind the report isolation boundary."""
-    manifest = {artifact.public_key: _public_artifact_path(artifact.path) for artifact in artifacts}
-    if any(
-        assessment.execution == "indeterminate" or assessment.maintainer_status != "none"
-        for _model_name, assessment in inputs.report_context.assessments
-    ):
-        manifest["run_issue_summary"] = "issues/run_summary.md"
+    summary_planned = _run_issue_summary_required(inputs)
+    manifest = {
+        artifact.public_key: _public_artifact_path(artifact.path)
+        for artifact in artifacts
+        if artifact.key != _RUN_ISSUE_SUMMARY_KEY or summary_planned
+    }
     try:
         return _build_retained_run(
             inputs.results,
@@ -23797,7 +23784,6 @@ def _finalize_retained_run_record(
     artifacts: Sequence[ReportArtifact],
     outcomes: Sequence[ReportArtifactOutcome],
     *,
-    run_issue_summary: Path | None,
     jsonl_succeeded: bool,
 ) -> None:
     """Rewrite the JSONL header once every report outcome is known.
@@ -23817,8 +23803,6 @@ def _finalize_retained_run_record(
         for artifact in artifacts
         if artifact.key in successful_keys
     }
-    if run_issue_summary is not None:
-        manifest["run_issue_summary"] = "issues/run_summary.md"
     metadata: JsonlMetadataRecord = {**retained.metadata, "artifacts": manifest}
     if inputs.overall_start_time is not None:
         metadata["total_runtime_seconds"] = round(time.time() - inputs.overall_start_time, 3)
@@ -23913,8 +23897,6 @@ def _generate_reports_and_log_outputs(
                 metadata={**retained.metadata, "comparison": _run_comparison_to_json(comparison)},
                 results=retained.results,
             )
-            artifacts = _build_report_artifacts(inputs)
-            by_key = {artifact.key: artifact for artifact in artifacts}
 
     jsonl_succeeded = _run_jsonl_artifact(
         retained,
@@ -23998,14 +23980,12 @@ def _generate_reports_and_log_outputs(
         retained,
         artifacts,
         outcomes,
-        run_issue_summary=run_issue_summary,
         jsonl_succeeded=jsonl_succeeded,
     )
 
     _log_report_generation_outcomes(
         artifacts=artifacts,
         outcomes=outcomes,
-        run_issue_summary=run_issue_summary,
     )
     return tuple(outcomes)
 
@@ -24101,8 +24081,6 @@ def _print_reports_dashboard(
     artifacts: Sequence[ReportArtifact],
     outcomes: Sequence[ReportArtifactOutcome],
     history_path: Path | None = None,
-    *,
-    run_issue_summary: Path | None = None,
 ) -> None:
     """Print the console dashboard for artifacts the current run produced.
 
@@ -24132,12 +24110,6 @@ def _print_reports_dashboard(
     for artifact in artifacts:
         if artifact.key in successful_keys:
             add_row(artifact.dashboard_label, artifact.dashboard_purpose, artifact.path)
-
-    add_row(
-        "Run Issue Summary",
-        "Start here: model-quality ranking and paste-ready GitHub issue body",
-        run_issue_summary,
-    )
 
     if history_path and history_path.exists():
         add_row("Run History", "Persistent database of previous runs", history_path)
@@ -24282,21 +24254,11 @@ def finalize_execution(
             runtime_fingerprint=runtime_fingerprint,
         )
         report_outcomes = _generate_reports_and_log_outputs(report_inputs)
-        run_issue_summary = next(
-            (
-                outcome.path
-                for outcome in report_outcomes
-                if outcome.key == "run_issue_summary" and outcome.succeeded
-            ),
-            None,
-        )
-
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(
             _build_report_artifacts(report_inputs),
             report_outcomes,
             history_path=history_path,
-            run_issue_summary=run_issue_summary,
         )
 
     else:

@@ -1322,14 +1322,36 @@ class TestIsolatedExecution:
         parser = check_models._build_cli_parser()
         return parser.parse_args(["--image", str(test_image), "--isolate", "--max-tokens", "5"])
 
-    def test_namespace_json_round_trip_preserves_paths(self, test_image: Path) -> None:
-        """Path-valued CLI args survive the JSON hand-off to the child."""
+    def test_worker_spec_carries_resolved_params_not_the_cli_namespace(
+        self, test_image: Path
+    ) -> None:
+        """The child gets what the parent resolved, with awkward types intact."""
         args = self._args(test_image)
-        restored = check_models._namespace_from_json(check_models._namespace_to_json(args))
-        assert restored.image == test_image
-        assert isinstance(restored.output_dir, Path)
-        assert restored.max_tokens == 5
-        assert restored.isolate is True
+        params = dataclasses.replace(
+            check_models._process_image_params_from_args(
+                args, model_identifier="org/m", image_path=test_image, prompt="p"
+            ),
+            logit_bias={7: -1.5, 12: 2.0},
+            resize_shape=(448, 448),
+            eos_tokens=("</s>", "<end>"),
+            explicit_sampling=frozenset({"top_p", "temperature"}),
+            processor_kwargs={"crop": {"size": 2}},
+        )
+        spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
+        assert "args" not in spec
+        restored = check_models._isolated_params_from_spec(spec)
+        assert restored == params
+        assert isinstance(restored.image_path, Path)
+        assert restored.logit_bias is not None
+        assert set(restored.logit_bias) == {7, 12}
+        assert isinstance(restored.explicit_sampling, frozenset)
+        assert restored.resize_shape == (448, 448)
+        # A URL input stays a string rather than becoming a Path.
+        url_params = dataclasses.replace(params, image_path="https://example.com/cat.jpg")
+        url_spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, url_params)))
+        assert check_models._isolated_params_from_spec(url_spec).image_path == (
+            "https://example.com/cat.jpg"
+        )
 
     def test_performance_result_json_round_trip(self) -> None:
         """Nested dataclasses and a duck-typed generation survive the round trip."""
@@ -1855,9 +1877,7 @@ class TestRepetitionGuard:
 
         assert params.assessment_profile == "metadata"
         spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
-        restored = check_models._isolated_params_from_spec(
-            spec, check_models._namespace_from_json(spec["args"])
-        )
+        restored = check_models._isolated_params_from_spec(spec)
 
         assert restored.assessment_profile == "metadata"
         for field in (
@@ -1925,9 +1945,7 @@ class TestRepetitionGuard:
         assert params.system_telemetry == "off"
         assert params.explicit_sampling == frozenset({"top_p", "top_k"})
         spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
-        restored = check_models._isolated_params_from_spec(
-            spec, check_models._namespace_from_json(spec["args"])
-        )
+        restored = check_models._isolated_params_from_spec(spec)
         differing = [
             spec_field.name
             for spec_field in dataclasses.fields(params)
@@ -2318,7 +2336,5 @@ class TestExplicitSampling:
             args, model_identifier="org/m", image_path=test_image, prompt="p"
         )
         spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
-        rebuilt = check_models._isolated_params_from_spec(
-            spec, check_models._namespace_from_json(spec["args"])
-        )
+        rebuilt = check_models._isolated_params_from_spec(spec)
         assert rebuilt.explicit_sampling == frozenset({"top_k"})

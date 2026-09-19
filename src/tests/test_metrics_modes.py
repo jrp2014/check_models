@@ -1218,6 +1218,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "jsonl",
         "log",
         "environment",
+        "run_issue_summary",
     ]
     assert [artifact.label.strip() for artifact in artifacts] == [
         "Output Index:",
@@ -1227,13 +1228,22 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "JSONL Report:",
         "Log File:",
         "Environment:",
+        "Run Issue:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     # diagnostics runs via its dedicated runner; log/environment are produced
     # by the run itself; the jsonl job is supplied by the orchestrator from
     # the in-memory retained run; the output index is built last, from this
     # run's outcomes.
-    joblessly_produced = {"diagnostics", "log", "environment", "jsonl", "output_index"}
+    # the run issue summary is scheduled explicitly after the artifacts it cites.
+    joblessly_produced = {
+        "diagnostics",
+        "log",
+        "environment",
+        "jsonl",
+        "output_index",
+        "run_issue_summary",
+    }
     assert all(
         artifact.job is not None for artifact in artifacts if artifact.key not in joblessly_produced
     )
@@ -1360,6 +1370,7 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         "jsonl",
         "log",
         "environment",
+        "run_issue_summary",
     )
     assert {artifact.public_key for artifact in artifacts} == {
         "output_index",
@@ -1369,6 +1380,7 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
         "results_jsonl",
         "log",
         "environment",
+        "run_issue_summary",
     }
 
 

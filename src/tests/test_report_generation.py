@@ -2530,13 +2530,12 @@ def test_report_dashboard_only_shows_current_successful_run_summary(
 
     artifacts = _all_artifacts(output_paths)
     outcomes = _all_success_outcomes(artifacts)
-    check_models._print_reports_dashboard(artifacts, outcomes, run_issue_summary=None)
+    # The summary is a planned artifact like any other: only its own successful
+    # outcome puts it on the dashboard, never the file's existence.
+    not_produced = tuple(o for o in outcomes if o.key != "run_issue_summary")
+    check_models._print_reports_dashboard(artifacts, not_produced)
     without_summary = capsys.readouterr().err
-    check_models._print_reports_dashboard(
-        artifacts,
-        outcomes,
-        run_issue_summary=stale_summary,
-    )
+    check_models._print_reports_dashboard(artifacts, outcomes)
     with_summary = capsys.readouterr().err
 
     assert "Run Issue Summary" not in without_summary

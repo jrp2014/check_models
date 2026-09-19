@@ -6,6 +6,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Isolated workers receive the parameters the parent resolved, not the CLI
+  namespace: the spec is `ProcessImageParams` plus the quality-config path,
+  and the child no longer re-interprets CLI state. The JSON round trip now
+  restores `frozenset`, integer-keyed dicts (`logit_bias`), PEP 695 aliases
+  and `Path` versus URL image inputs, and the params builder converts
+  argparse's `nargs` lists to the tuples the dataclass declares
+  (`resize_shape`, `eos_tokens`), which the round trip exposed.
+- The run issue summary is a planned `ReportArtifact` like every other
+  output, still scheduled explicitly. Its separate manifest, log, dashboard
+  and finalization handling is gone; all four now follow its outcome. The
+  artifact plan is no longer rebuilt after the comparison is computed, since
+  no job reads it.
 - Less repeated data plumbing in the monolith, no behaviour change intended:
   one generation call instead of two branches and a passthrough adapter
   (processor kwargs are splatted into the same call, so a key colliding with
