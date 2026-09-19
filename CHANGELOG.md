@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Hugging Face CLI references use `hf` (0.17.36): the "no models found" error
+  and the README troubleshooting example named the removed `huggingface-cli`
+  (and a non-MLX model). The `hf-cache-mlx-vlm-models` skill now says how to
+  remove a cached model under huggingface_hub 1.32's shared blob store
+  (`hf cache rm` then `hf cache prune`, never `rm -rf models--…`).
 - Isolated workers receive the parameters the parent resolved, not the CLI
   namespace: the spec is `ProcessImageParams` plus the quality-config path,
   and the child no longer re-interprets CLI state. The JSON round trip now

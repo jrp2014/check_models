@@ -197,6 +197,13 @@ When reporting cache contents, include:
 
 ## Rules
 
+- **Removing a cached model:** use `hf cache rm model/<org>/<name>` (add
+  `--dry-run` first), then `hf cache prune`. Never `rm -rf models--…`:
+  since huggingface_hub 1.32 the weights live in the hub-wide
+  `<hub>/blobs/<xx>/<hash>` store and each repo only links to them, so deleting
+  the repo directory frees almost nothing and orphans the weights. `prune`
+  also clears detached revisions, incomplete downloads and unreferenced shared
+  blobs. Do not delete cache entries unless the user asks.
 - **Do not** reimplement `scan_cache_dir` filters in ad-hoc scripts when
   `get_cached_model_ids` already encodes the contract.
 - **Do not** use `uv run`.

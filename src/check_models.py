@@ -17846,7 +17846,7 @@ def process_models(
             )
             exit_with_cli_error(
                 "No models found in the local Hugging Face cache. "
-                "Download a model (e.g., `huggingface-cli download mlx-community/<model>`) "
+                "Download a model (e.g., `hf download mlx-community/<model>`) "
                 f"or pass explicit IDs with --models.{skipped_hint}",
             )
         model_identifiers = apply_exclusions(

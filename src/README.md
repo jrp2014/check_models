@@ -1438,7 +1438,7 @@ If neither `--folder` nor `--image` is specified, the script logs a diagnostic m
 
 ```bash
 # Download a model explicitly
-huggingface-cli download microsoft/Phi-3-vision-128k-instruct
+hf download mlx-community/nanoLLaVA-1.5-4bit
 ```
 
 **Import errors**: Verify MLX installation on Apple Silicon Mac
