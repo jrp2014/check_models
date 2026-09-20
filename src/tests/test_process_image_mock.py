@@ -1663,6 +1663,25 @@ class TestImportProbe:
                 is None
             )
 
+    @pytest.mark.parametrize(
+        ("argv", "unneeded"),
+        [
+            (["check_models.py", "--help"], True),
+            (["/x/bin/check_models", "-n", "--image", "a.jpg"], True),
+            (["check_models.py", "--image", "a.jpg", "--dry-run"], True),
+            (["check_models.py", check_models.ISOLATED_WORKER_FLAG, "spec.json"], True),
+            (["check_models.py", "--image", "a.jpg"], False),
+            (["check_models.py"], False),
+            # pytest's own -n (xdist workers) must not read as this CLI's --dry-run.
+            (["/x/bin/pytest", "-n", "4"], False),
+        ],
+    )
+    def test_probe_is_skipped_only_where_no_sweep_needs_shielding(
+        self, argv: list[str], *, unneeded: bool
+    ) -> None:
+        """Help and dry-run pay for one mlx_vlm import, not two; real runs keep the probe."""
+        assert check_models._import_probe_unneeded(argv) is unneeded
+
 
 class TestRepetitionGuard:
     """The streaming wrapper reproduces generate() and aborts degenerate loops."""

@@ -30,11 +30,11 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~24700 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~25,100 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~23,900 lines across 34 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~26,300 lines across 34 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
 | `src/README.md` | Full CLI docs, all flags, usage examples (~1,600 lines) | Reference for CLI behavior |
 

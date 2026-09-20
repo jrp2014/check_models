@@ -11,6 +11,7 @@ import contextlib
 import importlib
 import json
 import logging
+import os
 import subprocess
 from dataclasses import dataclass, fields
 from pathlib import Path
@@ -348,18 +349,16 @@ class TestValidateAndWarnModelSelection:
         self,
         mod: types.ModuleType,
         caplog: pytest.LogCaptureFixture,
-        tmp_path: Path,
     ) -> None:
         """Dry-run selection should warn exactly as an executable selection would."""
         args = self._make_args(exclude=["missing-model"], models=["selected-model"])
-        image_path = tmp_path / "image.jpg"
 
         with (
             patch.object(mod, "_all_cached_repo_ids", return_value=["selected-model"]),
             patch.object(mod, "_arch_precheck_for_model", return_value=(None, None, None)),
             caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME),
         ):
-            mod._handle_dry_run(args, image_path, "Describe this image.", {})
+            mod._handle_dry_run(args, "Describe this image.", {})
 
         assert any(
             "missing-model" in message and "will have no effect" in message
@@ -371,7 +370,6 @@ class TestValidateAndWarnModelSelection:
         self,
         mod: types.ModuleType,
         caplog: pytest.LogCaptureFixture,
-        tmp_path: Path,
     ) -> None:
         """A partially downloaded --models entry is announced, not silently fetched later."""
         args = self._make_args(exclude=[], models=["org/partial"])
@@ -385,7 +383,7 @@ class TestValidateAndWarnModelSelection:
             patch.object(mod, "_arch_precheck_for_model", return_value=(None, None, None)),
             caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME),
         ):
-            mod._handle_dry_run(args, tmp_path / "image.jpg", "Describe this image.", {})
+            mod._handle_dry_run(args, "Describe this image.", {})
 
         assert any(
             "org/partial: its cached main revision fails the default-discovery layout check"
@@ -619,6 +617,37 @@ class TestPreparePrompt:
 
 
 # ── compute_confidence_indicators ──────────────────────────────────────────
+
+
+class TestConsoleContentWidth:
+    """Logged content must fit beside the handler's per-line prefix."""
+
+    @pytest.mark.parametrize(("shows_level", "prefix"), [(False, 11), (True, 20)])
+    def test_content_width_leaves_room_for_the_log_prefix(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        shows_level: bool,
+        prefix: int,
+    ) -> None:
+        """Regression: full-width rules wrapped, leaving an 11-char orphan on the next line."""
+        monkeypatch.setenv("MLX_VLM_WIDTH", "150")
+        monkeypatch.setattr(mod, "_console_shows_level", shows_level)
+        assert mod._console_total_width(max_width=100) == 150  # explicit width is not clamped
+        assert mod.get_terminal_width(max_width=100) == 150 - prefix
+
+    def test_detected_terminal_width_is_clamped_before_the_prefix(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without an override the terminal is clamped to max_width, then the prefix comes off."""
+        monkeypatch.delenv("MLX_VLM_WIDTH", raising=False)
+        monkeypatch.setattr(mod, "_console_shows_level", False)
+        monkeypatch.setattr(
+            mod.shutil, "get_terminal_size", lambda **_kwargs: os.terminal_size((200, 24))
+        )
+        assert mod.get_terminal_width(max_width=100) == 89
+        assert mod.get_terminal_width(min_width=95, max_width=100) == 95
 
 
 class TestDisplayWidthUtilities:

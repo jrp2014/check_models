@@ -6,6 +6,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `--help` and `--dry-run` skip the dependency import probe, which costs a
+  second full `mlx_vlm` import: `--help` drops from 5.7 s to 2.2 s. The probe
+  shields a sweep in progress from a hard-crashing import; neither command
+  invokes a model. Real runs are unchanged.
+- Dry-run output says things once: the truncated `Final prompt` preview is
+  omitted (the whole prompt follows), the image block is gone (the run header
+  already names the image and its dimensions, and small files read "0.00 MB"),
+  and the model list marks unknown image capability without repeating the
+  evidence printed in the warning above it.
+- `.github/copilot-instructions.md` line counts refreshed.
 - Hugging Face CLI references use `hf` (0.17.36): the "no models found" error
   and the README troubleshooting example named the removed `huggingface-cli`
   (and a non-MLX model). The `hf-cache-mlx-vlm-models` skill now says how to
@@ -423,6 +433,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Console rules and banners no longer wrap (0.17.37). They were drawn at the
+  full console width although every line carries the handler's 11-column
+  `[HH:MM:SS]` prefix (20 with `--verbose`), so each rule left an orphan
+  fragment on the next line on any terminal under about 131 columns.
+  `get_terminal_width()` now returns the width left for content;
+  `_console_total_width()` sizes the console itself. The never-assigned
+  `WIDTH_OVERRIDE` global is gone (`--width` has always travelled through
+  `MLX_VLM_WIDTH`).
 - Default discovery no longer skips models downloaded by huggingface_hub 1.32+
   as "weight shards missing" (0.17.35). That release keeps weights in a
   hub-wide, content-addressed `blobs/<xx>/<hash>` directory and makes each

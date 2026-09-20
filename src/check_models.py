@@ -630,6 +630,24 @@ def _format_import_probe_output_excerpt(
     return f"{lines[0]} ... {exception_line[: tail_budget - 3]}..."
 
 
+_NO_MODEL_RUN_FLAGS: Final[frozenset[str]] = frozenset({"-h", "--help", "-n", "--dry-run"})
+
+
+def _import_probe_unneeded(argv: Sequence[str]) -> bool:
+    """Return whether this invocation has no long-lived sweep for the probe to shield.
+
+    The probe loads the dependency in a child first, so that a dependency
+    which hard-crashes while loading never takes down a sweep in progress; it
+    costs a second full ``mlx_vlm`` load (about 2 s). An ``--isolate`` worker
+    is already the crash boundary, and ``--help`` / ``--dry-run`` invoke no
+    models, so a crash there loses nothing and reports itself. Only this
+    CLI's own command line counts: under pytest ``-n`` means something else.
+    """
+    if len(argv) >= 2 and argv[1] == ISOLATED_WORKER_FLAG:  # noqa: PLR2004 - argv[0] + flag
+        return True
+    return Path(argv[0]).stem == "check_models" and not _NO_MODEL_RUN_FLAGS.isdisjoint(argv[1:])
+
+
 def _probe_import_runtime(
     *,
     import_target: str,
@@ -638,15 +656,13 @@ def _probe_import_runtime(
 ) -> str | None:
     """Run a subprocess import probe and return an actionable error message when it fails.
 
-    Skipped inside an ``--isolate`` worker: the probe exists to shield the
-    long-lived parent from a hard-crashing dependency, and a worker is already
-    the crash boundary. A probe that merely *times out* is inconclusive, not a
+    Skipped where there is nothing to shield (see ``_import_probe_unneeded``).
+    A probe that merely *times out* is inconclusive, not a
     failure: under load (many test workers probing at once, a busy machine)
     the import finishes after the deadline, and treating that as "unavailable"
     produced false negatives both in real runs and in the parallel test suite.
     """
-    inside_isolated_worker = len(sys.argv) >= 2 and sys.argv[1] == ISOLATED_WORKER_FLAG  # noqa: PLR2004 - argv[0] + flag
-    if inside_isolated_worker or os.environ.get(IMPORT_PROBE_SKIP_ENV) == "1":
+    if _import_probe_unneeded(sys.argv) or os.environ.get(IMPORT_PROBE_SKIP_ENV) == "1":
         return None
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
@@ -3305,7 +3321,6 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 # Global rendering width override (set via --width); when set, all width
 # calculations should honor this value instead of auto-detected terminal width.
-WIDTH_OVERRIDE: int | None = None
 ANSI_ESCAPE_RE: Final[re.Pattern[str]] = re.compile(
     r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
 )
@@ -3399,9 +3414,12 @@ _LOCAL_TIMESTAMP_RE: Final[re.Pattern[str]] = re.compile(
     r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [A-Z]{2,5}"
 )
 CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S]"
-# Display width consumed by the Rich log handler prefix when show_level=True:
-# "[HH:MM:SS]" (10) + " " (1) + level padded to 8 chars (8) + " " (1) = 20.
-_RICH_LOG_PREFIX_WIDTH: Final[int] = 20
+# Columns the Rich log handler puts in front of every console line:
+# "[HH:MM:SS]" (10) + " " (1), plus the level padded to 8 chars + " " (9) when
+# --verbose shows the level column. Content wider than the console minus this
+# prefix wraps, so get_terminal_width() reports the width left for content.
+_CONSOLE_TIME_PREFIX_WIDTH: Final[int] = 11
+_CONSOLE_LEVEL_COLUMN_WIDTH: Final[int] = 9
 
 
 class StyleAwareRichHandler(RichHandler):
@@ -3492,6 +3510,8 @@ def _make_console_log_handler(
     width: int | None = None,
 ) -> StyleAwareRichHandler:
     """Create the Rich console log handler for stderr output."""
+    global _console_shows_level  # noqa: PLW0603 - one writer; read by get_terminal_width
+    _console_shows_level = verbose
     handler = StyleAwareRichHandler(
         console=_make_rich_console(width=width),
         show_time=True,
@@ -4830,29 +4850,37 @@ def _format_peak_memory_context(
 # --- Console UI helpers (rules/separators) ---
 
 
-def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
-    """Return a clamped terminal width for formatting.
+_console_shows_level: bool = False
 
-    Uses shutil.get_terminal_size with a sensible fallback; clamps the
-    value to avoid excessive lines on very wide terminals and poor display
-    on very narrow ones.
-    """
-    # If an explicit override is set (via --width), prefer it and do not apply
-    # per-call max_width limits; still enforce a minimal practical width.
-    if WIDTH_OVERRIDE is not None and WIDTH_OVERRIDE > 0:
-        return max(min_width, WIDTH_OVERRIDE)
-    # Support environment-based override as well (useful in CI): MLX_VLM_WIDTH
+
+def _console_total_width(max_width: int = 120) -> int:
+    """Return the full console width: --width / MLX_VLM_WIDTH, else the clamped terminal."""
     env_width = os.getenv("MLX_VLM_WIDTH")
     if env_width:
         try:
-            return max(min_width, int(env_width))
+            return int(env_width)
         except ValueError:
             pass
     try:
         width = shutil.get_terminal_size(fallback=(FORMATTING.generation_wrap_width, 24)).columns
     except OSError:
         width = FORMATTING.generation_wrap_width
-    return max(min_width, min(width, max_width))
+    return min(width, max_width)
+
+
+def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
+    """Return the console width available to logged content.
+
+    Every console line carries the handler's timestamp prefix (and the level
+    column under --verbose), so rules, banners and tables sized to the full
+    console width wrapped, leaving an orphan fragment on the next line. An
+    explicit --width / MLX_VLM_WIDTH is the full console width and is not
+    subject to ``max_width``; a detected terminal width is clamped to it first.
+    """
+    prefix = _CONSOLE_TIME_PREFIX_WIDTH + (
+        _CONSOLE_LEVEL_COLUMN_WIDTH if _console_shows_level else 0
+    )
+    return max(min_width, _console_total_width(max_width) - prefix)
 
 
 def _log_wrapped_error(label: str, value: str) -> None:
@@ -15821,12 +15849,9 @@ def _log_rich_renderable(
     width: int | None = None,
 ) -> None:
     """Log a Rich-rendered table/panel while keeping persisted logs plain."""
-    # When no explicit width is given, subtract the log-handler prefix (timestamp
-    # + level column) and indent from the terminal width so rendered rows don't
-    # wrap once the handler prepends its own prefix to each logged line.
-    render_width = width or max(
-        40, get_terminal_width(max_width=120) - _RICH_LOG_PREFIX_WIDTH - len(indent)
-    )
+    # get_terminal_width() already excludes the log-handler prefix; the indent
+    # is the only other thing the handler's line carries.
+    render_width = width or max(40, get_terminal_width(max_width=120) - len(indent))
     for line in _render_rich_lines(renderable, width=render_width):
         logger.info("%s%s", indent, line)
 
@@ -16381,7 +16406,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     console_handler = _make_console_log_handler(
         level=console_log_level,
         verbose=bool(args.verbose),
-        width=get_terminal_width(max_width=120),
+        width=max(60, _console_total_width(max_width=120)),
     )
     logger.addHandler(console_handler)
 
@@ -16785,10 +16810,11 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             include_metadata_hints=include_metadata_hints,
         )
         logger.debug("Using generated %s-lane prompt.", eval_mode)
-        logger.info(
-            "Final prompt: %s",
-            _build_prompt_preview(prompt, max_chars=max_display_len),
-        )
+        if not getattr(args, "dry_run", False):  # dry-run prints the whole prompt below
+            logger.info(
+                "Final prompt: %s",
+                _build_prompt_preview(prompt, max_chars=max_display_len),
+            )
     logger.debug("Full prompt:\n%s", prompt)
     logger.info("Prompt length: %d characters", len(prompt))
     logger.info(
@@ -24349,7 +24375,7 @@ def main(args: argparse.Namespace) -> None:
 
         # Handle dry-run mode: show what would be run and exit
         if getattr(args, "dry_run", False):
-            _handle_dry_run(args, image_path, prompt, library_versions)
+            _handle_dry_run(args, prompt, library_versions)
             return
 
         # Hard-fail before any model execution when core runtime deps are unavailable.
@@ -24404,7 +24430,6 @@ def main(args: argparse.Namespace) -> None:
 
 def _handle_dry_run(
     args: argparse.Namespace,
-    image_path: Path,
     prompt: str,
     library_versions: LibraryVersionDict,
 ) -> None:
@@ -24412,7 +24437,6 @@ def _handle_dry_run(
 
     Args:
         args: Parsed command line arguments
-        image_path: Resolved image path
         prompt: Generated or user-provided prompt
         library_versions: Dictionary of library versions
     """
@@ -24420,14 +24444,7 @@ def _handle_dry_run(
     logger.info("🔍 Validating configuration without running models...")
     log_blank()
 
-    # Image info
-    logger.info("📷 Image: %s", image_path)
-    if image_path.exists():
-        size_mb = image_path.stat().st_size / (1024 * 1024)
-        logger.info("   Size: %.2f MB", size_mb)
-    log_blank()
-
-    # Prompt info
+    # The run header above already names the image and its dimensions.
     logger.info("💬 Prompt:")
     # Wrap prompt for readability
     wrapped = textwrap.wrap(prompt, width=90)
@@ -24471,8 +24488,9 @@ def _handle_dry_run(
         for idx, model_id in enumerate(model_identifiers, start=1):
             model_type, resolved, arch_supported = _arch_precheck_for_model(model_id)
             capability = capability_by_id.get(model_id)
+            # The evidence is in the warning block above; repeating it here wraps the row.
             capability_note = (
-                f"  ❔ image capability unknown ({'; '.join(capability.evidence)})"
+                "  ❔ image capability unknown"
                 if capability is not None and capability.verdict == "unknown"
                 else ""
             )
