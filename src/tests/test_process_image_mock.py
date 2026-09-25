@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import io
+import itertools
 import json
 import logging
 import subprocess
@@ -2429,3 +2430,26 @@ class TestExplicitSampling:
         spec = json.loads(json.dumps(check_models._isolated_worker_spec(args, params)))
         rebuilt = check_models._isolated_params_from_spec(spec)
         assert rebuilt.explicit_sampling == frozenset({"top_k"})
+
+
+def test_phase_progress_notes_mark_each_slow_stretch_once(caplog: pytest.LogCaptureFixture) -> None:
+    """Loading, prompt rendering and input preparation each announce themselves once."""
+    caplog.set_level(logging.INFO, logger=check_models.logger.name)
+    phases = [
+        "input_validation",
+        "import",
+        "model_load",
+        "tokenizer_load",
+        "prefill",
+        "prefill",
+        "generation_before_first_token",
+        "cleanup",
+    ]
+    for previous, current in itertools.pairwise(phases):
+        check_models._log_phase_progress(previous, current)
+    notes = [record.getMessage() for record in caplog.records]
+    assert notes == [
+        "Loading model weights and processor...",
+        "Rendering the prompt...",
+        "Preparing image inputs and prefilling...",
+    ]

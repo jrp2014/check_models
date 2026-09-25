@@ -14087,7 +14087,8 @@ def _prepare_generation(
     if taken:
         effective = cast("Mapping[str, object]", generate_kwargs)
         logger.info(
-            "Sampling for %s from its generation_config.json (unset on the command line): %s",
+            "Token decoding settings for %s from its generation_config.json "
+            "(unset on the command line): %s",
             params.model_identifier,
             ", ".join(f"{key} {effective.get(key)}" for key in taken),
         )
@@ -15539,6 +15540,23 @@ def _run_isolated_worker(spec_path: Path) -> int:
     return 0
 
 
+# One line as each slow stretch before the first token begins, so a long
+# pause reads as work rather than a hang: weights and processor loading, the
+# harness rendering the prompt, then upstream preparing the image inputs and
+# running prefill (where mlx-vlm's own Prefill bar appears under --verbose).
+_PHASE_PROGRESS_NOTES: Final[dict[str, str]] = {
+    "model_load": "Loading model weights and processor...",
+    "prefill": "Rendering the prompt...",
+    "generation_before_first_token": "Preparing image inputs and prefilling...",
+}
+
+
+def _log_phase_progress(previous_phase: str, current_phase: str) -> None:
+    """Log a short progress note when a model enters one of the slow early phases."""
+    if current_phase != previous_phase and (note := _PHASE_PROGRESS_NOTES.get(current_phase)):
+        logger.info("%s", note)
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     stdout_capture = _TeeCaptureStream(sys.stdout)
@@ -15561,7 +15579,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
     def _update_phase(phase: str) -> None:
         nonlocal current_phase, upstream_boundary
+        previous_phase = current_phase
         current_phase = _normalise_failure_phase(phase) or phase
+        _log_phase_progress(previous_phase, current_phase)
         upstream_boundary = _advance_upstream_boundary(upstream_boundary, current_phase)
         if _ISOLATION_PHASE_SINK is not None:
             _ISOLATION_PHASE_SINK(current_phase)

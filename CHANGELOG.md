@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Each model's run logs one short line as each slow stretch before the first
+  token begins ("Loading model weights and processor...", "Rendering the
+  prompt...", "Preparing image inputs and prefilling..."), so a long pause
+  reads as work rather than a hang. The checkpoint-defaults line now reads
+  "Token decoding settings for ..." instead of "Sampling for ...".
 - Skills follow Anthropic's current authoring guidance: each description says
   what the skill does and then when to use it, in the third person, and no
   longer carries rules (the conda-not-uv and don't-file-unasked rules already
