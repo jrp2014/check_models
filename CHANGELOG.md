@@ -26,6 +26,10 @@ Notable changes to this project will be documented in this file.
   architecture package (local path-limited `git log`), distinguishing "no
   commits touched it" from "history unavailable". Labelled as context, not
   attribution.
+- Repository-scoped Codex configuration disables the overlapping Superpowers
+  workflow. Agent guidance selects the repository's HF CLI reference over
+  duplicate personal/plugin copies, preserving specialised skills and personal
+  defaults; the current Codex per-skill project-scope limitation is documented.
 - Agent guidance explicitly authorizes the safe local edit–test–fix loop for
   implementation requests while retaining authorization boundaries around
   downloads, dependency changes, model/data caches, expensive inference,

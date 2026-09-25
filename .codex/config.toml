@@ -1,0 +1,4 @@
+# Repository-only overrides; keep personal Codex defaults unchanged.
+# The canonical agent guidance already defines the development workflow.
+[plugins."superpowers@openai-curated"]
+enabled = false

@@ -271,6 +271,13 @@ run; do not describe them as a full code-quality pass.
 
 ### 10. Agentic skills (`.agents/skills/`)
 
+Codex repository-only skill configuration and its reversal are documented in
+[`docs/notes/CODEX_SKILL_OVERRIDES.md`](../docs/notes/CODEX_SKILL_OVERRIDES.md).
+They leave personal defaults and the repository skills below intact.
+When multiple `hf-cli` references are available, use `.agents/skills/hf-cli`
+for this repository; do not load duplicate personal or plugin CLI references
+for the same task. Use specialised HF/MLX skills for their distinct workflows.
+
 Skills provide task-specific context, constraints, and verification guidance.
 Read the relevant `SKILL.md` **before** starting work of that kind, then load
 supporting references only as needed. The same directory
