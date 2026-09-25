@@ -1,19 +1,18 @@
 ---
 name: upstream-mlx-vlm-issues
 description: >
-  Create or improve reproducible, maintainer-ready GitHub issue drafts for
-  upstream mlx-vlm from check_models failures or native repros. Use for crashes,
-  load/processor failures, wrong outputs, media-input bugs, and regressions.
-  Prefer existing diagnostics and issue_*.md artifacts. Do not open a GitHub
-  issue unless the user explicitly asks. This repo uses conda + pip, never uv.
+  Drafts reproducible, maintainer-ready GitHub issues for upstream mlx-vlm
+  from check_models failures or native repros, starting from existing
+  diagnostics and issue_*.md drafts. Use for crashes, load or processor
+  failures, wrong outputs, media-input bugs, and regressions.
 ---
 
 # Upstream mlx-vlm Issue Drafts
 
 Turn a failure into concise, actionable **mlx-vlm** issue Markdown. Default
 output is issue-ready text or an improved local draft under `src/output/issues/`.
-**Do not** run `gh issue create` or open a PR against upstream unless the user
-explicitly requests filing.
+File with `gh issue create`, or open a PR upstream, only when the user asks
+for it: an issue is published under the user's name and cannot be taken back.
 
 Adapted from the upstream `reproducible-github-issues` skill
 ([`skills/skills/reproducible-github-issues`](https://github.com/Blaizzy/mlx-vlm/tree/main/skills/skills/reproducible-github-issues),
@@ -60,7 +59,7 @@ Collect or infer:
 5. State clearly if it only fails with a private checkpoint.
 6. Lead with **root exception + first frames inside mlx-vlm / transformers /
    model code**; keep long harness stacks under an optional details block.
-7. Commands use `python -m …` under conda/`pip` — **never** `uv run`.
+7. Commands use `python -m …` under conda + pip, not `uv run`: the environment is conda-managed, and uv would install outside it.
 
 ## Maintainer quality bar
 

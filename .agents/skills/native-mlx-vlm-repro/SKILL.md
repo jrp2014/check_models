@@ -1,12 +1,11 @@
 ---
 name: native-mlx-vlm-repro
 description: >
-  Run or debug native mlx-vlm CLI/Python inference outside check_models when
-  verifying harness findings, minimizing reproductions, or confirming upstream
-  regressions. Use for python -m mlx_vlm.generate, load/apply_chat_template/
-  generate scripts, processor or chat-template errors, media-input failures, and
-  deterministic native repro commands. Prefer existing issue-draft or diagnostics
-  repro blocks when present. This repo uses conda + pip, never uv.
+  Reproduces harness findings with native mlx-vlm outside check_models:
+  `python -m mlx_vlm.generate` commands and load, apply_chat_template and
+  generate scripts. Use when verifying a harness finding, minimising a
+  reproduction, confirming an upstream regression, or debugging processor,
+  chat-template or media-input errors.
 ---
 
 # Native mlx-vlm Reproduction
@@ -31,7 +30,7 @@ python -m mlx_vlm.generate --help   # confirm installed CLI flags before finaliz
 - Use the **conda `mlx-vlm` env** and **`pip`** installs only.
 - Prefer `python -m mlx_vlm.generate` / `python -m mlx_vlm.server` over bare
   entry-point scripts when documenting commands.
-- **Never** document or run `uv run …` in this repository.
+- Write and run commands as `python -m …`, not `uv run …`: the environment is conda-managed, and uv would install outside it.
 - Do not download large models unless the user asks; prefer local cache paths or
   already-cached HF IDs.
 

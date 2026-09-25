@@ -1,8 +1,10 @@
 ---
 name: hf-cache-mlx-vlm-models
 description: >
-  Use when explaining cached-model discovery, skipped repositories, dry-run
-  selections, cache paths, or differences from mlx-vlm server listings.
+  Explains which cached Hugging Face models the harness selects, why others
+  are skipped, and how hub checkpoints are checked before download. Use for
+  cached-model discovery, skipped repositories, dry-run selections, cache
+  paths, pre-download checks, or differences from mlx-vlm server listings.
   Cache eligibility is not proof that a model can generate.
 ---
 

@@ -1,14 +1,11 @@
 ---
 name: upstream-mlx-vlm-contributing
 description: >
-  Shape a change to upstream mlx-vlm so it lands cleanly, working from the
-  editable checkout this project already installs: where processor, model and
-  test code go, backward-compatible config args, running the focused upstream
-  tests, matching upstream's black/isort/autoflake hooks with the ruff already
-  installed here, and PR expectations (tests, review, perf evidence). Use when
-  a check_models finding
-  turns into an upstream fix rather than an issue. This repo uses conda + pip,
-  never uv.
+  Turns a check_models finding into an upstream mlx-vlm fix from the editable
+  checkout already installed: where model, processor and test code go,
+  backward-compatible config arguments, focused upstream tests, upstream's
+  formatting hooks, and PR expectations. Use when a finding should become an
+  upstream fix rather than an issue.
 ---
 
 # Contributing to upstream mlx-vlm (conda + pip)
@@ -129,8 +126,9 @@ without copying them into this tree.
 
 ## Rules
 
-- **Do not** use `uv run` / `uv pip`; **do not** commit upstream repro or
-  benchmark scripts to this repository.
+- Use conda + pip, not `uv run` / `uv pip`: the environment is conda-managed, and uv would install outside it.
+- Keep upstream repro and benchmark scripts out of this repository; they
+  belong with the upstream change or in scratch.
 - Do not open the PR or push to the fork unless the user asks; prepare the
   branch, tests and PR text and stop.
 - Filing an issue instead: `upstream-mlx-vlm-issues`.

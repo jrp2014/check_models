@@ -1,11 +1,10 @@
 ---
 name: benchmarking-mlx-vlm
 description: >
-  Measure mlx-vlm/MLX performance credibly for perf comparisons, regressions,
-  or upstream PR evidence: median-of-N with warmup, mx.eval/mx.synchronize
-  before stopping timers, peak-memory protocol, and A/B discipline across MLX
-  versions. Use when timing model changes, comparing local MLX builds, or
-  preparing perf numbers for maintainers. This repo uses conda + pip, never uv.
+  Measures mlx-vlm and MLX performance credibly: median of N runs after
+  warm-up, MLX synchronised before timers stop, peak memory, and like-for-like
+  A/B across MLX versions. Use when timing a model change, comparing local MLX
+  builds, or preparing performance evidence for an upstream PR.
 ---
 
 # Benchmarking mlx-vlm (conda + pip)
@@ -97,8 +96,9 @@ python -m check_models --models <model> --image <img> > /tmp/b.log
 
 ## Rules
 
-- **Do not** use `uv run` / `uv venv`.
-- **Do not** commit benchmark scripts or output logs to this repo.
+- Use conda + pip, not `uv run` / `uv venv`: the environment is conda-managed, and uv would install outside it.
+- Keep benchmark scripts and output logs in scratch, out of this repo: they are
+  one-off evidence, and a PR carries the script text itself.
 - For upstream issue drafts built on these numbers, follow
   `upstream-mlx-vlm-issues`; for isolating failures first, follow
   `native-mlx-vlm-repro`.

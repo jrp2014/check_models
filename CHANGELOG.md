@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Skills follow Anthropic's current authoring guidance: each description says
+  what the skill does and then when to use it, in the third person, and no
+  longer carries rules (the conda-not-uv and don't-file-unasked rules already
+  stand in the skill bodies, and descriptions load into every session). The
+  cache skill's description now says what it does, not only when. Shouted
+  rules ("Things to NEVER do", bold "Never" and "Do not") are restated
+  plainly with their reasons, which the latest models follow without
+  over-applying.
 - Refreshed repository-local agent guidance for Codex/GPT-6 Astra: clearer
   outcomes, task scope, evidence, and validation reporting with less duplicated
   procedure. The cache skill now points to maintained rules instead of copying

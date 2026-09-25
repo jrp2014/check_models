@@ -1,8 +1,8 @@
 ---
 name: add-or-fix-type-checking
 description: >
-  Fix broken typing checks detected by mypy, ty, pyrefly, or `make quality`.
-  Use when typing errors appear in local runs, CI, or PR logs.
+  Fixes typing errors that mypy, ty or pyrefly report in this repository,
+  whether from `make quality`, CI or a PR log. Use when a type checker fails.
 ---
 
 # Add or Fix Type Checking
@@ -200,14 +200,14 @@ incomplete and there is no way to narrow or cast around it.
 Always add the specific error code: `# type: ignore[call-arg]`, not bare
 `# type: ignore`.
 
-### 5. Things to NEVER do
+### 5. Approaches to avoid
 
-- **Never use `assert` for type narrowing.** Asserts are stripped by
-  `python -O` and must not be relied on for correctness. Use `if ...: raise`
-  instead.
-- **Never use `# type: ignore` as a first resort.** Exhaust all approaches
-  above first.
-- **Never add bare `# type: ignore`** without a specific error code.
+- **`assert` for type narrowing.** Asserts are stripped by `python -O`, so
+  correctness cannot depend on them; use `if ...: raise` instead.
+- **`# type: ignore` as a first resort.** Try the approaches above first: a
+  suppression also hides the next real error on that line.
+- **Bare `# type: ignore`.** Name the error code, so the suppression audit in
+  the quality gate can check the suppression is still needed.
 - Do not use `cast()` when `@overload` or generics can eliminate it at the
   source.
 - Do not add helper methods or abstractions just to satisfy the type checker
