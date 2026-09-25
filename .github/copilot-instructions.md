@@ -22,6 +22,23 @@ not permission to expand its scope.
   validation scope, and remaining uncertainty. Distinguish observations from
   hypotheses and focused checks from the full quality gate.
 
+For an implementation request, the safe local edit–test–fix loop is authorized:
+edit task-relevant files, run deterministic local checks with disposable fixtures,
+fix failures caused by the change, and rerun affected checks without asking for
+approval at each step. Continue through the applicable validation in section 9
+and final diff review. Preserve unrelated work, keep generated validation output
+in temporary directories, and report unrelated failures without expanding scope.
+Review or diagnosis alone does not authorize implementation.
+
+This authorization does not include downloading models or datasets, installing
+or updating dependencies, mutating model/data caches (including deletion or
+pruning), expensive inference or benchmark runs, commits, pushes, or publishing
+reports, issues, or pull requests. These need explicit authorization covering
+the action and scope; do not ask again when the user's request already provides
+it. Ordinary gitignored test/lint/type-checker caches remain permitted as described
+in section 6. Stop at tool permission boundaries or when new authority is needed;
+this local workflow does not override sandbox or approval requirements.
+
 ---
 
 ### 1. Environment — before running Python or make

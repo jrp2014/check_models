@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Agent guidance explicitly authorizes the safe local edit–test–fix loop for
+  implementation requests while retaining authorization boundaries around
+  downloads, dependency changes, model/data caches, expensive inference,
+  commits, and publishing.
 - Each model's run logs one short line as each slow stretch before the first
   token begins ("Loading model weights and processor...", "Rendering the
   prompt...", "Preparing image inputs and prefilling..."), so a long pause
