@@ -20,7 +20,7 @@ which targets ty alone; this version covers this repository's three checkers
 ## Environment
 
 ```bash
-conda activate mlx-vlm                          # REQUIRED before any command
+conda activate mlx-vlm                          # before Python or make commands
 cd src && python -m tools.validate_env && cd ..  # quick sanity check
 ```
 
@@ -28,10 +28,18 @@ cd src && python -m tools.validate_env && cd ..  # quick sanity check
 
 ### 1. Identify scope from the failing run
 
+Keep the Transformers-derived workflow and examples below; this adaptation adds
+the repository's environment, three-checker, and stub-management requirements.
+For a review or diagnosis request, inspect and run read-only checks only.
+Formatting, fixes, installation, and stub regeneration belong to an authorized
+implementation task. Preserve unrelated local edits throughout.
+
 - If you already have `make quality` or CI output, extract the failing
   file/module paths.
-- If not, clear formatting and lint failures before the full gate so typing
-  failures are not hidden behind Ruff noise:
+- If no failing output is available, inspect the relevant diff and checker
+  configuration, then run a focused check to establish the failure.
+- For an implementation task, clear formatting and lint failures before the
+  full gate so typing failures are not hidden behind Ruff noise:
 
   ```bash
   make format
@@ -47,20 +55,21 @@ cd src && python -m tools.validate_env && cd ..  # quick sanity check
 This repo uses **three type checkers** in order of priority:
 
 ```bash
-# Primary — mypy (from src/)
-cd src && mypy --config-file pyproject.toml check_models.py tests
+# From the repository root; the subshell keeps later commands at that root.
+# Primary — mypy
+(cd src && mypy --config-file pyproject.toml check_models.py tests)
 
-# Secondary — ty (from repo root; resolves conda interpreter)
+# Secondary — ty (resolves conda interpreter)
 make ty
-
-# Tertiary — pyrefly (from repo root)
-make quality   # pyrefly runs as part of the pipeline
 ```
+
+Pyrefly also runs in the full `make quality` acceptance pipeline. That full
+pipeline is not a prerequisite to understanding one diagnostic.
 
 You can also run mypy on a specific file:
 
 ```bash
-cd src && mypy --config-file pyproject.toml check_models.py
+(cd src && mypy --config-file pyproject.toml check_models.py)
 ```
 
 ### 3. Triage errors by category before fixing anything
@@ -122,8 +131,9 @@ inputs = result.to(device)["input_ids"]
 
 #### d. Fix incorrect type hints at the source
 
-If a parameter is typed `X | None` but can never be `None` when actually
-called, remove `None` from the hint.
+If a parameter is typed `X | None` but its contract rules out `None`, correct
+the hint. Check the producer and consumer contracts, not just a few current
+callers.
 
 #### e. Annotate untyped attributes
 
@@ -247,10 +257,13 @@ make stubs-clear    # Remove generated stubs
 
 ### 8. Verify and close the loop
 
+A focused pass establishes only that scope. Report which checks ran and any
+remaining validation or environment limits; do not call it a full quality pass.
+
 - Re-run the individual checker that failed:
 
   ```bash
-  cd src && mypy --config-file pyproject.toml check_models.py
+  (cd src && mypy --config-file pyproject.toml check_models.py)
   make ty
   ```
 

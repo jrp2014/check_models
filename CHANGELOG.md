@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refreshed repository-local agent guidance for Codex/GPT-6 Astra: clearer
+  outcomes, task scope, evidence, and validation reporting with less duplicated
+  procedure. The cache skill now points to maintained rules instead of copying
+  feature internals; the typing skill retains its Transformers-derived workflow
+  and examples with small repository-specific clarifications.
 - `--help` and `--dry-run` skip the dependency import probe, which costs a
   second full `mlx_vlm` import: `--help` drops from 5.7 s to 2.2 s. The probe
   shields a sweep in progress from a hard-crashing import; neither command

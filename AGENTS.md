@@ -1,5 +1,8 @@
 # Agent Instructions
 
+Entry point for Codex (including GPT-6 Astra), Claude Code, and other agents.
+Use the shared guidance below; there is no separate model-specific rulebook.
+
 All project conventions, architecture, environment setup, coding standards,
 and change workflows are maintained in a single canonical file:
 

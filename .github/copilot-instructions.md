@@ -1,22 +1,43 @@
-## Copilot / AI Agent Instructions — check_models
+## Agent Guidance — check_models
 
 Benchmarking tool for MLX Vision Language Models on Apple Silicon. macOS-only, Python 3.13+, conda `mlx-vlm` environment required.
 
+### Working approach
+
+Use this document for project constraints and the linked references for task-specific
+detail. Choose an approach proportionate to the request; the workflows below are
+not permission to expand its scope.
+
+- Start from the current checkout, diff, and relevant evidence. Recheck them when
+  resuming work; earlier reviews may describe a different revision or worktree.
+- For review or diagnosis, inspect and report. For an implementation request, make
+  the smallest coherent change, preserve unrelated edits, and verify the result.
+  Ask when a missing choice materially affects scope or behavior.
+- Prefer clear contracts and a single source of facts over repeated plumbing.
+  Preserve meaning when simplifying; fewer lines alone are not the objective.
+- Test the observable boundary affected by a change, not just an internal helper.
+  For presentation changes, inspect representative rendered output as well as
+  calculations and strings.
+- Lead the handoff with the outcome. Give concrete findings, relevant file links,
+  validation scope, and remaining uncertainty. Distinguish observations from
+  hypotheses and focused checks from the full quality gate.
+
 ---
 
-### 1. Environment — always do this first
+### 1. Environment — before running Python or make
 
 ```bash
 conda activate mlx-vlm          # REQUIRED before any python/make command
 cd src && python -m tools.validate_env && cd ..   # quick sanity check
 ```
 
-If the environment doesn't exist: `bash src/tools/setup_conda_env.sh`.
+If the environment doesn't exist, the setup entry point is
+`bash src/tools/setup_conda_env.sh`; installing it is separate from a read-only review.
 For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 **Never run bare `python` without the conda environment active.**
 
-For every fresh Git worktree, also bootstrap the ignored repo-local Node lockfile
-before running the quality gate:
+For a fresh Git worktree that needs the quality gate, bootstrap the ignored
+repo-local Node lockfile:
 
 ```bash
 npm install --ignore-scripts --prefix src
@@ -26,17 +47,17 @@ npm install --ignore-scripts --prefix src
 Markdown-lint tests require a local copy. A missing lockfile in a fresh worktree
 is a setup failure, not a product regression.
 
-### 2. Key files (read before editing)
+### 2. Key files (read those relevant to the task)
 
-| File | Purpose | Size |
+| File | Purpose | Guidance |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~25,100 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~25,100 lines). Application logic lives here. | Primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~26,300 lines across 34 test files | Add tests to existing files |
+| `src/tests/test_*.py` | Regression and integration tests | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
-| `src/README.md` | Full CLI docs, all flags, usage examples (~1,600 lines) | Reference for CLI behavior |
+| `src/README.md` | CLI docs, flags, and usage examples | Reference for CLI behavior |
 
 ### 3. Navigating `src/check_models.py` (section map)
 
@@ -196,6 +217,8 @@ The file is organized in this order — search for these exact landmark headers 
 
 - `from __future__ import annotations` at top of every file
 - Full type annotations: all parameters + return types. Use `| None`, `list[str]` (not `Optional`, `List`)
+- Document the reason for lint or typing suppressions; prefer correcting the underlying issue.
+- Keep helpers cohesive. A well-commented function can be clearer than several tiny wrappers; see the implementation guide's Philosophy section.
 - Prefer explicit symbol imports when practical (e.g., `from check_models import foo`), especially in tests; avoid broad module imports when only a few symbols are used.
 - `Final` for constants: `TIMEOUT: Final[float] = 5.0`
 - `pathlib.Path` for all paths; convert to `str` only at library call boundaries
@@ -203,34 +226,37 @@ The file is organized in this order — search for these exact landmark headers 
 - Catch specific exceptions, not bare `except Exception`. Use `raise ... from e` for context
 - Conventional commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`
 
-### 9. Change workflow (single checklist)
+### 9. Implementing and handing off changes
 
-1. `conda activate mlx-vlm`
-2. `git checkout -b feature/your-change`
-3. Edit `src/check_models.py` (and/or other files in `src/`)
-4. Add/update tests in `src/tests/` for the change
-5. If you added imports or updated package thresholds → update `src/pyproject.toml` or `src/check_models_data/dependency_policy.py`, then run `make deps-sync` to rebuild README dependencies
-6. If you added/changed CLI flags → update the CLI reference table in `src/README.md` (§ Command Line Reference)
-7. `make format` — apply Ruff formatting before the full quality gate
-8. `make -C src lint-fix` — apply safe Ruff fixes when lint reports fixable issues
-9. If manual correction would be slower, optionally preview Ruff's unsafe fixes
-   with `cd src && ruff check --unsafe-fixes --diff check_models.py tests tools`.
-   Apply them with `cd src && ruff check --fix --unsafe-fixes check_models.py tests tools`
-   only after understanding every proposed semantic change. Critically inspect the
-   resulting `git diff`, repair or revert questionable transformations, and run
-   targeted tests. This is an escape hatch, not a routine extra workflow step or
-   permission to accept unsafe fixes on the nod.
-10. `make lint` — clear Ruff lint errors before running the full gate
-11. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
-12. `make quality` — run the full quality gate check, including the full pytest suite
-13. If report formats changed → update `src/output/` fixtures intentionally; validation tests must not rewrite tracked `src/output/` assets just to prove a change
-14. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
-15. `git commit -m "feat: description"` and push
+Inspect the current branch and worktree before editing. Reuse the appropriate
+checkout; create a branch or worktree when the task needs one, not as a ritual.
+Keep unrelated changes intact. Commit, push, and publish only when authorized.
+
+For code changes:
+
+1. Add or update tests in existing `src/tests/` files to cover the changed behavior.
+2. Update affected CLI docs or dependency declarations; use `make deps-sync` when
+   dependency metadata changes. Record maintainer-relevant changes under
+   `[Unreleased]` in `CHANGELOG.md`.
+3. Run focused checks, then `make format`, `make -C src lint-fix` when needed,
+   and `make lint` before the full `make quality` gate. Run
+   `bash src/tools/run_commit_hygiene.sh` before committing.
+4. Review the final diff and report the validation result. Update retained outputs
+   only as an intentional deliverable, never as a side effect of validation.
+
+Ruff unsafe fixes are an optional escape hatch, not a routine step. Preview with
+`cd src && ruff check --unsafe-fixes --diff check_models.py tests tools`; apply
+only understood changes, inspect the diff, and run targeted tests.
+
+For documentation-only changes, check the affected Markdown, links, examples,
+and skill metadata or documentation contract tests. State the checks actually
+run; do not describe them as a full code-quality pass.
 
 ### 10. Agentic skills (`.agents/skills/`)
 
-Skills provide structured, step-by-step workflows for recurring tasks. Read the
-relevant `SKILL.md` **before** starting work of that kind. The same directory
+Skills provide task-specific context, constraints, and verification guidance.
+Read the relevant `SKILL.md` **before** starting work of that kind, then load
+supporting references only as needed. The same directory
 is linked as `.claude/skills` (a committed symlink, after transformers'
 `make claude` pattern) so Claude Code discovers the skills natively; edit only
 the `.agents/skills/` copy.
@@ -295,17 +321,7 @@ this table lists it.
 3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`
 
-### 12. What NOT to do
-
-- **Don't split `check_models.py`** into multiple files — the monolith structure is intentional
-- **Don't hardcode magic numbers** — use `quality_config.yaml` or dataclass fields
-- **Don't suppress lints** (`# noqa`, `# type: ignore`) without a documented reason
-- **Don't run `python` without conda** — always `conda activate mlx-vlm` first
-- **Don't create ad-hoc test scripts** — add tests to existing `src/tests/test_*.py` files
-- **Don't duplicate formatting logic** — extend `format_field_value` for new metrics
-- **Don't over-extract helpers** — a single well-commented function is preferred over many tiny one-use helpers (see `docs/IMPLEMENTATION_GUIDE.md` § Philosophy)
-
-### 13. Dependency Synchronization and Policy
+### 12. Dependency Synchronization and Policy
 
 This repository implements a strict dependency alignment and verification policy to ensure type safety and runtime compatibility across the MLX stack:
 
