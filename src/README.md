@@ -718,7 +718,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
 | `UPDATE_SYSTEM_PACKAGES` | `tools/update.sh` conda base/env and Homebrew updates | `1` (run system updates) | `UPDATE_SYSTEM_PACKAGES=0` to skip |
-| `UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade for markdownlint tooling | `0` (install from lockfile) | `UPDATE_NODE_TOOLING=1` |
+| `UPDATE_NODE_TOOLING` | Whether `tools/update.sh` moves markdownlint-cli2 to the latest npm release | `1` (always latest; never pinned) | `UPDATE_NODE_TOOLING=0` (offline: install from the local lockfile) |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 | `MLX_REBUILD_ON_TOOLCHAIN_CHANGE` | Rebuild the local mlx checkout when the Metal compiler differs from the one recorded for the current build (otherwise `tools/update.sh` only warns) | `0` (warn) | `MLX_REBUILD_ON_TOOLCHAIN_CHANGE=1` |
 | `HISTORY_BACKUP_DIR` | Where `tools/update.sh` writes dated snapshots of the untracked `output/results.history.jsonl`; older snapshots that are byte-prefixes of the newest are pruned, with every copy and deletion printed | `../../backups` beside the local MLX repos | Any directory |

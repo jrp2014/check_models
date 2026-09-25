@@ -441,6 +441,10 @@ Notable changes to this project will be documented in this file.
   earlier advisory) and moved to markdownlint-cli2 0.23.3, which brings
   `smol-toml` 1.8.0; Skylos's dependency scan flagged 1.6.1 for a newly
   published denial-of-service advisory (GHSA-7w5x-hrqm-74c2, fixed in 1.7.1).
+- `tools/update.sh` now always moves markdownlint-cli2 to the latest npm
+  release (`UPDATE_NODE_TOOLING` defaults to `1`; `0` installs from the local
+  lockfile when offline), with `--ignore-scripts` on that path too. The
+  package stays a caret range with no override.
 - Console rules and banners no longer wrap (0.17.37). They were drawn at the
   full console width although every line carries the handler's 11-column
   `[HH:MM:SS]` prefix (20 with `--verbose`), so each rule left an orphan

@@ -710,9 +710,9 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
 def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
     """Keep markdownlint-cli2 aligned between npm metadata and update tooling.
 
-    Policy: the spec is a caret range (not an exact pin) and update.sh can move
-    to the latest release. The lockfile is deliberately untracked, so it is
-    only cross-checked when a local `npm install` has produced one.
+    Policy: the spec is a caret range (never an exact pin), and update.sh moves
+    to the latest release by default. The lockfile is deliberately untracked,
+    so it is only cross-checked when a local `npm install` has produced one.
     """
     package_json = json.loads((PKG_ROOT / "package.json").read_text(encoding="utf-8"))
 
@@ -741,12 +741,14 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
         update_script
     )
     assert (
-        'npm install --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest'
-        in update_script
-    )
+        "npm install --ignore-scripts --no-audit --no-fund "
+        '--prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest'
+    ) in update_script
     assert "--save-exact" not in update_script
-    assert update_script.index("markdownlint-cli2@latest") > update_script.index(
-        "UPDATE_NODE_TOOLING"
+    # Latest is the default; the lockfile install is only the offline opt-out.
+    assert '"${UPDATE_NODE_TOOLING:-1}" == "1"' in update_script
+    assert update_script.index("markdownlint-cli2@latest") < update_script.index(
+        "package-lock.json..."
     )
 
 
@@ -1390,8 +1392,8 @@ def test_update_script_import_repair_hint_uses_distribution_names() -> None:
     assert "Fix with: pip install ${MISSING_PKGS[*]}" not in update_script
 
 
-def test_update_script_updates_system_packages_by_default_and_node_latest_opt_in() -> None:
-    """The updater should refresh system packages by default but keep npm latest opt-in."""
+def test_update_script_updates_system_packages_and_node_tooling_by_default() -> None:
+    """The updater refreshes system packages and moves markdownlint-cli2 to latest by default."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
     contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
@@ -1399,7 +1401,7 @@ def test_update_script_updates_system_packages_by_default_and_node_latest_opt_in
     assert "UPDATE_SYSTEM_PACKAGES" in update_script
     assert "UPDATE_NODE_TOOLING" in update_script
     assert 'if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then' in update_script
-    assert 'if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then' in update_script
+    assert 'if [[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]]; then' in update_script
     assert "Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)" in (
         update_script
     )
@@ -1410,12 +1412,18 @@ def test_update_script_updates_system_packages_by_default_and_node_latest_opt_in
         in readme
     )
     # The contributor guide no longer repeats README table rows; it points at the table.
-    assert "`UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade" in readme
+    assert (
+        "`UPDATE_NODE_TOOLING` | Whether `tools/update.sh` moves markdownlint-cli2 to the latest"
+        in readme
+    )
     assert "environment table (`src/README.md`)" in contributing
 
     package_latest = "markdownlint-cli2@latest"
     assert package_latest in update_script
-    assert update_script.index(package_latest) > update_script.index("UPDATE_NODE_TOOLING")
+    # Latest comes first (the default branch); the lockfile install is the opt-out.
+    assert update_script.index(package_latest) < update_script.index(
+        "Installing repo-local markdownlint tooling from package-lock.json"
+    )
 
 
 def test_update_script_cleans_stale_pip_invalid_distribution_backups() -> None:

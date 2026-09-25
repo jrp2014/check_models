@@ -6,7 +6,7 @@
 #   0. Copy a dated snapshot of the untracked sweep history to the backups
 #      directory (HISTORY_BACKUP_DIR, default ../../backups beside the repos)
 #   1. Update conda/Homebrew by default unless UPDATE_SYSTEM_PACKAGES=0
-#   2. Install repo-local npm tooling from lockfile (or latest if UPDATE_NODE_TOOLING=1)
+#   2. Update repo-local markdownlint-cli2 to the latest npm release (never pinned)
 #   3. Update pip/wheel/setuptools
 #   4. Update local MLX repos (if present) OR update from PyPI
 #   5. Reinstall project in editable mode from pyproject.toml to reconcile deps
@@ -20,7 +20,7 @@
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
 #   UPDATE_SYSTEM_PACKAGES=0 ./update.sh # Skip conda base/env and Homebrew updates
-#   UPDATE_NODE_TOOLING=1 ./update.sh # Upgrade markdownlint-cli2 to latest npm release
+#   UPDATE_NODE_TOOLING=0 ./update.sh # Offline: install markdownlint from the local lockfile
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
 #   MACOSX_DEPLOYMENT_TARGET=26.2 ./update.sh # Override local mlx build target
 #   MLX_LOCAL_BUILD_SMOKE=1 ./update.sh # Force local MLX runtime smoke test
@@ -265,10 +265,14 @@ backup_run_history
 # steps are extra registry round-trips whose output nothing here consumes;
 # the advisory endpoint has hung installs for minutes when it was degraded
 # while the package registry itself answered instantly, so both are skipped.
+# markdownlint-cli2 always moves to the latest release (a caret range in
+# package.json, never an exact pin or an npm override): a stale pin is how a
+# transitive smol-toml advisory reached the gate. UPDATE_NODE_TOOLING=0 is the
+# offline escape hatch, installing whatever the untracked lockfile holds.
 if command -v npm >/dev/null 2>&1; then
-	if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then
+	if [[ "${UPDATE_NODE_TOOLING:-1}" == "1" ]]; then
 		echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
-		npm install --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
+		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
 	else
 		echo "[update.sh] Installing repo-local markdownlint tooling from package-lock.json..."
 		npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"
