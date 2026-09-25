@@ -68,7 +68,7 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Guidance |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~25,100 lines). Application logic lives here. | Primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~25,600 lines). Application logic lives here. | Primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
@@ -279,8 +279,10 @@ for this repository; do not load duplicate personal or plugin CLI references
 for the same task. Use specialised HF/MLX skills for their distinct workflows.
 
 Skills provide task-specific context, constraints, and verification guidance.
-Read the relevant `SKILL.md` **before** starting work of that kind, then load
-supporting references only as needed. The same directory
+Load the relevant skill **before** starting work of that kind, then load
+supporting references only as needed. Claude Code invokes it with the Skill
+tool (so its use is visible and tracked) instead of reading `SKILL.md`
+directly; other agents read the `SKILL.md`. The same directory
 is linked as `.claude/skills` (a committed symlink, after transformers'
 `make claude` pattern) so Claude Code discovers the skills natively; edit only
 the `.agents/skills/` copy.

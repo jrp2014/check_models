@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Agent instructions now tell Claude Code to invoke the repository skills
+  with the Skill tool rather than read their `SKILL.md` files, so their use
+  is visible to `/skill-doctor`; other agents still read the files.
 - `tools/update.sh` stops with diagnostics instead of working around
   trouble in the local MLX checkouts. `git pull` is now `--ff-only`, and a
   pull that cannot complete prints the branch state and both sides of any
@@ -488,6 +491,41 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Code-review fixes in `check_models.py`:
+  - Report escaping. A tag whose quoted attribute contains `<` is now
+    escaped, and `&quot;` is no longer double-escaped in tables. A bare URL
+    followed by `]` or `>` is wrapped whole and never takes in a `<`.
+    Blockquotes neutralise `~~~` fences and one- or two-character setext
+    underlines. Image metadata (IPTC/XMP) in the gallery is escaped.
+  - Comparison. Settings recorded in only one run (a targeted rerun against
+    a full sweep) are listed as unverified instead of making the runs
+    incomparable. Baseline revisions must be commit ids before they reach
+    git, and a `--compare-with` ref starting with `-` is refused. The
+    decoding split counts the same completed pairs as the text count. Changed
+    text and changed failure signatures count as changes, and the log no
+    longer says "no changes" for incomparable runs.
+  - Regeneration. The summary rejects a retained comparison its renderers
+    cannot format, and links the gallery only when the manifest lists it.
+  - Reproduction. Per-model repro commands carry the model's effective
+    checkpoint sampling (native mlx-vlm does not read
+    `generation_config.json`).
+  - Runs and analysis:
+    - A cache miss rescans once, so a model downloaded mid-run gets its
+      checkpoint sampling.
+    - Any existing directory passed to `--models` is treated as a local path.
+    - Isolated-worker failures record their own traceback instead of
+      `NoneType: None`.
+    - Every generation exception keeps its prompt diagnostics.
+    - Reasoning markers are located in the original text, since `casefold()`
+      can lengthen it.
+    - Captured output from a generation-phase failure no longer marks a
+      crash as a connectivity problem.
+    - A single run-on keyword is truncated in previews.
+    - `E4B`-style effective sizes are not recorded as total parameter
+      counts.
+    - The working set is shown in the same decimal GB as peak memory.
+    - Non-ASCII `--eos-tokens` are no longer mangled.
+    - A NaN temperature and infinite KV bits are rejected.
 - Progress bars printed during a run (mlx-vlm's prefill bar under
   `--verbose`, huggingface_hub's fetch and Xet bars) render as they would
   without the harness: full terminal width in Unicode blocks, so their right

@@ -908,3 +908,17 @@ class TestProcessorKwargsArgument:
         """Malformed JSON and non-object documents are argparse errors."""
         with pytest.raises(argparse.ArgumentTypeError, match=match):
             check_models._parse_processor_kwargs_arg(value)
+
+
+def test_non_finite_cli_values_are_rejected() -> None:
+    """NaN temperature and infinite KV bits are invalid, not silently accepted."""
+    with pytest.raises(ValueError, match="Temperature must be non-negative"):
+        check_models.validate_temperature(temp=float("nan"))
+    with pytest.raises(ValueError, match="kv_bits must be >= 1"):
+        check_models._validate_kv_bits_increments("kv_bits", float("inf"))
+
+
+def test_cli_eos_tokens_keep_non_ascii_and_decode_escapes() -> None:
+    """unicode_escape on a str turned non-ASCII tokens into mojibake."""
+    token = "<\uff5cend\u2581of\u2581sentence\uff5c>"  # DeepSeek-style end token
+    assert check_models._decode_cli_eos_tokens([token, "a\\nb"]) == (token, "a\nb")

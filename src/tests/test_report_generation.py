@@ -291,12 +291,16 @@ def _write_issue_summary_fixture(
 
 
 def test_format_peak_memory_context_uses_significant_figures() -> None:
-    """Human working-set context should follow project-wide significant figures."""
+    """Human working-set context should follow project-wide significant figures.
+
+    Peak and working set share decimal GB, so the percentage is checkable
+    from the two figures shown (96 GiB is 103 GB).
+    """
     assert check_models._format_peak_memory_context(18.2, 96 * 1024**3) == (
-        "18 GB (17.7% of 96 GB recommended working set)"
+        "18 GB (17.7% of 103 GB recommended working set)"
     )
     assert check_models._format_peak_memory_context(120.0, 96 * 1024**3) == (
-        "120 GB (116% of 96 GB recommended working set)"
+        "120 GB (116% of 103 GB recommended working set)"
     )
 
 
@@ -7724,3 +7728,151 @@ def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_p
     unavailable = check_models._architecture_commits(comparison, current, before_meta, wheel)
     assert {entry.status for entry in unavailable} == {"unavailable"}
     assert "history unavailable" in check_models._architecture_commit_item(unavailable[0])
+
+
+def test_reasoning_split_indexes_the_original_text_not_its_casefold() -> None:
+    """casefold() lengthens "ß", so offsets from a casefolded copy cut the answer short."""
+    text = "Straße Straße</think>Title: Boats"
+    assert check_models._final_answer_view(text, seeded_text="<think>") == "Title: Boats"
+    signals = check_models._detect_reasoning_output("<think>Straße Straße</think>Ok")
+    assert signals.has_thinking_trace
+    assert not signals.thinking_only_output
+
+
+def test_generation_phase_output_is_not_connectivity_evidence() -> None:
+    """A model describing a "502 Bad Gateway" page is not a transport failure."""
+    result = check_models.PerformanceResult(
+        model_name="m",
+        generation=None,
+        success=False,
+        error_message="shape mismatch",
+        captured_output_on_fail="The screenshot shows a 502 Bad Gateway page",
+        failure_phase="decode",
+    )
+    assert not check_models._is_indeterminate_connectivity_failure(result)
+    load_failure = replace(result, failure_phase="model_load")
+    assert check_models._is_indeterminate_connectivity_failure(load_failure)
+
+
+def test_effective_size_designation_is_not_the_total_parameter_count() -> None:
+    """Effective ("E4B") and active ("A3B") sizes are not the checkpoint's total."""
+    assert check_models._parameter_counts_from_name("org/gemma-3n-E4B-it-4bit")[0] is None
+    assert check_models._parameter_counts_from_name("org/Qwen3-VL-30B-A3B-4bit") == (
+        30_000_000_000,
+        3_000_000_000,
+    )
+
+
+def test_unraised_failure_records_its_own_traceback() -> None:
+    """Isolated-worker errors are built, not raised: format_exc() gave "NoneType: None"."""
+    result = check_models._build_failure_result(
+        model_name="m", error=TimeoutError("worker timed out"), captured_output=None
+    )
+    assert result.error_traceback is not None
+    assert "NoneType: None" not in result.error_traceback
+    assert "TimeoutError: worker timed out" in result.error_traceback
+
+
+def test_one_sided_generation_settings_are_unknown_not_a_mismatch() -> None:
+    """A targeted rerun shares more settings than a full sweep; that is not a change."""
+    metadata = {"prompt": "p", "eval_mode": "assisted", "assessment_profile": "general"}
+    baseline = check_models.ComparisonBaseline(
+        label="base",
+        metadata=cast("Any", metadata),
+        results=(),
+        image=cast("Any", {"sha256": "a" * 64}),
+        generation_settings=(("max_tokens", "500"), ("seed", "0")),
+    )
+    reasons, unverified = check_models._comparison_compatibility(
+        baseline,
+        current_metadata=cast("Any", metadata),
+        current_image=cast("Any", {"sha256": "a" * 64}),
+        current_generation_settings=(("max_tokens", "500"), ("seed", "0"), ("temperature", "0.0")),
+    )
+    assert reasons == ()
+    assert "generation settings temperature" in unverified
+    reasons, _ = check_models._comparison_compatibility(
+        baseline,
+        current_metadata=cast("Any", metadata),
+        current_image=cast("Any", {"sha256": "a" * 64}),
+        current_generation_settings=(("max_tokens", "300"), ("seed", "0")),
+    )
+    assert reasons == ("generation settings differ: max_tokens 500 → 300",)
+
+
+def test_baseline_revisions_must_be_commit_ids_before_reaching_git() -> None:
+    """Retained JSON could otherwise pass "--output=..." to git log/rev-list."""
+    current = {
+        "mlx": {"install_type": "editable", "source_location": "/r", "built_revision": "b" * 40}
+    }
+    hostile = {"mlx": {"built_revision": "--output=/tmp/x"}}
+    assert check_models._editable_revision_range(hostile, current, "mlx") is None
+
+
+def test_decoding_split_counts_the_same_pairs_as_the_text_count() -> None:
+    """An indeterminate side has no text to compare; neither count may include it."""
+
+    def row(execution: str, text: str) -> check_models.JsonlResultRecord:
+        return cast(
+            "check_models.JsonlResultRecord",
+            {
+                "assessment": {"execution": execution},
+                "generated_text": text,
+                "prompt_diagnostics": {"generate_kwargs": {"temperature": 0.0}},
+            },
+        )
+
+    pairs = [
+        ("a", row("indeterminate", ""), row("completed", "x")),
+        ("b", row("completed", "y"), row("completed", "y")),
+    ]
+    compared, changed = check_models._generated_text_changes(pairs)
+    assert (compared, changed) == (1, [])
+    assert check_models._text_changes_by_decoding(pairs) == (("greedy", 0, 1),)
+
+
+def test_repro_args_carry_the_models_effective_sampling() -> None:
+    """Native mlx-vlm ignores generation_config.json, so the command must state it."""
+    run_args = argparse.Namespace(temperature=0.0, top_p=1.0, top_k=0, enable_thinking=False)
+    merged = check_models._effective_repro_args(
+        run_args, {"temperature": 1.0, "top_p": 0.95, "top_k": 64}
+    )
+    assert merged is not None
+    assert (merged.temperature, merged.top_p, merged.top_k) == (1.0, 0.95, 64)
+
+
+def test_rehydrated_comparison_the_renderers_cannot_format_is_rejected() -> None:
+    """A one-entry harness list or a half-recorded ratio degrades regeneration, not crash it."""
+    base = check_models.RunComparison(
+        baseline_label="b",
+        baseline_timestamp=None,
+        baseline_components=(),
+        compared_models=0,
+        models_added=(),
+        models_removed=(),
+        changes=(),
+        identical_text_models=0,
+        text_compared_models=0,
+        tps_ratio_median=None,
+        tps_ratio_min=None,
+        tps_ratio_max=None,
+        tps_compared_models=0,
+        throughput_flags=(),
+        memory_changes=(),
+        history_runs_used=0,
+    )
+    assert check_models._check_rendered_comparison(base) is base
+    with pytest.raises(ValueError, match="harness_versions"):
+        check_models._check_rendered_comparison(replace(base, harness_versions=("0.17.38",)))
+    with pytest.raises(ValueError, match="ratio"):
+        check_models._check_rendered_comparison(replace(base, prompt_tps_ratio_median=1.0))
+
+    # Changed text and a changed failure signature are changes; the same
+    # signature is not.
+    assert not base.has_changes
+    assert replace(base, text_changed_models=("m",)).has_changes
+    same = check_models.CrashContinuity("m", "same_signature", "s", "s")
+    assert not replace(base, crash_continuity=(same,)).has_changes
+    assert replace(
+        base, crash_continuity=(same._replace(status="different_signature"),)
+    ).has_changes

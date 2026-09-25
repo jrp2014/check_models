@@ -40,7 +40,6 @@ from __future__ import annotations
 import argparse
 import ast
 import base64
-import codecs
 import functools
 import gc
 import hashlib
@@ -233,7 +232,7 @@ NOT_AVAILABLE: Final[str] = "N/A"
 # applies its own tighter RERUN_TRIAGE_MAX_TOKENS cap.
 TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
 HTML_UNESCAPED_AMPERSAND_RE: Final[re.Pattern[str]] = re.compile(
-    r"&(?!lt;|gt;|amp;|#)",
+    r"&(?!lt;|gt;|amp;|quot;|#)",
 )
 # MD037 included: verbatim model-output previews may contain emphasis-like
 # sequences (e.g. "*   bullet" reasoning text) that must not be edited.
@@ -3659,7 +3658,9 @@ class HTMLSelectiveEscaper:
     """
 
     allowed_tags: frozenset[str] = frozenset({"br", "b", "strong", "i", "em", "code"})
-    tag_pattern: re.Pattern[str] = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+    tag_pattern: re.Pattern[str] = re.compile(
+        r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+(?:\"[^\"]*\"|'[^']*'|[^<>\"'])*?)?>"
+    )
 
     def escape(self, text: str) -> str:
         """Escape tags except allowed safe tags."""
@@ -3928,10 +3929,13 @@ def _final_answer_split(
         end_lower = end_marker.casefold()
         seeded_open = seeded_lower.rfind(start_lower) > seeded_lower.rfind(end_lower)
         if seeded_open:
-            view_lower = view.casefold()
-            end_position = view_lower.find(end_lower)
-            if end_position >= 0 and view_lower.find(start_lower, 0, end_position) < 0:
-                cut = end_position + len(end_marker)
+            # Search the original text: casefold() can lengthen it (ß -> ss),
+            # so offsets from a casefolded copy would mis-slice the view.
+            end_match = re.search(re.escape(end_marker), view, re.IGNORECASE)
+            if end_match is not None and not re.search(
+                re.escape(start_marker), view[: end_match.start()], re.IGNORECASE
+            ):
+                cut = end_match.end()
                 removed.append(view[:cut])
                 view = view[cut:]
     return view.strip(), tuple(removed)
@@ -4161,14 +4165,16 @@ def _detect_reasoning_output(
         if empty_wrapper.search(semantic_text):
             thinking_trace_markers.extend((start_marker, end_marker))
         semantic_text = empty_wrapper.sub(" ", semantic_text)
-    text_lower: str = semantic_text.casefold()
     seeded_lower = seeded_text.casefold()
     thinking_trace_incomplete = False
     thinking_only_output = bool(thinking_trace_markers) and not semantic_text.strip()
     for start_marker, end_marker in delimiter_pairs:
         start_lower = start_marker.casefold()
         end_lower = end_marker.casefold()
-        start_position = text_lower.find(start_lower)
+        # Positions index semantic_text itself: casefold() can lengthen text
+        # (ß -> ss), so offsets from a casefolded copy would mis-slice it.
+        start_match = re.search(re.escape(start_marker), semantic_text, re.IGNORECASE)
+        start_position = start_match.start() if start_match is not None else -1
         seeded_start_position = seeded_lower.rfind(start_lower)
         seeded_end_position = seeded_lower.rfind(end_lower)
         seeded_trace_open = (
@@ -4177,13 +4183,12 @@ def _detect_reasoning_output(
         if start_position < 0 and not seeded_trace_open:
             continue
         thinking_trace_markers.append(start_marker)
-        end_position = text_lower.find(
-            end_lower,
-            start_position + len(start_marker) if start_position >= 0 else 0,
+        end_match = re.compile(re.escape(end_marker), re.IGNORECASE).search(
+            semantic_text, start_match.end() if start_match is not None else 0
         )
-        if end_position >= 0:
+        if end_match is not None:
             thinking_trace_markers.append(end_marker)
-            final_text = semantic_text[end_position + len(end_marker) :]
+            final_text = semantic_text[end_match.end() :]
             thinking_only_output = thinking_only_output or not bool(
                 re.search(r"[^\W_]", final_text, re.UNICODE)
             )
@@ -4859,7 +4864,7 @@ def _format_peak_memory_context(
     )
     if percentage is None or recommended_working_set_bytes is None:
         return peak
-    working_set_gb = recommended_working_set_bytes / (1024**3)
+    working_set_gb = recommended_working_set_bytes / DECIMAL_GB
     return (
         f"{peak} GB ({fmt_num(percentage)}% of {fmt_num(working_set_gb)} GB "
         "recommended working set)"
@@ -5059,10 +5064,7 @@ def _distribution_text_file(distribution_name: str, filename: str) -> str | None
         package_distribution = distribution(distribution_name)
     except PackageNotFoundError:
         return None
-    metadata_path = _distribution_metadata_file_path(
-        package_distribution,
-        DISTRIBUTION_DIRECT_URL_METADATA_FILE,
-    )
+    metadata_path = _distribution_metadata_file_path(package_distribution, filename)
     if metadata_path is None:
         return None
     try:
@@ -7451,14 +7453,14 @@ def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
     """Return whether connectivity prevented a conclusive model attempt."""
     if result.success:
         return False
+    # Output captured during generation includes the model's own streamed
+    # text, which can mention "502 Bad Gateway"; only load-time (or unphased)
+    # output is transport evidence.
+    captured = (
+        result.captured_output_on_fail if result.failure_phase in (None, "model_load") else None
+    )
     combined = " ".join(
-        part.casefold()
-        for part in (
-            result.error_message,
-            result.error_traceback,
-            result.captured_output_on_fail,
-        )
-        if part
+        part.casefold() for part in (result.error_message, result.error_traceback, captured) if part
     )
     return _has_external_connectivity_signal(combined)
 
@@ -7572,7 +7574,8 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     return False if found_template else None
 
 
-_PARAM_COUNT_NAME_RE = re.compile(r"(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE)
+# A size token glued to a letter ("E4B" effective, "A3B" active) is not the total.
+_PARAM_COUNT_NAME_RE = re.compile(r"(?<![a-z])(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE)
 # "A3B" / "a4b": an *active*-parameter designation (MoE), never the total.
 _ACTIVE_PARAM_COUNT_NAME_RE = re.compile(
     r"(?<![a-z0-9])a(\d+(?:\.\d+)?)([bm])(?![a-z0-9])", re.IGNORECASE
@@ -7659,15 +7662,8 @@ def _collect_model_burden(
     requested_revision: str | None = None,
 ) -> ModelBurdenFacts | None:
     """Collect burden facts from the resolved snapshot; None when unavailable."""
+    # Snapshot resolution already rescans once on a miss.
     snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
-    if snapshot_path is None or not snapshot_path.is_dir():
-        # A cold in-process download during this run postdates the cached
-        # cache scan; refresh once so the run's own downloads are visible.
-        try:
-            _get_hf_cache_info_cached(refresh=True)
-        except (OSError, ValueError, FileNotFoundError, HFValidationError):
-            return None
-        snapshot_path = _resolve_model_snapshot_path(model_identifier, requested_revision)
     if snapshot_path is None or not snapshot_path.is_dir():
         return None
     config: dict[str, JsonLike] = _read_snapshot_json(snapshot_path, "config.json") or {}
@@ -8107,7 +8103,10 @@ def _field_aware_preview(answer: str, *, max_chars: int) -> str | None:
             if len(candidate) > _PREVIEW_KEYWORDS_CHARS and shown:
                 break
             shown.append(keyword)
-        listed = ", ".join(shown) + (", ..." if len(shown) < len(keywords) else "")
+        # One run-on "keyword" must not bypass the keyword budget.
+        listed = _truncate_text_preview(", ".join(shown), max_chars=_PREVIEW_KEYWORDS_CHARS) + (
+            ", ..." if len(shown) < len(keywords) else ""
+        )
         keywords_part = f"Keywords ({len(keywords)}): {listed}"
     else:
         keywords_part = "Keywords: (not detected)"
@@ -9157,7 +9156,7 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
     if text.startswith("[!"):
         replacement = f"&#91;{text[1:]}"
     else:
-        setext_match = re.fullmatch(r"([=-])\1{2,}\s*", text)
+        setext_match = re.fullmatch(r"([=-])\1*\s*", text)
         if setext_match is not None:
             underline_entity = "&#61;" if setext_match.group(1) == "=" else "&#45;"
             replacement = f"{underline_entity}{text[1:]}"
@@ -9191,6 +9190,7 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
                             "#": "&#35;",
                             ">": "&gt;",
                             "`": "&#96;",
+                            "~": "&#126;",
                         }
                         leading_char = text[:1]
                         if leading_char in prefix_entities:
@@ -9288,19 +9288,26 @@ def _append_markdown_image_metadata_section(
             line.strip() for line in paragraphs[0].splitlines() if line.strip()
         ]
         first_line = first_paragraph_lines[0] if first_paragraph_lines else ""
-        _append_markdown_labeled_value(parts, label=label, value=first_line, bullet=True)
+        # Image metadata is untrusted text: escape it like other report prose.
+        _append_markdown_labeled_value(
+            parts, label=label, value=_escape_report_markdown_text(first_line), bullet=True
+        )
 
         remaining_lines = first_paragraph_lines[1:]
         if remaining_lines:
             parts.append("")
-            parts.extend(f"    {line}" for line in remaining_lines)
+            parts.extend(
+                f"    {_escape_markdown_blockquote_line(line)}" for line in remaining_lines
+            )
 
         for paragraph in paragraphs[1:]:
             paragraph_lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
             if not paragraph_lines:
                 continue
             parts.append("")
-            parts.extend(f"    {line}" for line in paragraph_lines)
+            parts.extend(
+                f"    {_escape_markdown_blockquote_line(line)}" for line in paragraph_lines
+            )
     parts.append("")
 
 
@@ -11165,7 +11172,7 @@ def _model_provenance_by_model(
 
 # A bare http(s) URL that is not already inside angle brackets or a Markdown
 # link: not preceded by [ or <, not followed by ] or >.
-_BARE_URL_RE: Final[re.Pattern[str]] = re.compile(r"(?<![\[<])(https?://[^\s\)>\]]+)(?![\]>])")
+_BARE_URL_RE: Final[re.Pattern[str]] = re.compile(r"(?<![\[<])(https?://[^\s<>\)\]]++)")
 
 
 def _wrap_bare_urls(text: str) -> str:
@@ -11654,8 +11661,8 @@ def validate_inputs(
 
 def validate_temperature(*, temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
-    if temp < 0.0:
-        msg: str = f"Temperature must be non-negative, got {temp}"
+    if not math.isfinite(temp) or temp < 0.0:
+        msg: str = f"Temperature must be non-negative and finite, got {temp}"
         raise ValueError(msg)
     if temp > MAX_REASONABLE_TEMPERATURE:
         logger.warning(
@@ -11692,8 +11699,8 @@ def validate_sampling_params(
 
 def _validate_kv_bits_increments(name: str, bits: float) -> None:
     """Validate a KV bit-width is >= 1 in integer or .5 increments."""
-    if bits < 1:
-        msg = f"{name} must be >= 1 if specified, got {bits:g}"
+    if not math.isfinite(bits) or bits < 1:
+        msg = f"{name} must be >= 1 and finite if specified, got {bits:g}"
         raise ValueError(msg)
 
     rounded_half = round(bits * 2) / 2
@@ -11873,7 +11880,11 @@ def _decode_cli_eos_tokens(raw_tokens: Sequence[str] | None) -> tuple[str, ...] 
     decoded_tokens: list[str] = []
     for token in raw_tokens:
         try:
-            decoded_tokens.append(codecs.decode(token, "unicode_escape"))
+            # unicode_escape on a str reads its UTF-8 bytes as Latin-1, turning
+            # non-ASCII tokens into mojibake without raising.
+            decoded_tokens.append(
+                token.encode("latin-1", "backslashreplace").decode("unicode_escape")
+            )
         except (UnicodeDecodeError, UnicodeError):
             decoded_tokens.append(token)
     return tuple(decoded_tokens)
@@ -13551,18 +13562,20 @@ def _resolve_model_snapshot(
     requested revision that cannot be resolved locally returns None rather
     than misreporting some other snapshot as the requested one.
     """
-    if model_identifier.startswith(("/", "./", "../")):
-        path = Path(model_identifier)
+    path = Path(model_identifier).expanduser()
+    if model_identifier.startswith(("/", "./", "../", "~")) or path.is_dir():
         return ResolvedSnapshot(path.resolve(), "local-path") if path.is_dir() else None
 
-    try:
-        cache_info = _get_hf_cache_info_cached()
-    except (OSError, ValueError, FileNotFoundError, HFValidationError):
-        return None
-
-    for repo in cache_info.repos:
-        if repo.repo_id == model_identifier:
-            return _resolve_repo_snapshot(list(repo.revisions), requested_revision)
+    # The scan is memoised per run; a miss rescans once, because a model
+    # downloaded earlier in this run (a cold in-process load) postdates it.
+    for refresh in (False, True):
+        try:
+            cache_info = _get_hf_cache_info_cached(refresh=refresh)
+        except (OSError, ValueError, FileNotFoundError, HFValidationError):
+            return None
+        for repo in cache_info.repos:
+            if repo.repo_id == model_identifier:
+                return _resolve_repo_snapshot(list(repo.revisions), requested_revision)
     return None
 
 
@@ -14445,7 +14458,9 @@ def _execute_prepared_generation(
             excluded=_expected_stop_token_names(prepared),
         )
         setattr(cast("Any", output), _STREAM_OBSERVATIONS_ATTR, observations)
-    except (TimeoutError, ValueError) as generation_err:
+    except Exception as generation_err:
+        # Every class, not just the wrapped ones: an IndexError from model
+        # code still needs the rendered prompt and kwargs to be reproduced.
         _tag_exception_prompt_diagnostics(generation_err, prepared.prompt_diagnostics)
         raise
     finally:
@@ -14548,7 +14563,11 @@ def _build_failure_result(  # noqa: PLR0913 - every retained failure fact is an 
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
-    tb_str = traceback.format_exc()
+    tb_str = (
+        traceback.format_exc()
+        if sys.exception() is not None
+        else "".join(traceback.format_exception(error))
+    )
     traversed_chain = tuple(_exception_chain(error))
     root_exception = _root_cause_exception(error, chain=traversed_chain)
     chronological_errors = (root_exception, *reversed(traversed_chain[:-1]))
@@ -19583,6 +19602,11 @@ _CRASH_CONTINUITY_LABELS: Final[dict[str, str]] = {
     "not_in_baseline": "failed; not run in baseline",
     "insufficient_evidence": "insufficient evidence (no retained signature)",
 }
+# A failure that started, stopped or changed signature is a change; the same
+# signature, and missing evidence, are not.
+_CRASH_CONTINUITY_CHANGE_STATUSES: Final[frozenset[str]] = frozenset(
+    {"different_signature", "new_failure", "completed_now"}
+)
 
 
 class ArchitectureCommits(NamedTuple):
@@ -19678,6 +19702,10 @@ class RunComparison:
             or self.changes
             or self.throughput_flags
             or self.memory_changes
+            or self.text_changed_models
+            or any(
+                entry.status in _CRASH_CONTINUITY_CHANGE_STATUSES for entry in self.crash_continuity
+            )
         )
 
 
@@ -19814,7 +19842,12 @@ def _resolve_comparison_baseline(
             return None
         repo_root, relpath = tracked
         ref = "HEAD" if choice.lower() == "auto" else choice
-        text = _run_git_capture(["show", f"{ref}:{relpath}"], repo_root)
+        # A ref starting with "-" would reach git as an option, never a revision.
+        text = (
+            None
+            if ref.startswith("-")
+            else _run_git_capture(["show", f"{ref}:{relpath}"], repo_root)
+        )
         if text is None:
             logger.warning(
                 "--compare-with %s: could not read %s:%s from git; skipping comparison.",
@@ -20062,14 +20095,24 @@ def _decoding_group(now: JsonlResultRecord, before: JsonlResultRecord) -> str:
     return "sampled" if not any(greedy) and settings[0] == settings[1] else "changed"
 
 
+def _completed_in_both(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> list[tuple[str, JsonlResultRecord, JsonlResultRecord]]:
+    """The pairs whose model completed in both runs: the text comparisons' population."""
+    return [
+        (model, now, before)
+        for model, now, before in pairs
+        if now["assessment"]["execution"] == "completed"
+        and before["assessment"]["execution"] == "completed"
+    ]
+
+
 def _text_changes_by_decoding(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> tuple[tuple[str, int, int], ...]:
     """Count changed text per decoding group over pairs completed in both runs."""
     counts: dict[str, list[int]] = {}
-    for _model, now, before in pairs:
-        if "crashed" in (now["assessment"]["execution"], before["assessment"]["execution"]):
-            continue
+    for _model, now, before in _completed_in_both(pairs):
         tally = counts.setdefault(_decoding_group(now, before), [0, 0])
         tally[0] += now.get("generated_text", "") != before.get("generated_text", "")
         tally[1] += 1
@@ -20084,12 +20127,7 @@ def _generated_text_changes(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> tuple[int, list[str]]:
     """Count the models completed in both runs and name those whose text differs."""
-    completed = [
-        (model, now, before)
-        for model, now, before in pairs
-        if now["assessment"]["execution"] == "completed"
-        and before["assessment"]["execution"] == "completed"
-    ]
+    completed = _completed_in_both(pairs)
     changed = [
         model
         for model, now, before in completed
@@ -20623,13 +20661,18 @@ def _comparison_compatibility(
     if current_generation_settings and baseline.generation_settings:
         now_settings = dict(current_generation_settings)
         before_settings = dict(baseline.generation_settings)
+        # Run-level settings are the ones every model shared, so the key set
+        # follows the roster (a targeted rerun shares more keys than a full
+        # sweep): a key recorded on only one side is unknown, not a change.
         diffs = sorted(
-            f"{key} {before_settings.get(key)} → {now_settings.get(key)}"
-            for key in set(now_settings) | set(before_settings)
-            if now_settings.get(key) != before_settings.get(key)
+            f"{key} {before_settings[key]} → {now_settings[key]}"
+            for key in set(now_settings) & set(before_settings)
+            if now_settings[key] != before_settings[key]
         )
         if diffs:
             reasons.append("generation settings differ: " + ", ".join(diffs))
+        if one_sided := sorted(set(now_settings) ^ set(before_settings)):
+            unverified.append("generation settings " + ", ".join(one_sided))
     else:
         unverified.append("generation settings")
     return tuple(reasons), tuple(unverified)
@@ -21386,7 +21429,7 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         )
     for model, baseline_peak, now_peak, delta in view.memory_rows:
         logger.info("  %s: peak %s -> %s GB (%s)", model, baseline_peak, now_peak, delta)
-    if not comparison.has_changes:
+    if comparison.comparable and not comparison.has_changes:
         logger.info("No changes beyond noise against the baseline sweep.")
 
 
@@ -21986,13 +22029,14 @@ _REPRO_THINKING_KWARG_KEYS: Final[tuple[str, ...]] = (
 def _repro_thinking_overrides(
     run_args: argparse.Namespace | None,
     effective_generate_kwargs: Mapping[str, object] | None,
+    keys: Sequence[str] = _REPRO_THINKING_KWARG_KEYS,
 ) -> dict[str, object]:
-    """Return per-model thinking kwargs that differ from the global CLI args."""
+    """Return per-model kwargs (thinking by default) that differ from the global CLI args."""
     if run_args is None or not effective_generate_kwargs:
         return {}
     return {
         key: effective_generate_kwargs[key]
-        for key in _REPRO_THINKING_KWARG_KEYS
+        for key in keys
         if key in effective_generate_kwargs
         and effective_generate_kwargs[key] != getattr(run_args, key, None)
     }
@@ -22008,7 +22052,13 @@ def _effective_repro_args(
     repro built from global CLI arguments alone would not reproduce the
     recorded output. The per-model kwargs captured in prompt diagnostics win.
     """
-    overrides = _repro_thinking_overrides(run_args, effective_generate_kwargs)
+    # Checkpoint sampling values too: native mlx-vlm does not read
+    # generation_config.json, so the command must state what the run used.
+    overrides = _repro_thinking_overrides(
+        run_args,
+        effective_generate_kwargs,
+        (*_REPRO_THINKING_KWARG_KEYS, *_CHECKPOINT_SAMPLING_DESTS),
+    )
     if run_args is None or not overrides:
         return run_args
     merged = argparse.Namespace(**vars(run_args))
@@ -23128,6 +23178,25 @@ def generate_run_issue_summary_report(
     return summary_path
 
 
+def _check_rendered_comparison(comparison: RunComparison) -> RunComparison:
+    """Reject a rehydrated comparison whose shape the renderers cannot format."""
+    if len(comparison.harness_versions) not in (0, _COMPARISON_JSON_PAIR_LENGTH):
+        message = "comparison harness_versions must name the baseline and current versions"
+        raise ValueError(message)
+    for triple in (
+        (comparison.tps_ratio_median, comparison.tps_ratio_min, comparison.tps_ratio_max),
+        (
+            comparison.prompt_tps_ratio_median,
+            comparison.prompt_tps_ratio_min,
+            comparison.prompt_tps_ratio_max,
+        ),
+    ):
+        if len({value is None for value in triple}) > 1:
+            message = "comparison ratio median, min and max must be recorded together"
+            raise ValueError(message)
+    return comparison
+
+
 def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     """Regenerate only the paste-ready issue body from retained run artifacts."""
     output_paths = ReportOutputPaths.from_root(output_dir)
@@ -23150,15 +23219,17 @@ def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
     comparison: RunComparison | None = None
     if isinstance(comparison_value, dict):
         try:
-            comparison = _run_comparison_from_json(comparison_value)
+            comparison = _check_rendered_comparison(_run_comparison_from_json(comparison_value))
         except (KeyError, IndexError, TypeError, ValueError):
             logger.warning(
                 "Retained comparison metadata could not be rehydrated; "
                 "regenerating the summary without the baseline section."
             )
+    artifacts = source.metadata.get("artifacts")
     return generate_run_issue_summary_report(
         output_paths,
         issue_reports=issue_reports,
+        include_gallery_markdown=isinstance(artifacts, dict) and "model_gallery" in artifacts,
         comparison=comparison,
     )
 
@@ -24020,12 +24091,24 @@ def _log_report_generation_outcomes(
 _COMPONENT_CHANGE_SUBJECT_LIMIT: Final[int] = 40
 
 
+_GIT_COMMIT_ID_RE: Final[re.Pattern[str]] = re.compile(r"[0-9a-f]{7,40}")
+
+
 def _editable_revision_range(
     baseline_provenance: object, current_provenance: object, name: str
 ) -> tuple[str, str, str] | None:
     """Return (checkout, baseline rev, current rev) when an editable checkout moved between runs."""
     before = _component_source_revision(baseline_provenance, name)
     after = _component_source_revision(current_provenance, name)
+    # Revisions come from retained JSON and reach git as arguments: accept
+    # only commit ids, never anything git could read as an option.
+    if not (
+        before
+        and after
+        and _GIT_COMMIT_ID_RE.fullmatch(before)
+        and _GIT_COMMIT_ID_RE.fullmatch(after)
+    ):
+        return None
     record = current_provenance.get(name) if isinstance(current_provenance, dict) else None
     location = record.get("source_location") if isinstance(record, dict) else None
     if (

@@ -272,7 +272,7 @@ def test_metrics_mode_compact_shows_working_set_context(
         print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
+    assert "1.0 GB (50% of 2 GB recommended working set)" in messages
 
 
 def test_metrics_mode_verbose_does_not_repeat_generated_text(
@@ -358,7 +358,7 @@ def test_metrics_mode_detailed_shows_working_set_context(
         print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
+    assert "1.0 GB (50% of 2 GB recommended working set)" in messages
 
 
 def test_metrics_mode_detailed_logs_runtime_phase_details(
@@ -554,7 +554,7 @@ def test_log_summary_contextualizes_comparison_and_average_peak_memory(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Recommended working set: 1.86 GB" in messages
-    assert "67.5% of 1.86 GB recommended working set" in messages
+    assert "67.5% of 2 GB recommended working set" in messages
 
 
 def test_log_summary_single_model_omits_efficiency_chart(

@@ -64,3 +64,56 @@ def test_escape_html_tags_selective_entity_chain() -> None:
     assert "&gt;" in result
     assert "&amp;" in result
     assert "&quot;" in result
+
+
+def test_html_escaper_escapes_a_tag_whose_quoted_attribute_holds_angle_brackets() -> None:
+    """A quoted "<" is legal inside a CommonMark raw-HTML tag, so it must not hide the tag."""
+    for tag in ('<img alt="<" src=x onerror=alert(1)>', '<img alt="<b>" onerror=x>'):
+        result = check_models.HTML_ESCAPER.escape(tag)
+        assert result.startswith("&lt;img")
+        assert "<b>" not in result
+
+
+def test_table_escaping_does_not_double_escape_quotes() -> None:
+    """html.escape(quote=True) yields &quot;, which must survive the ampersand pass."""
+    result = check_models.MARKDOWN_ESCAPER.escape('<a href="x">')
+    assert result == "&lt;a href=&quot;x&quot;&gt;"
+
+
+def test_bare_url_is_wrapped_whole_and_never_swallows_markup() -> None:
+    """A trailing ] must not cut the URL short, and "<" never joins it."""
+    assert check_models._wrap_bare_urls("[see https://example.com]") == (
+        "[see <https://example.com>]"
+    )
+    wrapped = check_models._wrap_bare_urls("https://x<script ")
+    assert wrapped.startswith("<https://x>")
+    assert check_models._escape_report_markdown_text("https://x<script ").endswith("&lt;script ")
+
+
+def test_blockquote_neutralises_tilde_fences_and_short_setext_underlines() -> None:
+    """~~~ opens a code block and =/== or -- underline the previous line."""
+    for line in ("~~~", "=", "==", "--"):
+        escaped = check_models._escape_markdown_blockquote_line(line)
+        assert escaped != line
+        assert escaped.startswith("&#")
+
+
+def test_image_metadata_section_escapes_untrusted_caption_lines() -> None:
+    """IPTC/XMP text is untrusted: raw HTML or headings must not reach the gallery."""
+    parts: list[str] = []
+    check_models._append_markdown_image_metadata_section(
+        parts,
+        {"description": "<img src=https://t/x.gif>\n# Heading\n<details open>"},
+    )
+    rendered = "\n".join(parts)
+    assert "<img" not in rendered
+    assert "<details" not in rendered
+    assert "\n    # Heading" not in rendered
+
+
+def test_field_aware_preview_bounds_a_single_run_on_keyword() -> None:
+    """One comma-free keyword blob must respect the keyword budget."""
+    answer = "Title: Boats\nDescription: Two boats.\nKeywords: " + "red car " * 250
+    preview = check_models._field_aware_preview(answer, max_chars=280)
+    assert preview is not None
+    assert len(preview) < 400

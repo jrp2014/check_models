@@ -1523,6 +1523,20 @@ class TestModelBurdenFacts:
     def test_unresolvable_snapshot_returns_none(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """No cached snapshot means no burden facts, not a partial record."""
         self._install_snapshot(monkeypatch, None)
+        assert check_models._collect_model_burden("org/uncached") is None
+
+    def test_relative_local_path_resolves_like_upstream(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Any existing directory is local, as upstream get_model_path treats it."""
+        (tmp_path / "models" / "my-vlm").mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+        resolved = check_models._resolve_model_snapshot("models/my-vlm")
+        assert resolved is not None
+        assert resolved == ((tmp_path / "models" / "my-vlm").resolve(), "local-path")
+
+    def test_snapshot_miss_rescans_the_cache_once(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A miss rescans once, then gives up; a hit never rescans."""
         refreshes: list[bool] = []
 
         def record_and_miss(*, refresh: bool = False) -> SimpleNamespace:
@@ -1530,35 +1544,33 @@ class TestModelBurdenFacts:
             return SimpleNamespace(repos=())
 
         monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", record_and_miss)
-        assert check_models._collect_model_burden("org/uncached") is None
-        # The miss triggered exactly one refreshed rescan before giving up.
-        assert refreshes == [True]
+        assert check_models._resolve_model_snapshot("org/uncached") is None
+        assert refreshes == [False, True]
 
     def test_cold_download_retries_with_refreshed_cache_scan(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A snapshot downloaded during this run is found after one cache refresh."""
-        snapshot = self._snapshot(tmp_path)
-        safe_io.write_text_no_follow(
-            snapshot / "config.json", json.dumps({"max_position_embeddings": 4096})
-        )
-        state = {"refreshed": False}
+        """A snapshot downloaded during this run is found after one cache refresh.
+
+        Regression: only burden collection (after generation) refreshed, so a
+        model downloaded mid-run ran without its checkpoint sampling settings.
+        """
+        downloaded = SimpleNamespace(repo_id="org/just-downloaded", revisions=("rev",))
 
         def fake_cache_info(*, refresh: bool = False) -> SimpleNamespace:
-            if refresh:
-                state["refreshed"] = True
-            return SimpleNamespace(repos=())
+            return SimpleNamespace(repos=(downloaded,) if refresh else ())
 
         monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", fake_cache_info)
         monkeypatch.setattr(
             check_models,
-            "_resolve_model_snapshot_path",
-            lambda *_a, **_k: snapshot if state["refreshed"] else None,
+            "_resolve_repo_snapshot",
+            lambda revisions, requested: ("resolved", revisions, requested),
         )
-
-        burden = check_models._collect_model_burden("org/just-downloaded")
-        assert burden is not None
-        assert burden.context_length == 4096
+        assert check_models._resolve_model_snapshot("org/just-downloaded") == (
+            "resolved",
+            ["rev"],
+            None,
+        )
 
     def test_real_hf_cache_symlink_layout_is_readable(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path

@@ -21,7 +21,8 @@ Key reminders:
   (`__pycache__`, `.pytest_cache`, `.ruff_cache`, `.mypy_cache`, `.skylos`)
   are fine
 - Keep `CHANGELOG.md` (`[Unreleased]`) up to date for maintainer-relevant changes, including refactors and tooling updates
-- For upstream mlx-vlm isolation/issues/cache discovery/fixes, read `.agents/skills/`
-  (also linked as `.claude/skills`)
-  (`native-mlx-vlm-repro`, `upstream-mlx-vlm-issues`, `hf-cache-mlx-vlm-models`,
-  `upstream-mlx-vlm-contributing`); use conda + pip only (never `uv`)
+- For upstream mlx-vlm isolation/issues/cache discovery/fixes, type-checker
+  failures and performance evidence, load the matching skill from
+  `.agents/skills/` (also linked as `.claude/skills`) before starting:
+  Claude Code invokes it with the Skill tool rather than reading the file;
+  other agents read its `SKILL.md`. Use conda + pip only (never `uv`)
