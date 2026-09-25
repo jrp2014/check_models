@@ -104,7 +104,7 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
   named 'mlx_vlm.speculative.drafters.internvl'
 - *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00242746
+- *Post-cleanup active memory (GB):* 0.002443844
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 1.08
 - *Parameter count:* 1.00B (name-estimate)
@@ -119,10 +119,10 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14470, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14490, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13427, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13446, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -154,7 +154,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15569, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -165,7 +165,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14485, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14505, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -177,13 +177,11 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+[23:29:08] INFO     Loading model weights and processor...
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 2276.51it/s]
-Download complete:           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B                         ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[22:08:20] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
+Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 4378.84it/s]
+ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+[23:29:08] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 <a id="diagnostic-mlx-community-mage-vl-optiq-4bit"></a>
@@ -222,7 +220,7 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 - *Stop reason:* exception
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0038693
+- *Post-cleanup active memory (GB):* 0.003885684
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
@@ -240,15 +238,15 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13761, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13780, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14392, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14412, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
     ...<6 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14296, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14316, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -277,7 +275,7 @@ ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15569, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -288,7 +286,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14497, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14517, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -298,12 +296,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14413, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14433, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13770, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13789, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -317,18 +315,16 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+[23:30:30] INFO     Loading model weights and processor...
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2093.91it/s]
-Download complete:           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete:           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[22:09:39] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config missing from snapshot
-                    (preprocessor_config.json, processor_config.json).
-[22:09:40] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
-                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
+Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3116.36it/s]
+[23:30:31] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config
+                    missing from snapshot (preprocessor_config.json, processor_config.json).
+[23:30:31] INFO     Rendering the prompt...
+[23:30:32] INFO     Preparing image inputs and prefilling...
+[23:30:33] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
+                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1,
+                    50, 76)]
 ```
 
 ## Completed Runs with Observations
@@ -362,11 +358,11 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.3292844999814406
-- *Peak memory at first token (GB):* 14.538337166
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.2974613329861313
+- *Peak memory at first token (GB):* 14.979459316
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0038693
+- *Post-cleanup active memory (GB):* 0.003885684
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 308
 - *Prompt composition:* 308 = 307 text/template + 1 image tokens (0%; exact,
@@ -420,11 +416,11 @@ Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser,
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.0373040419945
-- *Peak memory at first token (GB):* 9.283143748
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 37.72874329201295
+- *Peak memory at first token (GB):* 9.283160132
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.007342878
+- *Post-cleanup active memory (GB):* 0.007359262
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16560
 - *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
@@ -476,14 +472,14 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5394384580140468
-- *Peak memory at first token (GB):* 18.798060089
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.33273116700002
+- *Peak memory at first token (GB):* 18.798076473
 - *Checkpoint-declared sampling (generation_config.json):* temperature 0.6;
   top_p 0.95; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: default; min_p: default; repetition_penalty:
   generation_config
-- *Post-cleanup active memory (GB):* 0.000608798
+- *Post-cleanup active memory (GB):* 0.000625182
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1639
 - *Prompt composition:* 1,639 = 392 text/template + 1,247 image tokens (76%;
@@ -541,11 +537,11 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
 - *Processor class:* mlx_vlm.models.molmo2.processing.Molmo2Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.2260248749807943
-- *Peak memory at first token (GB):* 8.05654611
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.412299666000763
+- *Peak memory at first token (GB):* 8.640756456
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0055241
+- *Post-cleanup active memory (GB):* 0.005540484
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1526
 - *Prompt composition:* 1,526 = 324 text/template (tokenizer-exact) + 1,202
@@ -598,11 +594,11 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 12.625888375012437
-- *Peak memory at first token (GB):* 14.28609107
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 12.917716459021904
+- *Peak memory at first token (GB):* 14.286107454
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.010931016
+- *Post-cleanup active memory (GB):* 0.0109474
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16560
 - *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
@@ -655,11 +651,11 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5150958749873098
-- *Peak memory at first token (GB):* 6.729345598
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4830564160074573
+- *Peak memory at first token (GB):* 6.729361982
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.015371154
+- *Post-cleanup active memory (GB):* 0.015387538
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2197
 - *Prompt composition:* 2,197 = 405 text/template + 1,792 image tokens (82%;
@@ -711,14 +707,14 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.73320054099895
-- *Peak memory at first token (GB):* 25.464290278
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.034294499986572
+- *Peak memory at first token (GB):* 25.464306662
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.005933838
+- *Post-cleanup active memory (GB):* 0.005950222
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4409
 - *Prompt composition:* 4,409 = 353 text/template + 4,056 image tokens (92%;
@@ -833,14 +829,14 @@ Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.019459208007902
-- *Peak memory at first token (GB):* 3.257894536
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9325144590111449
+- *Peak memory at first token (GB):* 3.257927752
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: generation_config
-- *Post-cleanup active memory (GB):* 0.004377216
+- *Post-cleanup active memory (GB):* 0.0043936
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 934
 - *Prompt composition:* 934 = 345 text/template (tokenizer-exact) + 589
@@ -898,37 +894,37 @@ is in the model gallery.
 
 | Model                                                 | Runtime identity                                           | Performance                                           |
 |-------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed          | 2119 prompt / 141 generated; 480 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                      | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed | 2089 prompt / 112 generated; 96.4 tok/s; 6.5 GB peak  |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2394 prompt / 123 generated; 30.6 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 592 prompt / 85 generated; 48.6 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 591 prompt / 175 generated; 29.6 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 596 prompt / 130 generated; 114 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 596 prompt / 89 generated; 26.0 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed          | 592 prompt / 94 generated; 122 tok/s; 5.9 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed          | 6454 prompt / 139 generated; 75.7 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed       | 6454 prompt / 142 generated; 42.8 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1383 prompt / 99 generated; 165 tok/s; 4.7 GB peak    |
-| mlx-community/InternVL3-14B-4bit                      | rev 26328eaab82c; InternVLChatProcessor; stop completed    | 2115 prompt / 116 generated; 56.8 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2115 prompt / 103 generated; 37.4 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit          | rev e5abbe34cbfa; KimiVLProcessor; stop completed          | 1331 prompt / 729 generated; 66.6 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed          | 2111 prompt / 110 generated; 210 tok/s; 4.0 GB peak   |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed          | 2119 prompt / 141 generated; 483 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                      | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed | 2089 prompt / 112 generated; 101 tok/s; 6.5 GB peak   |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2394 prompt / 123 generated; 29.9 tok/s; 23 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 592 prompt / 85 generated; 47.5 tok/s; 28 GB peak     |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 591 prompt / 175 generated; 30.5 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 596 prompt / 130 generated; 109 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 596 prompt / 89 generated; 26.9 tok/s; 20 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed          | 592 prompt / 94 generated; 124 tok/s; 5.9 GB peak     |
+| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed          | 6454 prompt / 139 generated; 74.3 tok/s; 8.7 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed       | 6454 prompt / 142 generated; 40.9 tok/s; 78 GB peak   |
+| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1383 prompt / 99 generated; 172 tok/s; 4.7 GB peak    |
+| mlx-community/InternVL3-14B-4bit                      | rev 26328eaab82c; InternVLChatProcessor; stop completed    | 2115 prompt / 116 generated; 55.5 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2115 prompt / 103 generated; 36.7 tok/s; 17 GB peak   |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit          | rev e5abbe34cbfa; KimiVLProcessor; stop completed          | 1331 prompt / 729 generated; 60.6 tok/s; 20 GB peak   |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed          | 2111 prompt / 110 generated; 201 tok/s; 4.0 GB peak   |
 | mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed        | 393 prompt / 114 generated; 105 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2927 prompt / 160 generated; 66.6 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2926 prompt / 152 generated; 189 tok/s; 7.8 GB peak   |
-| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed   | 4085 prompt / 112 generated; 209 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed         | 1291 prompt / 151 generated; 102 tok/s; 24 GB peak    |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1141 prompt / 136 generated; 58.8 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed         | 3117 prompt / 114 generated; 38.5 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16551 prompt / 918 generated; 87.2 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16549 prompt / 128 generated; 79.6 tok/s; 23 GB peak  |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit              | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed         | 16549 prompt / 181 generated; 19.7 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit               | rev defcdea7cc7a; Qwen3VLProcessor; stop completed         | 16549 prompt / 104 generated; 69.0 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16565 prompt / 111 generated; 103 tok/s; 25 GB peak   |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16565 prompt / 142 generated; 87.7 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                       | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed         | 16565 prompt / 144 generated; 28.2 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed         | 1433 prompt / 78 generated; 126 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed         | 3494 prompt / 147 generated; 50.9 tok/s; 92 GB peak   |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2927 prompt / 160 generated; 64.9 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2926 prompt / 152 generated; 184 tok/s; 7.8 GB peak   |
+| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed   | 4085 prompt / 112 generated; 159 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed         | 1291 prompt / 151 generated; 76.2 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1141 prompt / 136 generated; 57.5 tok/s; 9.3 GB peak  |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed         | 3117 prompt / 114 generated; 39.4 tok/s; 16 GB peak   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16551 prompt / 918 generated; 87.7 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16549 prompt / 128 generated; 74.6 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit              | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed         | 16549 prompt / 181 generated; 21.0 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit               | rev defcdea7cc7a; Qwen3VLProcessor; stop completed         | 16549 prompt / 104 generated; 62.3 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16565 prompt / 111 generated; 72.7 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16565 prompt / 142 generated; 84.1 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                       | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed         | 16565 prompt / 144 generated; 29.4 tok/s; 21 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed         | 1433 prompt / 78 generated; 128 tok/s; 5.6 GB peak    |
+| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed         | 3494 prompt / 147 generated; 49.3 tok/s; 92 GB peak   |
 
 </details>
 

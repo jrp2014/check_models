@@ -36,7 +36,7 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 - *Stop reason:* exception
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0038693
+- *Post-cleanup active memory (GB):* 0.003885684
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 3.92
 - *Quantization:* 4-bit, group 64, affine
@@ -54,15 +54,15 @@ builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bi
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13761, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13780, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14392, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14412, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
     ...<6 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14296, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14316, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -91,7 +91,7 @@ ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15569, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -102,7 +102,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14497, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14517, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -112,12 +112,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14413, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14433, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13770, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13789, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -131,18 +131,16 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+[23:30:30] INFO     Loading model weights and processor...
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2093.91it/s]
-Download complete:           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete:           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[22:09:39] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config missing from snapshot
-                    (preprocessor_config.json, processor_config.json).
-[22:09:40] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
-                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
+Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3116.36it/s]
+[23:30:31] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config
+                    missing from snapshot (preprocessor_config.json, processor_config.json).
+[23:30:31] INFO     Rendering the prompt...
+[23:30:32] INFO     Preparing image inputs and prefilling...
+[23:30:33] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
+                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1,
+                    50, 76)]
 ```
 
 ## Reproduction inputs
@@ -237,7 +235,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision c98dad5f92f13334cc679c
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.37; revision a44e522108f41f3d5688057f27b50e93c14f468d; clean |
+| check_models    | 0.17.38; revision 691db9dc9705f46e3f81e85820279ced404e35aa; dirty |
 
 ### Full environment evidence
 
