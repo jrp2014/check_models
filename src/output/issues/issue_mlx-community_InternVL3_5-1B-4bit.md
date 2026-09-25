@@ -104,11 +104,11 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-[23:29:08] INFO     Loading model weights and processor...
+[23:54:09] INFO     Loading model weights and processor...
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 4378.84it/s]
+Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3749.22it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:29:08] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
+[23:54:09] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 ## Reproduction inputs
@@ -169,7 +169,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.38; revision 691db9dc9705f46e3f81e85820279ced404e35aa; dirty |
+| check_models    | 0.17.38; revision 29bae6c868c9e1e58221eb34da8336fa58581ed1; clean |
 
 ### Full environment evidence
 

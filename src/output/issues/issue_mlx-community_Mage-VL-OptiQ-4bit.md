@@ -131,14 +131,14 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 
 ```text
 === STDERR ===
-[23:30:30] INFO     Loading model weights and processor...
+[23:55:28] INFO     Loading model weights and processor...
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3116.36it/s]
-[23:30:31] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config
+Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3143.45it/s]
+[23:55:29] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config
                     missing from snapshot (preprocessor_config.json, processor_config.json).
-[23:30:31] INFO     Rendering the prompt...
-[23:30:32] INFO     Preparing image inputs and prefilling...
-[23:30:33] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
+[23:55:29] INFO     Rendering the prompt...
+[23:55:29] INFO     Preparing image inputs and prefilling...
+[23:55:30] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
                     ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1,
                     50, 76)]
 ```
@@ -235,7 +235,7 @@ Keywords:' --max-tokens 1000 --temperature 0.0 --revision c98dad5f92f13334cc679c
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.38; revision 691db9dc9705f46e3f81e85820279ced404e35aa; dirty |
+| check_models    | 0.17.38; revision 29bae6c868c9e1e58221eb34da8336fa58581ed1; clean |
 
 ### Full environment evidence
 
