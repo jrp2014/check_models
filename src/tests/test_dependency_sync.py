@@ -1324,7 +1324,7 @@ def test_update_script_rebuild_decision(inputs: str, expected: str) -> None:
 
 
 def test_update_script_wires_dirty_state_into_the_rebuild_decision() -> None:
-    """Stage 3 records git status --porcelain; Stage 4 consults it before skipping."""
+    """Stage 2 records git status --porcelain; Stage 3 consults it before skipping."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
 
     assert 'if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then' in update_script
@@ -2483,6 +2483,110 @@ def test_arch_precheck_for_model_type_resolves_aliases_and_rejects_empty() -> No
     model_type, resolved, supported = check_models.arch_precheck_for_model_type("MISTRAL3")
     assert (model_type, resolved) == ("mistral3", "mistral3")
     assert supported in (True, None)
+
+
+def _git(cwd: Path, *args: str) -> str:
+    """Run git with a fixed identity; return stdout."""
+    return subprocess.run(  # noqa: S603 - fixed git argv built by the test
+        [  # noqa: S607 - git from PATH in a test
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "-c",
+            "init.defaultBranch=main",
+            *args,
+        ],
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
+
+def test_update_pull_failure_stops_with_diagnostics(tmp_path: Path) -> None:
+    """A diverged checkout stops the run; the report names both sides of the divergence.
+
+    Continuing past a failed pull left the repo unbuilt and, for mlx, never
+    pinned, so later eager upgrades could replace the local build.
+    """
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    _git(origin, "init", "-q")
+    safe_io.write_text_no_follow(origin / "kernel.h", "v1\n")
+    _git(origin, "add", "kernel.h")
+    _git(origin, "commit", "-q", "-m", "initial")
+    _git(tmp_path, "clone", "-q", str(origin), "checkout")
+    checkout = tmp_path / "checkout"
+    safe_io.write_text_no_follow(origin / "kernel.h", "v2 upstream\n")
+    _git(origin, "commit", "-q", "-am", "upstream fix")
+    safe_io.write_text_no_follow(checkout / "local.txt", "local\n")
+    _git(checkout, "add", "local.txt")
+    _git(checkout, "commit", "-q", "-m", "local change")
+
+    function = _update_script_function("report_git_pull_failure")
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        [
+            "/bin/bash",
+            "-c",
+            (
+                f"{function}\ngit pull -q --ff-only 2>/dev/null && exit 9\n"
+                f'report_git_pull_failure mlx "{checkout}"'
+            ),
+        ],
+        cwd=checkout,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    report = result.stdout
+    assert "git pull --ff-only failed for mlx" in report
+    assert "upstream fix" in report
+    assert "local change" in report
+    assert "Nothing was built or reinstalled" in report
+
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    stage1 = script[script.index("# Stage 1: Sync") : script.index("# Stage 2: Verify")]
+    assert "if git pull --ff-only; then" in stage1
+    assert "return 1" in stage1[stage1.index("report_git_pull_failure") :]
+    # mlx-vlm's requirements.txt is its dependency list; a separate
+    # requirements pass ran before the mlx pin and could replace the local build.
+    assert "-r requirements.txt" not in script
+
+
+def test_update_reinstall_that_replaces_a_verified_local_build_stops(tmp_path: Path) -> None:
+    """After the eager project reinstall, every install Stage 3b verified must still verify."""
+    function = _update_script_function("verify_local_installs_survived_reconcile")
+    driver = f"""
+{function}
+get_installed_distribution_version() {{ echo "0.7.4"; }}
+pip_show_field() {{ echo "/site-packages"; }}
+VERIFIED_LOCAL_INSTALLS=("mlx=/repo/mlx" "mlx-vlm=/repo/mlx-vlm")
+verify_expected_editable_install() {{ [[ "$1" == "mlx" ]]; }}
+verify_local_installs_survived_reconcile && exit 9
+echo "status=$?"
+VERIFIED_LOCAL_INSTALLS=()
+verify_local_installs_survived_reconcile && echo "empty-ok"
+"""
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash evaluates an extracted repo function
+        ["/bin/bash", "-c", driver],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "replaced the local mlx-vlm build from /repo/mlx-vlm" in result.stdout
+    assert "Installed now: 0.7.4" in result.stdout
+    assert "status=1" in result.stdout
+    assert "empty-ok" in result.stdout
+
+    script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    assert (
+        "reconcile_project_environment_from_pyproject\nverify_local_installs_survived_reconcile\n"
+        in script
+    )
+    assert 'VERIFIED_LOCAL_INSTALLS+=("${REPO_NAMES[idx]}=${REPO_PATHS[idx]}")' in script
 
 
 def test_update_failed_mlx_build_pins_the_surviving_local_install(tmp_path: Path) -> None:

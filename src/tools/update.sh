@@ -31,15 +31,16 @@
 # Local MLX Development:
 #   If mlx and mlx-vlm directories exist at ../../ (sibling to check_models/),
 #   the script will automatically:
-#   1. Run git pull in each repository (an unchanged, clean repo whose editable
-#      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides)
-#   2. Install requirements.txt (if present) for additional dependencies
-#      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
-#   3. Install packages in dependency order: mlx → mlx-vlm
-#   4. Verify editable install origins for mlx and mlx-vlm
-#   5. Skip PyPI MLX updates for these packages
-#   6. Reinstall check_models from pyproject.toml to reconcile shared deps
-#   7. Run the local MLX runtime smoke if a local mlx build was installed
+#   1. Run git pull --ff-only in each repository; a pull that cannot complete
+#      stops the run with diagnostics. An unchanged, clean repo whose editable
+#      install still verifies skips its rebuild; FORCE_REINSTALL=1 overrides
+#   2. Install packages in dependency order: mlx → mlx-vlm (mlx-vlm's
+#      requirements.txt is its dependency list, so its install covers it)
+#   3. Verify editable install origins for mlx and mlx-vlm
+#   4. Skip PyPI MLX updates for these packages
+#   5. Reinstall check_models from pyproject.toml to reconcile shared deps,
+#      then stop with diagnostics if that replaced a verified local install
+#   6. Run the local MLX runtime smoke if a local mlx build was installed
 #
 # Requirements for local MLX builds:
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
@@ -827,6 +828,29 @@ check_mlx_build_requirements() {
 	return $has_errors
 }
 
+# A pull that did not complete leaves the checkout's state unknown to the
+# rest of the script, so report what git sees and stop rather than guess.
+report_git_pull_failure() {
+	local repo_name="$1" repo_path="$2"
+	echo ""
+	echo "❌ git pull --ff-only failed for $repo_name ($repo_path); stopping."
+	echo "   Branch and upstream:"
+	git -C "$repo_path" status --short --branch 2>&1 | sed 's/^/     /' || true
+	local upstream_ref
+	if upstream_ref="$(git -C "$repo_path" rev-parse --abbrev-ref '@{u}' 2>/dev/null)"; then
+		echo "   Commits on $upstream_ref not in HEAD:"
+		git -C "$repo_path" log --oneline "HEAD..$upstream_ref" 2>&1 | head -n 10 | sed 's/^/     /' || true
+		echo "   Local commits not on $upstream_ref:"
+		git -C "$repo_path" log --oneline "$upstream_ref..HEAD" 2>&1 | head -n 10 | sed 's/^/     /' || true
+	else
+		echo "   No upstream branch is configured for the current branch."
+	fi
+	echo "   Typical causes: a local edit to a file upstream has now changed"
+	echo "   (drop the local change if upstream fixed it, or stash and re-apply it),"
+	echo "   local commits that diverge from upstream, or no network."
+	echo "   Nothing was built or reinstalled. Resolve it in $repo_path, then re-run update.sh."
+}
+
 # Pure rebuild decision for one local MLX repo, kept free of side effects so
 # the shell contract is unit-testable. Prints "skip" or "rebuild".
 #   $1 force      FORCE_REINSTALL (0/1)
@@ -934,44 +958,35 @@ update_local_mlx_repos() {
 		fi
 	done
 
-	# Stage 1: Sync all repositories first
+	# Stage 1: Sync all repositories first. --ff-only never creates a merge
+	# commit in an upstream checkout. A pull that cannot complete (local edits
+	# that upstream now also changes, a diverged branch, no network) stops the
+	# run with diagnostics: continuing would leave that repo unbuilt and its
+	# install unguarded against the eager upgrades later in this script.
 	echo ""
-	echo "Stage 1: Syncing repositories with git pull..."
+	echo "Stage 1: Syncing repositories with git pull --ff-only..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		cd "${REPO_PATHS[idx]}"
-		echo "[update.sh] ($((idx + 1))/${#REPO_NAMES[@]}) git pull -> ${REPO_NAMES[idx]}"
+		echo "[update.sh] ($((idx + 1))/${#REPO_NAMES[@]}) git pull --ff-only -> ${REPO_NAMES[idx]}"
 		local PRE_PULL_HEAD
 		PRE_PULL_HEAD="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
-		if git pull; then
+		if git pull --ff-only; then
 			echo "✓ Git pull successful for ${REPO_NAMES[idx]}"
 			if [[ "$PRE_PULL_HEAD" != "unknown" && "$(git rev-parse HEAD 2>/dev/null)" == "$PRE_PULL_HEAD" ]]; then
 				REPO_UNCHANGED[idx]=1
 			fi
 		else
-			echo "⚠️  Git pull failed for ${REPO_NAMES[idx]} — skipping build"
-			REPO_SKIP[idx]=1
+			report_git_pull_failure "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
+			cd "$ORIGINAL_DIR"
+			return 1
 		fi
 		echo ""
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 2: Install all Python library dependencies from requirements.txt
+	# Stage 2: Verify repository integrity before building
 	echo ""
-	echo "Stage 2: Installing library dependencies (requirements.txt files)..."
-	for idx in "${!REPO_NAMES[@]}"; do
-		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
-		cd "${REPO_PATHS[idx]}"
-		if [[ -f "requirements.txt" ]]; then
-			echo "[update.sh] Installing requirements for ${REPO_NAMES[idx]}..."
-			pip_install -U -r requirements.txt
-		fi
-		echo ""
-	done
-	cd "$ORIGINAL_DIR"
-
-	# Stage 3: Verify repository integrity before building
-	echo ""
-	echo "Stage 3: Verifying repository integrity..."
+	echo "Stage 2: Verifying repository integrity..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
@@ -1001,9 +1016,13 @@ update_local_mlx_repos() {
 	echo "✓ All repositories verified"
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4: Build and install packages in dependency order (mlx → mlx-vlm)
+	# Stage 3: Build and install packages in dependency order (mlx → mlx-vlm).
+	# mlx-vlm reads its dependency list from requirements.txt, so installing it
+	# installs those; mlx has no requirements.txt. A separate requirements pass
+	# would run before the local mlx pin exists and could swap the local build
+	# for a newer PyPI release.
 	echo ""
-	echo "Stage 4: Building and installing MLX packages in dependency order..."
+	echo "Stage 3: Building and installing MLX packages in dependency order..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
@@ -1013,7 +1032,7 @@ update_local_mlx_repos() {
 		# the identical result, so skip it. The verification is the
 		# dependency-change guard — a PyPI release that clobbered the editable, a
 		# rebuilt environment, or a missing install all fail it; a dirty checkout
-		# (Stage 3) always rebuilds; FORCE_REINSTALL=1 never skips.
+		# (Stage 2) always rebuilds; FORCE_REINSTALL=1 never skips.
 		local editable_verified=0
 		if verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}" > /dev/null 2>&1; then
 			editable_verified=1
@@ -1143,11 +1162,11 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4b: Verify editable origins for mlx/mlx-vlm.
+	# Stage 3b: Verify editable origins for mlx/mlx-vlm.
 	# These packages often use release-style version strings even for local builds,
 	# so location metadata is a more reliable signal than version text.
 	echo ""
-	echo "Stage 4b: Verifying editable install origins for mlx/mlx-vlm..."
+	echo "Stage 3b: Verifying editable install origins for mlx/mlx-vlm..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		case "${REPO_NAMES[idx]}" in
@@ -1162,6 +1181,7 @@ update_local_mlx_repos() {
 					return 1
 				fi
 				log_editable_install_provenance "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
+				VERIFIED_LOCAL_INSTALLS+=("${REPO_NAMES[idx]}=${REPO_PATHS[idx]}")
 				;;
 		esac
 	done
@@ -1179,6 +1199,25 @@ update_local_mlx_repos() {
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	echo ""
 	return 0
+}
+
+# The project reinstall runs eager upgrades, and only mlx is pinned: a newer
+# PyPI mlx-vlm (or anything else in the resolver's reach) could still replace
+# a local editable install that Stage 3b verified. Re-check those installs and
+# stop with diagnostics rather than continue half-local.
+verify_local_installs_survived_reconcile() {
+	local entry name path
+	for entry in ${VERIFIED_LOCAL_INSTALLS[@]+"${VERIFIED_LOCAL_INSTALLS[@]}"}; do
+		name="${entry%%=*}"
+		path="${entry#*=}"
+		if ! verify_expected_editable_install "$name" "$path"; then
+			echo "❌ The project reinstall replaced the local $name build from $path."
+			echo "   Installed now: $(get_installed_distribution_version "$name") at $(pip_show_field "$name" Location)"
+			echo "   Typically a PyPI release newer than the local checkout's version."
+			echo "   Fix: cd $path && pip install -e . (mlx: pip install -v -e '.[dev]'), then re-run update.sh"
+			return 1
+		fi
+	done
 }
 
 # Clean build artifacts if requested
@@ -1203,6 +1242,7 @@ local_mlx_repos_present() {
 # Determine if we should skip PyPI MLX updates
 SKIP_MLX_PYPI=0
 LOCAL_MLX_READY=0
+VERIFIED_LOCAL_INSTALLS=()
 
 if local_mlx_repos_present; then
 	update_local_mlx_repos
@@ -1256,6 +1296,7 @@ else
 fi
 
 reconcile_project_environment_from_pyproject
+verify_local_installs_survived_reconcile
 
 if [[ $LOCAL_MLX_READY -eq 1 ]]; then
 	log_mlx_runtime_provenance

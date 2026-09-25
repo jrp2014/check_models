@@ -6,6 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `tools/update.sh` stops with diagnostics instead of working around
+  trouble in the local MLX checkouts. `git pull` is now `--ff-only`, and a
+  pull that cannot complete prints the branch state and both sides of any
+  divergence, then exits; it used to skip that repo and continue, leaving a
+  local mlx unpinned. The separate `requirements.txt` pass is gone: mlx has
+  none, mlx-vlm's is its own dependency list, and the pass ran before the
+  local mlx pin, so a newer PyPI mlx could replace the local build and force
+  a rebuild. After the final project reinstall, every local install verified
+  earlier is re-checked, and the run stops if one was replaced.
 - The baseline comparison records facts about the runs even when their
   outputs cannot be compared (a new image or prompt): which models were added
   or are absent, and whether an absent model is still cached but not selected
