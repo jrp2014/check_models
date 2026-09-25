@@ -2142,6 +2142,29 @@ class TestRepetitionGuard:
         assert "repetition_abort" in check_models._assessment_observations(result)
 
 
+def test_tee_capture_stream_looks_like_the_terminal_to_progress_bars(tmp_path: Path) -> None:
+    """Progress bars draw full width in Unicode through the capture only if it looks like the terminal.
+
+    Regression: the capture reported no encoding and no file descriptor, so
+    every mlx-vlm and huggingface_hub bar came out as a ragged ten-character
+    ASCII "#" bar while the user watched a --verbose sweep.
+    """
+    # tqdm is only a transitive dependency here, so the test asserts the
+    # stream contract tqdm reads rather than calling it: the real stream's
+    # encoding (Unicode blocks vs "#") and file descriptor (terminal width).
+    with (tmp_path / "terminal.txt").open("w", encoding="utf-8", errors="strict") as real:
+        tee = check_models._TeeCaptureStream(real)
+        assert tee.encoding == "utf-8"
+        assert tee.errors == "strict"
+        assert tee.fileno() == real.fileno()
+        tee.write("Prefill: 100%|\u2588\u2588| 2/2\n")
+        tee.flush()
+        assert "Prefill" in tee.getvalue()
+    # A stream with no descriptor still says so, rather than inventing one.
+    with pytest.raises(io.UnsupportedOperation):
+        check_models._TeeCaptureStream(io.StringIO()).fileno()
+
+
 class TestTeeCaptureStreamFinalization:
     """Late finalization must not raise once the underlying stream is closed."""
 

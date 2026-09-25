@@ -446,6 +446,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Progress bars printed during a run (mlx-vlm's prefill bar under
+  `--verbose`, huggingface_hub's fetch and Xet bars) render as they would
+  without the harness: full terminal width in Unicode blocks, so their right
+  edges line up. The per-model output capture stood in for stdout/stderr but
+  reported no encoding and no file descriptor, so tqdm fell back to ragged
+  ten-character ASCII `#` bars; it now forwards both from the real stream.
 - ty 0.0.84 stopped inferring `dict(mapping)` from the expected
   `dict[str, JsonLike]` type and expanded the recursive alias instead,
   failing four call sites; they now spell the type out

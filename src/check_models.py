@@ -2313,6 +2313,22 @@ class _TeeCaptureStream(io.TextIOBase):
     def isatty(self) -> bool:
         return self._stream.isatty()
 
+    # Progress bars (tqdm, used by mlx-vlm and huggingface_hub) inspect the
+    # stream they write to: with no encoding they fall back to ASCII "#" bars,
+    # and without a file descriptor they cannot size themselves to the
+    # terminal, so every bar came out a ragged ten characters wide. Forwarding
+    # both makes a captured bar render exactly as an uncaptured one.
+    @property
+    def encoding(self) -> str:  # type: ignore[override]  # TextIOBase declares a plain attribute
+        return getattr(self._stream, "encoding", None) or "utf-8"
+
+    @property
+    def errors(self) -> str | None:  # type: ignore[override]  # as encoding, above
+        return getattr(self._stream, "errors", None)
+
+    def fileno(self) -> int:
+        return self._stream.fileno()
+
     def getvalue(self) -> str:
         return self._buffer.getvalue()
 
