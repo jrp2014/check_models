@@ -1301,6 +1301,9 @@ class JsonlFailureRecord(TypedDict, total=False):
     package: str | None
     traceback: str | None
     exception_chain: list[dict[str, str]]
+    # Hash of the code, the number-stripped message and the traceback shape:
+    # the same fault on a different image keeps it; a renamed phase does not.
+    signature: str | None
 
 
 class JsonlArchitectureRecord(TypedDict):
@@ -19107,6 +19110,7 @@ def _build_jsonl_failure_record(
     }
     if result.exception_chain:
         failure["exception_chain"] = _serialize_exception_chain(result.exception_chain)
+    failure["signature"] = result.error_signature
     return failure
 
 
@@ -19560,6 +19564,40 @@ class RunComparisonMemoryChange:
     delta_gb: float
 
 
+class CrashContinuity(NamedTuple):
+    """How one model's failure in this run relates to the baseline, as recorded facts."""
+
+    model: str
+    status: str  # a key of _CRASH_CONTINUITY_LABELS
+    baseline_signature: str | None
+    current_signature: str | None
+
+
+# Matching signatures cluster failures; they do not prove one root cause, and
+# completing on a different input does not show a fault was fixed.
+_CRASH_CONTINUITY_LABELS: Final[dict[str, str]] = {
+    "same_signature": "same failure signature observed",
+    "different_signature": "different failure signature observed",
+    "new_failure": "newly observed failure",
+    "completed_now": "completed this run; failed in baseline",
+    "not_in_baseline": "failed; not run in baseline",
+    "insufficient_evidence": "insufficient evidence (no retained signature)",
+}
+
+
+class ArchitectureCommits(NamedTuple):
+    """Upstream commits between the runs that touched one affected model's architecture package.
+
+    Context for investigation, not attribution: shared generation, sampling and
+    processor code can change a model without touching its own package.
+    """
+
+    model: str
+    architecture: str
+    status: str  # "commits", "none", or "unavailable"
+    subjects: tuple[str, ...]
+
+
 class ComponentChange(NamedTuple):
     """The upstream commits that separate two runs for one editable component."""
 
@@ -19607,6 +19645,19 @@ class RunComparison:
     # Upstream commits between the baseline's and this run's revision of each
     # editable component: (name, baseline rev, current rev, count, subjects).
     component_changes: tuple[ComponentChange, ...] = ()
+    architecture_commits: tuple[ArchitectureCommits, ...] = ()
+    # For each model in models_removed: "not selected" (still in this run's
+    # cache discovery), "not cached" (absent from it), or "unknown" (no
+    # discovery record). Absence from a run says nothing about a fix.
+    models_removed_status: tuple[tuple[str, str], ...] = ()
+    crash_continuity: tuple[CrashContinuity, ...] = ()
+    # (group, text changed, pairs) over models completed in both runs, by the
+    # effective decoding settings of both: "greedy", "sampled" (same settings
+    # and seed), "changed" (mode or settings differ), "unknown".
+    text_changes_by_decoding: tuple[tuple[str, int, int], ...] = ()
+    # (baseline, current) check_models versions when they differ: a phase
+    # renamed between them changes a signature without changing the fault.
+    harness_versions: tuple[str, ...] = ()
     # Prefill (prompt) tok/s ratio now/baseline over like-for-like models.
     prompt_tps_ratio_median: float | None = None
     prompt_tps_ratio_min: float | None = None
@@ -19975,6 +20026,60 @@ def _record_repetition_aborted(record: JsonlResultRecord) -> bool:
     return "repetition_abort" in record["assessment"]["observations"]
 
 
+_DECODING_KEYS: Final[tuple[str, ...]] = (
+    "temperature",
+    "top_p",
+    "top_k",
+    "min_p",
+    "repetition_penalty",
+    "seed",
+)
+_DECODING_GROUP_LABELS: Final[tuple[tuple[str, str], ...]] = (
+    ("greedy", "greedy"),
+    ("sampled", "sampled, same settings and seed"),
+    ("changed", "decoding mode or settings changed"),
+    ("unknown", "settings not recorded"),
+)
+
+
+def _decoding_settings(record: JsonlResultRecord) -> tuple[JsonLike, ...] | None:
+    """Return the effective decoding settings a result ran with, when recorded."""
+    diagnostics = record.get("prompt_diagnostics")
+    settings = diagnostics.get("generate_kwargs") if isinstance(diagnostics, dict) else None
+    if not isinstance(settings, dict) or not isinstance(settings.get("temperature"), int | float):
+        return None
+    return tuple(settings.get(key) for key in _DECODING_KEYS)
+
+
+def _decoding_group(now: JsonlResultRecord, before: JsonlResultRecord) -> str:
+    """Classify a pair by decoding: greedy only needs temperature 0 on both sides."""
+    settings = (_decoding_settings(before), _decoding_settings(now))
+    if None in settings:
+        return "unknown"
+    greedy = [cast("tuple[float, ...]", side)[0] == 0 for side in settings]
+    if all(greedy):
+        return "greedy"
+    return "sampled" if not any(greedy) and settings[0] == settings[1] else "changed"
+
+
+def _text_changes_by_decoding(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> tuple[tuple[str, int, int], ...]:
+    """Count changed text per decoding group over pairs completed in both runs."""
+    counts: dict[str, list[int]] = {}
+    for _model, now, before in pairs:
+        if "crashed" in (now["assessment"]["execution"], before["assessment"]["execution"]):
+            continue
+        tally = counts.setdefault(_decoding_group(now, before), [0, 0])
+        tally[0] += now.get("generated_text", "") != before.get("generated_text", "")
+        tally[1] += 1
+    return tuple(
+        (group, counts[group][0], counts[group][1])
+        for group, _label in _DECODING_GROUP_LABELS
+        if group in counts
+    )
+
+
 def _generated_text_changes(
     pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
 ) -> tuple[int, list[str]]:
@@ -20196,6 +20301,86 @@ def _compare_model_performance(
         memory.append(memory_change)
 
 
+def _failure_signature(record: JsonlResultRecord) -> str | None:
+    failure = record.get("failure")
+    signature = failure.get("signature") if isinstance(failure, dict) else None
+    return signature if isinstance(signature, str) and signature else None
+
+
+def _crash_continuity_status(
+    now: JsonlResultRecord, before: JsonlResultRecord | None
+) -> str | None:
+    """Classify one model's failure continuity, or None when neither run failed."""
+    now_state = now["assessment"]["execution"]
+    before_state = before["assessment"]["execution"] if before is not None else None
+    if "crashed" not in (now_state, before_state):
+        return None
+    if before is None:
+        return "not_in_baseline"
+    if "indeterminate" in (now_state, before_state):
+        return "insufficient_evidence"
+    if now_state != before_state:
+        return "new_failure" if now_state == "crashed" else "completed_now"
+    signatures = (_failure_signature(before), _failure_signature(now))
+    if None in signatures:
+        return "insufficient_evidence"
+    return "same_signature" if signatures[0] == signatures[1] else "different_signature"
+
+
+def _crash_continuity(
+    current: Sequence[JsonlResultRecord], baseline_by: Mapping[str, JsonlResultRecord]
+) -> tuple[CrashContinuity, ...]:
+    entries = []
+    for record in current:
+        before = baseline_by.get(record["model"])
+        if (status := _crash_continuity_status(record, before)) is not None:
+            entries.append(
+                CrashContinuity(
+                    record["model"],
+                    status,
+                    _failure_signature(before) if before is not None else None,
+                    _failure_signature(record),
+                )
+            )
+    return tuple(entries)
+
+
+def _producer_version(metadata: JsonlMetadataRecord | None) -> str:
+    producer = metadata.get("producer") if metadata is not None else None
+    version = producer.get("version") if isinstance(producer, dict) else None
+    return version if isinstance(version, str) else ""
+
+
+def _harness_versions(
+    baseline_metadata: JsonlMetadataRecord, current_metadata: JsonlMetadataRecord | None
+) -> tuple[str, ...]:
+    """Return (baseline, current) producer versions when both are known and differ."""
+    versions = (_producer_version(baseline_metadata), _producer_version(current_metadata))
+    return versions if all(versions) and versions[0] != versions[1] else ()
+
+
+def _assessment_changes(
+    pairs: Sequence[tuple[str, JsonlResultRecord, JsonlResultRecord]],
+) -> list[RunComparisonModelChange]:
+    """Execution, usability and observation transitions over like-for-like pairs."""
+    return [
+        change
+        for model, now, before in pairs
+        if (change := _model_assessment_change(model, now, before)) is not None
+    ]
+
+
+def _removed_model_status(
+    removed: Sequence[str], current_metadata: JsonlMetadataRecord | None
+) -> tuple[tuple[str, str], ...]:
+    """Say why each baseline model is absent, from this run's own cache discovery."""
+    discovery = current_metadata.get("cache_discovery") if current_metadata else None
+    if not isinstance(discovery, list):
+        return tuple((model, "unknown") for model in removed)
+    cached = {entry.get("repo_id") for entry in discovery if isinstance(entry, dict)}
+    return tuple((model, "not selected" if model in cached else "not cached") for model in removed)
+
+
 def compare_run_results(
     current: Sequence[JsonlResultRecord],
     baseline: ComparisonBaseline,
@@ -20252,12 +20437,13 @@ def compare_run_results(
     flags: list[RunComparisonThroughputFlag] = []
     memory: list[RunComparisonMemoryChange] = []
     revision_changes: list[tuple[str, str, str]] = []
+    # Roster, revisions and provenance are facts about the runs themselves;
+    # only output and performance comparisons depend on identical inputs.
+    outputs_comparable = not incomparable_reasons
     for model in shared:
         now, before = current_by[model], baseline_by[model]
         if (revision := _model_revision_change(model, now, before)) is not None:
             revision_changes.append(revision)
-        if (change := _model_assessment_change(model, now, before)) is not None:
-            changes.append(change)
         if throughput_comparable:
             _compare_model_performance(
                 model, now, before, bands=bands, ratios=ratios, flags=flags, memory=memory
@@ -20265,7 +20451,9 @@ def compare_run_results(
 
     ratios_sorted = sorted(ratios)
     pairs = [(model, current_by[model], baseline_by[model]) for model in shared]
-    text_compared, text_changed = _generated_text_changes(pairs)
+    diff_pairs = pairs if outputs_comparable else []
+    changes.extend(_assessment_changes(diff_pairs))
+    text_compared, text_changed = _generated_text_changes(diff_pairs)
     identical_text = text_compared - len(text_changed)
     prefill_sorted = _prefill_tps_ratios(pairs) if throughput_comparable else []
     environment_notes = (
@@ -20281,6 +20469,12 @@ def compare_run_results(
         compared_models=len(shared),
         models_added=tuple(sorted(set(current_by) - set(baseline_by))),
         models_removed=tuple(sorted(set(baseline_by) - set(current_by))),
+        models_removed_status=_removed_model_status(
+            sorted(set(baseline_by) - set(current_by)), current_metadata
+        ),
+        crash_continuity=_crash_continuity(current, baseline_by),
+        text_changes_by_decoding=_text_changes_by_decoding(diff_pairs),
+        harness_versions=_harness_versions(baseline.metadata, current_metadata),
         changes=tuple(changes),
         identical_text_models=identical_text,
         text_compared_models=text_compared,
@@ -20457,21 +20651,12 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "baseline": comparison.baseline_hardware,
         "current": comparison.current_hardware,
     }
-    if not comparison.comparable:
-        return {
-            "baseline": comparison.baseline_label,
-            "baseline_timestamp": comparison.baseline_timestamp,
-            "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
-            "comparability": comparison.comparability,
-            "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
-            "execution_mode": execution_mode,
-            "hardware": hardware,
-        }
     return {
         "baseline": comparison.baseline_label,
         "baseline_timestamp": comparison.baseline_timestamp,
         "baseline_components": cast("JsonLike", dict(comparison.baseline_components)),
         "comparability": comparison.comparability,
+        "incomparable_reasons": cast("JsonLike", list(comparison.incomparable_reasons)),
         "unverified_facts": cast("JsonLike", list(comparison.unverified_facts)),
         "throughput_comparable": comparison.throughput_comparable,
         "environment_notes": cast("JsonLike", list(comparison.environment_notes)),
@@ -20482,6 +20667,19 @@ def _run_comparison_to_json(comparison: RunComparison | None) -> dict[str, JsonL
         "compared_models": comparison.compared_models,
         "models_added": cast("JsonLike", list(comparison.models_added)),
         "models_removed": cast("JsonLike", list(comparison.models_removed)),
+        "models_removed_status": cast("JsonLike", dict(comparison.models_removed_status)),
+        "crash_continuity": [
+            cast("JsonLike", entry._asdict()) for entry in comparison.crash_continuity
+        ],
+        "architecture_commits": [
+            cast("JsonLike", {**entry._asdict(), "subjects": list(entry.subjects)})
+            for entry in comparison.architecture_commits
+        ],
+        "text_changes_by_decoding": {
+            group: {"changed": changed, "compared": compared}
+            for group, changed, compared in comparison.text_changes_by_decoding
+        },
+        "harness_versions": cast("JsonLike", list(comparison.harness_versions)),
         "changes": [
             {
                 "model": change.model,
@@ -20669,24 +20867,6 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         "current_hardware": _comparison_opt_str(hardware.get("current")),
         "comparability": comparability,
     }
-    if comparability == "incomparable":
-        return RunComparison(
-            compared_models=0,
-            models_added=(),
-            models_removed=(),
-            changes=(),
-            identical_text_models=0,
-            text_compared_models=0,
-            tps_ratio_median=None,
-            tps_ratio_min=None,
-            tps_ratio_max=None,
-            tps_compared_models=0,
-            throughput_flags=(),
-            memory_changes=(),
-            history_runs_used=0,
-            incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
-            **cast("dict[str, Any]", identity),
-        )
     ratio = _comparison_mapping(value.get("generation_tps_ratio"))
     prefill = _comparison_mapping(value.get("prompt_tps_ratio"))
     changes = tuple(
@@ -20738,6 +20918,38 @@ def _run_comparison_from_json(value: dict[str, JsonLike]) -> RunComparison:
         memory_changes=memory_changes,
         history_runs_used=_comparison_req_int(value.get("history_runs_used", 0)),
         unverified_facts=_comparison_str_items(value.get("unverified_facts") or []),
+        incomparable_reasons=_comparison_str_items(value.get("incomparable_reasons") or []),
+        models_removed_status=tuple(
+            (model, _comparison_req_str(status))
+            for model, status in _comparison_mapping(value.get("models_removed_status")).items()
+        ),
+        crash_continuity=tuple(
+            CrashContinuity(
+                _comparison_req_str(entry["model"]),
+                _comparison_req_str(entry["status"]),
+                _comparison_opt_str(entry.get("baseline_signature")),
+                _comparison_opt_str(entry.get("current_signature")),
+            )
+            for entry in _comparison_rows(value.get("crash_continuity"))
+        ),
+        harness_versions=_comparison_str_items(value.get("harness_versions") or []),
+        architecture_commits=tuple(
+            ArchitectureCommits(
+                _comparison_req_str(entry["model"]),
+                _comparison_req_str(entry["architecture"]),
+                _comparison_req_str(entry["status"]),
+                _comparison_str_items(entry.get("subjects") or []),
+            )
+            for entry in _comparison_rows(value.get("architecture_commits"))
+        ),
+        text_changes_by_decoding=tuple(
+            (
+                group,
+                _comparison_req_int(_comparison_mapping(counts).get("changed", 0)),
+                _comparison_req_int(_comparison_mapping(counts).get("compared", 0)),
+            )
+            for group, counts in _comparison_mapping(value.get("text_changes_by_decoding")).items()
+        ),
         revision_changes=tuple(
             (
                 _comparison_req_str(entry["model"]),
@@ -20816,13 +21028,27 @@ class _ComparisonView:
     change_rows: tuple[tuple[str, str, str, str], ...]
     flag_rows: tuple[tuple[str, str, str, str, str], ...]
     memory_rows: tuple[tuple[str, str, str, str], ...]
+    continuity_rows: tuple[tuple[str, str], ...] = ()
+    continuity_note: str | None = None
 
 
 def _changed_text_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
-    """Name the models whose generated text changed, when any did."""
-    if not comparison.text_changed_models:
-        return []
-    return [("Generated text changed", ", ".join(comparison.text_changed_models))]
+    """Name the models whose generated text changed, and split the count by decoding."""
+    rows = []
+    if comparison.text_changed_models:
+        rows.append(("Generated text changed", ", ".join(comparison.text_changed_models)))
+    labels = dict(_DECODING_GROUP_LABELS)
+    if comparison.text_changes_by_decoding:
+        rows.append(
+            (
+                "Text changed, by decoding",
+                "; ".join(
+                    f"{labels.get(group, group)} {changed} of {compared}"
+                    for group, changed, compared in comparison.text_changes_by_decoding
+                ),
+            )
+        )
+    return rows
 
 
 def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
@@ -20835,6 +21061,13 @@ def _prefill_summary_rows(comparison: RunComparison) -> list[tuple[str, str]]:
         f"{comparison.prompt_tps_compared_models} models)"
     )
     return [("Prefill tok/s ratio (now/baseline)", prefill_text)]
+
+
+_REMOVED_MODEL_LABELS: Final[tuple[tuple[str, str], ...]] = (
+    ("not selected", "In baseline, still cached but not selected this run"),
+    ("not cached", "In baseline, no longer in the cache"),
+    ("unknown", "In baseline, not run this time"),
+)
 
 
 def _comparison_view(comparison: RunComparison) -> _ComparisonView:
@@ -20900,10 +21133,11 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     banner: str | None = None
     if comparison.comparability == "incomparable":
         banner = (
-            "**Not directly comparable** — the per-model diff is withheld because the "
-            "runs differ in: " + "; ".join(comparison.incomparable_reasons) + ". "
-            "Treat any difference against this baseline as a change of inputs, not a "
-            "change of model or runtime behaviour."
+            "**Not directly comparable** — output, quality and performance comparisons are "
+            "withheld because the runs differ in: "
+            + "; ".join(comparison.incomparable_reasons)
+            + ". The roster, revisions and upstream changes below are facts about the runs "
+            "and are still shown."
         )
     elif comparison.comparability == "unknown":
         banner = (
@@ -20924,15 +21158,7 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         else None
     )
 
-    membership_items: list[str] = []
-    if comparison.models_added:
-        membership_items.append(
-            "New this run (no baseline): " + _comparison_model_list(comparison.models_added)
-        )
-    if comparison.models_removed:
-        membership_items.append(
-            "In baseline, not run this time: " + _comparison_model_list(comparison.models_removed)
-        )
+    membership_items = _membership_items(comparison)
 
     change_rows = tuple(
         (
@@ -20971,29 +21197,67 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
     )
     return _ComparisonView(
         identity_rows=tuple(identity_rows),
-        summary_rows=tuple(summary_rows),
+        summary_rows=tuple(summary_rows) if comparison.comparable else (),
         banner=banner,
         revision_note=revision_note,
         environment_note=environment_note,
-        membership_items=tuple(membership_items),
+        membership_items=membership_items,
         change_rows=change_rows,
         flag_rows=flag_rows,
         memory_rows=memory_rows,
+        continuity_rows=tuple(
+            (entry.model, _CRASH_CONTINUITY_LABELS.get(entry.status, entry.status))
+            for entry in comparison.crash_continuity
+        ),
+        continuity_note=_continuity_note(comparison),
+    )
+
+
+def _membership_items(comparison: RunComparison) -> tuple[str, ...]:
+    """New models, and baseline models grouped by why they are absent from this run."""
+    items: list[str] = []
+    if comparison.models_added:
+        items.append(
+            "New this run (no baseline): " + _comparison_model_list(comparison.models_added)
+        )
+    status = dict(comparison.models_removed_status)
+    for reason, label in _REMOVED_MODEL_LABELS:
+        models = [
+            model for model in comparison.models_removed if status.get(model, "unknown") == reason
+        ]
+        if models:
+            items.append(f"{label}: {_comparison_model_list(models)}")
+    return tuple(items)
+
+
+def _continuity_note(comparison: RunComparison) -> str | None:
+    """Warn when signatures come from harness versions that may name phases differently."""
+    if not comparison.harness_versions or not comparison.crash_continuity:
+        return None
+    baseline_version, current_version = comparison.harness_versions[:2]
+    return (
+        f"Failure signatures come from different harness versions ({baseline_version} in the "
+        f"baseline, {current_version} now); a failure phase renamed between them changes a "
+        "signature without changing the fault."
     )
 
 
 _COMPONENT_CHANGE_SUMMARY_SUBJECTS: Final[int] = 15
 
 
+def _architecture_commit_item(entry: ArchitectureCommits) -> str:
+    """One line per affected model: its architecture and what touched that package."""
+    lead = f"`{entry.model}` (`{entry.architecture}`): "
+    if entry.status == "unavailable":
+        return lead + "history unavailable (mlx-vlm is not an editable git checkout)"
+    if entry.status == "none":
+        return lead + f"no commits touched `mlx_vlm/models/{entry.architecture}/`"
+    return lead + "; ".join(entry.subjects)
+
+
 def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSection:
     """Render the mechanical diff against the baseline sweep for run_summary.md."""
     view = _comparison_view(comparison)
-    if not comparison.comparable:
-        assert view.banner is not None  # noqa: S101 - incomparable always carries a banner
-        return ReportSection(
-            "Since the baseline sweep",
-            (ReportParagraph(view.banner), ReportKeyValues(view.identity_rows)),
-        )
     blocks: list[ReportBlock] = [ReportKeyValues(view.identity_rows + view.summary_rows)]
     if view.banner is not None:
         blocks.append(ReportParagraph(view.banner))
@@ -21011,7 +21275,7 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 compact=True,
             )
         )
-    else:
+    elif comparison.comparable:
         blocks.append(
             ReportParagraph(
                 "No execution, usability, or observation-set changes against the baseline."
@@ -21033,6 +21297,12 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 compact=True,
             )
         )
+    if view.continuity_rows:
+        blocks.append(
+            ReportTable(("Model", "Failure continuity"), view.continuity_rows, compact=True)
+        )
+    if view.continuity_note is not None:
+        blocks.append(ReportParagraph(view.continuity_note))
     for change in comparison.component_changes:
         shown = change.subjects[:_COMPONENT_CHANGE_SUMMARY_SUBJECTS]
         more = change.commit_count - len(shown)
@@ -21043,6 +21313,24 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 (
                     ReportBulletList(
                         (*shown, f"... and {more} more (see results.jsonl)") if more > 0 else shown
+                    ),
+                ),
+            )
+        )
+    if comparison.architecture_commits:
+        blocks.append(
+            ReportDetails(
+                "mlx-vlm commits touching the affected models' architectures",
+                (
+                    ReportBulletList(
+                        tuple(
+                            _architecture_commit_item(entry)
+                            for entry in comparison.architecture_commits
+                        )
+                    ),
+                    ReportParagraph(
+                        "Context, not attribution: shared generation, sampling and processor "
+                        "code can change a model without touching its own package."
                     ),
                 ),
             )
@@ -21070,8 +21358,6 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
     logger.info("Baseline: %s", comparison.baseline_label)
     if view.banner is not None:
         logger.warning("%s", _plain_log_text(view.banner))
-        if not comparison.comparable:
-            return
     for label, value in view.summary_rows:
         logger.info("%s: %s", label, value)
     if view.revision_note is not None:
@@ -21090,6 +21376,10 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("%s", _plain_log_text(item))
     for model, execution, usability, observations in view.change_rows:
         logger.info("  %s: %s | %s | %s", model, execution, usability, observations)
+    for model, continuity in view.continuity_rows:
+        logger.info("  %s: %s", model, continuity)
+    if view.continuity_note is not None:
+        logger.info("%s", view.continuity_note)
     for model, baseline_tps, now_tps, ratio, band in view.flag_rows:
         logger.info(
             "  %s: %s -> %s tok/s (x%s) outside band %s", model, baseline_tps, now_tps, ratio, band
@@ -21257,7 +21547,7 @@ def _validate_run_issue_failure(value: JsonLike, line_number: int) -> None:
         message = f"{context} is not a record"
         raise RunIssueSummaryValidationError(message)
     _require_optional_str_fields(
-        value, ("phase", "stage", "exception_type", "message"), context=context
+        value, ("phase", "stage", "exception_type", "message", "signature"), context=context
     )
     chain = value.get("exception_chain")
     if chain is None:
@@ -23730,6 +24020,51 @@ def _log_report_generation_outcomes(
 _COMPONENT_CHANGE_SUBJECT_LIMIT: Final[int] = 40
 
 
+def _editable_revision_range(
+    baseline_provenance: object, current_provenance: object, name: str
+) -> tuple[str, str, str] | None:
+    """Return (checkout, baseline rev, current rev) when an editable checkout moved between runs."""
+    before = _component_source_revision(baseline_provenance, name)
+    after = _component_source_revision(current_provenance, name)
+    record = current_provenance.get(name) if isinstance(current_provenance, dict) else None
+    location = record.get("source_location") if isinstance(record, dict) else None
+    if (
+        before is None
+        or after is None
+        or before.startswith(after)
+        or after.startswith(before)
+        or not isinstance(location, str)
+        or not isinstance(record, dict)
+        or record.get("install_type") != "editable"
+    ):
+        return None
+    return str(Path(location).expanduser()), before, after
+
+
+def _git_log_subjects(
+    checkout: str, before: str, after: str, *, path: str | None = None
+) -> tuple[str, ...] | None:
+    """Commit subjects in before..after (optionally under one path); None when git cannot say.
+
+    An empty tuple is a real answer: no commit in the range touched the path.
+    """
+    log = _run_macos_toolchain_command(
+        (
+            "git",
+            "-C",
+            checkout,
+            "log",
+            "--format=%h %s",
+            f"-n{_COMPONENT_CHANGE_SUBJECT_LIMIT}",
+            f"{before}..{after}",
+            *(("--", path) if path is not None else ()),
+        ),
+        timeout=5,
+        empty_output="",
+    )
+    return None if log is None else tuple(log.splitlines())
+
+
 def _component_commit_ranges(
     baseline_metadata: JsonlMetadataRecord, current_metadata: JsonlMetadataRecord
 ) -> tuple[ComponentChange, ...]:
@@ -23739,46 +24074,67 @@ def _component_commit_ranges(
     changed upstream since the baseline" without a network call; a component
     whose revisions match, or whose checkout is unavailable, is omitted.
     """
-    baseline_provenance = baseline_metadata.get("component_provenance")
     current_provenance = current_metadata.get("component_provenance")
     if not isinstance(current_provenance, dict):
         return ()
     changes: list[ComponentChange] = []
-    for name, record in current_provenance.items():
-        before = _component_source_revision(baseline_provenance, name)
-        after = _component_source_revision(current_provenance, name)
-        location = record.get("source_location") if isinstance(record, dict) else None
-        if (
-            before is None
-            or after is None
-            or before.startswith(after)
-            or after.startswith(before)
-            or not isinstance(location, str)
-            or record.get("install_type") != "editable"
-        ):
+    for name in current_provenance:
+        span = _editable_revision_range(
+            baseline_metadata.get("component_provenance"), current_provenance, name
+        )
+        if span is None:
             continue
-        checkout = str(Path(location).expanduser())
+        checkout, before, after = span
         count = _run_macos_toolchain_command(
             ("git", "-C", checkout, "rev-list", "--count", f"{before}..{after}"), timeout=5
         )
-        log = _run_macos_toolchain_command(
-            (
-                "git",
-                "-C",
-                checkout,
-                "log",
-                "--format=%h %s",
-                f"-n{_COMPONENT_CHANGE_SUBJECT_LIMIT}",
-                f"{before}..{after}",
-            ),
-            timeout=5,
-        )
-        if count is None or log is None or not count.isdigit():
+        subjects = _git_log_subjects(checkout, before, after)
+        if count is None or subjects is None or not count.isdigit():
             continue
-        changes.append(
-            ComponentChange(name, before[:9], after[:9], int(count), tuple(log.splitlines()))
-        )
+        changes.append(ComponentChange(name, before[:9], after[:9], int(count), subjects))
     return tuple(changes)
+
+
+def _architecture_commits(
+    comparison: RunComparison,
+    current: Sequence[JsonlResultRecord],
+    baseline_metadata: JsonlMetadataRecord,
+    current_metadata: JsonlMetadataRecord,
+) -> tuple[ArchitectureCommits, ...]:
+    """For each model whose outcome, text or failure moved, list mlx-vlm commits touching its package.
+
+    Uses the resolved architecture (a checkpoint's model_type can be an alias)
+    and runs only when mlx-vlm itself moved between the runs.
+    """
+    affected = {change.model for change in comparison.changes}
+    affected |= set(comparison.text_changed_models)
+    affected |= {entry.model for entry in comparison.crash_continuity}
+    current_provenance = current_metadata.get("component_provenance")
+    baseline_provenance = baseline_metadata.get("component_provenance")
+    moved = _component_source_revision(baseline_provenance, "mlx-vlm") != (
+        _component_source_revision(current_provenance, "mlx-vlm")
+    )
+    if not affected or not moved:
+        return ()
+    span = _editable_revision_range(baseline_provenance, current_provenance, "mlx-vlm")
+    subjects_by_architecture: dict[str, tuple[str, ...] | None] = {}
+    entries: list[ArchitectureCommits] = []
+    for record in current:
+        architecture_record = record.get("architecture")
+        architecture = (
+            architecture_record.get("resolved_model_type") if architecture_record else None
+        )
+        if record["model"] not in affected or not isinstance(architecture, str):
+            continue
+        if span is not None and architecture not in subjects_by_architecture:
+            checkout, before, after = span
+            subjects_by_architecture[architecture] = _git_log_subjects(
+                checkout, before, after, path=f"mlx_vlm/models/{architecture}"
+            )
+        subjects = subjects_by_architecture.get(architecture)
+        status = "unavailable" if subjects is None else ("commits" if subjects else "none")
+        entries.append(ArchitectureCommits(record["model"], architecture, status, subjects or ()))
+    return tuple(entries)
 
 
 def _compute_run_comparison(
@@ -23810,9 +24166,15 @@ def _compute_run_comparison(
         )
         if comparison is None:
             return None
-        return replace(
+        comparison = replace(
             comparison,
             component_changes=_component_commit_ranges(baseline.metadata, current.metadata),
+        )
+        return replace(
+            comparison,
+            architecture_commits=_architecture_commits(
+                comparison, current.results, baseline.metadata, current.metadata
+            ),
         )
     except Exception as error:  # comparison must never cost the run's reports
         logger.warning("Comparison skipped: unexpected comparison failure (%s)", error)

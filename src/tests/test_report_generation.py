@@ -11,6 +11,7 @@ import io
 import json
 import logging
 import re
+import subprocess
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -6275,7 +6276,10 @@ def test_compare_run_results_withholds_diff_when_inputs_differ() -> None:
     assert payload is not None
     assert payload["comparability"] == "incomparable"
     assert payload["execution_mode"] == {"baseline": "in_process", "current": "in_process"}
-    assert "changes" not in payload
+    # Input-dependent comparisons are withheld; the payload shape stays the same.
+    assert payload["changes"] == []
+    assert payload["identical_text_models"] == 0
+    assert payload["text_compared_models"] == 0
     rendered = "\n".join(
         check_models.render_report_markdown(
             (check_models._run_issue_summary_comparison_section(comparison),)
@@ -7453,3 +7457,270 @@ def test_comparison_names_changed_outputs_prefill_ratio_and_upstream_commits() -
     assert restored.text_changed_models == ("org/a",)
     assert restored.component_changes == comparison.component_changes
     assert restored.prompt_tps_ratio_median == pytest.approx(0.75)
+
+
+def test_incomparable_runs_keep_roster_and_say_why_a_model_is_absent() -> None:
+    """A new image withholds the diff, not the facts: absent models are explained, not "fixed"."""
+    baseline = _comparison_baseline(
+        [
+            _comparison_record("org/kept", usability="usable"),
+            _comparison_record("org/deselected", execution="crashed", usability="not_evaluated"),
+            _comparison_record("org/uncached", usability="usable"),
+        ]
+    )
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {
+            **baseline.metadata,
+            "prompt": "a different prompt",
+            "cache_discovery": [
+                {"repo_id": "org/kept", "selected": True},
+                {"repo_id": "org/deselected", "selected": False},
+                {"repo_id": "org/new", "selected": True},
+            ],
+        },
+    )
+    current = [
+        cast(
+            "check_models.JsonlResultRecord", _comparison_record("org/kept", usability="unusable")
+        ),
+        cast("check_models.JsonlResultRecord", _comparison_record("org/new")),
+    ]
+    comparison = check_models.compare_run_results(
+        current,
+        baseline,
+        current_metadata=metadata,
+        current_image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        current_generation_settings=(("max_tokens", "1000"),),
+    )
+    assert comparison.comparability == "incomparable"
+    assert comparison.changes == ()
+    assert comparison.models_added == ("org/new",)
+    assert dict(comparison.models_removed_status) == {
+        "org/deselected": "not selected",
+        "org/uncached": "not cached",
+    }
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "Not directly comparable" in rendered
+    assert "still cached but not selected this run: `org/deselected`" in rendered
+    assert "no longer in the cache: `org/uncached`" in rendered
+    assert "New this run" in rendered
+    assert "No execution, usability, or observation-set changes" not in rendered
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.models_removed_status == comparison.models_removed_status
+    assert restored.incomparable_reasons == comparison.incomparable_reasons
+    # Without discovery records the absence is stated without a cause.
+    unknown = check_models._removed_model_status(["org/x"], None)
+    assert unknown == (("org/x", "unknown"),)
+
+
+def test_crash_continuity_uses_signatures_cautiously_and_survives_a_new_image() -> None:
+    """Continuity is stated per model from retained signatures, never as "fixed"."""
+
+    def crashed(model: str, signature: str | None) -> dict[str, object]:
+        record = _comparison_record(model, execution="crashed", usability="not_evaluated")
+        record["failure"] = {"phase": "model_load", "signature": signature}
+        return record
+
+    baseline = _comparison_baseline(
+        [
+            crashed("org/same", "LOAD:aaa"),
+            crashed("org/moved", "LOAD:aaa"),
+            _comparison_record("org/broke"),
+            crashed("org/recovered", "GEN:bbb"),
+            crashed("org/legacy", None),
+        ]
+    )
+    baseline.metadata["producer"] = cast(
+        "check_models.CheckModelsProvenanceRecord", {"version": "0.17.30"}
+    )
+    current = [
+        cast("check_models.JsonlResultRecord", record)
+        for record in (
+            crashed("org/same", "LOAD:aaa"),
+            crashed("org/moved", "GEN:ccc"),
+            crashed("org/broke", "GEN:ddd"),
+            _comparison_record("org/recovered"),
+            crashed("org/legacy", "LOAD:eee"),
+            crashed("org/fresh", "LOAD:fff"),
+        )
+    ]
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {
+            **baseline.metadata,
+            "prompt": "another image's prompt",
+            "producer": {"version": "0.17.40"},
+        },
+    )
+    comparison = check_models.compare_run_results(
+        current,
+        baseline,
+        current_metadata=metadata,
+        current_image=cast("check_models.RunImageRecord", {"sha256": "a" * 64}),
+        current_generation_settings=(("max_tokens", "1000"),),
+    )
+    assert comparison.comparability == "incomparable"
+    assert {entry.model: entry.status for entry in comparison.crash_continuity} == {
+        "org/same": "same_signature",
+        "org/moved": "different_signature",
+        "org/broke": "new_failure",
+        "org/recovered": "completed_now",
+        "org/legacy": "insufficient_evidence",
+        "org/fresh": "not_in_baseline",
+    }
+    assert comparison.harness_versions == ("0.17.30", "0.17.40")
+    rendered = "\n".join(
+        check_models.render_report_markdown(
+            (check_models._run_issue_summary_comparison_section(comparison),)
+        )
+    )
+    assert "completed this run; failed in baseline" in rendered
+    assert "resolved" not in rendered.lower()
+    assert "different harness versions" in " ".join(rendered.split())
+    assert "0.17.30 in the baseline, 0.17.40 now" in " ".join(rendered.split())
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.crash_continuity == comparison.crash_continuity
+    assert restored.harness_versions == comparison.harness_versions
+
+
+def test_text_changes_are_split_by_the_effective_decoding_of_both_runs() -> None:
+    """Greedy, same-settings sampling, changed settings and unrecorded settings stay apart."""
+
+    def decoded(model: str, text: str, **settings: object) -> dict[str, object]:
+        record = _comparison_record(model, text=text)
+        record["prompt_diagnostics"] = {"generate_kwargs": {"seed": 0, **settings}}
+        return record
+
+    before = [
+        decoded("org/greedy", "a", temperature=0.0),
+        decoded("org/sampled", "b", temperature=0.7, top_p=0.8),
+        decoded("org/reseeded", "c", temperature=0.7, top_p=0.8),
+        _comparison_record("org/unrecorded", text="d"),
+    ]
+    now = [
+        decoded("org/greedy", "a", temperature=0.0),
+        decoded("org/sampled", "B", temperature=0.7, top_p=0.8),
+        decoded("org/reseeded", "C", temperature=0.7, top_p=0.8, seed=1),
+        _comparison_record("org/unrecorded", text="d"),
+    ]
+    baseline = _comparison_baseline(before)
+    comparison = check_models.compare_run_results(
+        [cast("check_models.JsonlResultRecord", record) for record in now],
+        baseline,
+        **cast("dict[str, Any]", _verified_comparison_kwargs(baseline)),
+    )
+    assert comparison.text_changes_by_decoding == (
+        ("greedy", 0, 1),
+        ("sampled", 1, 1),
+        ("changed", 1, 1),
+        ("unknown", 0, 1),
+    )
+    rows = dict(check_models._comparison_view(comparison).summary_rows)
+    assert rows["Text changed, by decoding"] == (
+        "greedy 0 of 1; sampled, same settings and seed 1 of 1; "
+        "decoding mode or settings changed 1 of 1; settings not recorded 0 of 1"
+    )
+    payload = check_models._run_comparison_to_json(comparison)
+    assert payload is not None
+    restored = check_models._run_comparison_from_json(payload)
+    assert restored.text_changes_by_decoding == comparison.text_changes_by_decoding
+
+
+def test_architecture_commits_separate_no_commits_from_unavailable_history(tmp_path: Path) -> None:
+    """Path-limited git history per affected model; an empty log is "none", not "unknown"."""
+    repo = tmp_path / "mlx-vlm"
+    package = repo / "mlx_vlm" / "models" / "alpha"
+    package.mkdir(parents=True)
+
+    def git(*args: str) -> str:
+        return subprocess.run(  # noqa: S603 - fixed git binary over a temp repository
+            ["git", "-C", str(repo), *args],  # noqa: S607 - git from PATH in a test
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+
+    git("init", "-q")
+    git("config", "user.email", "t@example.invalid")
+    git("config", "user.name", "t")
+    check_models._write_text_file(repo / "README.md", "base\n")
+    git("add", ".")
+    git("commit", "-qm", "base")
+    before = git("rev-parse", "HEAD")
+    check_models._write_text_file(package / "model.py", "x = 1\n")
+    git("add", ".")
+    git("commit", "-qm", "alpha: fix sanitize")
+    check_models._write_text_file(repo / "shared.py", "y = 2\n")
+    git("add", ".")
+    git("commit", "-qm", "shared sampler change")
+    after = git("rev-parse", "HEAD")
+
+    assert (
+        check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/beta") == ()
+    )
+    alpha = check_models._git_log_subjects(str(repo), before, after, path="mlx_vlm/models/alpha")
+    assert alpha is not None
+    assert [subject.split(" ", 1)[1] for subject in alpha] == ["alpha: fix sanitize"]
+
+    def provenance(revision: str) -> dict[str, object]:
+        return {
+            "mlx-vlm": {
+                "install_type": "editable",
+                "source_location": str(repo),
+                "source_revision": revision,
+            }
+        }
+
+    def affected(model: str, architecture: str) -> dict[str, object]:
+        record = _comparison_record(model, execution="crashed", usability="not_evaluated")
+        record["architecture"] = {"resolved_model_type": architecture}
+        return record
+
+    baseline = _comparison_baseline(
+        [affected("org/a", "alpha"), affected("org/b", "beta"), _comparison_record("org/c")]
+    )
+    current = [
+        cast("check_models.JsonlResultRecord", record)
+        for record in (
+            affected("org/a", "alpha"),
+            affected("org/b", "beta"),
+            _comparison_record("org/c"),
+        )
+    ]
+    comparison = check_models.compare_run_results(
+        current, baseline, **cast("dict[str, Any]", _verified_comparison_kwargs(baseline))
+    )
+    before_meta = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "component_provenance": provenance(before)},
+    )
+    after_meta = cast(
+        "check_models.JsonlMetadataRecord",
+        {**baseline.metadata, "component_provenance": provenance(after)},
+    )
+    entries = check_models._architecture_commits(comparison, current, before_meta, after_meta)
+    assert {(e.model, e.status) for e in entries} == {("org/a", "commits"), ("org/b", "none")}
+    items = [check_models._architecture_commit_item(entry) for entry in entries]
+    assert any("no commits touched `mlx_vlm/models/beta/`" in item for item in items)
+    # A wheel install has no history to read: said as such, never as "no commits".
+    wheel = cast(
+        "check_models.JsonlMetadataRecord",
+        {
+            **baseline.metadata,
+            "component_provenance": {
+                "mlx-vlm": {"install_type": "wheel", "source_revision": after}
+            },
+        },
+    )
+    unavailable = check_models._architecture_commits(comparison, current, before_meta, wheel)
+    assert {entry.status for entry in unavailable} == {"unavailable"}
+    assert "history unavailable" in check_models._architecture_commit_item(unavailable[0])

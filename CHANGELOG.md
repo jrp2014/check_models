@@ -6,6 +6,26 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The baseline comparison records facts about the runs even when their
+  outputs cannot be compared (a new image or prompt): which models were added
+  or are absent, and whether an absent model is still cached but not selected
+  or no longer in the cache, plus model revisions and upstream commit ranges.
+  Only output, quality and performance comparisons are withheld; the special
+  incomparable branches in the serialiser, loader and renderers are gone.
+- Crash continuity per model from failure signatures, which are now kept in
+  the retained failure record (`failure.signature`): same or different
+  signature observed, newly observed failure, completed this run after
+  failing in the baseline, or insufficient evidence. A note flags signatures
+  from different harness versions, since a renamed phase changes a signature
+  without changing the fault. Nothing is labelled "resolved".
+- Text changes are split by the effective decoding of both runs: greedy,
+  sampled with the same settings and seed, mode or settings changed, or not
+  recorded.
+- For each model whose outcome, text or failure moved, the comparison lists
+  the upstream mlx-vlm commits between the runs that touched its resolved
+  architecture package (local path-limited `git log`), distinguishing "no
+  commits touched it" from "history unavailable". Labelled as context, not
+  attribution.
 - Agent guidance explicitly authorizes the safe local edit–test–fix loop for
   implementation requests while retaining authorization boundaries around
   downloads, dependency changes, model/data caches, expensive inference,

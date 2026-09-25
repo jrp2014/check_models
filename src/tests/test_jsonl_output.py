@@ -1164,6 +1164,7 @@ def test_save_jsonl_report_serializes_crash_assessment_and_failure(tmp_path: Pat
         "exception_module": None,
         "package": "mlx-vlm",
         "traceback": None,
+        "signature": None,
     }
     assert "review" not in row
     assert "maintainer_triage" not in row
@@ -1269,6 +1270,7 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
         "exception_module": None,
         "package": None,
         "traceback": None,
+        "signature": None,
     }
 
 
