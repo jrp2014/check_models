@@ -1,11 +1,11 @@
 # Model Output Gallery
 
-Generated on: 2026-09-18 23:43:35 BST
+Generated on: 2026-09-25 22:19:51 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 44.7 MB
+- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.4 MB
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -18,7 +18,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-57f7cdeb1b88952a.jpg)
+![Reference image](assets/source-image-b32a199300908fe5.jpg)
 
 ## Current-run Chooser
 
@@ -26,64 +26,63 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                     | Mechanical checks      | Total s | Gen TPS             | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                  |
-|---------------------------------------------------------------------------------------------------------------------------|------------------------|---------|---------------------|-----------------|---------|------------|---------|-----------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | 11.48s  | 29.6 tok/s          | 3.59            | 23      | 2,393      | 151     | none                                                                                          |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | 16.34s  | 77.8 tok/s          | 1.31            | 19      | 1,634      | 997     | none                                                                                          |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | 9.76s   | 74.1 tok/s          | 5.84            | 8.8     | 6,450      | 140     | none                                                                                          |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | 8.50s   | 35.5 tok/s          | 1.79            | 18      | 2,612      | 138     | none                                                                                          |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | 6.02s   | 57.4 tok/s          | 2.02            | 10      | 2,113      | 126     | none                                                                                          |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | 5.78s   | 37.7 tok/s          | 1.43            | 17      | 2,113      | 77      | none                                                                                          |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | 3.36s   | 214 tok/s           | 1.12            | 4.0     | 2,103      | 81      | none                                                                                          |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | 3.23s   | 105 tok/s           | 0.72            | 7.0     | 391        | 101     | none                                                                                          |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | 6.77s   | 67.2 tok/s          | 3.09            | 13      | 2,926      | 109     | none                                                                                          |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | 7.77s   | 62.3 tok/s          | 2.66            | 13      | 2,926      | 187     | none                                                                                          |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | 3.75s   | 191 tok/s           | 1.53            | 7.8     | 2,925      | 102     | none                                                                                          |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | 4.87s   | 154 tok/s           | 2.62            | 3.9     | 4,083      | 84      | none                                                                                          |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | 6.73s   | 71.8 tok/s          | 1.28            | 24      | 1,289      | 155     | none                                                                                          |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | 4.21s   | 54.9 tok/s          | 0.78            | 9.3     | 1,133      | 107     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | 27.70s  | 86.3 tok/s          | 15.37           | 8.4     | 16,549     | 912     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | 77.47s  | 20.4 tok/s          | 65.80           | 26      | 16,547     | 177     | none                                                                                          |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | 39.47s  | 69.7 tok/s          | 35.72           | 11      | 16,547     | 93      | none                                                                                          |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | 39.73s  | 72.4 tok/s          | 34.63           | 25      | 16,563     | 97      | none                                                                                          |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | 44.16s  | 91.4 tok/s          | 40.63           | 11      | 16,563     | 86      | none                                                                                          |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | 36.64s  | 47.4 tok/s          | 20.49           | 92      | 3,491      | 121     | none                                                                                          |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | 18.44s  | 57.6 tok/s          | 13.94           | 14      | 16,558     | 136     | none                                                                                          |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | 4.62s   | 100 tok/s           | 1.56            | 6.5     | 2,090      | 96      | none                                                                                          |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | 5.10s   | 60.4 tok/s          | 0.93            | 7.6     | 595        | 101     | none                                                                                          |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | 5.04s   | 108 tok/s           | 0.99            | 16      | 595        | 96      | none                                                                                          |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | 8.45s   | 26.3 tok/s          | 1.69            | 20      | 595        | 89      | none                                                                                          |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | 3.74s   | 125 tok/s           | 0.77            | 6.0     | 591        | 73      | none                                                                                          |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | 2.91s   | 176 tok/s           | 1.14            | 4.7     | 1,379      | 65      | none                                                                                          |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `concerns detected`    | 23.56s  | 41.6 tok/s          | 13.67           | 78      | 6,450      | 103     | prompt hint repeated                                                                          |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | 6.16s   | 72.5 tok/s          | 1.35            | 8.6     | 1,524      | 216     | duplicate keywords                                                                            |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `concerns detected`    | 41.22s  | 91.3 tok/s          | 38.22           | 9.3     | 16,558     | 117     | prompt hint repeated                                                                          |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `concerns detected`    | 65.24s  | 29.8 tok/s          | 57.99           | 21      | 16,563     | 124     | unsupplied place name                                                                         |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `concerns detected`    | 3.33s   | 131 tok/s           | 1.07            | 5.6     | 1,426      | 98      | prompt hint repeated                                                                          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | 6.81s   | 46.1 tok/s          | 2.85            | 28      | 591        | 80      | duplicate keywords; prompt hint repeated                                                      |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `concerns detected`    | 9.47s   | 30.3 tok/s          | 1.47            | 17      | 590        | 152     | unsupplied place name                                                                         |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `concerns detected`    | 7.12s   | 40.2 tok/s          | 2.17            | 16      | 3,116      | 102     | prompt hint repeated                                                                          |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | 2.26s   | 476 tok/s           | 0.60            | 1.9     | 2,112      | 200     | repeated text; stopped early: repeating; duplicate keywords; prompt hint repeated             |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | 20.21s  | 63.0 tok/s          | 1.38            | 20      | 1,324      | 1,000   | cut off at token limit                                                                        |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | 14.66s  | 25.7 tok/s          | 2.00            | 9.8     | 301        | 275     | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | 57.79s  | 18.8 tok/s          | 2.20            | 15      | 301        | 1,000   | repeated text; cut off at token limit                                                         |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | 53.04s  | 24.3 tok/s          | 7.92            | 25      | 4,403      | 1,000   | cut off at token limit                                                                        |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | 41.31s  | 74.7 tok/s          | 35.71           | 23      | 16,547     | 200     | stopped early: repeating; duplicate keywords                                                  |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | 2.21s   | 320 tok/s           | 0.92            | 1.1     | 1,205      | 33      | labelled fields not detected                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | 4.43s   | 71.0 tok/s          | 0.83            | 7.2     | 589        | 88      | labelled fields not detected                                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | 5.26s   | 102 tok/s           | 1.51            | 6.7     | 2,195      | 200     | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | 2.34s   | 193 tok/s           | 0.66            | 1.8     | 330        | 92      | labelled fields not detected                                                                  |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | 4.02s   | insufficient sample | 1.50            | 9.7     | 1,344      | 7       | labelled fields not detected                                                                  |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | 0.16s   | -                   | -               | -       | -          | -       | none                                                                                          |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | 2.13s   | -                   | -               | -       | -          | -       | none                                                                                          |
-| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | 0.25s   | -                   | -               | -       | -          | -       | none                                                                                          |
+| Model                                                                                                                   | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `no concerns detected` | 2.24s   | 480 tok/s  | 0.70            | 1.9     | 2,119      | 141     | none                                                                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `no concerns detected` | 10.54s  | 30.6 tok/s | 3.92            | 23      | 2,394      | 123     | none                                                                                              |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                          | `no concerns detected` | 9.50s   | 75.7 tok/s | 5.75            | 8.7     | 6,454      | 139     | none                                                                                              |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `no concerns detected` | 26.53s  | 42.8 tok/s | 14.87           | 78      | 6,454      | 142     | none                                                                                              |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                           | `no concerns detected` | 6.40s   | 56.8 tok/s | 2.52            | 10      | 2,115      | 116     | none                                                                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `no concerns detected` | 6.62s   | 37.4 tok/s | 1.55            | 17      | 2,115      | 103     | none                                                                                              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                   | `no concerns detected` | 15.43s  | 66.6 tok/s | 1.68            | 20      | 1,331      | 729     | none                                                                                              |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `no concerns detected` | 3.46s   | 210 tok/s  | 1.26            | 4.0     | 2,111      | 110     | none                                                                                              |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                            | `no concerns detected` | 3.47s   | 105 tok/s  | 0.85            | 7.0     | 393        | 114     | none                                                                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `no concerns detected` | 7.08s   | 66.6 tok/s | 2.76            | 13      | 2,927      | 160     | none                                                                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `no concerns detected` | 3.96s   | 189 tok/s  | 1.51            | 7.8     | 2,926      | 152     | none                                                                                              |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `no concerns detected` | 4.97s   | 209 tok/s  | 2.65            | 3.9     | 4,085      | 112     | none                                                                                              |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `no concerns detected` | 6.30s   | 102 tok/s  | 1.53            | 24      | 1,291      | 151     | none                                                                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `no concerns detected` | 4.80s   | 58.8 tok/s | 0.99            | 9.3     | 1,141      | 136     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `no concerns detected` | 27.58s  | 87.2 tok/s | 15.30           | 8.4     | 16,551     | 918     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `no concerns detected` | 38.68s  | 79.6 tok/s | 34.11           | 23      | 16,549     | 128     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                           | `no concerns detected` | 76.57s  | 19.7 tok/s | 64.38           | 26      | 16,549     | 181     | none                                                                                              |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                             | `no concerns detected` | 38.78s  | 69.0 tok/s | 35.35           | 11      | 16,549     | 104     | none                                                                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `no concerns detected` | 36.19s  | 103 tok/s  | 31.54           | 25      | 16,565     | 111     | none                                                                                              |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `no concerns detected` | 37.02s  | 87.7 tok/s | 32.99           | 11      | 16,565     | 142     | none                                                                                              |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                              | `no concerns detected` | 60.89s  | 28.2 tok/s | 52.80           | 21      | 16,565     | 144     | none                                                                                              |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `no concerns detected` | 3.37s   | 126 tok/s  | 1.32            | 5.6     | 1,433      | 78      | none                                                                                              |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                          | `no concerns detected` | 42.10s  | 50.9 tok/s | 23.67           | 92      | 3,494      | 147     | none                                                                                              |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                           | `no concerns detected` | 4.98s   | 96.4 tok/s | 1.72            | 6.5     | 2,089      | 112     | none                                                                                              |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `no concerns detected` | 7.10s   | 48.6 tok/s | 3.07            | 28      | 592        | 85      | none                                                                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `no concerns detected` | 10.46s  | 29.6 tok/s | 1.55            | 17      | 591        | 175     | none                                                                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `no concerns detected` | 5.26s   | 114 tok/s  | 1.02            | 16      | 596        | 130     | none                                                                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `no concerns detected` | 8.44s   | 26.0 tok/s | 1.69            | 20      | 596        | 89      | none                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                         | `no concerns detected` | 4.17s   | 122 tok/s  | 1.05            | 5.9     | 592        | 94      | none                                                                                              |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `no concerns detected` | 3.77s   | 165 tok/s  | 1.70            | 4.7     | 1,383      | 99      | none                                                                                              |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `no concerns detected` | 7.74s   | 38.5 tok/s | 2.39            | 16      | 3,117      | 114     | none                                                                                              |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `concerns detected`    | 9.25s   | 35.2 tok/s | 1.93            | 18      | 2,619      | 164     | duplicate keywords                                                                                |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                         | `concerns detected`    | 5.30s   | 59.0 tok/s | 0.97            | 7.6     | 596        | 108     | duplicate keywords                                                                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)            | `major concerns`       | 7.59s   | 112 tok/s  | 1.54            | 19      | 1,639      | 425     | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `major concerns`       | 2.96s   | 361 tok/s  | 1.16            | 2.2     | 336        | 51      | labelled fields not detected                                                                      |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `major concerns`       | 57.73s  | 18.8 tok/s | 2.33            | 15      | 308        | 1,000   | repeated text; cut off at token limit; duplicate keywords                                         |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                            | `major concerns`       | 2.95s   | 308 tok/s  | 1.02            | 3.3     | 934        | 84      | incomplete thinking block                                                                         |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `major concerns`       | 7.05s   | 73.0 tok/s | 2.23            | 8.1     | 1,526      | 225     | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `major concerns`       | 54.66s  | 24.2 tok/s | 9.73            | 25      | 4,409      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                             | `major concerns`       | 43.19s  | 91.2 tok/s | 39.04           | 9.3     | 16,560     | 225     | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                           | `major concerns`       | 2.34s   | 545 tok/s  | 1.04            | 1.1     | 1,212      | 38      | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `major concerns`       | 20.22s  | 57.2 tok/s | 12.63           | 14      | 16,560     | 250     | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                       | `major concerns`       | 5.86s   | 86.1 tok/s | 1.22            | 7.0     | 590        | 196     | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                          | `major concerns`       | 4.43s   | 149 tok/s  | 2.50            | 4.2     | 5,581      | 102     | labelled fields not detected                                                                      |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                 | `major concerns`       | 3.47s   | 103 tok/s  | 1.52            | 6.7     | 2,197      | 16      | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `major concerns`       | 1.97s   | 341 tok/s  | 0.76            | 1.6     | 332        | 21      | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                          | `not assessed`         | 0.17s   | -          | -               | -       | -          | -       | none                                                                                              |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                           | `not assessed`         | 3.21s   | -          | -               | -       | -          | -       | none                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/granite-4.0-3b-vision-4bit` at 2.91s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.24s
 
-Lowest peak memory among completions without detected concerns: `mlx-community/North-Micro-Vision-Instruct-4bit` at 3.9 GB
+Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
@@ -91,22 +90,23 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                     | Mechanical checks | Observations                                                                                  |
-|---------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords; prompt hint repeated             |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`  | cut off at token limit                                                                        |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`  | repeated text; cut off at token limit                                                         |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`  | cut off at token limit                                                                        |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`  | stopped early: repeating; duplicate keywords                                                  |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`  | labelled fields not detected                                                                  |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`  | labelled fields not detected                                                                  |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`  | repeated text; stopped early: repeating; control tokens visible; labelled fields not detected |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`  | labelled fields not detected                                                                  |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`  | labelled fields not detected                                                                  |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`    | none                                                                                          |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`    | none                                                                                          |
-| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`    | none                                                                                          |
+| Model                                                                                                        | Mechanical checks | Observations                                                                                      |
+|--------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | `major concerns`  | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                      |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                         |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                         |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                        | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                  | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                      |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                      |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected                                                                      |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | labelled fields not detected                                                                      |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `not assessed`    | none                                                                                              |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                | `not assessed`    | none                                                                                              |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -115,66 +115,65 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                     | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
-|---------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)   | `no concerns detected` | Title: Swan on a calm river with moored boats \| Description: A solitary white swan swims gracefully on a calm river, with leisure boats and cruisers moored alongside r... \| Keywords (20): Swan, river, boats, mooring, residential buildings, greenery, water reflection, aquatic bird, marina, ...                                                                               |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)              | `no concerns detected` | Title: Solitary White Swan Glides on Calm River with Boats and Lush Foliage \| Description: On 12 September 2026 at 17:41 UTC+01 (52.393850°N, 0.270830°E), a solitary wh... \| Keywords (17): White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, ...[2,490 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                            | `no concerns detected` | Title: Swan at River Marina \| Description: A white swan glides on calm river waters, with leisure boats moored alongside riverside residential buildings in the... \| Keywords (13): Swan, River, Marina, Leisure boats, Residential buildings, Calm waters, White swan, Riverbank, Boats moored, ...                                                                                |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                   | `no concerns detected` | Title: Solitary Swan on Calm River Waters with Moored Boats and Riverside Buildings. \| Description: A solitary white swan glides gracefully across the calm river wate... \| Keywords (20): swan, river, boats, moored, residential buildings, foliage, calm waters, leisure, cruisers, riverside, ...                                                                               |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                             | `no concerns detected` | Title: Swan on Canal with Moored Boats \| Description: A white swan glides on a tranquil canal, surrounded by moored boats and riverside buildings, with lush greenery... \| Keywords (19): Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Reflection, Motorboat, Pier, ...                                                                               |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                               | `no concerns detected` | Title: Swan on Calm River \| Description: A white swan glides on tranquil river waters near a marina with moored boats and residential buildings, captured at dusk. \| Keywords (15): swan, river, marina, boats, residential buildings, foliage, trees, water reflection, architecture, motorboat, ...                                                                               |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                    | `no concerns detected` | Title: Swan gliding past moored boats on tranquil riverbank \| Description: A white swan swims gracefully on calm river waters, framed by lush greenery, with leisur... \| Keywords (14): swan, river, boats, marina, greenery, water, reflection, architecture, leisure, waterfront, aquatic bird, ...                                                                               |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                              | `no concerns detected` | Title: Swan Glides on Calm River Near Moored Boats \| Description: A white swan swims peacefully in a tranquil waterway, framed by greenery and moored leisure bo... \| Keywords (16): swan, river, waterway, mooring, motorboat, boats, greenery, trees, vegetation, waterfront, water reflection, ...                                                                               |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)           | `no concerns detected` | Title: **Swan Gliding Past Moored Boats on a Serene River** \| Description: A solitary white swan swims calmly on a tranquil river, surrounded by reflections of... \| Keywords (16): swan, river, moored boats, marina, residential waterfront, greenery, calm water, reflections, leisure boats, ...                                                                                |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)           | `no concerns detected` | Title: *Elegant Swan Glides Past Moored Boats on Serene River* \| Description: A solitary white swan gracefully swims across calm river waters on **September 12, 2026,... \| Keywords (20): swan, river, leisure boats, moored boats, riverside residential buildings, greenery, golden sunlight, ...                                                                                |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)               | `no concerns detected` | Title: Swans by Riverside Marina \| Description: A white swan swims serenely in calm waters at dusk near a marina moored with leisure boats, framed by lush greenery... \| Keywords (17): swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, residential architecture, ...                                                                                |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                 | `no concerns detected` | Title: Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery. In the background, leisure boa... \| Keywords (13): Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, Architecture, Leisure Boats, Foliage, ...                                                                               |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                        | `no concerns detected` | Title: White Swan Glides Past Moored Boats On Calm River \| Description: A solitary white swan glades across a calm river in the foreground, its reflection ripplin... \| Keywords (19): white swan, river, moored boats, motorboats, cruisers, marina, pontoon, water reflection, swan, waterfowl, ...                                                                               |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                          | `no concerns detected` | Title: Serene Swan on the River \| Description: A white swan is seen swimming peacefully on a calm river, with boats and houses in the background, captured on S... \| Keywords (18): swan, river, calm, boats, houses, foliage, waterfront, mooring, leisure, tranquility, architecture, waterway, ...                                                                               |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                               | `no concerns detected` | Title: Solitary Swan on Riverfront Marina \| Description: A solitary white swan glides across calm river waters in a canal with moored leisure boats and reside... \| Keywords (15): Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, ...[2,859 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                             | `no concerns detected` | Title: Swan Gliding on River Near Moored Boats \| Description: A solitary white swan glides across calm river waters, framed by overhanging green foliage, with se... \| Keywords (18): swan, river, moored boats, leisure craft, residential buildings, greenery, water reflection, foliage, pier, ...                                                                               |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                               | `no concerns detected` | Title: Swan on River with Moored Boats \| Description: A solitary white swan glides calmly on a river, framed by green foliage, with moored leisure boats and resid... \| Keywords (17): swan, river, boats, mooring, canal, greenery, trees, water reflection, waterfront, residential, motorboat, ...                                                                               |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                          | `no concerns detected` | Title: Swan Swimming Past Moored Boats \| Description: A solitary white swan glides across calm river waters near a riverside mooring of leisure cruisers and resid... \| Keywords (18): swan, river, moored boats, riverbank, vegetation, water reflection, cruiser, residential buildings, trees, ...                                                                               |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                            | `no concerns detected` | Title: Swan Glides Past Moored Boats on Calm Riverbank \| Description: A solitary white swan swims peacefully on a reflective river, with leisure boats moored along t... \| Keywords (15): swan, river, boats, mooring, residential buildings, water reflection, foliage, trees, motorboat, canal, ...                                                                               |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                            | `no concerns detected` | Title: Swan glides past moored boats on a calm river \| Description: A solitary white swan swims across calm river waters, framed by lush foreground foliage and... \| Keywords (18): Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, canal, bird, swimming, trees, ...                                                                               |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                             | `no concerns detected` | Title: Swan Gliding on Calm River with Moored Boats \| Description: A serene scene captures a solitary white swan gracefully swimming across calm river waters, frame... \| Keywords (23): Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Waterway, Motorboat, Pier, ...                                                                               |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                             | `no concerns detected` | Title: Solitary Swan Glides on Tranquil River \| Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river,... \| Keywords (12): Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, ...                                                                               |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                           | `no concerns detected` | Title: White Swan Gliding on a River Near Moored Boats \| Description: A solitary white swan glides across a calm river surface reflecting leisure boats and residential... \| Keywords (19): Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, Residential, Waterway, ...                                                                               |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                   | `no concerns detected` | Title: White swan swimming on calm river with moored boats \| Description: A solitary white swan glides across calm river waters near a wooden pier, with several... \| Keywords (15): white swan, river, motorboat, waterfowl, waterfront, greenery, reflection, residential building, boat, pier, ...                                                                               |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                           | `no concerns detected` | Title: White Swan Swimming Past Moored River Boats \| Description: A single white swan swims across calm river waters in front of leisure boats moored beside rivers... \| Keywords (18): swan, river, boats, marina, moored, waterfront, waterway, residential, architecture, greenery, waterfowl, ...                                                                               |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                           | `no concerns detected` | Title: Swan glides on calm water beneath residential buildings \| Description: A solitary white swan gracefully floats on the calm river water, framed by dense greenery... \| Keywords (16): swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, architecture, moored, peaceful, ...                                                                               |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                              | `no concerns detected` | Title: "Swan on the Canal" \| Description: A white swan glides gracefully across a calm river, framed by lush foliage and moored boats, with a serene residential backdrop. \| Keywords (10): swan, canal, water, foliage, boats, mooring, residential, reflection, serene, waterway                                                                                                  |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                      | `concerns detected`    | Title: Solitary swan glides on calm river waters \| Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisu... \| Keywords (17): swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, ...                                                                               |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                     | `concerns detected`    | Title: Serene River Scene with White Swan and Moored Boats \| Description: A tranquil riverside view features a solitary white swan gliding across calm water, surro... \| Keywords (42): swan, river, boats, mooring, canal, greenery, trees, vegetation, water reflection, waterfowl, waterfront, ...                                                                               |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                               | `concerns detected`    | Title: Graceful Swan on the River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruis... \| Keywords (26): swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, ...                                                                               |
-| [`mlx-community/Qwen3.8-27B-4bit`](#model-mlx-community-qwen38-27b-4bit)                                                  | `concerns detected`    | Title: Swan swimming near moored boats on the River Thames \| Description: A solitary white swan swims on the calm water of the River Thames at Lambeth, with its re... \| Keywords (15): Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, ...                                                                               |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                              | `concerns detected`    | Title: Swan on River \| Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers mo... \| Keywords (20): Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, ...                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                   | `concerns detected`    | Title: White Swan Gliding on River Near Moored Boats \| Description: A solitary white swan glides across calm river waters, with leisure boats and cruisers moored al... \| Keywords (16): swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pier, waterfront, waterway, greenery, ...                                                                               |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                   | `concerns detected`    | Title: Swan on River Cam, Cambridge – September 2026 \| Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September... \| Keywords (18): Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, ...                                                                                |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                 | `concerns detected`    | Title: Swan in River with Moored Boats \| Description: A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats... \| Keywords (18): Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, ...                                                                                |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                              | `major concerns`       | Title: Swans glide across calm river waters in a serene canal setting. \| Description: A solitary white swan glides gracefully across calm river waters framed by l... \| Keywords (63): Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, architecture, waterway, ...                                                                               |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                     | `major concerns`       | Title: Swan on canal with moored boats at marina \| Description: A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E. \| Keywords (3): Swans, Canal, Motorboat[3,708 characters of reasoning omitted; complete output in the evidence block]         |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-4bit`](#model-mlx-community-llama-32-11b-vision-instruct-4bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds with a solitary white swan gliding effortlessly across the... \| Keywords (48): riverside residential area, leisure boats, calm waters, serene atmosphere, lush foliage, white swan, riverside, ...                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)              | `major concerns`       | Title: Serene River Scene with a Majestic White Swan \| Description: A tranquil river scene unfolds on September 12, 2026, at 17:41:02 UTC+01:00, near 52.393850°N, 0.27... \| Keywords (120): River, White Swan, Lush Greenery, Moored Boats, Riversid Residential Buildings, Tranquil Atmosphere, ...                                                                               |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                           | `major concerns`       | Title: Mute Swan on River with Moored Boats \| Description: Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar I... \| Keywords (2): mute swan, river                                                                               |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                     | `major concerns`       | Title: Solitary swan on a calm river with moored boats \| Description: A white swan glides across the calm waters of a river, framed by green foliage in the foregrou... \| Keywords (57): swan, river, boats, mooring, motorboat, residential, building, balcony, trees, foliage, greenery, water, ...                                                                               |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                             | `major concerns`       | A solitary white swan gliding across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.                                                                                                                                                                                                    |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                         | `major concerns`       | A serene scene unfolds on a calm river, where a graceful swan glides across the water. Several boats, including motorboats and sailboats, are moored along the riverbank, nestled beneath a row of residential buildings. Lush greenery frames the scene, with trees and bushes linin...                                                                                              |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                   | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a...                                                                                          |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                              | `major concerns`       | "Amidst the Riverbank, a solitary white swan glides gracefully across calm waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background. The serene setting is complemented by the presence of greenery, archit...                                                                                              |
-| [`mlx-community/paligemma2-10b-mix-448-4bit`](#model-mlx-community-paligemma2-10b-mix-448-4bit)                           | `major concerns`       | - title, description, keywords                                                                                                                                                                                                                                                                                                                                                        |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                            | `not assessed`         | Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'                                                                                                                                                                                                                                                               |
-| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                             | `not assessed`         | Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]                                                                                                                                                                                                                                              |
-| [`mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit`](#model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit) | `not assessed`         | Model loading failed: Received 729 parameters not in model:<br>backbone.embeddings.biases,<br>backbone.embeddings.scales,<br>backbone.embeddings.weight,<br>backbone.layers.0.mixer.A_log,<br>backbone.layers.0.mixer.D,<br>backbone.layers.0.mixer.conv1d.bias,<br>backbone.layers.0.mixer.conv1d.weight,...                                                                         |
+| Model                                                                                                                   | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                            |
+|-------------------------------------------------------------------------------------------------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `no concerns detected` | Title: Sailboats on a River \| Description: Two sailboats glide across a calm river, surrounded by dense green forest and a partly cloudy sky. The sailboat on t... \| Keywords (15): Boat, Boating, Catamaran, Sailboat, Sailing, Life jacket, Man, Sail, Sails, Water, Forest, Sky, Trees, River, ...                                                                                   |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `no concerns detected` | Title: Two sailors on a catamaran and dinghy \| Description: Two sailors navigate a catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) on calm waters,... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                          | `no concerns detected` | Title: Two Sailors on Dinghies \| Description: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number... \| Keywords (19): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `no concerns detected` | Title: Two Sailors in Vortex and Laser Dinghies on Calm Waters \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                           | `no concerns detected` | Title: Sailing Dinghies on Calm Waters \| Description: Two sailors navigate small dinghies, a Vortex catamaran (1067) and a Laser dinghy (GBR 188572), on calm waters with a... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `no concerns detected` | Title: Sailing on Calm Waters with Catamaran and Laser Dinghy \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm waters near a fo... \| Keywords (17): Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, Life jacket, Outdoor recreation, River, ...                                                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                   | `no concerns detected` | Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline \| Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (... \| Keywords (19): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...[2,349 characters of reasoning omitted; complete output in the evidence block]     |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                  | `no concerns detected` | Title: Sailors race dinghies across calm waters. \| Description: Two sailors compete in a Vortex catamaran and Laser dinghy against a backdrop of dense green woodland. The s... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                            | `no concerns detected` | Title: Sailboats on Calm Water near Green Woodland \| Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, with dense fo... \| Keywords (17): Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 1067, Sail number 188572, Life jacket, ...                                                                                   |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `no concerns detected` | Title: **Sailing Dinghies in Coastal Waters – Vortex and Laser** \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy... \| Keywords (16): Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring, outdoor recreation, sailing, ...                                                                                    |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `no concerns detected` | Title: Coastal Sailing Adventure with Catamaran and Laser Dinghy \| Description: Two sailors navigate small boats—one a Vortex catamaran (sail number 1067) and... \| Keywords (19): Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                    |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)               | `no concerns detected` | Title: Sailboats on Calm Waters \| Description: Two sailors navigate small dinghies across tranquil waters, one steering a Vortex catamaran (sail number 1067) and the other... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                      | `no concerns detected` | Title: Two Sailboats Racing on Calm Waters \| Description: On 19 September 2026, an orange Vortex catamaran (sail number 1067) helmed by a sailor in a blue jacket a... \| Keywords (19): Sailing, Sailboat, Catamaran, Dinghy, Laser, Man, Sailor, Life jacket, Mast, Boat, Water, River, Estuary, ...                                                                                   |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `no concerns detected` | Title: Sailors on Dinghies in Coastal Waters \| Description: On September 19, 2026, two sailors navigate their respective dinghies, a Vortex catamaran and a Laser dinghy,... \| Keywords (18): Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Trees, Water, Clouds, Man, Mast, ...                                                                                   |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `no concerns detected` | Title: Sailors Steering Vortex &amp; Laser Dinghies on Calm Water \| Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river wat... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...[2,719 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                   | `no concerns detected` | Title: Two sailboats racing on calm water \| Description: Two sailors compete in a race on small dinghies—a Vortex catamaran (number 1067) and a Laser dinghy (num... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                           | `no concerns detected` | Title: Sailors in Vortex Catamaran and Laser Dinghy on Calm Water \| Description: On 2026-09-19, two sailors navigate small dinghies on calm waters: a Vortex catam... \| Keywords (24): Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR, 1067, 188572, Sailor, Water, River, ...                                                                                   |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                             | `no concerns detected` | Title: Sailors race dinghies on calm water \| Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, framed by dense green fore... \| Keywords (18): Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Shoreline, Sky, Clouds, Man, Sailor, ...                                                                                   |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `no concerns detected` | Title: Vortex Catamaran and Laser Sailing on Water \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm river waters on 19 Septe... \| Keywords (16): Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline, dense green woodland, partly cloudy sky, ...                                                                                   |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `no concerns detected` | Title: Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters \| Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dingh... \| Keywords (21): Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, ...                                                                                   |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                              | `no concerns detected` | Title: Two sailors racing Vortex and Laser dinghies on calm waters \| Description: A Vortex catamaran with sail number 1067 on the left and a Laser dinghy with sail n... \| Keywords (15): Vortex, Laser, catamaran, dinghy, sailing, sailors, estuary, woodland, boats, water, masts, GBR 188572, ...                                                                                   |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `no concerns detected` | Title: Sailing on the River \| Description: Two sailors are sailing their boats across the river. \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                                                                                                  |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                          | `no concerns detected` | Title: Two sailors on dinghies across calm waters \| Description: On 19 September 2026 at 17:12 UTC+1, two sailors steer small dinghies across calm coastal or river... \| Keywords (18): Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boating, Water, River, Estuary, ...                                                                                   |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                           | `no concerns detected` | Title: Sailing Adventure on the River \| Description: Two sailors navigate their boats across a serene river, with one in a Vortex catamaran and the other in a Laser dinghy, bot... \| Keywords (16): Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, Mast, Life jacket, Man, ...                                                                                   |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `no concerns detected` | Title: Two Sailors Sailing Dinghies on Calm Water \| Description: Two sailors steer a grey Vortex catamaran and a white Laser dinghy across calm waters agains... \| Keywords (15): Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, River, Outdoor Recreation, Boating, Estuary, ...                                                                                   |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `no concerns detected` | Title: Sailing Dinghies on Calm Water, September 2026 \| Description: Captured on 19th September 2026, this image shows a Vortex catamaran (sail number 1067) and a Laser din... \| Keywords (27): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `no concerns detected` | Title: Two sailors steering small boats across calm water \| Description: Two sailors navigate small boats across calm waters against a backdrop of dense green wo... \| Keywords (18): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `no concerns detected` | Title: Two Sailors Steering Dinghies on Calm Water \| Description: A Vortex catamaran and a Laser dinghy sail across calm waters against a backdrop of dense green woodland u... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                         | `no concerns detected` | Title: Two Dinghies Sail on Calm Woodland Water \| Description: Two small dinghies navigate placid waters beneath a backdrop of dense green woodland under partly... \| Keywords (15): Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboat, Water, Outdoor, Recreation, Trees, ...                                                                                    |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                            | `no concerns detected` | Title: "Sailors in Dinghies on a Calm Day" \| Description: Two sailors navigate their dinghies, a Vortex catamaran and a Laser dinghy, across a serene body of water wi... \| Keywords (13): Sailors, Dinghies, Vortex catamaran, Laser dinghy, Water, Trees, Coastline, Sailing, Life jacket, Man, ...                                                                                   |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `no concerns detected` | Title: Sailors Navigate Calm Waters in Dinghies \| Description: Two sailors steer small dinghies—a Vortex catamaran and a Laser dinghy—across calm waters with dense green wo... \| Keywords (21): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `concerns detected`    | Title: Laser and Vortex catamaran sailboats on a river with trees. \| Description: Two sailboats, a Laser dinghy with sail number GBR 188572 and a Vortex catam... \| Keywords (12): Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail number GBR 188572, sail number 1067, sailors, ...                                                                                   |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                         | `concerns detected`    | Title: Two Sailors Steering Small Dinghies on Calm Water \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy across calm water against a back... \| Keywords (19): Boat, Boating, Catamaran, Sailing, Sailor, Laser dinghy, Water, River, Estuary, Forest, Trees, Shoreline, ...                                                                                   |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)            | `major concerns`       | Alright, let's get this done. I need to create some metadata for this image, and it's my job to be precise.<br><br>First, I need to figure out a good title. "Sailboats on the Water" is too generic. "Two Sailors on Dinghies" is better, but I want something more specific. "Sailors on...                                                                                             |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `major concerns`       | A serene scene of two sailors navigating calm waters in a Vortex catamaran and Laser dinghy, set against a backdrop of dense green woodland, under a clear sky, with a sailboat and a man in a life jacket in the distance.                                                                                                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `major concerns`       | Title: Two Sailors Navigate Calm Waters in a Forested Estuary \| Description: On a sunny day in September 2026, two sailors, one in a Vortex catamaran and the o... \| Keywords (343): Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser, GBR, 1067, 188572, Sail, Boat, Water, ...                                                                                   |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                            | `major concerns`       | Title: Sailing vessels on calm waters \| Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest... \| Keywords (12): boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation                                                                                    |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                   | `major concerns`       | Title: Catamaran and Laser Dinghy Sail on Calm River \| Description: Two sailors navigate small dinghies across a tranquil river, with a Vortex catamaran on the... \| Keywords (52): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                    |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                         | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): Need title 5-10 words. Let's craft: "Two Sailors on Vortex Catamaran and Laser Dinghy" That's 8 words? Two(1) Sailors2 on3 Vortex4 Catamaran5 and6 Laser7 Dinghy8. Good.                                                                                                                                            |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                             | `major concerns`       | Title: Sailing Adventure \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm waters,... \| Keywords (67): Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, Forest, Woodland, Adventure, Outdoor, ...                                                                                   |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                           | `major concerns`       | A 5-10-word, 1-2-sentence, factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.                                                                                                                                                                                                                              |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `major concerns`       | Title: Sailing Catamaran and Laser Dinghy on Calm Waters \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 18857... \| Keywords (39): Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Calm waters, ...                                                                                   |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                       | `major concerns`       | Two sailors are engaged in a sailing competition on a calm body of water, likely an estuary or a sheltered bay, surrounded by lush green vegetation. On the left, a vibrant orange and white catamaran, identified by the sail number 1067 and the name "VORTEX," is being steered by...                                                                                                  |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                          | `major concerns`       | Title: "Harmony on the Water" \| Description: Two sailors navigate their small dinghies, a Vortex catamaran and a Laser dinghy, across calm waters, with a dense green woodland backdrop. The scene is set in an estuary, with a clear sky overhead. The sailors are equ... \| Keywords: (not detected)                                                                                   |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                 | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows two small sailboats racing on a river.                                                                                                                                                                                                                                                                                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `major concerns`       | "Boating in the Countryside: A Glimpse of Sailboats and Forests"                                                                                                                                                                                                                                                                                                                          |
+| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                          | `not assessed`         | Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'                                                                                                                                                                                                                                                                   |
+| [`mlx-community/Mage-VL-OptiQ-4bit`](#model-mlx-community-mage-vl-optiq-4bit)                                           | `not assessed`         | Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]                                                                                                                                                                                                                                                  |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.7.1`
-- `mlx`: `0.32.3.dev20260912+229f5b430`
+- `mlx-vlm`: `0.7.3`
+- `mlx`: `0.32.3.dev20260925+073d2252c`
 - `transformers`: `5.17.0`
 - `tokenizers`: `0.23.2`
-- `huggingface-hub`: `1.32.0`
+- `huggingface-hub`: `1.33.0`
 - *Python Version:* 3.14.7
 - *OS:* Darwin 27.0.0
 - *macOS Version:* 27.0
@@ -187,19 +186,20 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Image Metadata
 
-- *Description:* A solitary white swan glides gracefully across calm river
-  waters framed by lush foliage, with leisure boats and cruisers moored
-  alongside riverside residential buildings in the background.
-- *Keywords:* Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring,
-  Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection,
-  Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat, boating,
-  boats, cabin cruiser, calm water, cruiser, daytime, dock, environment,
-  foliage, harbor, houses, landscape, leisure, mute swan, natural, nature,
-  outdoor, peaceful, recreation, reflection, residential, river, riverside,
-  scenic, serene, swan, tranquility, travel, watercraft, white swan, wildlife
-- *Date:* 2026-09-12 17:41:02 UTC+01:00
-- *Time:* 17:41:02
-- *GPS:* 52.393850°N, 0.270830°E
+- *Description:* Two sailors steer small dinghies—a Vortex catamaran (sail
+  number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the
+  right—across calm coastal or river waters against a backdrop of dense green
+  woodland.
+- *Keywords:* Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser
+  dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat,
+  Sailing, Sailor, Shoreline, Sky, Trees, Water, Water sports, Yacht, active
+  lifestyle, adventure, aquatic sports, boat race, buoyancy aid, calm water,
+  coastal, competition, daytime, hobby, lake, leisure, maritime, nature,
+  navigation, outdoor, recreation, regatta, rigging, sail, sailing boat,
+  scenic, single-handed, skiff, sport, summer, vessel, water sport,
+  watercraft, watersport, yachting
+- *Date:* 2026-09-19 17:12:46 UTC+01:00
+- *Time:* 17:12:46
 
 ## Prompt
 
@@ -215,17 +215,16 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-09-12 17:41:02 UTC+01:00
-> &#45; GPS: 52.393850°N, 0.270830°E
+> &#45; Capture date/time: 2026-09-19 17:12:46 UTC+01:00
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: A solitary white swan glides gracefully across calm
-> river waters framed by lush foliage, with leisure boats and cruisers moored
-> alongside riverside residential buildings in the background.
-> &#45; Keyword hints: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina,
-> Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water
-> reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture,
-> boat
+> &#45; Description hint: Two sailors steer small dinghies—a Vortex catamaran
+> (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572)
+> on the right—across calm coastal or river waters against a backdrop of dense
+> green woodland.
+> &#45; Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest,
+> Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat,
+> Sailing, Sailor, Shoreline, Sky, Trees, Water
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -244,6 +243,67 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 Complete generated or crash evidence for every attempted model.
 
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+
+<details>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.39s
+- *Generation time:* 0.99s
+- *Total time:* 2.24s
+- *Prompt preparation time:* 0.514
+- *First-token latency:* 0.207
+- *Cleanup time:* 0.0623
+- *Prompt tokens:* 2,119
+- *Generation tokens:* 141
+- *Total tokens:* 2,260
+- *Prompt throughput (raw):* 10,217 tok/s
+- *Generation throughput (raw):* 480 tok/s
+- *Peak memory (GB):* 1.9
+- *Active memory (GB):* 0.90
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 0.897
+- *Post-cleanup active memory (GB):* 0.000134
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1357
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Sailboats on a River
+
+Description:
+Two sailboats glide across a calm river, surrounded by dense green forest and a partly cloudy sky. The sailboat on the left, a Vortex catamaran, has a prominent sail marked with the number 1067 and a life jacket on the man steering it. The sailboat on the right, a Laser dinghy, features a white sail with the number 188572 and the letters GBR.
+
+Keywords:
+Boat, Boating, Catamaran, Sailboat, Sailing, Life jacket, Man, Sail, Sails, Water, Forest, Sky, Trees, River, Clouds
+</pre>
+
+</details>
+
+---
+
 <a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
 ### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
@@ -258,17 +318,17 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.25s
-- *Generation time:* 8.70s
-- *Total time:* 11.48s
-- *Prompt preparation time:* 0.52
-- *First-token latency:* 3.04
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 2,393
-- *Generation tokens:* 151
-- *Total tokens:* 2,544
-- *Prompt throughput (raw):* 788 tok/s
-- *Generation throughput (raw):* 29.6 tok/s
+- *Model load time:* 2.06s
+- *Generation time:* 7.95s
+- *Total time:* 10.54s
+- *Prompt preparation time:* 0.524
+- *First-token latency:* 3.36
+- *Cleanup time:* 0.0896
+- *Prompt tokens:* 2,394
+- *Generation tokens:* 123
+- *Total tokens:* 2,517
+- *Prompt throughput (raw):* 712 tok/s
+- *Generation throughput (raw):* 30.6 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.47
@@ -277,7 +337,7 @@ Complete generated or crash evidence for every attempted model.
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1332
+- *Rendered prompt characters:* 1306
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -291,101 +351,14 @@ Complete generated or crash evidence for every attempted model.
 
 <pre class="model-output-readable">
 Title:
-Swan on a calm river with moored boats
+Two sailors on a catamaran and dinghy
 
 Description:
-A solitary white swan swims gracefully on a calm river, with leisure boats and cruisers moored alongside riverside residential buildings in the background, captured on 12 September 2026 at 17:41 UTC+01:00 near 52.393850°N, 0.270830°E.
+Two sailors navigate a catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) on calm waters, surrounded by dense green woodland under a partly cloudy sky.
 
 Keywords:
-Swan, river, boats, mooring, residential buildings, greenery, water reflection, aquatic bird, marina, waterfront, waterway, trees, vegetation, calm water, leisure boats, cruisers, riverside, architecture, waterfowl, swimming
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.62s
-- *Generation time:* 14.12s
-- *Total time:* 16.34s
-- *Prompt preparation time:* 0.602
-- *First-token latency:* 0.731
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 1,634
-- *Generation tokens:* 997
-- *Total tokens:* 2,631
-- *Prompt throughput (raw):* 2,234 tok/s
-- *Generation throughput (raw):* 77.8 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.18
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000609
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1522
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "repetition_context_size": 20,
-  "repetition_penalty": 1.0, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 0.95}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Let's tackle this step by step. First, the title needs to be concrete and 5-10 words. The main elements are the swan, river, boats, greenery. Maybe "Solitary White Swan Gliding on Calm River with Boats and Greenery" but need to be concise. Wait, the hint says solitary white swan, calm river, lush foliage, leisure boats. So maybe "Solitary White Swan on Calm River with Boats and Lush Foliage" – that's 9 words, good.
-
-Next, the description. Need to combine context (date/time: 2026-09-12 17:41 UTC+01, GPS 52.393850°N, 0.270830°E), main subject (white swan), setting (river, boats, residential buildings, greenery), action (glides), lighting (calm, late afternoon? Wait, 17:41 is 5:41 PM, so golden hour maybe). Let's put it together: "On 12 September 2026 at 17:41 UTC+01, a solitary white swan glides gracefully across calm river waters at 52.393850°N, 0.270830°E, framed by lush foliage, leisure boats, and riverside residential buildings." That covers date, time, GPS, subject, action, setting, lighting (calm), distinctive details.
-
-Keywords: Need 10-18 unique, comma-separated, covering context and visible details. Let's list from hint: Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming (wait, but the swan is swimming? Wait, the action is glide, but swimming is related. Wait, the hint has "Swimming" but maybe better to use "Waterfowl" instead? Wait, no, the hint has "Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat". Let's pick the most relevant: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, Golden Hour, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E. Wait, but need to be concise and relevant. Let's check the hint again: the descriptive hint mentions solitary white swan, calm river, lush foliage, leisure boats, residential buildings. Keyword hints include Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat. So let's pick the best ones: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E. Wait, but maybe more concise. Let's see: White Swan
-&lt;/think&gt;
-
-Title: Solitary White Swan Glides on Calm River with Boats and Lush Foliage
-
-Description: On 12 September 2026 at 17:41 UTC+01 (52.393850°N, 0.270830°E), a solitary white swan glides gracefully across calm river waters, framed by lush foliage, leisure boats, and riverside residential buildings.
-
-Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Let's tackle this step by step. First, the title needs to be concrete and 5-10 words. The main elements are the swan, river, boats, greenery. Maybe "Solitary White Swan Gliding on Calm River with Boats and Greenery" but need to be concise. Wait, the hint says solitary white swan, calm river, lush foliage, leisure boats. So maybe "Solitary White Swan on Calm River with Boats and Lush Foliage" – that's 9 words, good.
-
-Next, the description. Need to combine context (date/time: 2026-09-12 17:41 UTC+01, GPS 52.393850°N, 0.270830°E), main subject (white swan), setting (river, boats, residential buildings, greenery), action (glides), lighting (calm, late afternoon? Wait, 17:41 is 5:41 PM, so golden hour maybe). Let's put it together: "On 12 September 2026 at 17:41 UTC+01, a solitary white swan glides gracefully across calm river waters at 52.393850°N, 0.270830°E, framed by lush foliage, leisure boats, and riverside residential buildings." That covers date, time, GPS, subject, action, setting, lighting (calm), distinctive details.
-
-Keywords: Need 10-18 unique, comma-separated, covering context and visible details. Let's list from hint: Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming (wait, but the swan is swimming? Wait, the action is glide, but swimming is related. Wait, the hint has "Swimming" but maybe better to use "Waterfowl" instead? Wait, no, the hint has "Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat". Let's pick the most relevant: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, Golden Hour, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E. Wait, but need to be concise and relevant. Let's check the hint again: the descriptive hint mentions solitary white swan, calm river, lush foliage, leisure boats, residential buildings. Keyword hints include Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat. So let's pick the best ones: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E. Wait, but maybe more concise. Let's see: White Swan
-</think>
-
-Title: Solitary White Swan Glides on Calm River with Boats and Lush Foliage
-
-Description: On 12 September 2026 at 17:41 UTC+01 (52.393850°N, 0.270830°E), a solitary white swan glides gracefully across calm river waters, framed by lush foliage, leisure boats, and riverside residential buildings.
-
-Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl, Lush Foliage, Leisure Boats, Residential Buildings, Calm Water, September 12, 2026, UTC+01, 52.393850°N, 0.270830°E
-```
-
-</details>
 
 </details>
 
@@ -405,26 +378,26 @@ Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.49s
-- *Generation time:* 7.73s
-- *Total time:* 9.76s
-- *Prompt preparation time:* 0.532
-- *First-token latency:* 5.34
-- *Cleanup time:* 0.0933
-- *Prompt tokens:* 6,450
-- *Generation tokens:* 140
-- *Total tokens:* 6,590
-- *Prompt throughput (raw):* 1,208 tok/s
-- *Generation throughput (raw):* 74.1 tok/s
-- *Peak memory (GB):* 8.8
+- *Model load time:* 1.34s
+- *Generation time:* 7.59s
+- *Total time:* 9.50s
+- *Prompt preparation time:* 0.565
+- *First-token latency:* 5.25
+- *Cleanup time:* 0.088
+- *Prompt tokens:* 6,454
+- *Generation tokens:* 139
+- *Total tokens:* 6,593
+- *Prompt throughput (raw):* 1,230 tok/s
+- *Generation throughput (raw):* 75.7 tok/s
+- *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.00092
+- *Post-cleanup active memory (GB):* 0.00123
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1413
+- *Rendered prompt characters:* 1387
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -438,21 +411,21 @@ Keywords: White Swan, River, Boat, Marina, Greenery, Canal, Riverbank, Waterfowl
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan at River Marina
-Description: A white swan glides on calm river waters, with leisure boats moored alongside riverside residential buildings in the background, captured on 2026-09-12 at 17:41:02 UTC+01:00 at 52.393850°N, 0.270830°E.
-Keywords: Swan, River, Marina, Leisure boats, Residential buildings, Calm waters, White swan, Riverbank, Boats moored, Riverside, 2026-09-12 17:41:02, 52.393850°N, 0.270830°E
+Title: Two Sailors on Dinghies
+Description: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm waters against a backdrop of dense green woodland, captured on 2026-09-19 at 17:12:46.
+Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
 
-### mlx-community/Idefics3-8B-Llama3-bf16
+### mlx-community/GLM-4.6V-nvfp4
 
 <details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -460,45 +433,45 @@ Keywords: Swan, River, Marina, Leisure boats, Residential buildings, Calm waters
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.09s
-- *Generation time:* 5.68s
-- *Total time:* 8.50s
-- *Prompt preparation time:* 0.725
-- *First-token latency:* 1.08
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 2,612
-- *Generation tokens:* 138
-- *Total tokens:* 2,750
-- *Prompt throughput (raw):* 2,411 tok/s
-- *Generation throughput (raw):* 35.5 tok/s
-- *Peak memory (GB):* 18
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.43
-- *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.00149
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 7.71s
+- *Generation time:* 18.19s
+- *Total time:* 26.53s
+- *Prompt preparation time:* 0.613
+- *First-token latency:* 13.3
+- *Cleanup time:* 0.27
+- *Prompt tokens:* 6,454
+- *Generation tokens:* 142
+- *Total tokens:* 6,596
+- *Prompt throughput (raw):* 484 tok/s
+- *Generation throughput (raw):* 42.8 tok/s
+- *Peak memory (GB):* 78
+- *Active memory (GB):* 62
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 61.9
+- *Post-cleanup active memory (GB):* 0.00154
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1369
+- *Rendered prompt characters:* 1387
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Solitary Swan on Calm River Waters with Moored Boats and Riverside Buildings.
+Title: Two Sailors in Vortex and Laser Dinghies on Calm Waters
 
-Description: A solitary white swan glides gracefully across the calm river waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background. The serene and peaceful atmosphere is enhanced by the soft play of light on the water, creating a picturesque scene of natural beauty and human habitation.
+Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm river waters, with dense green woodland and a partly cloudy sky in the background; the catamaran sailor wears a life jacket, and both vessels are under sail.
 
-Keywords: swan, river, boats, moored, residential buildings, foliage, calm waters, leisure, cruisers, riverside, solitary, white, graceful, serene, peaceful, picturesque, light, water, natural beauty, human habitation.
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 </details>
@@ -520,25 +493,25 @@ Keywords: swan, river, boats, moored, residential buildings, foliage, calm water
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.15s
-- *Generation time:* 4.22s
-- *Total time:* 6.02s
-- *Prompt preparation time:* 0.64
-- *First-token latency:* 1.4
-- *Cleanup time:* 0.0997
-- *Prompt tokens:* 2,113
-- *Generation tokens:* 126
-- *Total tokens:* 2,239
-- *Prompt throughput (raw):* 1,510 tok/s
-- *Generation throughput (raw):* 57.4 tok/s
+- *Generation time:* 4.56s
+- *Total time:* 6.40s
+- *Prompt preparation time:* 0.676
+- *First-token latency:* 1.88
+- *Cleanup time:* 0.0988
+- *Prompt tokens:* 2,115
+- *Generation tokens:* 116
+- *Total tokens:* 2,231
+- *Prompt throughput (raw):* 1,125 tok/s
+- *Generation throughput (raw):* 56.8 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.0018
+- *Post-cleanup active memory (GB):* 0.00212
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1337
+- *Rendered prompt characters:* 1311
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -552,13 +525,11 @@ Keywords: swan, river, boats, moored, residential buildings, foliage, calm water
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan on Canal with Moored Boats
+Title: Sailing Dinghies on Calm Waters
 
-Description:
-A white swan glides on a tranquil canal, surrounded by moored boats and riverside buildings, with lush greenery framing the scene.
+Description: Two sailors navigate small dinghies, a Vortex catamaran (1067) and a Laser dinghy (GBR 188572), on calm waters with a backdrop of dense green woodland.
 
-Keywords:
-Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Reflection, Motorboat, Pier, Riverbank, Waterway, Aquatic Bird, Architecture, Vegetation, Waterfront, 2026-09-12, 52.393850°N, 0.270830°E
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 </details>
@@ -579,26 +550,26 @@ Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Refle
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.66s
-- *Generation time:* 3.48s
-- *Total time:* 5.78s
-- *Prompt preparation time:* 0.637
-- *First-token latency:* 0.816
-- *Cleanup time:* 0.102
-- *Prompt tokens:* 2,113
-- *Generation tokens:* 77
-- *Total tokens:* 2,190
-- *Prompt throughput (raw):* 2,590 tok/s
-- *Generation throughput (raw):* 37.7 tok/s
+- *Model load time:* 1.65s
+- *Generation time:* 4.31s
+- *Total time:* 6.62s
+- *Prompt preparation time:* 0.653
+- *First-token latency:* 0.908
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 2,115
+- *Generation tokens:* 103
+- *Total tokens:* 2,218
+- *Prompt throughput (raw):* 2,330 tok/s
+- *Generation throughput (raw):* 37.4 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00212
+- *Post-cleanup active memory (GB):* 0.00243
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1337
+- *Rendered prompt characters:* 1311
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -612,18 +583,169 @@ Swan, Canal, Boats, Mooring, Residential Buildings, Greenery, Trees, Water Refle
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan on Calm River
-Description: A white swan glides on tranquil river waters near a marina with moored boats and residential buildings, captured at dusk.
-Keywords: swan, river, marina, boats, residential buildings, foliage, trees, water reflection, architecture, motorboat, mooring, waterfront, aquatic bird, vegetation, calm waters
+Title: Sailing on Calm Waters with Catamaran and Laser Dinghy
+
+Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm waters near a forested shoreline during the late afternoon.
+
+Keywords: Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, Life jacket, Outdoor recreation, River, Trees, Water, Forest, Mast, Sails, Man
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 2.20s
+- *Generation time:* 12.62s
+- *Total time:* 15.43s
+- *Prompt preparation time:* 0.603
+- *First-token latency:* 1.01
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 1,331
+- *Generation tokens:* 729
+- *Total tokens:* 2,060
+- *Prompt throughput (raw):* 1,316 tok/s
+- *Generation throughput (raw):* 66.6 tok/s
+- *Peak memory (GB):* 20
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 1.5
+- *Model-load active memory (GB):* 17.8
+- *Post-cleanup active memory (GB):* 0.00308
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1493
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.6, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are:
+
+1. **Authoritative context**:
+   - Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+   - Descriptive hints: Two sailors steer dinghies (Vortex catamaran with sail number 1067 on the left, Laser dinghy GBR 188572 on the right) across calm waters with dense green woodland in the background.
+   - Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water
+
+2. **Image details**:
+   - Two sailboats: Vortex catamaran (sail 1067) and Laser dinghy (GBR 188572)
+   - Sailors on each boat
+   - Calm waters, likely an estuary or river
+   - Dense green woodland in the background
+   - Sky with clouds
+   - Other boats in the distance
+
+3. **Constraints**:
+   - Treat capture date/time and GPS as facts but not visible
+   - Descriptive hints may be incomplete or wrong: retain image details, correct conflicts, add important visible details
+   - Prefer image evidence over hints, omit uncertain details
+
+Now, let's process the image:
+
+**Title**: Need a 5-10 word title. Focus on the main elements: two dinghies, sailors, setting. Maybe "Two Sailors Navigate Dinghies in Calm Waters Near Forested Shoreline"
+
+**Description**: A concise 1-2 sentence description combining context and visible details. Mention the two dinghies (catamaran and Laser), sailors, calm waters, forested shoreline, and the time (though not visible but authoritative context). So: "Two sailors navigate a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky."
+
+**Keywords**: Need 10-18 unique keywords from the context and image. Let's list them:
+- Boat
+- Boating
+- Catamaran
+- Dinghy
+- Estuary
+- Forest
+- Laser dinghy
+- Life jacket
+- Man
+- Mast
+- Outdoor recreation
+- River
+- Sailboat
+- Sailor
+- Shoreline
+- Sky
+- Trees
+- Water
+- Vortex catamaran
+
+Now, check if all important elements are covered and no conflicting info. The title and description are clear. Keywords are all from the context and image, no conflicts. Make sure to retain all key elements without adding uncertain info.◁/think▷Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline
+Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky.
+Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water, Vortex catamaran
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Title: Swan on Calm River
-Description: A white swan glides on tranquil river waters near a marina with moored boats and residential buildings, captured at dusk. 
-Keywords: swan, river, marina, boats, residential buildings, foliage, trees, water reflection, architecture, motorboat, mooring, waterfront, aquatic bird, vegetation, calm waters
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are:
+
+1. **Authoritative context**: 
+   - Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+   - Descriptive hints: Two sailors steer dinghies (Vortex catamaran with sail number 1067 on the left, Laser dinghy GBR 188572 on the right) across calm waters with dense green woodland in the background.
+   - Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water
+
+2. **Image details**: 
+   - Two sailboats: Vortex catamaran (sail 1067) and Laser dinghy (GBR 188572)
+   - Sailors on each boat
+   - Calm waters, likely an estuary or river
+   - Dense green woodland in the background
+   - Sky with clouds
+   - Other boats in the distance
+
+3. **Constraints**:
+   - Treat capture date/time and GPS as facts but not visible
+   - Descriptive hints may be incomplete or wrong: retain image details, correct conflicts, add important visible details
+   - Prefer image evidence over hints, omit uncertain details
+
+Now, let's process the image:
+
+**Title**: Need a 5-10 word title. Focus on the main elements: two dinghies, sailors, setting. Maybe "Two Sailors Navigate Dinghies in Calm Waters Near Forested Shoreline"
+
+**Description**: A concise 1-2 sentence description combining context and visible details. Mention the two dinghies (catamaran and Laser), sailors, calm waters, forested shoreline, and the time (though not visible but authoritative context). So: "Two sailors navigate a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky."
+
+**Keywords**: Need 10-18 unique keywords from the context and image. Let's list them:
+- Boat
+- Boating
+- Catamaran
+- Dinghy
+- Estuary
+- Forest
+- Laser dinghy
+- Life jacket
+- Man
+- Mast
+- Outdoor recreation
+- River
+- Sailboat
+- Sailor
+- Shoreline
+- Sky
+- Trees
+- Water
+- Vortex catamaran
+
+Now, check if all important elements are covered and no conflicting info. The title and description are clear. Keywords are all from the context and image, no conflicts. Make sure to retain all key elements without adding uncertain info.◁/think▷Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline  
+Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky.  
+Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water, Vortex catamaran
 ```
 
 </details>
@@ -646,26 +768,26 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.17s
-- *Generation time:* 1.51s
-- *Total time:* 3.36s
-- *Prompt preparation time:* 0.684
-- *First-token latency:* 0.468
-- *Cleanup time:* 0.0924
-- *Prompt tokens:* 2,103
-- *Generation tokens:* 81
-- *Total tokens:* 2,184
-- *Prompt throughput (raw):* 4,492 tok/s
-- *Generation throughput (raw):* 214 tok/s
+- *Model load time:* 0.97s
+- *Generation time:* 1.79s
+- *Total time:* 3.46s
+- *Prompt preparation time:* 0.696
+- *First-token latency:* 0.576
+- *Cleanup time:* 0.0796
+- *Prompt tokens:* 2,111
+- *Generation tokens:* 110
+- *Total tokens:* 2,221
+- *Prompt throughput (raw):* 3,664 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00303
+- *Post-cleanup active memory (GB):* 0.00334
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1383
+- *Rendered prompt characters:* 1357
 - *Image placeholders:* 1
 - *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -679,9 +801,9 @@ Keywords: swan, river, marina, boats, residential buildings, foliage, trees, wat
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan gliding past moored boats on tranquil riverbank
-Description: A white swan swims gracefully on calm river waters, framed by lush greenery, with leisure boats and residential buildings in the background.
-Keywords: swan, river, boats, marina, greenery, water, reflection, architecture, leisure, waterfront, aquatic bird, trees, vegetation, canal
+Title: Sailors race dinghies across calm waters.
+Description: Two sailors compete in a Vortex catamaran and Laser dinghy against a backdrop of dense green woodland. The scene is set on a calm day with a blue sky and scattered clouds.
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees
 </pre>
 
 </details>
@@ -702,26 +824,26 @@ Keywords: swan, river, boats, marina, greenery, water, reflection, architecture,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.04s
-- *Generation time:* 1.68s
-- *Total time:* 3.23s
-- *Prompt preparation time:* 0.498
-- *First-token latency:* 0.239
-- *Cleanup time:* 0.0979
-- *Prompt tokens:* 391
-- *Generation tokens:* 101
-- *Total tokens:* 492
-- *Prompt throughput (raw):* 1,634 tok/s
+- *Model load time:* 1.01s
+- *Generation time:* 1.93s
+- *Total time:* 3.47s
+- *Prompt preparation time:* 0.517
+- *First-token latency:* 0.353
+- *Cleanup time:* 0.0963
+- *Prompt tokens:* 393
+- *Generation tokens:* 114
+- *Total tokens:* 507
+- *Prompt throughput (raw):* 1,114 tok/s
 - *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.00439
+- *Post-cleanup active memory (GB):* 0.00469
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
+- *Rendered prompt characters:* 1361
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -735,11 +857,11 @@ Keywords: swan, river, boats, marina, greenery, water, reflection, architecture,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan Glides on Calm River Near Moored Boats
+Title: Sailboats on Calm Water near Green Woodland
 
-Description: A white swan swims peacefully in a tranquil waterway, framed by greenery and moored leisure boats, under soft daylight near riverside homes, capturing a serene riverside scene in late summer.
+Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, with dense forest and scattered clouds under daylight conditions, showcasing outdoor sailing activity near a shoreline.
 
-Keywords: swan, river, waterway, mooring, motorboat, boats, greenery, trees, vegetation, waterfront, water reflection, waterfowl, marina, architecture, leisure, aquatic bird
+Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 1067, Sail number 188572, Life jacket, Mast, Water, Forest, Shoreline, Estuary, Boating, Outdoor recreation, Sky, Clouds
 </pre>
 
 </details>
@@ -760,26 +882,26 @@ Keywords: swan, river, waterway, mooring, motorboat, boats, greenery, trees, veg
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.52s
-- *Generation time:* 4.71s
-- *Total time:* 6.77s
-- *Prompt preparation time:* 0.53
-- *First-token latency:* 2.58
-- *Cleanup time:* 0.0973
-- *Prompt tokens:* 2,926
-- *Generation tokens:* 109
-- *Total tokens:* 3,035
-- *Prompt throughput (raw):* 1,133 tok/s
-- *Generation throughput (raw):* 67.2 tok/s
+- *Model load time:* 1.34s
+- *Generation time:* 5.17s
+- *Total time:* 7.08s
+- *Prompt preparation time:* 0.559
+- *First-token latency:* 2.23
+- *Cleanup time:* 0.0935
+- *Prompt tokens:* 2,927
+- *Generation tokens:* 160
+- *Total tokens:* 3,087
+- *Prompt throughput (raw):* 1,310 tok/s
+- *Generation throughput (raw):* 66.6 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
-- *Cache memory (GB):* 0.56
+- *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00466
+- *Post-cleanup active memory (GB):* 0.00495
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3770
+- *Rendered prompt characters:* 3744
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -793,73 +915,13 @@ Keywords: swan, river, waterway, mooring, motorboat, boats, greenery, trees, veg
 
 <pre class="model-output-readable">
 Title:
-**Swan Gliding Past Moored Boats on a Serene River**
+**Sailing Dinghies in Coastal Waters – Vortex and Laser**
 
 Description:
-A solitary white swan swims calmly on a tranquil river, surrounded by reflections of lush greenery and moored leisure boats, with residential buildings and marina infrastructure visible in the background under soft evening light.
+Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (GBR 188572) on calm waters near a dense woodland shoreline, captured on 19 September 2026 under overcast daylight conditions.
 
 Keywords:
-swan, river, moored boats, marina, residential waterfront, greenery, calm water, reflections, leisure boats, pier, waterfowl, aquatic bird, trees, vegetation, waterway, evening light
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.57s
-- *Generation time:* 5.67s
-- *Total time:* 7.77s
-- *Prompt preparation time:* 0.523
-- *First-token latency:* 2.16
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 2,926
-- *Generation tokens:* 187
-- *Total tokens:* 3,113
-- *Prompt throughput (raw):* 1,356 tok/s
-- *Generation throughput (raw):* 62.3 tok/s
-- *Peak memory (GB):* 13
-- *Active memory (GB):* 8.4
-- *Cache memory (GB):* 0.60
-- *Model-load active memory (GB):* 8.43
-- *Post-cleanup active memory (GB):* 0.00492
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3770
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 28777b889d841a86369c736175cb77258c8134b2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ministral-3-14B-Instruct-2512-nvfp4/snapshots/28777b889d841a86369c736175cb77258c8134b2
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-**Title:**
-*Elegant Swan Glides Past Moored Boats on Serene River*
-
-**Description:**
-A solitary white swan gracefully swims across calm river waters on **September 12, 2026, near 52.393850°N, 0.270830°E (UTC+01:00)**, framed by lush greenery and leisure boats moored alongside riverside residential buildings. Golden late-afternoon sunlight enhances reflections, while distinctive mooring posts and varied boat designs add character to the tranquil waterfront scene.
-
-**Keywords:**
-swan, river, leisure boats, moored boats, riverside residential buildings, greenery, golden sunlight, reflections, mooring posts, calm waters, waterfront, aquatic bird, waterway, canal, marina, trees, vegetation, waterfowl, late afternoon, serene river
+Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring, outdoor recreation, sailing, shoreline woodland, small catamaran (Vortex), two-person dinghies, UK sail number (GBR), calm water, overcast sky, recreational sailing, 2026-09-19
 </pre>
 
 </details>
@@ -880,26 +942,26 @@ swan, river, leisure boats, moored boats, riverside residential buildings, green
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.14s
-- *Generation time:* 2.06s
-- *Total time:* 3.75s
-- *Prompt preparation time:* 0.539
-- *First-token latency:* 1.02
-- *Cleanup time:* 0.0855
-- *Prompt tokens:* 2,925
-- *Generation tokens:* 102
-- *Total tokens:* 3,027
-- *Prompt throughput (raw):* 2,868 tok/s
-- *Generation throughput (raw):* 191 tok/s
+- *Model load time:* 1.08s
+- *Generation time:* 2.31s
+- *Total time:* 3.96s
+- *Prompt preparation time:* 0.559
+- *First-token latency:* 0.977
+- *Cleanup time:* 0.0847
+- *Prompt tokens:* 2,926
+- *Generation tokens:* 152
+- *Total tokens:* 3,078
+- *Prompt throughput (raw):* 2,996 tok/s
+- *Generation throughput (raw):* 189 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.38
+- *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00518
+- *Post-cleanup active memory (GB):* 0.00521
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3769
+- *Rendered prompt characters:* 3743
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -913,13 +975,13 @@ swan, river, leisure boats, moored boats, riverside residential buildings, green
 
 <pre class="model-output-readable">
 Title:
-Swans by Riverside Marina
+Coastal Sailing Adventure with Catamaran and Laser Dinghy
 
 Description:
-A white swan swims serenely in calm waters at dusk near a marina moored with leisure boats, framed by lush greenery and riverside residential brick buildings under soft, natural lighting.
+Two sailors navigate small boats—one a Vortex catamaran (sail number 1067) and the other a Laser dinghy (GBR 188572)—on calm waters under a partly cloudy sky, surrounded by dense green woodland. Both wear life jackets, with the catamaran equipped with a small outboard motor.
 
 Keywords:
-swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, residential architecture, boat moorings, aquatic bird, water reflection, trees, vegetation, swan grace, evening lighting
+Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Shoreline, Sky, Trees, Vortex boat, Watercraft, Wind conditions
 </pre>
 
 </details>
@@ -940,26 +1002,26 @@ swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, r
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 0.95s
-- *Generation time:* 3.17s
-- *Total time:* 4.87s
-- *Prompt preparation time:* 0.744
-- *First-token latency:* 1.9
-- *Cleanup time:* 0.0955
-- *Prompt tokens:* 4,083
-- *Generation tokens:* 84
-- *Total tokens:* 4,167
-- *Prompt throughput (raw):* 2,149 tok/s
-- *Generation throughput (raw):* 154 tok/s
+- *Model load time:* 0.99s
+- *Generation time:* 3.19s
+- *Total time:* 4.97s
+- *Prompt preparation time:* 0.782
+- *First-token latency:* 1.91
+- *Cleanup time:* 0.0902
+- *Prompt tokens:* 4,085
+- *Generation tokens:* 112
+- *Total tokens:* 4,197
+- *Prompt throughput (raw):* 2,140 tok/s
+- *Generation throughput (raw):* 209 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
+- *Cache memory (GB):* 0.66
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00643
+- *Post-cleanup active memory (GB):* 0.00646
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1463
+- *Rendered prompt characters:* 1437
 - *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Requested model revision:* not requested
@@ -972,11 +1034,11 @@ swan, canal, marina, mooring, motorboat, pier, waterfront, waterway, greenery, r
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan on the River
+Title: Sailboats on Calm Waters
 
-Description: A solitary white swan glides gracefully across calm river waters, framed by lush greenery. In the background, leisure boats and cruisers are moored alongside a riverside residential building, reflecting the tranquil waterfront setting.
+Description: Two sailors navigate small dinghies across tranquil waters, one steering a Vortex catamaran (sail number 1067) and the other a Laser dinghy (sail number GBR 1888572) amidst a backdrop of dense green woodland.
 
-Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, Architecture, Leisure Boats, Foliage, Reflection, Swan on the River
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 </details>
@@ -997,26 +1059,26 @@ Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.61s
-- *Generation time:* 3.45s
-- *Total time:* 6.73s
-- *Prompt preparation time:* 0.664
-- *First-token latency:* 0.66
-- *Cleanup time:* 0.139
-- *Prompt tokens:* 1,289
-- *Generation tokens:* 155
-- *Total tokens:* 1,444
-- *Prompt throughput (raw):* 1,953 tok/s
-- *Generation throughput (raw):* 71.8 tok/s
+- *Model load time:* 2.60s
+- *Generation time:* 3.02s
+- *Total time:* 6.30s
+- *Prompt preparation time:* 0.673
+- *First-token latency:* 0.911
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 1,291
+- *Generation tokens:* 151
+- *Total tokens:* 1,442
+- *Prompt throughput (raw):* 1,418 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
-- *Cache memory (GB):* 0.14
+- *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.00693
+- *Post-cleanup active memory (GB):* 0.00697
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
+- *Rendered prompt characters:* 1397
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1029,11 +1091,14 @@ Keywords: Swan, River, Greenery, Marina, Boat, Waterfront, Water, Aquatic Bird, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: White Swan Glides Past Moored Boats On Calm River
+Title:
+Two Sailboats Racing on Calm Waters
 
-Description: A solitary white swan glades across a calm river in the foreground, its reflection rippling in the water, while a collection of motorboats and cruisers—some with red and blue canvas covers—are moored along a wooden pontoon. Behind the marina, brick residential buildings with white-framed windows and balconies line the riverbank, framed overhanging tree branches and lush green foliage.
+Description:
+On 19 September 2026, an orange Vortex catamaran (sail number 1067) helmed by a sailor in a blue jacket and life jacket sails alongside a white Laser dinghy (GBR 188572) helmed by a crew member in dark clothing, both crossing calm waters with dense green woodland and a moored sailing vessel beyond.
 
-Keywords: white swan, river, moored boats, motorboats, cruisers, marina, pontoon, water reflection, swan, waterfowl, riverbank, residential buildings, trees, greenery, vegetation, mooring, architecture, waterfront, aquatic bird
+Keywords:
+Sailing, Sailboat, Catamaran, Dinghy, Laser, Man, Sailor, Life jacket, Mast, Boat, Water, River, Estuary, Shoreline, Trees, Forest, Sky, Clouds, Outdoor recreation
 </pre>
 
 </details>
@@ -1055,25 +1120,25 @@ Keywords: white swan, river, moored boats, motorboats, cruisers, marina, pontoon
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
 - *Model load time:* 0.97s
-- *Generation time:* 2.73s
-- *Total time:* 4.21s
-- *Prompt preparation time:* 0.502
-- *First-token latency:* 0.3
-- *Cleanup time:* 0.0931
-- *Prompt tokens:* 1,133
-- *Generation tokens:* 107
-- *Total tokens:* 1,240
-- *Prompt throughput (raw):* 3,774 tok/s
-- *Generation throughput (raw):* 54.9 tok/s
+- *Generation time:* 3.31s
+- *Total time:* 4.80s
+- *Prompt preparation time:* 0.519
+- *First-token latency:* 0.498
+- *Cleanup time:* 0.0864
+- *Prompt tokens:* 1,141
+- *Generation tokens:* 136
+- *Total tokens:* 1,277
+- *Prompt throughput (raw):* 2,291 tok/s
+- *Generation throughput (raw):* 58.8 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.007
+- *Post-cleanup active memory (GB):* 0.00703
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1353
+- *Rendered prompt characters:* 1327
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -1087,11 +1152,11 @@ Keywords: white swan, river, moored boats, motorboats, cruisers, marina, pontoon
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Serene Swan on the River
+Title: Sailors on Dinghies in Coastal Waters
 
-Description: A white swan is seen swimming peacefully on a calm river, with boats and houses in the background, captured on September 12, 2026.
+Description: On September 19, 2026, two sailors navigate their respective dinghies, a Vortex catamaran and a Laser dinghy, across calm waters near a forested shoreline.
 
-Keywords: swan, river, calm, boats, houses, foliage, waterfront, mooring, leisure, tranquility, architecture, waterway, aquatic bird, greenery, water reflection, motorboat, pier, vegetation
+Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Trees, Water, Clouds, Man, Mast, Outdoor Recreation, Sailboat, Shoreline, Sky, Estuary, Life Jacket
 </pre>
 
 </details>
@@ -1112,26 +1177,26 @@ Keywords: swan, river, calm, boats, houses, foliage, waterfront, mooring, leisur
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.79s
-- *Generation time:* 25.95s
-- *Total time:* 27.70s
-- *Prompt preparation time:* 0.957
-- *First-token latency:* 14.5
-- *Cleanup time:* 0.097
-- *Prompt tokens:* 16,549
-- *Generation tokens:* 912
-- *Total tokens:* 17,461
-- *Prompt throughput (raw):* 1,140 tok/s
-- *Generation throughput (raw):* 86.3 tok/s
+- *Model load time:* 0.76s
+- *Generation time:* 25.83s
+- *Total time:* 27.58s
+- *Prompt preparation time:* 0.981
+- *First-token latency:* 14.4
+- *Cleanup time:* 0.0947
+- *Prompt tokens:* 16,551
+- *Generation tokens:* 918
+- *Total tokens:* 17,469
+- *Prompt throughput (raw):* 1,148 tok/s
+- *Generation throughput (raw):* 87.2 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
 - *Model-load active memory (GB):* 4.26
-- *Post-cleanup active memory (GB):* 0.00762
+- *Post-cleanup active memory (GB):* 0.00765
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1412
+- *Rendered prompt characters:* 1386
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1147,77 +1212,115 @@ Keywords: swan, river, calm, boats, houses, foliage, waterfront, mooring, leisur
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this. First, the title needs to be 5-10 words. The main elements are the swan, river, boats, residential buildings. So maybe "Solitary Swan on Riverfront Marina" but let's check word count. "Solitary Swan Gliding on Riverfront Marina" – that's 10 words. Good.
+Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. Looking at the image: two sailors on dinghies, Vortex catamaran (1067) and Laser (GBR 188572). Title could be "Sailors Steering Vortex &amp; Laser Dinghies on Calm Water".
 
-Next, the description. Must combine context (capture date, GPS) and the main visible subject, setting, action, lighting, details. Wait, context says capture date/time is 2026-09-12 17:41:02 UTC+01:00, but we can't claim it's visible. The image is from that time. The main subject is a white swan on the water, background has boats, residential buildings, trees. Lighting: maybe overcast since it's a calm day, not too bright. Let's see. The description should include: "Solitary white swan glides across calm river waters in a canal-like waterway, framed by lush greenery and a riverside marina with moored leisure boats and residential buildings in the background. Captured on 2026-09-12 17:41 UTC+01:00, the scene features reflections on the water, a red inflatable boat, and tree branches framing the view."
+Then description: combine context and visible details. Context is capture date/time but we don't need to include that in the description, but the main subject is the two boats. The description should mention the boats, action (steering), setting (calm waters, woodland), lighting (sunny, maybe), and distinctive details like the sail numbers and the life jackets. So: "Two sailors on Vortex catamaran (1067) and Laser dinghy (GBR 188572) steer small boats across calm water, with green woodland and blue sky."
 
-Wait, but we can't claim the capture date/time is visible, just include it as context. The description should say "Captured on 2026-09-12 17:41 UTC+01:00" as part of the factual description. Let's structure it: "A solitary white swan glides across calm water in a canal with moored boats and residential buildings, framed by lush trees; captured at 2026-09-12 17:41 UTC+01:00."
+Wait, check the context: capture date is given but not needed in description. The descriptive hints have Vortex catamaran, Laser dinghy, sail numbers, life jackets, etc. So the description should include those. Let's make sure to include key details: Vortex (with 1067), Laser (GBR 188572), sailors, calm water, woodland, sky.
 
-Wait, the context says "Capture date/time: 2026-09-12 17:41:02 UTC+01:00" so we need to include that. The main visible details: swan, calm water, boats (white, blue, maroon covers), residential buildings (brown, balconies), trees. Also, the water reflection is visible, and the red inflatable boat. Let's make sure the description is factual. "A solitary white swan glides across calm river waters bordered by lush greenery and a marina with leisure boats moored alongside riverside residential buildings. Captured at 2026-09-12 17:41 UTC+01:00, the scene shows water reflections, a red inflatable boat, and tree branches framing the tranquil setting."
+Then keywords: need 10-18 unique, comma-separated. From context and visible: Boat, Boating, Catamaran, Clouds (there are clouds in the sky), Dinghy, Estuary (wait, the image says "coastal or river waters"—maybe estuary? But let's check: the background is dense trees, so maybe river or estuary. But "Estuary" is a keyword hint, so include that. Laser dinghy, Life jacket (on the Vortex sailor, the other is a sailor on Laser), Man, Mast (sails have masts), Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. Let's list them:
 
-Now, keywords. Need 10-18 unique, comma-separated. From context: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture. Also, the specific boats (but keywords are general). Let's pick: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway. Wait, need to make sure they're unique. Let's list:
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water.
 
-1. Canal
-2. Riverbank
-3. Marina
-4. Mooring
-5. Motorboat
-6. Pier
-7. Boat
-8. Architecture
-9. Waterway
-10. Swimming
-11. Trees
-12. Vegetation
-13. Water reflection
-14. Waterfowl
-15. Waterfront
+Wait, need to check if all these are visible. Life jacket: yes, the Vortex sailor has one. Mast: both have masts. Sailor: visible. Sky: yes, blue sky with clouds. Trees: background. Water: yes. Estuary: the water looks like a river or estuary, but the hints say Estuary, so include. River: also possible. Let's make sure it's 10-18. Let's count: 1. Boat, 2. Boating, 3. Catamaran, 4. Clouds, 5. Dinghy, 6. Estuary, 7. Laser dinghy, 8. Life jacket, 9. Man, 10. Mast, 11. Outdoor recreation, 12. River, 13. Sailboat, 14. Sailing, 15. Sailor, 16. Shoreline, 17. Sky, 18. Trees, 19. Water. Wait, but need 10-18, so maybe cut some. Let's pick the essential ones:
 
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. That's 19. Let's adjust: 10-18.
+
+Wait, the context has "
 &lt;/think&gt;
 
-Title: Solitary Swan on Riverfront Marina
-Description: A solitary white swan glides across calm river waters in a canal with moored leisure boats and residential buildings, framed by lush trees; captured at 2026-09-12 17:41 UTC+01:00.
-Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront
+Title: Sailors Steering Vortex &amp; Laser Dinghies on Calm Water
+
+Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river waters, with dense woodland backdrop and blue sky under sunny conditions.
+
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Got it, let's tackle this. First, the title needs to be 5-10 words. The main elements are the swan, river, boats, residential buildings. So maybe "Solitary Swan on Riverfront Marina" but let's check word count. "Solitary Swan Gliding on Riverfront Marina" – that's 10 words. Good.
+Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. Looking at the image: two sailors on dinghies, Vortex catamaran (1067) and Laser (GBR 188572). Title could be "Sailors Steering Vortex & Laser Dinghies on Calm Water".
 
-Next, the description. Must combine context (capture date, GPS) and the main visible subject, setting, action, lighting, details. Wait, context says capture date/time is 2026-09-12 17:41:02 UTC+01:00, but we can't claim it's visible. The image is from that time. The main subject is a white swan on the water, background has boats, residential buildings, trees. Lighting: maybe overcast since it's a calm day, not too bright. Let's see. The description should include: "Solitary white swan glides across calm river waters in a canal-like waterway, framed by lush greenery and a riverside marina with moored leisure boats and residential buildings in the background. Captured on 2026-09-12 17:41 UTC+01:00, the scene features reflections on the water, a red inflatable boat, and tree branches framing the view."
+Then description: combine context and visible details. Context is capture date/time but we don't need to include that in the description, but the main subject is the two boats. The description should mention the boats, action (steering), setting (calm waters, woodland), lighting (sunny, maybe), and distinctive details like the sail numbers and the life jackets. So: "Two sailors on Vortex catamaran (1067) and Laser dinghy (GBR 188572) steer small boats across calm water, with green woodland and blue sky."
 
-Wait, but we can't claim the capture date/time is visible, just include it as context. The description should say "Captured on 2026-09-12 17:41 UTC+01:00" as part of the factual description. Let's structure it: "A solitary white swan glides across calm water in a canal with moored boats and residential buildings, framed by lush trees; captured at 2026-09-12 17:41 UTC+01:00."
+Wait, check the context: capture date is given but not needed in description. The descriptive hints have Vortex catamaran, Laser dinghy, sail numbers, life jackets, etc. So the description should include those. Let's make sure to include key details: Vortex (with 1067), Laser (GBR 188572), sailors, calm water, woodland, sky.
 
-Wait, the context says "Capture date/time: 2026-09-12 17:41:02 UTC+01:00" so we need to include that. The main visible details: swan, calm water, boats (white, blue, maroon covers), residential buildings (brown, balconies), trees. Also, the water reflection is visible, and the red inflatable boat. Let's make sure the description is factual. "A solitary white swan glides across calm river waters bordered by lush greenery and a marina with leisure boats moored alongside riverside residential buildings. Captured at 2026-09-12 17:41 UTC+01:00, the scene shows water reflections, a red inflatable boat, and tree branches framing the tranquil setting."
+Then keywords: need 10-18 unique, comma-separated. From context and visible: Boat, Boating, Catamaran, Clouds (there are clouds in the sky), Dinghy, Estuary (wait, the image says "coastal or river waters"—maybe estuary? But let's check: the background is dense trees, so maybe river or estuary. But "Estuary" is a keyword hint, so include that. Laser dinghy, Life jacket (on the Vortex sailor, the other is a sailor on Laser), Man, Mast (sails have masts), Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. Let's list them:
 
-Now, keywords. Need 10-18 unique, comma-separated. From context: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture. Also, the specific boats (but keywords are general). Let's pick: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway. Wait, need to make sure they're unique. Let's list:
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water.
 
-1. Canal
-2. Riverbank
-3. Marina
-4. Mooring
-5. Motorboat
-6. Pier
-7. Boat
-8. Architecture
-9. Waterway
-10. Swimming
-11. Trees
-12. Vegetation
-13. Water reflection
-14. Waterfowl
-15. Waterfront
+Wait, need to check if all these are visible. Life jacket: yes, the Vortex sailor has one. Mast: both have masts. Sailor: visible. Sky: yes, blue sky with clouds. Trees: background. Water: yes. Estuary: the water looks like a river or estuary, but the hints say Estuary, so include. River: also possible. Let's make sure it's 10-18. Let's count: 1. Boat, 2. Boating, 3. Catamaran, 4. Clouds, 5. Dinghy, 6. Estuary, 7. Laser dinghy, 8. Life jacket, 9. Man, 10. Mast, 11. Outdoor recreation, 12. River, 13. Sailboat, 14. Sailing, 15. Sailor, 16. Shoreline, 17. Sky, 18. Trees, 19. Water. Wait, but need 10-18, so maybe cut some. Let's pick the essential ones:
 
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. That's 19. Let's adjust: 10-18.
+
+Wait, the context has "
 </think>
 
-Title: Solitary Swan on Riverfront Marina
-Description: A solitary white swan glides across calm river waters in a canal with moored leisure boats and residential buildings, framed by lush trees; captured at 2026-09-12 17:41 UTC+01:00.
-Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture, Waterway, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront
+Title: Sailors Steering Vortex & Laser Dinghies on Calm Water
+
+Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river waters, with dense woodland backdrop and blue sky under sunny conditions.
+
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 ```
 
 </details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
+
+### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
+- *Model load time:* 1.94s
+- *Generation time:* 35.72s
+- *Total time:* 38.68s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 33.2
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,549
+- *Generation tokens:* 128
+- *Total tokens:* 16,677
+- *Prompt throughput (raw):* 498 tok/s
+- *Generation throughput (raw):* 79.6 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 2.4
+- *Model-load active memory (GB):* 18.3
+- *Post-cleanup active memory (GB):* 0.00797
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1378
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "repetition_context_size": 20, "repetition_penalty": 1.0, "seed": 0,
+  "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two sailboats racing on calm water
+Description: Two sailors compete in a race on small dinghies—a Vortex catamaran (number 1067) and a Laser dinghy (number GBR 188572)—on calm water. The scene is set against a backdrop of a dense green forest under a partly cloudy sky.
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+</pre>
 
 </details>
 
@@ -1237,26 +1340,26 @@ Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.98s
-- *Generation time:* 74.51s
-- *Total time:* 77.47s
-- *Prompt preparation time:* 0.97
-- *First-token latency:* 64.9
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 16,547
-- *Generation tokens:* 177
-- *Total tokens:* 16,724
-- *Prompt throughput (raw):* 255 tok/s
-- *Generation throughput (raw):* 20.4 tok/s
+- *Model load time:* 2.01s
+- *Generation time:* 73.55s
+- *Total time:* 76.57s
+- *Prompt preparation time:* 1
+- *First-token latency:* 63.5
+- *Cleanup time:* 0.145
+- *Prompt tokens:* 16,549
+- *Generation tokens:* 181
+- *Total tokens:* 16,730
+- *Prompt throughput (raw):* 261 tok/s
+- *Generation throughput (raw):* 19.7 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
 - *Model-load active memory (GB):* 19.6
-- *Post-cleanup active memory (GB):* 0.00824
+- *Post-cleanup active memory (GB):* 0.00828
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1404
+- *Rendered prompt characters:* 1378
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1270,11 +1373,11 @@ Keywords: Canal, Riverbank, Marina, Mooring, Motorboat, Pier, Boat, Architecture
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan Gliding on River Near Moored Boats
+Title: Sailors in Vortex Catamaran and Laser Dinghy on Calm Water
 
-Description: A solitary white swan glides across calm river waters, framed by overhanging green foliage, with several leisure boats and cruisers moored at a riverside pier in front of residential buildings. The scene, captured on 2026-09-12 at 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E, reflects a tranquil riverside setting with visible water reflections and lush vegetation.
+Description: On 2026-09-19, two sailors navigate small dinghies on calm waters: a Vortex catamaran (sail number 1067) with an orange and grey sail, and a white Laser dinghy (sail number GBR 188572) with a red sun emblem, against a backdrop of dense green woodland under a partly cloudy sky.
 
-Keywords: swan, river, moored boats, leisure craft, residential buildings, greenery, water reflection, foliage, pier, canal, waterfront, waterway, aquatic bird, motorboat, marina, trees, vegetation, architecture
+Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR, 1067, 188572, Sailor, Water, River, Estuary, Forest, Trees, Shoreline, Sky, Clouds, Life jacket, Outdoor recreation, Mast, Boating, Boat
 </pre>
 
 </details>
@@ -1295,26 +1398,26 @@ Keywords: swan, river, moored boats, leisure craft, residential buildings, green
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.45s
-- *Generation time:* 37.06s
-- *Total time:* 39.47s
-- *Prompt preparation time:* 0.96
-- *First-token latency:* 34.9
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 16,547
-- *Generation tokens:* 93
-- *Total tokens:* 16,640
-- *Prompt throughput (raw):* 475 tok/s
-- *Generation throughput (raw):* 69.7 tok/s
+- *Model load time:* 0.94s
+- *Generation time:* 36.86s
+- *Total time:* 38.78s
+- *Prompt preparation time:* 0.975
+- *First-token latency:* 34.4
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 16,549
+- *Generation tokens:* 104
+- *Total tokens:* 16,653
+- *Prompt throughput (raw):* 480 tok/s
+- *Generation throughput (raw):* 69.0 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00856
+- *Post-cleanup active memory (GB):* 0.00859
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1404
+- *Rendered prompt characters:* 1378
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1328,11 +1431,11 @@ Keywords: swan, river, moored boats, leisure craft, residential buildings, green
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan on River with Moored Boats
+Title: Sailors race dinghies on calm water
 
-Description: A solitary white swan glides calmly on a river, framed by green foliage, with moored leisure boats and residential buildings visible in the background under soft, natural light.
+Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, framed by dense green forest under a partly cloudy sky. The scene captures active sailing with visible sail numbers and life jackets.
 
-Keywords: swan, river, boats, mooring, canal, greenery, trees, water reflection, waterfront, residential, motorboat, pier, waterway, vegetation, architecture, aquatic bird, waterfowl
+Keywords: Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Shoreline, Sky, Clouds, Man, Sailor, Life jacket, Outdoor recreation, Estuary, Boat, Boating
 </pre>
 
 </details>
@@ -1353,26 +1456,26 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, water reflection,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.76s
-- *Generation time:* 35.97s
-- *Total time:* 39.73s
-- *Prompt preparation time:* 0.986
-- *First-token latency:* 33.7
-- *Cleanup time:* 0.145
-- *Prompt tokens:* 16,563
-- *Generation tokens:* 97
-- *Total tokens:* 16,660
-- *Prompt throughput (raw):* 491 tok/s
-- *Generation throughput (raw):* 72.4 tok/s
+- *Model load time:* 2.53s
+- *Generation time:* 32.62s
+- *Total time:* 36.19s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 30.6
+- *Cleanup time:* 0.132
+- *Prompt tokens:* 16,565
+- *Generation tokens:* 111
+- *Total tokens:* 16,676
+- *Prompt throughput (raw):* 541 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.89
+- *Cache memory (GB):* 0.91
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.00906
+- *Post-cleanup active memory (GB):* 0.0091
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
+- *Rendered prompt characters:* 1397
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1385,11 +1488,11 @@ Keywords: swan, river, boats, mooring, canal, greenery, trees, water reflection,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan Swimming Past Moored Boats
+Title: Vortex Catamaran and Laser Sailing on Water
 
-Description: A solitary white swan glides across calm river waters near a riverside mooring of leisure cruisers and residential buildings, framed by lush foliage and dappled natural light.
+Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm river waters on 19 September 2026. The scene is framed by dense green woodland along the shoreline under a partly cloudy sky.
 
-Keywords: swan, river, moored boats, riverbank, vegetation, water reflection, cruiser, residential buildings, trees, leisure boats, waterfront, marina, wildlife, calm water, UK landscape, mooring, architecture, nature
+Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline, dense green woodland, partly cloudy sky, outdoor recreation, sailing, man, mast, forest, Boating, sailboat, Water
 </pre>
 
 </details>
@@ -1410,26 +1513,26 @@ Keywords: swan, river, moored boats, riverbank, vegetation, water reflection, cr
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.63s
-- *Generation time:* 41.57s
-- *Total time:* 44.16s
-- *Prompt preparation time:* 0.946
-- *First-token latency:* 39.8
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 16,563
-- *Generation tokens:* 86
-- *Total tokens:* 16,649
-- *Prompt throughput (raw):* 416 tok/s
-- *Generation throughput (raw):* 91.4 tok/s
+- *Model load time:* 1.41s
+- *Generation time:* 34.62s
+- *Total time:* 37.02s
+- *Prompt preparation time:* 0.986
+- *First-token latency:* 32.1
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 16,565
+- *Generation tokens:* 142
+- *Total tokens:* 16,707
+- *Prompt throughput (raw):* 516 tok/s
+- *Generation throughput (raw):* 87.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.96
-- *Post-cleanup active memory (GB):* 0.00959
+- *Post-cleanup active memory (GB):* 0.00962
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
+- *Rendered prompt characters:* 1397
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1442,11 +1545,146 @@ Keywords: swan, river, moored boats, riverbank, vegetation, water reflection, cr
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan Glides Past Moored Boats on Calm Riverbank
+Title:
+Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters
 
-Description: A solitary white swan swims peacefully on a reflective river, with leisure boats moored along the bank beside residential buildings under soft daylight.
+Description:
+Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters, with dense woodland lining the shore under an overcast sky.
 
-Keywords: swan, river, boats, mooring, residential buildings, water reflection, foliage, trees, motorboat, canal, waterfront, waterway, aquatic bird, architecture, greenery
+Keywords:
+Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, Sky, Clouds, Outdoor recreation, Shoreline, Water, GBR, 1067, 188572
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title:  
+Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters
+
+Description:  
+Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters, with dense woodland lining the shore under an overcast sky.
+
+Keywords:  
+Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, Sky, Clouds, Outdoor recreation, Shoreline, Water, GBR, 1067, 188572
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen38-27b-nvfp4"></a>
+
+### mlx-community/Qwen3.8-27B-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen3.8-27B-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
+- *Model load time:* 1.97s
+- *Generation time:* 57.90s
+- *Total time:* 60.89s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 51.9
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 16,565
+- *Generation tokens:* 144
+- *Total tokens:* 16,709
+- *Prompt throughput (raw):* 319 tok/s
+- *Generation throughput (raw):* 28.2 tok/s
+- *Peak memory (GB):* 21
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 1.9
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.0101
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1397
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 5ff8ef173ad0d7c3aae92f0be43031a6ab8067c6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-nvfp4/snapshots/5ff8ef173ad0d7c3aae92f0be43031a6ab8067c6
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Two sailors racing Vortex and Laser dinghies on calm waters
+
+Description:
+A Vortex catamaran with sail number 1067 on the left and a Laser dinghy with sail number GBR 188572 on the right are sailed by individuals across a calm estuary. Both boats are set against a shoreline of dense green woodland under a bright, cloudy sky, with other moored vessels visible in the background.
+
+Keywords:
+Vortex, Laser, catamaran, dinghy, sailing, sailors, estuary, woodland, boats, water, masts, GBR 188572, sail numbers, outdoor, sky
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.66s
+- *Generation time:* 1.94s
+- *Total time:* 3.37s
+- *Prompt preparation time:* 0.773
+- *First-token latency:* 0.6
+- *Cleanup time:* 0.0911
+- *Prompt tokens:* 1,433
+- *Generation tokens:* 78
+- *Total tokens:* 1,511
+- *Prompt throughput (raw):* 2,387 tok/s
+- *Generation throughput (raw):* 126 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.35
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1338
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Sailing on the River
+Description: Two sailors are sailing their boats across the river.
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
 </pre>
 
 </details>
@@ -1467,17 +1705,17 @@ Keywords: swan, river, boats, mooring, residential buildings, water reflection, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 12.73s
-- *Generation time:* 23.05s
-- *Total time:* 36.64s
-- *Prompt preparation time:* 0.847
-- *First-token latency:* 19
-- *Cleanup time:* 0.313
-- *Prompt tokens:* 3,491
-- *Generation tokens:* 121
-- *Total tokens:* 3,612
-- *Prompt throughput (raw):* 183 tok/s
-- *Generation throughput (raw):* 47.4 tok/s
+- *Model load time:* 14.32s
+- *Generation time:* 26.57s
+- *Total time:* 42.10s
+- *Prompt preparation time:* 1.21
+- *First-token latency:* 21.3
+- *Cleanup time:* 0.306
+- *Prompt tokens:* 3,494
+- *Generation tokens:* 147
+- *Total tokens:* 3,641
+- *Prompt throughput (raw):* 164 tok/s
+- *Generation throughput (raw):* 50.9 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
@@ -1486,7 +1724,7 @@ Keywords: swan, river, boats, mooring, residential buildings, water reflection, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1410
+- *Rendered prompt characters:* 1384
 - *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1500,88 +1738,14 @@ Keywords: swan, river, boats, mooring, residential buildings, water reflection, 
 
 <pre class="model-output-readable">
 Title:
-Swan glides past moored boats on a calm river
-Description:
-A solitary white swan swims across calm river waters, framed by lush foreground foliage and a background of moored leisure boats alongside brick residential buildings with balconies. The scene is lit by soft, overcast daylight, with reflections of the boats and trees visible on the water's surface.
-Keywords:
-Swan, waterfowl, river, marina, mooring, motorboat, pier, waterfront, waterway, canal, bird, swimming, trees, vegetation, greenery, architecture, boat, water reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.21s
-- *Generation time:* 16.31s
-- *Total time:* 18.44s
-- *Prompt preparation time:* 0.921
-- *First-token latency:* 13.1
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 16,558
-- *Generation tokens:* 136
-- *Total tokens:* 16,694
-- *Prompt throughput (raw):* 1,263 tok/s
-- *Generation throughput (raw):* 57.6 tok/s
-- *Peak memory (GB):* 14
-- *Active memory (GB):* 9.5
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.0109
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1462
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Swan Gliding on Calm River with Moored Boats
+Two sailors on dinghies across calm waters
 
 Description:
-A serene scene captures a solitary white swan gracefully swimming across calm river waters, framed by lush greenery and leisure boats moored alongside riverside residential buildings. The setting is illuminated by soft, natural light, highlighting the tranquil atmosphere of the waterfront.
+On 19 September 2026 at 17:12 UTC+1, two sailors steer small dinghies across calm coastal or river waters, with a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right, set against a backdrop of dense green woodland under a partly cloudy sky.
 
 Keywords:
-Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Waterway, Motorboat, Pier, Marina, Reflection, Architecture, Canals, Waterfowl, Trees, Vegetation, Riverbank, Swimming, Leisure, Reflections, Soft Lighting, Natural Setting.
+Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boating, Water, River, Estuary, Shoreline, Forest, Trees, Mast, Life jacket, Outdoor recreation
 </pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Title:
-Swan Gliding on Calm River with Moored Boats
-
-Description:
-A serene scene captures a solitary white swan gracefully swimming across calm river waters, framed by lush greenery and leisure boats moored alongside riverside residential buildings. The setting is illuminated by soft, natural light, highlighting the tranquil atmosphere of the waterfront.
-
-Keywords: 
-Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Waterway, Motorboat, Pier, Marina, Reflection, Architecture, Canals, Waterfowl, Trees, Vegetation, Riverbank, Swimming, Leisure, Reflections, Soft Lighting, Natural Setting.
-```
-
-</details>
 
 </details>
 
@@ -1601,26 +1765,26 @@ Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Wa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.16s
-- *Generation time:* 2.52s
-- *Total time:* 4.62s
-- *Prompt preparation time:* 0.928
-- *First-token latency:* 0.735
-- *Cleanup time:* 0.113
-- *Prompt tokens:* 2,090
-- *Generation tokens:* 96
-- *Total tokens:* 2,186
-- *Prompt throughput (raw):* 2,842 tok/s
-- *Generation throughput (raw):* 100 tok/s
+- *Model load time:* 1.09s
+- *Generation time:* 2.89s
+- *Total time:* 4.98s
+- *Prompt preparation time:* 0.986
+- *First-token latency:* 0.85
+- *Cleanup time:* 0.105
+- *Prompt tokens:* 2,089
+- *Generation tokens:* 112
+- *Total tokens:* 2,201
+- *Prompt throughput (raw):* 2,459 tok/s
+- *Generation throughput (raw):* 96.4 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.35
+- *Cache memory (GB):* 0.34
 - *Model-load active memory (GB):* 5.46
-- *Post-cleanup active memory (GB):* 0.0114
+- *Post-cleanup active memory (GB):* 0.0115
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4270
+- *Rendered prompt characters:* 4244
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1634,21 +1798,23 @@ Swan, River, Calm, Moored Boats, Residential Buildings, Greenery, Waterfront, Wa
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Solitary Swan Glides on Tranquil River
-Description: A serene scene captures a graceful white swan effortlessly gliding across the calm waters of a river, framed by lush greenery. Leisure boats and cruisers are moored alongside riverside residential buildings, creating a picturesque setting under the soft lighting of the late afternoon.
-Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon, Tranquil, Waterfowl, Architecture, Waterway
+Title: Sailing Adventure on the River
+
+Description: Two sailors navigate their boats across a serene river, with one in a Vortex catamaran and the other in a Laser dinghy, both wearing life jackets and skillfully steering their vessels against the backdrop of dense green woodland. The scene captures a peaceful moment of outdoor recreation under a partly cloudy sky.
+
+Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, Mast, Life jacket, Man, Outdoor recreation, Forest, Clouds, Estuary
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
-### mlx-community/gemma-4-12B-it-4bit
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -1656,48 +1822,101 @@ Keywords: Swan, River, Greenery, Boats, Cruisers, Buildings, Lighting, Afternoon
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.86s
-- *Generation time:* 2.61s
-- *Total time:* 5.10s
-- *Prompt preparation time:* 0.62
-- *First-token latency:* 0.359
-- *Cleanup time:* 0.119
-- *Prompt tokens:* 595
-- *Generation tokens:* 101
-- *Total tokens:* 696
-- *Prompt throughput (raw):* 1,659 tok/s
-- *Generation throughput (raw):* 60.4 tok/s
-- *Peak memory (GB):* 7.6
-- *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.32
-- *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.013
+- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
+- *Model load time:* 3.36s
+- *Generation time:* 3.08s
+- *Total time:* 7.10s
+- *Prompt preparation time:* 0.657
+- *First-token latency:* 0.531
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 592
+- *Generation tokens:* 85
+- *Total tokens:* 677
+- *Prompt throughput (raw):* 1,115 tok/s
+- *Generation throughput (raw):* 48.6 tok/s
+- *Peak memory (GB):* 28
+- *Active memory (GB):* 27
+- *Cache memory (GB):* 0.01
+- *Model-load active memory (GB):* 27.2
+- *Post-cleanup active memory (GB):* 0.0115
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1386
+- *Rendered prompt characters:* 1332
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-White Swan Gliding on a River Near Moored Boats
+Title: Two Sailors Sailing Dinghies on Calm Water
+Description: Two sailors steer a grey Vortex catamaran and a white Laser dinghy across calm waters against a dense woodland backdrop under a cloudy sky.
+Keywords: Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, River, Outdoor Recreation, Boating, Estuary, Sky, Clouds, Life jacket,
+</pre>
 
-Description:
-A solitary white swan glides across a calm river surface reflecting leisure boats and residential buildings. The scene is framed by lush greenery and features multiple motorboats moored along a waterfront pier.
+</details>
 
-Keywords:
-Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, Residential, Waterway, Reflection, Nature, Bird, Swimming, Waterfront, Greenery, Trees, Vegetation
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.36s
+- *Generation time:* 7.47s
+- *Total time:* 10.46s
+- *Prompt preparation time:* 0.609
+- *First-token latency:* 0.99
+- *Cleanup time:* 0.13
+- *Prompt tokens:* 591
+- *Generation tokens:* 175
+- *Total tokens:* 766
+- *Prompt throughput (raw):* 597 tok/s
+- *Generation throughput (raw):* 29.6 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 0.44
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1361
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Sailing Dinghies on Calm Water, September 2026
+
+Description: Captured on 19th September 2026, this image shows a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) sailing on calm water, with dense woodland forming the backdrop. The scene is lit by bright daylight, revealing details of the boats, sailors, and shoreline.
+
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Vortex, GBR 188572, 1067, Daylight, September, Woodland, Reflection
 </pre>
 
 </details>
@@ -1718,17 +1937,17 @@ Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, R
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.55s
-- *Generation time:* 1.88s
-- *Total time:* 5.04s
-- *Prompt preparation time:* 0.599
-- *First-token latency:* 0.416
-- *Cleanup time:* 0.144
-- *Prompt tokens:* 595
-- *Generation tokens:* 96
-- *Total tokens:* 691
-- *Prompt throughput (raw):* 1,431 tok/s
-- *Generation throughput (raw):* 108 tok/s
+- *Model load time:* 2.47s
+- *Generation time:* 2.15s
+- *Total time:* 5.26s
+- *Prompt preparation time:* 0.632
+- *First-token latency:* 0.425
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 596
+- *Generation tokens:* 130
+- *Total tokens:* 726
+- *Prompt throughput (raw):* 1,403 tok/s
+- *Generation throughput (raw):* 114 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1737,7 +1956,7 @@ Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, R
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1386
+- *Rendered prompt characters:* 1360
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1751,9 +1970,11 @@ Swan, Waterfowl, River, Canal, Boat, Motorboat, Marina, Mooring, Architecture, R
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: White swan swimming on calm river with moored boats
-Description: A solitary white swan glides across calm river waters near a wooden pier, with several leisure boats and residential buildings visible in the background. The scene is framed by lush green foliage reflecting in the still water under natural daylight.
-Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflection, residential building, boat, pier, aquatic bird, leisure boat, vegetation, waterway, mooring
+Title: Two sailors steering small boats across calm water
+
+Description: Two sailors navigate small boats across calm waters against a backdrop of dense green woodland under a cloudy sky. On the left, a person in a blue life jacket steers a Vortex catamaran with sail number 1067, while on the right, another person steers a white Laser dinghy with sail number GBR 188572.
+
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Sky, Trees, Water
 </pre>
 
 </details>
@@ -1774,17 +1995,17 @@ Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflect
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.74s
-- *Generation time:* 5.08s
-- *Total time:* 8.45s
-- *Prompt preparation time:* 0.622
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.154
-- *Prompt tokens:* 595
+- *Model load time:* 2.68s
+- *Generation time:* 5.12s
+- *Total time:* 8.44s
+- *Prompt preparation time:* 0.634
+- *First-token latency:* 1.1
+- *Cleanup time:* 0.138
+- *Prompt tokens:* 596
 - *Generation tokens:* 89
-- *Total tokens:* 684
-- *Prompt throughput (raw):* 529 tok/s
-- *Generation throughput (raw):* 26.3 tok/s
+- *Total tokens:* 685
+- *Prompt throughput (raw):* 542 tok/s
+- *Generation throughput (raw):* 26.0 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.79
@@ -1793,7 +2014,7 @@ Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflect
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1386
+- *Rendered prompt characters:* 1360
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1807,9 +2028,9 @@ Keywords: white swan, river, motorboat, waterfowl, waterfront, greenery, reflect
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: White Swan Swimming Past Moored River Boats
-Description: A single white swan swims across calm river waters in front of leisure boats moored beside riverside residential buildings. The scene is framed by lush green foliage under soft, late afternoon light.
-Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential, architecture, greenery, waterfowl, motorboat, reflection, riverbank, England, nature, swimming, leisure
+Title: Two Sailors Steering Dinghies on Calm Water
+Description: A Vortex catamaran and a Laser dinghy sail across calm waters against a backdrop of dense green woodland under a cloudy sky.
+Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Trees, Water
 </pre>
 
 </details>
@@ -1830,18 +2051,18 @@ Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.76s
-- *Generation time:* 1.35s
-- *Total time:* 3.74s
-- *Prompt preparation time:* 0.615
-- *First-token latency:* 0.189
-- *Cleanup time:* 0.117
-- *Prompt tokens:* 591
-- *Generation tokens:* 73
-- *Total tokens:* 664
-- *Prompt throughput (raw):* 3,128 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory (GB):* 6.0
+- *Model load time:* 1.70s
+- *Generation time:* 1.83s
+- *Total time:* 4.17s
+- *Prompt preparation time:* 0.64
+- *First-token latency:* 0.432
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 592
+- *Generation tokens:* 94
+- *Total tokens:* 686
+- *Prompt throughput (raw):* 1,370 tok/s
+- *Generation throughput (raw):* 122 tok/s
+- *Peak memory (GB):* 5.9
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
@@ -1849,7 +2070,7 @@ Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential,
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1358
+- *Rendered prompt characters:* 1332
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1863,9 +2084,9 @@ Keywords: swan, river, boats, marina, moored, waterfront, waterway, residential,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Swan glides on calm water beneath residential buildings
-Description: A solitary white swan gracefully floats on the calm river water, framed by dense greenery and moored leisure boats in the background.
-Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, architecture, moored, peaceful, waterfront, vegetation, gliding, pastime
+Title: Two Dinghies Sail on Calm Woodland Water
+Description: Two small dinghies navigate placid waters beneath a backdrop of dense green woodland under partly cloudy skies. The catamaran on the left and the Laser dinghy on the right feature distinctive sail numbers.
+Keywords: Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboat, Water, Outdoor, Recreation, Trees, Small Craft, Sky, Dinghy Racing
 </pre>
 
 </details>
@@ -1887,16 +2108,16 @@ Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, 
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
 - *Model load time:* 0.61s
-- *Generation time:* 1.51s
-- *Total time:* 2.91s
-- *Prompt preparation time:* 0.792
-- *First-token latency:* 0.392
-- *Cleanup time:* 0.097
-- *Prompt tokens:* 1,379
-- *Generation tokens:* 65
-- *Total tokens:* 1,444
-- *Prompt throughput (raw):* 3,519 tok/s
-- *Generation throughput (raw):* 176 tok/s
+- *Generation time:* 2.31s
+- *Total time:* 3.77s
+- *Prompt preparation time:* 0.849
+- *First-token latency:* 0.896
+- *Cleanup time:* 0.0984
+- *Prompt tokens:* 1,383
+- *Generation tokens:* 99
+- *Total tokens:* 1,482
+- *Prompt throughput (raw):* 1,544 tok/s
+- *Generation throughput (raw):* 165 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.22
@@ -1905,7 +2126,7 @@ Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1556
+- *Rendered prompt characters:* 1530
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -1919,414 +2140,9 @@ Keywords: swan, waterfowl, river, canal, marina, boats, trees, greenery, quiet, 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Swan on the Canal"
-Description: A white swan glides gracefully across a calm river, framed by lush foliage and moored boats, with a serene residential backdrop.
-Keywords: swan, canal, water, foliage, boats, mooring, residential, reflection, serene, waterway
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 6.82s
-- *Generation time:* 16.15s
-- *Total time:* 23.56s
-- *Prompt preparation time:* 0.59
-- *First-token latency:* 12.4
-- *Cleanup time:* 0.268
-- *Prompt tokens:* 6,450
-- *Generation tokens:* 103
-- *Total tokens:* 6,553
-- *Prompt throughput (raw):* 520 tok/s
-- *Generation throughput (raw):* 41.6 tok/s
-- *Peak memory (GB):* 78
-- *Active memory (GB):* 62
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00123
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1413
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Solitary swan glides on calm river waters
-Description: A solitary white swan glides gracefully across calm river waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background under overcast lighting.
-Keywords: swan, river, water, foliage, boats, cruisers, residential buildings, moored, overcast, water reflection, waterfowl, waterfront, waterway, aquatic bird, greenery, trees, vegetation
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: london eye souvenir stall, london eye
-  souvenir booth, london eye souvenir kiosk
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.17s
-- *Generation time:* 4.33s
-- *Total time:* 6.16s
-- *Prompt preparation time:* 0.651
-- *First-token latency:* 0.731
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 1,524
-- *Generation tokens:* 216
-- *Total tokens:* 1,740
-- *Prompt throughput (raw):* 2,084 tok/s
-- *Generation throughput (raw):* 72.5 tok/s
-- *Peak memory (GB):* 8.6
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 0.31
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00549
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1370
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Serene River Scene with White Swan and Moored Boats
-
-Description: A tranquil riverside view features a solitary white swan gliding across calm water, surrounded by lush greenery and trees. In the background, various leisure boats and cruisers are moored along the riverbank, with residential buildings visible beyond the foliage.
-
-Keywords: swan, river, boats, mooring, canal, greenery, trees, vegetation, water reflection, waterfowl, waterfront, waterway, aquatic bird, architecture, boat, marina, leisure, residential, calm, serene, UK, London, Thames, London Eye, London Bridge, London Underground, London Tower, London Tower Bridge, London Eye Tower, London Eye Pier, London Eye Walkway, London Eye Observation Deck, London Eye Restaurant, London Eye Cafe, London Eye Gift Shop, London Eye Souvenir Shop, London Eye Souvenir Stall, London Eye Souvenir Booth, London Eye Souvenir Kiosk, London Eye Souvenir Stall, London Eye Souvenir Booth, London Eye Souvenir Kiosk
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
-
-### mlx-community/Qwen2-VL-7B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.81s
-- *Generation time:* 39.51s
-- *Total time:* 41.22s
-- *Prompt preparation time:* 0.897
-- *First-token latency:* 37.4
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 16,558
-- *Generation tokens:* 117
-- *Total tokens:* 16,675
-- *Prompt throughput (raw):* 443 tok/s
-- *Generation throughput (raw):* 91.3 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 4.7
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00731
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1462
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Graceful Swan on the River
-
-Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-
-Keywords: swan, river, calm water, lush foliage, leisure boats, cruisers, riverside buildings, residential area, greenery, water reflection, aquatic bird, nature, tranquility, serene, peaceful, waterfowl, waterway, scenic, picturesque, boating, mooring, waterfront, trees, vegetation, architecture, boat.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen38-27b-4bit"></a>
-
-### mlx-community/Qwen3.8-27B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen3.8-27B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Names a place the prompt did not supply: River Thames,
-  Lambeth
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.12s
-- *Generation time:* 62.16s
-- *Total time:* 65.24s
-- *Prompt preparation time:* 0.954
-- *First-token latency:* 57.1
-- *Cleanup time:* 0.133
-- *Prompt tokens:* 16,563
-- *Generation tokens:* 124
-- *Total tokens:* 16,687
-- *Prompt throughput (raw):* 290 tok/s
-- *Generation throughput (raw):* 29.8 tok/s
-- *Peak memory (GB):* 21
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 1.9
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.0101
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1423
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 10c35caafbb80f7dc6a7a432cdd11af10a6d4818
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-4bit/snapshots/10c35caafbb80f7dc6a7a432cdd11af10a6d4818
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 20, "top_p": 0.95}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Swan swimming near moored boats on the River Thames
-
-Description:
-A solitary white swan swims on the calm water of the River Thames at Lambeth, with its reflection visible on the surface. In the background, several leisure boats and cruisers are moored along the riverbank in front of brown residential buildings, framed by overhanging green foliage.
-
-Keywords:
-Swan, River Thames, Boat, Waterfowl, Water, Reflection, Mooring, Residential building, Foliage, Greenery, Calm water, Leisure boat, Canopy, Urban river, Nature
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.78s
-- *Generation time:* 1.82s
-- *Total time:* 3.33s
-- *Prompt preparation time:* 0.728
-- *First-token latency:* 0.374
-- *Cleanup time:* 0.081
-- *Prompt tokens:* 1,426
-- *Generation tokens:* 98
-- *Total tokens:* 1,524
-- *Prompt throughput (raw):* 3,817 tok/s
-- *Generation throughput (raw):* 131 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0103
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1364
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Swan on River
-Description: A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-Keywords: Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Duplicate keywords: reflection; Repeats the prompt's hint
-  instead of describing the image: description
-- *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.32s
-- *Generation time:* 2.85s
-- *Total time:* 6.81s
-- *Prompt preparation time:* 0.627
-- *First-token latency:* 0.333
-- *Cleanup time:* 0.151
-- *Prompt tokens:* 591
-- *Generation tokens:* 80
-- *Total tokens:* 671
-- *Prompt throughput (raw):* 1,775 tok/s
-- *Generation throughput (raw):* 46.1 tok/s
-- *Peak memory (GB):* 28
-- *Active memory (GB):* 27
-- *Cache memory (GB):* 0.01
-- *Model-load active memory (GB):* 27.2
-- *Post-cleanup active memory (GB):* 0.0114
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1358
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: White Swan Gliding on River Near Moored Boats
-Description: A solitary white swan glides across calm river waters, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-Keywords: swan, waterfowl, river, boat, marina, mooring, motorboat, cruiser, pier, waterfront, waterway, greenery, vegetation, architecture, reflection, reflection
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Names a place the prompt did not supply: River Cam
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.39s
-- *Generation time:* 6.49s
-- *Total time:* 9.47s
-- *Prompt preparation time:* 0.571
-- *First-token latency:* 0.933
-- *Cleanup time:* 0.151
-- *Prompt tokens:* 590
-- *Generation tokens:* 152
-- *Total tokens:* 742
-- *Prompt throughput (raw):* 632 tok/s
-- *Generation throughput (raw):* 30.3 tok/s
-- *Peak memory (GB):* 17
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 0.44
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.012
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Swan on River Cam, Cambridge – September 2026
-Description: A white swan swims on the River Cam at 52.393850°N, 0.270830°E, captured on 12 September 2026 at 17:41 UTC+01:00; moored leisure boats and residential buildings line the riverbank under overcast conditions. The calm water reflects the boats and surrounding greenery.
-Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverbank, Waterway, Residential building, Trees, Vegetation, Water reflection, Leisure boat, Cruiser, September, Aquatic bird, Overcast sky
+Title: "Sailors in Dinghies on a Calm Day"
+Description: Two sailors navigate their dinghies, a Vortex catamaran and a Laser dinghy, across a serene body of water with dense green woodland in the background.
+Keywords: Sailors, Dinghies, Vortex catamaran, Laser dinghy, Water, Trees, Coastline, Sailing, Life jacket, Man, Sail number, 1067, 188572
 </pre>
 
 </details>
@@ -2341,33 +2157,32 @@ Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverban
 <summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* concerns detected
+- *Mechanical checks:* no concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Repeats the prompt's hint instead of describing the image:
-  description
+- *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.84s
-- *Generation time:* 4.71s
-- *Total time:* 7.12s
-- *Prompt preparation time:* 0.566
-- *First-token latency:* 1.65
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 3,116
-- *Generation tokens:* 102
-- *Total tokens:* 3,218
-- *Prompt throughput (raw):* 1,883 tok/s
-- *Generation throughput (raw):* 40.2 tok/s
+- *Model load time:* 1.83s
+- *Generation time:* 5.36s
+- *Total time:* 7.74s
+- *Prompt preparation time:* 0.545
+- *First-token latency:* 1.86
+- *Cleanup time:* 0.109
+- *Prompt tokens:* 3,117
+- *Generation tokens:* 114
+- *Total tokens:* 3,231
+- *Prompt throughput (raw):* 1,676 tok/s
+- *Generation throughput (raw):* 38.5 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
 - *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0171
+- *Post-cleanup active memory (GB):* 0.0163
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1332
+- *Rendered prompt characters:* 1306
 - *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2380,63 +2195,240 @@ Keywords: Swan, River Cam, Cambridge, Waterfowl, Boat, Mooring, Marina, Riverban
 *Readable output:*
 
 <pre class="model-output-readable">
-### Title:
-Swan in River with Moored Boats
+Title:
+Sailors Navigate Calm Waters in Dinghies
 
-### Description:
-A solitary white swan gracefully swims across calm river waters, framed by lush foliage, with leisure boats and residential buildings in the background.
+Description:
+Two sailors steer small dinghies—a Vortex catamaran and a Laser dinghy—across calm waters with dense green woodland in the background under a partly cloudy sky.
 
-### Keywords:
-Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Waterway, Trees, Vegetation, Reflection, Waterfowl, Architecture, Calm, Leisure, Riverbank
+Keywords:
+Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Woodland
 </pre>
 
 </details>
 
 ---
 
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+### mlx-community/Idefics3-8B-Llama3-bf16
 
 <details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: river
+- *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
+- *Model load time:* 1.91s
+- *Generation time:* 6.58s
+- *Total time:* 9.25s
+- *Prompt preparation time:* 0.752
+- *First-token latency:* 1.21
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 2,619
+- *Generation tokens:* 164
+- *Total tokens:* 2,783
+- *Prompt throughput (raw):* 2,163 tok/s
+- *Generation throughput (raw):* 35.2 tok/s
+- *Peak memory (GB):* 18
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.43
+- *Model-load active memory (GB):* 16.9
+- *Post-cleanup active memory (GB):* 0.0018
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1343
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Laser and Vortex catamaran sailboats on a river with trees.
+
+Description: Two sailboats, a Laser dinghy with sail number GBR 188572 and a Vortex catamaran with sail number 1067, are sailing on a calm river. The Laser dinghy is on the right, and the Vortex catamaran is on the left. Both boats have their sails up and are being steered by their respective sailors. In the background, there is a dense green woodland. The sky is partly cloudy, and the lighting is natural daylight.
+
+Keywords: Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail number GBR 188572, sail number 1067, sailors, sail, river, natural daylight, partly cloudy sky.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
+
+### mlx-community/gemma-4-12B-it-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: sailing
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
+- *Model load time:* 1.83s
+- *Generation time:* 2.81s
+- *Total time:* 5.30s
+- *Prompt preparation time:* 0.656
+- *First-token latency:* 0.377
+- *Cleanup time:* 0.112
+- *Prompt tokens:* 596
+- *Generation tokens:* 108
+- *Total tokens:* 704
+- *Prompt throughput (raw):* 1,582 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
+- *Peak memory (GB):* 7.6
+- *Active memory (GB):* 6.8
+- *Cache memory (GB):* 0.32
+- *Model-load active memory (GB):* 6.76
+- *Post-cleanup active memory (GB):* 0.0131
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1360
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Two Sailors Steering Small Dinghies on Calm Water
+Description: Two sailors navigate a Vortex catamaran and a Laser dinghy across calm water against a backdrop of dense green woodland. The scene captures a moment of outdoor sailing with the boats positioned in front of a forested shoreline.
+Keywords: Boat, Boating, Catamaran, Sailing, Sailor, Laser dinghy, Water, River, Estuary, Forest, Trees, Shoreline, Sailboat, Life jacket, Outdoor recreation, Mast, Clouds, Sailing, Sailing_sport
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: canal, water,
-  architecture, waterway, aquatic bird, waterfront; Repeats the prompt's hint
-  instead of describing the image: description
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.41s
-- *Generation time:* 1.02s
-- *Total time:* 2.26s
-- *Prompt preparation time:* 0.496
-- *First-token latency:* 0.116
-- *Cleanup time:* 0.0727
-- *Prompt tokens:* 2,112
-- *Generation tokens:* 200
-- *Total tokens:* 2,312
-- *Prompt throughput (raw):* 18,197 tok/s
-- *Generation throughput (raw):* 476 tok/s
-- *Peak memory (GB):* 1.9
-- *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.18
-- *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.000134
+- *Observations:* Generation was stopped early after sustained repeated
+  output; Required labelled fields not detected: title, description, keywords;
+  Internal reasoning block appears incomplete
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.63s
+- *Generation time:* 5.34s
+- *Total time:* 7.59s
+- *Prompt preparation time:* 0.607
+- *First-token latency:* 0.95
+- *Cleanup time:* 0.0967
+- *Prompt tokens:* 1,639
+- *Generation tokens:* 425
+- *Total tokens:* 2,064
+- *Prompt throughput (raw):* 1,726 tok/s
+- *Generation throughput (raw):* 112 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.29
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.000609
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1383
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1496
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "repetition_context_size": 20,
+  "repetition_penalty": 1.0, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 0.95}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get this done. I need to create some metadata for this image, and it's my job to be precise.
+
+First, I need to figure out a good title. "Sailboats on the Water" is too generic. "Two Sailors on Dinghies" is better, but I want something more specific. "Sailors on Catamaran and Laser Dinghy" - that's it! Concise and accurate.
+
+Next, the description. I'll start with the basics: date, time, and location. Then I'll describe the scene. I'll mention the two boats, the sailors, and the setting. The hint about the boats is great. Let me work that in. Okay, I'm going to use the hint about the catamaran and laser. I'll refine that. "On a calm day, two sailors navigate a Vortex catamaran and a Laser dinghy on a lake in the UK." That's good, it's accurate, and it's a good length.
+
+Finally, the keywords. I'll go through the hints and add in some keywords that are relevant. Let's see, "sailboat," "dinghy," "catamaran," "laser," "sailor," "boat," "water," "lake," "sky," "trees," "shoreline," "recreation," "sport," "vessel," "wind," "man," "life jacket," "hull," "rigging," "sail number," "1067," "GBR 188572," "green," "calm," "daytime," "September," "UK," "England," "solent," "estuary," "marina," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-fastvlm-05b-bf16"></a>
+
+### mlx-community/FastVLM-0.5B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/FastVLM-0.5B-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: title, description,
+  keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
+  fastvlm)
+- *Model load time:* 0.59s
+- *Generation time:* 1.30s
+- *Total time:* 2.96s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 0.103
+- *Cleanup time:* 0.0812
+- *Prompt tokens:* 336
+- *Generation tokens:* 51
+- *Total tokens:* 387
+- *Prompt throughput (raw):* 3,266 tok/s
+- *Generation throughput (raw):* 361 tok/s
+- *Peak memory (GB):* 2.2
+- *Active memory (GB):* 1.2
+- *Cache memory (GB):* 0.02
+- *Model-load active memory (GB):* 1.25
+- *Post-cleanup active memory (GB):* 0.00092
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1401
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 81ffe929046666c43de53691147b1669ba0f3a4c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--FastVLM-0.5B-bf16/snapshots/81ffe929046666c43de53691147b1669ba0f3a4c
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2444,157 +2436,7 @@ Swan, River, Boats, Marina, Water, Foliage, Residential, Mooring, Waterfront, Wa
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Swans glide across calm river waters in a serene canal setting.
-
-Description:
-A solitary white swan glides gracefully across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
-
-Keywords:
-Swans, canal, water, serene, leisure, boats, water, architecture, greenery, water, architecture, waterway, aquatic bird, waterfront, waterfront, waterway, aquatic bird, canal, water, architecture, water, waterway, waterway, water, aquatic bird, waterfront, water, waterway, waterway, water, water, waterway, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water, water
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Response appears cut off at the token limit
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.37s
-- *Generation time:* 17.25s
-- *Total time:* 20.21s
-- *Prompt preparation time:* 0.587
-- *First-token latency:* 0.727
-- *Cleanup time:* 0.119
-- *Prompt tokens:* 1,324
-- *Generation tokens:* 1,000
-- *Total tokens:* 2,324
-- *Prompt throughput (raw):* 1,822 tok/s
-- *Generation throughput (raw):* 63.0 tok/s
-- *Peak memory (GB):* 20
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00277
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1519
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-09-12 17:41:02 UTC+01:00) and GPS coordinates (52.393850°N, 0.270830°E). The descriptive hints mention a white swan, calm river, lush foliage, leisure boats, cruisers, residential buildings, and a pier. The keywords include Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat.
-
-The image shows a white swan swimming in a canal with boats docked nearby, residential buildings in the background, greenery, and foliage framing the scene. The lighting suggests it's daytime with clear conditions. The swan is the main subject, and the boats are moored along the riverbank. The time is in the late afternoon or early evening (UTC+01:00), so the lighting might be softer, but the image doesn't show the sun's position directly, so the description should focus on what's visible.
-
-Now, the title needs to be a concrete 5-10 words. Maybe something like "Swan on canal with moored boats at marina". That's concise and captures the main elements.
-
-For the description, combine the context (date/time, GPS) with the main subject (swan), setting (canal, marina), and details (leisure boats, residential buildings, greenery). So: "A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E."
-
-For keywords, list 10-18 unique terms. Let's include the main elements: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, UTC+01:00, UTC-1:00 (since the timestamp is UTC+01:00, but maybe the location's time is different? Wait, the GPS coordinates are in UTC+01:00, but the location's local time is not specified. The keywords should be descriptive of what's visible. So maybe include "Water reflection", "Leisure boats", "Residental buildings", "Greenery", "Motorboat", "Pier", "Swimming swan", "UTC+01:00", "UTC-1:00" (since the capture time is UTC+01:00, but the location's time zone? Maybe not. Alternatively, just use the time as provided. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they're visible. So maybe the keywords shouldn't include the time zone unless visible. The image might not show the time, so perhaps omit the time zones. Wait, the keywords provided in the context include "UTC+01:00" and "UTC-1:00" as hints. But the image might not show the time, so maybe exclude those. Let me check the hints again. The keyword hints include "UTC+01:00" and "UTC-1:00" as hints. But the task says to retain details supported by the image. If the image doesn't show the time, then maybe don't include the time zones. The context says to treat capture date/time and GPS as authoritative but not claim they're visible. So the time zones might not be visible. So maybe exclude UTC+01:00 and UTC-1:00 from keywords. Instead, focus on visible elements: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, Trees, Vegetation. Wait, the hints include "Trees" and "Vegetation". So maybe include those. Also, "Waterfowl" is another keyword hint. So maybe: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, Trees, Vegetation, Waterfowl. That's 10 keywords. Let me check if they are unique and cover the scene. Yes, that works.◁/think▷Title: Swan on canal with moored boats at marina
-Description: A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E.
-Keywords: Swans, Canal, Motorboat,
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key elements from the context are the capture date/time (2026-09-12 17:41:02 UTC+01:00) and GPS coordinates (52.393850°N, 0.270830°E). The descriptive hints mention a white swan, calm river, lush foliage, leisure boats, cruisers, residential buildings, and a pier. The keywords include Adobe Stock, Any Vision, Bird, Canal, Greenery, Marina, Mooring, Motorboat, Pier, Riverbank, Swimming, Trees, Vegetation, Water reflection, Waterfowl, Waterfront, Waterway, aquatic bird, architecture, boat.
-
-The image shows a white swan swimming in a canal with boats docked nearby, residential buildings in the background, greenery, and foliage framing the scene. The lighting suggests it's daytime with clear conditions. The swan is the main subject, and the boats are moored along the riverbank. The time is in the late afternoon or early evening (UTC+01:00), so the lighting might be softer, but the image doesn't show the sun's position directly, so the description should focus on what's visible.
-
-Now, the title needs to be a concrete 5-10 words. Maybe something like "Swan on canal with moored boats at marina". That's concise and captures the main elements.
-
-For the description, combine the context (date/time, GPS) with the main subject (swan), setting (canal, marina), and details (leisure boats, residential buildings, greenery). So: "A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E."
-
-For keywords, list 10-18 unique terms. Let's include the main elements: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, UTC+01:00, UTC-1:00 (since the timestamp is UTC+01:00, but maybe the location's time is different? Wait, the GPS coordinates are in UTC+01:00, but the location's local time is not specified. The keywords should be descriptive of what's visible. So maybe include "Water reflection", "Leisure boats", "Residental buildings", "Greenery", "Motorboat", "Pier", "Swimming swan", "UTC+01:00", "UTC-1:00" (since the capture time is UTC+01:00, but the location's time zone? Maybe not. Alternatively, just use the time as provided. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they're visible. So maybe the keywords shouldn't include the time zone unless visible. The image might not show the time, so perhaps omit the time zones. Wait, the keywords provided in the context include "UTC+01:00" and "UTC-1:00" as hints. But the image might not show the time, so maybe exclude those. Let me check the hints again. The keyword hints include "UTC+01:00" and "UTC-1:00" as hints. But the task says to retain details supported by the image. If the image doesn't show the time, then maybe don't include the time zones. The context says to treat capture date/time and GPS as authoritative but not claim they're visible. So the time zones might not be visible. So maybe exclude UTC+01:00 and UTC-1:00 from keywords. Instead, focus on visible elements: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, Trees, Vegetation. Wait, the hints include "Trees" and "Vegetation". So maybe include those. Also, "Waterfowl" is another keyword hint. So maybe: Swans, Canal, Motorboat, Marina, Residential buildings, Greenery, Water reflection, Leisure boats, Pier, Trees, Vegetation, Waterfowl. That's 10 keywords. Let me check if they are unique and cover the scene. Yes, that works.◁/think▷Title: Swan on canal with moored boats at marina  
-Description: A white swan glides across a calm canal, surrounded by moored motorboats and residential buildings with lush greenery, at 2026-09-12 17:41:02 UTC+01:00 near 52.393850°N, 0.270830°E.  
-Keywords: Swans, Canal, Motorboat,
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-4bit"></a>
-
-### mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: riverside, riverside
-  scenery, riverside beauty, riverside charm, riverside tranquility, riverside
-  serenity, riverside calmness, riverside peacefulness
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.36s
-- *Generation time:* 12.72s
-- *Total time:* 14.66s
-- *Prompt preparation time:* 0.567
-- *First-token latency:* 1.47
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 301
-- *Generation tokens:* 275
-- *Total tokens:* 576
-- *Prompt throughput (raw):* 205 tok/s
-- *Generation throughput (raw):* 25.7 tok/s
-- *Peak memory (GB):* 9.8
-- *Active memory (GB):* 6.0
-- *Cache memory (GB):* 0.95
-- *Model-load active memory (GB):* 6.02
-- *Post-cleanup active memory (GB):* 0.00356
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 82f31be9840fa0d4c7e99257fe2e28b59a46df97
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-4bit/snapshots/82f31be9840fa0d4c7e99257fe2e28b59a46df97
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Serene River Scene with a Majestic White Swan
-
-Description: A tranquil river scene unfolds with a solitary white swan gliding effortlessly across the calm waters, surrounded by lush foliage and the serene atmosphere of a riverside residential area, where leisure boats and cruisers are moored, creating a picturesque scene with a sense of peace and harmony.
-
-Keywords: riverside residential area, leisure boats, calm waters, serene atmosphere, lush foliage, white swan, riverside, moored boats, peaceful scene, picturesque scene, tranquil scene, riverside scene, riverside life, riverside living, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside calmness, riverside peacefulness, riverside scenery, riverside beauty, riverside charm, riverside tranquility, riverside serenity, riverside
+A serene scene of two sailors navigating calm waters in a Vortex catamaran and Laser dinghy, set against a backdrop of dense green woodland, under a clear sky, with a sailboat and a man in a life jacket in the distance.
 </pre>
 
 </details>
@@ -2614,28 +2456,32 @@ Keywords: riverside residential area, leisure boats, calm waters, serene atmosph
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit
+  the token limit; Duplicate keywords: adventure, learning, education,
+  training, practice, improvement, progress, success, achievement,
+  accomplishment, pride, satisfaction, happiness, joy, laughter, smiles,
+  gratitude, appreciation, wonder, awe, amazement, enthusiasm, excitement,
+  exploration, discovery
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.83s
-- *Generation time:* 55.34s
-- *Total time:* 57.79s
-- *Prompt preparation time:* 0.608
-- *First-token latency:* 1.63
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 301
+- *Model load time:* 1.52s
+- *Generation time:* 55.62s
+- *Total time:* 57.73s
+- *Prompt preparation time:* 0.579
+- *First-token latency:* 1.78
+- *Cleanup time:* 0.0966
+- *Prompt tokens:* 308
 - *Generation tokens:* 1,000
-- *Total tokens:* 1,301
-- *Prompt throughput (raw):* 185 tok/s
+- *Total tokens:* 1,308
+- *Prompt throughput (raw):* 173 tok/s
 - *Generation throughput (raw):* 18.8 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.40
-- *Model-load active memory (GB):* 11.4
-- *Post-cleanup active memory (GB):* 0.00408
+- *Model-load active memory (GB):* 11.3
+- *Post-cleanup active memory (GB):* 0.00387
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
+- *Rendered prompt characters:* 1410
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2649,11 +2495,149 @@ Keywords: riverside residential area, leisure boats, calm waters, serene atmosph
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Serene River Scene with a Majestic White Swan
+Title: Two Sailors Navigate Calm Waters in a Forested Estuary
 
-Description: A tranquil river scene unfolds on September 12, 2026, at 17:41:02 UTC+01:00, near 52.393850°N, 0.270830°E, featuring a solitary white swan gliding across the calm waters, surrounded by lush greenery and a backdrop of moored boats and riverside residential buildings.
+Description: On a sunny day in September 2026, two sailors, one in a Vortex catamaran and the other in a Laser dinghy, navigate their boats across the calm waters of an estuary, surrounded by dense green woodland and a blue sky with clouds. The Vortex catamaran, with its distinctive orange and grey sail, is sail number 1067, while the Laser dinghy, with its white sail bearing the GBR 188572 number, is a British vessel.
 
-Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential Buildings, Tranquil Atmosphere, September Day, 2026, 17:41:02 UTC+01:00, 52.393850°N, 0.270830°E, Water Reflection, Waterfront, Waterway, Aquatic Bird, Architecture, Boat, Nature, Wildlife, Scenic View, Peaceful Scene, Calm Waters, Serene Environment, Outdoor Activity, Water Sports, Bird Watching, Wildlife Photography, Nature Photography, Scenic Photography, Landscape Photography, Riverbank, Riverbank Scene, Riverbank View, Riverbank Photography, Riverbank Landscape, Riverbank Nature, Riverbank Wildlife, Riverbank Scenic, Riverbank Peaceful, Riverbank Calm, Riverbank Serene, Riverbank Outdoor, Riverbank Water Sports, Riverbank Bird Watching, Riverbank Wildlife Photography, Riverbank Nature Photography, Riverbank Scenic Photography, Riverbank Landscape Photography, Riverbank Riverbank Scene, Riverbank Riverbank View, Riverbank Riverbank Photography, Riverbank Riverbank Landscape, Riverbank Riverbank Nature, Riverbank Riverbank Wildlife, Riverbank Riverbank Scenic, Riverbank Riverbank Peaceful, Riverbank Riverbank Calm, Riverbank Riverbank Serene, Riverbank Riverbank Outdoor, Riverbank Riverbank Water Sports, Riverbank Riverbank Bird Watching, Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Nature Photography, Riverbank Riverbank Scenic Photography, Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Landscape, Riverbank Riverbank Riverbank Riverbank Riverbank Nature, Riverbank Riverbank Riverbank Riverbank Riverbank Wildlife, Riverbank Riverbank Riverbank Riverbank Riverbank Scenic, Riverbank Riverbank Riverbank Riverbank Riverbank Peaceful, Riverbank Riverbank Riverbank Riverbank Riverbank Calm, Riverbank Riverbank Riverbank Riverbank Riverbank Serene, Riverbank Riverbank Riverbank Riverbank Riverbank Outdoor, Riverbank Riverbank Riverbank Riverbank Riverbank Water Sports, Riverbank Riverbank Riverbank Riverbank Riverbank Bird Watching, Riverbank Riverbank Riverbank Riverbank Riverbank Wildlife Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Nature Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Scenic Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Landscape Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Scene, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank View, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Photography, Riverbank Riverbank Riverbank Riverbank Riverbank Riverbank Landscape
+Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser, GBR, 1067, 188572, Sail, Boat, Water, Trees, Clouds, Sky, Blue, Green, Woodland, Nature, Outdoor, Recreation, Sport, Activity, Adventure, Fun, Relaxation, Peaceful, Calm, Serene, Scenic, Breathtaking, Beautiful, Picturesque, Idyllic, Tranquil, Soothing, Uplifting, Inspiring, Motivational, Encouraging, Empowering, Confidence-Boosting, Self-Improvement, Personal-Growth, Development, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, En
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Internal reasoning block appears incomplete
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.94s
+- *Generation time:* 1.30s
+- *Total time:* 2.95s
+- *Prompt preparation time:* 0.701
+- *First-token latency:* 0.353
+- *Cleanup time:* 0.0914
+- *Prompt tokens:* 934
+- *Generation tokens:* 84
+- *Total tokens:* 1,018
+- *Prompt throughput (raw):* 2,645 tok/s
+- *Generation throughput (raw):* 308 tok/s
+- *Peak memory (GB):* 3.3
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00438
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1374
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "repetition_context_size": 20, "repetition_penalty": 1.0, "seed": 0,
+  "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+Here's the response following the instructions:
+
+Title: Sailing vessels on calm waters
+
+Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest in the background.
+
+Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<think>
+Here's the response following the instructions:
+
+Title: Sailing vessels on calm waters
+
+Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest in the background.
+
+Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
+
+### mlx-community/Molmo2-8B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Generation was stopped early after sustained repeated
+  output; Duplicate keywords: blue stripes, white boat, blue canopy, white
+  hull
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.05s
+- *Generation time:* 5.31s
+- *Total time:* 7.05s
+- *Prompt preparation time:* 0.676
+- *First-token latency:* 1.6
+- *Cleanup time:* 0.0859
+- *Prompt tokens:* 1,526
+- *Generation tokens:* 225
+- *Total tokens:* 1,751
+- *Prompt throughput (raw):* 956 tok/s
+- *Generation throughput (raw):* 73.0 tok/s
+- *Peak memory (GB):* 8.1
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 1.8
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.00552
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1344
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Catamaran and Laser Dinghy Sail on Calm River
+
+Description: Two sailors navigate small dinghies across a tranquil river, with a Vortex catamaran on the left and a Laser dinghy on the right. The scene features calm waters, dense green woodland, and a clear blue sky with scattered clouds.
+
+Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Sail number, Vortex, Calm waters, Dense woodland, Clear sky, Scattered clouds, Small dinghies, Two sailors, White hulls, Blue life jackets, White sails, Orange stripes, White text, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull,
 </pre>
 
 </details>
@@ -2671,29 +2655,31 @@ Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential B
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Response appears cut off at the token limit
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible; Required
+  labelled fields not detected: title, description; Response appears cut off
+  at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.25s
-- *Generation time:* 49.12s
-- *Total time:* 53.04s
-- *Prompt preparation time:* 0.664
-- *First-token latency:* 7.3
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 4,403
+- *Model load time:* 2.91s
+- *Generation time:* 51.06s
+- *Total time:* 54.66s
+- *Prompt preparation time:* 0.681
+- *First-token latency:* 9.1
+- *Cleanup time:* 0.12
+- *Prompt tokens:* 4,409
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,403
-- *Prompt throughput (raw):* 603 tok/s
-- *Generation throughput (raw):* 24.3 tok/s
+- *Total tokens:* 5,409
+- *Prompt throughput (raw):* 484 tok/s
+- *Generation throughput (raw):* 24.2 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.0059
+- *Post-cleanup active memory (GB):* 0.00593
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1570
+- *Rendered prompt characters:* 1544
 - *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2706,67 +2692,205 @@ Keywords: River, White Swan, Lush Greenery, Moored Boats, Riversid Residential B
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Mute Swan on River with Moored Boats
+ to=self&lt;|message|&gt;Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+
+Descriptive hints:
+- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
+- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
 Description:
-Captured on 2026-09-12 17:41:02 BST at 52.393850°N, 0.270830°E, a mute swan swims on calm water that reflects moored motor cruisers and riverside apartments. The scene shows boats including ‘Samar II’ and ‘Magna Carta’ with red and blue covers at a wooden pier beneath a brown-brick apartment block with balconies, framed by overhanging tree branches and foreground foliage in soft daylight.
-Keywords: mute swan, river
+Keywords:
+
+Need title 5-10 words. Let's craft: "Two Sailors on Vortex Catamaran and Laser Dinghy" That's 8 words? Two(1) Sailors2 on3 Vortex4 Catamaran5 and6 Laser7 Dinghy8. Good.
+
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can mention captured on 2026-09-19 17:12:46 UTC+01:00? Might be okay to include. Probably include date.
+
+We need combine relevant context with main visible subject, setting, action, lighting, distinctive details.
+
+Image shows two small sailboats on water. Left is Vortex with sail number 1067, grey sail with orange stripes, hull orange/white. Sailor wearing blue top and red life jacket standing. Right is Laser with sail number 188572 GBR, white sail with blue corners, red sunburst logo. Sailor sitting wearing black jacket and life jacket. Background dense green trees, shoreline, partly cloudy sky. Another boat in background: white boat with blue cover and mast. Also a small white boat with blue trim mid background, buoy.
+
+Lighting is daylight, overcast partly.
+
+Make description 1-2 sentences.
+
+Maybe: On 2026-09-19 at 17:12:46 UTC+01:00, a Vortex catamaran sail number 1067 and a Laser dinghy sail number GBR 188572 sail on calm water with wooded shoreline and partly cloudy sky behind them; the Vortex sailor stands at the helm in a life jacket while the Laser sailor sits. That's one sentence maybe long.
+
+Need British English. Use "behaviour"? Okay.
+
+Keywords: 10-18 unique comma-separated. Use hints but correct. Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+
+We need unique. Possibly include Vortex catamaran, sail number, etc. But keywords list likely generic.
+
+Make 15 keywords.
+
+Let's produce:
+
+Title:
+Two Sailors on Vortex Catamaran and Laser Dinghy
+
+Description:
+Captured on 2026-09-19 17:12:46 UTC+01:00, a Vortex catamaran numbered 1067 and a Laser dinghy numbered GBR 188572 are under sail on calm water with a wooded shoreline and partly cloudy sky beyond; the Vortex sailor stands wearing a life jacket at the helm while the Laser sailor sits in the cockpit, with additional moored vessels in the background.
+
+Keywords: sailboat, sailing, dinghy, catamaran, Vortex, Laser dinghy, sailor, life jacket, water, shoreline, trees, forest, sky, clouds, outdoor recreation
+
+That's 15.
+
+Ensure format exactly:
+
+Title:
+Description:
+Keywords:
+
+Return exactly these three sections and nothing else.
+
+Make sure Title is 5-10 words. Ours is 8.
+
+Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to semicolon? Might be okay. Could make one sentence. Let's keep as one sentence maybe with
 </pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ to=self<|message|>Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+
+Descriptive hints:
+- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
+- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:
+
+Need title 5-10 words. Let's craft: "Two Sailors on Vortex Catamaran and Laser Dinghy" That's 8 words? Two(1) Sailors2 on3 Vortex4 Catamaran5 and6 Laser7 Dinghy8. Good.
+
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can mention captured on 2026-09-19 17:12:46 UTC+01:00? Might be okay to include. Probably include date.
+
+We need combine relevant context with main visible subject, setting, action, lighting, distinctive details.
+
+Image shows two small sailboats on water. Left is Vortex with sail number 1067, grey sail with orange stripes, hull orange/white. Sailor wearing blue top and red life jacket standing. Right is Laser with sail number 188572 GBR, white sail with blue corners, red sunburst logo. Sailor sitting wearing black jacket and life jacket. Background dense green trees, shoreline, partly cloudy sky. Another boat in background: white boat with blue cover and mast. Also a small white boat with blue trim mid background, buoy.
+
+Lighting is daylight, overcast partly.
+
+Make description 1-2 sentences.
+
+Maybe: On 2026-09-19 at 17:12:46 UTC+01:00, a Vortex catamaran sail number 1067 and a Laser dinghy sail number GBR 188572 sail on calm water with wooded shoreline and partly cloudy sky behind them; the Vortex sailor stands at the helm in a life jacket while the Laser sailor sits. That's one sentence maybe long.
+
+Need British English. Use "behaviour"? Okay.
+
+Keywords: 10-18 unique comma-separated. Use hints but correct. Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+
+We need unique. Possibly include Vortex catamaran, sail number, etc. But keywords list likely generic.
+
+Make 15 keywords.
+
+Let's produce:
+
+Title:
+Two Sailors on Vortex Catamaran and Laser Dinghy
+
+Description:
+Captured on 2026-09-19 17:12:46 UTC+01:00, a Vortex catamaran numbered 1067 and a Laser dinghy numbered GBR 188572 are under sail on calm water with a wooded shoreline and partly cloudy sky beyond; the Vortex sailor stands wearing a life jacket at the helm while the Laser sailor sits in the cockpit, with additional moored vessels in the background.
+
+Keywords: sailboat, sailing, dinghy, catamaran, Vortex, Laser dinghy, sailor, life jacket, water, shoreline, trees, forest, sky, clouds, outdoor recreation
+
+That's 15.
+
+Ensure format exactly:
+
+Title:
+Description:
+Keywords:
+
+Return exactly these three sections and nothing else.
+
+Make sure Title is 5-10 words. Ours is 8.
+
+Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to semicolon? Might be okay. Could make one sentence. Let's keep as one sentence maybe with
+```
+
+</details>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit"></a>
+<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
 
-### mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit
+### mlx-community/Qwen2-VL-7B-Instruct-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit</summary>
+<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Duplicate keywords: wildlife, animal, bird
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.95s
-- *Generation time:* 38.39s
-- *Total time:* 41.31s
-- *Prompt preparation time:* 0.969
-- *First-token latency:* 34.9
-- *Cleanup time:* 0.137
-- *Prompt tokens:* 16,547
-- *Generation tokens:* 200
-- *Total tokens:* 16,747
-- *Prompt throughput (raw):* 475 tok/s
-- *Generation throughput (raw):* 74.7 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 4.0
-- *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00793
+- *Observations:* Response repeats the same text; Generation was stopped early
+  after sustained repeated output; Duplicate keywords: trees, forest, mast,
+  life jacket, river, estuary, sky, shoreline, sail, boat, boating
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.76s
+- *Generation time:* 41.51s
+- *Total time:* 43.19s
+- *Prompt preparation time:* 0.918
+- *First-token latency:* 38.2
+- *Cleanup time:* 0.099
+- *Prompt tokens:* 16,560
+- *Generation tokens:* 225
+- *Total tokens:* 16,785
+- *Prompt throughput (raw):* 434 tok/s
+- *Generation throughput (raw):* 91.2 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 4.7
+- *Cache memory (GB):* 2.4
+- *Model-load active memory (GB):* 4.68
+- *Post-cleanup active memory (GB):* 0.00734
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1404
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Rendered prompt characters:* 1436
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 0555d34cb1ed80c0e61a5635194c70027b4c2ff3
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen3-VL-30B-A3B-Instruct-4bit/snapshots/0555d34cb1ed80c0e61a5635194c70027b4c2ff3
+- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "repetition_context_size": 20, "repetition_penalty": 1.0, "seed": 0,
-  "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Solitary swan on a calm river with moored boats
-Description: A white swan glides across the calm waters of a river, framed by green foliage in the foreground. In the background, a row of moored motorboats and cruisers are docked beside a residential building with balconies, under a soft, overcast sky.
-Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony, trees, foliage, greenery, water, reflection, calm, wildlife, waterfowl, aquatic bird, architecture, canal, waterfront, marina, pier, waterway, leisure, nature, outdoor, serene, tranquil, peaceful, dusk, evening, overcast, cloudy, landscape, scene, view, perspective, foreground, background, composition, natural, wildlife, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal, bird, animal,
+Title: Sailing Adventure
+
+Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm waters, with dense green woodland in the background.
+
+Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, Forest, Woodland, Adventure, Outdoor, Action, Sailboat, Mast, Life jacket, River, Estuary, Sky, Clouds, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat,
 </pre>
 
 </details>
@@ -2789,16 +2913,16 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
 - *Model load time:* 0.34s
-- *Generation time:* 1.02s
-- *Total time:* 2.21s
-- *Prompt preparation time:* 0.84
-- *First-token latency:* 0.122
-- *Cleanup time:* 0.0747
-- *Prompt tokens:* 1,205
-- *Generation tokens:* 33
-- *Total tokens:* 1,238
-- *Prompt throughput (raw):* 9,864 tok/s
-- *Generation throughput (raw):* 320 tok/s
+- *Generation time:* 1.11s
+- *Total time:* 2.34s
+- *Prompt preparation time:* 0.892
+- *First-token latency:* 0.209
+- *Cleanup time:* 0.0888
+- *Prompt tokens:* 1,212
+- *Generation tokens:* 38
+- *Total tokens:* 1,250
+- *Prompt throughput (raw):* 5,790 tok/s
+- *Generation throughput (raw):* 545 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -2807,7 +2931,7 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1364
+- *Rendered prompt characters:* 1338
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2821,7 +2945,68 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 *Readable output:*
 
 <pre class="model-output-readable">
- A solitary white swan gliding across calm river waters framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background.
+ A 5-10-word, 1-2-sentence, factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Generation was stopped early after sustained repeated
+  output; Duplicate keywords: blue and white forest, blue and white sky, blue
+  and white water, blue and white sail
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.17s
+- *Generation time:* 17.00s
+- *Total time:* 20.22s
+- *Prompt preparation time:* 2.04
+- *First-token latency:* 11.8
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 16,560
+- *Generation tokens:* 250
+- *Total tokens:* 16,810
+- *Prompt throughput (raw):* 1,405 tok/s
+- *Generation throughput (raw):* 57.2 tok/s
+- *Peak memory (GB):* 14
+- *Active memory (GB):* 9.5
+- *Cache memory (GB):* 2.4
+- *Model-load active memory (GB):* 9.46
+- *Post-cleanup active memory (GB):* 0.0109
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* repetition_abort
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1436
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Sailing Catamaran and Laser Dinghy on Calm Waters
+
+Description:
+Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across tranquil waters, set against a backdrop of dense green woodland under a partly cloudy sky.
+
+Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Calm waters, Distant shoreline, Forest, Cloudy sky, Life jackets, Outdoor recreation, River, Shoreline, Trees, Water, Man, Mast, Sunburst logo, Blue and white sails, Orange and black sail, Blue and white catamaran, White Laser dinghy, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail,
 </pre>
 
 </details>
@@ -2843,18 +3028,18 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.78s
-- *Generation time:* 2.07s
-- *Total time:* 4.43s
-- *Prompt preparation time:* 0.551
-- *First-token latency:* 0.302
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 589
-- *Generation tokens:* 88
-- *Total tokens:* 677
-- *Prompt throughput (raw):* 1,952 tok/s
-- *Generation throughput (raw):* 71.0 tok/s
-- *Peak memory (GB):* 7.2
+- *Model load time:* 1.76s
+- *Generation time:* 3.50s
+- *Total time:* 5.86s
+- *Prompt preparation time:* 0.588
+- *First-token latency:* 0.674
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 590
+- *Generation tokens:* 196
+- *Total tokens:* 786
+- *Prompt throughput (raw):* 875 tok/s
+- *Generation throughput (raw):* 86.1 tok/s
+- *Peak memory (GB):* 7.0
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
@@ -2862,7 +3047,7 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1389
+- *Rendered prompt characters:* 1363
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2876,7 +3061,62 @@ Keywords: swan, river, boats, mooring, motorboat, residential, building, balcony
 *Readable output:*
 
 <pre class="model-output-readable">
-A serene scene unfolds on a calm river, where a graceful swan glides across the water. Several boats, including motorboats and sailboats, are moored along the riverbank, nestled beneath a row of residential buildings. Lush greenery frames the scene, with trees and bushes lining the riverbanks, adding a touch of nature to the urban setting. The overall atmosphere is peaceful and tranquil, capturing a moment of calm in a waterside community.
+Two sailors are engaged in a sailing competition on a calm body of water, likely an estuary or a sheltered bay, surrounded by lush green vegetation. On the left, a vibrant orange and white catamaran, identified by the sail number 1067 and the name "VORTEX," is being steered by a person wearing a blue jacket and dark pants. The catamaran has a grey and orange striped sail with the sail number prominently displayed. On the right, a white and blue Laser dinghy, bearing the sail number GBR 188572, is being sailed by a person in a dark jacket and dark pants. The Laser has a white sail with a red logo and the British flag. Both boats are relatively close to each other, suggesting a close race. The water is calm, reflecting the boats and the surrounding greenery. The sky is partly cloudy, providing ample daylight for the sailing activity. The overall scene depicts a competitive yet serene sporting event.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-granite-vision-32-2b-nvfp4"></a>
+
+### mlx-community/granite-vision-3.2-2b-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/granite-vision-3.2-2b-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* major concerns
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
+- *Model load time:* 0.41s
+- *Generation time:* 3.19s
+- *Total time:* 4.43s
+- *Prompt preparation time:* 0.831
+- *First-token latency:* 1.71
+- *Cleanup time:* 0.0894
+- *Prompt tokens:* 5,581
+- *Generation tokens:* 102
+- *Total tokens:* 5,683
+- *Prompt throughput (raw):* 3,258 tok/s
+- *Generation throughput (raw):* 149 tok/s
+- *Peak memory (GB):* 4.2
+- *Active memory (GB):* 2.4
+- *Cache memory (GB):* 0.94
+- *Model-load active memory (GB):* 2.36
+- *Post-cleanup active memory (GB):* 0.015
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1483
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--granite-vision-3.2-2b-nvfp4/snapshots/f0c70965cdae87ebf38e84ff958e841ad943e8e6
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Harmony on the Water"
+Description: Two sailors navigate their small dinghies, a Vortex catamaran and a Laser dinghy, across calm waters, with a dense green woodland backdrop. The scene is set in an estuary, with a clear sky overhead. The sailors are equipped with life jackets, and the boats are moored in a serene, outdoor recreational setting.
 </pre>
 
 </details>
@@ -2895,30 +3135,29 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Unrecognised model control tokens remain
-  visible; Required labelled fields not detected: title, description, keywords
+- *Observations:* Unrecognised model control tokens remain visible; Required
+  labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.12s
-- *Generation time:* 3.47s
-- *Total time:* 5.26s
-- *Prompt preparation time:* 0.665
-- *First-token latency:* 0.877
-- *Cleanup time:* 0.169
-- *Prompt tokens:* 2,195
-- *Generation tokens:* 200
-- *Total tokens:* 2,395
-- *Prompt throughput (raw):* 2,504 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Model load time:* 1.10s
+- *Generation time:* 1.68s
+- *Total time:* 3.47s
+- *Prompt preparation time:* 0.692
+- *First-token latency:* 0.859
+- *Cleanup time:* 0.161
+- *Prompt tokens:* 2,197
+- *Generation tokens:* 16
+- *Total tokens:* 2,213
+- *Prompt throughput (raw):* 2,559 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
-- *Cache memory (GB):* 0.70
+- *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.7
-- *Post-cleanup active memory (GB):* 0.0152
+- *Post-cleanup active memory (GB):* 0.0154
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1591
+- *Rendered prompt characters:* 1565
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2932,14 +3171,14 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows two small sailboats racing on a river.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white swan swimming in a river with a white
+<|channel|> analysis<|message|> The image shows two small sailboats racing on a river.
 ```
 
 </details>
@@ -2964,26 +3203,26 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.59s
-- *Generation time:* 1.14s
-- *Total time:* 2.34s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 0.0877
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 330
-- *Generation tokens:* 92
-- *Total tokens:* 422
-- *Prompt throughput (raw):* 3,762 tok/s
-- *Generation throughput (raw):* 193 tok/s
-- *Peak memory (GB):* 1.8
+- *Model load time:* 0.50s
+- *Generation time:* 0.82s
+- *Total time:* 1.97s
+- *Prompt preparation time:* 0.64
+- *First-token latency:* 0.17
+- *Cleanup time:* 0.0973
+- *Prompt tokens:* 332
+- *Generation tokens:* 21
+- *Total tokens:* 353
+- *Prompt throughput (raw):* 1,956 tok/s
+- *Generation throughput (raw):* 341 tok/s
+- *Peak memory (GB):* 1.6
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.28
+- *Cache memory (GB):* 0.30
 - *Model-load active memory (GB):* 0.614
-- *Post-cleanup active memory (GB):* 0.0158
+- *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1418
+- *Rendered prompt characters:* 1392
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2997,62 +3236,7 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 *Readable output:*
 
 <pre class="model-output-readable">
-"Amidst the Riverbank, a solitary white swan glides gracefully across calm waters, framed by lush foliage, with leisure boats and cruisers moored alongside riverside residential buildings in the background. The serene setting is complemented by the presence of greenery, architecture, and waterfowl, all under the watchful gaze of the canal. The image captures the essence of a peaceful riverside community, where nature and human life intersect."
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-paligemma2-10b-mix-448-4bit"></a>
-
-### mlx-community/paligemma2-10b-mix-448-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/paligemma2-10b-mix-448-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: title, description,
-  keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type paligemma)
-- *Model load time:* 1.62s
-- *Generation time:* 1.70s
-- *Total time:* 4.02s
-- *Prompt preparation time:* 0.688
-- *First-token latency:* 0.911
-- *Cleanup time:* 0.137
-- *Prompt tokens:* 1,344
-- *Generation tokens:* 7
-- *Total tokens:* 1,351
-- *Prompt throughput (raw):* 1,475 tok/s
-- *Generation throughput (raw):* 36.5 tok/s
-- *Peak memory (GB):* 9.7
-- *Active memory (GB):* 6.0
-- *Cache memory (GB):* 1.8
-- *Model-load active memory (GB):* 6.05
-- *Post-cleanup active memory (GB):* 0.0169
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1318
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* c5f440f2179e48eb7c3266b874ec3625869c3620
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-mix-448-4bit/snapshots/c5f440f2179e48eb7c3266b874ec3625869c3620
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-- title, description, keywords
+"Boating in the Countryside: A Glimpse of Sailboats and Forests"
 </pre>
 
 </details>
@@ -3084,12 +3268,12 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Root exception message:* Model type internvl not supported. Error: No
   module named 'mlx_vlm.speculative.drafters.internvl'
 - *Arch supported by installed mlx-vlm:* no (model_type internvl)
-- *Model load time:* 0.16s
+- *Model load time:* 0.17s
 - *Generation time:* -
-- *Total time:* 0.16s
+- *Total time:* 0.17s
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0649
+- *Cleanup time:* 0.0817
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3099,7 +3283,7 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00212
+- *Post-cleanup active memory (GB):* 0.00243
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
@@ -3116,10 +3300,10 @@ A serene scene unfolds on a calm river, where a graceful swan glides across the 
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14470, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13427, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -3129,7 +3313,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 842, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -3151,7 +3335,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15569, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3162,7 +3346,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14485, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -3172,9 +3356,13 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 4711.94it/s]
-ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+Fetching 14 files: 100%|##########| 14/14 [00:00<00:00, 2276.51it/s]
+Download complete:           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B                         ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
+[22:08:20] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 </details>
@@ -3207,12 +3395,12 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Root exception message:* cu_seqlens mismatch: total_patches=7600
   calculated=3800 grid=[(1, 50, 76)]
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.84s
-- *Generation time:* 0.64s
-- *Total time:* 2.13s
-- *Prompt preparation time:* 0.646
+- *Model load time:* 0.81s
+- *Generation time:* 1.72s
+- *Total time:* 3.21s
+- *Prompt preparation time:* 0.677
 - *First-token latency:* -
-- *Cleanup time:* 0.0932
+- *Cleanup time:* 0.13
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -3222,11 +3410,11 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Active memory (GB):* -
 - *Cache memory (GB):* -
 - *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00408
+- *Post-cleanup active memory (GB):* 0.00387
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* exception
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1462
+- *Rendered prompt characters:* 1436
 - *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -3240,15 +3428,15 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13761, in _run_generation_guarded
     return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in _generate_once
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14392, in _generate_once
     return _generate_with_repetition_guard(
         model=prepared.model,
-    ...<5 lines>...
+    ...<6 lines>...
         **prepared.generate_kwargs,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in _generate_with_repetition_guard
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14296, in _generate_with_repetition_guard
     for chunk in stream_generate(
                  ~~~~~~~~~~~~~~~^
         model=model, processor=processor, prompt=prompt, image=image, **kwargs
@@ -3258,7 +3446,7 @@ Traceback (most recent call last):
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1083, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 434, in generate_step
+  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 424, in generate_step
     embedding_output = model.get_input_embeddings(
         input_ids, pixel_values, mask=mask, **kwargs
     )
@@ -3277,7 +3465,7 @@ ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15569, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -3288,7 +3476,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14484, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14497, in _run_model_generation
     output, duration = _execute_prepared_generation(
                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         params,
@@ -3298,12 +3486,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14400, in _execute_prepared_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14413, in _execute_prepared_generation
     output = _run_generation_guarded(
         params=params,
         generate_once=_generate_once,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13712, in _run_generation_guarded
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13770, in _run_generation_guarded
     raise _tag_exception_failure_phase(
         ValueError(msg), _generation_failure_phase(gen_known_err)
     ) from gen_known_err
@@ -3315,1633 +3503,18 @@ ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seq
 
 ```text
 === STDERR ===
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 3074.10it/s]
-[23:33:20] Generation error for mlx-community/Mage-VL-OptiQ-4bit
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13703, in
-           _run_generation_guarded
-               return generate_once()
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14380, in
-           _generate_once
-               return _generate_with_repetition_guard(
-                   model=prepared.model,
-               ...<5 lines>...
-                   **prepared.generate_kwargs,
-               )
-             File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14275, in
-           _generate_with_repetition_guard
-               for chunk in stream_generate(
-                            ~~~~~~~~~~~~~~~^
-                   model=model, processor=processor, prompt=prompt, image=image, **kwargs
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-               ):
-               ^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1083, in
-           stream_generate
-               for n, (token, logprobs) in enumerate(gen):
-                                           ~~~~~~~~~^^^^^
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 434, in
-           generate_step
-               embedding_output = model.get_input_embeddings(
-                   input_ids, pixel_values, mask=mask, **kwargs
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/mage_vl.py", line 66,
-           in get_input_embeddings
-               hidden_states = self.vision_tower(
-                   pixel_values.astype(inputs_embeds.dtype), patch_positions, grid_thw
-               )
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 381,
-           in __call__
-               cu = build_cu_seqlens(grid_thw, total_patches, self.config.frame_windows_size)
-             File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 309,
-           in build_cu_seqlens
-               raise ValueError(
-                   f"cu_seqlens mismatch: total_patches={total_patches} calculated={cu[-1]}
-           grid={grid_thw}"
-               )
-           ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
-```
-
-</details>
-
----
-
-<a id="model-mlx-community-nvidia-nemotron-3-nano-omni-30b-a3b-4bit"></a>
-
-### mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Model Error
-- *Error code:* MLX_VLM_MODEL_LOAD_MODEL
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Received 729 parameters not in model:
-  <br>backbone.embeddings.biases,<br>backbone.embeddings.scales,<br>backbone.embeddings.weight,<br>backbone.layers.0.mixer.A_log,<br>backbone.layers.0.mixer.D,<br>backbone.layers.0.mixer.conv1d.bias,<br>backbone.layers.0.mixer.conv1d.weight,<br>backbone.layers.0.mixer.dt_bias,<br>backbone.layers.0.mixer.in_proj.biases,<br>backbone.layers.0.mixer.in_proj.scales,<br>backbone.layers.0.mixer.in_proj.weight,<br>backbone.layers.0.mixer.norm.weight,<br>backbone.layers.0.mixer.out_proj.biases,<br>backbone.layers.0.mixer.out_proj.scales,<br>backbone.layers.0.mixer.out_proj.weight,<br>backbone.layers.0.norm.weight,<br>backbone.layers.1.mixer.gate.e_score_correction_bias,<br>backbone.layers.1.mixer.gate.weight,<br>backbone.layers.1.mixer.shared_experts.down_proj.biases,<br>backbone.layers.1.mixer.shared_experts.down_proj.scales,<br>backbone.layers.1.mixer.shared_experts.down_proj.weight,<br>backbone.layers.1.mixer.shared_experts.up_proj.biases,<br>backbone.layers.1.mixer.shared_experts.up_proj.scales,<br>backbone.layers.1.mixer.shared_experts.up_proj.weight,<br>backbone.layers.1.mixer.switch_mlp.fc1.biases,<br>backbone.layers.1.mixer.switch_mlp.fc1.scales,<br>backbone.layers.1.mixer.switch_mlp.fc1.weight,<br>backbone.layers.1.mixer.switch_mlp.fc2.biases,<br>backbone.layers.1.mixer.switch_mlp.fc2.scales,<br>backbone.layers.1.mixer.switch_mlp.fc2.weight,<br>backbone.layers.1.norm.weight,<br>backbone.layers.10.mixer.gate.e_score_correction_bias,<br>backbone.layers.10.mixer.gate.weight,<br>backbone.layers.10.mixer.shared_experts.down_proj.biases,<br>backbone.layers.10.mixer.shared_experts.down_proj.scales,<br>backbone.layers.10.mixer.shared_experts.down_proj.weight,<br>backbone.layers.10.mixer.shared_experts.up_proj.biases,<br>backbone.layers.10.mixer.shared_experts.up_proj.scales,<br>backbone.layers.10.mixer.shared_experts.up_proj.weight,<br>backbone.layers.10.mixer.switch_mlp.fc1.biases,<br>backbone.layers.10.mixer.switch_mlp.fc1.scales,<br>backbone.layers.10.mixer.switch_mlp.fc1.weight,<br>backbone.layers.10.mixer.switch_mlp.fc2.biases,<br>backbone.layers.10.mixer.switch_mlp.fc2.scales,<br>backbone.layers.10.mixer.switch_mlp.fc2.weight,<br>backbone.layers.10.norm.weight,<br>backbone.layers.11.mixer.A_log,<br>backbone.layers.11.mixer.D,<br>backbone.layers.11.mixer.conv1d.bias,<br>backbone.layers.11.mixer.conv1d.weight,<br>backbone.layers.11.mixer.dt_bias,<br>backbone.layers.11.mixer.in_proj.biases,<br>backbone.layers.11.mixer.in_proj.scales,<br>backbone.layers.11.mixer.in_proj.weight,<br>backbone.layers.11.mixer.norm.weight,<br>backbone.layers.11.mixer.out_proj.biases,<br>backbone.layers.11.mixer.out_proj.scales,<br>backbone.layers.11.mixer.out_proj.weight,<br>backbone.layers.11.norm.weight,<br>backbone.layers.12.mixer.k_proj.biases,<br>backbone.layers.12.mixer.k_proj.scales,<br>backbone.layers.12.mixer.k_proj.weight,<br>backbone.layers.12.mixer.o_proj.biases,<br>backbone.layers.12.mixer.o_proj.scales,<br>backbone.layers.12.mixer.o_proj.weight,<br>backbone.layers.12.mixer.q_proj.biases,<br>backbone.layers.12.mixer.q_proj.scales,<br>backbone.layers.12.mixer.q_proj.weight,<br>backbone.layers.12.mixer.v_proj.biases,<br>backbone.layers.12.mixer.v_proj.scales,<br>backbone.layers.12.mixer.v_proj.weight,<br>backbone.layers.12.norm.weight,<br>backbone.layers.13.mixer.gate.e_score_correction_bias,<br>backbone.layers.13.mixer.gate.weight,<br>backbone.layers.13.mixer.shared_experts.down_proj.biases,<br>backbone.layers.13.mixer.shared_experts.down_proj.scales,<br>backbone.layers.13.mixer.shared_experts.down_proj.weight,<br>backbone.layers.13.mixer.shared_experts.up_proj.biases,<br>backbone.layers.13.mixer.shared_experts.up_proj.scales,<br>backbone.layers.13.mixer.shared_experts.up_proj.weight,<br>backbone.layers.13.mixer.switch_mlp.fc1.biases,<br>backbone.layers.13.mixer.switch_mlp.fc1.scales,<br>backbone.layers.13.mixer.switch_mlp.fc1.weight,<br>backbone.layers.13.mixer.switch_mlp.fc2.biases,<br>backbone.layers.13.mixer.switch_mlp.fc2.scales,<br>backbone.layers.13.mixer.switch_mlp.fc2.weight,<br>backbone.layers.13.norm.weight,<br>backbone.layers.14.mixer.A_log,<br>backbone.layers.14.mixer.D,<br>backbone.layers.14.mixer.conv1d.bias,<br>backbone.layers.14.mixer.conv1d.weight,<br>backbone.layers.14.mixer.dt_bias,<br>backbone.layers.14.mixer.in_proj.biases,<br>backbone.layers.14.mixer.in_proj.scales,<br>backbone.layers.14.mixer.in_proj.weight,<br>backbone.layers.14.mixer.norm.weight,<br>backbone.layers.14.mixer.out_proj.biases,<br>backbone.layers.14.mixer.out_proj.scales,<br>backbone.layers.14.mixer.out_proj.weight,<br>backbone.layers.14.norm.weight,<br>backbone.layers.15.mixer.gate.e_score_correction_bias,<br>backbone.layers.15.mixer.gate.weight,<br>backbone.layers.15.mixer.shared_experts.down_proj.biases,<br>backbone.layers.15.mixer.shared_experts.down_proj.scales,<br>backbone.layers.15.mixer.shared_experts.down_proj.weight,<br>backbone.layers.15.mixer.shared_experts.up_proj.biases,<br>backbone.layers.15.mixer.shared_experts.up_proj.scales,<br>backbone.layers.15.mixer.shared_experts.up_proj.weight,<br>backbone.layers.15.mixer.switch_mlp.fc1.biases,<br>backbone.layers.15.mixer.switch_mlp.fc1.scales,<br>backbone.layers.15.mixer.switch_mlp.fc1.weight,<br>backbone.layers.15.mixer.switch_mlp.fc2.biases,<br>backbone.layers.15.mixer.switch_mlp.fc2.scales,<br>backbone.layers.15.mixer.switch_mlp.fc2.weight,<br>backbone.layers.15.norm.weight,<br>backbone.layers.16.mixer.A_log,<br>backbone.layers.16.mixer.D,<br>backbone.layers.16.mixer.conv1d.bias,<br>backbone.layers.16.mixer.conv1d.weight,<br>backbone.layers.16.mixer.dt_bias,<br>backbone.layers.16.mixer.in_proj.biases,<br>backbone.layers.16.mixer.in_proj.scales,<br>backbone.layers.16.mixer.in_proj.weight,<br>backbone.layers.16.mixer.norm.weight,<br>backbone.layers.16.mixer.out_proj.biases,<br>backbone.layers.16.mixer.out_proj.scales,<br>backbone.layers.16.mixer.out_proj.weight,<br>backbone.layers.16.norm.weight,<br>backbone.layers.17.mixer.gate.e_score_correction_bias,<br>backbone.layers.17.mixer.gate.weight,<br>backbone.layers.17.mixer.shared_experts.down_proj.biases,<br>backbone.layers.17.mixer.shared_experts.down_proj.scales,<br>backbone.layers.17.mixer.shared_experts.down_proj.weight,<br>backbone.layers.17.mixer.shared_experts.up_proj.biases,<br>backbone.layers.17.mixer.shared_experts.up_proj.scales,<br>backbone.layers.17.mixer.shared_experts.up_proj.weight,<br>backbone.layers.17.mixer.switch_mlp.fc1.biases,<br>backbone.layers.17.mixer.switch_mlp.fc1.scales,<br>backbone.layers.17.mixer.switch_mlp.fc1.weight,<br>backbone.layers.17.mixer.switch_mlp.fc2.biases,<br>backbone.layers.17.mixer.switch_mlp.fc2.scales,<br>backbone.layers.17.mixer.switch_mlp.fc2.weight,<br>backbone.layers.17.norm.weight,<br>backbone.layers.18.mixer.A_log,<br>backbone.layers.18.mixer.D,<br>backbone.layers.18.mixer.conv1d.bias,<br>backbone.layers.18.mixer.conv1d.weight,<br>backbone.layers.18.mixer.dt_bias,<br>backbone.layers.18.mixer.in_proj.biases,<br>backbone.layers.18.mixer.in_proj.scales,<br>backbone.layers.18.mixer.in_proj.weight,<br>backbone.layers.18.mixer.norm.weight,<br>backbone.layers.18.mixer.out_proj.biases,<br>backbone.layers.18.mixer.out_proj.scales,<br>backbone.layers.18.mixer.out_proj.weight,<br>backbone.layers.18.norm.weight,<br>backbone.layers.19.mixer.k_proj.biases,<br>backbone.layers.19.mixer.k_proj.scales,<br>backbone.layers.19.mixer.k_proj.weight,<br>backbone.layers.19.mixer.o_proj.biases,<br>backbone.layers.19.mixer.o_proj.scales,<br>backbone.layers.19.mixer.o_proj.weight,<br>backbone.layers.19.mixer.q_proj.biases,<br>backbone.layers.19.mixer.q_proj.scales,<br>backbone.layers.19.mixer.q_proj.weight,<br>backbone.layers.19.mixer.v_proj.biases,<br>backbone.layers.19.mixer.v_proj.scales,<br>backbone.layers.19.mixer.v_proj.weight,<br>backbone.layers.19.norm.weight,<br>backbone.layers.2.mixer.A_log,<br>backbone.layers.2.mixer.D,<br>backbone.layers.2.mixer.conv1d.bias,<br>backbone.layers.2.mixer.conv1d.weight,<br>backbone.layers.2.mixer.dt_bias,<br>backbone.layers.2.mixer.in_proj.biases,<br>backbone.layers.2.mixer.in_proj.scales,<br>backbone.layers.2.mixer.in_proj.weight,<br>backbone.layers.2.mixer.norm.weight,<br>backbone.layers.2.mixer.out_proj.biases,<br>backbone.layers.2.mixer.out_proj.scales,<br>backbone.layers.2.mixer.out_proj.weight,<br>backbone.layers.2.norm.weight,<br>backbone.layers.20.mixer.gate.e_score_correction_bias,<br>backbone.layers.20.mixer.gate.weight,<br>backbone.layers.20.mixer.shared_experts.down_proj.biases,<br>backbone.layers.20.mixer.shared_experts.down_proj.scales,<br>backbone.layers.20.mixer.shared_experts.down_proj.weight,<br>backbone.layers.20.mixer.shared_experts.up_proj.biases,<br>backbone.layers.20.mixer.shared_experts.up_proj.scales,<br>backbone.layers.20.mixer.shared_experts.up_proj.weight,<br>backbone.layers.20.mixer.switch_mlp.fc1.biases,<br>backbone.layers.20.mixer.switch_mlp.fc1.scales,<br>backbone.layers.20.mixer.switch_mlp.fc1.weight,<br>backbone.layers.20.mixer.switch_mlp.fc2.biases,<br>backbone.layers.20.mixer.switch_mlp.fc2.scales,<br>backbone.layers.20.mixer.switch_mlp.fc2.weight,<br>backbone.layers.20.norm.weight,<br>backbone.layers.21.mixer.A_log,<br>backbone.layers.21.mixer.D,<br>backbone.layers.21.mixer.conv1d.bias,<br>backbone.layers.21.mixer.conv1d.weight,<br>backbone.layers.21.mixer.dt_bias,<br>backbone.layers.21.mixer.in_proj.biases,<br>backbone.layers.21.mixer.in_proj.scales,<br>backbone.layers.21.mixer.in_proj.weight,<br>backbone.layers.21.mixer.norm.weight,<br>backbone.layers.21.mixer.out_proj.biases,<br>backbone.layers.21.mixer.out_proj.scales,<br>backbone.layers.21.mixer.out_proj.weight,<br>backbone.layers.21.norm.weight,<br>backbone.layers.22.mixer.gate.e_score_correction_bias,<br>backbone.layers.22.mixer.gate.weight,<br>backbone.layers.22.mixer.shared_experts.down_proj.biases,<br>backbone.layers.22.mixer.shared_experts.down_proj.scales,<br>backbone.layers.22.mixer.shared_experts.down_proj.weight,<br>backbone.layers.22.mixer.shared_experts.up_proj.biases,<br>backbone.layers.22.mixer.shared_experts.up_proj.scales,<br>backbone.layers.22.mixer.shared_experts.up_proj.weight,<br>backbone.layers.22.mixer.switch_mlp.fc1.biases,<br>backbone.layers.22.mixer.switch_mlp.fc1.scales,<br>backbone.layers.22.mixer.switch_mlp.fc1.weight,<br>backbone.layers.22.mixer.switch_mlp.fc2.biases,<br>backbone.layers.22.mixer.switch_mlp.fc2.scales,<br>backbone.layers.22.mixer.switch_mlp.fc2.weight,<br>backbone.layers.22.norm.weight,<br>backbone.layers.23.mixer.A_log,<br>backbone.layers.23.mixer.D,<br>backbone.layers.23.mixer.conv1d.bias,<br>backbone.layers.23.mixer.conv1d.weight,<br>backbone.layers.23.mixer.dt_bias,<br>backbone.layers.23.mixer.in_proj.biases,<br>backbone.layers.23.mixer.in_proj.scales,<br>backbone.layers.23.mixer.in_proj.weight,<br>backbone.layers.23.mixer.norm.weight,<br>backbone.layers.23.mixer.out_proj.biases,<br>backbone.layers.23.mixer.out_proj.scales,<br>backbone.layers.23.mixer.out_proj.weight,<br>backbone.layers.23.norm.weight,<br>backbone.layers.24.mixer.gate.e_score_correction_bias,<br>backbone.layers.24.mixer.gate.weight,<br>backbone.layers.24.mixer.shared_experts.down_proj.biases,<br>backbone.layers.24.mixer.shared_experts.down_proj.scales,<br>backbone.layers.24.mixer.shared_experts.down_proj.weight,<br>backbone.layers.24.mixer.shared_experts.up_proj.biases,<br>backbone.layers.24.mixer.shared_experts.up_proj.scales,<br>backbone.layers.24.mixer.shared_experts.up_proj.weight,<br>backbone.layers.24.mixer.switch_mlp.fc1.biases,<br>backbone.layers.24.mixer.switch_mlp.fc1.scales,<br>backbone.layers.24.mixer.switch_mlp.fc1.weight,<br>backbone.layers.24.mixer.switch_mlp.fc2.biases,<br>backbone.layers.24.mixer.switch_mlp.fc2.scales,<br>backbone.layers.24.mixer.switch_mlp.fc2.weight,<br>backbone.layers.24.norm.weight,<br>backbone.layers.25.mixer.A_log,<br>backbone.layers.25.mixer.D,<br>backbone.layers.25.mixer.conv1d.bias,<br>backbone.layers.25.mixer.conv1d.weight,<br>backbone.layers.25.mixer.dt_bias,<br>backbone.layers.25.mixer.in_proj.biases,<br>backbone.layers.25.mixer.in_proj.scales,<br>backbone.layers.25.mixer.in_proj.weight,<br>backbone.layers.25.mixer.norm.weight,<br>backbone.layers.25.mixer.out_proj.biases,<br>backbone.layers.25.mixer.out_proj.scales,<br>backbone.layers.25.mixer.out_proj.weight,<br>backbone.layers.25.norm.weight,<br>backbone.layers.26.mixer.k_proj.biases,<br>backbone.layers.26.mixer.k_proj.scales,<br>backbone.layers.26.mixer.k_proj.weight,<br>backbone.layers.26.mixer.o_proj.biases,<br>backbone.layers.26.mixer.o_proj.scales,<br>backbone.layers.26.mixer.o_proj.weight,<br>backbone.layers.26.mixer.q_proj.biases,<br>backbone.layers.26.mixer.q_proj.scales,<br>backbone.layers.26.mixer.q_proj.weight,<br>backbone.layers.26.mixer.v_proj.biases,<br>backbone.layers.26.mixer.v_proj.scales,<br>backbone.layers.26.mixer.v_proj.weight,<br>backbone.layers.26.norm.weight,<br>backbone.layers.27.mixer.gate.e_score_correction_bias,<br>backbone.layers.27.mixer.gate.weight,<br>backbone.layers.27.mixer.shared_experts.down_proj.biases,<br>backbone.layers.27.mixer.shared_experts.down_proj.scales,<br>backbone.layers.27.mixer.shared_experts.down_proj.weight,<br>backbone.layers.27.mixer.shared_experts.up_proj.biases,<br>backbone.layers.27.mixer.shared_experts.up_proj.scales,<br>backbone.layers.27.mixer.shared_experts.up_proj.weight,<br>backbone.layers.27.mixer.switch_mlp.fc1.biases,<br>backbone.layers.27.mixer.switch_mlp.fc1.scales,<br>backbone.layers.27.mixer.switch_mlp.fc1.weight,<br>backbone.layers.27.mixer.switch_mlp.fc2.biases,<br>backbone.layers.27.mixer.switch_mlp.fc2.scales,<br>backbone.layers.27.mixer.switch_mlp.fc2.weight,<br>backbone.layers.27.norm.weight,<br>backbone.layers.28.mixer.A_log,<br>backbone.layers.28.mixer.D,<br>backbone.layers.28.mixer.conv1d.bias,<br>backbone.layers.28.mixer.conv1d.weight,<br>backbone.layers.28.mixer.dt_bias,<br>backbone.layers.28.mixer.in_proj.biases,<br>backbone.layers.28.mixer.in_proj.scales,<br>backbone.layers.28.mixer.in_proj.weight,<br>backbone.layers.28.mixer.norm.weight,<br>backbone.layers.28.mixer.out_proj.biases,<br>backbone.layers.28.mixer.out_proj.scales,<br>backbone.layers.28.mixer.out_proj.weight,<br>backbone.layers.28.norm.weight,<br>backbone.layers.29.mixer.gate.e_score_correction_bias,<br>backbone.layers.29.mixer.gate.weight,<br>backbone.layers.29.mixer.shared_experts.down_proj.biases,<br>backbone.layers.29.mixer.shared_experts.down_proj.scales,<br>backbone.layers.29.mixer.shared_experts.down_proj.weight,<br>backbone.layers.29.mixer.shared_experts.up_proj.biases,<br>backbone.layers.29.mixer.shared_experts.up_proj.scales,<br>backbone.layers.29.mixer.shared_experts.up_proj.weight,<br>backbone.layers.29.mixer.switch_mlp.fc1.biases,<br>backbone.layers.29.mixer.switch_mlp.fc1.scales,<br>backbone.layers.29.mixer.switch_mlp.fc1.weight,<br>backbone.layers.29.mixer.switch_mlp.fc2.biases,<br>backbone.layers.29.mixer.switch_mlp.fc2.scales,<br>backbone.layers.29.mixer.switch_mlp.fc2.weight,<br>backbone.layers.29.norm.weight,<br>backbone.layers.3.mixer.gate.e_score_correction_bias,<br>backbone.layers.3.mixer.gate.weight,<br>backbone.layers.3.mixer.shared_experts.down_proj.biases,<br>backbone.layers.3.mixer.shared_experts.down_proj.scales,<br>backbone.layers.3.mixer.shared_experts.down_proj.weight,<br>backbone.layers.3.mixer.shared_experts.up_proj.biases,<br>backbone.layers.3.mixer.shared_experts.up_proj.scales,<br>backbone.layers.3.mixer.shared_experts.up_proj.weight,<br>backbone.layers.3.mixer.switch_mlp.fc1.biases,<br>backbone.layers.3.mixer.switch_mlp.fc1.scales,<br>backbone.layers.3.mixer.switch_mlp.fc1.weight,<br>backbone.layers.3.mixer.switch_mlp.fc2.biases,<br>backbone.layers.3.mixer.switch_mlp.fc2.scales,<br>backbone.layers.3.mixer.switch_mlp.fc2.weight,<br>backbone.layers.3.norm.weight,<br>backbone.layers.30.mixer.A_log,<br>backbone.layers.30.mixer.D,<br>backbone.layers.30.mixer.conv1d.bias,<br>backbone.layers.30.mixer.conv1d.weight,<br>backbone.layers.30.mixer.dt_bias,<br>backbone.layers.30.mixer.in_proj.biases,<br>backbone.layers.30.mixer.in_proj.scales,<br>backbone.layers.30.mixer.in_proj.weight,<br>backbone.layers.30.mixer.norm.weight,<br>backbone.layers.30.mixer.out_proj.biases,<br>backbone.layers.30.mixer.out_proj.scales,<br>backbone.layers.30.mixer.out_proj.weight,<br>backbone.layers.30.norm.weight,<br>backbone.layers.31.mixer.gate.e_score_correction_bias,<br>backbone.layers.31.mixer.gate.weight,<br>backbone.layers.31.mixer.shared_experts.down_proj.biases,<br>backbone.layers.31.mixer.shared_experts.down_proj.scales,<br>backbone.layers.31.mixer.shared_experts.down_proj.weight,<br>backbone.layers.31.mixer.shared_experts.up_proj.biases,<br>backbone.layers.31.mixer.shared_experts.up_proj.scales,<br>backbone.layers.31.mixer.shared_experts.up_proj.weight,<br>backbone.layers.31.mixer.switch_mlp.fc1.biases,<br>backbone.layers.31.mixer.switch_mlp.fc1.scales,<br>backbone.layers.31.mixer.switch_mlp.fc1.weight,<br>backbone.layers.31.mixer.switch_mlp.fc2.biases,<br>backbone.layers.31.mixer.switch_mlp.fc2.scales,<br>backbone.layers.31.mixer.switch_mlp.fc2.weight,<br>backbone.layers.31.norm.weight,<br>backbone.layers.32.mixer.A_log,<br>backbone.layers.32.mixer.D,<br>backbone.layers.32.mixer.conv1d.bias,<br>backbone.layers.32.mixer.conv1d.weight,<br>backbone.layers.32.mixer.dt_bias,<br>backbone.layers.32.mixer.in_proj.biases,<br>backbone.layers.32.mixer.in_proj.scales,<br>backbone.layers.32.mixer.in_proj.weight,<br>backbone.layers.32.mixer.norm.weight,<br>backbone.layers.32.mixer.out_proj.biases,<br>backbone.layers.32.mixer.out_proj.scales,<br>backbone.layers.32.mixer.out_proj.weight,<br>backbone.layers.32.norm.weight,<br>backbone.layers.33.mixer.k_proj.biases,<br>backbone.layers.33.mixer.k_proj.scales,<br>backbone.layers.33.mixer.k_proj.weight,<br>backbone.layers.33.mixer.o_proj.biases,<br>backbone.layers.33.mixer.o_proj.scales,<br>backbone.layers.33.mixer.o_proj.weight,<br>backbone.layers.33.mixer.q_proj.biases,<br>backbone.layers.33.mixer.q_proj.scales,<br>backbone.layers.33.mixer.q_proj.weight,<br>backbone.layers.33.mixer.v_proj.biases,<br>backbone.layers.33.mixer.v_proj.scales,<br>backbone.layers.33.mixer.v_proj.weight,<br>backbone.layers.33.norm.weight,<br>backbone.layers.34.mixer.gate.e_score_correction_bias,<br>backbone.layers.34.mixer.gate.weight,<br>backbone.layers.34.mixer.shared_experts.down_proj.biases,<br>backbone.layers.34.mixer.shared_experts.down_proj.scales,<br>backbone.layers.34.mixer.shared_experts.down_proj.weight,<br>backbone.layers.34.mixer.shared_experts.up_proj.biases,<br>backbone.layers.34.mixer.shared_experts.up_proj.scales,<br>backbone.layers.34.mixer.shared_experts.up_proj.weight,<br>backbone.layers.34.mixer.switch_mlp.fc1.biases,<br>backbone.layers.34.mixer.switch_mlp.fc1.scales,<br>backbone.layers.34.mixer.switch_mlp.fc1.weight,<br>backbone.layers.34.mixer.switch_mlp.fc2.biases,<br>backbone.layers.34.mixer.switch_mlp.fc2.scales,<br>backbone.layers.34.mixer.switch_mlp.fc2.weight,<br>backbone.layers.34.norm.weight,<br>backbone.layers.35.mixer.A_log,<br>backbone.layers.35.mixer.D,<br>backbone.layers.35.mixer.conv1d.bias,<br>backbone.layers.35.mixer.conv1d.weight,<br>backbone.layers.35.mixer.dt_bias,<br>backbone.layers.35.mixer.in_proj.biases,<br>backbone.layers.35.mixer.in_proj.scales,<br>backbone.layers.35.mixer.in_proj.weight,<br>backbone.layers.35.mixer.norm.weight,<br>backbone.layers.35.mixer.out_proj.biases,<br>backbone.layers.35.mixer.out_proj.scales,<br>backbone.layers.35.mixer.out_proj.weight,<br>backbone.layers.35.norm.weight,<br>backbone.layers.36.mixer.gate.e_score_correction_bias,<br>backbone.layers.36.mixer.gate.weight,<br>backbone.layers.36.mixer.shared_experts.down_proj.biases,<br>backbone.layers.36.mixer.shared_experts.down_proj.scales,<br>backbone.layers.36.mixer.shared_experts.down_proj.weight,<br>backbone.layers.36.mixer.shared_experts.up_proj.biases,<br>backbone.layers.36.mixer.shared_experts.up_proj.scales,<br>backbone.layers.36.mixer.shared_experts.up_proj.weight,<br>backbone.layers.36.mixer.switch_mlp.fc1.biases,<br>backbone.layers.36.mixer.switch_mlp.fc1.scales,<br>backbone.layers.36.mixer.switch_mlp.fc1.weight,<br>backbone.layers.36.mixer.switch_mlp.fc2.biases,<br>backbone.layers.36.mixer.switch_mlp.fc2.scales,<br>backbone.layers.36.mixer.switch_mlp.fc2.weight,<br>backbone.layers.36.norm.weight,<br>backbone.layers.37.mixer.A_log,<br>backbone.layers.37.mixer.D,<br>backbone.layers.37.mixer.conv1d.bias,<br>backbone.layers.37.mixer.conv1d.weight,<br>backbone.layers.37.mixer.dt_bias,<br>backbone.layers.37.mixer.in_proj.biases,<br>backbone.layers.37.mixer.in_proj.scales,<br>backbone.layers.37.mixer.in_proj.weight,<br>backbone.layers.37.mixer.norm.weight,<br>backbone.layers.37.mixer.out_proj.biases,<br>backbone.layers.37.mixer.out_proj.scales,<br>backbone.layers.37.mixer.out_proj.weight,<br>backbone.layers.37.norm.weight,<br>backbone.layers.38.mixer.gate.e_score_correction_bias,<br>backbone.layers.38.mixer.gate.weight,<br>backbone.layers.38.mixer.shared_experts.down_proj.biases,<br>backbone.layers.38.mixer.shared_experts.down_proj.scales,<br>backbone.layers.38.mixer.shared_experts.down_proj.weight,<br>backbone.layers.38.mixer.shared_experts.up_proj.biases,<br>backbone.layers.38.mixer.shared_experts.up_proj.scales,<br>backbone.layers.38.mixer.shared_experts.up_proj.weight,<br>backbone.layers.38.mixer.switch_mlp.fc1.biases,<br>backbone.layers.38.mixer.switch_mlp.fc1.scales,<br>backbone.layers.38.mixer.switch_mlp.fc1.weight,<br>backbone.layers.38.mixer.switch_mlp.fc2.biases,<br>backbone.layers.38.mixer.switch_mlp.fc2.scales,<br>backbone.layers.38.mixer.switch_mlp.fc2.weight,<br>backbone.layers.38.norm.weight,<br>backbone.layers.39.mixer.A_log,<br>backbone.layers.39.mixer.D,<br>backbone.layers.39.mixer.conv1d.bias,<br>backbone.layers.39.mixer.conv1d.weight,<br>backbone.layers.39.mixer.dt_bias,<br>backbone.layers.39.mixer.in_proj.biases,<br>backbone.layers.39.mixer.in_proj.scales,<br>backbone.layers.39.mixer.in_proj.weight,<br>backbone.layers.39.mixer.norm.weight,<br>backbone.layers.39.mixer.out_proj.biases,<br>backbone.layers.39.mixer.out_proj.scales,<br>backbone.layers.39.mixer.out_proj.weight,<br>backbone.layers.39.norm.weight,<br>backbone.layers.4.mixer.A_log,<br>backbone.layers.4.mixer.D,<br>backbone.layers.4.mixer.conv1d.bias,<br>backbone.layers.4.mixer.conv1d.weight,<br>backbone.layers.4.mixer.dt_bias,<br>backbone.layers.4.mixer.in_proj.biases,<br>backbone.layers.4.mixer.in_proj.scales,<br>backbone.layers.4.mixer.in_proj.weight,<br>backbone.layers.4.mixer.norm.weight,<br>backbone.layers.4.mixer.out_proj.biases,<br>backbone.layers.4.mixer.out_proj.scales,<br>backbone.layers.4.mixer.out_proj.weight,<br>backbone.layers.4.norm.weight,<br>backbone.layers.40.mixer.gate.e_score_correction_bias,<br>backbone.layers.40.mixer.gate.weight,<br>backbone.layers.40.mixer.shared_experts.down_proj.biases,<br>backbone.layers.40.mixer.shared_experts.down_proj.scales,<br>backbone.layers.40.mixer.shared_experts.down_proj.weight,<br>backbone.layers.40.mixer.shared_experts.up_proj.biases,<br>backbone.layers.40.mixer.shared_experts.up_proj.scales,<br>backbone.layers.40.mixer.shared_experts.up_proj.weight,<br>backbone.layers.40.mixer.switch_mlp.fc1.biases,<br>backbone.layers.40.mixer.switch_mlp.fc1.scales,<br>backbone.layers.40.mixer.switch_mlp.fc1.weight,<br>backbone.layers.40.mixer.switch_mlp.fc2.biases,<br>backbone.layers.40.mixer.switch_mlp.fc2.scales,<br>backbone.layers.40.mixer.switch_mlp.fc2.weight,<br>backbone.layers.40.norm.weight,<br>backbone.layers.41.mixer.A_log,<br>backbone.layers.41.mixer.D,<br>backbone.layers.41.mixer.conv1d.bias,<br>backbone.layers.41.mixer.conv1d.weight,<br>backbone.layers.41.mixer.dt_bias,<br>backbone.layers.41.mixer.in_proj.biases,<br>backbone.layers.41.mixer.in_proj.scales,<br>backbone.layers.41.mixer.in_proj.weight,<br>backbone.layers.41.mixer.norm.weight,<br>backbone.layers.41.mixer.out_proj.biases,<br>backbone.layers.41.mixer.out_proj.scales,<br>backbone.layers.41.mixer.out_proj.weight,<br>backbone.layers.41.norm.weight,<br>backbone.layers.42.mixer.k_proj.biases,<br>backbone.layers.42.mixer.k_proj.scales,<br>backbone.layers.42.mixer.k_proj.weight,<br>backbone.layers.42.mixer.o_proj.biases,<br>backbone.layers.42.mixer.o_proj.scales,<br>backbone.layers.42.mixer.o_proj.weight,<br>backbone.layers.42.mixer.q_proj.biases,<br>backbone.layers.42.mixer.q_proj.scales,<br>backbone.layers.42.mixer.q_proj.weight,<br>backbone.layers.42.mixer.v_proj.biases,<br>backbone.layers.42.mixer.v_proj.scales,<br>backbone.layers.42.mixer.v_proj.weight,<br>backbone.layers.42.norm.weight,<br>backbone.layers.43.mixer.gate.e_score_correction_bias,<br>backbone.layers.43.mixer.gate.weight,<br>backbone.layers.43.mixer.shared_experts.down_proj.biases,<br>backbone.layers.43.mixer.shared_experts.down_proj.scales,<br>backbone.layers.43.mixer.shared_experts.down_proj.weight,<br>backbone.layers.43.mixer.shared_experts.up_proj.biases,<br>backbone.layers.43.mixer.shared_experts.up_proj.scales,<br>backbone.layers.43.mixer.shared_experts.up_proj.weight,<br>backbone.layers.43.mixer.switch_mlp.fc1.biases,<br>backbone.layers.43.mixer.switch_mlp.fc1.scales,<br>backbone.layers.43.mixer.switch_mlp.fc1.weight,<br>backbone.layers.43.mixer.switch_mlp.fc2.biases,<br>backbone.layers.43.mixer.switch_mlp.fc2.scales,<br>backbone.layers.43.mixer.switch_mlp.fc2.weight,<br>backbone.layers.43.norm.weight,<br>backbone.layers.44.mixer.A_log,<br>backbone.layers.44.mixer.D,<br>backbone.layers.44.mixer.conv1d.bias,<br>backbone.layers.44.mixer.conv1d.weight,<br>backbone.layers.44.mixer.dt_bias,<br>backbone.layers.44.mixer.in_proj.biases,<br>backbone.layers.44.mixer.in_proj.scales,<br>backbone.layers.44.mixer.in_proj.weight,<br>backbone.layers.44.mixer.norm.weight,<br>backbone.layers.44.mixer.out_proj.biases,<br>backbone.layers.44.mixer.out_proj.scales,<br>backbone.layers.44.mixer.out_proj.weight,<br>backbone.layers.44.norm.weight,<br>backbone.layers.45.mixer.gate.e_score_correction_bias,<br>backbone.layers.45.mixer.gate.weight,<br>backbone.layers.45.mixer.shared_experts.down_proj.biases,<br>backbone.layers.45.mixer.shared_experts.down_proj.scales,<br>backbone.layers.45.mixer.shared_experts.down_proj.weight,<br>backbone.layers.45.mixer.shared_experts.up_proj.biases,<br>backbone.layers.45.mixer.shared_experts.up_proj.scales,<br>backbone.layers.45.mixer.shared_experts.up_proj.weight,<br>backbone.layers.45.mixer.switch_mlp.fc1.biases,<br>backbone.layers.45.mixer.switch_mlp.fc1.scales,<br>backbone.layers.45.mixer.switch_mlp.fc1.weight,<br>backbone.layers.45.mixer.switch_mlp.fc2.biases,<br>backbone.layers.45.mixer.switch_mlp.fc2.scales,<br>backbone.layers.45.mixer.switch_mlp.fc2.weight,<br>backbone.layers.45.norm.weight,<br>backbone.layers.46.mixer.A_log,<br>backbone.layers.46.mixer.D,<br>backbone.layers.46.mixer.conv1d.bias,<br>backbone.layers.46.mixer.conv1d.weight,<br>backbone.layers.46.mixer.dt_bias,<br>backbone.layers.46.mixer.in_proj.biases,<br>backbone.layers.46.mixer.in_proj.scales,<br>backbone.layers.46.mixer.in_proj.weight,<br>backbone.layers.46.mixer.norm.weight,<br>backbone.layers.46.mixer.out_proj.biases,<br>backbone.layers.46.mixer.out_proj.scales,<br>backbone.layers.46.mixer.out_proj.weight,<br>backbone.layers.46.norm.weight,<br>backbone.layers.47.mixer.gate.e_score_correction_bias,<br>backbone.layers.47.mixer.gate.weight,<br>backbone.layers.47.mixer.shared_experts.down_proj.biases,<br>backbone.layers.47.mixer.shared_experts.down_proj.scales,<br>backbone.layers.47.mixer.shared_experts.down_proj.weight,<br>backbone.layers.47.mixer.shared_experts.up_proj.biases,<br>backbone.layers.47.mixer.shared_experts.up_proj.scales,<br>backbone.layers.47.mixer.shared_experts.up_proj.weight,<br>backbone.layers.47.mixer.switch_mlp.fc1.biases,<br>backbone.layers.47.mixer.switch_mlp.fc1.scales,<br>backbone.layers.47.mixer.switch_mlp.fc1.weight,<br>backbone.layers.47.mixer.switch_mlp.fc2.biases,<br>backbone.layers.47.mixer.switch_mlp.fc2.scales,<br>backbone.layers.47.mixer.switch_mlp.fc2.weight,<br>backbone.layers.47.norm.weight,<br>backbone.layers.48.mixer.A_log,<br>backbone.layers.48.mixer.D,<br>backbone.layers.48.mixer.conv1d.bias,<br>backbone.layers.48.mixer.conv1d.weight,<br>backbone.layers.48.mixer.dt_bias,<br>backbone.layers.48.mixer.in_proj.biases,<br>backbone.layers.48.mixer.in_proj.scales,<br>backbone.layers.48.mixer.in_proj.weight,<br>backbone.layers.48.mixer.norm.weight,<br>backbone.layers.48.mixer.out_proj.biases,<br>backbone.layers.48.mixer.out_proj.scales,<br>backbone.layers.48.mixer.out_proj.weight,<br>backbone.layers.48.norm.weight,<br>backbone.layers.49.mixer.gate.e_score_correction_bias,<br>backbone.layers.49.mixer.gate.weight,<br>backbone.layers.49.mixer.shared_experts.down_proj.biases,<br>backbone.layers.49.mixer.shared_experts.down_proj.scales,<br>backbone.layers.49.mixer.shared_experts.down_proj.weight,<br>backbone.layers.49.mixer.shared_experts.up_proj.biases,<br>backbone.layers.49.mixer.shared_experts.up_proj.scales,<br>backbone.layers.49.mixer.shared_experts.up_proj.weight,<br>backbone.layers.49.mixer.switch_mlp.fc1.biases,<br>backbone.layers.49.mixer.switch_mlp.fc1.scales,<br>backbone.layers.49.mixer.switch_mlp.fc1.weight,<br>backbone.layers.49.mixer.switch_mlp.fc2.biases,<br>backbone.layers.49.mixer.switch_mlp.fc2.scales,<br>backbone.layers.49.mixer.switch_mlp.fc2.weight,<br>backbone.layers.49.norm.weight,<br>backbone.layers.5.mixer.k_proj.biases,<br>backbone.layers.5.mixer.k_proj.scales,<br>backbone.layers.5.mixer.k_proj.weight,<br>backbone.layers.5.mixer.o_proj.biases,<br>backbone.layers.5.mixer.o_proj.scales,<br>backbone.layers.5.mixer.o_proj.weight,<br>backbone.layers.5.mixer.q_proj.biases,<br>backbone.layers.5.mixer.q_proj.scales,<br>backbone.layers.5.mixer.q_proj.weight,<br>backbone.layers.5.mixer.v_proj.biases,<br>backbone.layers.5.mixer.v_proj.scales,<br>backbone.layers.5.mixer.v_proj.weight,<br>backbone.layers.5.norm.weight,<br>backbone.layers.50.mixer.A_log,<br>backbone.layers.50.mixer.D,<br>backbone.layers.50.mixer.conv1d.bias,<br>backbone.layers.50.mixer.conv1d.weight,<br>backbone.layers.50.mixer.dt_bias,<br>backbone.layers.50.mixer.in_proj.biases,<br>backbone.layers.50.mixer.in_proj.scales,<br>backbone.layers.50.mixer.in_proj.weight,<br>backbone.layers.50.mixer.norm.weight,<br>backbone.layers.50.mixer.out_proj.biases,<br>backbone.layers.50.mixer.out_proj.scales,<br>backbone.layers.50.mixer.out_proj.weight,<br>backbone.layers.50.norm.weight,<br>backbone.layers.51.mixer.gate.e_score_correction_bias,<br>backbone.layers.51.mixer.gate.weight,<br>backbone.layers.51.mixer.shared_experts.down_proj.biases,<br>backbone.layers.51.mixer.shared_experts.down_proj.scales,<br>backbone.layers.51.mixer.shared_experts.down_proj.weight,<br>backbone.layers.51.mixer.shared_experts.up_proj.biases,<br>backbone.layers.51.mixer.shared_experts.up_proj.scales,<br>backbone.layers.51.mixer.shared_experts.up_proj.weight,<br>backbone.layers.51.mixer.switch_mlp.fc1.biases,<br>backbone.layers.51.mixer.switch_mlp.fc1.scales,<br>backbone.layers.51.mixer.switch_mlp.fc1.weight,<br>backbone.layers.51.mixer.switch_mlp.fc2.biases,<br>backbone.layers.51.mixer.switch_mlp.fc2.scales,<br>backbone.layers.51.mixer.switch_mlp.fc2.weight,<br>backbone.layers.51.norm.weight,<br>backbone.layers.6.mixer.gate.e_score_correction_bias,<br>backbone.layers.6.mixer.gate.weight,<br>backbone.layers.6.mixer.shared_experts.down_proj.biases,<br>backbone.layers.6.mixer.shared_experts.down_proj.scales,<br>backbone.layers.6.mixer.shared_experts.down_proj.weight,<br>backbone.layers.6.mixer.shared_experts.up_proj.biases,<br>backbone.layers.6.mixer.shared_experts.up_proj.scales,<br>backbone.layers.6.mixer.shared_experts.up_proj.weight,<br>backbone.layers.6.mixer.switch_mlp.fc1.biases,<br>backbone.layers.6.mixer.switch_mlp.fc1.scales,<br>backbone.layers.6.mixer.switch_mlp.fc1.weight,<br>backbone.layers.6.mixer.switch_mlp.fc2.biases,<br>backbone.layers.6.mixer.switch_mlp.fc2.scales,<br>backbone.layers.6.mixer.switch_mlp.fc2.weight,<br>backbone.layers.6.norm.weight,<br>backbone.layers.7.mixer.A_log,<br>backbone.layers.7.mixer.D,<br>backbone.layers.7.mixer.conv1d.bias,<br>backbone.layers.7.mixer.conv1d.weight,<br>backbone.layers.7.mixer.dt_bias,<br>backbone.layers.7.mixer.in_proj.biases,<br>backbone.layers.7.mixer.in_proj.scales,<br>backbone.layers.7.mixer.in_proj.weight,<br>backbone.layers.7.mixer.norm.weight,<br>backbone.layers.7.mixer.out_proj.biases,<br>backbone.layers.7.mixer.out_proj.scales,<br>backbone.layers.7.mixer.out_proj.weight,<br>backbone.layers.7.norm.weight,<br>backbone.layers.8.mixer.gate.e_score_correction_bias,<br>backbone.layers.8.mixer.gate.weight,<br>backbone.layers.8.mixer.shared_experts.down_proj.biases,<br>backbone.layers.8.mixer.shared_experts.down_proj.scales,<br>backbone.layers.8.mixer.shared_experts.down_proj.weight,<br>backbone.layers.8.mixer.shared_experts.up_proj.biases,<br>backbone.layers.8.mixer.shared_experts.up_proj.scales,<br>backbone.layers.8.mixer.shared_experts.up_proj.weight,<br>backbone.layers.8.mixer.switch_mlp.fc1.biases,<br>backbone.layers.8.mixer.switch_mlp.fc1.scales,<br>backbone.layers.8.mixer.switch_mlp.fc1.weight,<br>backbone.layers.8.mixer.switch_mlp.fc2.biases,<br>backbone.layers.8.mixer.switch_mlp.fc2.scales,<br>backbone.layers.8.mixer.switch_mlp.fc2.weight,<br>backbone.layers.8.norm.weight,<br>backbone.layers.9.mixer.A_log,<br>backbone.layers.9.mixer.D,<br>backbone.layers.9.mixer.conv1d.bias,<br>backbone.layers.9.mixer.conv1d.weight,<br>backbone.layers.9.mixer.dt_bias,<br>backbone.layers.9.mixer.in_proj.biases,<br>backbone.layers.9.mixer.in_proj.scales,<br>backbone.layers.9.mixer.in_proj.weight,<br>backbone.layers.9.mixer.norm.weight,<br>backbone.layers.9.mixer.out_proj.biases,<br>backbone.layers.9.mixer.out_proj.scales,<br>backbone.layers.9.mixer.out_proj.weight,<br>backbone.layers.9.norm.weight,<br>backbone.norm_f.weight,<br>lm_head.biases,<br>lm_head.scales,<br>lm_head.weight.
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* Received 729 parameters not in model:
-  <br>backbone.embeddings.biases,<br>backbone.embeddings.scales,<br>backbone.embeddings.weight,<br>backbone.layers.0.mixer.A_log,<br>backbone.layers.0.mixer.D,<br>backbone.layers.0.mixer.conv1d.bias,<br>backbone.layers.0.mixer.conv1d.weight,<br>backbone.layers.0.mixer.dt_bias,<br>backbone.layers.0.mixer.in_proj.biases,<br>backbone.layers.0.mixer.in_proj.scales,<br>backbone.layers.0.mixer.in_proj.weight,<br>backbone.layers.0.mixer.norm.weight,<br>backbone.layers.0.mixer.out_proj.biases,<br>backbone.layers.0.mixer.out_proj.scales,<br>backbone.layers.0.mixer.out_proj.weight,<br>backbone.layers.0.norm.weight,<br>backbone.layers.1.mixer.gate.e_score_correction_bias,<br>backbone.layers.1.mixer.gate.weight,<br>backbone.layers.1.mixer.shared_experts.down_proj.biases,<br>backbone.layers.1.mixer.shared_experts.down_proj.scales,<br>backbone.layers.1.mixer.shared_experts.down_proj.weight,<br>backbone.layers.1.mixer.shared_experts.up_proj.biases,<br>backbone.layers.1.mixer.shared_experts.up_proj.scales,<br>backbone.layers.1.mixer.shared_experts.up_proj.weight,<br>backbone.layers.1.mixer.switch_mlp.fc1.biases,<br>backbone.layers.1.mixer.switch_mlp.fc1.scales,<br>backbone.layers.1.mixer.switch_mlp.fc1.weight,<br>backbone.layers.1.mixer.switch_mlp.fc2.biases,<br>backbone.layers.1.mixer.switch_mlp.fc2.scales,<br>backbone.layers.1.mixer.switch_mlp.fc2.weight,<br>backbone.layers.1.norm.weight,<br>backbone.layers.10.mixer.gate.e_score_correction_bias,<br>backbone.layers.10.mixer.gate.weight,<br>backbone.layers.10.mixer.shared_experts.down_proj.biases,<br>backbone.layers.10.mixer.shared_experts.down_proj.scales,<br>backbone.layers.10.mixer.shared_experts.down_proj.weight,<br>backbone.layers.10.mixer.shared_experts.up_proj.biases,<br>backbone.layers.10.mixer.shared_experts.up_proj.scales,<br>backbone.layers.10.mixer.shared_experts.up_proj.weight,<br>backbone.layers.10.mixer.switch_mlp.fc1.biases,<br>backbone.layers.10.mixer.switch_mlp.fc1.scales,<br>backbone.layers.10.mixer.switch_mlp.fc1.weight,<br>backbone.layers.10.mixer.switch_mlp.fc2.biases,<br>backbone.layers.10.mixer.switch_mlp.fc2.scales,<br>backbone.layers.10.mixer.switch_mlp.fc2.weight,<br>backbone.layers.10.norm.weight,<br>backbone.layers.11.mixer.A_log,<br>backbone.layers.11.mixer.D,<br>backbone.layers.11.mixer.conv1d.bias,<br>backbone.layers.11.mixer.conv1d.weight,<br>backbone.layers.11.mixer.dt_bias,<br>backbone.layers.11.mixer.in_proj.biases,<br>backbone.layers.11.mixer.in_proj.scales,<br>backbone.layers.11.mixer.in_proj.weight,<br>backbone.layers.11.mixer.norm.weight,<br>backbone.layers.11.mixer.out_proj.biases,<br>backbone.layers.11.mixer.out_proj.scales,<br>backbone.layers.11.mixer.out_proj.weight,<br>backbone.layers.11.norm.weight,<br>backbone.layers.12.mixer.k_proj.biases,<br>backbone.layers.12.mixer.k_proj.scales,<br>backbone.layers.12.mixer.k_proj.weight,<br>backbone.layers.12.mixer.o_proj.biases,<br>backbone.layers.12.mixer.o_proj.scales,<br>backbone.layers.12.mixer.o_proj.weight,<br>backbone.layers.12.mixer.q_proj.biases,<br>backbone.layers.12.mixer.q_proj.scales,<br>backbone.layers.12.mixer.q_proj.weight,<br>backbone.layers.12.mixer.v_proj.biases,<br>backbone.layers.12.mixer.v_proj.scales,<br>backbone.layers.12.mixer.v_proj.weight,<br>backbone.layers.12.norm.weight,<br>backbone.layers.13.mixer.gate.e_score_correction_bias,<br>backbone.layers.13.mixer.gate.weight,<br>backbone.layers.13.mixer.shared_experts.down_proj.biases,<br>backbone.layers.13.mixer.shared_experts.down_proj.scales,<br>backbone.layers.13.mixer.shared_experts.down_proj.weight,<br>backbone.layers.13.mixer.shared_experts.up_proj.biases,<br>backbone.layers.13.mixer.shared_experts.up_proj.scales,<br>backbone.layers.13.mixer.shared_experts.up_proj.weight,<br>backbone.layers.13.mixer.switch_mlp.fc1.biases,<br>backbone.layers.13.mixer.switch_mlp.fc1.scales,<br>backbone.layers.13.mixer.switch_mlp.fc1.weight,<br>backbone.layers.13.mixer.switch_mlp.fc2.biases,<br>backbone.layers.13.mixer.switch_mlp.fc2.scales,<br>backbone.layers.13.mixer.switch_mlp.fc2.weight,<br>backbone.layers.13.norm.weight,<br>backbone.layers.14.mixer.A_log,<br>backbone.layers.14.mixer.D,<br>backbone.layers.14.mixer.conv1d.bias,<br>backbone.layers.14.mixer.conv1d.weight,<br>backbone.layers.14.mixer.dt_bias,<br>backbone.layers.14.mixer.in_proj.biases,<br>backbone.layers.14.mixer.in_proj.scales,<br>backbone.layers.14.mixer.in_proj.weight,<br>backbone.layers.14.mixer.norm.weight,<br>backbone.layers.14.mixer.out_proj.biases,<br>backbone.layers.14.mixer.out_proj.scales,<br>backbone.layers.14.mixer.out_proj.weight,<br>backbone.layers.14.norm.weight,<br>backbone.layers.15.mixer.gate.e_score_correction_bias,<br>backbone.layers.15.mixer.gate.weight,<br>backbone.layers.15.mixer.shared_experts.down_proj.biases,<br>backbone.layers.15.mixer.shared_experts.down_proj.scales,<br>backbone.layers.15.mixer.shared_experts.down_proj.weight,<br>backbone.layers.15.mixer.shared_experts.up_proj.biases,<br>backbone.layers.15.mixer.shared_experts.up_proj.scales,<br>backbone.layers.15.mixer.shared_experts.up_proj.weight,<br>backbone.layers.15.mixer.switch_mlp.fc1.biases,<br>backbone.layers.15.mixer.switch_mlp.fc1.scales,<br>backbone.layers.15.mixer.switch_mlp.fc1.weight,<br>backbone.layers.15.mixer.switch_mlp.fc2.biases,<br>backbone.layers.15.mixer.switch_mlp.fc2.scales,<br>backbone.layers.15.mixer.switch_mlp.fc2.weight,<br>backbone.layers.15.norm.weight,<br>backbone.layers.16.mixer.A_log,<br>backbone.layers.16.mixer.D,<br>backbone.layers.16.mixer.conv1d.bias,<br>backbone.layers.16.mixer.conv1d.weight,<br>backbone.layers.16.mixer.dt_bias,<br>backbone.layers.16.mixer.in_proj.biases,<br>backbone.layers.16.mixer.in_proj.scales,<br>backbone.layers.16.mixer.in_proj.weight,<br>backbone.layers.16.mixer.norm.weight,<br>backbone.layers.16.mixer.out_proj.biases,<br>backbone.layers.16.mixer.out_proj.scales,<br>backbone.layers.16.mixer.out_proj.weight,<br>backbone.layers.16.norm.weight,<br>backbone.layers.17.mixer.gate.e_score_correction_bias,<br>backbone.layers.17.mixer.gate.weight,<br>backbone.layers.17.mixer.shared_experts.down_proj.biases,<br>backbone.layers.17.mixer.shared_experts.down_proj.scales,<br>backbone.layers.17.mixer.shared_experts.down_proj.weight,<br>backbone.layers.17.mixer.shared_experts.up_proj.biases,<br>backbone.layers.17.mixer.shared_experts.up_proj.scales,<br>backbone.layers.17.mixer.shared_experts.up_proj.weight,<br>backbone.layers.17.mixer.switch_mlp.fc1.biases,<br>backbone.layers.17.mixer.switch_mlp.fc1.scales,<br>backbone.layers.17.mixer.switch_mlp.fc1.weight,<br>backbone.layers.17.mixer.switch_mlp.fc2.biases,<br>backbone.layers.17.mixer.switch_mlp.fc2.scales,<br>backbone.layers.17.mixer.switch_mlp.fc2.weight,<br>backbone.layers.17.norm.weight,<br>backbone.layers.18.mixer.A_log,<br>backbone.layers.18.mixer.D,<br>backbone.layers.18.mixer.conv1d.bias,<br>backbone.layers.18.mixer.conv1d.weight,<br>backbone.layers.18.mixer.dt_bias,<br>backbone.layers.18.mixer.in_proj.biases,<br>backbone.layers.18.mixer.in_proj.scales,<br>backbone.layers.18.mixer.in_proj.weight,<br>backbone.layers.18.mixer.norm.weight,<br>backbone.layers.18.mixer.out_proj.biases,<br>backbone.layers.18.mixer.out_proj.scales,<br>backbone.layers.18.mixer.out_proj.weight,<br>backbone.layers.18.norm.weight,<br>backbone.layers.19.mixer.k_proj.biases,<br>backbone.layers.19.mixer.k_proj.scales,<br>backbone.layers.19.mixer.k_proj.weight,<br>backbone.layers.19.mixer.o_proj.biases,<br>backbone.layers.19.mixer.o_proj.scales,<br>backbone.layers.19.mixer.o_proj.weight,<br>backbone.layers.19.mixer.q_proj.biases,<br>backbone.layers.19.mixer.q_proj.scales,<br>backbone.layers.19.mixer.q_proj.weight,<br>backbone.layers.19.mixer.v_proj.biases,<br>backbone.layers.19.mixer.v_proj.scales,<br>backbone.layers.19.mixer.v_proj.weight,<br>backbone.layers.19.norm.weight,<br>backbone.layers.2.mixer.A_log,<br>backbone.layers.2.mixer.D,<br>backbone.layers.2.mixer.conv1d.bias,<br>backbone.layers.2.mixer.conv1d.weight,<br>backbone.layers.2.mixer.dt_bias,<br>backbone.layers.2.mixer.in_proj.biases,<br>backbone.layers.2.mixer.in_proj.scales,<br>backbone.layers.2.mixer.in_proj.weight,<br>backbone.layers.2.mixer.norm.weight,<br>backbone.layers.2.mixer.out_proj.biases,<br>backbone.layers.2.mixer.out_proj.scales,<br>backbone.layers.2.mixer.out_proj.weight,<br>backbone.layers.2.norm.weight,<br>backbone.layers.20.mixer.gate.e_score_correction_bias,<br>backbone.layers.20.mixer.gate.weight,<br>backbone.layers.20.mixer.shared_experts.down_proj.biases,<br>backbone.layers.20.mixer.shared_experts.down_proj.scales,<br>backbone.layers.20.mixer.shared_experts.down_proj.weight,<br>backbone.layers.20.mixer.shared_experts.up_proj.biases,<br>backbone.layers.20.mixer.shared_experts.up_proj.scales,<br>backbone.layers.20.mixer.shared_experts.up_proj.weight,<br>backbone.layers.20.mixer.switch_mlp.fc1.biases,<br>backbone.layers.20.mixer.switch_mlp.fc1.scales,<br>backbone.layers.20.mixer.switch_mlp.fc1.weight,<br>backbone.layers.20.mixer.switch_mlp.fc2.biases,<br>backbone.layers.20.mixer.switch_mlp.fc2.scales,<br>backbone.layers.20.mixer.switch_mlp.fc2.weight,<br>backbone.layers.20.norm.weight,<br>backbone.layers.21.mixer.A_log,<br>backbone.layers.21.mixer.D,<br>backbone.layers.21.mixer.conv1d.bias,<br>backbone.layers.21.mixer.conv1d.weight,<br>backbone.layers.21.mixer.dt_bias,<br>backbone.layers.21.mixer.in_proj.biases,<br>backbone.layers.21.mixer.in_proj.scales,<br>backbone.layers.21.mixer.in_proj.weight,<br>backbone.layers.21.mixer.norm.weight,<br>backbone.layers.21.mixer.out_proj.biases,<br>backbone.layers.21.mixer.out_proj.scales,<br>backbone.layers.21.mixer.out_proj.weight,<br>backbone.layers.21.norm.weight,<br>backbone.layers.22.mixer.gate.e_score_correction_bias,<br>backbone.layers.22.mixer.gate.weight,<br>backbone.layers.22.mixer.shared_experts.down_proj.biases,<br>backbone.layers.22.mixer.shared_experts.down_proj.scales,<br>backbone.layers.22.mixer.shared_experts.down_proj.weight,<br>backbone.layers.22.mixer.shared_experts.up_proj.biases,<br>backbone.layers.22.mixer.shared_experts.up_proj.scales,<br>backbone.layers.22.mixer.shared_experts.up_proj.weight,<br>backbone.layers.22.mixer.switch_mlp.fc1.biases,<br>backbone.layers.22.mixer.switch_mlp.fc1.scales,<br>backbone.layers.22.mixer.switch_mlp.fc1.weight,<br>backbone.layers.22.mixer.switch_mlp.fc2.biases,<br>backbone.layers.22.mixer.switch_mlp.fc2.scales,<br>backbone.layers.22.mixer.switch_mlp.fc2.weight,<br>backbone.layers.22.norm.weight,<br>backbone.layers.23.mixer.A_log,<br>backbone.layers.23.mixer.D,<br>backbone.layers.23.mixer.conv1d.bias,<br>backbone.layers.23.mixer.conv1d.weight,<br>backbone.layers.23.mixer.dt_bias,<br>backbone.layers.23.mixer.in_proj.biases,<br>backbone.layers.23.mixer.in_proj.scales,<br>backbone.layers.23.mixer.in_proj.weight,<br>backbone.layers.23.mixer.norm.weight,<br>backbone.layers.23.mixer.out_proj.biases,<br>backbone.layers.23.mixer.out_proj.scales,<br>backbone.layers.23.mixer.out_proj.weight,<br>backbone.layers.23.norm.weight,<br>backbone.layers.24.mixer.gate.e_score_correction_bias,<br>backbone.layers.24.mixer.gate.weight,<br>backbone.layers.24.mixer.shared_experts.down_proj.biases,<br>backbone.layers.24.mixer.shared_experts.down_proj.scales,<br>backbone.layers.24.mixer.shared_experts.down_proj.weight,<br>backbone.layers.24.mixer.shared_experts.up_proj.biases,<br>backbone.layers.24.mixer.shared_experts.up_proj.scales,<br>backbone.layers.24.mixer.shared_experts.up_proj.weight,<br>backbone.layers.24.mixer.switch_mlp.fc1.biases,<br>backbone.layers.24.mixer.switch_mlp.fc1.scales,<br>backbone.layers.24.mixer.switch_mlp.fc1.weight,<br>backbone.layers.24.mixer.switch_mlp.fc2.biases,<br>backbone.layers.24.mixer.switch_mlp.fc2.scales,<br>backbone.layers.24.mixer.switch_mlp.fc2.weight,<br>backbone.layers.24.norm.weight,<br>backbone.layers.25.mixer.A_log,<br>backbone.layers.25.mixer.D,<br>backbone.layers.25.mixer.conv1d.bias,<br>backbone.layers.25.mixer.conv1d.weight,<br>backbone.layers.25.mixer.dt_bias,<br>backbone.layers.25.mixer.in_proj.biases,<br>backbone.layers.25.mixer.in_proj.scales,<br>backbone.layers.25.mixer.in_proj.weight,<br>backbone.layers.25.mixer.norm.weight,<br>backbone.layers.25.mixer.out_proj.biases,<br>backbone.layers.25.mixer.out_proj.scales,<br>backbone.layers.25.mixer.out_proj.weight,<br>backbone.layers.25.norm.weight,<br>backbone.layers.26.mixer.k_proj.biases,<br>backbone.layers.26.mixer.k_proj.scales,<br>backbone.layers.26.mixer.k_proj.weight,<br>backbone.layers.26.mixer.o_proj.biases,<br>backbone.layers.26.mixer.o_proj.scales,<br>backbone.layers.26.mixer.o_proj.weight,<br>backbone.layers.26.mixer.q_proj.biases,<br>backbone.layers.26.mixer.q_proj.scales,<br>backbone.layers.26.mixer.q_proj.weight,<br>backbone.layers.26.mixer.v_proj.biases,<br>backbone.layers.26.mixer.v_proj.scales,<br>backbone.layers.26.mixer.v_proj.weight,<br>backbone.layers.26.norm.weight,<br>backbone.layers.27.mixer.gate.e_score_correction_bias,<br>backbone.layers.27.mixer.gate.weight,<br>backbone.layers.27.mixer.shared_experts.down_proj.biases,<br>backbone.layers.27.mixer.shared_experts.down_proj.scales,<br>backbone.layers.27.mixer.shared_experts.down_proj.weight,<br>backbone.layers.27.mixer.shared_experts.up_proj.biases,<br>backbone.layers.27.mixer.shared_experts.up_proj.scales,<br>backbone.layers.27.mixer.shared_experts.up_proj.weight,<br>backbone.layers.27.mixer.switch_mlp.fc1.biases,<br>backbone.layers.27.mixer.switch_mlp.fc1.scales,<br>backbone.layers.27.mixer.switch_mlp.fc1.weight,<br>backbone.layers.27.mixer.switch_mlp.fc2.biases,<br>backbone.layers.27.mixer.switch_mlp.fc2.scales,<br>backbone.layers.27.mixer.switch_mlp.fc2.weight,<br>backbone.layers.27.norm.weight,<br>backbone.layers.28.mixer.A_log,<br>backbone.layers.28.mixer.D,<br>backbone.layers.28.mixer.conv1d.bias,<br>backbone.layers.28.mixer.conv1d.weight,<br>backbone.layers.28.mixer.dt_bias,<br>backbone.layers.28.mixer.in_proj.biases,<br>backbone.layers.28.mixer.in_proj.scales,<br>backbone.layers.28.mixer.in_proj.weight,<br>backbone.layers.28.mixer.norm.weight,<br>backbone.layers.28.mixer.out_proj.biases,<br>backbone.layers.28.mixer.out_proj.scales,<br>backbone.layers.28.mixer.out_proj.weight,<br>backbone.layers.28.norm.weight,<br>backbone.layers.29.mixer.gate.e_score_correction_bias,<br>backbone.layers.29.mixer.gate.weight,<br>backbone.layers.29.mixer.shared_experts.down_proj.biases,<br>backbone.layers.29.mixer.shared_experts.down_proj.scales,<br>backbone.layers.29.mixer.shared_experts.down_proj.weight,<br>backbone.layers.29.mixer.shared_experts.up_proj.biases,<br>backbone.layers.29.mixer.shared_experts.up_proj.scales,<br>backbone.layers.29.mixer.shared_experts.up_proj.weight,<br>backbone.layers.29.mixer.switch_mlp.fc1.biases,<br>backbone.layers.29.mixer.switch_mlp.fc1.scales,<br>backbone.layers.29.mixer.switch_mlp.fc1.weight,<br>backbone.layers.29.mixer.switch_mlp.fc2.biases,<br>backbone.layers.29.mixer.switch_mlp.fc2.scales,<br>backbone.layers.29.mixer.switch_mlp.fc2.weight,<br>backbone.layers.29.norm.weight,<br>backbone.layers.3.mixer.gate.e_score_correction_bias,<br>backbone.layers.3.mixer.gate.weight,<br>backbone.layers.3.mixer.shared_experts.down_proj.biases,<br>backbone.layers.3.mixer.shared_experts.down_proj.scales,<br>backbone.layers.3.mixer.shared_experts.down_proj.weight,<br>backbone.layers.3.mixer.shared_experts.up_proj.biases,<br>backbone.layers.3.mixer.shared_experts.up_proj.scales,<br>backbone.layers.3.mixer.shared_experts.up_proj.weight,<br>backbone.layers.3.mixer.switch_mlp.fc1.biases,<br>backbone.layers.3.mixer.switch_mlp.fc1.scales,<br>backbone.layers.3.mixer.switch_mlp.fc1.weight,<br>backbone.layers.3.mixer.switch_mlp.fc2.biases,<br>backbone.layers.3.mixer.switch_mlp.fc2.scales,<br>backbone.layers.3.mixer.switch_mlp.fc2.weight,<br>backbone.layers.3.norm.weight,<br>backbone.layers.30.mixer.A_log,<br>backbone.layers.30.mixer.D,<br>backbone.layers.30.mixer.conv1d.bias,<br>backbone.layers.30.mixer.conv1d.weight,<br>backbone.layers.30.mixer.dt_bias,<br>backbone.layers.30.mixer.in_proj.biases,<br>backbone.layers.30.mixer.in_proj.scales,<br>backbone.layers.30.mixer.in_proj.weight,<br>backbone.layers.30.mixer.norm.weight,<br>backbone.layers.30.mixer.out_proj.biases,<br>backbone.layers.30.mixer.out_proj.scales,<br>backbone.layers.30.mixer.out_proj.weight,<br>backbone.layers.30.norm.weight,<br>backbone.layers.31.mixer.gate.e_score_correction_bias,<br>backbone.layers.31.mixer.gate.weight,<br>backbone.layers.31.mixer.shared_experts.down_proj.biases,<br>backbone.layers.31.mixer.shared_experts.down_proj.scales,<br>backbone.layers.31.mixer.shared_experts.down_proj.weight,<br>backbone.layers.31.mixer.shared_experts.up_proj.biases,<br>backbone.layers.31.mixer.shared_experts.up_proj.scales,<br>backbone.layers.31.mixer.shared_experts.up_proj.weight,<br>backbone.layers.31.mixer.switch_mlp.fc1.biases,<br>backbone.layers.31.mixer.switch_mlp.fc1.scales,<br>backbone.layers.31.mixer.switch_mlp.fc1.weight,<br>backbone.layers.31.mixer.switch_mlp.fc2.biases,<br>backbone.layers.31.mixer.switch_mlp.fc2.scales,<br>backbone.layers.31.mixer.switch_mlp.fc2.weight,<br>backbone.layers.31.norm.weight,<br>backbone.layers.32.mixer.A_log,<br>backbone.layers.32.mixer.D,<br>backbone.layers.32.mixer.conv1d.bias,<br>backbone.layers.32.mixer.conv1d.weight,<br>backbone.layers.32.mixer.dt_bias,<br>backbone.layers.32.mixer.in_proj.biases,<br>backbone.layers.32.mixer.in_proj.scales,<br>backbone.layers.32.mixer.in_proj.weight,<br>backbone.layers.32.mixer.norm.weight,<br>backbone.layers.32.mixer.out_proj.biases,<br>backbone.layers.32.mixer.out_proj.scales,<br>backbone.layers.32.mixer.out_proj.weight,<br>backbone.layers.32.norm.weight,<br>backbone.layers.33.mixer.k_proj.biases,<br>backbone.layers.33.mixer.k_proj.scales,<br>backbone.layers.33.mixer.k_proj.weight,<br>backbone.layers.33.mixer.o_proj.biases,<br>backbone.layers.33.mixer.o_proj.scales,<br>backbone.layers.33.mixer.o_proj.weight,<br>backbone.layers.33.mixer.q_proj.biases,<br>backbone.layers.33.mixer.q_proj.scales,<br>backbone.layers.33.mixer.q_proj.weight,<br>backbone.layers.33.mixer.v_proj.biases,<br>backbone.layers.33.mixer.v_proj.scales,<br>backbone.layers.33.mixer.v_proj.weight,<br>backbone.layers.33.norm.weight,<br>backbone.layers.34.mixer.gate.e_score_correction_bias,<br>backbone.layers.34.mixer.gate.weight,<br>backbone.layers.34.mixer.shared_experts.down_proj.biases,<br>backbone.layers.34.mixer.shared_experts.down_proj.scales,<br>backbone.layers.34.mixer.shared_experts.down_proj.weight,<br>backbone.layers.34.mixer.shared_experts.up_proj.biases,<br>backbone.layers.34.mixer.shared_experts.up_proj.scales,<br>backbone.layers.34.mixer.shared_experts.up_proj.weight,<br>backbone.layers.34.mixer.switch_mlp.fc1.biases,<br>backbone.layers.34.mixer.switch_mlp.fc1.scales,<br>backbone.layers.34.mixer.switch_mlp.fc1.weight,<br>backbone.layers.34.mixer.switch_mlp.fc2.biases,<br>backbone.layers.34.mixer.switch_mlp.fc2.scales,<br>backbone.layers.34.mixer.switch_mlp.fc2.weight,<br>backbone.layers.34.norm.weight,<br>backbone.layers.35.mixer.A_log,<br>backbone.layers.35.mixer.D,<br>backbone.layers.35.mixer.conv1d.bias,<br>backbone.layers.35.mixer.conv1d.weight,<br>backbone.layers.35.mixer.dt_bias,<br>backbone.layers.35.mixer.in_proj.biases,<br>backbone.layers.35.mixer.in_proj.scales,<br>backbone.layers.35.mixer.in_proj.weight,<br>backbone.layers.35.mixer.norm.weight,<br>backbone.layers.35.mixer.out_proj.biases,<br>backbone.layers.35.mixer.out_proj.scales,<br>backbone.layers.35.mixer.out_proj.weight,<br>backbone.layers.35.norm.weight,<br>backbone.layers.36.mixer.gate.e_score_correction_bias,<br>backbone.layers.36.mixer.gate.weight,<br>backbone.layers.36.mixer.shared_experts.down_proj.biases,<br>backbone.layers.36.mixer.shared_experts.down_proj.scales,<br>backbone.layers.36.mixer.shared_experts.down_proj.weight,<br>backbone.layers.36.mixer.shared_experts.up_proj.biases,<br>backbone.layers.36.mixer.shared_experts.up_proj.scales,<br>backbone.layers.36.mixer.shared_experts.up_proj.weight,<br>backbone.layers.36.mixer.switch_mlp.fc1.biases,<br>backbone.layers.36.mixer.switch_mlp.fc1.scales,<br>backbone.layers.36.mixer.switch_mlp.fc1.weight,<br>backbone.layers.36.mixer.switch_mlp.fc2.biases,<br>backbone.layers.36.mixer.switch_mlp.fc2.scales,<br>backbone.layers.36.mixer.switch_mlp.fc2.weight,<br>backbone.layers.36.norm.weight,<br>backbone.layers.37.mixer.A_log,<br>backbone.layers.37.mixer.D,<br>backbone.layers.37.mixer.conv1d.bias,<br>backbone.layers.37.mixer.conv1d.weight,<br>backbone.layers.37.mixer.dt_bias,<br>backbone.layers.37.mixer.in_proj.biases,<br>backbone.layers.37.mixer.in_proj.scales,<br>backbone.layers.37.mixer.in_proj.weight,<br>backbone.layers.37.mixer.norm.weight,<br>backbone.layers.37.mixer.out_proj.biases,<br>backbone.layers.37.mixer.out_proj.scales,<br>backbone.layers.37.mixer.out_proj.weight,<br>backbone.layers.37.norm.weight,<br>backbone.layers.38.mixer.gate.e_score_correction_bias,<br>backbone.layers.38.mixer.gate.weight,<br>backbone.layers.38.mixer.shared_experts.down_proj.biases,<br>backbone.layers.38.mixer.shared_experts.down_proj.scales,<br>backbone.layers.38.mixer.shared_experts.down_proj.weight,<br>backbone.layers.38.mixer.shared_experts.up_proj.biases,<br>backbone.layers.38.mixer.shared_experts.up_proj.scales,<br>backbone.layers.38.mixer.shared_experts.up_proj.weight,<br>backbone.layers.38.mixer.switch_mlp.fc1.biases,<br>backbone.layers.38.mixer.switch_mlp.fc1.scales,<br>backbone.layers.38.mixer.switch_mlp.fc1.weight,<br>backbone.layers.38.mixer.switch_mlp.fc2.biases,<br>backbone.layers.38.mixer.switch_mlp.fc2.scales,<br>backbone.layers.38.mixer.switch_mlp.fc2.weight,<br>backbone.layers.38.norm.weight,<br>backbone.layers.39.mixer.A_log,<br>backbone.layers.39.mixer.D,<br>backbone.layers.39.mixer.conv1d.bias,<br>backbone.layers.39.mixer.conv1d.weight,<br>backbone.layers.39.mixer.dt_bias,<br>backbone.layers.39.mixer.in_proj.biases,<br>backbone.layers.39.mixer.in_proj.scales,<br>backbone.layers.39.mixer.in_proj.weight,<br>backbone.layers.39.mixer.norm.weight,<br>backbone.layers.39.mixer.out_proj.biases,<br>backbone.layers.39.mixer.out_proj.scales,<br>backbone.layers.39.mixer.out_proj.weight,<br>backbone.layers.39.norm.weight,<br>backbone.layers.4.mixer.A_log,<br>backbone.layers.4.mixer.D,<br>backbone.layers.4.mixer.conv1d.bias,<br>backbone.layers.4.mixer.conv1d.weight,<br>backbone.layers.4.mixer.dt_bias,<br>backbone.layers.4.mixer.in_proj.biases,<br>backbone.layers.4.mixer.in_proj.scales,<br>backbone.layers.4.mixer.in_proj.weight,<br>backbone.layers.4.mixer.norm.weight,<br>backbone.layers.4.mixer.out_proj.biases,<br>backbone.layers.4.mixer.out_proj.scales,<br>backbone.layers.4.mixer.out_proj.weight,<br>backbone.layers.4.norm.weight,<br>backbone.layers.40.mixer.gate.e_score_correction_bias,<br>backbone.layers.40.mixer.gate.weight,<br>backbone.layers.40.mixer.shared_experts.down_proj.biases,<br>backbone.layers.40.mixer.shared_experts.down_proj.scales,<br>backbone.layers.40.mixer.shared_experts.down_proj.weight,<br>backbone.layers.40.mixer.shared_experts.up_proj.biases,<br>backbone.layers.40.mixer.shared_experts.up_proj.scales,<br>backbone.layers.40.mixer.shared_experts.up_proj.weight,<br>backbone.layers.40.mixer.switch_mlp.fc1.biases,<br>backbone.layers.40.mixer.switch_mlp.fc1.scales,<br>backbone.layers.40.mixer.switch_mlp.fc1.weight,<br>backbone.layers.40.mixer.switch_mlp.fc2.biases,<br>backbone.layers.40.mixer.switch_mlp.fc2.scales,<br>backbone.layers.40.mixer.switch_mlp.fc2.weight,<br>backbone.layers.40.norm.weight,<br>backbone.layers.41.mixer.A_log,<br>backbone.layers.41.mixer.D,<br>backbone.layers.41.mixer.conv1d.bias,<br>backbone.layers.41.mixer.conv1d.weight,<br>backbone.layers.41.mixer.dt_bias,<br>backbone.layers.41.mixer.in_proj.biases,<br>backbone.layers.41.mixer.in_proj.scales,<br>backbone.layers.41.mixer.in_proj.weight,<br>backbone.layers.41.mixer.norm.weight,<br>backbone.layers.41.mixer.out_proj.biases,<br>backbone.layers.41.mixer.out_proj.scales,<br>backbone.layers.41.mixer.out_proj.weight,<br>backbone.layers.41.norm.weight,<br>backbone.layers.42.mixer.k_proj.biases,<br>backbone.layers.42.mixer.k_proj.scales,<br>backbone.layers.42.mixer.k_proj.weight,<br>backbone.layers.42.mixer.o_proj.biases,<br>backbone.layers.42.mixer.o_proj.scales,<br>backbone.layers.42.mixer.o_proj.weight,<br>backbone.layers.42.mixer.q_proj.biases,<br>backbone.layers.42.mixer.q_proj.scales,<br>backbone.layers.42.mixer.q_proj.weight,<br>backbone.layers.42.mixer.v_proj.biases,<br>backbone.layers.42.mixer.v_proj.scales,<br>backbone.layers.42.mixer.v_proj.weight,<br>backbone.layers.42.norm.weight,<br>backbone.layers.43.mixer.gate.e_score_correction_bias,<br>backbone.layers.43.mixer.gate.weight,<br>backbone.layers.43.mixer.shared_experts.down_proj.biases,<br>backbone.layers.43.mixer.shared_experts.down_proj.scales,<br>backbone.layers.43.mixer.shared_experts.down_proj.weight,<br>backbone.layers.43.mixer.shared_experts.up_proj.biases,<br>backbone.layers.43.mixer.shared_experts.up_proj.scales,<br>backbone.layers.43.mixer.shared_experts.up_proj.weight,<br>backbone.layers.43.mixer.switch_mlp.fc1.biases,<br>backbone.layers.43.mixer.switch_mlp.fc1.scales,<br>backbone.layers.43.mixer.switch_mlp.fc1.weight,<br>backbone.layers.43.mixer.switch_mlp.fc2.biases,<br>backbone.layers.43.mixer.switch_mlp.fc2.scales,<br>backbone.layers.43.mixer.switch_mlp.fc2.weight,<br>backbone.layers.43.norm.weight,<br>backbone.layers.44.mixer.A_log,<br>backbone.layers.44.mixer.D,<br>backbone.layers.44.mixer.conv1d.bias,<br>backbone.layers.44.mixer.conv1d.weight,<br>backbone.layers.44.mixer.dt_bias,<br>backbone.layers.44.mixer.in_proj.biases,<br>backbone.layers.44.mixer.in_proj.scales,<br>backbone.layers.44.mixer.in_proj.weight,<br>backbone.layers.44.mixer.norm.weight,<br>backbone.layers.44.mixer.out_proj.biases,<br>backbone.layers.44.mixer.out_proj.scales,<br>backbone.layers.44.mixer.out_proj.weight,<br>backbone.layers.44.norm.weight,<br>backbone.layers.45.mixer.gate.e_score_correction_bias,<br>backbone.layers.45.mixer.gate.weight,<br>backbone.layers.45.mixer.shared_experts.down_proj.biases,<br>backbone.layers.45.mixer.shared_experts.down_proj.scales,<br>backbone.layers.45.mixer.shared_experts.down_proj.weight,<br>backbone.layers.45.mixer.shared_experts.up_proj.biases,<br>backbone.layers.45.mixer.shared_experts.up_proj.scales,<br>backbone.layers.45.mixer.shared_experts.up_proj.weight,<br>backbone.layers.45.mixer.switch_mlp.fc1.biases,<br>backbone.layers.45.mixer.switch_mlp.fc1.scales,<br>backbone.layers.45.mixer.switch_mlp.fc1.weight,<br>backbone.layers.45.mixer.switch_mlp.fc2.biases,<br>backbone.layers.45.mixer.switch_mlp.fc2.scales,<br>backbone.layers.45.mixer.switch_mlp.fc2.weight,<br>backbone.layers.45.norm.weight,<br>backbone.layers.46.mixer.A_log,<br>backbone.layers.46.mixer.D,<br>backbone.layers.46.mixer.conv1d.bias,<br>backbone.layers.46.mixer.conv1d.weight,<br>backbone.layers.46.mixer.dt_bias,<br>backbone.layers.46.mixer.in_proj.biases,<br>backbone.layers.46.mixer.in_proj.scales,<br>backbone.layers.46.mixer.in_proj.weight,<br>backbone.layers.46.mixer.norm.weight,<br>backbone.layers.46.mixer.out_proj.biases,<br>backbone.layers.46.mixer.out_proj.scales,<br>backbone.layers.46.mixer.out_proj.weight,<br>backbone.layers.46.norm.weight,<br>backbone.layers.47.mixer.gate.e_score_correction_bias,<br>backbone.layers.47.mixer.gate.weight,<br>backbone.layers.47.mixer.shared_experts.down_proj.biases,<br>backbone.layers.47.mixer.shared_experts.down_proj.scales,<br>backbone.layers.47.mixer.shared_experts.down_proj.weight,<br>backbone.layers.47.mixer.shared_experts.up_proj.biases,<br>backbone.layers.47.mixer.shared_experts.up_proj.scales,<br>backbone.layers.47.mixer.shared_experts.up_proj.weight,<br>backbone.layers.47.mixer.switch_mlp.fc1.biases,<br>backbone.layers.47.mixer.switch_mlp.fc1.scales,<br>backbone.layers.47.mixer.switch_mlp.fc1.weight,<br>backbone.layers.47.mixer.switch_mlp.fc2.biases,<br>backbone.layers.47.mixer.switch_mlp.fc2.scales,<br>backbone.layers.47.mixer.switch_mlp.fc2.weight,<br>backbone.layers.47.norm.weight,<br>backbone.layers.48.mixer.A_log,<br>backbone.layers.48.mixer.D,<br>backbone.layers.48.mixer.conv1d.bias,<br>backbone.layers.48.mixer.conv1d.weight,<br>backbone.layers.48.mixer.dt_bias,<br>backbone.layers.48.mixer.in_proj.biases,<br>backbone.layers.48.mixer.in_proj.scales,<br>backbone.layers.48.mixer.in_proj.weight,<br>backbone.layers.48.mixer.norm.weight,<br>backbone.layers.48.mixer.out_proj.biases,<br>backbone.layers.48.mixer.out_proj.scales,<br>backbone.layers.48.mixer.out_proj.weight,<br>backbone.layers.48.norm.weight,<br>backbone.layers.49.mixer.gate.e_score_correction_bias,<br>backbone.layers.49.mixer.gate.weight,<br>backbone.layers.49.mixer.shared_experts.down_proj.biases,<br>backbone.layers.49.mixer.shared_experts.down_proj.scales,<br>backbone.layers.49.mixer.shared_experts.down_proj.weight,<br>backbone.layers.49.mixer.shared_experts.up_proj.biases,<br>backbone.layers.49.mixer.shared_experts.up_proj.scales,<br>backbone.layers.49.mixer.shared_experts.up_proj.weight,<br>backbone.layers.49.mixer.switch_mlp.fc1.biases,<br>backbone.layers.49.mixer.switch_mlp.fc1.scales,<br>backbone.layers.49.mixer.switch_mlp.fc1.weight,<br>backbone.layers.49.mixer.switch_mlp.fc2.biases,<br>backbone.layers.49.mixer.switch_mlp.fc2.scales,<br>backbone.layers.49.mixer.switch_mlp.fc2.weight,<br>backbone.layers.49.norm.weight,<br>backbone.layers.5.mixer.k_proj.biases,<br>backbone.layers.5.mixer.k_proj.scales,<br>backbone.layers.5.mixer.k_proj.weight,<br>backbone.layers.5.mixer.o_proj.biases,<br>backbone.layers.5.mixer.o_proj.scales,<br>backbone.layers.5.mixer.o_proj.weight,<br>backbone.layers.5.mixer.q_proj.biases,<br>backbone.layers.5.mixer.q_proj.scales,<br>backbone.layers.5.mixer.q_proj.weight,<br>backbone.layers.5.mixer.v_proj.biases,<br>backbone.layers.5.mixer.v_proj.scales,<br>backbone.layers.5.mixer.v_proj.weight,<br>backbone.layers.5.norm.weight,<br>backbone.layers.50.mixer.A_log,<br>backbone.layers.50.mixer.D,<br>backbone.layers.50.mixer.conv1d.bias,<br>backbone.layers.50.mixer.conv1d.weight,<br>backbone.layers.50.mixer.dt_bias,<br>backbone.layers.50.mixer.in_proj.biases,<br>backbone.layers.50.mixer.in_proj.scales,<br>backbone.layers.50.mixer.in_proj.weight,<br>backbone.layers.50.mixer.norm.weight,<br>backbone.layers.50.mixer.out_proj.biases,<br>backbone.layers.50.mixer.out_proj.scales,<br>backbone.layers.50.mixer.out_proj.weight,<br>backbone.layers.50.norm.weight,<br>backbone.layers.51.mixer.gate.e_score_correction_bias,<br>backbone.layers.51.mixer.gate.weight,<br>backbone.layers.51.mixer.shared_experts.down_proj.biases,<br>backbone.layers.51.mixer.shared_experts.down_proj.scales,<br>backbone.layers.51.mixer.shared_experts.down_proj.weight,<br>backbone.layers.51.mixer.shared_experts.up_proj.biases,<br>backbone.layers.51.mixer.shared_experts.up_proj.scales,<br>backbone.layers.51.mixer.shared_experts.up_proj.weight,<br>backbone.layers.51.mixer.switch_mlp.fc1.biases,<br>backbone.layers.51.mixer.switch_mlp.fc1.scales,<br>backbone.layers.51.mixer.switch_mlp.fc1.weight,<br>backbone.layers.51.mixer.switch_mlp.fc2.biases,<br>backbone.layers.51.mixer.switch_mlp.fc2.scales,<br>backbone.layers.51.mixer.switch_mlp.fc2.weight,<br>backbone.layers.51.norm.weight,<br>backbone.layers.6.mixer.gate.e_score_correction_bias,<br>backbone.layers.6.mixer.gate.weight,<br>backbone.layers.6.mixer.shared_experts.down_proj.biases,<br>backbone.layers.6.mixer.shared_experts.down_proj.scales,<br>backbone.layers.6.mixer.shared_experts.down_proj.weight,<br>backbone.layers.6.mixer.shared_experts.up_proj.biases,<br>backbone.layers.6.mixer.shared_experts.up_proj.scales,<br>backbone.layers.6.mixer.shared_experts.up_proj.weight,<br>backbone.layers.6.mixer.switch_mlp.fc1.biases,<br>backbone.layers.6.mixer.switch_mlp.fc1.scales,<br>backbone.layers.6.mixer.switch_mlp.fc1.weight,<br>backbone.layers.6.mixer.switch_mlp.fc2.biases,<br>backbone.layers.6.mixer.switch_mlp.fc2.scales,<br>backbone.layers.6.mixer.switch_mlp.fc2.weight,<br>backbone.layers.6.norm.weight,<br>backbone.layers.7.mixer.A_log,<br>backbone.layers.7.mixer.D,<br>backbone.layers.7.mixer.conv1d.bias,<br>backbone.layers.7.mixer.conv1d.weight,<br>backbone.layers.7.mixer.dt_bias,<br>backbone.layers.7.mixer.in_proj.biases,<br>backbone.layers.7.mixer.in_proj.scales,<br>backbone.layers.7.mixer.in_proj.weight,<br>backbone.layers.7.mixer.norm.weight,<br>backbone.layers.7.mixer.out_proj.biases,<br>backbone.layers.7.mixer.out_proj.scales,<br>backbone.layers.7.mixer.out_proj.weight,<br>backbone.layers.7.norm.weight,<br>backbone.layers.8.mixer.gate.e_score_correction_bias,<br>backbone.layers.8.mixer.gate.weight,<br>backbone.layers.8.mixer.shared_experts.down_proj.biases,<br>backbone.layers.8.mixer.shared_experts.down_proj.scales,<br>backbone.layers.8.mixer.shared_experts.down_proj.weight,<br>backbone.layers.8.mixer.shared_experts.up_proj.biases,<br>backbone.layers.8.mixer.shared_experts.up_proj.scales,<br>backbone.layers.8.mixer.shared_experts.up_proj.weight,<br>backbone.layers.8.mixer.switch_mlp.fc1.biases,<br>backbone.layers.8.mixer.switch_mlp.fc1.scales,<br>backbone.layers.8.mixer.switch_mlp.fc1.weight,<br>backbone.layers.8.mixer.switch_mlp.fc2.biases,<br>backbone.layers.8.mixer.switch_mlp.fc2.scales,<br>backbone.layers.8.mixer.switch_mlp.fc2.weight,<br>backbone.layers.8.norm.weight,<br>backbone.layers.9.mixer.A_log,<br>backbone.layers.9.mixer.D,<br>backbone.layers.9.mixer.conv1d.bias,<br>backbone.layers.9.mixer.conv1d.weight,<br>backbone.layers.9.mixer.dt_bias,<br>backbone.layers.9.mixer.in_proj.biases,<br>backbone.layers.9.mixer.in_proj.scales,<br>backbone.layers.9.mixer.in_proj.weight,<br>backbone.layers.9.mixer.norm.weight,<br>backbone.layers.9.mixer.out_proj.biases,<br>backbone.layers.9.mixer.out_proj.scales,<br>backbone.layers.9.mixer.out_proj.weight,<br>backbone.layers.9.norm.weight,<br>backbone.norm_f.weight,<br>lm_head.biases,<br>lm_head.scales,<br>lm_head.weight.
-- *Arch supported by installed mlx-vlm:* yes (model_type
-  nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 0.25s
-- *Generation time:* -
-- *Total time:* 0.25s
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.0671
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.0059
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-4bit/snapshots/8f86ad8f279ce1ec3b8b65970f32da1e89ab7a45
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14457, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13369, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 826, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1172, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
-    raise ValueError(
-        f"Received {num_extra} parameters not in model: \n{extras}."
-    )
-ValueError: Received 729 parameters not in model: 
-backbone.embeddings.biases,
-backbone.embeddings.scales,
-backbone.embeddings.weight,
-backbone.layers.0.mixer.A_log,
-backbone.layers.0.mixer.D,
-backbone.layers.0.mixer.conv1d.bias,
-backbone.layers.0.mixer.conv1d.weight,
-backbone.layers.0.mixer.dt_bias,
-backbone.layers.0.mixer.in_proj.biases,
-backbone.layers.0.mixer.in_proj.scales,
-backbone.layers.0.mixer.in_proj.weight,
-backbone.layers.0.mixer.norm.weight,
-backbone.layers.0.mixer.out_proj.biases,
-backbone.layers.0.mixer.out_proj.scales,
-backbone.layers.0.mixer.out_proj.weight,
-backbone.layers.0.norm.weight,
-backbone.layers.1.mixer.gate.e_score_correction_bias,
-backbone.layers.1.mixer.gate.weight,
-backbone.layers.1.mixer.shared_experts.down_proj.biases,
-backbone.layers.1.mixer.shared_experts.down_proj.scales,
-backbone.layers.1.mixer.shared_experts.down_proj.weight,
-backbone.layers.1.mixer.shared_experts.up_proj.biases,
-backbone.layers.1.mixer.shared_experts.up_proj.scales,
-backbone.layers.1.mixer.shared_experts.up_proj.weight,
-backbone.layers.1.mixer.switch_mlp.fc1.biases,
-backbone.layers.1.mixer.switch_mlp.fc1.scales,
-backbone.layers.1.mixer.switch_mlp.fc1.weight,
-backbone.layers.1.mixer.switch_mlp.fc2.biases,
-backbone.layers.1.mixer.switch_mlp.fc2.scales,
-backbone.layers.1.mixer.switch_mlp.fc2.weight,
-backbone.layers.1.norm.weight,
-backbone.layers.10.mixer.gate.e_score_correction_bias,
-backbone.layers.10.mixer.gate.weight,
-backbone.layers.10.mixer.shared_experts.down_proj.biases,
-backbone.layers.10.mixer.shared_experts.down_proj.scales,
-backbone.layers.10.mixer.shared_experts.down_proj.weight,
-backbone.layers.10.mixer.shared_experts.up_proj.biases,
-backbone.layers.10.mixer.shared_experts.up_proj.scales,
-backbone.layers.10.mixer.shared_experts.up_proj.weight,
-backbone.layers.10.mixer.switch_mlp.fc1.biases,
-backbone.layers.10.mixer.switch_mlp.fc1.scales,
-backbone.layers.10.mixer.switch_mlp.fc1.weight,
-backbone.layers.10.mixer.switch_mlp.fc2.biases,
-backbone.layers.10.mixer.switch_mlp.fc2.scales,
-backbone.layers.10.mixer.switch_mlp.fc2.weight,
-backbone.layers.10.norm.weight,
-backbone.layers.11.mixer.A_log,
-backbone.layers.11.mixer.D,
-backbone.layers.11.mixer.conv1d.bias,
-backbone.layers.11.mixer.conv1d.weight,
-backbone.layers.11.mixer.dt_bias,
-backbone.layers.11.mixer.in_proj.biases,
-backbone.layers.11.mixer.in_proj.scales,
-backbone.layers.11.mixer.in_proj.weight,
-backbone.layers.11.mixer.norm.weight,
-backbone.layers.11.mixer.out_proj.biases,
-backbone.layers.11.mixer.out_proj.scales,
-backbone.layers.11.mixer.out_proj.weight,
-backbone.layers.11.norm.weight,
-backbone.layers.12.mixer.k_proj.biases,
-backbone.layers.12.mixer.k_proj.scales,
-backbone.layers.12.mixer.k_proj.weight,
-backbone.layers.12.mixer.o_proj.biases,
-backbone.layers.12.mixer.o_proj.scales,
-backbone.layers.12.mixer.o_proj.weight,
-backbone.layers.12.mixer.q_proj.biases,
-backbone.layers.12.mixer.q_proj.scales,
-backbone.layers.12.mixer.q_proj.weight,
-backbone.layers.12.mixer.v_proj.biases,
-backbone.layers.12.mixer.v_proj.scales,
-backbone.layers.12.mixer.v_proj.weight,
-backbone.layers.12.norm.weight,
-backbone.layers.13.mixer.gate.e_score_correction_bias,
-backbone.layers.13.mixer.gate.weight,
-backbone.layers.13.mixer.shared_experts.down_proj.biases,
-backbone.layers.13.mixer.shared_experts.down_proj.scales,
-backbone.layers.13.mixer.shared_experts.down_proj.weight,
-backbone.layers.13.mixer.shared_experts.up_proj.biases,
-backbone.layers.13.mixer.shared_experts.up_proj.scales,
-backbone.layers.13.mixer.shared_experts.up_proj.weight,
-backbone.layers.13.mixer.switch_mlp.fc1.biases,
-backbone.layers.13.mixer.switch_mlp.fc1.scales,
-backbone.layers.13.mixer.switch_mlp.fc1.weight,
-backbone.layers.13.mixer.switch_mlp.fc2.biases,
-backbone.layers.13.mixer.switch_mlp.fc2.scales,
-backbone.layers.13.mixer.switch_mlp.fc2.weight,
-backbone.layers.13.norm.weight,
-backbone.layers.14.mixer.A_log,
-backbone.layers.14.mixer.D,
-backbone.layers.14.mixer.conv1d.bias,
-backbone.layers.14.mixer.conv1d.weight,
-backbone.layers.14.mixer.dt_bias,
-backbone.layers.14.mixer.in_proj.biases,
-backbone.layers.14.mixer.in_proj.scales,
-backbone.layers.14.mixer.in_proj.weight,
-backbone.layers.14.mixer.norm.weight,
-backbone.layers.14.mixer.out_proj.biases,
-backbone.layers.14.mixer.out_proj.scales,
-backbone.layers.14.mixer.out_proj.weight,
-backbone.layers.14.norm.weight,
-backbone.layers.15.mixer.gate.e_score_correction_bias,
-backbone.layers.15.mixer.gate.weight,
-backbone.layers.15.mixer.shared_experts.down_proj.biases,
-backbone.layers.15.mixer.shared_experts.down_proj.scales,
-backbone.layers.15.mixer.shared_experts.down_proj.weight,
-backbone.layers.15.mixer.shared_experts.up_proj.biases,
-backbone.layers.15.mixer.shared_experts.up_proj.scales,
-backbone.layers.15.mixer.shared_experts.up_proj.weight,
-backbone.layers.15.mixer.switch_mlp.fc1.biases,
-backbone.layers.15.mixer.switch_mlp.fc1.scales,
-backbone.layers.15.mixer.switch_mlp.fc1.weight,
-backbone.layers.15.mixer.switch_mlp.fc2.biases,
-backbone.layers.15.mixer.switch_mlp.fc2.scales,
-backbone.layers.15.mixer.switch_mlp.fc2.weight,
-backbone.layers.15.norm.weight,
-backbone.layers.16.mixer.A_log,
-backbone.layers.16.mixer.D,
-backbone.layers.16.mixer.conv1d.bias,
-backbone.layers.16.mixer.conv1d.weight,
-backbone.layers.16.mixer.dt_bias,
-backbone.layers.16.mixer.in_proj.biases,
-backbone.layers.16.mixer.in_proj.scales,
-backbone.layers.16.mixer.in_proj.weight,
-backbone.layers.16.mixer.norm.weight,
-backbone.layers.16.mixer.out_proj.biases,
-backbone.layers.16.mixer.out_proj.scales,
-backbone.layers.16.mixer.out_proj.weight,
-backbone.layers.16.norm.weight,
-backbone.layers.17.mixer.gate.e_score_correction_bias,
-backbone.layers.17.mixer.gate.weight,
-backbone.layers.17.mixer.shared_experts.down_proj.biases,
-backbone.layers.17.mixer.shared_experts.down_proj.scales,
-backbone.layers.17.mixer.shared_experts.down_proj.weight,
-backbone.layers.17.mixer.shared_experts.up_proj.biases,
-backbone.layers.17.mixer.shared_experts.up_proj.scales,
-backbone.layers.17.mixer.shared_experts.up_proj.weight,
-backbone.layers.17.mixer.switch_mlp.fc1.biases,
-backbone.layers.17.mixer.switch_mlp.fc1.scales,
-backbone.layers.17.mixer.switch_mlp.fc1.weight,
-backbone.layers.17.mixer.switch_mlp.fc2.biases,
-backbone.layers.17.mixer.switch_mlp.fc2.scales,
-backbone.layers.17.mixer.switch_mlp.fc2.weight,
-backbone.layers.17.norm.weight,
-backbone.layers.18.mixer.A_log,
-backbone.layers.18.mixer.D,
-backbone.layers.18.mixer.conv1d.bias,
-backbone.layers.18.mixer.conv1d.weight,
-backbone.layers.18.mixer.dt_bias,
-backbone.layers.18.mixer.in_proj.biases,
-backbone.layers.18.mixer.in_proj.scales,
-backbone.layers.18.mixer.in_proj.weight,
-backbone.layers.18.mixer.norm.weight,
-backbone.layers.18.mixer.out_proj.biases,
-backbone.layers.18.mixer.out_proj.scales,
-backbone.layers.18.mixer.out_proj.weight,
-backbone.layers.18.norm.weight,
-backbone.layers.19.mixer.k_proj.biases,
-backbone.layers.19.mixer.k_proj.scales,
-backbone.layers.19.mixer.k_proj.weight,
-backbone.layers.19.mixer.o_proj.biases,
-backbone.layers.19.mixer.o_proj.scales,
-backbone.layers.19.mixer.o_proj.weight,
-backbone.layers.19.mixer.q_proj.biases,
-backbone.layers.19.mixer.q_proj.scales,
-backbone.layers.19.mixer.q_proj.weight,
-backbone.layers.19.mixer.v_proj.biases,
-backbone.layers.19.mixer.v_proj.scales,
-backbone.layers.19.mixer.v_proj.weight,
-backbone.layers.19.norm.weight,
-backbone.layers.2.mixer.A_log,
-backbone.layers.2.mixer.D,
-backbone.layers.2.mixer.conv1d.bias,
-backbone.layers.2.mixer.conv1d.weight,
-backbone.layers.2.mixer.dt_bias,
-backbone.layers.2.mixer.in_proj.biases,
-backbone.layers.2.mixer.in_proj.scales,
-backbone.layers.2.mixer.in_proj.weight,
-backbone.layers.2.mixer.norm.weight,
-backbone.layers.2.mixer.out_proj.biases,
-backbone.layers.2.mixer.out_proj.scales,
-backbone.layers.2.mixer.out_proj.weight,
-backbone.layers.2.norm.weight,
-backbone.layers.20.mixer.gate.e_score_correction_bias,
-backbone.layers.20.mixer.gate.weight,
-backbone.layers.20.mixer.shared_experts.down_proj.biases,
-backbone.layers.20.mixer.shared_experts.down_proj.scales,
-backbone.layers.20.mixer.shared_experts.down_proj.weight,
-backbone.layers.20.mixer.shared_experts.up_proj.biases,
-backbone.layers.20.mixer.shared_experts.up_proj.scales,
-backbone.layers.20.mixer.shared_experts.up_proj.weight,
-backbone.layers.20.mixer.switch_mlp.fc1.biases,
-backbone.layers.20.mixer.switch_mlp.fc1.scales,
-backbone.layers.20.mixer.switch_mlp.fc1.weight,
-backbone.layers.20.mixer.switch_mlp.fc2.biases,
-backbone.layers.20.mixer.switch_mlp.fc2.scales,
-backbone.layers.20.mixer.switch_mlp.fc2.weight,
-backbone.layers.20.norm.weight,
-backbone.layers.21.mixer.A_log,
-backbone.layers.21.mixer.D,
-backbone.layers.21.mixer.conv1d.bias,
-backbone.layers.21.mixer.conv1d.weight,
-backbone.layers.21.mixer.dt_bias,
-backbone.layers.21.mixer.in_proj.biases,
-backbone.layers.21.mixer.in_proj.scales,
-backbone.layers.21.mixer.in_proj.weight,
-backbone.layers.21.mixer.norm.weight,
-backbone.layers.21.mixer.out_proj.biases,
-backbone.layers.21.mixer.out_proj.scales,
-backbone.layers.21.mixer.out_proj.weight,
-backbone.layers.21.norm.weight,
-backbone.layers.22.mixer.gate.e_score_correction_bias,
-backbone.layers.22.mixer.gate.weight,
-backbone.layers.22.mixer.shared_experts.down_proj.biases,
-backbone.layers.22.mixer.shared_experts.down_proj.scales,
-backbone.layers.22.mixer.shared_experts.down_proj.weight,
-backbone.layers.22.mixer.shared_experts.up_proj.biases,
-backbone.layers.22.mixer.shared_experts.up_proj.scales,
-backbone.layers.22.mixer.shared_experts.up_proj.weight,
-backbone.layers.22.mixer.switch_mlp.fc1.biases,
-backbone.layers.22.mixer.switch_mlp.fc1.scales,
-backbone.layers.22.mixer.switch_mlp.fc1.weight,
-backbone.layers.22.mixer.switch_mlp.fc2.biases,
-backbone.layers.22.mixer.switch_mlp.fc2.scales,
-backbone.layers.22.mixer.switch_mlp.fc2.weight,
-backbone.layers.22.norm.weight,
-backbone.layers.23.mixer.A_log,
-backbone.layers.23.mixer.D,
-backbone.layers.23.mixer.conv1d.bias,
-backbone.layers.23.mixer.conv1d.weight,
-backbone.layers.23.mixer.dt_bias,
-backbone.layers.23.mixer.in_proj.biases,
-backbone.layers.23.mixer.in_proj.scales,
-backbone.layers.23.mixer.in_proj.weight,
-backbone.layers.23.mixer.norm.weight,
-backbone.layers.23.mixer.out_proj.biases,
-backbone.layers.23.mixer.out_proj.scales,
-backbone.layers.23.mixer.out_proj.weight,
-backbone.layers.23.norm.weight,
-backbone.layers.24.mixer.gate.e_score_correction_bias,
-backbone.layers.24.mixer.gate.weight,
-backbone.layers.24.mixer.shared_experts.down_proj.biases,
-backbone.layers.24.mixer.shared_experts.down_proj.scales,
-backbone.layers.24.mixer.shared_experts.down_proj.weight,
-backbone.layers.24.mixer.shared_experts.up_proj.biases,
-backbone.layers.24.mixer.shared_experts.up_proj.scales,
-backbone.layers.24.mixer.shared_experts.up_proj.weight,
-backbone.layers.24.mixer.switch_mlp.fc1.biases,
-backbone.layers.24.mixer.switch_mlp.fc1.scales,
-backbone.layers.24.mixer.switch_mlp.fc1.weight,
-backbone.layers.24.mixer.switch_mlp.fc2.biases,
-backbone.layers.24.mixer.switch_mlp.fc2.scales,
-backbone.layers.24.mixer.switch_mlp.fc2.weight,
-backbone.layers.24.norm.weight,
-backbone.layers.25.mixer.A_log,
-backbone.layers.25.mixer.D,
-backbone.layers.25.mixer.conv1d.bias,
-backbone.layers.25.mixer.conv1d.weight,
-backbone.layers.25.mixer.dt_bias,
-backbone.layers.25.mixer.in_proj.biases,
-backbone.layers.25.mixer.in_proj.scales,
-backbone.layers.25.mixer.in_proj.weight,
-backbone.layers.25.mixer.norm.weight,
-backbone.layers.25.mixer.out_proj.biases,
-backbone.layers.25.mixer.out_proj.scales,
-backbone.layers.25.mixer.out_proj.weight,
-backbone.layers.25.norm.weight,
-backbone.layers.26.mixer.k_proj.biases,
-backbone.layers.26.mixer.k_proj.scales,
-backbone.layers.26.mixer.k_proj.weight,
-backbone.layers.26.mixer.o_proj.biases,
-backbone.layers.26.mixer.o_proj.scales,
-backbone.layers.26.mixer.o_proj.weight,
-backbone.layers.26.mixer.q_proj.biases,
-backbone.layers.26.mixer.q_proj.scales,
-backbone.layers.26.mixer.q_proj.weight,
-backbone.layers.26.mixer.v_proj.biases,
-backbone.layers.26.mixer.v_proj.scales,
-backbone.layers.26.mixer.v_proj.weight,
-backbone.layers.26.norm.weight,
-backbone.layers.27.mixer.gate.e_score_correction_bias,
-backbone.layers.27.mixer.gate.weight,
-backbone.layers.27.mixer.shared_experts.down_proj.biases,
-backbone.layers.27.mixer.shared_experts.down_proj.scales,
-backbone.layers.27.mixer.shared_experts.down_proj.weight,
-backbone.layers.27.mixer.shared_experts.up_proj.biases,
-backbone.layers.27.mixer.shared_experts.up_proj.scales,
-backbone.layers.27.mixer.shared_experts.up_proj.weight,
-backbone.layers.27.mixer.switch_mlp.fc1.biases,
-backbone.layers.27.mixer.switch_mlp.fc1.scales,
-backbone.layers.27.mixer.switch_mlp.fc1.weight,
-backbone.layers.27.mixer.switch_mlp.fc2.biases,
-backbone.layers.27.mixer.switch_mlp.fc2.scales,
-backbone.layers.27.mixer.switch_mlp.fc2.weight,
-backbone.layers.27.norm.weight,
-backbone.layers.28.mixer.A_log,
-backbone.layers.28.mixer.D,
-backbone.layers.28.mixer.conv1d.bias,
-backbone.layers.28.mixer.conv1d.weight,
-backbone.layers.28.mixer.dt_bias,
-backbone.layers.28.mixer.in_proj.biases,
-backbone.layers.28.mixer.in_proj.scales,
-backbone.layers.28.mixer.in_proj.weight,
-backbone.layers.28.mixer.norm.weight,
-backbone.layers.28.mixer.out_proj.biases,
-backbone.layers.28.mixer.out_proj.scales,
-backbone.layers.28.mixer.out_proj.weight,
-backbone.layers.28.norm.weight,
-backbone.layers.29.mixer.gate.e_score_correction_bias,
-backbone.layers.29.mixer.gate.weight,
-backbone.layers.29.mixer.shared_experts.down_proj.biases,
-backbone.layers.29.mixer.shared_experts.down_proj.scales,
-backbone.layers.29.mixer.shared_experts.down_proj.weight,
-backbone.layers.29.mixer.shared_experts.up_proj.biases,
-backbone.layers.29.mixer.shared_experts.up_proj.scales,
-backbone.layers.29.mixer.shared_experts.up_proj.weight,
-backbone.layers.29.mixer.switch_mlp.fc1.biases,
-backbone.layers.29.mixer.switch_mlp.fc1.scales,
-backbone.layers.29.mixer.switch_mlp.fc1.weight,
-backbone.layers.29.mixer.switch_mlp.fc2.biases,
-backbone.layers.29.mixer.switch_mlp.fc2.scales,
-backbone.layers.29.mixer.switch_mlp.fc2.weight,
-backbone.layers.29.norm.weight,
-backbone.layers.3.mixer.gate.e_score_correction_bias,
-backbone.layers.3.mixer.gate.weight,
-backbone.layers.3.mixer.shared_experts.down_proj.biases,
-backbone.layers.3.mixer.shared_experts.down_proj.scales,
-backbone.layers.3.mixer.shared_experts.down_proj.weight,
-backbone.layers.3.mixer.shared_experts.up_proj.biases,
-backbone.layers.3.mixer.shared_experts.up_proj.scales,
-backbone.layers.3.mixer.shared_experts.up_proj.weight,
-backbone.layers.3.mixer.switch_mlp.fc1.biases,
-backbone.layers.3.mixer.switch_mlp.fc1.scales,
-backbone.layers.3.mixer.switch_mlp.fc1.weight,
-backbone.layers.3.mixer.switch_mlp.fc2.biases,
-backbone.layers.3.mixer.switch_mlp.fc2.scales,
-backbone.layers.3.mixer.switch_mlp.fc2.weight,
-backbone.layers.3.norm.weight,
-backbone.layers.30.mixer.A_log,
-backbone.layers.30.mixer.D,
-backbone.layers.30.mixer.conv1d.bias,
-backbone.layers.30.mixer.conv1d.weight,
-backbone.layers.30.mixer.dt_bias,
-backbone.layers.30.mixer.in_proj.biases,
-backbone.layers.30.mixer.in_proj.scales,
-backbone.layers.30.mixer.in_proj.weight,
-backbone.layers.30.mixer.norm.weight,
-backbone.layers.30.mixer.out_proj.biases,
-backbone.layers.30.mixer.out_proj.scales,
-backbone.layers.30.mixer.out_proj.weight,
-backbone.layers.30.norm.weight,
-backbone.layers.31.mixer.gate.e_score_correction_bias,
-backbone.layers.31.mixer.gate.weight,
-backbone.layers.31.mixer.shared_experts.down_proj.biases,
-backbone.layers.31.mixer.shared_experts.down_proj.scales,
-backbone.layers.31.mixer.shared_experts.down_proj.weight,
-backbone.layers.31.mixer.shared_experts.up_proj.biases,
-backbone.layers.31.mixer.shared_experts.up_proj.scales,
-backbone.layers.31.mixer.shared_experts.up_proj.weight,
-backbone.layers.31.mixer.switch_mlp.fc1.biases,
-backbone.layers.31.mixer.switch_mlp.fc1.scales,
-backbone.layers.31.mixer.switch_mlp.fc1.weight,
-backbone.layers.31.mixer.switch_mlp.fc2.biases,
-backbone.layers.31.mixer.switch_mlp.fc2.scales,
-backbone.layers.31.mixer.switch_mlp.fc2.weight,
-backbone.layers.31.norm.weight,
-backbone.layers.32.mixer.A_log,
-backbone.layers.32.mixer.D,
-backbone.layers.32.mixer.conv1d.bias,
-backbone.layers.32.mixer.conv1d.weight,
-backbone.layers.32.mixer.dt_bias,
-backbone.layers.32.mixer.in_proj.biases,
-backbone.layers.32.mixer.in_proj.scales,
-backbone.layers.32.mixer.in_proj.weight,
-backbone.layers.32.mixer.norm.weight,
-backbone.layers.32.mixer.out_proj.biases,
-backbone.layers.32.mixer.out_proj.scales,
-backbone.layers.32.mixer.out_proj.weight,
-backbone.layers.32.norm.weight,
-backbone.layers.33.mixer.k_proj.biases,
-backbone.layers.33.mixer.k_proj.scales,
-backbone.layers.33.mixer.k_proj.weight,
-backbone.layers.33.mixer.o_proj.biases,
-backbone.layers.33.mixer.o_proj.scales,
-backbone.layers.33.mixer.o_proj.weight,
-backbone.layers.33.mixer.q_proj.biases,
-backbone.layers.33.mixer.q_proj.scales,
-backbone.layers.33.mixer.q_proj.weight,
-backbone.layers.33.mixer.v_proj.biases,
-backbone.layers.33.mixer.v_proj.scales,
-backbone.layers.33.mixer.v_proj.weight,
-backbone.layers.33.norm.weight,
-backbone.layers.34.mixer.gate.e_score_correction_bias,
-backbone.layers.34.mixer.gate.weight,
-backbone.layers.34.mixer.shared_experts.down_proj.biases,
-backbone.layers.34.mixer.shared_experts.down_proj.scales,
-backbone.layers.34.mixer.shared_experts.down_proj.weight,
-backbone.layers.34.mixer.shared_experts.up_proj.biases,
-backbone.layers.34.mixer.shared_experts.up_proj.scales,
-backbone.layers.34.mixer.shared_experts.up_proj.weight,
-backbone.layers.34.mixer.switch_mlp.fc1.biases,
-backbone.layers.34.mixer.switch_mlp.fc1.scales,
-backbone.layers.34.mixer.switch_mlp.fc1.weight,
-backbone.layers.34.mixer.switch_mlp.fc2.biases,
-backbone.layers.34.mixer.switch_mlp.fc2.scales,
-backbone.layers.34.mixer.switch_mlp.fc2.weight,
-backbone.layers.34.norm.weight,
-backbone.layers.35.mixer.A_log,
-backbone.layers.35.mixer.D,
-backbone.layers.35.mixer.conv1d.bias,
-backbone.layers.35.mixer.conv1d.weight,
-backbone.layers.35.mixer.dt_bias,
-backbone.layers.35.mixer.in_proj.biases,
-backbone.layers.35.mixer.in_proj.scales,
-backbone.layers.35.mixer.in_proj.weight,
-backbone.layers.35.mixer.norm.weight,
-backbone.layers.35.mixer.out_proj.biases,
-backbone.layers.35.mixer.out_proj.scales,
-backbone.layers.35.mixer.out_proj.weight,
-backbone.layers.35.norm.weight,
-backbone.layers.36.mixer.gate.e_score_correction_bias,
-backbone.layers.36.mixer.gate.weight,
-backbone.layers.36.mixer.shared_experts.down_proj.biases,
-backbone.layers.36.mixer.shared_experts.down_proj.scales,
-backbone.layers.36.mixer.shared_experts.down_proj.weight,
-backbone.layers.36.mixer.shared_experts.up_proj.biases,
-backbone.layers.36.mixer.shared_experts.up_proj.scales,
-backbone.layers.36.mixer.shared_experts.up_proj.weight,
-backbone.layers.36.mixer.switch_mlp.fc1.biases,
-backbone.layers.36.mixer.switch_mlp.fc1.scales,
-backbone.layers.36.mixer.switch_mlp.fc1.weight,
-backbone.layers.36.mixer.switch_mlp.fc2.biases,
-backbone.layers.36.mixer.switch_mlp.fc2.scales,
-backbone.layers.36.mixer.switch_mlp.fc2.weight,
-backbone.layers.36.norm.weight,
-backbone.layers.37.mixer.A_log,
-backbone.layers.37.mixer.D,
-backbone.layers.37.mixer.conv1d.bias,
-backbone.layers.37.mixer.conv1d.weight,
-backbone.layers.37.mixer.dt_bias,
-backbone.layers.37.mixer.in_proj.biases,
-backbone.layers.37.mixer.in_proj.scales,
-backbone.layers.37.mixer.in_proj.weight,
-backbone.layers.37.mixer.norm.weight,
-backbone.layers.37.mixer.out_proj.biases,
-backbone.layers.37.mixer.out_proj.scales,
-backbone.layers.37.mixer.out_proj.weight,
-backbone.layers.37.norm.weight,
-backbone.layers.38.mixer.gate.e_score_correction_bias,
-backbone.layers.38.mixer.gate.weight,
-backbone.layers.38.mixer.shared_experts.down_proj.biases,
-backbone.layers.38.mixer.shared_experts.down_proj.scales,
-backbone.layers.38.mixer.shared_experts.down_proj.weight,
-backbone.layers.38.mixer.shared_experts.up_proj.biases,
-backbone.layers.38.mixer.shared_experts.up_proj.scales,
-backbone.layers.38.mixer.shared_experts.up_proj.weight,
-backbone.layers.38.mixer.switch_mlp.fc1.biases,
-backbone.layers.38.mixer.switch_mlp.fc1.scales,
-backbone.layers.38.mixer.switch_mlp.fc1.weight,
-backbone.layers.38.mixer.switch_mlp.fc2.biases,
-backbone.layers.38.mixer.switch_mlp.fc2.scales,
-backbone.layers.38.mixer.switch_mlp.fc2.weight,
-backbone.layers.38.norm.weight,
-backbone.layers.39.mixer.A_log,
-backbone.layers.39.mixer.D,
-backbone.layers.39.mixer.conv1d.bias,
-backbone.layers.39.mixer.conv1d.weight,
-backbone.layers.39.mixer.dt_bias,
-backbone.layers.39.mixer.in_proj.biases,
-backbone.layers.39.mixer.in_proj.scales,
-backbone.layers.39.mixer.in_proj.weight,
-backbone.layers.39.mixer.norm.weight,
-backbone.layers.39.mixer.out_proj.biases,
-backbone.layers.39.mixer.out_proj.scales,
-backbone.layers.39.mixer.out_proj.weight,
-backbone.layers.39.norm.weight,
-backbone.layers.4.mixer.A_log,
-backbone.layers.4.mixer.D,
-backbone.layers.4.mixer.conv1d.bias,
-backbone.layers.4.mixer.conv1d.weight,
-backbone.layers.4.mixer.dt_bias,
-backbone.layers.4.mixer.in_proj.biases,
-backbone.layers.4.mixer.in_proj.scales,
-backbone.layers.4.mixer.in_proj.weight,
-backbone.layers.4.mixer.norm.weight,
-backbone.layers.4.mixer.out_proj.biases,
-backbone.layers.4.mixer.out_proj.scales,
-backbone.layers.4.mixer.out_proj.weight,
-backbone.layers.4.norm.weight,
-backbone.layers.40.mixer.gate.e_score_correction_bias,
-backbone.layers.40.mixer.gate.weight,
-backbone.layers.40.mixer.shared_experts.down_proj.biases,
-backbone.layers.40.mixer.shared_experts.down_proj.scales,
-backbone.layers.40.mixer.shared_experts.down_proj.weight,
-backbone.layers.40.mixer.shared_experts.up_proj.biases,
-backbone.layers.40.mixer.shared_experts.up_proj.scales,
-backbone.layers.40.mixer.shared_experts.up_proj.weight,
-backbone.layers.40.mixer.switch_mlp.fc1.biases,
-backbone.layers.40.mixer.switch_mlp.fc1.scales,
-backbone.layers.40.mixer.switch_mlp.fc1.weight,
-backbone.layers.40.mixer.switch_mlp.fc2.biases,
-backbone.layers.40.mixer.switch_mlp.fc2.scales,
-backbone.layers.40.mixer.switch_mlp.fc2.weight,
-backbone.layers.40.norm.weight,
-backbone.layers.41.mixer.A_log,
-backbone.layers.41.mixer.D,
-backbone.layers.41.mixer.conv1d.bias,
-backbone.layers.41.mixer.conv1d.weight,
-backbone.layers.41.mixer.dt_bias,
-backbone.layers.41.mixer.in_proj.biases,
-backbone.layers.41.mixer.in_proj.scales,
-backbone.layers.41.mixer.in_proj.weight,
-backbone.layers.41.mixer.norm.weight,
-backbone.layers.41.mixer.out_proj.biases,
-backbone.layers.41.mixer.out_proj.scales,
-backbone.layers.41.mixer.out_proj.weight,
-backbone.layers.41.norm.weight,
-backbone.layers.42.mixer.k_proj.biases,
-backbone.layers.42.mixer.k_proj.scales,
-backbone.layers.42.mixer.k_proj.weight,
-backbone.layers.42.mixer.o_proj.biases,
-backbone.layers.42.mixer.o_proj.scales,
-backbone.layers.42.mixer.o_proj.weight,
-backbone.layers.42.mixer.q_proj.biases,
-backbone.layers.42.mixer.q_proj.scales,
-backbone.layers.42.mixer.q_proj.weight,
-backbone.layers.42.mixer.v_proj.biases,
-backbone.layers.42.mixer.v_proj.scales,
-backbone.layers.42.mixer.v_proj.weight,
-backbone.layers.42.norm.weight,
-backbone.layers.43.mixer.gate.e_score_correction_bias,
-backbone.layers.43.mixer.gate.weight,
-backbone.layers.43.mixer.shared_experts.down_proj.biases,
-backbone.layers.43.mixer.shared_experts.down_proj.scales,
-backbone.layers.43.mixer.shared_experts.down_proj.weight,
-backbone.layers.43.mixer.shared_experts.up_proj.biases,
-backbone.layers.43.mixer.shared_experts.up_proj.scales,
-backbone.layers.43.mixer.shared_experts.up_proj.weight,
-backbone.layers.43.mixer.switch_mlp.fc1.biases,
-backbone.layers.43.mixer.switch_mlp.fc1.scales,
-backbone.layers.43.mixer.switch_mlp.fc1.weight,
-backbone.layers.43.mixer.switch_mlp.fc2.biases,
-backbone.layers.43.mixer.switch_mlp.fc2.scales,
-backbone.layers.43.mixer.switch_mlp.fc2.weight,
-backbone.layers.43.norm.weight,
-backbone.layers.44.mixer.A_log,
-backbone.layers.44.mixer.D,
-backbone.layers.44.mixer.conv1d.bias,
-backbone.layers.44.mixer.conv1d.weight,
-backbone.layers.44.mixer.dt_bias,
-backbone.layers.44.mixer.in_proj.biases,
-backbone.layers.44.mixer.in_proj.scales,
-backbone.layers.44.mixer.in_proj.weight,
-backbone.layers.44.mixer.norm.weight,
-backbone.layers.44.mixer.out_proj.biases,
-backbone.layers.44.mixer.out_proj.scales,
-backbone.layers.44.mixer.out_proj.weight,
-backbone.layers.44.norm.weight,
-backbone.layers.45.mixer.gate.e_score_correction_bias,
-backbone.layers.45.mixer.gate.weight,
-backbone.layers.45.mixer.shared_experts.down_proj.biases,
-backbone.layers.45.mixer.shared_experts.down_proj.scales,
-backbone.layers.45.mixer.shared_experts.down_proj.weight,
-backbone.layers.45.mixer.shared_experts.up_proj.biases,
-backbone.layers.45.mixer.shared_experts.up_proj.scales,
-backbone.layers.45.mixer.shared_experts.up_proj.weight,
-backbone.layers.45.mixer.switch_mlp.fc1.biases,
-backbone.layers.45.mixer.switch_mlp.fc1.scales,
-backbone.layers.45.mixer.switch_mlp.fc1.weight,
-backbone.layers.45.mixer.switch_mlp.fc2.biases,
-backbone.layers.45.mixer.switch_mlp.fc2.scales,
-backbone.layers.45.mixer.switch_mlp.fc2.weight,
-backbone.layers.45.norm.weight,
-backbone.layers.46.mixer.A_log,
-backbone.layers.46.mixer.D,
-backbone.layers.46.mixer.conv1d.bias,
-backbone.layers.46.mixer.conv1d.weight,
-backbone.layers.46.mixer.dt_bias,
-backbone.layers.46.mixer.in_proj.biases,
-backbone.layers.46.mixer.in_proj.scales,
-backbone.layers.46.mixer.in_proj.weight,
-backbone.layers.46.mixer.norm.weight,
-backbone.layers.46.mixer.out_proj.biases,
-backbone.layers.46.mixer.out_proj.scales,
-backbone.layers.46.mixer.out_proj.weight,
-backbone.layers.46.norm.weight,
-backbone.layers.47.mixer.gate.e_score_correction_bias,
-backbone.layers.47.mixer.gate.weight,
-backbone.layers.47.mixer.shared_experts.down_proj.biases,
-backbone.layers.47.mixer.shared_experts.down_proj.scales,
-backbone.layers.47.mixer.shared_experts.down_proj.weight,
-backbone.layers.47.mixer.shared_experts.up_proj.biases,
-backbone.layers.47.mixer.shared_experts.up_proj.scales,
-backbone.layers.47.mixer.shared_experts.up_proj.weight,
-backbone.layers.47.mixer.switch_mlp.fc1.biases,
-backbone.layers.47.mixer.switch_mlp.fc1.scales,
-backbone.layers.47.mixer.switch_mlp.fc1.weight,
-backbone.layers.47.mixer.switch_mlp.fc2.biases,
-backbone.layers.47.mixer.switch_mlp.fc2.scales,
-backbone.layers.47.mixer.switch_mlp.fc2.weight,
-backbone.layers.47.norm.weight,
-backbone.layers.48.mixer.A_log,
-backbone.layers.48.mixer.D,
-backbone.layers.48.mixer.conv1d.bias,
-backbone.layers.48.mixer.conv1d.weight,
-backbone.layers.48.mixer.dt_bias,
-backbone.layers.48.mixer.in_proj.biases,
-backbone.layers.48.mixer.in_proj.scales,
-backbone.layers.48.mixer.in_proj.weight,
-backbone.layers.48.mixer.norm.weight,
-backbone.layers.48.mixer.out_proj.biases,
-backbone.layers.48.mixer.out_proj.scales,
-backbone.layers.48.mixer.out_proj.weight,
-backbone.layers.48.norm.weight,
-backbone.layers.49.mixer.gate.e_score_correction_bias,
-backbone.layers.49.mixer.gate.weight,
-backbone.layers.49.mixer.shared_experts.down_proj.biases,
-backbone.layers.49.mixer.shared_experts.down_proj.scales,
-backbone.layers.49.mixer.shared_experts.down_proj.weight,
-backbone.layers.49.mixer.shared_experts.up_proj.biases,
-backbone.layers.49.mixer.shared_experts.up_proj.scales,
-backbone.layers.49.mixer.shared_experts.up_proj.weight,
-backbone.layers.49.mixer.switch_mlp.fc1.biases,
-backbone.layers.49.mixer.switch_mlp.fc1.scales,
-backbone.layers.49.mixer.switch_mlp.fc1.weight,
-backbone.layers.49.mixer.switch_mlp.fc2.biases,
-backbone.layers.49.mixer.switch_mlp.fc2.scales,
-backbone.layers.49.mixer.switch_mlp.fc2.weight,
-backbone.layers.49.norm.weight,
-backbone.layers.5.mixer.k_proj.biases,
-backbone.layers.5.mixer.k_proj.scales,
-backbone.layers.5.mixer.k_proj.weight,
-backbone.layers.5.mixer.o_proj.biases,
-backbone.layers.5.mixer.o_proj.scales,
-backbone.layers.5.mixer.o_proj.weight,
-backbone.layers.5.mixer.q_proj.biases,
-backbone.layers.5.mixer.q_proj.scales,
-backbone.layers.5.mixer.q_proj.weight,
-backbone.layers.5.mixer.v_proj.biases,
-backbone.layers.5.mixer.v_proj.scales,
-backbone.layers.5.mixer.v_proj.weight,
-backbone.layers.5.norm.weight,
-backbone.layers.50.mixer.A_log,
-backbone.layers.50.mixer.D,
-backbone.layers.50.mixer.conv1d.bias,
-backbone.layers.50.mixer.conv1d.weight,
-backbone.layers.50.mixer.dt_bias,
-backbone.layers.50.mixer.in_proj.biases,
-backbone.layers.50.mixer.in_proj.scales,
-backbone.layers.50.mixer.in_proj.weight,
-backbone.layers.50.mixer.norm.weight,
-backbone.layers.50.mixer.out_proj.biases,
-backbone.layers.50.mixer.out_proj.scales,
-backbone.layers.50.mixer.out_proj.weight,
-backbone.layers.50.norm.weight,
-backbone.layers.51.mixer.gate.e_score_correction_bias,
-backbone.layers.51.mixer.gate.weight,
-backbone.layers.51.mixer.shared_experts.down_proj.biases,
-backbone.layers.51.mixer.shared_experts.down_proj.scales,
-backbone.layers.51.mixer.shared_experts.down_proj.weight,
-backbone.layers.51.mixer.shared_experts.up_proj.biases,
-backbone.layers.51.mixer.shared_experts.up_proj.scales,
-backbone.layers.51.mixer.shared_experts.up_proj.weight,
-backbone.layers.51.mixer.switch_mlp.fc1.biases,
-backbone.layers.51.mixer.switch_mlp.fc1.scales,
-backbone.layers.51.mixer.switch_mlp.fc1.weight,
-backbone.layers.51.mixer.switch_mlp.fc2.biases,
-backbone.layers.51.mixer.switch_mlp.fc2.scales,
-backbone.layers.51.mixer.switch_mlp.fc2.weight,
-backbone.layers.51.norm.weight,
-backbone.layers.6.mixer.gate.e_score_correction_bias,
-backbone.layers.6.mixer.gate.weight,
-backbone.layers.6.mixer.shared_experts.down_proj.biases,
-backbone.layers.6.mixer.shared_experts.down_proj.scales,
-backbone.layers.6.mixer.shared_experts.down_proj.weight,
-backbone.layers.6.mixer.shared_experts.up_proj.biases,
-backbone.layers.6.mixer.shared_experts.up_proj.scales,
-backbone.layers.6.mixer.shared_experts.up_proj.weight,
-backbone.layers.6.mixer.switch_mlp.fc1.biases,
-backbone.layers.6.mixer.switch_mlp.fc1.scales,
-backbone.layers.6.mixer.switch_mlp.fc1.weight,
-backbone.layers.6.mixer.switch_mlp.fc2.biases,
-backbone.layers.6.mixer.switch_mlp.fc2.scales,
-backbone.layers.6.mixer.switch_mlp.fc2.weight,
-backbone.layers.6.norm.weight,
-backbone.layers.7.mixer.A_log,
-backbone.layers.7.mixer.D,
-backbone.layers.7.mixer.conv1d.bias,
-backbone.layers.7.mixer.conv1d.weight,
-backbone.layers.7.mixer.dt_bias,
-backbone.layers.7.mixer.in_proj.biases,
-backbone.layers.7.mixer.in_proj.scales,
-backbone.layers.7.mixer.in_proj.weight,
-backbone.layers.7.mixer.norm.weight,
-backbone.layers.7.mixer.out_proj.biases,
-backbone.layers.7.mixer.out_proj.scales,
-backbone.layers.7.mixer.out_proj.weight,
-backbone.layers.7.norm.weight,
-backbone.layers.8.mixer.gate.e_score_correction_bias,
-backbone.layers.8.mixer.gate.weight,
-backbone.layers.8.mixer.shared_experts.down_proj.biases,
-backbone.layers.8.mixer.shared_experts.down_proj.scales,
-backbone.layers.8.mixer.shared_experts.down_proj.weight,
-backbone.layers.8.mixer.shared_experts.up_proj.biases,
-backbone.layers.8.mixer.shared_experts.up_proj.scales,
-backbone.layers.8.mixer.shared_experts.up_proj.weight,
-backbone.layers.8.mixer.switch_mlp.fc1.biases,
-backbone.layers.8.mixer.switch_mlp.fc1.scales,
-backbone.layers.8.mixer.switch_mlp.fc1.weight,
-backbone.layers.8.mixer.switch_mlp.fc2.biases,
-backbone.layers.8.mixer.switch_mlp.fc2.scales,
-backbone.layers.8.mixer.switch_mlp.fc2.weight,
-backbone.layers.8.norm.weight,
-backbone.layers.9.mixer.A_log,
-backbone.layers.9.mixer.D,
-backbone.layers.9.mixer.conv1d.bias,
-backbone.layers.9.mixer.conv1d.weight,
-backbone.layers.9.mixer.dt_bias,
-backbone.layers.9.mixer.in_proj.biases,
-backbone.layers.9.mixer.in_proj.scales,
-backbone.layers.9.mixer.in_proj.weight,
-backbone.layers.9.mixer.norm.weight,
-backbone.layers.9.mixer.out_proj.biases,
-backbone.layers.9.mixer.out_proj.scales,
-backbone.layers.9.mixer.out_proj.weight,
-backbone.layers.9.norm.weight,
-backbone.norm_f.weight,
-lm_head.biases,
-lm_head.scales,
-lm_head.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15585, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14472, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Received 729 parameters not in model: 
-backbone.embeddings.biases,
-backbone.embeddings.scales,
-backbone.embeddings.weight,
-backbone.layers.0.mixer.A_log,
-backbone.layers.0.mixer.D,
-backbone.layers.0.mixer.conv1d.bias,
-backbone.layers.0.mixer.conv1d.weight,
-backbone.layers.0.mixer.dt_bias,
-backbone.layers.0.mixer.in_proj.biases,
-backbone.layers.0.mixer.in_proj.scales,
-backbone.layers.0.mixer.in_proj.weight,
-backbone.layers.0.mixer.norm.weight,
-backbone.layers.0.mixer.out_proj.biases,
-backbone.layers.0.mixer.out_proj.scales,
-backbone.layers.0.mixer.out_proj.weight,
-backbone.layers.0.norm.weight,
-backbone.layers.1.mixer.gate.e_score_correction_bias,
-backbone.layers.1.mixer.gate.weight,
-backbone.layers.1.mixer.shared_experts.down_proj.biases,
-backbone.layers.1.mixer.shared_experts.down_proj.scales,
-backbone.layers.1.mixer.shared_experts.down_proj.weight,
-backbone.layers.1.mixer.shared_experts.up_proj.biases,
-backbone.layers.1.mixer.shared_experts.up_proj.scales,
-backbone.layers.1.mixer.shared_experts.up_proj.weight,
-backbone.layers.1.mixer.switch_mlp.fc1.biases,
-backbone.layers.1.mixer.switch_mlp.fc1.scales,
-backbone.layers.1.mixer.switch_mlp.fc1.weight,
-backbone.layers.1.mixer.switch_mlp.fc2.biases,
-backbone.layers.1.mixer.switch_mlp.fc2.scales,
-backbone.layers.1.mixer.switch_mlp.fc2.weight,
-backbone.layers.1.norm.weight,
-backbone.layers.10.mixer.gate.e_score_correction_bias,
-backbone.layers.10.mixer.gate.weight,
-backbone.layers.10.mixer.shared_experts.down_proj.biases,
-backbone.layers.10.mixer.shared_experts.down_proj.scales,
-backbone.layers.10.mixer.shared_experts.down_proj.weight,
-backbone.layers.10.mixer.shared_experts.up_proj.biases,
-backbone.layers.10.mixer.shared_experts.up_proj.scales,
-backbone.layers.10.mixer.shared_experts.up_proj.weight,
-backbone.layers.10.mixer.switch_mlp.fc1.biases,
-backbone.layers.10.mixer.switch_mlp.fc1.scales,
-backbone.layers.10.mixer.switch_mlp.fc1.weight,
-backbone.layers.10.mixer.switch_mlp.fc2.biases,
-backbone.layers.10.mixer.switch_mlp.fc2.scales,
-backbone.layers.10.mixer.switch_mlp.fc2.weight,
-backbone.layers.10.norm.weight,
-backbone.layers.11.mixer.A_log,
-backbone.layers.11.mixer.D,
-backbone.layers.11.mixer.conv1d.bias,
-backbone.layers.11.mixer.conv1d.weight,
-backbone.layers.11.mixer.dt_bias,
-backbone.layers.11.mixer.in_proj.biases,
-backbone.layers.11.mixer.in_proj.scales,
-backbone.layers.11.mixer.in_proj.weight,
-backbone.layers.11.mixer.norm.weight,
-backbone.layers.11.mixer.out_proj.biases,
-backbone.layers.11.mixer.out_proj.scales,
-backbone.layers.11.mixer.out_proj.weight,
-backbone.layers.11.norm.weight,
-backbone.layers.12.mixer.k_proj.biases,
-backbone.layers.12.mixer.k_proj.scales,
-backbone.layers.12.mixer.k_proj.weight,
-backbone.layers.12.mixer.o_proj.biases,
-backbone.layers.12.mixer.o_proj.scales,
-backbone.layers.12.mixer.o_proj.weight,
-backbone.layers.12.mixer.q_proj.biases,
-backbone.layers.12.mixer.q_proj.scales,
-backbone.layers.12.mixer.q_proj.weight,
-backbone.layers.12.mixer.v_proj.biases,
-backbone.layers.12.mixer.v_proj.scales,
-backbone.layers.12.mixer.v_proj.weight,
-backbone.layers.12.norm.weight,
-backbone.layers.13.mixer.gate.e_score_correction_bias,
-backbone.layers.13.mixer.gate.weight,
-backbone.layers.13.mixer.shared_experts.down_proj.biases,
-backbone.layers.13.mixer.shared_experts.down_proj.scales,
-backbone.layers.13.mixer.shared_experts.down_proj.weight,
-backbone.layers.13.mixer.shared_experts.up_proj.biases,
-backbone.layers.13.mixer.shared_experts.up_proj.scales,
-backbone.layers.13.mixer.shared_experts.up_proj.weight,
-backbone.layers.13.mixer.switch_mlp.fc1.biases,
-backbone.layers.13.mixer.switch_mlp.fc1.scales,
-backbone.layers.13.mixer.switch_mlp.fc1.weight,
-backbone.layers.13.mixer.switch_mlp.fc2.biases,
-backbone.layers.13.mixer.switch_mlp.fc2.scales,
-backbone.layers.13.mixer.switch_mlp.fc2.weight,
-backbone.layers.13.norm.weight,
-backbone.layers.14.mixer.A_log,
-backbone.layers.14.mixer.D,
-backbone.layers.14.mixer.conv1d.bias,
-backbone.layers.14.mixer.conv1d.weight,
-backbone.layers.14.mixer.dt_bias,
-backbone.layers.14.mixer.in_proj.biases,
-backbone.layers.14.mixer.in_proj.scales,
-backbone.layers.14.mixer.in_proj.weight,
-backbone.layers.14.mixer.norm.weight,
-backbone.layers.14.mixer.out_proj.biases,
-backbone.layers.14.mixer.out_proj.scales,
-backbone.layers.14.mixer.out_proj.weight,
-backbone.layers.14.norm.weight,
-backbone.layers.15.mixer.gate.e_score_correction_bias,
-backbone.layers.15.mixer.gate.weight,
-backbone.layers.15.mixer.shared_experts.down_proj.biases,
-backbone.layers.15.mixer.shared_experts.down_proj.scales,
-backbone.layers.15.mixer.shared_experts.down_proj.weight,
-backbone.layers.15.mixer.shared_experts.up_proj.biases,
-backbone.layers.15.mixer.shared_experts.up_proj.scales,
-backbone.layers.15.mixer.shared_experts.up_proj.weight,
-backbone.layers.15.mixer.switch_mlp.fc1.biases,
-backbone.layers.15.mixer.switch_mlp.fc1.scales,
-backbone.layers.15.mixer.switch_mlp.fc1.weight,
-backbone.layers.15.mixer.switch_mlp.fc2.biases,
-backbone.layers.15.mixer.switch_mlp.fc2.scales,
-backbone.layers.15.mixer.switch_mlp.fc2.weight,
-backbone.layers.15.norm.weight,
-backbone.layers.16.mixer.A_log,
-backbone.layers.16.mixer.D,
-backbone.layers.16.mixer.conv1d.bias,
-backbone.layers.16.mixer.conv1d.weight,
-backbone.layers.16.mixer.dt_bias,
-backbone.layers.16.mixer.in_proj.biases,
-backbone.layers.16.mixer.in_proj.scales,
-backbone.layers.16.mixer.in_proj.weight,
-backbone.layers.16.mixer.norm.weight,
-backbone.layers.16.mixer.out_proj.biases,
-backbone.layers.16.mixer.out_proj.scales,
-backbone.layers.16.mixer.out_proj.weight,
-backbone.layers.16.norm.weight,
-backbone.layers.17.mixer.gate.e_score_correction_bias,
-backbone.layers.17.mixer.gate.weight,
-backbone.layers.17.mixer.shared_experts.down_proj.biases,
-backbone.layers.17.mixer.shared_experts.down_proj.scales,
-backbone.layers.17.mixer.shared_experts.down_proj.weight,
-backbone.layers.17.mixer.shared_experts.up_proj.biases,
-backbone.layers.17.mixer.shared_experts.up_proj.scales,
-backbone.layers.17.mixer.shared_experts.up_proj.weight,
-backbone.layers.17.mixer.switch_mlp.fc1.biases,
-backbone.layers.17.mixer.switch_mlp.fc1.scales,
-backbone.layers.17.mixer.switch_mlp.fc1.weight,
-backbone.layers.17.mixer.switch_mlp.fc2.biases,
-backbone.layers.17.mixer.switch_mlp.fc2.scales,
-backbone.layers.17.mixer.switch_mlp.fc2.weight,
-backbone.layers.17.norm.weight,
-backbone.layers.18.mixer.A_log,
-backbone.layers.18.mixer.D,
-backbone.layers.18.mixer.conv1d.bias,
-backbone.layers.18.mixer.conv1d.weight,
-backbone.layers.18.mixer.dt_bias,
-backbone.layers.18.mixer.in_proj.biases,
-backbone.layers.18.mixer.in_proj.scales,
-backbone.layers.18.mixer.in_proj.weight,
-backbone.layers.18.mixer.norm.weight,
-backbone.layers.18.mixer.out_proj.biases,
-backbone.layers.18.mixer.out_proj.scales,
-backbone.layers.18.mixer.out_proj.weight,
-backbone.layers.18.norm.weight,
-backbone.layers.19.mixer.k_proj.biases,
-backbone.layers.19.mixer.k_proj.scales,
-backbone.layers.19.mixer.k_proj.weight,
-backbone.layers.19.mixer.o_proj.biases,
-backbone.layers.19.mixer.o_proj.scales,
-backbone.layers.19.mixer.o_proj.weight,
-backbone.layers.19.mixer.q_proj.biases,
-backbone.layers.19.mixer.q_proj.scales,
-backbone.layers.19.mixer.q_proj.weight,
-backbone.layers.19.mixer.v_proj.biases,
-backbone.layers.19.mixer.v_proj.scales,
-backbone.layers.19.mixer.v_proj.weight,
-backbone.layers.19.norm.weight,
-backbone.layers.2.mixer.A_log,
-backbone.layers.2.mixer.D,
-backbone.layers.2.mixer.conv1d.bias,
-backbone.layers.2.mixer.conv1d.weight,
-backbone.layers.2.mixer.dt_bias,
-backbone.layers.2.mixer.in_proj.biases,
-backbone.layers.2.mixer.in_proj.scales,
-backbone.layers.2.mixer.in_proj.weight,
-backbone.layers.2.mixer.norm.weight,
-backbone.layers.2.mixer.out_proj.biases,
-backbone.layers.2.mixer.out_proj.scales,
-backbone.layers.2.mixer.out_proj.weight,
-backbone.layers.2.norm.weight,
-backbone.layers.20.mixer.gate.e_score_correction_bias,
-backbone.layers.20.mixer.gate.weight,
-backbone.layers.20.mixer.shared_experts.down_proj.biases,
-backbone.layers.20.mixer.shared_experts.down_proj.scales,
-backbone.layers.20.mixer.shared_experts.down_proj.weight,
-backbone.layers.20.mixer.shared_experts.up_proj.biases,
-backbone.layers.20.mixer.shared_experts.up_proj.scales,
-backbone.layers.20.mixer.shared_experts.up_proj.weight,
-backbone.layers.20.mixer.switch_mlp.fc1.biases,
-backbone.layers.20.mixer.switch_mlp.fc1.scales,
-backbone.layers.20.mixer.switch_mlp.fc1.weight,
-backbone.layers.20.mixer.switch_mlp.fc2.biases,
-backbone.layers.20.mixer.switch_mlp.fc2.scales,
-backbone.layers.20.mixer.switch_mlp.fc2.weight,
-backbone.layers.20.norm.weight,
-backbone.layers.21.mixer.A_log,
-backbone.layers.21.mixer.D,
-backbone.layers.21.mixer.conv1d.bias,
-backbone.layers.21.mixer.conv1d.weight,
-backbone.layers.21.mixer.dt_bias,
-backbone.layers.21.mixer.in_proj.biases,
-backbone.layers.21.mixer.in_proj.scales,
-backbone.layers.21.mixer.in_proj.weight,
-backbone.layers.21.mixer.norm.weight,
-backbone.layers.21.mixer.out_proj.biases,
-backbone.layers.21.mixer.out_proj.scales,
-backbone.layers.21.mixer.out_proj.weight,
-backbone.layers.21.norm.weight,
-backbone.layers.22.mixer.gate.e_score_correction_bias,
-backbone.layers.22.mixer.gate.weight,
-backbone.layers.22.mixer.shared_experts.down_proj.biases,
-backbone.layers.22.mixer.shared_experts.down_proj.scales,
-backbone.layers.22.mixer.shared_experts.down_proj.weight,
-backbone.layers.22.mixer.shared_experts.up_proj.biases,
-backbone.layers.22.mixer.shared_experts.up_proj.scales,
-backbone.layers.22.mixer.shared_experts.up_proj.weight,
-backbone.layers.22.mixer.switch_mlp.fc1.biases,
-backbone.layers.22.mixer.switch_mlp.fc1.scales,
-backbone.layers.22.mixer.switch_mlp.fc1.weight,
-backbone.layers.22.mixer.switch_mlp.fc2.biases,
-backbone.layers.22.mixer.switch_mlp.fc2.scales,
-backbone.layers.22.mixer.switch_mlp.fc2.weight,
-backbone.layers.22.norm.weight,
-backbone.layers.23.mixer.A_log,
-backbone.layers.23.mixer.D,
-backbone.layers.23.mixer.conv1d.bias,
-backbone.layers.23.mixer.conv1d.weight,
-backbone.layers.23.mixer.dt_bias,
-backbone.layers.23.mixer.in_proj.biases,
-backbone.layers.23.mixer.in_proj.scales,
-backbone.layers.23.mixer.in_proj.weight,
-backbone.layers.23.mixer.norm.weight,
-backbone.layers.23.mixer.out_proj.biases,
-backbone.layers.23.mixer.out_proj.scales,
-backbone.layers.23.mixer.out_proj.weight,
-backbone.layers.23.norm.weight,
-backbone.layers.24.mixer.gate.e_score_correction_bias,
-backbone.layers.24.mixer.gate.weight,
-backbone.layers.24.mixer.shared_experts.down_proj.biases,
-backbone.layers.24.mixer.shared_experts.down_proj.scales,
-backbone.layers.24.mixer.shared_experts.down_proj.weight,
-backbone.layers.24.mixer.shared_experts.up_proj.biases,
-backbone.layers.24.mixer.shared_experts.up_proj.scales,
-backbone.layers.24.mixer.shared_experts.up_proj.weight,
-backbone.layers.24.mixer.switch_mlp.fc1.biases,
-backbone.layers.24.mixer.switch_mlp.fc1.scales,
-backbone.layers.24.mixer.switch_mlp.fc1.weight,
-backbone.layers.24.mixer.switch_mlp.fc2.biases,
-backbone.layers.24.mixer.switch_mlp.fc2.scales,
-backbone.layers.24.mixer.switch_mlp.fc2.weight,
-backbone.layers.24.norm.weight,
-backbone.layers.25.mixer.A_log,
-backbone.layers.25.mixer.D,
-backbone.layers.25.mixer.conv1d.bias,
-backbone.layers.25.mixer.conv1d.weight,
-backbone.layers.25.mixer.dt_bias,
-backbone.layers.25.mixer.in_proj.biases,
-backbone.layers.25.mixer.in_proj.scales,
-backbone.layers.25.mixer.in_proj.weight,
-backbone.layers.25.mixer.norm.weight,
-backbone.layers.25.mixer.out_proj.biases,
-backbone.layers.25.mixer.out_proj.scales,
-backbone.layers.25.mixer.out_proj.weight,
-backbone.layers.25.norm.weight,
-backbone.layers.26.mixer.k_proj.biases,
-backbone.layers.26.mixer.k_proj.scales,
-backbone.layers.26.mixer.k_proj.weight,
-backbone.layers.26.mixer.o_proj.biases,
-backbone.layers.26.mixer.o_proj.scales,
-backbone.layers.26.mixer.o_proj.weight,
-backbone.layers.26.mixer.q_proj.biases,
-backbone.layers.26.mixer.q_proj.scales,
-backbone.layers.26.mixer.q_proj.weight,
-backbone.layers.26.mixer.v_proj.biases,
-backbone.layers.26.mixer.v_proj.scales,
-backbone.layers.26.mixer.v_proj.weight,
-backbone.layers.26.norm.weight,
-backbone.layers.27.mixer.gate.e_score_correction_bias,
-backbone.layers.27.mixer.gate.weight,
-backbone.layers.27.mixer.shared_experts.down_proj.biases,
-backbone.layers.27.mixer.shared_experts.down_proj.scales,
-backbone.layers.27.mixer.shared_experts.down_proj.weight,
-backbone.layers.27.mixer.shared_experts.up_proj.biases,
-backbone.layers.27.mixer.shared_experts.up_proj.scales,
-backbone.layers.27.mixer.shared_experts.up_proj.weight,
-backbone.layers.27.mixer.switch_mlp.fc1.biases,
-backbone.layers.27.mixer.switch_mlp.fc1.scales,
-backbone.layers.27.mixer.switch_mlp.fc1.weight,
-backbone.layers.27.mixer.switch_mlp.fc2.biases,
-backbone.layers.27.mixer.switch_mlp.fc2.scales,
-backbone.layers.27.mixer.switch_mlp.fc2.weight,
-backbone.layers.27.norm.weight,
-backbone.layers.28.mixer.A_log,
-backbone.layers.28.mixer.D,
-backbone.layers.28.mixer.conv1d.bias,
-backbone.layers.28.mixer.conv1d.weight,
-backbone.layers.28.mixer.dt_bias,
-backbone.layers.28.mixer.in_proj.biases,
-backbone.layers.28.mixer.in_proj.scales,
-backbone.layers.28.mixer.in_proj.weight,
-backbone.layers.28.mixer.norm.weight,
-backbone.layers.28.mixer.out_proj.biases,
-backbone.layers.28.mixer.out_proj.scales,
-backbone.layers.28.mixer.out_proj.weight,
-backbone.layers.28.norm.weight,
-backbone.layers.29.mixer.gate.e_score_correction_bias,
-backbone.layers.29.mixer.gate.weight,
-backbone.layers.29.mixer.shared_experts.down_proj.biases,
-backbone.layers.29.mixer.shared_experts.down_proj.scales,
-backbone.layers.29.mixer.shared_experts.down_proj.weight,
-backbone.layers.29.mixer.shared_experts.up_proj.biases,
-backbone.layers.29.mixer.shared_experts.up_proj.scales,
-backbone.layers.29.mixer.shared_experts.up_proj.weight,
-backbone.layers.29.mixer.switch_mlp.fc1.biases,
-backbone.layers.29.mixer.switch_mlp.fc1.scales,
-backbone.layers.29.mixer.switch_mlp.fc1.weight,
-backbone.layers.29.mixer.switch_mlp.fc2.biases,
-backbone.layers.29.mixer.switch_mlp.fc2.scales,
-backbone.layers.29.mixer.switch_mlp.fc2.weight,
-backbone.layers.29.norm.weight,
-backbone.layers.3.mixer.gate.e_score_correction_bias,
-backbone.layers.3.mixer.gate.weight,
-backbone.layers.3.mixer.shared_experts.down_proj.biases,
-backbone.layers.3.mixer.shared_experts.down_proj.scales,
-backbone.layers.3.mixer.shared_experts.down_proj.weight,
-backbone.layers.3.mixer.shared_experts.up_proj.biases,
-backbone.layers.3.mixer.shared_experts.up_proj.scales,
-backbone.layers.3.mixer.shared_experts.up_proj.weight,
-backbone.layers.3.mixer.switch_mlp.fc1.biases,
-backbone.layers.3.mixer.switch_mlp.fc1.scales,
-backbone.layers.3.mixer.switch_mlp.fc1.weight,
-backbone.layers.3.mixer.switch_mlp.fc2.biases,
-backbone.layers.3.mixer.switch_mlp.fc2.scales,
-backbone.layers.3.mixer.switch_mlp.fc2.weight,
-backbone.layers.3.norm.weight,
-backbone.layers.30.mixer.A_log,
-backbone.layers.30.mixer.D,
-backbone.layers.30.mixer.conv1d.bias,
-backbone.layers.30.mixer.conv1d.weight,
-backbone.layers.30.mixer.dt_bias,
-backbone.layers.30.mixer.in_proj.biases,
-backbone.layers.30.mixer.in_proj.scales,
-backbone.layers.30.mixer.in_proj.weight,
-backbone.layers.30.mixer.norm.weight,
-backbone.layers.30.mixer.out_proj.biases,
-backbone.layers.30.mixer.out_proj.scales,
-backbone.layers.30.mixer.out_proj.weight,
-backbone.layers.30.norm.weight,
-backbone.layers.31.mixer.gate.e_score_correction_bias,
-backbone.layers.31.mixer.gate.weight,
-backbone.layers.31.mixer.shared_experts.down_proj.biases,
-backbone.layers.31.mixer.shared_experts.down_proj.scales,
-backbone.layers.31.mixer.shared_experts.down_proj.weight,
-backbone.layers.31.mixer.shared_experts.up_proj.biases,
-backbone.layers.31.mixer.shared_experts.up_proj.scales,
-backbone.layers.31.mixer.shared_experts.up_proj.weight,
-backbone.layers.31.mixer.switch_mlp.fc1.biases,
-backbone.layers.31.mixer.switch_mlp.fc1.scales,
-backbone.layers.31.mixer.switch_mlp.fc1.weight,
-backbone.layers.31.mixer.switch_mlp.fc2.biases,
-backbone.layers.31.mixer.switch_mlp.fc2.scales,
-backbone.layers.31.mixer.switch_mlp.fc2.weight,
-backbone.layers.31.norm.weight,
-backbone.layers.32.mixer.A_log,
-backbone.layers.32.mixer.D,
-backbone.layers.32.mixer.conv1d.bias,
-backbone.layers.32.mixer.conv1d.weight,
-backbone.layers.32.mixer.dt_bias,
-backbone.layers.32.mixer.in_proj.biases,
-backbone.layers.32.mixer.in_proj.scales,
-backbone.layers.32.mixer.in_proj.weight,
-backbone.layers.32.mixer.norm.weight,
-backbone.layers.32.mixer.out_proj.biases,
-backbone.layers.32.mixer.out_proj.scales,
-backbone.layers.32.mixer.out_proj.weight,
-backbone.layers.32.norm.weight,
-backbone.layers.33.mixer.k_proj.biases,
-backbone.layers.33.mixer.k_proj.scales,
-backbone.layers.33.mixer.k_proj.weight,
-backbone.layers.33.mixer.o_proj.biases,
-backbone.layers.33.mixer.o_proj.scales,
-backbone.layers.33.mixer.o_proj.weight,
-backbone.layers.33.mixer.q_proj.biases,
-backbone.layers.33.mixer.q_proj.scales,
-backbone.layers.33.mixer.q_proj.weight,
-backbone.layers.33.mixer.v_proj.biases,
-backbone.layers.33.mixer.v_proj.scales,
-backbone.layers.33.mixer.v_proj.weight,
-backbone.layers.33.norm.weight,
-backbone.layers.34.mixer.gate.e_score_correction_bias,
-backbone.layers.34.mixer.gate.weight,
-backbone.layers.34.mixer.shared_experts.down_proj.biases,
-backbone.layers.34.mixer.shared_experts.down_proj.scales,
-backbone.layers.34.mixer.shared_experts.down_proj.weight,
-backbone.layers.34.mixer.shared_experts.up_proj.biases,
-backbone.layers.34.mixer.shared_experts.up_proj.scales,
-backbone.layers.34.mixer.shared_experts.up_proj.weight,
-backbone.layers.34.mixer.switch_mlp.fc1.biases,
-backbone.layers.34.mixer.switch_mlp.fc1.scales,
-backbone.layers.34.mixer.switch_mlp.fc1.weight,
-backbone.layers.34.mixer.switch_mlp.fc2.biases,
-backbone.layers.34.mixer.switch_mlp.fc2.scales,
-backbone.layers.34.mixer.switch_mlp.fc2.weight,
-backbone.layers.34.norm.weight,
-backbone.layers.35.mixer.A_log,
-backbone.layers.35.mixer.D,
-backbone.layers.35.mixer.conv1d.bias,
-backbone.layers.35.mixer.conv1d.weight,
-backbone.layers.35.mixer.dt_bias,
-backbone.layers.35.mixer.in_proj.biases,
-backbone.layers.35.mixer.in_proj.scales,
-backbone.layers.35.mixer.in_proj.weight,
-backbone.layers.35.mixer.norm.weight,
-backbone.layers.35.mixer.out_proj.biases,
-backbone.layers.35.mixer.out_proj.scales,
-backbone.layers.35.mixer.out_proj.weight,
-backbone.layers.35.norm.weight,
-backbone.layers.36.mixer.gate.e_score_correction_bias,
-backbone.layers.36.mixer.gate.weight,
-backbone.layers.36.mixer.shared_experts.down_proj.biases,
-backbone.layers.36.mixer.shared_experts.down_proj.scales,
-backbone.layers.36.mixer.shared_experts.down_proj.weight,
-backbone.layers.36.mixer.shared_experts.up_proj.biases,
-backbone.layers.36.mixer.shared_experts.up_proj.scales,
-backbone.layers.36.mixer.shared_experts.up_proj.weight,
-backbone.layers.36.mixer.switch_mlp.fc1.biases,
-backbone.layers.36.mixer.switch_mlp.fc1.scales,
-backbone.layers.36.mixer.switch_mlp.fc1.weight,
-backbone.layers.36.mixer.switch_mlp.fc2.biases,
-backbone.layers.36.mixer.switch_mlp.fc2.scales,
-backbone.layers.36.mixer.switch_mlp.fc2.weight,
-backbone.layers.36.norm.weight,
-backbone.layers.37.mixer.A_log,
-backbone.layers.37.mixer.D,
-backbone.layers.37.mixer.conv1d.bias,
-backbone.layers.37.mixer.conv1d.weight,
-backbone.layers.37.mixer.dt_bias,
-backbone.layers.37.mixer.in_proj.biases,
-backbone.layers.37.mixer.in_proj.scales,
-backbone.layers.37.mixer.in_proj.weight,
-backbone.layers.37.mixer.norm.weight,
-backbone.layers.37.mixer.out_proj.biases,
-backbone.layers.37.mixer.out_proj.scales,
-backbone.layers.37.mixer.out_proj.weight,
-backbone.layers.37.norm.weight,
-backbone.layers.38.mixer.gate.e_score_correction_bias,
-backbone.layers.38.mixer.gate.weight,
-backbone.layers.38.mixer.shared_experts.down_proj.biases,
-backbone.layers.38.mixer.shared_experts.down_proj.scales,
-backbone.layers.38.mixer.shared_experts.down_proj.weight,
-backbone.layers.38.mixer.shared_experts.up_proj.biases,
-backbone.layers.38.mixer.shared_experts.up_proj.scales,
-backbone.layers.38.mixer.shared_experts.up_proj.weight,
-backbone.layers.38.mixer.switch_mlp.fc1.biases,
-backbone.layers.38.mixer.switch_mlp.fc1.scales,
-backbone.layers.38.mixer.switch_mlp.fc1.weight,
-backbone.layers.38.mixer.switch_mlp.fc2.biases,
-backbone.layers.38.mixer.switch_mlp.fc2.scales,
-backbone.layers.38.mixer.switch_mlp.fc2.weight,
-backbone.layers.38.norm.weight,
-backbone.layers.39.mixer.A_log,
-backbone.layers.39.mixer.D,
-backbone.layers.39.mixer.conv1d.bias,
-backbone.layers.39.mixer.conv1d.weight,
-backbone.layers.39.mixer.dt_bias,
-backbone.layers.39.mixer.in_proj.biases,
-backbone.layers.39.mixer.in_proj.scales,
-backbone.layers.39.mixer.in_proj.weight,
-backbone.layers.39.mixer.norm.weight,
-backbone.layers.39.mixer.out_proj.biases,
-backbone.layers.39.mixer.out_proj.scales,
-backbone.layers.39.mixer.out_proj.weight,
-backbone.layers.39.norm.weight,
-backbone.layers.4.mixer.A_log,
-backbone.layers.4.mixer.D,
-backbone.layers.4.mixer.conv1d.bias,
-backbone.layers.4.mixer.conv1d.weight,
-backbone.layers.4.mixer.dt_bias,
-backbone.layers.4.mixer.in_proj.biases,
-backbone.layers.4.mixer.in_proj.scales,
-backbone.layers.4.mixer.in_proj.weight,
-backbone.layers.4.mixer.norm.weight,
-backbone.layers.4.mixer.out_proj.biases,
-backbone.layers.4.mixer.out_proj.scales,
-backbone.layers.4.mixer.out_proj.weight,
-backbone.layers.4.norm.weight,
-backbone.layers.40.mixer.gate.e_score_correction_bias,
-backbone.layers.40.mixer.gate.weight,
-backbone.layers.40.mixer.shared_experts.down_proj.biases,
-backbone.layers.40.mixer.shared_experts.down_proj.scales,
-backbone.layers.40.mixer.shared_experts.down_proj.weight,
-backbone.layers.40.mixer.shared_experts.up_proj.biases,
-backbone.layers.40.mixer.shared_experts.up_proj.scales,
-backbone.layers.40.mixer.shared_experts.up_proj.weight,
-backbone.layers.40.mixer.switch_mlp.fc1.biases,
-backbone.layers.40.mixer.switch_mlp.fc1.scales,
-backbone.layers.40.mixer.switch_mlp.fc1.weight,
-backbone.layers.40.mixer.switch_mlp.fc2.biases,
-backbone.layers.40.mixer.switch_mlp.fc2.scales,
-backbone.layers.40.mixer.switch_mlp.fc2.weight,
-backbone.layers.40.norm.weight,
-backbone.layers.41.mixer.A_log,
-backbone.layers.41.mixer.D,
-backbone.layers.41.mixer.conv1d.bias,
-backbone.layers.41.mixer.conv1d.weight,
-backbone.layers.41.mixer.dt_bias,
-backbone.layers.41.mixer.in_proj.biases,
-backbone.layers.41.mixer.in_proj.scales,
-backbone.layers.41.mixer.in_proj.weight,
-backbone.layers.41.mixer.norm.weight,
-backbone.layers.41.mixer.out_proj.biases,
-backbone.layers.41.mixer.out_proj.scales,
-backbone.layers.41.mixer.out_proj.weight,
-backbone.layers.41.norm.weight,
-backbone.layers.42.mixer.k_proj.biases,
-backbone.layers.42.mixer.k_proj.scales,
-backbone.layers.42.mixer.k_proj.weight,
-backbone.layers.42.mixer.o_proj.biases,
-backbone.layers.42.mixer.o_proj.scales,
-backbone.layers.42.mixer.o_proj.weight,
-backbone.layers.42.mixer.q_proj.biases,
-backbone.layers.42.mixer.q_proj.scales,
-backbone.layers.42.mixer.q_proj.weight,
-backbone.layers.42.mixer.v_proj.biases,
-backbone.layers.42.mixer.v_proj.scales,
-backbone.layers.42.mixer.v_proj.weight,
-backbone.layers.42.norm.weight,
-backbone.layers.43.mixer.gate.e_score_correction_bias,
-backbone.layers.43.mixer.gate.weight,
-backbone.layers.43.mixer.shared_experts.down_proj.biases,
-backbone.layers.43.mixer.shared_experts.down_proj.scales,
-backbone.layers.43.mixer.shared_experts.down_proj.weight,
-backbone.layers.43.mixer.shared_experts.up_proj.biases,
-backbone.layers.43.mixer.shared_experts.up_proj.scales,
-backbone.layers.43.mixer.shared_experts.up_proj.weight,
-backbone.layers.43.mixer.switch_mlp.fc1.biases,
-backbone.layers.43.mixer.switch_mlp.fc1.scales,
-backbone.layers.43.mixer.switch_mlp.fc1.weight,
-backbone.layers.43.mixer.switch_mlp.fc2.biases,
-backbone.layers.43.mixer.switch_mlp.fc2.scales,
-backbone.layers.43.mixer.switch_mlp.fc2.weight,
-backbone.layers.43.norm.weight,
-backbone.layers.44.mixer.A_log,
-backbone.layers.44.mixer.D,
-backbone.layers.44.mixer.conv1d.bias,
-backbone.layers.44.mixer.conv1d.weight,
-backbone.layers.44.mixer.dt_bias,
-backbone.layers.44.mixer.in_proj.biases,
-backbone.layers.44.mixer.in_proj.scales,
-backbone.layers.44.mixer.in_proj.weight,
-backbone.layers.44.mixer.norm.weight,
-backbone.layers.44.mixer.out_proj.biases,
-backbone.layers.44.mixer.out_proj.scales,
-backbone.layers.44.mixer.out_proj.weight,
-backbone.layers.44.norm.weight,
-backbone.layers.45.mixer.gate.e_score_correction_bias,
-backbone.layers.45.mixer.gate.weight,
-backbone.layers.45.mixer.shared_experts.down_proj.biases,
-backbone.layers.45.mixer.shared_experts.down_proj.scales,
-backbone.layers.45.mixer.shared_experts.down_proj.weight,
-backbone.layers.45.mixer.shared_experts.up_proj.biases,
-backbone.layers.45.mixer.shared_experts.up_proj.scales,
-backbone.layers.45.mixer.shared_experts.up_proj.weight,
-backbone.layers.45.mixer.switch_mlp.fc1.biases,
-backbone.layers.45.mixer.switch_mlp.fc1.scales,
-backbone.layers.45.mixer.switch_mlp.fc1.weight,
-backbone.layers.45.mixer.switch_mlp.fc2.biases,
-backbone.layers.45.mixer.switch_mlp.fc2.scales,
-backbone.layers.45.mixer.switch_mlp.fc2.weight,
-backbone.layers.45.norm.weight,
-backbone.layers.46.mixer.A_log,
-backbone.layers.46.mixer.D,
-backbone.layers.46.mixer.conv1d.bias,
-backbone.layers.46.mixer.conv1d.weight,
-backbone.layers.46.mixer.dt_bias,
-backbone.layers.46.mixer.in_proj.biases,
-backbone.layers.46.mixer.in_proj.scales,
-backbone.layers.46.mixer.in_proj.weight,
-backbone.layers.46.mixer.norm.weight,
-backbone.layers.46.mixer.out_proj.biases,
-backbone.layers.46.mixer.out_proj.scales,
-backbone.layers.46.mixer.out_proj.weight,
-backbone.layers.46.norm.weight,
-backbone.layers.47.mixer.gate.e_score_correction_bias,
-backbone.layers.47.mixer.gate.weight,
-backbone.layers.47.mixer.shared_experts.down_proj.biases,
-backbone.layers.47.mixer.shared_experts.down_proj.scales,
-backbone.layers.47.mixer.shared_experts.down_proj.weight,
-backbone.layers.47.mixer.shared_experts.up_proj.biases,
-backbone.layers.47.mixer.shared_experts.up_proj.scales,
-backbone.layers.47.mixer.shared_experts.up_proj.weight,
-backbone.layers.47.mixer.switch_mlp.fc1.biases,
-backbone.layers.47.mixer.switch_mlp.fc1.scales,
-backbone.layers.47.mixer.switch_mlp.fc1.weight,
-backbone.layers.47.mixer.switch_mlp.fc2.biases,
-backbone.layers.47.mixer.switch_mlp.fc2.scales,
-backbone.layers.47.mixer.switch_mlp.fc2.weight,
-backbone.layers.47.norm.weight,
-backbone.layers.48.mixer.A_log,
-backbone.layers.48.mixer.D,
-backbone.layers.48.mixer.conv1d.bias,
-backbone.layers.48.mixer.conv1d.weight,
-backbone.layers.48.mixer.dt_bias,
-backbone.layers.48.mixer.in_proj.biases,
-backbone.layers.48.mixer.in_proj.scales,
-backbone.layers.48.mixer.in_proj.weight,
-backbone.layers.48.mixer.norm.weight,
-backbone.layers.48.mixer.out_proj.biases,
-backbone.layers.48.mixer.out_proj.scales,
-backbone.layers.48.mixer.out_proj.weight,
-backbone.layers.48.norm.weight,
-backbone.layers.49.mixer.gate.e_score_correction_bias,
-backbone.layers.49.mixer.gate.weight,
-backbone.layers.49.mixer.shared_experts.down_proj.biases,
-backbone.layers.49.mixer.shared_experts.down_proj.scales,
-backbone.layers.49.mixer.shared_experts.down_proj.weight,
-backbone.layers.49.mixer.shared_experts.up_proj.biases,
-backbone.layers.49.mixer.shared_experts.up_proj.scales,
-backbone.layers.49.mixer.shared_experts.up_proj.weight,
-backbone.layers.49.mixer.switch_mlp.fc1.biases,
-backbone.layers.49.mixer.switch_mlp.fc1.scales,
-backbone.layers.49.mixer.switch_mlp.fc1.weight,
-backbone.layers.49.mixer.switch_mlp.fc2.biases,
-backbone.layers.49.mixer.switch_mlp.fc2.scales,
-backbone.layers.49.mixer.switch_mlp.fc2.weight,
-backbone.layers.49.norm.weight,
-backbone.layers.5.mixer.k_proj.biases,
-backbone.layers.5.mixer.k_proj.scales,
-backbone.layers.5.mixer.k_proj.weight,
-backbone.layers.5.mixer.o_proj.biases,
-backbone.layers.5.mixer.o_proj.scales,
-backbone.layers.5.mixer.o_proj.weight,
-backbone.layers.5.mixer.q_proj.biases,
-backbone.layers.5.mixer.q_proj.scales,
-backbone.layers.5.mixer.q_proj.weight,
-backbone.layers.5.mixer.v_proj.biases,
-backbone.layers.5.mixer.v_proj.scales,
-backbone.layers.5.mixer.v_proj.weight,
-backbone.layers.5.norm.weight,
-backbone.layers.50.mixer.A_log,
-backbone.layers.50.mixer.D,
-backbone.layers.50.mixer.conv1d.bias,
-backbone.layers.50.mixer.conv1d.weight,
-backbone.layers.50.mixer.dt_bias,
-backbone.layers.50.mixer.in_proj.biases,
-backbone.layers.50.mixer.in_proj.scales,
-backbone.layers.50.mixer.in_proj.weight,
-backbone.layers.50.mixer.norm.weight,
-backbone.layers.50.mixer.out_proj.biases,
-backbone.layers.50.mixer.out_proj.scales,
-backbone.layers.50.mixer.out_proj.weight,
-backbone.layers.50.norm.weight,
-backbone.layers.51.mixer.gate.e_score_correction_bias,
-backbone.layers.51.mixer.gate.weight,
-backbone.layers.51.mixer.shared_experts.down_proj.biases,
-backbone.layers.51.mixer.shared_experts.down_proj.scales,
-backbone.layers.51.mixer.shared_experts.down_proj.weight,
-backbone.layers.51.mixer.shared_experts.up_proj.biases,
-backbone.layers.51.mixer.shared_experts.up_proj.scales,
-backbone.layers.51.mixer.shared_experts.up_proj.weight,
-backbone.layers.51.mixer.switch_mlp.fc1.biases,
-backbone.layers.51.mixer.switch_mlp.fc1.scales,
-backbone.layers.51.mixer.switch_mlp.fc1.weight,
-backbone.layers.51.mixer.switch_mlp.fc2.biases,
-backbone.layers.51.mixer.switch_mlp.fc2.scales,
-backbone.layers.51.mixer.switch_mlp.fc2.weight,
-backbone.layers.51.norm.weight,
-backbone.layers.6.mixer.gate.e_score_correction_bias,
-backbone.layers.6.mixer.gate.weight,
-backbone.layers.6.mixer.shared_experts.down_proj.biases,
-backbone.layers.6.mixer.shared_experts.down_proj.scales,
-backbone.layers.6.mixer.shared_experts.down_proj.weight,
-backbone.layers.6.mixer.shared_experts.up_proj.biases,
-backbone.layers.6.mixer.shared_experts.up_proj.scales,
-backbone.layers.6.mixer.shared_experts.up_proj.weight,
-backbone.layers.6.mixer.switch_mlp.fc1.biases,
-backbone.layers.6.mixer.switch_mlp.fc1.scales,
-backbone.layers.6.mixer.switch_mlp.fc1.weight,
-backbone.layers.6.mixer.switch_mlp.fc2.biases,
-backbone.layers.6.mixer.switch_mlp.fc2.scales,
-backbone.layers.6.mixer.switch_mlp.fc2.weight,
-backbone.layers.6.norm.weight,
-backbone.layers.7.mixer.A_log,
-backbone.layers.7.mixer.D,
-backbone.layers.7.mixer.conv1d.bias,
-backbone.layers.7.mixer.conv1d.weight,
-backbone.layers.7.mixer.dt_bias,
-backbone.layers.7.mixer.in_proj.biases,
-backbone.layers.7.mixer.in_proj.scales,
-backbone.layers.7.mixer.in_proj.weight,
-backbone.layers.7.mixer.norm.weight,
-backbone.layers.7.mixer.out_proj.biases,
-backbone.layers.7.mixer.out_proj.scales,
-backbone.layers.7.mixer.out_proj.weight,
-backbone.layers.7.norm.weight,
-backbone.layers.8.mixer.gate.e_score_correction_bias,
-backbone.layers.8.mixer.gate.weight,
-backbone.layers.8.mixer.shared_experts.down_proj.biases,
-backbone.layers.8.mixer.shared_experts.down_proj.scales,
-backbone.layers.8.mixer.shared_experts.down_proj.weight,
-backbone.layers.8.mixer.shared_experts.up_proj.biases,
-backbone.layers.8.mixer.shared_experts.up_proj.scales,
-backbone.layers.8.mixer.shared_experts.up_proj.weight,
-backbone.layers.8.mixer.switch_mlp.fc1.biases,
-backbone.layers.8.mixer.switch_mlp.fc1.scales,
-backbone.layers.8.mixer.switch_mlp.fc1.weight,
-backbone.layers.8.mixer.switch_mlp.fc2.biases,
-backbone.layers.8.mixer.switch_mlp.fc2.scales,
-backbone.layers.8.mixer.switch_mlp.fc2.weight,
-backbone.layers.8.norm.weight,
-backbone.layers.9.mixer.A_log,
-backbone.layers.9.mixer.D,
-backbone.layers.9.mixer.conv1d.bias,
-backbone.layers.9.mixer.conv1d.weight,
-backbone.layers.9.mixer.dt_bias,
-backbone.layers.9.mixer.in_proj.biases,
-backbone.layers.9.mixer.in_proj.scales,
-backbone.layers.9.mixer.in_proj.weight,
-backbone.layers.9.mixer.norm.weight,
-backbone.layers.9.mixer.out_proj.biases,
-backbone.layers.9.mixer.out_proj.scales,
-backbone.layers.9.mixer.out_proj.weight,
-backbone.layers.9.norm.weight,
-backbone.norm_f.weight,
-lm_head.biases,
-lm_head.scales,
-lm_head.weight.
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-Fetching 25 files:   0%|          | 0/25 [00:00<?, ?it/s]
-Fetching 25 files: 100%|##########| 25/25 [00:00<00:00, 4387.35it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 2093.91it/s]
+Download complete:           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete:           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[22:09:39] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config missing from snapshot
+                    (preprocessor_config.json, processor_config.json).
+[22:09:40] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
+                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
 ```
 
 </details>
