@@ -433,6 +433,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- ty 0.0.84 stopped inferring `dict(mapping)` from the expected
+  `dict[str, JsonLike]` type and expanded the recursive alias instead,
+  failing four call sites; they now spell the type out
+  (`dict[str, JsonLike](...)`), which every checker reads the same way.
+- Dropped the stale `smol-toml` 1.6.1 npm override (added in March for an
+  earlier advisory) and moved to markdownlint-cli2 0.23.3, which brings
+  `smol-toml` 1.8.0; Skylos's dependency scan flagged 1.6.1 for a newly
+  published denial-of-service advisory (GHSA-7w5x-hrqm-74c2, fixed in 1.7.1).
 - Console rules and banners no longer wrap (0.17.37). They were drawn at the
   full console width although every line carries the handler's 11-column
   `[HH:MM:SS]` prefix (20 with `--verbose`), so each rule left an orphan

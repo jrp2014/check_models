@@ -11883,7 +11883,7 @@ def _validate_processor_kwargs(
     if harness:
         msg = f"processor_kwargs cannot name harness generation arguments: {', '.join(harness)}"
         raise ValueError(msg)
-    return dict(processor_kwargs)
+    return dict[str, JsonLike](processor_kwargs)
 
 
 def _harness_generation_argument_names() -> frozenset[str]:
@@ -12511,7 +12511,7 @@ def _build_prompt_diagnostics(  # noqa: PLR0913 - every retained prompt fact is 
         thinking_budget_source=thinking_budget_source,
         template_thinking_markers=_template_declares_thinking(snapshot_path),
         declared_sampling=(
-            dict(declared_sampling)
+            dict[str, JsonLike](declared_sampling)
             if declared_sampling is not None
             else _declared_sampling_defaults(snapshot_path)
         ),
@@ -12589,7 +12589,7 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
     if diagnostics.declared_sampling:
         payload["declared_sampling"] = dict(diagnostics.declared_sampling)
     if diagnostics.sampling_sources:
-        payload["sampling_sources"] = dict(diagnostics.sampling_sources)
+        payload["sampling_sources"] = dict[str, JsonLike](diagnostics.sampling_sources)
     if diagnostics.special_tokens:
         payload["special_tokens"] = [
             _prompt_diag_json_value(item) for item in diagnostics.special_tokens
@@ -18816,7 +18816,7 @@ def _history_model_result_from_result(
     # sweep; noise bands match them per model instead.
     diagnostics = result.prompt_diagnostics
     if diagnostics is not None and diagnostics.generate_kwargs:
-        record["generation_settings"] = dict(diagnostics.generate_kwargs)
+        record["generation_settings"] = dict[str, JsonLike](diagnostics.generate_kwargs)
     # pyrefly types update() against the subclass only; the shared facts are a
     # valid partial of it (every shared key is optional in both records).
     record.update(cast("HistoryModelResultRecord", _generation_facts_record(result)))

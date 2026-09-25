@@ -731,11 +731,10 @@ def test_markdownlint_cli2_is_repo_local_uncapped_and_updateable() -> None:
         )
         locked_version = package_lock["packages"]["node_modules/markdownlint-cli2"]["version"]
         assert locked_version, "lockfile must resolve markdownlint-cli2"
-        # The security override for the transitive smol-toml stays pinned and synced.
-        assert (
-            package_lock["packages"]["node_modules/smol-toml"]["version"]
-            == package_json["overrides"]["smol-toml"]
-        )
+        # Any security override for a transitive package must be what the lockfile
+        # resolved (an override that no longer applies is stale and should go).
+        for name, pinned in (package_json.get("overrides") or {}).items():
+            assert package_lock["packages"][f"node_modules/{name}"]["version"] == pinned, name
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert 'npm install --ignore-scripts --no-audit --no-fund --prefix "$PROJECT_ROOT"' in (
