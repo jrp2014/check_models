@@ -7469,7 +7469,10 @@ def test_incomparable_runs_keep_roster_and_say_why_a_model_is_absent() -> None:
         [
             _comparison_record("org/kept", usability="usable"),
             _comparison_record("org/deselected", execution="crashed", usability="not_evaluated"),
-            _comparison_record("org/uncached", usability="usable"),
+            {
+                **_comparison_record("org/uncached", usability="usable"),
+                "model_provenance": {"revision_source": "refs/main"},
+            },
         ]
     )
     metadata = cast(
@@ -7876,3 +7879,53 @@ def test_rehydrated_comparison_the_renderers_cannot_format_is_rejected() -> None
     assert replace(
         base, crash_continuity=(same._replace(status="different_signature"),)
     ).has_changes
+
+
+def test_absent_local_models_are_not_reported_as_removed_from_the_cache() -> None:
+    """HF discovery never listed a local directory, so its absence says nothing of removal."""
+    metadata = cast(
+        "check_models.JsonlMetadataRecord",
+        {"cache_discovery": [{"repo_id": "org/cached", "selected": False}]},
+    )
+    local = {"model_provenance": {"revision_source": "local-path"}}
+    hf = {"model_provenance": {"revision_source": "refs/main"}}
+    rows = cast(
+        "dict[str, check_models.JsonlResultRecord]",
+        {
+            "/abs/models/vlm": local,
+            "./models/vlm": local,
+            "models/vlm": local,  # bare relative: looks like a repo id
+            "org/no-provenance": {},
+            "org/gone": hf,
+            "org/cached": hf,
+        },
+    )
+    status = dict(check_models._removed_model_status(sorted(rows), metadata, rows))
+    assert status == {
+        "/abs/models/vlm": "unknown",
+        "./models/vlm": "unknown",
+        "models/vlm": "unknown",
+        "org/no-provenance": "unknown",
+        "org/gone": "not cached",
+        "org/cached": "not selected",
+    }
+    assert check_models._removed_model_status(["org/gone"], None, rows) == (
+        ("org/gone", "unknown"),
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("org/model-E12B", (None, None)),
+        ("org/model-E4.5B", (None, None)),
+        ("org/model-12B", (12_000_000_000, None)),
+        ("org/model-4.5B", (4_500_000_000, None)),
+        ("org/model-30B-A3B", (30_000_000_000, 3_000_000_000)),
+    ],
+)
+def test_size_tokens_match_whole_never_inside_an_effective_size(
+    name: str, expected: tuple[int | None, int | None]
+) -> None:
+    """A restart inside "E12B" or "E4.5B" must not manufacture a total."""
+    assert check_models._parameter_counts_from_name(name) == expected

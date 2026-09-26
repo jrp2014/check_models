@@ -491,6 +491,17 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Follow-ups to the code-review fixes:
+  - A cached repository that lacks a requested revision now triggers the
+    one cache rescan, so a revision downloaded mid-run resolves (and
+    burden facts, sampling and provenance see it). An explicit revision
+    still missing after the rescan returns nothing, never another snapshot.
+  - A model absent from this run is called "no longer in the cache" only
+    when its baseline row shows it was loaded from the Hugging Face cache.
+    Local directories, in any path form, and rows without provenance are
+    "not run this time".
+  - Parameter-size tokens must match whole, so `E12B` or `E4.5B` no longer
+    yield a total from their tail.
 - Code-review fixes in `check_models.py`:
   - Report escaping. A tag whose quoted attribute contains `<` is now
     escaped, and `&quot;` is no longer double-escaped in tables. A bare URL

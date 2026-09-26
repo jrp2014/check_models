@@ -7574,8 +7574,11 @@ def _template_declares_thinking(snapshot_path: Path | None) -> bool | None:
     return False if found_template else None
 
 
-# A size token glued to a letter ("E4B" effective, "A3B" active) is not the total.
-_PARAM_COUNT_NAME_RE = re.compile(r"(?<![a-z])(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE)
+# A size token glued to a letter ("E4B" effective, "A3B" active) is not the total;
+# the digit/point lookbehind stops a restart inside one ("E12B" -> "2B").
+_PARAM_COUNT_NAME_RE = re.compile(
+    r"(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*([bm])(?![a-z0-9])", re.IGNORECASE
+)
 # "A3B" / "a4b": an *active*-parameter designation (MoE), never the total.
 _ACTIVE_PARAM_COUNT_NAME_RE = re.compile(
     r"(?<![a-z0-9])a(\d+(?:\.\d+)?)([bm])(?![a-z0-9])", re.IGNORECASE
@@ -13575,7 +13578,14 @@ def _resolve_model_snapshot(
             return None
         for repo in cache_info.repos:
             if repo.repo_id == model_identifier:
-                return _resolve_repo_snapshot(list(repo.revisions), requested_revision)
+                # A known repository can still lack the requested revision
+                # (downloaded later this run): only a resolved snapshot ends
+                # the search; an unresolved explicit revision never falls
+                # back to another snapshot.
+                resolved = _resolve_repo_snapshot(list(repo.revisions), requested_revision)
+                if resolved is not None:
+                    return resolved
+                break
     return None
 
 
@@ -20408,15 +20418,46 @@ def _assessment_changes(
     ]
 
 
+_HF_CACHE_REVISION_SOURCES: Final[frozenset[str]] = frozenset(
+    {"requested-revision", "refs/main", "newest-snapshot"}
+)
+
+
 def _removed_model_status(
-    removed: Sequence[str], current_metadata: JsonlMetadataRecord | None
+    removed: Sequence[str],
+    current_metadata: JsonlMetadataRecord | None,
+    baseline_rows: Mapping[str, JsonlResultRecord] | None = None,
 ) -> tuple[tuple[str, str], ...]:
-    """Say why each baseline model is absent, from this run's own cache discovery."""
+    """Say why each baseline model is absent, from this run's own cache discovery.
+
+    Discovery lists Hugging Face cache repositories only, so absence from it
+    says "no longer cached" only for a model the baseline row shows was
+    loaded from that cache. A local directory (any path form, including a
+    bare relative one that looks like a repo id) or a row without provenance
+    was never in that list, and its absence stays "unknown".
+    """
     discovery = current_metadata.get("cache_discovery") if current_metadata else None
     if not isinstance(discovery, list):
         return tuple((model, "unknown") for model in removed)
     cached = {entry.get("repo_id") for entry in discovery if isinstance(entry, dict)}
-    return tuple((model, "not selected" if model in cached else "not cached") for model in removed)
+
+    def _from_hf_cache(model: str) -> bool:
+        row = baseline_rows.get(model) if baseline_rows is not None else None
+        provenance = row.get("model_provenance") if row is not None else None
+        return (
+            isinstance(provenance, dict)
+            and provenance.get("revision_source") in _HF_CACHE_REVISION_SOURCES
+        )
+
+    return tuple(
+        (
+            model,
+            "not selected"
+            if model in cached
+            else ("not cached" if _from_hf_cache(model) else "unknown"),
+        )
+        for model in removed
+    )
 
 
 def compare_run_results(
@@ -20508,7 +20549,7 @@ def compare_run_results(
         models_added=tuple(sorted(set(current_by) - set(baseline_by))),
         models_removed=tuple(sorted(set(baseline_by) - set(current_by))),
         models_removed_status=_removed_model_status(
-            sorted(set(baseline_by) - set(current_by)), current_metadata
+            sorted(set(baseline_by) - set(current_by)), current_metadata, baseline_by
         ),
         crash_continuity=_crash_continuity(current, baseline_by),
         text_changes_by_decoding=_text_changes_by_decoding(diff_pairs),

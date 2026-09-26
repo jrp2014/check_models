@@ -1525,6 +1525,79 @@ class TestModelBurdenFacts:
         self._install_snapshot(monkeypatch, None)
         assert check_models._collect_model_burden("org/uncached") is None
 
+    @staticmethod
+    def _revision(commit_hash: str, snapshot: Path, *refs: str) -> SimpleNamespace:
+        return SimpleNamespace(
+            commit_hash=commit_hash, refs=frozenset(refs), snapshot_path=snapshot, last_modified=0.0
+        )
+
+    def _install_scans(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        initial: tuple[SimpleNamespace, ...],
+        refreshed: tuple[SimpleNamespace, ...],
+    ) -> list[bool]:
+        calls: list[bool] = []
+
+        def fake_cache_info(*, refresh: bool = False) -> SimpleNamespace:
+            calls.append(refresh)
+            revisions = refreshed if refresh else initial
+            return SimpleNamespace(
+                repos=(SimpleNamespace(repo_id="org/model", revisions=revisions),)
+            )
+
+        monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", fake_cache_info)
+        return calls
+
+    def test_revision_downloaded_mid_run_is_found_after_one_refresh(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """A known repository missing the requested revision rescans once.
+
+        Regression: finding the repository returned immediately, so a revision
+        downloaded later in the run was never seen by the refreshed scan.
+        """
+        rev_a = self._revision("a" * 40, tmp_path / "a", "main")
+        rev_b = self._revision("b" * 40, tmp_path / "b")
+        calls = self._install_scans(monkeypatch, (rev_a,), (rev_a, rev_b))
+        resolved = check_models._resolve_model_snapshot("org/model", "b" * 40)
+        assert resolved == (tmp_path / "b", "requested-revision")
+        assert calls == [False, True]
+
+    def test_revision_missing_after_refresh_never_falls_back(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """An unresolved explicit revision returns None, not main or another snapshot."""
+        rev_a = self._revision("a" * 40, tmp_path / "a", "main")
+        calls = self._install_scans(monkeypatch, (rev_a,), (rev_a,))
+        assert check_models._resolve_model_snapshot("org/model", "c" * 40) is None
+        assert calls == [False, True]
+
+    def test_resolved_revision_does_not_rescan(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """A successful first resolution never pays for a second cache scan."""
+        rev_a = self._revision("a" * 40, tmp_path / "a", "main")
+        calls = self._install_scans(monkeypatch, (rev_a,), (rev_a,))
+        assert check_models._resolve_model_snapshot("org/model") == (tmp_path / "a", "refs/main")
+        assert calls == [False]
+
+    def test_burden_recovers_a_revision_downloaded_mid_run(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """Burden facts come through the shared resolver for the new revision."""
+        snapshot_b = tmp_path / "b"
+        snapshot_b.mkdir()
+        safe_io.write_text_no_follow(
+            snapshot_b / "config.json", json.dumps({"max_position_embeddings": 8192})
+        )
+        rev_a = self._revision("a" * 40, tmp_path / "a", "main")
+        rev_b = self._revision("b" * 40, snapshot_b)
+        self._install_scans(monkeypatch, (rev_a,), (rev_a, rev_b))
+        burden = check_models._collect_model_burden("org/model", "b" * 40)
+        assert burden is not None
+        assert burden.context_length == 8192
+
     def test_relative_local_path_resolves_like_upstream(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:
