@@ -491,6 +491,27 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Streaming diagnostics separate first stream activity from the first
+  generated token. A speculative or diffusion draft, or upstream's zero-token
+  terminal result, no longer sets the time to first token, the first-token
+  peak memory or the before/after-first-token failure boundary; only a
+  non-draft chunk carrying a token does. The stream is closed on every exit,
+  so an early abort runs upstream's cleanup at once; a cleanup error never
+  replaces an exception already in flight (a Ctrl-C cancellation stays a
+  cancellation, a model error stays that error, with the cleanup error as a
+  note). Time to first token can
+  read slightly later than before for draft-first models.
+- The API-drift check no longer treats `**kwargs` acceptance as proof that
+  upstream consumes a generation setting: every keyword the harness sends
+  must also be declared in `mlx_vlm.generate.types.GenerateKwargs`, when the
+  installed mlx-vlm has it. All currently sent keywords are declared. Like
+  the other upstream probes, it never imports mlx-vlm when the import
+  safety probe has marked that import unsafe.
+- Image validation closes the image it loads as a probe.
+- New tests: upstream `generate()` and the harness accumulator agree on the
+  same synthetic stream; a pinned revision reaches `load()`; the report
+  preview corrects EXIF orientation and keeps PNG transparency; malformed
+  images are rejected.
 - Follow-ups to the code-review fixes:
   - A cached repository that lacks a requested revision now triggers the
     one cache rescan, so a revision downloaded mid-run resolves (and

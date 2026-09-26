@@ -7,6 +7,7 @@ mechanical helper behavior.
 from __future__ import annotations
 
 import argparse
+import builtins
 import contextlib
 import importlib
 import json
@@ -20,6 +21,7 @@ from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
     import types
+    from collections.abc import Mapping, Sequence
 
 import pytest
 import yaml
@@ -1297,6 +1299,73 @@ class TestPreflightDependencyDiagnostics:
         assert issues == [
             "mlx_vlm.generate.stream_generate is missing required keyword parameter(s): verbose, temperature.",
         ]
+
+    def test_var_keyword_acceptance_is_not_upstream_consumption(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """A keyword reaching only **kwargs must be declared in upstream's contract."""
+
+        def _fake_stream(model: object, prompt: str, **kwargs: object) -> object:
+            return (model, prompt, kwargs)
+
+        issues = mod._get_callable_contract_issues(
+            qualified_name="mlx_vlm.generate.stream_generate",
+            symbol_value=_fake_stream,
+            required_keyword_params=("model", "prompt", "temperature", "retired_flag"),
+            declared_keywords=frozenset({"model", "prompt", "temperature"}),
+        )
+        assert len(issues) == 1
+        assert "retired_flag only through **kwargs" in issues[0]
+        # Without an upstream contract to consult, **kwargs acceptance stands.
+        assert (
+            mod._get_callable_contract_issues(
+                qualified_name="mlx_vlm.generate.stream_generate",
+                symbol_value=_fake_stream,
+                required_keyword_params=("temperature", "retired_flag"),
+            )
+            == []
+        )
+
+    def test_generate_contract_never_imports_mlx_vlm_after_an_unsafe_probe(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A failed import probe leaves placeholders bound; the contract check must not import.
+
+        Regression: the keyword-contract helper imported mlx_vlm.generate.types
+        even when the probe had marked the mlx-vlm import unsafe.
+        """
+        monkeypatch.setattr(mod, "stream_generate", mod._raise_mlx_vlm_missing)
+        attempted: list[str] = []
+        real_import = builtins.__import__
+
+        def _recording_import(
+            name: str,
+            globals_: Mapping[str, object] | None = None,
+            locals_: Mapping[str, object] | None = None,
+            fromlist: Sequence[str] | None = (),
+            level: int = 0,
+        ) -> types.ModuleType:
+            if name.startswith("mlx_vlm"):
+                attempted.append(name)
+            return real_import(name, globals_, locals_, fromlist, level)
+
+        monkeypatch.setattr(builtins, "__import__", _recording_import)
+        assert mod._upstream_generate_kwarg_names() is None
+        mod._detect_runtime_api_drift_issues()
+        assert attempted == []
+
+    def test_every_sent_generation_keyword_is_declared_upstream(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Installed mlx-vlm's GenerateKwargs declares every keyword the harness sends."""
+        declared = mod._upstream_generate_kwarg_names()
+        if declared is None:
+            pytest.skip("installed mlx-vlm predates mlx_vlm.generate.types")
+        assert set(mod._SENT_GENERATE_KEYWORDS) <= declared
 
     def test_import_probe_excerpt_preserves_actionable_import_error_tail(
         self,

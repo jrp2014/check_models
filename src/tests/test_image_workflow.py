@@ -1,5 +1,6 @@
 """Tests for image discovery and validation workflows."""
 
+import io
 import os
 from pathlib import Path
 
@@ -7,6 +8,7 @@ import pytest
 from PIL import Image
 
 import check_models
+from tools import safe_io
 
 
 def test_find_most_recent_file_in_directory(tmp_path: Path) -> None:
@@ -193,3 +195,55 @@ def test_validate_image_accessible_never_caches_failures(tmp_path: Path) -> None
     for _ in range(2):
         with pytest.raises(OSError, match="Error accessing image"):
             check_models.validate_image_accessible(image_path=img_path)
+
+
+def test_validate_image_accessible_closes_the_probe_image(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The validity probe owns the image it loads and closes it deterministically."""
+    img_path = tmp_path / "probe.jpg"
+    Image.new("RGB", (10, 10)).save(img_path)
+    monkeypatch.setattr(check_models, "_IMAGE_VALIDATION_CACHE", {})
+    closed: list[bool] = []
+
+    class _Probe:
+        def close(self) -> None:
+            closed.append(True)
+
+    monkeypatch.setattr(check_models, "load_image", lambda _path: _Probe())
+    check_models.validate_image_accessible(image_path=img_path)
+    assert closed == [True]
+
+
+def test_validate_image_accessible_rejects_a_malformed_image(tmp_path: Path) -> None:
+    """Bytes that are not an image fail validation instead of reaching a model."""
+    img_path = tmp_path / "broken.jpg"
+    safe_io.write_text_no_follow(img_path, "not really a jpeg")
+    with pytest.raises((OSError, ValueError)):
+        check_models.validate_image_accessible(image_path=img_path)
+
+
+def test_report_preview_applies_exif_orientation(tmp_path: Path) -> None:
+    """Source bytes keep their orientation tag; the report preview is upright."""
+    img_path = tmp_path / "rotated.jpg"
+    exif = Image.Exif()
+    exif[0x0112] = 6  # Orientation: rotate 90 degrees clockwise to display
+    Image.new("RGB", (100, 50)).save(img_path, exif=exif.tobytes())
+    preview = check_models._report_image_preview(img_path)
+    assert preview is not None
+    with Image.open(io.BytesIO(preview[2])) as shown:
+        assert shown.size == (50, 100)
+    with Image.open(img_path) as source:
+        assert source.size == (100, 50)
+
+
+def test_report_preview_keeps_png_transparency(tmp_path: Path) -> None:
+    """A transparent PNG previews as PNG with its alpha channel intact."""
+    img_path = tmp_path / "alpha.png"
+    Image.new("RGBA", (40, 40), (255, 0, 0, 0)).save(img_path)
+    preview = check_models._report_image_preview(img_path)
+    assert preview is not None
+    assert preview[1] == "image/png"
+    with Image.open(io.BytesIO(preview[2])) as shown:
+        assert shown.mode == "RGBA"
+        assert shown.getchannel("A").getextrema() == (0, 0)

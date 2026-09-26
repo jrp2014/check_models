@@ -363,6 +363,16 @@ class TestProcessImageWithModelMock:
             str(snapshot),
         ]
 
+    def test_load_model_forwards_the_requested_revision(self, test_image: Path) -> None:
+        """A pinned --revision reaches upstream load() unchanged, alongside the model id."""
+        params = replace(_build_params(test_image), revision="abc123def456")
+        with patch.object(
+            check_models, "load", return_value=(_FakeModel(), _FakeProcessor())
+        ) as mock_load:
+            check_models._load_model(params)
+        assert mock_load.call_args.kwargs["path_or_hf_repo"] == params.model_identifier
+        assert mock_load.call_args.kwargs["revision"] == "abc123def456"
+
     @pytest.mark.parametrize(
         ("load_error", "revision", "force_download"),
         [
@@ -2308,7 +2318,7 @@ class TestStreamObservations:
     def test_guard_fills_observations_from_the_stream(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """First-chunk time and peak, and the ids of retained chunks, are recorded."""
+        """First-token time and peak, and the ids of retained chunks, are recorded."""
         chunks = self._chunks(["a ", "b ", "c "])
         chunks.insert(1, types.SimpleNamespace(text="draft", token=999, is_draft=True))
         monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: iter(chunks))
@@ -2322,11 +2332,233 @@ class TestStreamObservations:
             observations=observations,
         )
         assert observations.first_chunk_at is not None
+        assert observations.first_token_at is not None
         assert observations.time_to_first_token_s is not None
         assert observations.time_to_first_token_s >= 0.0
-        # The first chunk's upstream peak is the prefill peak; drafts add no ids.
-        assert observations.first_chunk_peak_memory_gb == 1.5
+        # The first token's upstream peak is the prefill peak; drafts add no ids.
+        assert observations.first_token_peak_memory_gb == 1.5
         assert observations.token_ids == [100, 101, 102]
+
+    def _run_guard(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        stream: object,
+        on_first_token: object = None,
+    ) -> check_models.StreamObservations:
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_kw: stream)
+        observations = check_models.StreamObservations(started_at=time.perf_counter())
+        check_models._generate_with_repetition_guard(
+            model=cast("Any", object()),
+            processor=_FakeProcessor(),
+            prompt="p",
+            image="i.jpg",
+            on_first_token=cast("Any", on_first_token),
+            observations=observations,
+        )
+        return observations
+
+    def test_draft_first_stream_times_the_first_real_token(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A leading draft is activity; the first token is the first non-draft token chunk."""
+        chunks = self._chunks(["a ", "b "])
+        chunks.insert(
+            0, types.SimpleNamespace(text="draft", token=999, is_draft=True, peak_memory=9.0)
+        )
+        fired: list[bool] = []
+        observations = self._run_guard(monkeypatch, iter(chunks), lambda: fired.append(True))
+        assert fired == [True]
+        assert observations.first_chunk_at is not None
+        assert observations.first_token_at is not None
+        assert observations.first_chunk_at <= observations.first_token_at
+        assert observations.first_token_peak_memory_gb == 1.5
+
+    def test_zero_token_stream_has_activity_but_no_first_token(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Upstream's zero-token terminal result (token None, 0 tokens) is not a first token."""
+        terminal = types.SimpleNamespace(
+            text="", token=None, generation_tokens=0, finish_reason="length", peak_memory=1.0
+        )
+        fired: list[bool] = []
+        observations = self._run_guard(monkeypatch, iter([terminal]), lambda: fired.append(True))
+        assert fired == []
+        assert observations.first_chunk_at is not None
+        assert observations.first_token_at is None
+        assert observations.time_to_first_token_s is None
+
+    def test_failure_after_drafts_only_is_before_the_first_token(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A crash after draft chunks alone happened before any generated token."""
+
+        def stream() -> Iterator[types.SimpleNamespace]:
+            yield types.SimpleNamespace(text="draft", token=999, is_draft=True)
+            message = "boom"
+            raise RuntimeError(message)
+
+        with pytest.raises(RuntimeError) as caught:
+            self._run_guard(monkeypatch, stream())
+        assert check_models._extract_failure_phase(caught.value) == "generation_before_first_token"
+
+    def test_stream_is_closed_when_the_loop_exits_early(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An early exit closes the generator so upstream cleanup runs at once, not at GC."""
+        closed: list[bool] = []
+
+        def stream() -> Iterator[types.SimpleNamespace]:
+            try:
+                yield from self._chunks(["a ", "b ", "c "])
+            finally:
+                closed.append(True)
+
+        def fail() -> None:
+            message = "stop"
+            raise RuntimeError(message)
+
+        with pytest.raises(RuntimeError) as caught:
+            self._run_guard(monkeypatch, stream(), fail)
+        # The traceback still references the loop frame, so only an explicit
+        # close() can have run the generator's cleanup by now.
+        assert caught.value is not None
+        assert closed == [True]
+
+    def test_guard_matches_upstream_generate_over_the_same_stream(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The harness accumulator and upstream generate() agree on one synthetic stream.
+
+        Runs the real upstream generate() (only its stream is synthetic), so a
+        change in how upstream joins text, skips drafts or reports the final
+        metrics shows up as a mismatch rather than a silent divergence.
+        """
+        generate_module = pytest.importorskip("mlx_vlm.generate")
+        dispatch = sys.modules.get("mlx_vlm.generate.dispatch")
+        if dispatch is None or not hasattr(dispatch, "stream_generate"):
+            pytest.skip("installed mlx-vlm has no generate.dispatch module")
+        result_type = generate_module.GenerationResult
+        chunks = [
+            result_type(text="", is_draft=True, draft_text="dr", peak_memory=0.5),
+            result_type(
+                text="Hello",
+                token=10,
+                prompt_tokens=5,
+                generation_tokens=1,
+                prompt_tps=100.0,
+                generation_tps=20.0,
+                peak_memory=1.0,
+            ),
+            result_type(
+                text=" world",
+                token=11,
+                prompt_tokens=5,
+                generation_tokens=2,
+                total_tokens=7,
+                prompt_tps=100.0,
+                generation_tps=21.0,
+                peak_memory=1.25,
+                finish_reason="stop",
+                token_ids=[10, 11],
+            ),
+        ]
+
+        class _Criteria:
+            def reset(self, _eos: object) -> None:
+                return None
+
+            def add_eos_token_ids(self, _tokens: object) -> None:
+                return None
+
+        processor = types.SimpleNamespace(
+            tokenizer=types.SimpleNamespace(stopping_criteria=_Criteria())
+        )
+        model = types.SimpleNamespace(config=types.SimpleNamespace(eos_token_id=2))
+        monkeypatch.setattr(dispatch, "stream_generate", lambda *_a, **_k: iter(chunks))
+        monkeypatch.setattr(check_models, "stream_generate", lambda **_k: iter(chunks))
+
+        upstream = dispatch.generate(model, processor, "p", "i.jpg", max_tokens=8)
+        ours = check_models._generate_with_repetition_guard(
+            model=cast("Any", model),
+            processor=cast("Any", processor),
+            prompt="p",
+            image="i.jpg",
+            max_tokens=8,
+        )
+        for field in (
+            "text",
+            "finish_reason",
+            "token",
+            "token_ids",
+            "prompt_tokens",
+            "generation_tokens",
+            "total_tokens",
+            "prompt_tps",
+            "generation_tps",
+            "peak_memory",
+        ):
+            assert getattr(ours, field) == getattr(upstream, field), field
+
+    @staticmethod
+    def _stream_with_failing_cleanup() -> Iterator[types.SimpleNamespace]:
+        try:
+            yield types.SimpleNamespace(text="a ", token=1, generation_tokens=1)
+            yield types.SimpleNamespace(text="b ", token=2, generation_tokens=2)
+        finally:
+            message = "cleanup failed"
+            raise RuntimeError(message)
+
+    def test_cleanup_failure_never_replaces_a_cancellation(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Ctrl-C mid-stream stays a KeyboardInterrupt even when upstream cleanup raises.
+
+        Regression: an exception from close() in ``finally`` replaced the
+        KeyboardInterrupt, so a cancelled run was recorded as a model failure.
+        """
+
+        def cancel() -> None:
+            raise KeyboardInterrupt
+
+        with pytest.raises(KeyboardInterrupt) as caught:
+            self._run_guard(monkeypatch, self._stream_with_failing_cleanup(), cancel)
+        assert any("cleanup failed" in note for note in getattr(caught.value, "__notes__", []))
+
+    def test_cleanup_failure_never_replaces_a_model_error(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The model's own failure propagates; the cleanup error is only a note on it."""
+
+        def fail() -> None:
+            message = "model broke"
+            raise ValueError(message)
+
+        with pytest.raises(ValueError, match="model broke") as caught:
+            self._run_guard(monkeypatch, self._stream_with_failing_cleanup(), fail)
+        assert any("cleanup failed" in note for note in getattr(caught.value, "__notes__", []))
+
+    def test_cleanup_failure_after_success_is_the_outcome(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """With nothing else in flight, a failing close() is a real, boundary-tagged failure."""
+
+        class _Stream:
+            def __init__(self) -> None:
+                self._chunks = iter([types.SimpleNamespace(text="a", token=1, generation_tokens=1)])
+
+            def __iter__(self) -> _Stream:
+                return self
+
+            def __next__(self) -> types.SimpleNamespace:
+                return next(self._chunks)
+
+            def close(self) -> None:
+                message = "cleanup failed"
+                raise RuntimeError(message)
+
+        with pytest.raises(RuntimeError, match="cleanup failed") as caught:
+            self._run_guard(monkeypatch, _Stream())
+        assert check_models._extract_failure_phase(caught.value) == "generation_after_first_token"
 
     def test_time_to_first_token_needs_both_timestamps(self) -> None:
         """TTFT is only defined once both timestamps exist."""
@@ -2334,7 +2566,7 @@ class TestStreamObservations:
         assert check_models.StreamObservations(started_at=1.0).time_to_first_token_s is None
         assert (
             check_models.StreamObservations(
-                started_at=2.0, first_chunk_at=2.5
+                started_at=2.0, first_chunk_at=2.1, first_token_at=2.5
             ).time_to_first_token_s
             == 0.5
         )
@@ -2366,7 +2598,7 @@ class TestStreamObservations:
         output = _FakeGenerationResult()
         output.text = "Hello <|box|> world"  # reached the text, so it is leakage
         observations = check_models.StreamObservations(
-            started_at=10.0, first_chunk_at=10.75, first_chunk_peak_memory_gb=3.25
+            started_at=10.0, first_token_at=10.75, first_token_peak_memory_gb=3.25
         )
         observations.special_tokens = ("<|box|>",)
         setattr(output, check_models._STREAM_OBSERVATIONS_ATTR, observations)

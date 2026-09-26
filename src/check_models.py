@@ -5459,13 +5459,38 @@ _GENERATION_RESULT_REQUIRED_FIELDS: Final[tuple[str, ...]] = (
 )
 
 
+def _upstream_generate_kwarg_names() -> frozenset[str] | None:
+    """Keys of upstream's public ``GenerateKwargs`` contract, or None when absent.
+
+    A callable taking ``**kwargs`` accepts any keyword, which proves only that
+    Python will not reject the call, not that upstream consumes the setting.
+    Releases predating ``mlx_vlm.generate.types`` return None (no extra check).
+    When the import probe marked mlx-vlm unsafe, the placeholders stay bound
+    and nothing may import it in this process, so this returns None too.
+    """
+    if stream_generate is _raise_mlx_vlm_missing:
+        return None
+    try:
+        types_module = __import__("mlx_vlm.generate.types", fromlist=["GenerateKwargs"])
+    except ImportError:
+        return None
+    contract = getattr(types_module, "GenerateKwargs", None)
+    keys = getattr(contract, "__annotations__", None)
+    return frozenset(keys) if isinstance(keys, dict) and keys else None
+
+
 def _get_callable_contract_issues(
     *,
     qualified_name: str,
     symbol_value: object,
     required_keyword_params: Sequence[str],
+    declared_keywords: frozenset[str] | None = None,
 ) -> list[str]:
-    """Return contract issues for a callable surface used by check_models."""
+    """Return contract issues for a callable surface used by check_models.
+
+    ``declared_keywords``, when given, is the upstream contract a keyword that
+    only reaches ``**kwargs`` must appear in to count as consumed.
+    """
     if symbol_value is _raise_mlx_vlm_missing:
         dependency_message = MISSING_DEPENDENCIES.get("mlx-vlm", ERROR_MLX_VLM_MISSING)
         return [
@@ -5488,6 +5513,7 @@ def _get_callable_contract_issues(
         parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
     )
     missing_keyword_params: list[str] = []
+    undeclared_keyword_params: list[str] = []
     positional_only_keyword_params: list[str] = []
 
     for parameter_name in required_keyword_params:
@@ -5495,6 +5521,8 @@ def _get_callable_contract_issues(
         if parameter is None:
             if not has_var_keyword:
                 missing_keyword_params.append(parameter_name)
+            elif declared_keywords is not None and parameter_name not in declared_keywords:
+                undeclared_keyword_params.append(parameter_name)
             continue
         if parameter.kind is inspect.Parameter.POSITIONAL_ONLY:
             positional_only_keyword_params.append(parameter_name)
@@ -5504,6 +5532,12 @@ def _get_callable_contract_issues(
         issues.append(
             f"{qualified_name} is missing required keyword parameter(s): "
             f"{', '.join(missing_keyword_params)}.",
+        )
+    if undeclared_keyword_params:
+        issues.append(
+            f"{qualified_name} accepts {', '.join(undeclared_keyword_params)} only through "
+            "**kwargs and upstream's GenerateKwargs no longer declares them; the setting "
+            "may be silently ignored.",
         )
     if positional_only_keyword_params:
         issues.append(
@@ -5566,6 +5600,7 @@ def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
     """Return issues when installed MLX runtime call surfaces drift from our contract."""
     issues: list[str] = []
     missing_mlx_vlm_surfaces: list[str] = []
+    generate_contract = _upstream_generate_kwarg_names()
     for symbol_name, (
         qualified_name,
         required_keyword_params,
@@ -5574,11 +5609,19 @@ def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
         if symbol_value is _raise_mlx_vlm_missing:
             missing_mlx_vlm_surfaces.append(qualified_name)
             continue
+        # Generation settings must be declared upstream, not merely accepted;
+        # the positional call arguments are checked by the signature alone.
+        declared = (
+            generate_contract | frozenset(_GENERATE_CALL_ARGS)
+            if symbol_name == "stream_generate" and generate_contract is not None
+            else None
+        )
         issues.extend(
             _get_callable_contract_issues(
                 qualified_name=qualified_name,
                 symbol_value=symbol_value,
                 required_keyword_params=required_keyword_params,
+                declared_keywords=declared,
             ),
         )
 
@@ -12665,8 +12708,13 @@ def validate_image_accessible(*, image_path: str | Path) -> None:
         with TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT):
             # load_image() from mlx_vlm.utils handles both file paths and URLs
             # Returns PIL.Image.Image, verifying the image is accessible and valid
-            # Convert Path to str since load_image expects str
-            _ = load_image(str(image_path))
+            # Convert Path to str since load_image expects str. The image is
+            # only a validity probe: close it now rather than leave its pixel
+            # buffer (and any file handle) to garbage collection.
+            loaded = load_image(str(image_path))
+            close = getattr(loaded, "close", None)
+            if callable(close):
+                close()
     except RuntimeError as err:
         if str(err) != ERROR_MLX_VLM_MISSING:
             msg = f"Error accessing image {image_path}: {err}"
@@ -14192,26 +14240,29 @@ def _stream_tail_repeats(pieces: Sequence[str], chunk: object, chunk_count: int)
 class StreamObservations:
     """Facts only the streaming loop can see; attached to the generation result.
 
-    ``started_at`` is set by the caller right before the upstream call;
-    ``first_chunk_at`` by the loop when the first chunk arrives, so their
-    difference is the time to first token as a caller experiences it (input
-    preparation, prefill and the first decode step). ``token_ids`` are the
-    retained (non-draft) generated ids, from which special tokens are
-    detected by id rather than by regex on the decoded text.
+    ``started_at`` is set by the caller right before the upstream call.
+    ``first_chunk_at`` records the first stream activity of any kind (a
+    speculative or diffusion draft, or a zero-token terminal result);
+    ``first_token_at`` the first non-draft chunk carrying a generated token,
+    so ``time_to_first_token_s`` is the time to first token as a caller
+    experiences it (input preparation, prefill and the first decode step).
+    ``token_ids`` are the retained (non-draft) generated ids, from which
+    special tokens are detected by id rather than by regex on the text.
     """
 
     started_at: float | None = None
     first_chunk_at: float | None = None
-    first_chunk_peak_memory_gb: float | None = None
+    first_token_at: float | None = None
+    first_token_peak_memory_gb: float | None = None
     token_ids: list[int] = dataclass_field(default_factory=list)
     special_tokens: tuple[str, ...] = ()
 
     @property
     def time_to_first_token_s(self) -> float | None:
-        """Wall-clock seconds from the generate call to the first chunk, if both seen."""
-        if self.started_at is None or self.first_chunk_at is None:
+        """Wall-clock seconds from the generate call to the first generated token, if seen."""
+        if self.started_at is None or self.first_token_at is None:
             return None
-        return max(self.first_chunk_at - self.started_at, 0.0)
+        return max(self.first_token_at - self.started_at, 0.0)
 
 
 _STREAM_OBSERVATIONS_ATTR: Final[str] = "_check_models_stream_observations"
@@ -14223,14 +14274,27 @@ def _object_stream_observations(value: object | None) -> StreamObservations | No
     return observations if isinstance(observations, StreamObservations) else None
 
 
-def _observe_first_chunk(observations: StreamObservations | None, chunk: object) -> None:
-    """Record the first chunk's arrival time and upstream peak memory."""
+def _chunk_carries_token(chunk: object) -> bool:
+    """Whether a non-draft chunk carries a generated token (not just activity).
+
+    Upstream's zero-token terminal result has ``token=None`` and
+    ``generation_tokens=0``; any real step carries its token, even when the
+    detokenizer has not released text for it yet.
+    """
+    if getattr(chunk, "token", None) is not None:
+        return True
+    generated = getattr(chunk, "generation_tokens", None)
+    return isinstance(generated, int) and not isinstance(generated, bool) and generated > 0
+
+
+def _observe_first_token(observations: StreamObservations | None, chunk: object) -> None:
+    """Record the first generated token's arrival time and upstream peak memory."""
     if observations is None:
         return
-    observations.first_chunk_at = time.perf_counter()
+    observations.first_token_at = time.perf_counter()
     peak = getattr(chunk, "peak_memory", None)
     if isinstance(peak, int | float) and not isinstance(peak, bool) and peak >= 0:
-        observations.first_chunk_peak_memory_gb = float(peak)
+        observations.first_token_peak_memory_gb = float(peak)
 
 
 def _observe_token(observations: StreamObservations | None, chunk: object) -> None:
@@ -14287,6 +14351,76 @@ def _emitted_special_tokens(
     return tuple(seen)
 
 
+def _register_stream_stop_tokens(model: object, processor: object, eos_tokens: object) -> None:
+    """Register custom EOS tokens, or reset to the model default, as upstream generate() does.
+
+    Resetting stops a previous model's registration leaking into this run.
+    """
+    tokenizer = getattr(processor, "tokenizer", processor)
+    stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
+    if stopping_criteria is None:
+        return
+    if eos_tokens is not None:
+        stopping_criteria.add_eos_token_ids(eos_tokens)
+    elif (eos_id := getattr(getattr(model, "config", None), "eos_token_id", None)) is not None:
+        stopping_criteria.reset(eos_id)
+
+
+def _assemble_stream_result(
+    last: GenerationResult | SupportsGenerationResult | None,
+    pieces: Sequence[str],
+    processor: object,
+    *,
+    aborted: bool,
+) -> GenerationResult | SupportsGenerationResult:
+    """Return upstream generate()'s result shape: the last chunk's metrics with the joined text."""
+    if last is None:
+        # Upstream generate() returns an empty result for an empty stream; an
+        # empty stream is an empty_output observation, not a crash.
+        return cast(
+            "SupportsGenerationResult",
+            types.SimpleNamespace(
+                text="", finish_reason=None, peak_memory=mx.get_peak_memory() / 1e9
+            ),
+        )
+    text = "".join(pieces)
+    # Upstream generate() applies the processor's optional clean_output hook
+    # to the joined text (e.g. diffusion_gemma strips leaked channel
+    # scaffolding); mirror it so stream_generate-based results match.
+    clean_output = getattr(processor, "clean_output", None)
+    if callable(clean_output) and isinstance(cleaned := clean_output(text), str):
+        text = cleaned
+    finish_reason = "repetition_abort" if aborted else getattr(last, "finish_reason", None)
+    if is_dataclass(last) and not isinstance(last, type):
+        return replace(last, text=text, finish_reason=finish_reason)
+    duck = types.SimpleNamespace(**vars(last))
+    duck.text = text
+    duck.finish_reason = finish_reason
+    return cast("SupportsGenerationResult", duck)
+
+
+def _close_stream(stream: object, *, pending: BaseException | None, token_seen: bool) -> None:
+    """Close the upstream generator without letting its cleanup hide a real outcome.
+
+    ``close()`` runs upstream's cleanup (stream synchronisation, wired-memory
+    restore). When an exception is already leaving the loop — a model failure,
+    or a KeyboardInterrupt cancelling the run — a cleanup error must not
+    replace it: it is attached as a note and the original propagates. Only on
+    the success path is a cleanup failure itself the outcome, tagged with the
+    first-token boundary it reached. A cancellation raised during cleanup is
+    never swallowed.
+    """
+    close = getattr(stream, "close", None)
+    if not callable(close):
+        return
+    try:
+        close()
+    except Exception as cleanup_err:  # noqa: BLE001 - re-raised, or noted on the in-flight error
+        if pending is None:
+            raise _tag_generation_boundary_failure(cleanup_err, token_seen=token_seen) from None
+        pending.add_note(f"Upstream stream cleanup also failed: {cleanup_err!r}")
+
+
 def _generate_with_repetition_guard(
     model: nn.Module,
     processor: ProcessorLike | PreTrainedTokenizer,
@@ -14316,39 +14450,42 @@ def _generate_with_repetition_guard(
     joined text passes through the processor's optional ``clean_output``
     hook before being returned.
 
-    ``on_first_token`` fires once, when the first chunk arrives; a failure
-    escaping the stream is tagged with that boundary (before/after the first
-    token) unless a deeper phase is already on it. ``observations``, when
-    given, receives the first chunk's time and peak memory and every retained
-    chunk's token id.
+    ``on_first_token`` fires once, at the first non-draft chunk carrying a
+    generated token (a draft or a zero-token terminal result is activity, not
+    a token); a failure escaping the stream is tagged with that boundary
+    (before/after the first token) unless a deeper phase is already on it.
+    ``observations``, when given, receives the first activity time, the first
+    token's time and peak memory, and every retained chunk's token id. The
+    stream is closed on every exit, so an early abort runs upstream's
+    cleanup (stream synchronisation, wired-memory restore) deterministically.
     """
-    tokenizer = processor.tokenizer if hasattr(processor, "tokenizer") else processor
-    stopping_criteria = getattr(tokenizer, "stopping_criteria", None)
-    eos_tokens = kwargs.get("eos_tokens")
-    if stopping_criteria is not None:
-        if eos_tokens is not None:
-            stopping_criteria.add_eos_token_ids(eos_tokens)
-        elif (eos_id := getattr(getattr(model, "config", None), "eos_token_id", None)) is not None:
-            stopping_criteria.reset(eos_id)
+    _register_stream_stop_tokens(model, processor, kwargs.get("eos_tokens"))
     pieces: list[str] = []
     last: GenerationResult | SupportsGenerationResult | None = None
     aborted = False
+    token_seen = False
     chunk_count = 0
     echo = sys.stdout if kwargs.get("verbose") else None
+    stream: Iterator[GenerationResult] | None = None
+    pending: BaseException | None = None
     try:
-        for chunk in stream_generate(
+        stream = stream_generate(
             model=model, processor=processor, prompt=prompt, image=image, **kwargs
-        ):
-            if last is None:
-                _observe_first_chunk(observations, chunk)
-                if on_first_token is not None:
-                    on_first_token()
+        )
+        for chunk in stream:
+            if last is None and observations is not None:
+                observations.first_chunk_at = time.perf_counter()
             last = chunk
             if getattr(chunk, "is_draft", False):
                 # Speculative/diffusion draft chunks are progress display only;
                 # upstream generate() excludes their text from the final answer,
                 # so they are neither echoed nor retained.
                 continue
+            if not token_seen and _chunk_carries_token(chunk):
+                token_seen = True
+                _observe_first_token(observations, chunk)
+                if on_first_token is not None:
+                    on_first_token()
             _observe_token(observations, chunk)
             pieces.append(chunk.text)
             if (
@@ -14365,36 +14502,17 @@ def _generate_with_repetition_guard(
         if echo is not None and pieces:
             echo.write("\n")
             echo.flush()
-        if last is None:
-            # Upstream generate() returns an empty result for an empty stream; an
-            # empty stream is an empty_output observation, not a crash.
-            return cast(
-                "SupportsGenerationResult",
-                types.SimpleNamespace(
-                    text="", finish_reason=None, peak_memory=mx.get_peak_memory() / 1e9
-                ),
-            )
-        text = "".join(pieces)
-        # Upstream generate() applies the processor's optional clean_output hook
-        # to the joined text (e.g. diffusion_gemma strips leaked channel
-        # scaffolding); mirror it so stream_generate-based results match.
-        clean_output = getattr(processor, "clean_output", None)
-        if callable(clean_output) and isinstance(cleaned := clean_output(text), str):
-            text = cleaned
-        finish_reason = "repetition_abort" if aborted else getattr(last, "finish_reason", None)
-        if is_dataclass(last) and not isinstance(last, type):
-            return replace(last, text=text, finish_reason=finish_reason)
-        duck = types.SimpleNamespace(**vars(last))
-        duck.text = text
-        duck.finish_reason = finish_reason
-        return cast("SupportsGenerationResult", duck)
+        return _assemble_stream_result(last, pieces, processor, aborted=aborted)
     except BaseException as stream_err:
         # The streaming boundary is the only phase evidence available here:
         # upstream does not say which of its stages failed. Output
         # finalisation (echo, clean_output, result assembly) is inside the
         # same block so a failure there keeps the boundary it reached.
-        _tag_generation_boundary_failure(stream_err, token_seen=last is not None)
+        _tag_generation_boundary_failure(stream_err, token_seen=token_seen)
+        pending = stream_err
         raise
+    finally:
+        _close_stream(stream, pending=pending, token_seen=token_seen)
 
 
 def _expected_stop_token_names(prepared: _PreparedGeneration) -> frozenset[str]:
@@ -14778,7 +14896,7 @@ def _build_success_process_result(
                 observations.time_to_first_token_s if observations is not None else None
             ),
             first_token_peak_memory_gb=(
-                observations.first_chunk_peak_memory_gb if observations is not None else None
+                observations.first_token_peak_memory_gb if observations is not None else None
             ),
             model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
             stop_reason=stop_reason,
