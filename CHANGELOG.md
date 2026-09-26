@@ -508,8 +508,10 @@ Notable changes to this project will be documented in this file.
   the other upstream probes, it never imports mlx-vlm when the import
   safety probe has marked that import unsafe.
 - Image validation closes the image it loads as a probe.
-- New tests: upstream `generate()` and the harness accumulator agree on the
-  same synthetic stream; a pinned revision reaches `load()`; the report
+- New tests: native repro commands parse with mlx-vlm's own
+  `parse_arguments()` (after upstream test_cli.py's `_args()`), with every
+  value round-tripping; upstream `generate()` and the harness accumulator
+  agree on the same synthetic stream; a pinned revision reaches `load()`; the report
   preview corrects EXIF orientation and keeps PNG transparency; malformed
   images are rejected.
 - Follow-ups to the code-review fixes:

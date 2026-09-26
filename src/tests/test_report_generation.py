@@ -12,6 +12,7 @@ import json
 import logging
 import re
 import subprocess
+import sys
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -707,9 +708,9 @@ def test_run_issue_summary_withholds_command_for_post_load_crash(tmp_path: Path)
     assert "any-local-image.jpg" not in content
 
 
-def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
-    """The native command must retain every harness setting exposed by its CLI."""
-    run_args = Namespace(
+def _native_repro_args_with_every_setting() -> Namespace:
+    """Run arguments exercising every setting the native repro command can carry."""
+    return Namespace(
         max_tokens=321,
         temperature=0.25,
         top_p=0.81,
@@ -744,6 +745,62 @@ def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
         thinking_start_token=THINKING_START_TOKEN,
         thinking_end_token=CUSTOM_THINKING_END_TOKEN,
     )
+
+
+def test_native_repro_command_parses_with_upstream_cli() -> None:
+    """Every flag the native repro command emits is accepted by mlx-vlm's own parser.
+
+    Mirrors upstream test_cli.py's ``_args()``: the rendered tokens go through
+    the real ``parse_arguments()``, so a renamed or removed upstream flag fails
+    here instead of in a maintainer's terminal, and the values round-trip.
+    """
+    dispatch = pytest.importorskip("mlx_vlm.generate.dispatch")
+    run_args = _native_repro_args_with_every_setting()
+    tokens = check_models._build_native_mlx_vlm_cli_tokens(
+        model_name="org/model",
+        prompt="Describe this image.",
+        image_ref="image.jpg",
+        run_args=run_args,
+        resolved_revision="resolved-revision",
+    )
+    assert tokens[:3] == ["python", "-m", "mlx_vlm.generate"]
+    with patch.object(sys, "argv", ["mlx_vlm.generate", *tokens[3:]]):
+        parsed = dispatch.parse_arguments()
+
+    expected = {
+        "model": "org/model",
+        "prompt": ["Describe this image."],
+        "max_tokens": run_args.max_tokens,
+        "temperature": run_args.temperature,
+        "top_p": run_args.top_p,
+        "min_p": run_args.min_p,
+        "top_k": run_args.top_k,
+        "seed": run_args.seed,
+        "repetition_penalty": run_args.repetition_penalty,
+        "max_kv_size": run_args.max_kv_size,
+        "kv_quant_scheme": run_args.kv_quant_scheme,
+        "resize_shape": list(run_args.resize_shape),
+        "eos_tokens": list(run_args.eos_tokens),
+        "revision": "resolved-revision",
+        "prefill_step_size": run_args.prefill_step_size,
+        "thinking_budget": run_args.thinking_budget,
+        "thinking_mode": run_args.thinking_mode,
+        "thinking_start_token": run_args.thinking_start_token,
+        "thinking_end_token": run_args.thinking_end_token,
+        "processor_kwargs": run_args.processor_kwargs,
+    }
+    actual = {key: getattr(parsed, key, "MISSING") for key in expected}
+    # The parser may normalise a scalar image or prompt into a list.
+    if isinstance(actual["prompt"], str):
+        actual["prompt"] = [actual["prompt"]]
+    assert actual == expected
+    for flag in ("skip_special_tokens", "force_download", "trust_remote_code", "enable_thinking"):
+        assert getattr(parsed, flag) is True, flag
+
+
+def test_native_repro_preserves_every_supported_nondefault_argument() -> None:
+    """The native command must retain every harness setting exposed by its CLI."""
+    run_args = _native_repro_args_with_every_setting()
 
     tokens = check_models._build_native_mlx_vlm_cli_tokens(
         model_name="org/model",
