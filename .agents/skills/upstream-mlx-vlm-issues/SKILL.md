@@ -57,9 +57,13 @@ Collect or infer:
 3. Prefer public models and small/synthetic media when possible.
 4. One image before multi-input; one model per process.
 5. State clearly if it only fails with a private checkpoint.
-6. Lead with **root exception + first frames inside mlx-vlm / transformers /
+6. Read the model family's `mlx_vlm/models/<family>/README.md` before filing
+   (the draft's "Family README in installed mlx-vlm" fact names it). If it
+   recommends a different checkpoint, try that one first; when that one also
+   fails, file it and say so in the issue.
+7. Lead with **root exception + first frames inside mlx-vlm / transformers /
    model code**; keep long harness stacks under an optional details block.
-7. Commands use `python -m …` under conda + pip, not `uv run`: the environment is conda-managed, and uv would install outside it.
+8. Commands use `python -m …` under conda + pip, not `uv run`: the environment is conda-managed, and uv would install outside it.
 
 ## Maintainer quality bar
 
@@ -108,6 +112,7 @@ existing artifacts rather than paraphrasing away exact errors.
 - Resolved revision:
 - Source: <HF cache | local path | converted checkpoint>
 - Trust remote code: <yes/no>
+- Family README: <path, and the checkpoint it recommends, if any | none>
 
 ### Reproduction
 

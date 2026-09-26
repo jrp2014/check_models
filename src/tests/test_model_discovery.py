@@ -210,6 +210,32 @@ def test_config_check_leaves_an_absent_file_to_the_missing_reason() -> None:
     assert check_models._cached_config_problem(repo) is None
 
 
+def test_family_readme_fact_points_drafters_at_the_upstream_readme(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Issue drafts say whether the installed family ships a README; unknowns stay silent."""
+    root = tmp_path / "mlx_vlm"
+    (root / "models" / "mage_vl").mkdir(parents=True)
+    (root / "models" / "plain").mkdir(parents=True)
+    safe_io.write_text_no_follow(root / "models" / "mage_vl" / "README.md", "# Mage-VL\n")
+    monkeypatch.setattr(check_models, "_mlx_vlm_package_root", lambda: root)
+    precheck = {
+        "org/mage": ("mage_vl", "mage_vl", True),
+        "org/plain": ("plain", "plain", True),
+        "org/unsupported": ("internvl", "internvl", False),
+        "org/unknown": (None, None, None),
+    }
+    monkeypatch.setattr(check_models, "_arch_precheck_for_model", precheck.__getitem__)
+    assert check_models._family_readme_summary("org/mage") == (
+        "mlx_vlm/models/mage_vl/README.md (read before filing)"
+    )
+    assert check_models._family_readme_summary("org/plain") == "none"
+    assert check_models._family_readme_summary("org/unsupported") is None
+    assert check_models._family_readme_summary("org/unknown") is None
+    monkeypatch.setattr(check_models, "_mlx_vlm_package_root", lambda: None)
+    assert check_models._family_readme_summary("org/mage") is None
+
+
 def test_auto_cache_discovery_logs_skipped_models(caplog: pytest.LogCaptureFixture) -> None:
     """Unspecified model runs should highlight cached models skipped by discovery."""
     eligibility = (

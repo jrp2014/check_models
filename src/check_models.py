@@ -9881,6 +9881,9 @@ def _diagnostics_result_facts(
     arch_summary = _arch_precheck_summary(result.model_name)
     if arch_summary is not None:
         rows.append(("Arch supported by installed mlx-vlm", arch_summary))
+    readme_summary = _family_readme_summary(result.model_name)
+    if readme_summary is not None:
+        rows.append(("Family README in installed mlx-vlm", readme_summary))
     rows.extend(
         (
             _OBSERVATION_DETAIL_LABELS.get(key, key.replace("_", " ").capitalize()),
@@ -17709,6 +17712,23 @@ def _arch_precheck_summary(model_id: str) -> str | None:
     resolved_note = f" via {resolved}" if resolved is not None and resolved != model_type else ""
     verdict = "yes" if supported else "no"
     return f"{verdict} (model_type {model_type}{resolved_note})"
+
+
+def _family_readme_summary(model_id: str) -> str | None:
+    """Say whether the installed mlx-vlm ships a README for this model's family.
+
+    A read-only fact located without importing mlx-vlm. Family READMEs can
+    name a corrected or recommended checkpoint, so whoever drafts an issue
+    should read it before filing; its text is not parsed here. None when the
+    architecture or the package location is unknown.
+    """
+    _model_type, resolved, supported = _arch_precheck_for_model(model_id)
+    root = _mlx_vlm_package_root()
+    if not supported or resolved is None or root is None:
+        return None
+    if (root / "models" / resolved / "README.md").is_file():
+        return f"mlx_vlm/models/{resolved}/README.md (read before filing)"
+    return "none"
 
 
 def _all_cached_repo_ids() -> list[str]:

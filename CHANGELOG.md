@@ -6,6 +6,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Issue drafts and `diagnostics.md` state whether the installed mlx-vlm
+  ships a README for the model's family ("Family README in installed
+  mlx-vlm"), read without importing mlx-vlm; the README text is not parsed.
+  The `upstream-mlx-vlm-issues` skill now reads that README before filing,
+  tries any checkpoint it recommends, and records it in the issue's Model
+  section.
 - The `native-mlx-vlm-repro` skill reads the model family's upstream README
   first (it may name a corrected checkpoint to try before filing), states
   that the native CLI ignores `generation_config.json` so repro commands must
