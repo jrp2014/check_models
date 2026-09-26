@@ -31,7 +31,7 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
   named 'mlx_vlm.speculative.drafters.internvl'
 - *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.002443844
+- *Post-cleanup active memory (GB):* 0.00242746
 - *Post-cleanup cache memory (GB):* 0.0
 - *Checkpoint weights (GB):* 1.08
 - *Parameter count:* 1.00B (name-estimate)
@@ -104,11 +104,11 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-[23:19:03] INFO     Loading model weights and processor...
+[23:44:38] INFO     Loading model weights and processor...
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 4677.79it/s]
+Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3143.31it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:19:03] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
+[23:44:38] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 ## Reproduction inputs
@@ -169,7 +169,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.38; revision 6cd0a83e7afcc0892806ff31d87d38973d8a0a8c; clean |
+| check_models    | 0.17.38; revision 8f3ccf2bed66d213cf465120f18ac7619015cdbb; clean |
 
 ### Full environment evidence
 
