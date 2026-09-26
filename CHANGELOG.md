@@ -6,6 +6,26 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The `hf-cache-mlx-vlm-models` skill records what the sweeps have shown
+  about checkpoints: the signals of a misconfigured checkpoint and the check
+  that catches each (missing processor config, flattened weight keys,
+  text-only templates, unloadable config, no loader package, weights beyond
+  unified memory, incomplete shards), that a family README can name a
+  corrected repo, that runnable-but-unusable output is a finding to report
+  rather than a reason to prune, and which timing effects are environmental.
+- The coding conventions in `.github/copilot-instructions.md` now require
+  the bounded, non-link-following I/O helpers for every file read and write
+  (Skylos SKY-D324/SKY-D325 recur otherwise), including installed package
+  sources.
+- The architecture pre-check counts an installed mlx-vlm model package only
+  when its `__init__.py` binds `Model` and its config class (`ModelConfig`
+  or `ModelArgs`), read statically without importing, after Nativ's
+  capability-manifest generator; a same-named folder is no longer enough.
+  Image-generation, detection and shared-submodule packages drop out. No
+  cached model changes verdict.
+- `tools.hub_precheck` compares a candidate's safetensors weights with this
+  Mac's unified memory (blocked when larger) and Metal's recommended working
+  set (a warning when larger), using the harness's own memory facts.
 - Issue drafts and `diagnostics.md` state whether the installed mlx-vlm
   ships a README for the model's family ("Family README in installed
   mlx-vlm"), read without importing mlx-vlm; the README text is not parsed.

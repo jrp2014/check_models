@@ -104,6 +104,43 @@ comparisons, establish whether the server uses served-model or cache discovery;
 start a server only when the requested task needs it. For actual reproduction,
 use `native-mlx-vlm-repro`.
 
+## Runnable, misconfigured, or unusable
+
+Sweeps have shown three distinct outcomes; keep them apart when judging a
+candidate or explaining a result.
+
+**Misconfigured checkpoint** (fails, or misbehaves, whatever the model's
+quality). Signals seen so far, each with its check:
+
+| Signal | What happened | Check |
+| --- | --- | --- |
+| No `preprocessor_config.json` / `processor_config.json` | the processor fell back to defaults silently (a video patch size of 2 doubled the patches and crashed prefill) | "Snapshot notes" in diagnostics |
+| Weight keys flattened or renamed | load rejected hundreds of weights | a native `load()` |
+| Text-only chat template on a vision model | list-content messages fail at prefill, or the image is dropped | `tools.hub_precheck` template shape |
+| `config.json` unparseable or without `model_type` | nothing can load it | discovery layout skip |
+| `model_type` without an installed loader package | load crash (`Model type … not supported`) | architecture pre-check |
+| Weights larger than unified memory | cannot be held | `tools.hub_precheck` memory verdict |
+| Missing or empty weight shards | incomplete download | discovery layout skip |
+
+The remedy is usually another checkpoint, not a code fix. The family README
+in the installed mlx-vlm (`mlx_vlm/models/<family>/README.md`, named in issue
+drafts) can list a corrected repo; the `nativ-community` checkpoints linked
+from them loaded and ran where the `mlx-community` copies did not.
+
+**Runnable but unusable output** is a finding in its own right, not a reason
+to drop a model: missing requested fields, repetition loops, unfinished
+thinking blocks, or leaked control tokens. Keep such models in the sweep
+(they are often the only coverage for their architecture) and report them.
+Leaked control or role tokens may point at a template or tokenizer config
+rather than the model; classify them only after a native reproduction
+(`native-mlx-vlm-repro`).
+
+**Environmental, not the model:** the first sweep after an mlx rebuild runs
+on a cold Metal shader cache and inflates prefill (up to 4x on one model;
+under a second for most); concurrent CPU work, including a git history
+search, dents throughput for the models running at the time. Compare timing
+on a warm, idle machine.
+
 ## Report the result
 
 Give the effective cache location, exact selected IDs, counts, and skip reasons

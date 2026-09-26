@@ -2433,6 +2433,24 @@ def _candidate(**overrides: object) -> hub_precheck.HubCandidate:
     return hub_precheck.HubCandidate(**typing.cast("dict[str, typing.Any]", base))
 
 
+def test_hub_precheck_memory_verdict_uses_weights_against_memory_facts() -> None:
+    """Weights larger than unified memory block; larger than the working set warn."""
+    status, reasons = _candidate(weights_gb=173.8, memory_gb=137.4, working_set_gb=103.1).verdict()
+    assert status == "BLOCKED"
+    assert any("exceed this Mac's 137.4 GB of unified memory" in reason for reason in reasons)
+    status, reasons = _candidate(weights_gb=110.0, memory_gb=137.4, working_set_gb=103.1).verdict()
+    assert status == "WARN"
+    assert any("recommended working set (103.1 GB)" in reason for reason in reasons)
+    assert _candidate(weights_gb=6.0, memory_gb=137.4, working_set_gb=103.1).verdict() == (
+        "OK",
+        [],
+    )
+    # Unknown memory facts never produce a memory verdict.
+    assert _candidate(weights_gb=500.0).verdict() == ("OK", [])
+    assert hub_precheck._gigabytes(137_438_953_472) == 137.4
+    assert hub_precheck._gigabytes(None) is None
+
+
 def test_hub_precheck_verdicts_block_layout_architecture_and_text_only_templates() -> None:
     assert _candidate().verdict() == ("OK", [])
     status, reasons = _candidate(template="string-only").verdict()

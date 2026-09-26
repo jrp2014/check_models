@@ -395,6 +395,10 @@ def _fake_mlx_vlm_package(tmp_path: Path, model_types: tuple[str, ...], remappin
     package_dir = tmp_path / "mlx_vlm"
     for model_type in model_types:
         (package_dir / "models" / model_type).mkdir(parents=True)
+        safe_io.write_text_no_follow(
+            package_dir / "models" / model_type / "__init__.py",
+            "from .config import ModelConfig\nfrom .model import Model\n",
+        )
     (package_dir / "models" / "__pycache__").mkdir(exist_ok=True)
     safe_io.write_text_no_follow(package_dir / "utils.py", remapping)
     return package_dir
@@ -416,6 +420,38 @@ def test_installed_mlx_vlm_model_types_scans_package_dirs(
 
     assert check_models._installed_mlx_vlm_model_types() == frozenset({"qwen2_vl", "fastvlm"})
     assert check_models._mlx_vlm_model_remapping() == {"llava_qwen2": "fastvlm"}
+
+
+@pytest.mark.usefixtures("_clear_arch_caches")
+def test_only_packages_binding_a_model_loader_count_as_architectures(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A folder counts only when its __init__ binds Model and its config (after Nativ).
+
+    Upstream get_model_and_args needs both; image-generation packages, empty
+    shared-submodule holders and unparsable files are not text loaders.
+    """
+    package_dir = _fake_mlx_vlm_package(tmp_path, ("qwen2_vl",), "MODEL_REMAPPING = {}\n")
+    models = package_dir / "models"
+    cases = {
+        "old_style": "from .model import Model, ModelArgs\n",
+        "defined_here": "class ModelConfig:\n    pass\n\nclass Model:\n    pass\n",
+        "image_gen": "from .model import FluxImageGenerationModel\n",
+        "model_only": "from .model import Model\n",
+        "shared_holder": "",
+        "broken": "from .model import (\n",
+    }
+    for name, source in cases.items():
+        (models / name).mkdir()
+        safe_io.write_text_no_follow(models / name / "__init__.py", source)
+    (models / "no_init").mkdir()
+    fake_spec = SimpleNamespace(submodule_search_locations=[str(package_dir)])
+    monkeypatch.setattr(check_models, "find_spec", lambda _name: fake_spec)
+
+    assert check_models._installed_mlx_vlm_model_types() == frozenset(
+        {"qwen2_vl", "old_style", "defined_here"}
+    )
 
 
 @pytest.mark.usefixtures("_clear_arch_caches")

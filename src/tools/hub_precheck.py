@@ -6,10 +6,14 @@ hub reads the way ``check_models`` will judge it once cached:
 1. **Layout**: the server-style file rule (``config.json``,
    ``tokenizer_config.json``, safetensors weights).
 2. **Architecture**: the ``model_type`` resolves (via ``MODEL_REMAPPING``) to
-   an installed ``mlx_vlm/models/`` package. Folder-name check only.
+   an installed ``mlx_vlm/models/`` package whose ``__init__`` binds ``Model``
+   and its config class (read statically, never imported).
 3. **Chat template shape**: whether the template iterates message content
    parts (multimodal) or concatenates content as a string (text-only), which
    fails at prefill for vision families that send list-content messages.
+4. **Memory**: the safetensors weights alone against this Mac's unified
+   memory (blocked when larger: they cannot be held) and Metal's recommended
+   working set (a warning when larger: expect paging or a load failure).
 
 Only ``config.json`` and the chat template are fetched, over HTTPS, without
 touching the local Hugging Face cache. Verdicts are hints, never proof.
@@ -85,6 +89,9 @@ class HubCandidate:
     arch_supported: bool | None
     template: TemplateShape
     error: str | None = None
+    weights_gb: float | None = None
+    memory_gb: float | None = None
+    working_set_gb: float | None = None
 
     def verdict(self) -> tuple[str, list[str]]:
         """Return ("OK" | "WARN" | "BLOCKED", reasons)."""
@@ -105,6 +112,20 @@ class HubCandidate:
                 "architecture not checked"
                 + (": no model_type in config.json" if self.model_type is None else "")
             )
+        if self.weights_gb is not None and self.memory_gb and self.weights_gb > self.memory_gb:
+            blocked.append(
+                f"weights ({self.weights_gb:.1f} GB) exceed this Mac's "
+                f"{self.memory_gb:.1f} GB of unified memory"
+            )
+        elif (
+            self.weights_gb is not None
+            and self.working_set_gb
+            and self.weights_gb > self.working_set_gb
+        ):
+            warnings.append(
+                f"weights ({self.weights_gb:.1f} GB) exceed Metal's recommended working set "
+                f"({self.working_set_gb:.1f} GB); expect paging or a load failure"
+            )
         if self.template == "string-only":
             blocked.append(
                 "text-only chat template (concatenates message content as a string); "
@@ -120,6 +141,7 @@ class HubCandidate:
 
 
 ArchCheck = Callable[[object], tuple[str | None, str | None, bool | None]]
+MemoryCheck = Callable[[], tuple[int | None, int | None]]
 Fetcher = Callable[[str], HubCandidate]
 
 
@@ -131,6 +153,23 @@ def _default_arch_check() -> ArchCheck:
     from check_models import arch_precheck_for_model_type  # noqa: PLC0415 - see above
 
     return arch_precheck_for_model_type
+
+
+def _default_memory_check() -> tuple[int | None, int | None]:
+    """(unified memory bytes, Metal recommended working set bytes) from the harness."""
+    import os  # noqa: PLC0415 - deferred so --help never imports the monolith
+
+    os.environ.setdefault("CHECK_MODELS_SKIP_IMPORT_PROBE", "1")
+    from check_models import (  # noqa: PLC0415 - see above
+        _get_recommended_working_set_bytes,
+        _get_total_memory_bytes,
+    )
+
+    return _get_total_memory_bytes(), _get_recommended_working_set_bytes()
+
+
+def _gigabytes(value: int | None) -> float | None:
+    return round(value / 1e9, 1) if value else None
 
 
 def _fetch_text(url: str, headers: dict[str, str]) -> str | None:
@@ -164,7 +203,12 @@ def _template_from_tokenizer_config(text: str | None) -> str | None:
     return None
 
 
-def fetch_candidate(repo_id: str, *, arch_check: ArchCheck | None = None) -> HubCandidate:
+def fetch_candidate(
+    repo_id: str,
+    *,
+    arch_check: ArchCheck | None = None,
+    memory_check: MemoryCheck | None = None,
+) -> HubCandidate:
     """Read the file list, config.json and chat template of a hub repo."""
     from huggingface_hub import HfApi, hf_hub_url  # noqa: PLC0415 - network path only
     from huggingface_hub.utils import build_hf_headers  # noqa: PLC0415 - network path only
@@ -177,6 +221,12 @@ def fetch_candidate(repo_id: str, *, arch_check: ArchCheck | None = None) -> Hub
     files = tuple(sorted(sibling.rfilename for sibling in info.siblings or ()))
     sizes = [sibling.size for sibling in info.siblings or () if sibling.size]
     size_gb = round(sum(sizes) / 1e9, 1) if sizes else None
+    weight_sizes = [
+        sibling.size
+        for sibling in info.siblings or ()
+        if sibling.size and sibling.rfilename.endswith(".safetensors")
+    ]
+    memory_bytes, working_set_bytes = (memory_check or _default_memory_check)()
     headers = build_hf_headers()
     config_text = _fetch_text(hf_hub_url(repo_id, "config.json"), headers)
     model_type_raw: object = None
@@ -201,6 +251,9 @@ def fetch_candidate(repo_id: str, *, arch_check: ArchCheck | None = None) -> Hub
         resolved_model_type=resolved,
         arch_supported=supported,
         template=template_shape(template),
+        weights_gb=_gigabytes(sum(weight_sizes)) if weight_sizes else None,
+        memory_gb=_gigabytes(memory_bytes),
+        working_set_gb=_gigabytes(working_set_bytes),
     )
 
 

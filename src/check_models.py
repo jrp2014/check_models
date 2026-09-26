@@ -17088,13 +17088,46 @@ def _package_dir_names(root: Path) -> frozenset[str]:
     )
 
 
+def _package_binds_model_loader(package: Path) -> bool:
+    """Whether a model package's ``__init__`` binds ``Model`` and its config class.
+
+    Upstream ``get_model_and_args`` imports ``mlx_vlm.models.<type>`` and
+    uses its ``Model`` and ``ModelConfig`` (``ModelArgs`` in older packages),
+    so a folder without them (an image-generation or detection package, or a
+    shared-submodule holder with an empty ``__init__``) cannot load an
+    image-to-text model. Read statically, never imported (after Nativ's
+    capability-manifest generator).
+    """
+    try:
+        tree = ast.parse(_read_text_file(package / "__init__.py"))
+    except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
+        return False
+    names: set[str] = set()
+    for statement in tree.body:
+        if isinstance(statement, ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef):
+            names.add(statement.name)
+        elif isinstance(statement, ast.Import | ast.ImportFrom):
+            names.update(alias.asname or alias.name.rsplit(".", 1)[-1] for alias in statement.names)
+        elif isinstance(statement, ast.Assign | ast.AnnAssign):
+            targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+            names.update(target.id for target in targets if isinstance(target, ast.Name))
+    return "Model" in names and bool({"ModelConfig", "ModelArgs"} & names)
+
+
 @functools.cache
 def _installed_mlx_vlm_model_types() -> frozenset[str] | None:
-    """Return model-type package dirs of the installed mlx-vlm without importing it."""
+    """Return the installed mlx-vlm's model-loader packages without importing it.
+
+    A package counts only when its ``__init__`` binds a ``Model`` and its
+    config class, not merely because a folder of that name exists.
+    """
     root = _mlx_vlm_package_root()
     if root is None or not (root / "models").is_dir():
         return None
-    return _package_dir_names(root / "models")
+    models = root / "models"
+    return frozenset(
+        name for name in _package_dir_names(models) if _package_binds_model_loader(models / name)
+    )
 
 
 @functools.cache
@@ -17528,8 +17561,9 @@ def _classify_image_capability(repo: object) -> ImageCapability:
 def _model_arch_precheck(repo: object) -> tuple[str | None, str | None, bool | None]:
     """Check the cached config's model_type against installed mlx-vlm model packages.
 
-    Mirrors upstream's ``--check-arch`` tier: a file-presence and folder-name
-    check only, never a proof that generation works. Returns
+    Mirrors upstream's ``--check-arch`` tier: a static check that the model
+    type resolves to an installed loader package, never a proof that
+    generation works. Returns
     ``(model_type, resolved_model_type, supported)`` where ``supported`` is
     ``None`` when indeterminate (no config, unreadable config, or no installed
     mlx-vlm package to compare against).
@@ -17549,7 +17583,7 @@ def arch_precheck_for_model_type(
 
     Shared by the cached-repo precheck and ``tools.hub_precheck`` (the
     pre-download check), so a hub candidate is judged exactly as a cached
-    repo would be. Folder-name check only, never proof that generation works.
+    repo would be. A static loader check, never proof that generation works.
     """
     if not isinstance(raw_model_type, str) or not raw_model_type:
         return None, None, None
@@ -25195,7 +25229,7 @@ def _handle_dry_run(
         if unsupported_arch_count:
             logger.warning(
                 "   %d model(s) use architectures not supported by the installed mlx-vlm "
-                "(folder-name pre-check only; they will still be attempted to capture "
+                "(static loader pre-check only; they will still be attempted to capture "
                 "real crash evidence)",
                 unsupported_arch_count,
             )

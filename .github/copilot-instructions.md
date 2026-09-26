@@ -239,6 +239,15 @@ The file is organized in this order — search for these exact landmark headers 
 - Prefer explicit symbol imports when practical (e.g., `from check_models import foo`), especially in tests; avoid broad module imports when only a few symbols are used.
 - `Final` for constants: `TIMEOUT: Final[float] = 5.0`
 - `pathlib.Path` for all paths; convert to `str` only at library call boundaries
+- File I/O goes through the bounded, non-link-following helpers, never raw
+  `Path.read_text`/`write_text` or `open()`: `_read_text_file`/`_write_text_file`
+  in `check_models.py` (and `_read_snapshot_json` for model-cache JSON, which
+  also enforces cache containment), `tools.safe_io.read_text_no_follow`/
+  `write_text_no_follow` in tools and tests. They reject symlinked parents,
+  require a regular file and cap the size; Skylos flags raw reads and writes
+  (SKY-D324/SKY-D325) and the danger gate blocks on them. This applies to
+  files the project itself ships or installs too (mlx-vlm package sources,
+  config files), not only user input.
 - `raise SystemExit(code)` instead of `sys.exit()` (better for type narrowing)
 - Catch specific exceptions, not bare `except Exception`. Use `raise ... from e` for context
 - Conventional commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`
