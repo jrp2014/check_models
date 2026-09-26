@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- The `native-mlx-vlm-repro` skill reads the model family's upstream README
+  first (it may name a corrected checkpoint to try before filing), states
+  that the native CLI ignores `generation_config.json` so repro commands must
+  carry sampling explicitly, and registers `--eos-tokens` in its Python
+  `stream_generate` example as `generate()` and the harness do.
 - Agent instructions now tell Claude Code to invoke the repository skills
   with the Skill tool rather than read their `SKILL.md` files, so their use
   is visible to `/skill-doctor`; other agents still read the files.

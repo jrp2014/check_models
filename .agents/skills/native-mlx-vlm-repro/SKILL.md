@@ -38,18 +38,22 @@ python -m mlx_vlm.generate --help   # confirm installed CLI flags before finaliz
 
 1. Identify model ID or local path, modality, prompt, media files, and expected
    output.
-2. Prefer an existing local/cached model when reproducing.
-3. If `check_models` already produced artifacts, start from those instead of
+2. Read the model family's `mlx_vlm/models/<family>/README.md` (in the
+   editable checkout or the installed package) before anything else. It may
+   name a corrected or recommended checkpoint (for example the
+   `nativ-community/` repos listed for Mage-VL, Mistral 3 and Nemotron 3 Nano
+   Omni); when the harness ran a different repo, try the README's checkpoint
+   before treating the failure as an mlx-vlm defect.
+3. Prefer an existing local/cached model when reproducing.
+4. If `check_models` already produced artifacts, start from those instead of
    inventing a new command:
    - sweep overview: `src/output/issues/run_summary.md`
    - crash draft: `src/output/issues/issue_*.md` (native CLI command + traceback)
    - aggregate: `src/output/reports/diagnostics.md` → Shared Reproduction
    - machine facts: `src/output/results.jsonl` (the metadata header carries the
      run context: image digest, generation settings, provenance, comparison)
-4. Confirm flags with `python -m mlx_vlm.generate --help` before treating a
+5. Confirm flags with `python -m mlx_vlm.generate --help` before treating a
    command as final; mlx-vlm flags drift across releases.
-5. When debugging a model family inside an mlx-vlm checkout, read
-   `mlx_vlm/models/<family>/README.md` if present.
 
 ## Command patterns
 
@@ -104,6 +108,11 @@ formatted = apply_chat_template(
 )
 if isinstance(formatted, list):
     formatted = "\n".join(str(message) for message in formatted)
+# generate() and the harness register --eos-tokens before streaming;
+# stream_generate alone does not, so a repro of such a run must do it too.
+criteria = getattr(getattr(processor, "tokenizer", processor), "stopping_criteria", None)
+if criteria is not None and EOS_TOKENS:
+    criteria.add_eos_token_ids(EOS_TOKENS)
 pieces, last = [], None
 for chunk in stream_generate(
     model=model, processor=processor, prompt=formatted, image=IMAGE, **GENERATE_KWARGS
@@ -141,6 +150,12 @@ hook) — then say so, because the harness does not exercise that code.
 - Prefer the harness’s effective generation kwargs from diagnostics/JSONL over
   guessed flags. Only include native-CLI-supported settings in CLI repros;
   put harness-only settings in the Python block or prose.
+- State sampling explicitly. The native CLI does not read the checkpoint's
+  `generation_config.json`
+  ([Blaizzy/mlx-vlm#2228](https://github.com/Blaizzy/mlx-vlm/issues/2228)),
+  so a command without `--temperature`, `--top-p` and `--top-k` runs the CLI's
+  defaults, not what the harness ran. Copy them from the model's effective
+  `generate_kwargs` (the harness's own repro commands already do).
 
 ## Thinking-output checks
 
