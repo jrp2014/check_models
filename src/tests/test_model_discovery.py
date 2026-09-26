@@ -156,6 +156,60 @@ def test_cached_model_eligibility_reports_skip_reasons(monkeypatch: pytest.Monke
     assert entries["org/no-main-ref"].reasons == ("missing main revision in cache",)
 
 
+@pytest.mark.parametrize(
+    ("config_text", "reason"),
+    [
+        ('{"model_type": "qwen2_vl"}', None),
+        ('{"model_type": "custom", "model_file": "model.py"}', None),
+        ("not json", "config.json is not a readable JSON object"),
+        ("[1, 2]", "config.json is not a readable JSON object"),
+        ("{}", "config.json has no model_type"),
+        ('{"model_type": "  "}', "config.json has no model_type"),
+    ],
+    ids=["vlm", "custom-code", "malformed", "not-an-object", "empty", "blank-model-type"],
+)
+def test_cached_repo_with_an_unloadable_config_is_skipped(
+    tmp_path: Path, config_text: str, reason: str | None
+) -> None:
+    """A config.json load() cannot use is a layout skip, not a model crash.
+
+    Cases follow mlx-vlm's server discovery tests (test_server.py::test_metadata):
+    upstream load() dispatches on model_type, so an unparseable config or one
+    without model_type can only fail to load. Custom model code is never run.
+    """
+    snapshot = tmp_path / "models--org--m" / "snapshots" / ("a" * 40)
+    snapshot.mkdir(parents=True)
+    safe_io.write_text_no_follow(snapshot / "config.json", config_text)
+    safe_io.write_text_no_follow(snapshot / "tokenizer_config.json", "{}")
+    safe_io.write_text_no_follow(snapshot / "model.safetensors", "weights")
+    safe_io.write_text_no_follow(snapshot / "model.py", "raise RuntimeError('must not execute')")
+    files = ("config.json", "tokenizer_config.json", "model.safetensors", "model.py")
+    repo = SimpleNamespace(
+        repo_id="org/m",
+        repo_type="model",
+        refs={
+            "main": SimpleNamespace(
+                files=tuple(SimpleNamespace(file_path=name) for name in files),
+                snapshot_path=snapshot,
+            )
+        },
+    )
+    entry = check_models._cached_repo_model_eligibility(repo)
+    if reason is None:
+        assert entry.supported
+        assert entry.reasons == ()
+    else:
+        assert not entry.supported
+        assert entry.reasons == (reason,)
+        assert f"cache layout: {reason}" in entry.skip_reasons
+
+
+def test_config_check_leaves_an_absent_file_to_the_missing_reason() -> None:
+    """Without a snapshot on disk the content check stays silent."""
+    repo = _fake_cache_repo("org/listed-only", ("config.json", "tokenizer_config.json"))
+    assert check_models._cached_config_problem(repo) is None
+
+
 def test_auto_cache_discovery_logs_skipped_models(caplog: pytest.LogCaptureFixture) -> None:
     """Unspecified model runs should highlight cached models skipped by discovery."""
     eligibility = (

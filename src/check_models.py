@@ -17558,6 +17558,28 @@ def arch_precheck_for_model_type(
     return model_type, resolved, resolved in installed
 
 
+def _cached_config_problem(repo: object) -> str | None:
+    """Say why a present ``config.json`` cannot be loaded, or None when it can.
+
+    Upstream ``load()`` reads ``config.json`` and dispatches on its
+    ``model_type``, so a file that is not a JSON object, or that has no
+    ``model_type``, is a guaranteed load failure rather than an unfamiliar
+    layout; mlx-vlm's server does not list such folders either. Only a file
+    actually on disk is judged: an absent one is the separate
+    "missing config.json" reason.
+    """
+    snapshot = _hf_cache_main_snapshot_path(repo)
+    if snapshot is None or not (snapshot / "config.json").is_file():
+        return None
+    config = _read_snapshot_json(snapshot, "config.json")
+    if config is None:
+        return "config.json is not a readable JSON object"
+    model_type = config.get("model_type")
+    if not isinstance(model_type, str) or not model_type.strip():
+        return "config.json has no model_type"
+    return None
+
+
 def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
     """Classify whether a cached repo should be auto-run like mlx-vlm's server list."""
     repo_id = str(getattr(repo, "repo_id", ""))
@@ -17573,6 +17595,8 @@ def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
     else:
         if "config.json" not in main_files:
             reasons.append("missing config.json")
+        elif (config_problem := _cached_config_problem(repo)) is not None:
+            reasons.append(config_problem)
         if "tokenizer_config.json" not in main_files:
             reasons.append("missing tokenizer_config.json")
         has_safetensors = "model.safetensors.index.json" in main_files or any(

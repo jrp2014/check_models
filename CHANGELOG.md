@@ -491,6 +491,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Cache discovery skips a repo whose `config.json` is not a readable JSON
+  object or has no `model_type` (cache-layout reason), as mlx-vlm's server
+  listing does; upstream `load()` dispatches on `model_type`, so such a repo
+  could only produce a load crash misreported as a model failure. Only a
+  file actually on disk is judged. No currently cached model is affected.
 - Streaming diagnostics separate first stream activity from the first
   generated token. A speculative or diffusion draft, or upstream's zero-token
   terminal result, no longer sets the time to first token, the first-token
