@@ -65,6 +65,22 @@ Collect or infer:
    model code**; keep long harness stacks under an optional details block.
 8. Commands use `python -m …` under conda + pip, not `uv run`: the environment is conda-managed, and uv would install outside it.
 
+## Checkpoint problems are not mlx-vlm issues
+
+mlx-vlm maintainers receive many reports that turn out to be checkpoint
+problems. Every generated draft opens with "Before filing: rule out the
+checkpoint", listing the checks the run's own evidence calls for (no loader
+for the model type, processor files missing from the snapshot, a family
+README, a load-phase failure). Work through them first:
+
+- No loader for the model type: a support request, not a bug. Look for an
+  existing request; do not file a crash report.
+- A corrected or alternative checkpoint runs cleanly: the fault is in the
+  original checkpoint. Report it on that model's Hugging Face repo
+  (discussions), not to mlx-vlm, or not at all.
+- File with mlx-vlm only when the failure reproduces natively with a
+  checkpoint that should work, and say in the issue which checks you ran.
+
 ## Maintainer quality bar
 
 Ready when an mlx-vlm maintainer can run **one** native command (or one server

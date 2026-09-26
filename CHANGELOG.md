@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Crash issue drafts and the run summary's crash sections open with "Before
+  filing: rule out the checkpoint", listing only the checks the run's own
+  evidence calls for: no loader for the model type (a support request, not a
+  defect), processor files missing from the snapshot, a family README to
+  read for a corrected checkpoint, and a load-phase failure to retry with
+  another conversion. The `upstream-mlx-vlm-issues` skill routes checkpoint
+  faults to the model's Hugging Face repo rather than mlx-vlm, so
+  maintainers are not sent checkpoint misconfigurations as bugs.
 - The `hf-cache-mlx-vlm-models` skill records what the sweeps have shown
   about checkpoints: the signals of a misconfigured checkpoint and the check
   that catches each (missing processor config, flattened weight keys,

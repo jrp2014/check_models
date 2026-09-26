@@ -7986,3 +7986,80 @@ def test_size_tokens_match_whole_never_inside_an_effective_size(
 ) -> None:
     """A restart inside "E12B" or "E4.5B" must not manufacture a total."""
     assert check_models._parameter_counts_from_name(name) == expected
+
+
+def test_crash_drafts_open_with_the_checkpoint_checks_the_evidence_calls_for(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Each checkpoint check appears only when the run recorded its fact.
+
+    Maintainers receive many crash reports that are checkpoint problems; the
+    draft must put the recorded checkpoint evidence first.
+    """
+    monkeypatch.setattr(
+        check_models,
+        "_family_readme_summary",
+        lambda model: (
+            "mlx_vlm/models/mage_vl/README.md (read before filing)" if model == "org/mage" else None
+        ),
+    )
+
+    def rendered(
+        *,
+        model: str,
+        phase: str | None,
+        model_type: str | None,
+        arch_supported: bool | None,
+        snapshot_notes: tuple[str, ...],
+    ) -> str:
+        section = check_models._checkpoint_checks_section(
+            model=model,
+            phase=phase,
+            model_type=model_type,
+            arch_supported=arch_supported,
+            snapshot_notes=snapshot_notes,
+        )
+        return " ".join("\n".join(check_models.render_report_markdown((section,))).split())
+
+    unsupported = rendered(
+        model="org/internvl",
+        phase="model_load",
+        model_type="internvl",
+        arch_supported=False,
+        snapshot_notes=(),
+    )
+    assert "Before filing: rule out the checkpoint" in unsupported
+    assert "no loader for model type `internvl`" in unsupported
+    assert "support request, not a defect" in unsupported
+    assert "while loading" not in unsupported  # the missing loader already explains it
+
+    mage = rendered(
+        model="org/mage",
+        phase="generation_before_first_token",
+        model_type="mage_vl",
+        arch_supported=True,
+        snapshot_notes=("processor config missing from snapshot (preprocessor_config.json)",),
+    )
+    assert "lacks files the processor expects" in mage
+    assert "`mlx_vlm/models/mage_vl/README.md`" in mage
+    assert "support request" not in mage
+
+    load = rendered(
+        model="org/other",
+        phase="model_load",
+        model_type="qwen2_vl",
+        arch_supported=True,
+        snapshot_notes=(),
+    )
+    assert "The crash happened while loading" in load
+
+    plain = rendered(
+        model="org/other",
+        phase="decode",
+        model_type="qwen2_vl",
+        arch_supported=True,
+        snapshot_notes=(),
+    )
+    assert "Reproduce with the native command below" in plain
+    for absent in ("support request", "lacks files", "family README", "while loading"):
+        assert absent not in plain

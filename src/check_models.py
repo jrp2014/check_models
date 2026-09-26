@@ -22651,10 +22651,25 @@ def _run_issue_summary_crash_section(
                 ),
             )
         )
+    architecture = result.get("architecture")
+    retained_notes = (result.get("prompt_diagnostics") or {}).get("snapshot_notes")
+    checkpoint_checks = _checkpoint_checks_section(
+        model=result["model"],
+        phase=failure.get("phase") if failure is not None else None,
+        model_type=architecture.get("model_type") if architecture else None,
+        arch_supported=(
+            architecture.get("supported_by_installed_mlx_vlm") if architecture else None
+        ),
+        snapshot_notes=(
+            tuple(str(note) for note in retained_notes) if isinstance(retained_notes, list) else ()
+        ),
+        level=4,
+    )
     return ReportSection(
         result["model"],
         (
             ReportKeyValues(tuple(facts)),
+            checkpoint_checks,
             ReportParagraph("Root exception chain"),
             ReportCodeBlock(_run_issue_summary_exception_lines(failure)),
             ReportSection(
@@ -23906,6 +23921,63 @@ def _diagnostics_shared_context_blocks(
     )
 
 
+def _checkpoint_checks_section(
+    *,
+    model: str,
+    phase: str | None,
+    model_type: str | None,
+    arch_supported: bool | None,
+    snapshot_notes: Sequence[str],
+    level: int = 2,
+) -> ReportSection:
+    """List the checkpoint-side checks to run before treating a crash as an mlx-vlm bug.
+
+    Many failures reported upstream turn out to be checkpoint problems
+    (missing processor files, weights or config that do not match mlx-vlm's
+    model definition, an architecture mlx-vlm does not implement). Each item
+    here is stated only when the run recorded the fact it rests on, so a
+    maintainer never receives a draft whose checkpoint cause was already
+    visible.
+    """
+    items: list[str] = []
+    if arch_supported is False:
+        items.append(
+            f"The installed mlx-vlm has no loader for model type `{model_type}`. "
+            "That is a support request, not a defect: look for an existing "
+            "request before opening one, and do not file it as a bug."
+        )
+    if snapshot_notes:
+        items.append(
+            "The checkpoint snapshot lacks files the processor expects ("
+            + "; ".join(snapshot_notes)
+            + "), so the processor used its defaults. Try a conversion of the "
+            "same model that ships them before filing."
+        )
+    readme = _family_readme_summary(model)
+    if readme is not None and readme != "none":
+        path = readme.split(" (", 1)[0]
+        items.append(
+            f"The installed mlx-vlm has a family README, `{path}`. Read it for a "
+            "recommended or corrected checkpoint and try that one first."
+        )
+    if phase == "model_load" and arch_supported is not False:
+        items.append(
+            "The crash happened while loading. A load failure can come from the "
+            "checkpoint (weight names or config that do not match mlx-vlm's model "
+            "definition) as well as from mlx-vlm: try another conversion of the "
+            "same model with a native `load()` before filing."
+        )
+    items.append(
+        "Reproduce with the native command below, outside check_models, and say "
+        "in the issue which of these checks you ran."
+    )
+    return ReportSection(
+        "Before filing: rule out the checkpoint",
+        (ReportBulletList(tuple(items)),),
+        level=level,
+    )
+
+
 def _generate_github_issue_reports(
     *,
     report_context: ReportRenderContext,
@@ -23945,7 +24017,19 @@ def _generate_github_issue_reports(
         issue_path = issue_paths[result.model_name]
         parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
         provenance = model_provenance.get(result.model_name)
+        model_type, _resolved, arch_supported = _arch_precheck_for_model(result.model_name)
         issue_blocks: tuple[ReportBlock, ...] = (
+            _checkpoint_checks_section(
+                model=result.model_name,
+                phase=result.failure_phase,
+                model_type=model_type,
+                arch_supported=arch_supported,
+                snapshot_notes=(
+                    result.prompt_diagnostics.snapshot_notes
+                    if result.prompt_diagnostics is not None
+                    else ()
+                ),
+            ),
             _report_section(
                 "Maintainer evidence",
                 ReportSection(
