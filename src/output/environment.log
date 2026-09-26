@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-09-25 23:52:46 BST
+FULL ENVIRONMENT DUMP - 2026-09-26 23:17:17 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -13,14 +13,14 @@ attrs==26.1.0
 blessed==1.50.0
 boolean.py==5.0
 build==1.6.1
-ca9==0.5.0
+ca9==0.6.0
 CacheControl==0.14.4
 certifi==2026.7.22
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.1
-check_models==0.17.37
-check_models==0.17.37
+check_models==0.17.38
+check_models==0.17.38
 click==8.5.0
 cmake==4.4.3
 coverage==7.16.1
@@ -33,7 +33,7 @@ editor==2.0.1
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.141.1
-filelock==4.0.3
+filelock==4.0.4
 fsspec==2026.9.0
 h11==0.16.0
 hf-xet==1.6.0
@@ -68,8 +68,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.6.0
-mlx==0.32.3.dev20260925+073d2252c
-mlx==0.32.3.dev20260925+073d2252c
+mlx==0.32.3.dev20260926+a2a09fd56
+mlx==0.32.3.dev20260926+a2a09fd56
 mlx-audio==0.5.6
 mlx-lm==0.32.0
 mlx-lm==0.32.0
@@ -81,7 +81,7 @@ msgpack==1.2.2
 mypy==2.3.1
 mypy_extensions==1.1.0
 networkx==3.7
-nodeenv==1.10.0
+nodeenv==1.11.0
 num2words==0.5.14
 numpy==2.5.3
 opencv-python==5.0.0.93
@@ -94,7 +94,7 @@ pip==26.2.1
 pip-requirements-parser==32.0.1
 pip_api==0.0.35
 pip_audit==2.10.1
-platformdirs==4.11.14
+platformdirs==4.12.0
 pluggy==1.6.0
 pre_commit==4.6.2
 protobuf==7.36.2
@@ -130,7 +130,7 @@ scipy==1.18.1
 sentencepiece==0.2.2
 setuptools==84.0.0
 shellingham==1.5.4
-skylos==4.39.1
+skylos==4.39.2
 sortedcontainers==2.4.0
 sounddevice==0.5.6
 sse-starlette==3.4.11
@@ -169,7 +169,7 @@ typing_extensions==4.16.0
 uc-micro-py==2.0.0
 urllib3==2.8.0
 uvicorn==0.54.0
-virtualenv==21.12.1
+virtualenv==21.13.0
 vulture==2.16
 wcwidth==0.9.1
 websockets==17.1
@@ -178,5 +178,5 @@ xmod==1.10.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-09-25 23:52:46 BST
+Environment dump completed at 2026-09-26 23:17:17 BST
 ================================================================================

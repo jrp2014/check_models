@@ -20,27 +20,27 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 48    |
-| Conclusive outcomes | 48    |
-| Completed           | 46    |
-| Crashed             | 2     |
+| Attempted           | 50    |
+| Conclusive outcomes | 50    |
+| Completed           | 49    |
+| Crashed             | 1     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 2     |
-| none                           | 38    |
+| actionable failure             | 1     |
+| none                           | 41    |
 | observation needs reproduction | 8     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| not assessed         | 2     |
+| not assessed         | 1     |
 | major concerns       | 13    |
-| no concerns detected | 31    |
+| no concerns detected | 34    |
 | concerns detected    | 2     |
 
 Observation counts
@@ -61,7 +61,6 @@ Observation counts
 | Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
 |-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
 | [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                               | crashed   | not assessed      | actionable_failure             | none                                                                                              |
-| [mlx-community/Mage-VL-OptiQ-4bit](#diagnostic-mlx-community-mage-vl-optiq-4bit)                                | crashed   | not assessed      | actionable_failure             | none                                                                                              |
 | [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation_needs_reproduction | repeated text; cut off at token limit; duplicate keywords                                         |
 | [mlx-community/Qwen2-VL-7B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-7b-instruct-4bit)                  | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                       |
 | [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
@@ -119,10 +118,10 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14490, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14636, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13446, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13511, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -132,7 +131,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 842, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 841, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -154,7 +153,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15758, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -165,7 +164,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14651, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -177,154 +176,11 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-[23:54:09] INFO     Loading model weights and processor...
+[23:19:03] INFO     Loading model weights and processor...
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3749.22it/s]
+Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 4677.79it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:54:09] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
-```
-
-<a id="diagnostic-mlx-community-mage-vl-optiq-4bit"></a>
-
-### mlx-community/Mage-VL-OptiQ-4bit
-
-#### Root exception and chain
-
-```text
-builtins.ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
-builtins.ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
-```
-
-#### Execution and provenance
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Phase:* generation_before_first_token
-- *Stage:* Model Error
-- *Package:* mlx-vlm
-- *Error type:* ValueError
-- *Error message:* Model generation failed for
-  mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600
-  calculated=3800 grid=[(1, 50, 76)]
-- *Root error type:* ValueError
-- *Root error message:* cu_seqlens mismatch: total_patches=7600
-  calculated=3800 grid=[(1, 50, 76)]
-- *Resolved model revision:* c98dad5f92f13334cc679c93fb9f185ab49ed626
-- *Processor class:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* exception
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.003885684
-- *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 3.92
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 262,144 (text_config.max_position_embeddings)
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *Snapshot notes (neutral):* processor config missing from snapshot
-  (preprocessor_config.json, processor_config.json)
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-<details>
-<summary>Complete traceback</summary>
-
-```text
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13780, in _run_generation_guarded
-    return generate_once()
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14412, in _generate_once
-    return _generate_with_repetition_guard(
-        model=prepared.model,
-    ...<6 lines>...
-        **prepared.generate_kwargs,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14316, in _generate_with_repetition_guard
-    for chunk in stream_generate(
-                 ~~~~~~~~~~~~~~~^
-        model=model, processor=processor, prompt=prompt, image=image, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1083, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/ar.py", line 424, in generate_step
-    embedding_output = model.get_input_embeddings(
-        input_ids, pixel_values, mask=mask, **kwargs
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/mage_vl.py", line 66, in get_input_embeddings
-    hidden_states = self.vision_tower(
-        pixel_values.astype(inputs_embeds.dtype), patch_positions, grid_thw
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 381, in __call__
-    cu = build_cu_seqlens(grid_thw, total_patches, self.config.frame_windows_size)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/mage_vl/vision.py", line 309, in build_cu_seqlens
-    raise ValueError(
-        f"cu_seqlens mismatch: total_patches={total_patches} calculated={cu[-1]} grid={grid_thw}"
-    )
-ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14517, in _run_model_generation
-    output, duration = _execute_prepared_generation(
-                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        params,
-        ^^^^^^^
-    ...<2 lines>...
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14433, in _execute_prepared_generation
-    output = _run_generation_guarded(
-        params=params,
-        generate_once=_generate_once,
-    )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13789, in _run_generation_guarded
-    raise _tag_exception_failure_phase(
-        ValueError(msg), _generation_failure_phase(gen_known_err)
-    ) from gen_known_err
-ValueError: Model generation failed for mlx-community/Mage-VL-OptiQ-4bit: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1, 50, 76)]
-
-```
-
-</details>
-
-#### Captured stdout/stderr
-
-```text
-=== STDERR ===
-[23:55:28] INFO     Loading model weights and processor...
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3143.45it/s]
-[23:55:29] DEBUG    Legacy snapshot note for mlx-community/Mage-VL-OptiQ-4bit: processor config
-                    missing from snapshot (preprocessor_config.json, processor_config.json).
-[23:55:29] INFO     Rendering the prompt...
-[23:55:29] INFO     Preparing image inputs and prefilling...
-[23:55:30] ERROR    Generation error for mlx-community/Mage-VL-OptiQ-4bit
-                    ValueError: cu_seqlens mismatch: total_patches=7600 calculated=3800 grid=[(1,
-                    50, 76)]
+[23:19:03] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 ## Completed Runs with Observations
@@ -345,6 +201,7 @@ Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3143
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, token_cap_truncation, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Family README in installed mlx-vlm:* none
 - *Repeated fragment:* keyword: "adventure"
 - *Title word count:* 9
 - *Keyword count:* 343
@@ -358,8 +215,8 @@ Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3143
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.1173165419895668
-- *Peak memory at first token (GB):* 14.979459316
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.8235993749985937
+- *Peak memory at first token (GB):* 14.70301275
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *Post-cleanup active memory (GB):* 0.003885684
@@ -407,6 +264,7 @@ Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repeated_output, repetition_abort, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Family README in installed mlx-vlm:* none
 - *Repeated fragment:* keyword: "trees"
 - *Title word count:* 2
 - *Keyword count:* 67
@@ -416,7 +274,7 @@ Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser,
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.707785375008825
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.15250420800294
 - *Peak memory at first token (GB):* 9.283160132
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -466,13 +324,15 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Observations:* repetition_abort, missing_requested_sections,
   thinking_trace_incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Family README in installed mlx-vlm:* mlx_vlm/models/ernie4_5_moe_vl/README.md
+  (read before filing)
 - *Labelled fields not detected:* ["title", "description", "keywords"]
 - *Thinking trace markers:* ["&lt;think&gt;"]
 - *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.3287507079949137
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.221283582999604
 - *Peak memory at first token (GB):* 18.798076473
 - *Checkpoint-declared sampling (generation_config.json):* temperature 0.6;
   top_p 0.95; repetition_penalty 1.0
@@ -529,6 +389,7 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repetition_abort, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Family README in installed mlx-vlm:* none
 - *Title word count:* 8
 - *Keyword count:* 52
 - *Duplicate keywords:* ["blue stripes", "white boat", "blue canopy", "white
@@ -537,8 +398,8 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
 - *Processor class:* mlx_vlm.models.molmo2.processing.Molmo2Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.3944302500167396
-- *Peak memory at first token (GB):* 8.183413476
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 3.565519374998985
+- *Peak memory at first token (GB):* 8.056562494
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *Post-cleanup active memory (GB):* 0.005540484
@@ -586,6 +447,7 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* repetition_abort, duplicate_keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Family README in installed mlx-vlm:* none
 - *Title word count:* 8
 - *Keyword count:* 39
 - *Duplicate keywords:* ["blue and white forest", "blue and white sky", "blue
@@ -594,7 +456,7 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 14.266369332995964
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 13.2070994170208
 - *Peak memory at first token (GB):* 14.286107454
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -645,13 +507,14 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, unexpected_special_token
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
+- *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description", "keywords"]
 - *Unexpected special tokens:* ["&lt;|channel|&gt;", "&lt;|message|&gt;"]
 - *Resolved model revision:* 9c056d48b1e611dc586139a5deb927ae363cfe6f
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5211921670124866
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4863514589960687
 - *Peak memory at first token (GB):* 6.729361982
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
@@ -696,6 +559,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Observations:* missing_requested_sections, token_cap_truncation,
   unexpected_special_token, role_boundary_token_present
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
+- *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
@@ -707,7 +571,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.610304666974116
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 11.043253916024696
 - *Peak memory at first token (GB):* 25.464306662
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
@@ -757,51 +621,23 @@ Title:
 Description:
 Keywords:
 
-Need title 5-10 words. Let's craft: "Two Sailors on Vortex Catamaran and Laser Dinghy" That's 8 words? Two(1) Sailors2 on3 Vortex4 Catamaran5 and6 Laser7 Dinghy8. Good.
+Need British English.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can mention captured on 2026-09-19 17:12:46 UTC+01:00? Might be okay to include. Probably include date.
+Title: 5-10 words. Concrete. Maybe "Vortex Catamaran and Laser Dinghy Sailing on Water". That's 8 words? Vortex(1) Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 Water8. Good.
 
-We need combine relevant context with main visible subject, setting, action, lighting, distinctive details.
+Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can include date/time in description? Probably yes as context. It says combining relevant context with main visible subject... Setting, action, lighting, distinctive details. Might include date. But not claim visible. Could say Captured on 2026-09-19... That's a fact. Probably acceptable.
 
-Image shows two small sailboats on water. Left is Vortex with sail number 1067, grey sail with orange stripes, hull orange/white. Sailor wearing blue top and red life jacket standing. Right is Laser with sail number 188572 GBR, white sail with blue corners, red sunburst logo. Sailor sitting wearing black jacket and life jacket. Background dense green trees, shoreline, partly cloudy sky. Another boat in background: white boat with blue cover and mast. Also a small white boat with blue trim mid background, buoy.
+The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
 
-Lighting is daylight, overcast partly.
+Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with "VORTEX" and 1067. It appears to be a small trimaran? Or a catamaran? Hints say catamaran. Might keep as small sailing dinghy. Could say Vortex dinghy. Might be safe to say Vortex sailing dinghy. But hint says catamaran. Image shows what looks like a small boat with maybe two hulls? Actually it's a single hull with a small outrigger? Hmm looks like a Vortex class dinghy which is a monohull? Let's keep description as Vortex sailing boat. Might follow hint but image evidence shows it's a single hull with maybe a cat? I think Vortex is a dinghy, not catamaran. Could note as Vortex dinghy. Might be conflict. Prefer image evidence. I'd say Vortex dinghy (sail number 1067). Might keep catamaran? Safer to say small sailing dinghy.
 
-Make description 1-2 sentences.
+Laser dinghy sail number 188572 GBR. The sail number on sail is 188572, GBR. Good.
 
-Maybe: On 2026-09-19 at 17:12:46 UTC+01:00, a Vortex catamaran sail number 1067 and a Laser dinghy sail number GBR 188572 sail on calm water with wooded shoreline and partly cloudy sky behind them; the Vortex sailor stands at the helm in a life jacket while the Laser sailor sits. That's one sentence maybe long.
+Lighting: daylight, partly cloudy.
 
-Need British English. Use "behaviour"? Okay.
+Provide keywords 10-18 unique comma-separated.
 
-Keywords: 10-18 unique comma-separated. Use hints but correct. Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
-
-We need unique. Possibly include Vortex catamaran, sail number, etc. But keywords list likely generic.
-
-Make 15 keywords.
-
-Let's produce:
-
-Title:
-Two Sailors on Vortex Catamaran and Laser Dinghy
-
-Description:
-Captured on 2026-09-19 17:12:46 UTC+01:00, a Vortex catamaran numbered 1067 and a Laser dinghy numbered GBR 188572 are under sail on calm water with a wooded shoreline and partly cloudy sky beyond; the Vortex sailor stands wearing a life jacket at the helm while the Laser sailor sits in the cockpit, with additional moored vessels in the background.
-
-Keywords: sailboat, sailing, dinghy, catamaran, Vortex, Laser dinghy, sailor, life jacket, water, shoreline, trees, forest, sky, clouds, outdoor recreation
-
-That's 15.
-
-Ensure format exactly:
-
-Title:
-Description:
-Keywords:
-
-Return exactly these three sections and nothing else.
-
-Make sure Title is 5-10 words. Ours is 8.
-
-Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to semicolon? Might be okay. Could make one sentence. Let's keep as one sentence maybe with
+Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water under a partly cloudy sky. On the left a white and orange Vortex dinghy numbered 1067 with a grey and orange sail is underway with a sailor standing in a blue jacket and life jacket; on the right a white Laser dinghy numbered GBR 188572 with a white and blue sail is underway with a sailor seated in a black life jacket. Both are on calm water with wooded shoreline
 ```
 
 </details>
@@ -822,6 +658,8 @@ Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* thinking_trace_incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Family README in installed mlx-vlm:* mlx_vlm/models/minicpmv4_6/README.md
+  (read before filing)
 - *Thinking trace markers:* ["&lt;think&gt;"]
 - *Title word count:* 5
 - *Keyword count:* 12
@@ -829,8 +667,8 @@ Description is 1-2 sentences. It's one sentence? It's maybe two sentences due to
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9244277920224704
-- *Peak memory at first token (GB):* 3.257943688
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.714477458008332
+- *Peak memory at first token (GB):* 3.257927752
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -892,39 +730,42 @@ is in the model gallery.
 <details>
 <summary>Completions without detected concerns</summary>
 
-| Model                                                 | Runtime identity                                           | Performance                                           |
-|-------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev ed71acdae079; Lfm2VlProcessor; stop completed          | 2119 prompt / 141 generated; 480 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                      | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed | 2089 prompt / 112 generated; 98.5 tok/s; 6.5 GB peak  |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed        | 2394 prompt / 123 generated; 30.0 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | rev ded389e478f8; DiffusionGemma4Processor; stop completed | 592 prompt / 85 generated; 46.5 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed          | 591 prompt / 175 generated; 30.4 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed          | 596 prompt / 130 generated; 104 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed          | 596 prompt / 89 generated; 26.3 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                     | rev 475b9088d297; Gemma4Processor; stop completed          | 592 prompt / 94 generated; 121 tok/s; 5.9 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                     | rev bd7b20686e8c; Glm46VProcessor; stop completed          | 6454 prompt / 139 generated; 73.1 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed       | 6454 prompt / 142 generated; 39.5 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit              | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed  | 1383 prompt / 99 generated; 166 tok/s; 4.7 GB peak    |
-| mlx-community/InternVL3-14B-4bit                      | rev 26328eaab82c; InternVLChatProcessor; stop completed    | 2115 prompt / 116 generated; 55.4 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed    | 2115 prompt / 103 generated; 36.8 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit          | rev e5abbe34cbfa; KimiVLProcessor; stop completed          | 1331 prompt / 729 generated; 61.5 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed          | 2111 prompt / 110 generated; 209 tok/s; 4.0 GB peak   |
-| mlx-community/MiniCPM-o-4_5-4bit                      | rev 592c09d85e7b; MiniCPMOProcessor; stop completed        | 393 prompt / 114 generated; 104 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed        | 2927 prompt / 160 generated; 66.3 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed        | 2926 prompt / 152 generated; 186 tok/s; 7.8 GB peak   |
-| mlx-community/North-Micro-Vision-Instruct-4bit        | rev 87466363e6c5; CohereCompassProcessor; stop completed   | 4085 prompt / 112 generated; 147 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit           | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed         | 1291 prompt / 151 generated; 73.1 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed           | 1141 prompt / 136 generated; 55.7 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed         | 3117 prompt / 114 generated; 39.5 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed         | 16551 prompt / 918 generated; 78.2 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit          | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed         | 16549 prompt / 128 generated; 74.8 tok/s; 23 GB peak  |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit              | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed         | 16549 prompt / 181 generated; 19.8 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit               | rev defcdea7cc7a; Qwen3VLProcessor; stop completed         | 16549 prompt / 104 generated; 67.4 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed         | 16565 prompt / 111 generated; 68.6 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed         | 16565 prompt / 142 generated; 88.1 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                       | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed         | 16565 prompt / 144 generated; 28.0 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed         | 1433 prompt / 78 generated; 124 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                     | rev 41d17ee00e16; Step3VLProcessor; stop completed         | 3494 prompt / 147 generated; 46.4 tok/s; 92 GB peak   |
+| Model                                                       | Runtime identity                                             | Performance                                           |
+|-------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------|
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2119 prompt / 141 generated; 475 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2089 prompt / 112 generated; 91.7 tok/s; 6.5 GB peak  |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit       | rev 0a970d20ad7d; Mistral3Processor; stop completed          | 2394 prompt / 123 generated; 29.3 tok/s; 23 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 592 prompt / 85 generated; 39.2 tok/s; 28 GB peak     |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 591 prompt / 175 generated; 29.4 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 596 prompt / 130 generated; 76.1 tok/s; 16 GB peak    |
+| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 596 prompt / 89 generated; 26.8 tok/s; 20 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 592 prompt / 94 generated; 96.4 tok/s; 5.9 GB peak    |
+| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6454 prompt / 139 generated; 73.6 tok/s; 8.7 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6454 prompt / 142 generated; 40.2 tok/s; 78 GB peak   |
+| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1383 prompt / 99 generated; 129 tok/s; 4.7 GB peak    |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2115 prompt / 116 generated; 56.3 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2115 prompt / 103 generated; 36.6 tok/s; 17 GB peak   |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1331 prompt / 729 generated; 60.7 tok/s; 20 GB peak   |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 2111 prompt / 110 generated; 206 tok/s; 4.0 GB peak   |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 393 prompt / 114 generated; 104 tok/s; 7.0 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2927 prompt / 160 generated; 65.5 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2926 prompt / 152 generated; 188 tok/s; 7.8 GB peak   |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4085 prompt / 112 generated; 165 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1291 prompt / 151 generated; 60.2 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1141 prompt / 136 generated; 37.1 tok/s; 9.3 GB peak  |
+| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3117 prompt / 114 generated; 37.2 tok/s; 16 GB peak   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16551 prompt / 918 generated; 87.3 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16549 prompt / 128 generated; 75.2 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16549 prompt / 181 generated; 16.7 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16549 prompt / 104 generated; 67.6 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16565 prompt / 111 generated; 73.5 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16565 prompt / 142 generated; 84.5 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16565 prompt / 144 generated; 28.2 tok/s; 21 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx                    | rev 844516024a1c; SmolVLMProcessor; stop completed           | 1433 prompt / 78 generated; 125 tok/s; 5.6 GB peak    |
+| mlx-community/Step-3.7-Flash-oQ3e                           | rev 41d17ee00e16; Step3VLProcessor; stop completed           | 3494 prompt / 147 generated; 44.0 tok/s; 92 GB peak   |
+| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4212 prompt / 130 generated; 124 tok/s; 5.4 GB peak   |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1273 prompt / 134 generated; 35.0 tok/s; 18 GB peak   |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3628 prompt / 144 generated; 91.5 tok/s; 23 GB peak   |
 
 </details>
 
@@ -1017,7 +858,6 @@ these models, append the flags recorded in their diagnostics blocks:
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
 | mlx-community/InternVL3_5-1B-4bit                | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
-| mlx-community/Mage-VL-OptiQ-4bit                 | c98dad5f92f13334cc679c93fb9f185ab49ed626 |
 | mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
 | mlx-community/Qwen2-VL-7B-Instruct-4bit          | 1c638e970be36948e087e77d103b9147e1a9a1dd |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | 846ea5576854468f25af3767d769b0805b1b08b6 |
@@ -1032,9 +872,9 @@ these models, append the flags recorded in their diagnostics blocks:
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.3                                                                                                                                           |
-| mlx-vlm source revision    | 990a028763b2f8c605329f29ae4e747f9285902d                                                                                                        |
-| mlx                        | 0.32.3.dev20260925+073d2252c                                                                                                                    |
-| mlx source revision        | 073d2252c                                                                                                                                       |
+| mlx-vlm source revision    | 0e0a9d8c81282a100fec028474a7a688551f5e78                                                                                                        |
+| mlx                        | 0.32.3.dev20260926+a2a09fd56                                                                                                                    |
+| mlx source revision        | a2a09fd56                                                                                                                                       |
 | mlx-audio                  | 0.5.6                                                                                                                                           |
 | transformers               | 5.17.0                                                                                                                                          |
 | tokenizers                 | 0.23.2                                                                                                                                          |
@@ -1062,7 +902,7 @@ these models, append the flags recorded in their diagnostics blocks:
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.14/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (192,479,632 bytes, sha256=bd049de2432f971b6f50b872f6e15f0c73477ed4bdab4208beaf921423ae197d) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,850,640 bytes, sha256=30c725ed1dc696853d8cd25b36b6f5758e833264048a33cac57c265534b6c8bd)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (192,396,832 bytes, sha256=7f1bfc850ac0ab7e9a1af5b48f253c65a7717834f569a6df483b1e422c0318b9) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,851,232 bytes, sha256=412d8415db62d18e8c280ae19a5159fb6847fb9fa4d4939c2ac76a4c069c0508)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

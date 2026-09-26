@@ -46,10 +46,10 @@ builtins.ValueError: Model loading failed: Model type internvl not supported. Er
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14490, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14636, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13446, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13511, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -59,7 +59,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 842, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 841, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -81,7 +81,7 @@ ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.s
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15608, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15758, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -92,7 +92,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14505, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14651, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
 
@@ -104,11 +104,11 @@ ValueError: Model loading failed: Model type internvl not supported. Error: No m
 
 ```text
 === STDERR ===
-[23:54:09] INFO     Loading model weights and processor...
+[23:19:03] INFO     Loading model weights and processor...
 Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3749.22it/s]
+Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 4677.79it/s]
 ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:54:09] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
+[23:19:03] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
 ```
 
 ## Reproduction inputs
@@ -161,7 +161,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 | Component       | Value                                                             |
 |-----------------|-------------------------------------------------------------------|
 | mlx-vlm         | 0.7.3                                                             |
-| mlx             | 0.32.3.dev20260925+073d2252c                                      |
+| mlx             | 0.32.3.dev20260926+a2a09fd56                                      |
 | transformers    | 5.17.0                                                            |
 | tokenizers      | 0.23.2                                                            |
 | huggingface-hub | 1.33.0                                                            |
@@ -169,7 +169,7 @@ python -m mlx_vlm.generate --model mlx-community/InternVL3_5-1B-4bit --image any
 | Python Version  | 3.14.7                                                            |
 | macOS Version   | 27.0                                                              |
 | GPU/Chip        | Apple M5 Max                                                      |
-| check_models    | 0.17.38; revision 29bae6c868c9e1e58221eb34da8336fa58581ed1; clean |
+| check_models    | 0.17.38; revision 6cd0a83e7afcc0892806ff31d87d38973d8a0a8c; clean |
 
 ### Full environment evidence
 
