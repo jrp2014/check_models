@@ -9,14 +9,14 @@ establish fitness for other tasks.
 
 ## Run at a glance
 
-- Run duration: 14m 47s
+- Run duration: 13m 21s
 - Evaluation lane: assisted
 - Prompt hints: the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - Assessment: General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- Input image: JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.4 MB
+- Input image: JPEG, 9,805 x 6,538 pixels (64.1 MP), 54.2 MB
 - Models attempted: 50 (completed 50, crashed 0, indeterminate 0)
-- Mechanical checks: no concerns detected 35, concerns detected 2, major concerns 13, not assessed 0
-- Top observations: Response repeats the same text (2), Generation was stopped early after sustained repeated output (4), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (8), Response appears cut off at the token limit (2)
+- Mechanical checks: no concerns detected 27, concerns detected 14, major concerns 9, not assessed 0
+- Top observations: Response repeats the same text (1), Unrecognised model control tokens remain visible (2), Required labelled fields not detected (9), Response appears cut off at the token limit (2), Internal reasoning block appears incomplete (1)
 
 ## Start here
 

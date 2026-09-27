@@ -14,7 +14,7 @@ establish fitness for other tasks.
   the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.4 MB
+- *Input image:* JPEG, 9,805 x 6,538 pixels (64.1 MP), 54.2 MB
 
 Outcome counts
 
@@ -30,43 +30,38 @@ Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| none                           | 42    |
-| observation needs reproduction | 8     |
+| none                           | 47    |
+| observation needs reproduction | 3     |
 
 Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| major concerns       | 13    |
-| no concerns detected | 35    |
-| concerns detected    | 2     |
+| major concerns       | 9     |
+| no concerns detected | 27    |
+| concerns detected    | 14    |
 
 Observation counts
 
-| Observation                                                  | Count |
-|--------------------------------------------------------------|-------|
-| Response repeats the same text                               | 2     |
-| Generation was stopped early after sustained repeated output | 4     |
-| Unrecognised model control tokens remain visible             | 2     |
-| Required labelled fields not detected                        | 8     |
-| Response appears cut off at the token limit                  | 2     |
-| Internal reasoning block appears incomplete                  | 2     |
-| Conversation-role control tokens remain visible              | 1     |
-| Repeated keyword entries                                     | 6     |
-| Names a place the prompt did not supply                      | 1     |
+| Observation                                                               | Count |
+|---------------------------------------------------------------------------|-------|
+| Response repeats the same text                                            | 1     |
+| Unrecognised model control tokens remain visible                          | 2     |
+| Required labelled fields not detected                                     | 9     |
+| Response appears cut off at the token limit                               | 2     |
+| Internal reasoning block appears incomplete                               | 1     |
+| Conversation-role control tokens remain visible                           | 1     |
+| Repeated keyword entries                                                  | 4     |
+| Output repeats the prompt's own hint text instead of describing the image | 11    |
+| Names a place the prompt did not supply                                   | 1     |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                             |
-|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation_needs_reproduction | repeated text; cut off at token limit; duplicate keywords                                                                |
-| [mlx-community/Qwen2-VL-7B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-7b-instruct-4bit)                  | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                                              |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
-| [mlx-community/Molmo2-8B-4bit](#diagnostic-mlx-community-molmo2-8b-4bit)                                        | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                                             |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                                             |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected                                                                     |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                                 | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                                                |
+| Model                                                                                                    | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                       |
+|----------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | completed | major concerns    | observation_needs_reproduction | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected                                                               |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)       | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
 
 ## Crashes requiring action
 
@@ -74,12 +69,12 @@ None.
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
 
 <details>
-<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — repeated text; cut off at token limit; duplicate keywords</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-8bit — unusable — repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords</summary>
 
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
 
 #### Execution and provenance
 
@@ -88,294 +83,63 @@ None.
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, token_cap_truncation, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Observations:* repeated_output, missing_requested_sections,
+  token_cap_truncation, thinking_trace_incomplete, duplicate_keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
 - *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "adventure"
-- *Title word count:* 9
-- *Keyword count:* 343
-- *Duplicate keywords:* ["adventure", "learning", "education", "training",
-  "practice", "improvement", "progress", "success", "achievement",
-  "accomplishment", "pride", "satisfaction", "happiness", "joy", "laughter",
-  "smiles", "gratitude", "appreciation", "wonder", "awe", "amazement",
-  "enthusiasm", "excitement", "exploration", "discovery"]
-- *Token-cap degradation evidence:* ["repetitive_tail", "unfinished_list"]
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Labelled fields not detected:* ["title"]
+- *Repeated fragment:* keyword: "tan canopy"
+- *Thinking trace markers:* ["\u25c1think\u25b7"]
+- *Keyword count:* 100
+- *Duplicate keywords:* ["dock", "marina", "calm water", "reflections", "early
+  evening", "blue hull", "tan canopy", "blue and light blue", "marina dock",
+  "leisure boats", "early evening light", "blue and light blue hull", "other
+  sailboats", "correct conflicts", "moored"]
+- *Token-cap degradation evidence:* ["missing_sections", "repetitive_tail",
+  "incomplete_thinking_trace"]
+- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Processor class:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.1661522499925923
-- *Peak memory at first token (GB):* 14.979459316
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.003885684
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4177025409881026
+- *Peak memory at first token (GB):* 20.066962996
+- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
+  temperature 0.6
+- *Sampling settings source:* temperature: generation_config; top_p: default;
+  top_k: default; min_p: default; repetition_penalty: default
+- *Post-cleanup active memory (GB):* 0.003082856
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 308
-- *Prompt composition:* 308 = 307 text/template + 1 image tokens (0%; exact,
-  counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 11.34
-- *Parameter count:* 11.00B (name-estimate)
+- *Prompt tokens:* 1331
+- *Prompt composition:* 1,331 = 317 text/template + 1,014 image tokens (76%;
+  exact, counted by token id in the prepared input)
+- *Checkpoint weights (GB):* 17.83
+- *Active parameter count:* 3.00B (name-estimate; total not stated in the
+  name)
 - *Quantization:* 8-bit, group 64
 - *Declared context length:* 131,072 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (11.35 GB vs 11.34 GB on disk)
+- *Load active memory vs checkpoint:* 1.00x (17.83 GB vs 17.83 GB on disk)
 - *Generation tokens:* 1000
-- *Configured EOS token ID:* 128009
-- *Configured EOS token:* &lt;|eot_id|&gt;
+- *Configured EOS token ID:* 163594
+- *Configured EOS token:* [EOS]
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); thermal state max nominal over 2
+  sample(s); mode snapshot
 
 #### Complete output
 
 ```text
-Title: Two Sailors Navigate Calm Waters in a Forested Estuary
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-09-26 17:36:29 UTC+01:00) and GPS coordinates (50.682100°N, 3.466600°W). The descriptive hints mention a blue and light blue motor cabin cruiser with a tan canopy at a marina, with reflections, early evening light, calm water, and other boats in the background.
 
-Description: On a sunny day in September 2026, two sailors, one in a Vortex catamaran and the other in a Laser dinghy, navigate their boats across the calm waters of an estuary, surrounded by dense green woodland and a blue sky with clouds. The Vortex catamaran, with its distinctive orange and grey sail, is sail number 1067, while the Laser dinghy, with its white sail bearing the GBR 188572 number, is a British vessel.
+The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other vessels and calm water reflections.
 
-Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser, GBR, 1067, 188572, Sail, Boat, Water, Trees, Clouds, Sky, Blue, Green, Woodland, Nature, Outdoor, Recreation, Sport, Activity, Adventure, Fun, Relaxation, Peaceful, Calm, Serene, Scenic, Breathtaking, Beautiful, Picturesque, Idyllic, Tranquil, Soothing, Uplifting, Inspiring, Motivational, Encouraging, Empowering, Confidence-Boosting, Self-Improvement, Personal-Growth, Development, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, En
-```
+Now, for the title: needs to be 5-10 words. Maybe something like "Motor cabin cruiser moored at marina in early evening light."
 
-</details>
+Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinctive features (tan canopy, blue hull, reflections). So, "A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light."
 
-<a id="diagnostic-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
+Keywords: Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, marina, calm water, reflections, early evening, blue hull, tan canopy, blue and light blue), plus the GPS and date/time. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they are visible. So maybe exclude them from keywords. Focus on visible details. So keywords: Motor cabin cruiser, blue hull, light blue, tan canopy, marina dock, sailboats, leisure boats, calm water, reflections, early evening, blue and light blue, blue hull, tan canopy, marina, dock, other boats, water reflection.
 
-<details>
-<summary>mlx-community/Qwen2-VL-7B-Instruct-4bit — unusable — repeated text; stopped early: repeating; duplicate keywords</summary>
-
-### mlx-community/Qwen2-VL-7B-Instruct-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repeated_output, repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Family README in installed mlx-vlm:* none
-- *Repeated fragment:* keyword: "trees"
-- *Title word count:* 2
-- *Keyword count:* 67
-- *Duplicate keywords:* ["trees", "forest", "mast", "life jacket", "river",
-  "estuary", "sky", "shoreline", "sail", "boat", "boating"]
-- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 41.53652204197715
-- *Peak memory at first token (GB):* 9.283160132
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.007359262
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16560
-- *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 4.67
-- *Parameter count:* 7.00B (name-estimate)
-- *Quantization:* 4-bit, group 64
-- *Declared context length:* 32,768 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (4.68 GB vs 4.67 GB on disk)
-- *Generation tokens:* 225
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: Sailing Adventure
-
-Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm waters, with dense green woodland in the background.
-
-Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, Forest, Woodland, Adventure, Outdoor, Action, Sailboat, Mast, Life jacket, River, Estuary, Sky, Clouds, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
-
-<details>
-<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit — unusable — stopped early: repeating; labelled fields not detected; incomplete thinking block</summary>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repetition_abort, missing_requested_sections,
-  thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Family README in installed mlx-vlm:* mlx_vlm/models/ernie4_5_moe_vl/README.md
-  (read before filing)
-- *Labelled fields not detected:* ["title", "description", "keywords"]
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4070924170082435
-- *Peak memory at first token (GB):* 18.798076473
-- *Checkpoint-declared sampling (generation_config.json):* temperature 0.6;
-  top_p 0.95; repetition_penalty 1.0
-- *Sampling settings source:* temperature: generation_config; top_p:
-  generation_config; top_k: default; min_p: default; repetition_penalty:
-  generation_config
-- *Post-cleanup active memory (GB):* 0.000625182
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1639
-- *Prompt composition:* 1,639 = 392 text/template + 1,247 image tokens (76%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 17.44
-- *Parameter count:* 28.00B total, 3.00B active (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 131,072 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (17.45 GB vs 17.44 GB on disk)
-- *Generation tokens:* 425
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-- *Configured thinking start token:* &lt;think&gt;
-- *Configured thinking end token:* &lt;/think&gt;
-- *Configured thinking budget:* 800
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Alright, let's get this done. I need to create some metadata for this image, and it's my job to be precise.
-
-First, I need to figure out a good title. "Sailboats on the Water" is too generic. "Two Sailors on Dinghies" is better, but I want something more specific. "Sailors on Catamaran and Laser Dinghy" - that's it! Concise and accurate.
-
-Next, the description. I'll start with the basics: date, time, and location. Then I'll describe the scene. I'll mention the two boats, the sailors, and the setting. The hint about the boats is great. Let me work that in. Okay, I'm going to use the hint about the catamaran and laser. I'll refine that. "On a calm day, two sailors navigate a Vortex catamaran and a Laser dinghy on a lake in the UK." That's good, it's accurate, and it's a good length.
-
-Finally, the keywords. I'll go through the hints and add in some keywords that are relevant. Let's see, "sailboat," "dinghy," "catamaran," "laser," "sailor," "boat," "water," "lake," "sky," "trees," "shoreline," "recreation," "sport," "vessel," "wind," "man," "life jacket," "hull," "rigging," "sail number," "1067," "GBR 188572," "green," "calm," "daytime," "September," "UK," "England," "solent," "estuary," "marina," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-molmo2-8b-4bit"></a>
-
-<details>
-<summary>mlx-community/Molmo2-8B-4bit — unusable — stopped early: repeating; duplicate keywords</summary>
-
-### mlx-community/Molmo2-8B-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Family README in installed mlx-vlm:* none
-- *Title word count:* 8
-- *Keyword count:* 52
-- *Duplicate keywords:* ["blue stripes", "white boat", "blue canopy", "white
-  hull"]
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Processor class:* mlx_vlm.models.molmo2.processing.Molmo2Processor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.402567250013817
-- *Peak memory at first token (GB):* 8.183413476
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.005540484
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1526
-- *Prompt composition:* 1,526 = 324 text/template (tokenizer-exact) + 1,202
-  non-text (79%, image/audio expansion)
-- *Checkpoint weights (GB):* 6.44
-- *Parameter count:* 8.00B (name-estimate)
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 36,864 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (6.45 GB vs 6.44 GB on disk)
-- *Generation tokens:* 225
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title: Catamaran and Laser Dinghy Sail on Calm River
-
-Description: Two sailors navigate small dinghies across a tranquil river, with a Vortex catamaran on the left and a Laser dinghy on the right. The scene features calm waters, dense green woodland, and a clear blue sky with scattered clouds.
-
-Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Sail number, Vortex, Calm waters, Dense woodland, Clear sky, Scattered clouds, Small dinghies, Two sailors, White hulls, Blue life jackets, White sails, Orange stripes, White text, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull,
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-x-reasoner-7b-8bit"></a>
-
-<details>
-<summary>mlx-community/X-Reasoner-7B-8bit — unusable — stopped early: repeating; duplicate keywords</summary>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* repetition_abort, duplicate_keywords
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Family README in installed mlx-vlm:* none
-- *Title word count:* 8
-- *Keyword count:* 39
-- *Duplicate keywords:* ["blue and white forest", "blue and white sky", "blue
-  and white water", "blue and white sail"]
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 14.845471542008454
-- *Peak memory at first token (GB):* 14.286107454
-- *Sampling settings source:* temperature: default; top_p: default; top_k:
-  default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0109474
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 16560
-- *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
-  exact, counted by token id in the prepared input)
-- *Checkpoint weights (GB):* 9.45
-- *Parameter count:* 7.00B (name-estimate)
-- *Quantization:* 8-bit, group 64
-- *Declared context length:* 128,000 (max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (9.46 GB vs 9.45 GB on disk)
-- *Generation tokens:* 250
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-Title:
-Sailing Catamaran and Laser Dinghy on Calm Waters
-
-Description:
-Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across tranquil waters, set against a backdrop of dense green woodland under a partly cloudy sky.
-
-Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Calm waters, Distant shoreline, Forest, Cloudy sky, Life jackets, Outdoor recreation, River, Shoreline, Trees, Water, Man, Mast, Sunburst logo, Blue and white sails, Orange and black sail, Blue and white catamaran, White Laser dinghy, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail,
+Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, "motor cabin cruiser" and "cruise" or "motorboat". Let's list the visible unique elements: blue and light blue hull, tan canopy, marina dock, other boats (sailboats, leisure boats), calm water, reflections, early evening light, blue hull, tan canopy, dock, marina. Maybe 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, blue hull, tan canopy, dock, marina, calm water, other boats. That's 13. Maybe add "moored" as a keyword? But the hint says "moored" is already in hints. Wait the keywords from hints include "Mooring" but the user said to retain details supported by the image, correct conflicts, omit uncertain. The image shows the boat moored, so "moored" is visible. But the hints include "Mooring" so maybe include that. Wait the user said to prefer image evidence over hints. The image shows the boat is moored, so include "moored". But the hints might have "Mooring" which is similar. Let's check the hints: the hints include "Mooring" so maybe include that. But the user says to prefer image evidence. The image shows the boat is moored, so "moored" is visible. So include "moored". But the hints have "Mooring" – perhaps the user wants to use the hint's terms. Wait, the instructions say "retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details." So if the image shows the boat is moored, then "moored" is a visible detail, so include it. But the hints have "Mooring" which is similar. Maybe use "moored" instead. Let's list keywords: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. Wait, need to make sure 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. That's 14. Maybe combine "blue hull" and "blue and light
 ```
 
 </details>
@@ -403,30 +167,31 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.505170916003408
-- *Peak memory at first token (GB):* 6.729361982
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.5301418750023004
+- *Peak memory at first token (GB):* 6.729394782
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
 - *Post-cleanup active memory (GB):* 0.015387538
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2197
-- *Prompt composition:* 2,197 = 405 text/template + 1,792 image tokens (82%;
+- *Prompt tokens:* 2201
+- *Prompt composition:* 2,201 = 409 text/template + 1,792 image tokens (81%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 5.68
 - *Parameter count:* 9.00B (name-estimate)
 - *Quantization:* 4-bit, group 64, affine
 - *Load active memory vs checkpoint:* 1.00x (5.70 GB vs 5.68 GB on disk)
-- *Generation tokens:* 16
+- *Generation tokens:* 18
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;|return|&gt;
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
+  sample(s); mode snapshot
 
 #### Complete output
 
 ```text
-<|channel|> analysis<|message|> The image shows two small sailboats racing on a river.
+<|channel|> analysis<|message|> The image shows a blue and white boat with a tan colored canopy.
 ```
 
 </details>
@@ -434,7 +199,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 <a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
 <details>
-<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — unusable — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name</summary>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — unusable — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</summary>
 
 ### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
@@ -446,23 +211,22 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_special_token, role_boundary_token_present, unverified_place_name
+  unexpected_special_token, role_boundary_token_present
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
-- *Place names the prompt did not supply:* ["River That"]
 - *Title word count:* 0
-- *Keyword count:* 1
-- *Token-cap degradation evidence:* ["missing_sections"]
+- *Keyword count:* 20
+- *Token-cap degradation evidence:* ["missing_sections", "unfinished_list"]
 - *Special tokens emitted (by token id):* ["&lt;|message|&gt;"]
 - *Resolved model revision:* 98377360cbc84f982e90336f956b08adb46cad88
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 10.289382999995723
-- *Peak memory at first token (GB):* 25.464306662
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 8.139284834003774
+- *Peak memory at first token (GB):* 25.464323046
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
@@ -470,8 +234,8 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
   repetition_penalty: default
 - *Post-cleanup active memory (GB):* 0.005950222
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 4409
-- *Prompt composition:* 4,409 = 353 text/template + 4,056 image tokens (92%;
+- *Prompt tokens:* 4410
+- *Prompt composition:* 4,410 = 354 text/template + 4,056 image tokens (92%;
   exact, counted by token id in the prepared input)
 - *Checkpoint weights (GB):* 23.85
 - *Parameter count:* 30.00B (name-estimate)
@@ -485,7 +249,8 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
   (preprocessor_config.json, processor_config.json)
 - *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
   speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
+  sample(s); power: AC over 2 sample(s); thermal state max fair over 2
+  sample(s); mode snapshot
 
 #### Complete output
 
@@ -495,11 +260,12 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+- GPS: 50.682100°N, 3.466600°W
 
 Descriptive hints:
-- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
-- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 
 Write:
 - a concrete 5-10-word title;
@@ -511,100 +277,43 @@ Title:
 Description:
 Keywords:
 
-Need British English.
+We need title 5-10 words. Concrete.
 
-Title: 5-10 words. Concrete. Maybe "Vortex Catamaran and Laser Dinghy Sailing on Water". That's 8 words? Vortex(1) Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 Water8. Good.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can include date/time in description? Probably yes as context. It says combining relevant context with main visible subject... Setting, action, lighting, distinctive details. Might include date. But not claim visible. Could say Captured on 2026-09-19... That's a fact. Probably acceptable.
+Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
 
-The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
+Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
+Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
 
-Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
+Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-We need British English spelling.
+Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
 
-Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
+Make sure British-English: moor, etc. Use British spelling.
 
-Should be 1-2 sentences. Let's do two sentences.
-
-Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
 
 Let's craft.
 
-Title:
-Vortex Catamaran and Laser Dinghy Sailing on River
+Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
 
-That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+That's 8 words.
 
-Description:
-Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
 
-That's
-```
+That's two sentences. Good.
 
-</details>
+Keywords: maybe 13-15 items.
 
-<a id="diagnostic-mlx-community-minicpm-v-46-4bit"></a>
+Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
 
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-4bit — unusable — incomplete thinking block</summary>
+Need comma-separated. Unique.
 
-### mlx-community/MiniCPM-V-4.6-4bit
+Ensure 10-18. Let's produce 15.
 
-#### Execution and provenance
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Family README in installed mlx-vlm:* mlx_vlm/models/minicpmv4_6/README.md
-  (read before filing)
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Title word count:* 5
-- *Keyword count:* 12
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9595268330012914
-- *Peak memory at first token (GB):* 3.257993288
-- *Checkpoint-declared sampling (generation_config.json):* do_sample True;
-  temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
-- *Sampling settings source:* temperature: generation_config; top_p:
-  generation_config; top_k: generation_config; min_p: default;
-  repetition_penalty: generation_config
-- *Post-cleanup active memory (GB):* 0.0043936
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 934
-- *Prompt composition:* 934 = 345 text/template (tokenizer-exact) + 589
-  non-text (63%, image/audio expansion)
-- *Checkpoint weights (GB):* 2.16
-- *Quantization:* 4-bit, group 64, affine
-- *Declared context length:* 262,144 (text_config.max_position_embeddings)
-- *Load active memory vs checkpoint:* 1.00x (2.16 GB vs 2.16 GB on disk)
-- *Generation tokens:* 84
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-#### Complete output
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title: Sailing vessels on calm waters
-
-Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest in the background.
-
-Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation
+Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
 ```
 
 </details>
@@ -619,15 +328,28 @@ Prompt-compliance observations (missing fields, constraint counts, hint
 copying, instruction echo, cap hits) inform model selection; complete evidence
 is in the model gallery.
 
-| Model                                     | Mechanical checks | Observations                 |
-|-------------------------------------------|-------------------|------------------------------|
-| mlx-community/FastVLM-0.5B-bf16           | major concerns    | labelled fields not detected |
-| mlx-community/gemma-3n-E4B-it-4bit        | major concerns    | labelled fields not detected |
-| mlx-community/granite-vision-3.2-2b-nvfp4 | major concerns    | labelled fields not detected |
-| mlx-community/nanoLLaVA-1.5-4bit          | major concerns    | labelled fields not detected |
-| mlx-community/SmolVLM-256M-Instruct-4bit  | major concerns    | labelled fields not detected |
-| mlx-community/gemma-4-12B-it-4bit         | concerns detected | duplicate keywords           |
-| mlx-community/Idefics3-8B-Llama3-bf16     | concerns detected | duplicate keywords           |
+| Model                                                 | Mechanical checks | Observations                             |
+|-------------------------------------------------------|-------------------|------------------------------------------|
+| mlx-community/FastVLM-0.5B-bf16                       | major concerns    | labelled fields not detected             |
+| mlx-community/gemma-3n-E4B-it-4bit                    | major concerns    | labelled fields not detected             |
+| mlx-community/granite-vision-3.2-2b-nvfp4             | major concerns    | labelled fields not detected             |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                 | major concerns    | labelled fields not detected             |
+| mlx-community/nanoLLaVA-1.5-4bit                      | major concerns    | labelled fields not detected             |
+| mlx-community/SmolVLM-256M-Instruct-4bit              | major concerns    | labelled fields not detected             |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | concerns detected | duplicate keywords; prompt hint repeated |
+| mlx-community/gemma-4-e4b-it-4bit                     | concerns detected | duplicate keywords                       |
+| mlx-community/X-Reasoner-7B-8bit                      | concerns detected | duplicate keywords                       |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | concerns detected | prompt hint repeated                     |
+| mlx-community/GLM-4.6V-Flash-4bit                     | concerns detected | prompt hint repeated                     |
+| mlx-community/GLM-4.6V-nvfp4                          | concerns detected | prompt hint repeated                     |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | concerns detected | prompt hint repeated                     |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | concerns detected | prompt hint repeated                     |
+| mlx-community/pixtral-12b-8bit                        | concerns detected | prompt hint repeated                     |
+| mlx-community/Qwen2-VL-7B-Instruct-4bit               | concerns detected | prompt hint repeated                     |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | concerns detected | prompt hint repeated                     |
+| mlx-community/Step-3.7-Flash-oQ3e                     | concerns detected | prompt hint repeated                     |
+| nativ-community/Mage-VL-OptiQ-4bit                    | concerns detected | prompt hint repeated                     |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | concerns detected | unsupplied place name                    |
 
 ## Context for completions without detected concerns
 
@@ -636,41 +358,33 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                           |
 |-------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2119 prompt / 141 generated; 478 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2089 prompt / 112 generated; 98.7 tok/s; 6.5 GB peak  |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit       | rev 0a970d20ad7d; Mistral3Processor; stop completed          | 2394 prompt / 123 generated; 29.3 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 592 prompt / 85 generated; 44.0 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 591 prompt / 175 generated; 30.0 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 596 prompt / 130 generated; 101 tok/s; 16 GB peak     |
-| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 596 prompt / 89 generated; 22.2 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 592 prompt / 94 generated; 111 tok/s; 5.9 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6454 prompt / 139 generated; 73.9 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6454 prompt / 142 generated; 39.9 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1383 prompt / 99 generated; 169 tok/s; 4.7 GB peak    |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2115 prompt / 116 generated; 54.1 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2115 prompt / 103 generated; 33.9 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1331 prompt / 729 generated; 60.9 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 2111 prompt / 110 generated; 205 tok/s; 4.0 GB peak   |
-| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 393 prompt / 114 generated; 104 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2927 prompt / 160 generated; 65.3 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2926 prompt / 152 generated; 187 tok/s; 7.8 GB peak   |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4085 prompt / 112 generated; 156 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1291 prompt / 151 generated; 72.8 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1141 prompt / 136 generated; 52.1 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3117 prompt / 114 generated; 38.4 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16551 prompt / 918 generated; 82.8 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16549 prompt / 128 generated; 73.3 tok/s; 23 GB peak  |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16549 prompt / 181 generated; 19.6 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16549 prompt / 104 generated; 68.7 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16565 prompt / 111 generated; 70.8 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16565 prompt / 142 generated; 85.3 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16565 prompt / 144 generated; 26.9 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx                    | rev 844516024a1c; SmolVLMProcessor; stop completed           | 1433 prompt / 78 generated; 126 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                           | rev 41d17ee00e16; Step3VLProcessor; stop completed           | 3494 prompt / 147 generated; 47.7 tok/s; 92 GB peak   |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4212 prompt / 130 generated; 126 tok/s; 5.4 GB peak   |
-| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16562 prompt / 220 generated; 84.4 tok/s; 11 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1273 prompt / 134 generated; 36.1 tok/s; 18 GB peak   |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3628 prompt / 144 generated; 131 tok/s; 23 GB peak    |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2098 prompt / 143 generated; 101 tok/s; 6.5 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 597 prompt / 81 generated; 55.0 tok/s; 28 GB peak     |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit            | rev 846ea5576854; Ernie4_5_VLProcessor; stop completed       | 1646 prompt / 540 generated; 118 tok/s; 19 GB peak    |
+| mlx-community/gemma-4-12B-it-4bit                           | rev 73bcf09092aa; Gemma4UnifiedProcessor; stop completed     | 601 prompt / 112 generated; 61.2 tok/s; 7.6 GB peak   |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 601 prompt / 106 generated; 112 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 601 prompt / 113 generated; 23.8 tok/s; 20 GB peak    |
+| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1384 prompt / 91 generated; 169 tok/s; 4.6 GB peak    |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2120 prompt / 103 generated; 55.7 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2120 prompt / 79 generated; 36.1 tok/s; 17 GB peak    |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit            | rev 8451adc50203; MllamaProcessor; stop completed            | 309 prompt / 114 generated; 21.5 tok/s; 15 GB peak    |
+| mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 398 prompt / 93 generated; 106 tok/s; 7.0 GB peak     |
+| mlx-community/MiniCPM-V-4.6-4bit                            | rev 86cd463d33a9; MiniCPMVProcessor; stop completed          | 938 prompt / 564 generated; 295 tok/s; 3.3 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2935 prompt / 199 generated; 64.9 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2934 prompt / 121 generated; 187 tok/s; 7.8 GB peak   |
+| mlx-community/Molmo2-8B-4bit                                | rev 4fcbe9265776; Molmo2Processor; stop completed            | 1531 prompt / 181 generated; 72.2 tok/s; 8.5 GB peak  |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4091 prompt / 108 generated; 210 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1295 prompt / 130 generated; 99.0 tok/s; 24 GB peak   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16556 prompt / 901 generated; 89.2 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16554 prompt / 168 generated; 83.7 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16554 prompt / 190 generated; 21.0 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16554 prompt / 120 generated; 70.7 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16569 prompt / 123 generated; 105 tok/s; 25 GB peak   |
+| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16569 prompt / 111 generated; 90.6 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16569 prompt / 128 generated; 29.4 tok/s; 21 GB peak  |
+| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16566 prompt / 123 generated; 84.0 tok/s; 11 GB peak  |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1281 prompt / 144 generated; 36.4 tok/s; 18 GB peak   |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3636 prompt / 120 generated; 144 tok/s; 23 GB peak    |
 
 </details>
 
@@ -679,9 +393,9 @@ is in the model gallery.
 ### Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 9,984 x 6,656 pixels
-- *Image size:* 49,407,373 bytes
-- *Image SHA-256:* 97f53d5eeb6a63e6e685321bc95e66807a87db2e01f63f48a48a99f9342c7d12
+- *Image dimensions:* 9,805 x 6,538 pixels
+- *Image size:* 54,173,041 bytes
+- *Image SHA-256:* bd1c0e60ad08718e500069551a1ac0d3697010373ec1509d4f76cd6e1d79b11a
 
 <details>
 <summary>Exact prompt</summary>
@@ -692,11 +406,12 @@ Create British-English catalogue metadata from the image and supplied context.
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+- GPS: 50.682100°N, 3.466600°W
 
 Descriptive hints:
-- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
-- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 
 Write:
 - a concrete 5-10-word title;
@@ -715,10 +430,10 @@ The original local input is not published, so this report does not claim a
 complete reproduction command. Use a shareable equivalent image or add the
 original image before filing.
 
-- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-b32a199300908fe5.jpg>
+- *Retained preview:* <https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-6b2dcf5e8c73798e.jpg>
 - *Preview dimensions:* 1,024 x 683 pixels
-- *Preview size:* 142,804 bytes
-- *Preview SHA-256:* b32a199300908fe503b50bbf79a097af655b5c3c31d1b7ada8ea97c88cc62c91
+- *Preview size:* 144,352 bytes
+- *Preview SHA-256:* 6b2dcf5e8c73798e30387b33b07879805862c4f195e39570744d3d5f570f4e96
 
 Shareable stand-in: the retained gallery preview is a downscaled re-encoding
 of the original, so an observation reproduced on it must be reported as
@@ -729,18 +444,19 @@ native mlx-vlm process.
 
 ```bash
 set -euo pipefail
-curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-b32a199300908fe5.jpg
-printf '%s\n' 'b32a199300908fe503b50bbf79a097af655b5c3c31d1b7ada8ea97c88cc62c91  repro-image.jpg' | shasum -a 256 --check
+curl --fail --location --output repro-image.jpg https://raw.githubusercontent.com/jrp2014/check_models/main/src/output/reports/assets/source-image-6b2dcf5e8c73798e.jpg
+printf '%s\n' '6b2dcf5e8c73798e30387b33b07879805862c4f195e39570744d3d5f570f4e96  repro-image.jpg' | shasum -a 256 --check
 python -m mlx_vlm.generate --model MODEL_ID --image repro-image.jpg --prompt 'Create British-English catalogue metadata from the image and supplied context.
 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+- GPS: 50.682100°N, 3.466600°W
 
 Descriptive hints:
-- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
-- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 
 Write:
 - a concrete 5-10-word title;
@@ -753,32 +469,22 @@ Description:
 Keywords:' --max-tokens 1000 --temperature 0.0 --revision RESOLVED_REVISION --trust-remote-code --seed 0 --prefill-step-size 2048
 ```
 
-The shared command omits per-model automatic thinking flags. When substituting
-these models, append the flags recorded in their diagnostics blocks:
-`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit` (--enable-thinking
---thinking-budget 800).
-
 ### Highlighted model revisions
 
-| Model                                            | Resolved revision                        |
-|--------------------------------------------------|------------------------------------------|
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
-| mlx-community/Qwen2-VL-7B-Instruct-4bit          | 1c638e970be36948e087e77d103b9147e1a9a1dd |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | 846ea5576854468f25af3767d769b0805b1b08b6 |
-| mlx-community/Molmo2-8B-4bit                     | 4fcbe926577641af12aa5086cf5c292db9dd9730 |
-| mlx-community/X-Reasoner-7B-8bit                 | 21732e74613b465bc98e9d5ec210aba5c7adbcc1 |
-| mlx-community/llm-jp-4-vl-9b-mlx-4bit            | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
-| mlx-community/Muse-Glimmer-30B-OptiQ-4bit        | 98377360cbc84f982e90336f956b08adb46cad88 |
-| mlx-community/MiniCPM-V-4.6-4bit                 | 86cd463d33a946e4481b77e3c10fc63121b60a19 |
+| Model                                        | Resolved revision                        |
+|----------------------------------------------|------------------------------------------|
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit | e5abbe34cbfabd829fafd0362856e5b468d19f85 |
+| mlx-community/llm-jp-4-vl-9b-mlx-4bit        | 9c056d48b1e611dc586139a5deb927ae363cfe6f |
+| mlx-community/Muse-Glimmer-30B-OptiQ-4bit    | 98377360cbc84f982e90336f956b08adb46cad88 |
 
 ### Components and system
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.3                                                                                                                                           |
-| mlx-vlm source revision    | e6bf06faa0dda2598df9cd5fb6f2f204c4415b4f                                                                                                        |
-| mlx                        | 0.32.3.dev20260926+a2a09fd56                                                                                                                    |
-| mlx source revision        | a2a09fd56                                                                                                                                       |
+| mlx-vlm source revision    | 967bf90b8e7ae6e5110b6da87134f30d94591d2e                                                                                                        |
+| mlx                        | 0.32.3.dev20260927+09e67c686                                                                                                                    |
+| mlx source revision        | 09e67c686                                                                                                                                       |
 | mlx-audio                  | 0.5.6                                                                                                                                           |
 | transformers               | 5.17.0                                                                                                                                          |
 | tokenizers                 | 0.23.2                                                                                                                                          |
@@ -807,6 +513,6 @@ these models, append the flags recorded in their diagnostics blocks:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-314-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (192,396,832 bytes, sha256=7f1bfc850ac0ab7e9a1af5b48f253c65a7717834f569a6df483b1e422c0318b9) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,851,232 bytes, sha256=412d8415db62d18e8c280ae19a5159fb6847fb9fa4d4939c2ac76a4c069c0508)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (22,851,232 bytes, sha256=cb5c5797fac0cf2d32a5828de933ccd58b4be33a113209a2750140e1f1406447)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 <!-- markdownlint-enable MD004 MD037 -->

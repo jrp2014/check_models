@@ -1,11 +1,11 @@
 # Model Output Gallery
 
-Generated on: 2026-09-27 01:01:54 BST
+Generated on: 2026-09-27 21:23:48 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
 - *Assessment:* General checks + metadata fields and duplicate keywords; length limits and factual accuracy not assessed
-- *Input image:* JPEG, 9,984 x 6,656 pixels (66.5 MP), 49.4 MB
+- *Input image:* JPEG, 9,805 x 6,538 pixels (64.1 MP), 54.2 MB
 
 This run records model responses to one shared image and prompt (evaluation
 lane: assisted). Mechanical checks are not factual-accuracy judgments; inspect
@@ -18,7 +18,7 @@ model.
 
 ## Reference Image
 
-![Reference image](assets/source-image-b32a199300908fe5.jpg)
+![Reference image](assets/source-image-6b2dcf5e8c73798e.jpg)
 
 ## Current-run Chooser
 
@@ -26,65 +26,65 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.17s   | 478 tok/s  | 0.62            | 1.9     | 2,119      | 141     | none                                                                                                                     |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | 10.72s  | 29.3 tok/s | 3.69            | 23      | 2,394      | 123     | none                                                                                                                     |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 9.63s   | 73.9 tok/s | 5.72            | 8.7     | 6,454      | 139     | none                                                                                                                     |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | 36.86s  | 39.9 tok/s | 19.85           | 78      | 6,454      | 142     | none                                                                                                                     |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.24s   | 54.1 tok/s | 2.22            | 10      | 2,115      | 116     | none                                                                                                                     |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 7.03s   | 33.9 tok/s | 1.61            | 17      | 2,115      | 103     | none                                                                                                                     |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 16.43s  | 60.9 tok/s | 1.41            | 20      | 1,331      | 729     | none                                                                                                                     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | 3.59s   | 205 tok/s  | 1.15            | 4.0     | 2,111      | 110     | none                                                                                                                     |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.49s   | 104 tok/s  | 0.74            | 7.0     | 393        | 114     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.31s   | 65.3 tok/s | 2.66            | 13      | 2,927      | 160     | none                                                                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 4.10s   | 187 tok/s  | 1.58            | 7.8     | 2,926      | 152     | none                                                                                                                     |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.61s   | 156 tok/s  | 2.89            | 3.9     | 4,085      | 112     | none                                                                                                                     |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.89s   | 72.8 tok/s | 1.34            | 24      | 1,291      | 151     | none                                                                                                                     |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 5.02s   | 52.1 tok/s | 0.87            | 9.3     | 1,141      | 136     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 30.62s  | 82.8 tok/s | 17.73           | 8.4     | 16,551     | 918     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 42.88s  | 73.3 tok/s | 38.07           | 23      | 16,549     | 128     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 75.17s  | 19.6 tok/s | 62.94           | 26      | 16,549     | 181     | none                                                                                                                     |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 40.87s  | 68.7 tok/s | 37.41           | 11      | 16,549     | 104     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 39.80s  | 70.8 tok/s | 34.48           | 25      | 16,565     | 111     | none                                                                                                                     |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 41.11s  | 85.3 tok/s | 36.68           | 11      | 16,565     | 142     | none                                                                                                                     |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 68.66s  | 26.9 tok/s | 60.20           | 21      | 16,565     | 144     | none                                                                                                                     |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | 3.19s   | 126 tok/s  | 1.11            | 5.6     | 1,433      | 78      | none                                                                                                                     |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | 45.94s  | 47.7 tok/s | 26.28           | 92      | 3,494      | 147     | none                                                                                                                     |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 4.86s   | 98.7 tok/s | 1.63            | 6.5     | 2,089      | 112     | none                                                                                                                     |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 7.15s   | 44.0 tok/s | 3.06            | 28      | 592        | 85      | none                                                                                                                     |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 10.39s  | 30.0 tok/s | 1.51            | 17      | 591        | 175     | none                                                                                                                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.49s   | 101 tok/s  | 1.04            | 16      | 596        | 130     | none                                                                                                                     |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.58s   | 22.2 tok/s | 1.97            | 20      | 596        | 89      | none                                                                                                                     |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | 4.17s   | 111 tok/s  | 0.85            | 5.9     | 592        | 94      | none                                                                                                                     |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.27s   | 169 tok/s  | 1.21            | 4.7     | 1,383      | 99      | none                                                                                                                     |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 8.06s   | 38.4 tok/s | 2.68            | 16      | 3,117      | 114     | none                                                                                                                     |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.87s   | 126 tok/s  | 2.20            | 5.4     | 4,212      | 130     | none                                                                                                                     |
-| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 39.08s  | 84.4 tok/s | 34.20           | 11      | 16,562     | 220     | none                                                                                                                     |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.26s   | 36.1 tok/s | 1.97            | 18      | 1,273      | 134     | none                                                                                                                     |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.99s   | 131 tok/s  | 5.79            | 23      | 3,628      | 144     | none                                                                                                                     |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 9.68s   | 33.8 tok/s | 1.91            | 18      | 2,619      | 164     | duplicate keywords                                                                                                       |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`    | 5.25s   | 60.0 tok/s | 0.97            | 7.6     | 596        | 108     | duplicate keywords                                                                                                       |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns`       | 8.05s   | 97.4 tok/s | 1.41            | 19      | 1,639      | 425     | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.15s   | 297 tok/s  | 1.21            | 2.2     | 336        | 51      | labelled fields not detected                                                                                             |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 58.17s  | 18.6 tok/s | 2.17            | 15      | 308        | 1,000   | repeated text; cut off at token limit; duplicate keywords                                                                |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | 2.98s   | 221 tok/s  | 0.96            | 3.3     | 934        | 84      | incomplete thinking block                                                                                                |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `major concerns`       | 6.47s   | 71.0 tok/s | 1.40            | 8.2     | 1,526      | 225     | stopped early: repeating; duplicate keywords                                                                             |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 58.65s  | 22.5 tok/s | 10.29           | 25      | 4,409      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `major concerns`       | 46.05s  | 84.0 tok/s | 41.54           | 9.3     | 16,560     | 225     | repeated text; stopped early: repeating; duplicate keywords                                                              |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.31s   | 308 tok/s  | 0.96            | 1.1     | 1,212      | 38      | labelled fields not detected                                                                                             |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 22.07s  | 55.4 tok/s | 14.85           | 14      | 16,560     | 250     | stopped early: repeating; duplicate keywords                                                                             |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 5.99s   | 70.0 tok/s | 0.88            | 7.2     | 590        | 196     | labelled fields not detected                                                                                             |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 4.98s   | 145 tok/s  | 2.99            | 4.2     | 5,581      | 102     | labelled fields not detected                                                                                             |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.57s   | 107 tok/s  | 1.51            | 6.7     | 2,197      | 16      | control tokens visible; labelled fields not detected                                                                     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 1.94s   | 196 tok/s  | 0.69            | 1.6     | 332        | 21      | labelled fields not detected                                                                                             |
+| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                       |
+|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | 8.19s   | 118 tok/s  | 1.39            | 19      | 1,646      | 540     | none                                                                                                               |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 5.70s   | 55.7 tok/s | 2.06            | 10      | 2,120      | 103     | none                                                                                                               |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 6.08s   | 36.1 tok/s | 1.51            | 17      | 2,120      | 79      | none                                                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | 9.62s   | 21.5 tok/s | 2.11            | 15      | 309        | 114     | none                                                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | 4.52s   | 295 tok/s  | 0.96            | 3.3     | 938        | 564     | none                                                                                                               |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.24s   | 106 tok/s  | 0.78            | 7.0     | 398        | 93      | none                                                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.73s   | 64.9 tok/s | 2.73            | 13      | 2,935      | 199     | none                                                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 3.93s   | 187 tok/s  | 1.62            | 7.8     | 2,934      | 121     | none                                                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | 5.78s   | 72.2 tok/s | 1.46            | 8.5     | 1,531      | 181     | none                                                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.07s   | 210 tok/s  | 2.71            | 3.9     | 4,091      | 108     | none                                                                                                               |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 5.85s   | 99.0 tok/s | 1.28            | 24      | 1,295      | 130     | none                                                                                                               |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 27.77s  | 89.2 tok/s | 15.94           | 8.4     | 16,556     | 901     | none                                                                                                               |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 42.73s  | 83.7 tok/s | 37.80           | 23      | 16,554     | 168     | none                                                                                                               |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 74.51s  | 21.0 tok/s | 62.50           | 26      | 16,554     | 190     | none                                                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 42.92s  | 70.7 tok/s | 39.34           | 11      | 16,554     | 120     | none                                                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 41.27s  | 105 tok/s  | 36.54           | 25      | 16,569     | 123     | none                                                                                                               |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 42.30s  | 90.6 tok/s | 38.66           | 11      | 16,569     | 111     | none                                                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 55.64s  | 29.4 tok/s | 48.19           | 21      | 16,569     | 128     | none                                                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 5.07s   | 101 tok/s  | 1.62            | 6.5     | 2,098      | 143     | none                                                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 6.65s   | 55.0 tok/s | 2.71            | 28      | 597        | 81      | none                                                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | 5.25s   | 61.2 tok/s | 1.02            | 7.6     | 601        | 112     | none                                                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.12s   | 112 tok/s  | 1.11            | 16      | 601        | 106     | none                                                                                                               |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 10.59s  | 23.8 tok/s | 2.10            | 20      | 601        | 113     | none                                                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.76s   | 169 tok/s  | 1.41            | 4.6     | 1,384      | 91      | none                                                                                                               |
+| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 36.32s  | 84.0 tok/s | 32.42           | 11      | 16,566     | 123     | none                                                                                                               |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.51s   | 36.4 tok/s | 2.00            | 18      | 1,281      | 144     | none                                                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.54s   | 144 tok/s  | 5.72            | 23      | 3,636      | 120     | none                                                                                                               |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | 2.14s   | 486 tok/s  | 0.63            | 1.9     | 2,123      | 96      | duplicate keywords; prompt hint repeated                                                                           |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | 10.05s  | 30.5 tok/s | 3.52            | 23      | 2,402      | 119     | prompt hint repeated                                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | 8.62s   | 75.9 tok/s | 5.61            | 8.7     | 6,393      | 83      | prompt hint repeated                                                                                               |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | 32.92s  | 41.8 tok/s | 18.23           | 78      | 6,393      | 117     | prompt hint repeated                                                                                               |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 7.12s   | 34.3 tok/s | 1.85            | 18      | 2,620      | 89      | prompt hint repeated                                                                                               |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | 3.98s   | 58.6 tok/s | 0.85            | 9.3     | 1,144      | 98      | prompt hint repeated                                                                                               |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `concerns detected`    | 47.93s  | 91.8 tok/s | 45.04           | 9.3     | 16,565     | 107     | prompt hint repeated                                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | 3.47s   | 129 tok/s  | 1.15            | 5.6     | 1,438      | 118     | prompt hint repeated                                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | 39.24s  | 51.3 tok/s | 21.72           | 92      | 3,498      | 111     | prompt hint repeated                                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | 19.11s  | 57.4 tok/s | 13.18           | 14      | 16,565     | 215     | duplicate keywords                                                                                                 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `concerns detected`    | 8.57s   | 30.8 tok/s | 1.54            | 17      | 596        | 127     | unsupplied place name                                                                                              |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | 5.07s   | 103 tok/s  | 1.02            | 5.9     | 597        | 93      | duplicate keywords                                                                                                 |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | 7.91s   | 39.5 tok/s | 2.63            | 16      | 3,125      | 119     | prompt hint repeated                                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | 4.84s   | 125 tok/s  | 2.25            | 5.4     | 4,217      | 118     | prompt hint repeated                                                                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 2.95s   | 359 tok/s  | 1.17            | 2.2     | 341        | 38      | labelled fields not detected                                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | 20.29s  | 63.2 tok/s | 1.42            | 20      | 1,331      | 1,000   | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `major concerns`       | 3.56s   | 203 tok/s  | 1.21            | 4.0     | 2,115      | 122     | labelled fields not detected                                                                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 53.48s  | 24.1 tok/s | 8.14            | 25      | 4,410      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.31s   | 524 tok/s  | 1.04            | 1.1     | 1,217      | 39      | labelled fields not detected                                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 4.46s   | 85.0 tok/s | 0.91            | 7.2     | 595        | 114     | labelled fields not detected                                                                                       |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 5.33s   | 129 tok/s  | 3.33            | 4.4     | 5,666      | 82      | labelled fields not detected                                                                                       |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.56s   | 107 tok/s  | 1.53            | 6.7     | 2,201      | 18      | control tokens visible; labelled fields not detected                                                               |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 1.94s   | 335 tok/s  | 0.72            | 1.8     | 337        | 23      | labelled fields not detected                                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.17s
+Quickest completion without detected concerns (end-to-end, including model load): `mlx-community/MiniCPM-o-4_5-4bit` at 3.24s
 
-Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
+Lowest peak memory among completions without detected concerns: `mlx-community/MiniCPM-V-4.6-4bit` at 3.3 GB
 
 Decode tok/s stays per model in the chooser and is not averaged across models: tokenizers, image-token expansion and reasoning lengths differ too much for a cross-model mean to guide a choice.
 
@@ -92,21 +92,17 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Mechanical checks | Observations                                                                                                             |
-|--------------------------------------------------------------------------------------------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | `major concerns`  | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                                             |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                                                |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                                                |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                        | `major concerns`  | stopped early: repeating; duplicate keywords                                                                             |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                  | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                                              |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                                             |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | stopped early: repeating; duplicate keywords                                                                             |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                                             |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected                                                                                             |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                                                     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | labelled fields not detected                                                                                             |
+| Model                                                                                                 | Mechanical checks | Observations                                                                                                       |
+|-------------------------------------------------------------------------------------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                            | `major concerns`  | labelled fields not detected                                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit) | `major concerns`  | repeated text; labelled fields not detected; cut off at token limit; incomplete thinking block; duplicate keywords |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                | `major concerns`  | labelled fields not detected                                                                                       |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)       | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible                  |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)         | `major concerns`  | labelled fields not detected                                                                                       |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                     | `major concerns`  | labelled fields not detected                                                                                       |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)        | `major concerns`  | labelled fields not detected                                                                                       |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)               | `major concerns`  | control tokens visible; labelled fields not detected                                                               |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                          | `major concerns`  | labelled fields not detected                                                                                       |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -115,64 +111,64 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                            |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | Title: Sailboats on a River \| Description: Two sailboats glide across a calm river, surrounded by dense green forest and a partly cloudy sky. The sailboat on t... \| Keywords (15): Boat, Boating, Catamaran, Sailboat, Sailing, Life jacket, Man, Sail, Sails, Water, Forest, Sky, Trees, River, ...                                                                                   |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | Title: Two sailors on a catamaran and dinghy \| Description: Two sailors navigate a catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) on calm waters,... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | Title: Two Sailors on Dinghies \| Description: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number... \| Keywords (19): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | Title: Two Sailors in Vortex and Laser Dinghies on Calm Waters \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Sailing Dinghies on Calm Waters \| Description: Two sailors navigate small dinghies, a Vortex catamaran (1067) and a Laser dinghy (GBR 188572), on calm waters with a... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Sailing on Calm Waters with Catamaran and Laser Dinghy \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm waters near a fo... \| Keywords (17): Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, Life jacket, Outdoor recreation, River, ...                                                                                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline \| Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (... \| Keywords (19): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...[2,349 characters of reasoning omitted; complete output in the evidence block]     |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | Title: Sailors race dinghies across calm waters. \| Description: Two sailors compete in a Vortex catamaran and Laser dinghy against a backdrop of dense green woodland. The s... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Sailboats on Calm Water near Green Woodland \| Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, with dense fo... \| Keywords (17): Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 1067, Sail number 188572, Life jacket, ...                                                                                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **Sailing Dinghies in Coastal Waters – Vortex and Laser** \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy... \| Keywords (16): Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring, outdoor recreation, sailing, ...                                                                                    |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Coastal Sailing Adventure with Catamaran and Laser Dinghy \| Description: Two sailors navigate small boats—one a Vortex catamaran (sail number 1067) and... \| Keywords (19): Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                    |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Sailboats on Calm Waters \| Description: Two sailors navigate small dinghies across tranquil waters, one steering a Vortex catamaran (sail number 1067) and the other... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                    |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Two Sailboats Racing on Calm Waters \| Description: On 19 September 2026, an orange Vortex catamaran (sail number 1067) helmed by a sailor in a blue jacket a... \| Keywords (19): Sailing, Sailboat, Catamaran, Dinghy, Laser, Man, Sailor, Life jacket, Mast, Boat, Water, River, Estuary, ...                                                                                   |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | Title: Sailors on Dinghies in Coastal Waters \| Description: On September 19, 2026, two sailors navigate their respective dinghies, a Vortex catamaran and a Laser dinghy,... \| Keywords (18): Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Trees, Water, Clouds, Man, Mast, ...                                                                                   |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | Title: Sailors Steering Vortex &amp; Laser Dinghies on Calm Water \| Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river wat... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...[2,719 characters of reasoning omitted; complete output in the evidence block] |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Two sailboats racing on calm water \| Description: Two sailors compete in a race on small dinghies—a Vortex catamaran (number 1067) and a Laser dinghy (num... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | Title: Sailors in Vortex Catamaran and Laser Dinghy on Calm Water \| Description: On 2026-09-19, two sailors navigate small dinghies on calm waters: a Vortex catam... \| Keywords (24): Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR, 1067, 188572, Sailor, Water, River, ...                                                                                   |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Sailors race dinghies on calm water \| Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, framed by dense green fore... \| Keywords (18): Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Shoreline, Sky, Clouds, Man, Sailor, ...                                                                                   |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Vortex Catamaran and Laser Sailing on Water \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm river waters on 19 Septe... \| Keywords (16): Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline, dense green woodland, partly cloudy sky, ...                                                                                   |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | Title: Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters \| Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dingh... \| Keywords (21): Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, ...                                                                                   |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Two sailors racing Vortex and Laser dinghies on calm waters \| Description: A Vortex catamaran with sail number 1067 on the left and a Laser dinghy with sail n... \| Keywords (15): Vortex, Laser, catamaran, dinghy, sailing, sailors, estuary, woodland, boats, water, masts, GBR 188572, ...                                                                                   |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | Title: Sailing on the River \| Description: Two sailors are sailing their boats across the river. \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                                                                                                  |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | Title: Two sailors on dinghies across calm waters \| Description: On 19 September 2026 at 17:12 UTC+1, two sailors steer small dinghies across calm coastal or river... \| Keywords (18): Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boating, Water, River, Estuary, ...                                                                                   |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Sailing Adventure on the River \| Description: Two sailors navigate their boats across a serene river, with one in a Vortex catamaran and the other in a Laser dinghy, bot... \| Keywords (16): Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, Mast, Life jacket, Man, ...                                                                                   |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Two Sailors Sailing Dinghies on Calm Water \| Description: Two sailors steer a grey Vortex catamaran and a white Laser dinghy across calm waters agains... \| Keywords (15): Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, River, Outdoor Recreation, Boating, Estuary, ...                                                                                   |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | Title: Sailing Dinghies on Calm Water, September 2026 \| Description: Captured on 19th September 2026, this image shows a Vortex catamaran (sail number 1067) and a Laser din... \| Keywords (27): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Two sailors steering small boats across calm water \| Description: Two sailors navigate small boats across calm waters against a backdrop of dense green wo... \| Keywords (18): Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                   |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: Two Sailors Steering Dinghies on Calm Water \| Description: A Vortex catamaran and a Laser dinghy sail across calm waters against a backdrop of dense green woodland u... \| Keywords (19): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | Title: Two Dinghies Sail on Calm Woodland Water \| Description: Two small dinghies navigate placid waters beneath a backdrop of dense green woodland under partly... \| Keywords (15): Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboat, Water, Outdoor, Recreation, Trees, ...                                                                                    |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Sailors in Dinghies on a Calm Day" \| Description: Two sailors navigate their dinghies, a Vortex catamaran and a Laser dinghy, across a serene body of water wi... \| Keywords (13): Sailors, Dinghies, Vortex catamaran, Laser dinghy, Water, Trees, Coastline, Sailing, Life jacket, Man, ...                                                                                   |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | Title: Sailors Navigate Calm Waters in Dinghies \| Description: Two sailors steer small dinghies—a Vortex catamaran and a Laser dinghy—across calm waters with dense green wo... \| Keywords (21): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | Title: Two Sailboats Glide Across Calm Waters Amidst Lush Forest \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number G... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | Title: Two Sailors Steering Vortex Catamaran and Laser Dinghy on Calm River \| Description: Two sailors steer small dinghies across calm, rippled river water: a wh... \| Keywords (16): Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Sailors, Life jackets, ...                                                                                   |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Sailors Navigate Calm Waters in Dinghies \| Description: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) and a Laser dinghy (sai... \| Keywords (18): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Mast, Outdoor recreation, ...                                                                                   |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Two Sailors Compete in Dinghy Race \| Description: On a calm body of water under a partly cloudy sky, a sailor in a blue life jacket steers a Vortex catamaran with sa... \| Keywords (20): Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, ...                                                                                   |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | Title: Laser and Vortex catamaran sailboats on a river with trees. \| Description: Two sailboats, a Laser dinghy with sail number GBR 188572 and a Vortex catam... \| Keywords (12): Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail number GBR 188572, sail number 1067, sailors, ...                                                                                   |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`    | Title: Two Sailors Steering Small Dinghies on Calm Water \| Description: Two sailors navigate a Vortex catamaran and a Laser dinghy across calm water against a back... \| Keywords (19): Boat, Boating, Catamaran, Sailing, Sailor, Laser dinghy, Water, River, Estuary, Forest, Trees, Shoreline, ...                                                                                   |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns`       | Alright, let's get this done. I need to create some metadata for this image, and it's my job to be precise.<br><br>First, I need to figure out a good title. "Sailboats on the Water" is too generic. "Two Sailors on Dinghies" is better, but I want something more specific. "Sailors on...                                                                                             |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene scene of two sailors navigating calm waters in a Vortex catamaran and Laser dinghy, set against a backdrop of dense green woodland, under a clear sky, with a sailboat and a man in a life jacket in the distance.                                                                                                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | Title: Two Sailors Navigate Calm Waters in a Forested Estuary \| Description: On a sunny day in September 2026, two sailors, one in a Vortex catamaran and the o... \| Keywords (343): Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser, GBR, 1067, 188572, Sail, Boat, Water, ...                                                                                   |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | Title: Sailing vessels on calm waters \| Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest... \| Keywords (12): boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation                                                                                    |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `major concerns`       | Title: Catamaran and Laser Dinghy Sail on Calm River \| Description: Two sailors navigate small dinghies across a tranquil river, with a Vortex catamaran on the... \| Keywords (52): Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, ...                                                                                    |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (1): Need British English.                                                                                                                                                                                                                                                                                               |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `major concerns`       | Title: Sailing Adventure \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm waters,... \| Keywords (67): Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, Forest, Woodland, Adventure, Outdoor, ...                                                                                   |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A 5-10-word, 1-2-sentence, factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.                                                                                                                                                                                                                              |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | Title: Sailing Catamaran and Laser Dinghy on Calm Waters \| Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 18857... \| Keywords (39): Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Calm waters, ...                                                                                   |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | Two sailors are engaged in a sailing competition on a calm body of water, likely an estuary or a sheltered bay, surrounded by lush green vegetation. On the left, a vibrant orange and white catamaran, identified by the sail number 1067 and the name "VORTEX," is being steered by...                                                                                                  |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Harmony on the Water" \| Description: Two sailors navigate their small dinghies, a Vortex catamaran and a Laser dinghy, across calm waters, with a dense green woodland backdrop. The scene is set in an estuary, with a clear sky overhead. The sailors are equ... \| Keywords: (not detected)                                                                                   |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows two small sailboats racing on a river.                                                                                                                                                                                                                                                                                                |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | "Boating in the Countryside: A Glimpse of Sailboats and Forests"                                                                                                                                                                                                                                                                                                                          |
+| Model                                                                                                                               | Mechanical checks      | Output preview                                                                                                                                                                                                                                                                                                                                                                        |
+|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `no concerns detected` | Title: Blue and light blue motor cabin cruiser at a UK marina \| Description: On September 26th, 2026, a blue and light blue motor cabin cruiser with a tan canop... \| Keywords (15): Blue and light blue motor cabin cruiser, tan canopy, calm water, marina, reflection, UK, yacht, boat fender, ...[1,523 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | Title: Blue Cabin Cruiser at Marina \| Description: A blue cabin cruiser with a tan canopy is moored at a marina dock, surrounded by sailboats and leisure boats on c... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | Title: Blue Cabin Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in calm water... \| Keywords (13): Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, ...                                                                               |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `no concerns detected` | Title: Blue and Tan Motor Cabin Cruiser at Marina Dock \| Description: A blue and tan motor cabin cruiser is moored at a marina dock on a calm day, with the ear... \| Keywords (10): Motor cabin cruiser, Marina dock, Calm water, Early evening, Tan canopy, Blue hull, Sailboats, Leisure boats, ...                                                                               |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `no concerns detected` | Title: Blue Cabin Cruiser Moored Calm Harbor \| Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water surrounded by other s... \| Keywords (17): boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, ...[1,844 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | Title: Blue Motor Cabin Cruiser at Calm Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in... \| Keywords (16): Boat, Cabin cruiser, Canopy, Dock, Marina, Motorboat, Reflection, Sailboat, Water, Blue hull, Tan canopy, ...                                                                               |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | Title: **"Classic Cabin Cruiser at Sunset Marina – Calm Water Reflections"** \| Description: A well-maintained **blue and light blue motor cabin cruiser** with a tan ca... \| Keywords (20): Boat, cabin cruiser, marina, moored vessel, calm water, reflections, early evening light, tan canopy, ...                                                                               |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | Title: Evening Marina Mooring: Blue Cabin Cruiser Reflection \| Description: A blue and light-blue motor cabin cruiser with tan canopy is securely moored at a dock... \| Keywords (13): blue motor cabin cruiser, marina dock, calm water reflections, tan boat canopy, sailboats, leisure yachts, ...                                                                               |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `no concerns detected` | Title: Blue Cabin Cruiser Moored at Calm Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrou... \| Keywords (36): Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, ...                                                                               |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | Title: Blue and Tan Boat at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock. The boat is surr... \| Keywords (19): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mooring, Motorboat, ...                                                                               |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | Title: Blue and Cream Motor Cabin Cruiser Moored at Marina \| Description: A blue-hulled motor cabin cruiser with cream cabin trim and a tan canvas canopy, christened... \| Keywords (18): Motorboat, Cabin cruiser, Marina, Sailboat, Dock, Water reflection, Boat fender, Boat canopy, Mooring, ...                                                                                |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | Title: Blue Cabin Cruiser at Marina \| Description: A blue and light blue cabin cruiser named "EVENHAZE" with tan canopy moored at a marina dock under early even... \| Keywords (16): Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy, Fender, ...[3,130 characters of reasoning omitted; complete output in the evidence block] |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | Title: Blue Cabin Cruiser Moored at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a wooden dock in a marina, surrou... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | Title: Blue Cabin Cruiser Moored at Marina Dock \| Description: A blue and light blue cabin cruiser named "EVENHAZE" with a tan canopy is moored at a wooden dock in a... \| Keywords (18): Cabin cruiser, Marina, Dock, Mooring, Sailboat, Motorboat, Watercraft, Yacht, Boat canopy, Boat fender, ...                                                                               |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | Title: Blue Cabin Cruiser Moored at Sunset Marina \| Description: A blue and light blue cabin cruiser named 'Evenhaze' with tan canopy is moored at a marina dock durin... \| Keywords (18): cabin cruiser, boat canopy, fender, marina, dock, sailboat, motorboat, calm water, reflection, harbor, ...                                                                               |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | Title: Blue and tan motor cruiser moored at marina \| Description: This blue and tan motor cabin cruiser named 'Evenhaze' is moored at a wooden marina dock on c... \| Keywords (19): Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, ...                                                                               |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | Title: Evenhaze Cabin Cruiser Moored at Marina Dock \| Description: The blue and light blue cabin cruiser named Evenhaze, with a tan canvas canopy, is moored at... \| Keywords (15): Evenhaze, cabin cruiser, tan canopy, marina, dock, sailboats, leisure craft, evening light, water reflection, ...                                                                               |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | Title: Blue motor cruiser moored at a Cornish marina \| Description: The "Evenhaze," a blue motor cabin cruiser with a tan cabin canopy, is moored alongside a weather... \| Keywords (16): Blue motor cruiser, Cornish harbour, Evenhaze, Marina, Moored boat, Tan canopy, Wooden dock, Sailboats, ...                                                                               |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | Title: Blue Motorboat at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sail... \| Keywords (17): Motorboat, Marina, Calm Water, Reflective Surface, Evening Light, Blue Hull, White Trim, Red Keel, Sailboats, ...                                                                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | Title: Blue and Light Blue Motor Cabin Cruiser Moored at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina d... \| Keywords (14): Boat, cabin cruiser, motorboat, marina, dock, harbor, reflection, water, nautical, mooring, fender, yacht, ...                                                                               |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `no concerns detected` | Title: Blue Motor Cabin Cruiser Moored at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a dock, surrounded by oth... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | Title: Blue motor cabin cruiser moored at a marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy sits moored at a dock alongside vari... \| Keywords (17): Blue motorboat, boat canopy, boat fender, boating, cabin cruiser, calm water, dock, harbour, marina, mast, ...                                                                               |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | Title: Blue Motor Cabin Cruiser Moored at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 Septe... \| Keywords (17): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | Title: "Marina Calm: Blue Motor Cabin Cruiser" \| Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other... \| Keywords (10): Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Evening light, ...                                                                               |
+| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | Title: Blue and Light Blue Canopy Cruiser Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canvas canopy is moored alongs... \| Keywords (15): motor cabin cruiser, blue hull, light blue paint, tan canvas canopy, marina dock, moored boat, calm water, ...                                                                               |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | Title: Blue Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 September 2026, alo... \| Keywords (18): Boat, Cabin cruiser, Marina, Dock, Calm water, Reflection, Tan canopy, Sailboats, Leisure boats, Mooring, ...                                                                               |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | Title: Evenhaze Motor Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser named "Evenhaze," featuring a tan canopy, is moored at a wooden d... \| Keywords (16): Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Motorboat, Nautical, ...                                                                               |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `concerns detected`    | Title: Boat Docking at a Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats a... \| Keywords (14): Boat, Boat, Cabin, Cruiser, Dock, Marina, Reflection, Sailboat, Sailing, Water, Reflection, Rope, Sailboat, ...                                                                               |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock along... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `concerns detected`    | Title: Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by other sailbo... \| Keywords (9): Boat, Cabin cruiser, Marina, Motorboat, Reflection, Tan canopy, Watercraft, Blue motorboat, Calm water                                                                               |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `concerns detected`    | Title: Blue and light blue motor cruiser with tan canopy at marina dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a ma... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser at Marina Dock. \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock al... \| Keywords (10): blue, light blue, motor cabin cruiser, tan canopy, marina dock, sailboats, leisure boats, calm water, ...                                                                               |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `concerns detected`    | Title: "Evening Reflections on a Calm Harbor" \| Description: A blue and light blue motorboat with a tan canopy is moored at a marina dock, surrounded by other sailboats and lei... \| Keywords (10): boat, motorboat, canopy, marina, dock, sailboat, calm water, reflection, early evening, nautical                                                                               |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `concerns detected`    | Title: Blue Motor Cabin Cruiser at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboa... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser Moored at Marina \| Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock a... \| Keywords (19): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `concerns detected`    | Title: Blue cabin cruiser moored at marina dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside othe... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `concerns detected`    | Title: Blue Cabin Cruiser at Marina Dock \| Description: A blue and light blue motor cabin cruiser named "Evenhaze" is moored at a marina dock, surrounded by sailboats... \| Keywords (33): Blue cabin cruiser, Evenhaze, marina dock, sailboats, leisure boats, calm water, early evening light, ...                                                                                |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `concerns detected`    | Title: Blue Cabin Cruiser Moored at Plymouth Marina \| Description: A blue and light blue cabin cruiser with a tan canopy is moored at a marina dock in Plymouth,... \| Keywords (18): Boat, Cabin cruiser, Motorboat, Mooring, Marina, Dock, Sailboat, Yacht, Watercraft, Reflection, Calm Water, ...                                                                                |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `concerns detected`    | Title: Blue Motor Cabin Cruiser Moored at Calm Marina Dock \| Description: A blue and light blue motor cabin cruiser is gently moored alongside a marina dock, refle... \| Keywords (15): Motorboat, Cabin Cruiser, Marina, Dock, Mooring, Boat, Watercraft, Reflection, Sailboat, Yacht, Nautical, ...                                                                               |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `concerns detected`    | Title: Blue Cabin Cruiser Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `concerns detected`    | Title: Blue and Light Blue Motor Cabin Cruiser with Tan Canopy Moored at Marina Dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is m... \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                               |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | A serene marina scene featuring a blue and light blue motor cabin cruiser moored alongside other sailboats and leisure boats on calm water, with a clear reflection in the early evening light.                                                                                                                                                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `major concerns`       | Title: (not detected) \| Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinct... \| Keywords (100): Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, ...                                                                               |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `major concerns`       | Title: Blue and white motor cabin cruiser at marina dock \| Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evenin... \| Keywords: (not detected)                                                                               |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | Title: (not detected) \| Description: (not detected) \| Keywords (20): We need title 5-10 words. Concrete., ...                                                                                                                                                                                                                                                                       |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | A 5-10-word, 1-2-sentence, factual description, combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.                                                                                                                                                                                                                         |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is positioned in the foreground, with its reflection clearly visible on t...                                                                                              |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Tranquil Marina Reflections" \| Description: (not detected) \| Keywords (20): Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, ...                                                                                                                                                                                    |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows a blue and white boat with a tan colored canopy.                                                                                                                                                                                                                                                                                  |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | "Boat in a Marina at a Dock with a Motorboat and Canopy in the Early Evening Light"                                                                                                                                                                                                                                                                                                   |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
 
 - `mlx-vlm`: `0.7.3`
-- `mlx`: `0.32.3.dev20260926+a2a09fd56`
+- `mlx`: `0.32.3.dev20260927+09e67c686`
 - `transformers`: `5.17.0`
 - `tokenizers`: `0.23.2`
 - `huggingface-hub`: `1.33.0`
@@ -188,20 +184,19 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 ## Image Metadata
 
-- *Description:* Two sailors steer small dinghies—a Vortex catamaran (sail
-  number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the
-  right—across calm coastal or river waters against a backdrop of dense green
-  woodland.
-- *Keywords:* Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser
-  dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat,
-  Sailing, Sailor, Shoreline, Sky, Trees, Water, Water sports, Yacht, active
-  lifestyle, adventure, aquatic sports, boat race, buoyancy aid, calm water,
-  coastal, competition, daytime, hobby, lake, leisure, maritime, nature,
-  navigation, outdoor, recreation, regatta, rigging, sail, sailing boat,
-  scenic, single-handed, skiff, sport, summer, vessel, water sport,
-  watercraft, watersport, yachting
-- *Date:* 2026-09-19 17:12:46 UTC+01:00
-- *Time:* 17:12:46
+- *Description:* A blue and light blue motor cabin cruiser with a tan canopy
+  moored at a marina dock alongside other sailboats and leisure boats on calm
+  water, casting clear reflections in the early evening light.
+- *Keywords:* Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm
+  Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection,
+  Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht, blue boat,
+  boatyard, coastal, cruiser, daytime, harbour, holiday, jetty, leisure,
+  marine, maritime, moored, motor cruiser, navigation, outdoor, pier, pontoon,
+  port, quay, recreation, sea, seaside, summer, sunny, transportation, travel,
+  vacation, vessel, vintage boat, water, waterfront, yachting
+- *Date:* 2026-09-26 17:36:29 UTC+01:00
+- *Time:* 17:36:29
+- *GPS:* 50.682100°N, 3.466600°W
 
 ## Prompt
 
@@ -217,16 +212,16 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 > details.
 >
 > Context: Authoritative context:
-> &#45; Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+> &#45; Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+> &#45; GPS: 50.682100°N, 3.466600°W
 >
 > &#8203;Descriptive hints:
-> &#45; Description hint: Two sailors steer small dinghies—a Vortex catamaran
-> (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572)
-> on the right—across calm coastal or river waters against a backdrop of dense
-> green woodland.
-> &#45; Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest,
-> Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat,
-> Sailing, Sailor, Shoreline, Sky, Trees, Water
+> &#45; Description hint: A blue and light blue motor cabin cruiser with a tan
+> canopy moored at a marina dock alongside other sailboats and leisure boats
+> on calm water, casting clear reflections in the early evening light.
+> &#45; Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser,
+> Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical,
+> Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 >
 > &#8203;Write:
 > &#45; a concrete 5-10-word title;
@@ -245,12 +240,12 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 
 Complete generated or crash evidence for every attempted model.
 
-<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
 
-### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
 
 <details>
-<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -258,223 +253,79 @@ Complete generated or crash evidence for every attempted model.
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.35s
-- *Generation time:* 0.92s
-- *Total time:* 2.17s
-- *Prompt preparation time:* 0.546
-- *First-token latency:* 0.116
-- *Cleanup time:* 0.0729
-- *Prompt tokens:* 2,119
-- *Generation tokens:* 141
-- *Total tokens:* 2,260
-- *Prompt throughput (raw):* 18,299 tok/s
-- *Generation throughput (raw):* 478 tok/s
-- *Peak memory (GB):* 1.9
-- *Active memory (GB):* 0.90
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.00015
+- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
+- *Model load time:* 1.58s
+- *Generation time:* 5.95s
+- *Total time:* 8.19s
+- *Prompt preparation time:* 0.658
+- *First-token latency:* 0.774
+- *Cleanup time:* 0.1
+- *Prompt tokens:* 1,646
+- *Generation tokens:* 540
+- *Total tokens:* 2,186
+- *Prompt throughput (raw):* 2,127 tok/s
+- *Generation throughput (raw):* 118 tok/s
+- *Peak memory (GB):* 19
+- *Active memory (GB):* 17
+- *Cache memory (GB):* 0.15
+- *Model-load active memory (GB):* 17.4
+- *Post-cleanup active memory (GB):* 0.000609
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1357
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Rendered prompt characters:* 1523
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Sailboats on a River
-
-Description:
-Two sailboats glide across a calm river, surrounded by dense green forest and a partly cloudy sky. The sailboat on the left, a Vortex catamaran, has a prominent sail marked with the number 1067 and a life jacket on the man steering it. The sailboat on the right, a Laser dinghy, features a white sail with the number 188572 and the letters GBR.
-
-Keywords:
-Boat, Boating, Catamaran, Sailboat, Sailing, Life jacket, Man, Sail, Sails, Water, Forest, Sky, Trees, River, Clouds
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-<details>
-<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.29s
-- *Generation time:* 7.89s
-- *Total time:* 10.72s
-- *Prompt preparation time:* 0.533
-- *First-token latency:* 3.07
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 2,394
-- *Generation tokens:* 123
-- *Total tokens:* 2,517
-- *Prompt throughput (raw):* 779 tok/s
-- *Generation throughput (raw):* 29.3 tok/s
-- *Peak memory (GB):* 23
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000412
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1306
-- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
+- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
+  "prefill_step_size": 2048, "repetition_context_size": 20,
+  "repetition_penalty": 1.0, "seed": 0, "temperature": 0.6, "thinking_budget":
+  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
+  "&lt;think&gt;", "top_p": 0.95}
 - *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title:
-Two sailors on a catamaran and dinghy
+Alright, let's get to work. I'm looking at this image of a marina, and my job is to create some metadata. First, I need to break down what I see. It's a classic British marina scene, right? I see a bunch of boats, a mix of sailboats and motorboats. The main thing is a blue and light blue motor cabin cruiser with a tan canopy, moored up. The water's calm, reflecting the boats and the sky. The light is soft, late afternoon or early evening. The location looks like the UK, based on the hints, and the GPS coordinates confirm it.
 
-Description:
-Two sailors navigate a catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) on calm waters, surrounded by dense green woodland under a partly cloudy sky.
+I'm going to create the title first. It needs to be concise. I'm thinking "Blue and light blue motor cabin cruiser at a UK marina" is good. Now, the description. I need to weave in the context, the date, and the location, and the key details. I'll start with the date and location: "On September 26th, 2026, this blue and light blue motor cabin cruiser with a tan canopy is moored in the calm, calm waters of a UK marina, its reflection clearly visible in the evening light." Perfect, it covers everything.
 
-Keywords:
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Finally, the keywords. I'll pick the most relevant ones. I've got to include things like "blue motor cabin cruiser," "tan canopy," "calm water," "marina," "reflection," "UK," "yacht," "boat fender," "dock," "motorboat," "nautical," "water reflection," "sailboat," "boating," and "mooring." I've got to be thorough and specific, so I'm using those.
+
+Okay, let's check the output: title, description, keywords. Good. Everything is accurate. I've followed all the instructions.
+&lt;/think&gt;
+
+Title: Blue and light blue motor cabin cruiser at a UK marina
+
+Description: On September 26th, 2026, a blue and light blue motor cabin cruiser with a tan canopy is moored in the calm, calm waters of a UK marina, its reflection clearly visible in the evening light.
+
+Keywords: Blue and light blue motor cabin cruiser, tan canopy, calm water, marina, reflection, UK, yacht, boat fender, dock, motorboat, nautical, water reflection, sailboat, boating, mooring.
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-4bit"></a>
-
-### mlx-community/GLM-4.6V-Flash-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+<summary>Exact raw output</summary>
 
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.45s
-- *Generation time:* 7.60s
-- *Total time:* 9.63s
-- *Prompt preparation time:* 0.575
-- *First-token latency:* 5.19
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 6,454
-- *Generation tokens:* 139
-- *Total tokens:* 6,593
-- *Prompt throughput (raw):* 1,244 tok/s
-- *Generation throughput (raw):* 73.9 tok/s
-- *Peak memory (GB):* 8.7
-- *Active memory (GB):* 7.1
-- *Cache memory (GB):* 0.47
-- *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.00125
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
+```text
+Alright, let's get to work. I'm looking at this image of a marina, and my job is to create some metadata. First, I need to break down what I see. It's a classic British marina scene, right? I see a bunch of boats, a mix of sailboats and motorboats. The main thing is a blue and light blue motor cabin cruiser with a tan canopy, moored up. The water's calm, reflecting the boats and the sky. The light is soft, late afternoon or early evening. The location looks like the UK, based on the hints, and the GPS coordinates confirm it.
 
-*Readable output:*
+I'm going to create the title first. It needs to be concise. I'm thinking "Blue and light blue motor cabin cruiser at a UK marina" is good. Now, the description. I need to weave in the context, the date, and the location, and the key details. I'll start with the date and location: "On September 26th, 2026, this blue and light blue motor cabin cruiser with a tan canopy is moored in the calm, calm waters of a UK marina, its reflection clearly visible in the evening light." Perfect, it covers everything.
 
-<pre class="model-output-readable">
-Title: Two Sailors on Dinghies
-Description: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm waters against a backdrop of dense green woodland, captured on 2026-09-19 at 17:12:46.
-Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
-</pre>
+Finally, the keywords. I'll pick the most relevant ones. I've got to include things like "blue motor cabin cruiser," "tan canopy," "calm water," "marina," "reflection," "UK," "yacht," "boat fender," "dock," "motorboat," "nautical," "water reflection," "sailboat," "boating," and "mooring." I've got to be thorough and specific, so I'm using those.
+
+Okay, let's check the output: title, description, keywords. Good. Everything is accurate. I've followed all the instructions.
+</think>
+
+Title: Blue and light blue motor cabin cruiser at a UK marina
+
+Description: On September 26th, 2026, a blue and light blue motor cabin cruiser with a tan canopy is moored in the calm, calm waters of a UK marina, its reflection clearly visible in the evening light.
+
+Keywords: Blue and light blue motor cabin cruiser, tan canopy, calm water, marina, reflection, UK, yacht, boat fender, dock, motorboat, nautical, water reflection, sailboat, boating, mooring.
+```
 
 </details>
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 12.66s
-- *Generation time:* 23.42s
-- *Total time:* 36.86s
-- *Prompt preparation time:* 0.782
-- *First-token latency:* 17.5
-- *Cleanup time:* 0.292
-- *Prompt tokens:* 6,454
-- *Generation tokens:* 142
-- *Total tokens:* 6,596
-- *Prompt throughput (raw):* 368 tok/s
-- *Generation throughput (raw):* 39.9 tok/s
-- *Peak memory (GB):* 78
-- *Active memory (GB):* 62
-- *Cache memory (GB):* 1.4
-- *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00156
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1387
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Sailors in Vortex and Laser Dinghies on Calm Waters
-
-Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm river waters, with dense green woodland and a partly cloudy sky in the background; the catamaran sailor wears a life jacket, and both vessels are under sail.
-
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
-</pre>
 
 </details>
 
@@ -494,26 +345,26 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.18s
-- *Generation time:* 4.37s
-- *Total time:* 6.24s
-- *Prompt preparation time:* 0.686
-- *First-token latency:* 1.53
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 2,115
-- *Generation tokens:* 116
-- *Total tokens:* 2,231
-- *Prompt throughput (raw):* 1,381 tok/s
-- *Generation throughput (raw):* 54.1 tok/s
+- *Model load time:* 1.10s
+- *Generation time:* 3.91s
+- *Total time:* 5.70s
+- *Prompt preparation time:* 0.683
+- *First-token latency:* 1.4
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 2,120
+- *Generation tokens:* 103
+- *Total tokens:* 2,223
+- *Prompt throughput (raw):* 1,514 tok/s
+- *Generation throughput (raw):* 55.7 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00213
+- *Post-cleanup active memory (GB):* 0.00212
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1311
+- *Rendered prompt characters:* 1338
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -527,11 +378,13 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailing Dinghies on Calm Waters
+Title: Blue Cabin Cruiser at Marina
 
-Description: Two sailors navigate small dinghies, a Vortex catamaran (1067) and a Laser dinghy (GBR 188572), on calm waters with a backdrop of dense green woodland.
+Description:
+A blue cabin cruiser with a tan canopy is moored at a marina dock, surrounded by sailboats and leisure boats on calm water, reflecting in the early evening light.
 
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Keywords:
+Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -552,26 +405,26 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.65s
-- *Generation time:* 4.65s
-- *Total time:* 7.03s
-- *Prompt preparation time:* 0.731
-- *First-token latency:* 0.909
-- *Cleanup time:* 0.121
-- *Prompt tokens:* 2,115
-- *Generation tokens:* 103
-- *Total tokens:* 2,218
-- *Prompt throughput (raw):* 2,328 tok/s
-- *Generation throughput (raw):* 33.9 tok/s
+- *Model load time:* 1.64s
+- *Generation time:* 3.71s
+- *Total time:* 6.08s
+- *Prompt preparation time:* 0.725
+- *First-token latency:* 0.82
+- *Cleanup time:* 0.108
+- *Prompt tokens:* 2,120
+- *Generation tokens:* 79
+- *Total tokens:* 2,199
+- *Prompt throughput (raw):* 2,585 tok/s
+- *Generation throughput (raw):* 36.1 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00244
+- *Post-cleanup active memory (GB):* 0.00243
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1311
+- *Rendered prompt characters:* 1338
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.internvl_chat.processor.InternVLChatProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -585,23 +438,21 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailing on Calm Waters with Catamaran and Laser Dinghy
-
-Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm waters near a forested shoreline during the late afternoon.
-
-Keywords: Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, Life jacket, Outdoor recreation, River, Trees, Water, Forest, Mast, Sails, Man
+Title: Blue Cabin Cruiser at Marina Dock
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in calm water during early evening light.
+Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Marina, Motorboat, Nautical, Reflection, Sailboat, Water reflection, Watercraft
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
-### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
+### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
+<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -609,204 +460,212 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, L
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.41s
-- *Generation time:* 13.39s
-- *Total time:* 16.43s
-- *Prompt preparation time:* 0.618
-- *First-token latency:* 0.715
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 1,331
-- *Generation tokens:* 729
-- *Total tokens:* 2,060
-- *Prompt throughput (raw):* 1,862 tok/s
-- *Generation throughput (raw):* 60.9 tok/s
-- *Peak memory (GB):* 20
-- *Active memory (GB):* 18
-- *Cache memory (GB):* 1.5
-- *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.0031
+- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
+- *Model load time:* 1.54s
+- *Generation time:* 7.42s
+- *Total time:* 9.62s
+- *Prompt preparation time:* 0.65
+- *First-token latency:* 1.53
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 309
+- *Generation tokens:* 114
+- *Total tokens:* 423
+- *Prompt throughput (raw):* 203 tok/s
+- *Generation throughput (raw):* 21.5 tok/s
+- *Peak memory (GB):* 15
+- *Active memory (GB):* 11
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 11.3
+- *Post-cleanup active memory (GB):* 0.00389
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1493
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Rendered prompt characters:* 1437
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.6, "top_p": 1.0}
-- *EOS token:* [EOS]
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|eot_id\|>
 
 *Readable output:*
 
 <pre class="model-output-readable">
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are:
+Title: Blue and Tan Motor Cabin Cruiser at Marina Dock
 
-1. **Authoritative context**:
-   - Capture date/time: 2026-09-19 17:12:46 UTC+01:00
-   - Descriptive hints: Two sailors steer dinghies (Vortex catamaran with sail number 1067 on the left, Laser dinghy GBR 188572 on the right) across calm waters with dense green woodland in the background.
-   - Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water
+Description: A blue and tan motor cabin cruiser is moored at a marina dock on a calm day, with the early evening sun casting a warm glow on the water and reflecting off the calm surface. The boat is surrounded by other sailboats and leisure boats, with its tan canopy and blue hull standing out against the serene backdrop.
 
-2. **Image details**:
-   - Two sailboats: Vortex catamaran (sail 1067) and Laser dinghy (GBR 188572)
-   - Sailors on each boat
-   - Calm waters, likely an estuary or river
-   - Dense green woodland in the background
-   - Sky with clouds
-   - Other boats in the distance
+Keywords: Motor cabin cruiser, Marina dock, Calm water, Early evening, Tan canopy, Blue hull, Sailboats, Leisure boats, Reflections, Watercraft.
+</pre>
 
-3. **Constraints**:
-   - Treat capture date/time and GPS as facts but not visible
-   - Descriptive hints may be incomplete or wrong: retain image details, correct conflicts, add important visible details
-   - Prefer image evidence over hints, omit uncertain details
+</details>
 
-Now, let's process the image:
+---
 
-**Title**: Need a 5-10 word title. Focus on the main elements: two dinghies, sailors, setting. Maybe "Two Sailors Navigate Dinghies in Calm Waters Near Forested Shoreline"
+<a id="model-mlx-community-minicpm-v-46-4bit"></a>
 
-**Description**: A concise 1-2 sentence description combining context and visible details. Mention the two dinghies (catamaran and Laser), sailors, calm waters, forested shoreline, and the time (though not visible but authoritative context). So: "Two sailors navigate a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky."
+### mlx-community/MiniCPM-V-4.6-4bit
 
-**Keywords**: Need 10-18 unique keywords from the context and image. Let's list them:
-- Boat
-- Boating
-- Catamaran
-- Dinghy
-- Estuary
-- Forest
-- Laser dinghy
-- Life jacket
-- Man
-- Mast
-- Outdoor recreation
-- River
-- Sailboat
-- Sailor
-- Shoreline
-- Sky
-- Trees
-- Water
-- Vortex catamaran
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
 
-Now, check if all important elements are covered and no conflicting info. The title and description are clear. Keywords are all from the context and image, no conflicts. Make sure to retain all key elements without adding uncertain info.◁/think▷Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline
-Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky.
-Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water, Vortex catamaran
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
+- *Model load time:* 0.87s
+- *Generation time:* 2.88s
+- *Total time:* 4.52s
+- *Prompt preparation time:* 0.763
+- *First-token latency:* 0.24
+- *Cleanup time:* 0.0955
+- *Prompt tokens:* 938
+- *Generation tokens:* 564
+- *Total tokens:* 1,502
+- *Prompt throughput (raw):* 3,911 tok/s
+- *Generation throughput (raw):* 295 tok/s
+- *Peak memory (GB):* 3.3
+- *Active memory (GB):* 2.2
+- *Cache memory (GB):* 0.06
+- *Model-load active memory (GB):* 2.16
+- *Post-cleanup active memory (GB):* 0.00439
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1401
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "repetition_context_size": 20, "repetition_penalty": 1.0, "seed": 0,
+  "temperature": 0.7, "top_k": 0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;think&gt;
+We need to create a title, description, and keywords based on the image. First, let's extract the main subject. The image shows a blue and light blue motor cabin cruiser with a tan canopy. It's moored at a marina with other boats. The water is calm with reflections.
+
+Now, for the title: need to be 5-10 words. Let's try: Blue Cabin Cruiser Moored at Calm Marina Harbor.
+
+But should be concise. Maybe: Blue Cabin Cruiser Moored Calm Water Harbor.
+
+Now description: Combine the main subject with context. The boat is docked, surrounded by other sailboats, calm water, reflections.
+
+Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, rope, sailing, boat, maritime, nautical vessels, etc.
+
+We need to ensure they are unique and cover the details. Let's list:
+
+1. boat
+2. cabin cruiser
+3. canopy
+4. mooring
+5. calm water
+6. harbor
+7. marina
+8. sailboats
+9. reflection
+10. fender
+11. mast
+12. nautical
+13. boat docking
+14. water reflection
+15. motorboat
+16. dock
+17. ship
+18. maritime
+
+But need to make sure they are unique and cover the main elements. Also, the description should combine relevant context.
+
+Now, combine:
+
+Title: Blue Cabin Cruiser Moored Calm Harbor
+
+Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water, surrounded by other sailboats.
+
+Keywords: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, rope, sailing, maritime, vessel
+
+Let's check count: I have 18 items, which is within 10-18.
+
+Make sure they are unique: each keyword is different from others.
+
+Final output should have exactly Title, Description, Keywords.
+&lt;/think&gt;
+
+Title: Blue Cabin Cruiser Moored Calm Harbor
+Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water surrounded by other sailboats.
+Keywords: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, sailing, maritime, vessel
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are:
+<think>
+We need to create a title, description, and keywords based on the image. First, let's extract the main subject. The image shows a blue and light blue motor cabin cruiser with a tan canopy. It's moored at a marina with other boats. The water is calm with reflections.
 
-1. **Authoritative context**: 
-   - Capture date/time: 2026-09-19 17:12:46 UTC+01:00
-   - Descriptive hints: Two sailors steer dinghies (Vortex catamaran with sail number 1067 on the left, Laser dinghy GBR 188572 on the right) across calm waters with dense green woodland in the background.
-   - Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water
+Now, for the title: need to be 5-10 words. Let's try: Blue Cabin Cruiser Moored at Calm Marina Harbor.
 
-2. **Image details**: 
-   - Two sailboats: Vortex catamaran (sail 1067) and Laser dinghy (GBR 188572)
-   - Sailors on each boat
-   - Calm waters, likely an estuary or river
-   - Dense green woodland in the background
-   - Sky with clouds
-   - Other boats in the distance
+But should be concise. Maybe: Blue Cabin Cruiser Moored Calm Water Harbor.
 
-3. **Constraints**:
-   - Treat capture date/time and GPS as facts but not visible
-   - Descriptive hints may be incomplete or wrong: retain image details, correct conflicts, add important visible details
-   - Prefer image evidence over hints, omit uncertain details
+Now description: Combine the main subject with context. The boat is docked, surrounded by other sailboats, calm water, reflections.
 
-Now, let's process the image:
+Keywords: Need 10-18 unique, covering relevant context and visible details. Let's list: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, rope, sailing, boat, maritime, nautical vessels, etc.
 
-**Title**: Need a 5-10 word title. Focus on the main elements: two dinghies, sailors, setting. Maybe "Two Sailors Navigate Dinghies in Calm Waters Near Forested Shoreline"
+We need to ensure they are unique and cover the details. Let's list:
 
-**Description**: A concise 1-2 sentence description combining context and visible details. Mention the two dinghies (catamaran and Laser), sailors, calm waters, forested shoreline, and the time (though not visible but authoritative context). So: "Two sailors navigate a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky."
+1. boat
+2. cabin cruiser
+3. canopy
+4. mooring
+5. calm water
+6. harbor
+7. marina
+8. sailboats
+9. reflection
+10. fender
+11. mast
+12. nautical
+13. boat docking
+14. water reflection
+15. motorboat
+16. dock
+17. ship
+18. maritime
 
-**Keywords**: Need 10-18 unique keywords from the context and image. Let's list them:
-- Boat
-- Boating
-- Catamaran
-- Dinghy
-- Estuary
-- Forest
-- Laser dinghy
-- Life jacket
-- Man
-- Mast
-- Outdoor recreation
-- River
-- Sailboat
-- Sailor
-- Shoreline
-- Sky
-- Trees
-- Water
-- Vortex catamaran
+But need to make sure they are unique and cover the main elements. Also, the description should combine relevant context.
 
-Now, check if all important elements are covered and no conflicting info. The title and description are clear. Keywords are all from the context and image, no conflicts. Make sure to retain all key elements without adding uncertain info.◁/think▷Title: Two Sailors Navigate dinghies in Calm Waters Near Forested Shoreline  
-Description: Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters near a forested shoreline under a partly cloudy sky.  
-Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailor, Shoreline, Sky, Trees, Water, Vortex catamaran
+Now, combine:
+
+Title: Blue Cabin Cruiser Moored Calm Harbor
+
+Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water, surrounded by other sailboats.
+
+Keywords: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, rope, sailing, maritime, vessel
+
+Let's check count: I have 18 items, which is within 10-18.
+
+Make sure they are unique: each keyword is different from others.
+
+Final output should have exactly Title, Description, Keywords.
+</think>
+
+Title: Blue Cabin Cruiser Moored Calm Harbor
+Description: A blue cabin cruiser with tan canopy is moored at a marina, reflecting on calm water surrounded by other sailboats.
+Keywords: boat, cabin cruiser, canopy, mooring, calm water, harbor, marina, sailboats, reflection, fender, mast, nautical, watercraft, dock, sailing, maritime, vessel
 ```
 
 </details>
-
-</details>
-
----
-
-<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
-
-### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.18s
-- *Generation time:* 1.69s
-- *Total time:* 3.59s
-- *Prompt preparation time:* 0.711
-- *First-token latency:* 0.468
-- *Cleanup time:* 0.0976
-- *Prompt tokens:* 2,111
-- *Generation tokens:* 110
-- *Total tokens:* 2,221
-- *Prompt throughput (raw):* 4,509 tok/s
-- *Generation throughput (raw):* 205 tok/s
-- *Peak memory (GB):* 4.0
-- *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00336
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1357
-- *Image placeholders:* 1
-- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Sailors race dinghies across calm waters.
-Description: Two sailors compete in a Vortex catamaran and Laser dinghy against a backdrop of dense green woodland. The scene is set on a calm day with a blue sky and scattered clouds.
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees
-</pre>
 
 </details>
 
@@ -826,17 +685,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.08s
-- *Generation time:* 1.85s
-- *Total time:* 3.49s
-- *Prompt preparation time:* 0.549
-- *First-token latency:* 0.239
-- *Cleanup time:* 0.114
-- *Prompt tokens:* 393
-- *Generation tokens:* 114
-- *Total tokens:* 507
-- *Prompt throughput (raw):* 1,641 tok/s
-- *Generation throughput (raw):* 104 tok/s
+- *Model load time:* 1.00s
+- *Generation time:* 1.67s
+- *Total time:* 3.24s
+- *Prompt preparation time:* 0.562
+- *First-token latency:* 0.237
+- *Cleanup time:* 0.0971
+- *Prompt tokens:* 398
+- *Generation tokens:* 93
+- *Total tokens:* 491
+- *Prompt throughput (raw):* 1,679 tok/s
+- *Generation throughput (raw):* 106 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
@@ -845,7 +704,7 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1361
+- *Rendered prompt characters:* 1388
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.minicpmo.processing_minicpmo.MiniCPMOProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -859,11 +718,11 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailboats on Calm Water near Green Woodland
+Title: Blue Motor Cabin Cruiser at Calm Marina Dock
 
-Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, with dense forest and scattered clouds under daylight conditions, showcasing outdoor sailing activity near a shoreline.
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina, reflecting in calm water under early evening light, surrounded by other boats.
 
-Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 1067, Sail number 188572, Life jacket, Mast, Water, Forest, Shoreline, Estuary, Boating, Outdoor recreation, Sky, Clouds
+Keywords: Boat, Cabin cruiser, Canopy, Dock, Marina, Motorboat, Reflection, Sailboat, Water, Blue hull, Tan canopy, Mooring, Calm water, Nautical, Harbor, Leisure boats
 </pre>
 
 </details>
@@ -884,17 +743,17 @@ Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.60s
-- *Generation time:* 5.11s
-- *Total time:* 7.31s
-- *Prompt preparation time:* 0.591
-- *First-token latency:* 2.12
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 2,927
-- *Generation tokens:* 160
-- *Total tokens:* 3,087
-- *Prompt throughput (raw):* 1,378 tok/s
-- *Generation throughput (raw):* 65.3 tok/s
+- *Model load time:* 1.32s
+- *Generation time:* 5.80s
+- *Total time:* 7.73s
+- *Prompt preparation time:* 0.609
+- *First-token latency:* 2.15
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 2,935
+- *Generation tokens:* 199
+- *Total tokens:* 3,134
+- *Prompt throughput (raw):* 1,365 tok/s
+- *Generation throughput (raw):* 64.9 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.60
@@ -903,7 +762,7 @@ Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3744
+- *Rendered prompt characters:* 3771
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -917,13 +776,13 @@ Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 
 
 <pre class="model-output-readable">
 Title:
-**Sailing Dinghies in Coastal Waters – Vortex and Laser**
+**"Classic Cabin Cruiser at Sunset Marina – Calm Water Reflections"**
 
 Description:
-Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (GBR 188572) on calm waters near a dense woodland shoreline, captured on 19 September 2026 under overcast daylight conditions.
+A well-maintained **blue and light blue motor cabin cruiser** with a tan canopy is moored at a marina dock in the UK, surrounded by sailboats and leisure boats on calm water. The scene captures early evening light with clear reflections, set at **50.682100°N, 3.466600°W** on **26 September 2026**.
 
 Keywords:
-Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring, outdoor recreation, sailing, shoreline woodland, small catamaran (Vortex), two-person dinghies, UK sail number (GBR), calm water, overcast sky, recreational sailing, 2026-09-19
+Boat, cabin cruiser, marina, moored vessel, calm water, reflections, early evening light, tan canopy, blue hull, leisure boats, sailboats, dock, nautical setting, UK coastal waters, 2026-09-26, 50.682100°N 3.466600°W, boating, watercraft, harbour, nautical photography
 </pre>
 
 </details>
@@ -944,26 +803,26 @@ Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.13s
-- *Generation time:* 2.40s
-- *Total time:* 4.10s
-- *Prompt preparation time:* 0.566
-- *First-token latency:* 1.04
-- *Cleanup time:* 0.0955
-- *Prompt tokens:* 2,926
-- *Generation tokens:* 152
-- *Total tokens:* 3,078
-- *Prompt throughput (raw):* 2,816 tok/s
+- *Model load time:* 1.02s
+- *Generation time:* 2.27s
+- *Total time:* 3.93s
+- *Prompt preparation time:* 0.625
+- *First-token latency:* 1.02
+- *Cleanup time:* 0.0878
+- *Prompt tokens:* 2,934
+- *Generation tokens:* 121
+- *Total tokens:* 3,055
+- *Prompt throughput (raw):* 2,889 tok/s
 - *Generation throughput (raw):* 187 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
-- *Cache memory (GB):* 0.41
+- *Cache memory (GB):* 0.38
 - *Model-load active memory (GB):* 2.75
 - *Post-cleanup active memory (GB):* 0.00523
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 3743
+- *Rendered prompt characters:* 3770
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -977,13 +836,71 @@ Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring
 
 <pre class="model-output-readable">
 Title:
-Coastal Sailing Adventure with Catamaran and Laser Dinghy
+Evening Marina Mooring: Blue Cabin Cruiser Reflection
 
 Description:
-Two sailors navigate small boats—one a Vortex catamaran (sail number 1067) and the other a Laser dinghy (GBR 188572)—on calm waters under a partly cloudy sky, surrounded by dense green woodland. Both wear life jackets, with the catamaran equipped with a small outboard motor.
+A blue and light-blue motor cabin cruiser with tan canopy is securely moored at a dock in a calm marina during early evening light, surrounded by sailboats and leisure craft. Its clear water reflections accentuate the tranquil, nautical atmosphere.
 
 Keywords:
-Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Shoreline, Sky, Trees, Vortex boat, Watercraft, Wind conditions
+blue motor cabin cruiser, marina dock, calm water reflections, tan boat canopy, sailboats, leisure yachts, early evening lighting, mooring ropes, nautical setting, dockside scene, watercraft, cabin cruiser, harbor ambiance.
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-molmo2-8b-4bit"></a>
+
+### mlx-community/Molmo2-8B-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* no concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* none
+- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
+- *Model load time:* 1.05s
+- *Generation time:* 3.97s
+- *Total time:* 5.78s
+- *Prompt preparation time:* 0.753
+- *First-token latency:* 0.769
+- *Cleanup time:* 0.0988
+- *Prompt tokens:* 1,531
+- *Generation tokens:* 181
+- *Total tokens:* 1,712
+- *Prompt throughput (raw):* 1,991 tok/s
+- *Generation throughput (raw):* 72.2 tok/s
+- *Peak memory (GB):* 8.5
+- *Active memory (GB):* 6.5
+- *Cache memory (GB):* 0.31
+- *Model-load active memory (GB):* 6.45
+- *Post-cleanup active memory (GB):* 0.00554
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1371
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue Cabin Cruiser Moored at Calm Marina Dock
+
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by other sailboats and leisure boats on calm water. The scene is set in early evening light, with clear reflections visible on the water's surface.
+
+Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht, Boat mooring, Boat dock, Boat reflection, Boat mast, Boat rope, Boat sailboat, Boat leisure, Boat harbor, Boat early evening, Boat calm water, Boat moored, Boat marina, Boat nautical, Boat watercraft, Boat yacht, Boat boat, Boat boat boat
 </pre>
 
 </details>
@@ -1004,26 +921,26 @@ Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.17s
-- *Generation time:* 3.62s
-- *Total time:* 5.61s
-- *Prompt preparation time:* 0.813
-- *First-token latency:* 2.13
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 4,085
-- *Generation tokens:* 112
-- *Total tokens:* 4,197
-- *Prompt throughput (raw):* 1,917 tok/s
-- *Generation throughput (raw):* 156 tok/s
+- *Model load time:* 0.98s
+- *Generation time:* 3.22s
+- *Total time:* 5.07s
+- *Prompt preparation time:* 0.853
+- *First-token latency:* 1.91
+- *Cleanup time:* 0.0919
+- *Prompt tokens:* 4,091
+- *Generation tokens:* 108
+- *Total tokens:* 4,199
+- *Prompt throughput (raw):* 2,146 tok/s
+- *Generation throughput (raw):* 210 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.65
+- *Cache memory (GB):* 0.66
 - *Model-load active memory (GB):* 2.18
 - *Post-cleanup active memory (GB):* 0.00647
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1437
+- *Rendered prompt characters:* 1464
 - *Processor:* mlx_vlm.models.cohere_compass.processing_cohere_compass.CohereCompassProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
 - *Requested model revision:* not requested
@@ -1036,11 +953,11 @@ Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, M
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailboats on Calm Waters
+Title: Blue and Tan Boat at Marina Dock
 
-Description: Two sailors navigate small dinghies across tranquil waters, one steering a Vortex catamaran (sail number 1067) and the other a Laser dinghy (sail number GBR 1888572) amidst a backdrop of dense green woodland.
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock. The boat is surrounded by other sailboats and leisure boats on calm water, with clear reflections visible in the early evening light.
 
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -1061,26 +978,26 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.75s
-- *Generation time:* 3.42s
-- *Total time:* 6.89s
-- *Prompt preparation time:* 0.707
-- *First-token latency:* 0.689
-- *Cleanup time:* 0.153
-- *Prompt tokens:* 1,291
-- *Generation tokens:* 151
-- *Total tokens:* 1,442
-- *Prompt throughput (raw):* 1,874 tok/s
-- *Generation throughput (raw):* 72.8 tok/s
+- *Model load time:* 2.54s
+- *Generation time:* 2.60s
+- *Total time:* 5.85s
+- *Prompt preparation time:* 0.701
+- *First-token latency:* 0.638
+- *Cleanup time:* 0.134
+- *Prompt tokens:* 1,295
+- *Generation tokens:* 130
+- *Total tokens:* 1,425
+- *Prompt throughput (raw):* 2,031 tok/s
+- *Generation throughput (raw):* 99.0 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
-- *Cache memory (GB):* 0.14
+- *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 23.1
 - *Post-cleanup active memory (GB):* 0.00698
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1397
+- *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1094,71 +1011,13 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 
 <pre class="model-output-readable">
 Title:
-Two Sailboats Racing on Calm Waters
+Blue and Cream Motor Cabin Cruiser Moored at Marina
 
 Description:
-On 19 September 2026, an orange Vortex catamaran (sail number 1067) helmed by a sailor in a blue jacket and life jacket sails alongside a white Laser dinghy (GBR 188572) helmed by a crew member in dark clothing, both crossing calm waters with dense green woodland and a moored sailing vessel beyond.
+A blue-hulled motor cabin cruiser with cream cabin trim and a tan canvas canopy, christened Evenhaie, is moored at a concrete marina dock in calm water. It casts a clear reflection alongside a dense cluster of sailboats and leisure boats in the soft early-evening light.
 
 Keywords:
-Sailing, Sailboat, Catamaran, Dinghy, Laser, Man, Sailor, Life jacket, Mast, Boat, Water, River, Estuary, Shoreline, Trees, Forest, Sky, Clouds, Outdoor recreation
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### mlx-community/Phi-3.5-vision-instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.98s
-- *Generation time:* 3.48s
-- *Total time:* 5.02s
-- *Prompt preparation time:* 0.556
-- *First-token latency:* 0.322
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 1,141
-- *Generation tokens:* 136
-- *Total tokens:* 1,277
-- *Prompt throughput (raw):* 3,546 tok/s
-- *Generation throughput (raw):* 52.1 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 8.3
-- *Cache memory (GB):* 0.52
-- *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00705
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1327
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Sailors on Dinghies in Coastal Waters
-
-Description: On September 19, 2026, two sailors navigate their respective dinghies, a Vortex catamaran and a Laser dinghy, across calm waters near a forested shoreline.
-
-Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Trees, Water, Clouds, Man, Mast, Outdoor Recreation, Sailboat, Shoreline, Sky, Estuary, Life Jacket
+Motorboat, Cabin cruiser, Marina, Sailboat, Dock, Water reflection, Boat fender, Boat canopy, Mooring, Calm water, Nautical, Watercraft, Yacht, Mast, Rope, Harbor, Sailing, Boating
 </pre>
 
 </details>
@@ -1179,17 +1038,17 @@ Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Tre
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.77s
-- *Generation time:* 28.82s
-- *Total time:* 30.62s
+- *Model load time:* 0.71s
+- *Generation time:* 26.05s
+- *Total time:* 27.77s
 - *Prompt preparation time:* 1.01
-- *First-token latency:* 16.8
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 16,551
-- *Generation tokens:* 918
-- *Total tokens:* 17,469
-- *Prompt throughput (raw):* 985 tok/s
-- *Generation throughput (raw):* 82.8 tok/s
+- *First-token latency:* 15
+- *Cleanup time:* 0.093
+- *Prompt tokens:* 16,556
+- *Generation tokens:* 901
+- *Total tokens:* 17,457
+- *Prompt throughput (raw):* 1,101 tok/s
+- *Generation throughput (raw):* 89.2 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
@@ -1198,7 +1057,7 @@ Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Tre
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1386
+- *Rendered prompt characters:* 1413
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1214,56 +1073,74 @@ Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Tre
 *Readable output:*
 
 <pre class="model-output-readable">
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. Looking at the image: two sailors on dinghies, Vortex catamaran (1067) and Laser (GBR 188572). Title could be "Sailors Steering Vortex &amp; Laser Dinghies on Calm Water".
+Got it, let's tackle this. First, the title needs to be concise. The main subject is the blue and light blue motor cabin cruiser. Let's see: "Blue Motor Cruiser at Marina" – that's 5 words. Wait, maybe "Cabin Cruiser Docked at Marina" but let's check. The image has a blue boat with a tan canopy, so title should reflect that.
 
-Then description: combine context and visible details. Context is capture date/time but we don't need to include that in the description, but the main subject is the two boats. The description should mention the boats, action (steering), setting (calm waters, woodland), lighting (sunny, maybe), and distinctive details like the sail numbers and the life jackets. So: "Two sailors on Vortex catamaran (1067) and Laser dinghy (GBR 188572) steer small boats across calm water, with green woodland and blue sky."
+Description: Needs to include context, setting, action, lighting, details. The capture date is 2026-09-26 17:36:29 UTC+01:00, but the description hints mention early evening light. So "Evening light reflects on the blue cabin cruiser 'EVENHAZE' moored at a marina dock with sailboats, calm water, tan canopy, and fenders." Wait, the context says capture date is 2026-09-26 17:36 UTC+01:00, but the description hint says early evening. But the task says treat capture date/time as authoritative, so the time is given. But the description should combine relevant context with visible details. The main subject is the blue motor cruiser (the one with "EVENHAZE" on it), docked at marina, other boats in background, calm water, reflections. So "A blue and light blue cabin cruiser named 'EVENHAZE' with tan canopy moored at a marina dock during early evening, with calm water reflecting its hull and surrounding sailboats."
 
-Wait, check the context: capture date is given but not needed in description. The descriptive hints have Vortex catamaran, Laser dinghy, sail numbers, life jackets, etc. So the description should include those. Let's make sure to include key details: Vortex (with 1067), Laser (GBR 188572), sailors, calm water, woodland, sky.
+Wait, the description should combine context and visible details. Context includes capture date/time, but the description should mention the time (early evening) as per hint. Wait, the descriptive hints say "early evening light". So the description should include that. Also, the main subject is the blue motor cruiser, so focus on that.
 
-Then keywords: need 10-18 unique, comma-separated. From context and visible: Boat, Boating, Catamaran, Clouds (there are clouds in the sky), Dinghy, Estuary (wait, the image says "coastal or river waters"—maybe estuary? But let's check: the background is dense trees, so maybe river or estuary. But "Estuary" is a keyword hint, so include that. Laser dinghy, Life jacket (on the Vortex sailor, the other is a sailor on Laser), Man, Mast (sails have masts), Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. Let's list them:
+Keywords: Need 10-18 unique, comma-separated. From context: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy. Also, "EVENHAZE" is a name, so "Boat name EVENHAZE" might be included? Wait, keyword hints include "Cabin cruiser" so that's a keyword. Also "Motorboat", "Boat fender" (since there are blue fenders on the boat), "Rope" (maybe the ropes on the dock?), "Watercraft", "Nautical", "Sailing". Let's check the image: the boat has blue hull, light blue superstructure, tan canopy, blue fenders, dock, other sailboats, calm water, reflection. So keywords: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy, Fender, Rope, Watercraft, Nautical, Sailing, Boating. Wait, need to be unique. Let's list them:
 
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water.
+- Boat (primary)
+- Dock (where it's moored)
+- Marina (the setting)
+- Calm Water (the water condition)
+- Reflection (on the water)
+- Mooring (how it's docked)
+- Sailboat (in the background)
+- Motorboat (the type of boat)
+- Cabin cruiser (the type of vessel)
+- Tan canopy (distinctive detail)
+- Fender (the blue fenders)
+- Rope (maybe the rope on the dock, but is that visible? The image shows the dock with ropes, maybe)
+- Watercraft (general term)
+- Nautical (related to the context)
+- Sailing (the background boats have masts, so sailing)
+- Boating (the activity)
 
-Wait, need to check if all these are visible. Life jacket: yes, the Vortex sailor has one. Mast: both have masts. Sailor: visible. Sky: yes, blue sky with clouds. Trees: background. Water: yes. Estuary: the water looks like a river or estuary, but the hints say Estuary, so include. River: also possible. Let's make sure it's 10-18. Let's count: 1. Boat, 2. Boating, 3. Catamaran, 4. Clouds, 5. Dinghy, 6. Estuary, 7. Laser dinghy, 8. Life jacket, 9. Man, 10. Mast, 11. Outdoor recreation, 12. River, 13. Sailboat, 14. Sailing, 15. Sailor, 16. Shoreline, 17. Sky, 18. Trees, 19. Water. Wait, but need 10-18, so maybe cut some. Let's pick the essential ones:
-
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. That's 19. Let's adjust: 10-18.
-
-Wait, the context has "
+Wait, let's check the context: "Authoritative context" has GPS coordinates, but we can't include that as a keyword. The keywords need to be from the descriptive
 &lt;/think&gt;
 
-Title: Sailors Steering Vortex &amp; Laser Dinghies on Calm Water
-
-Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river waters, with dense woodland backdrop and blue sky under sunny conditions.
-
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Title: Blue Cabin Cruiser at Marina
+Description: A blue and light blue cabin cruiser named "EVENHAZE" with tan canopy moored at a marina dock under early evening light, reflecting on calm water alongside sailboats and leisure boats.
+Keywords: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy, Fender, Rope, Watercraft, Nautical, Sailing, Boating
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. Looking at the image: two sailors on dinghies, Vortex catamaran (1067) and Laser (GBR 188572). Title could be "Sailors Steering Vortex & Laser Dinghies on Calm Water".
+Got it, let's tackle this. First, the title needs to be concise. The main subject is the blue and light blue motor cabin cruiser. Let's see: "Blue Motor Cruiser at Marina" – that's 5 words. Wait, maybe "Cabin Cruiser Docked at Marina" but let's check. The image has a blue boat with a tan canopy, so title should reflect that.
 
-Then description: combine context and visible details. Context is capture date/time but we don't need to include that in the description, but the main subject is the two boats. The description should mention the boats, action (steering), setting (calm waters, woodland), lighting (sunny, maybe), and distinctive details like the sail numbers and the life jackets. So: "Two sailors on Vortex catamaran (1067) and Laser dinghy (GBR 188572) steer small boats across calm water, with green woodland and blue sky."
+Description: Needs to include context, setting, action, lighting, details. The capture date is 2026-09-26 17:36:29 UTC+01:00, but the description hints mention early evening light. So "Evening light reflects on the blue cabin cruiser 'EVENHAZE' moored at a marina dock with sailboats, calm water, tan canopy, and fenders." Wait, the context says capture date is 2026-09-26 17:36 UTC+01:00, but the description hint says early evening. But the task says treat capture date/time as authoritative, so the time is given. But the description should combine relevant context with visible details. The main subject is the blue motor cruiser (the one with "EVENHAZE" on it), docked at marina, other boats in background, calm water, reflections. So "A blue and light blue cabin cruiser named 'EVENHAZE' with tan canopy moored at a marina dock during early evening, with calm water reflecting its hull and surrounding sailboats."
 
-Wait, check the context: capture date is given but not needed in description. The descriptive hints have Vortex catamaran, Laser dinghy, sail numbers, life jackets, etc. So the description should include those. Let's make sure to include key details: Vortex (with 1067), Laser (GBR 188572), sailors, calm water, woodland, sky.
+Wait, the description should combine context and visible details. Context includes capture date/time, but the description should mention the time (early evening) as per hint. Wait, the descriptive hints say "early evening light". So the description should include that. Also, the main subject is the blue motor cruiser, so focus on that.
 
-Then keywords: need 10-18 unique, comma-separated. From context and visible: Boat, Boating, Catamaran, Clouds (there are clouds in the sky), Dinghy, Estuary (wait, the image says "coastal or river waters"—maybe estuary? But let's check: the background is dense trees, so maybe river or estuary. But "Estuary" is a keyword hint, so include that. Laser dinghy, Life jacket (on the Vortex sailor, the other is a sailor on Laser), Man, Mast (sails have masts), Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. Let's list them:
+Keywords: Need 10-18 unique, comma-separated. From context: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy. Also, "EVENHAZE" is a name, so "Boat name EVENHAZE" might be included? Wait, keyword hints include "Cabin cruiser" so that's a keyword. Also "Motorboat", "Boat fender" (since there are blue fenders on the boat), "Rope" (maybe the ropes on the dock?), "Watercraft", "Nautical", "Sailing". Let's check the image: the boat has blue hull, light blue superstructure, tan canopy, blue fenders, dock, other sailboats, calm water, reflection. So keywords: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy, Fender, Rope, Watercraft, Nautical, Sailing, Boating. Wait, need to be unique. Let's list them:
 
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water.
+- Boat (primary)
+- Dock (where it's moored)
+- Marina (the setting)
+- Calm Water (the water condition)
+- Reflection (on the water)
+- Mooring (how it's docked)
+- Sailboat (in the background)
+- Motorboat (the type of boat)
+- Cabin cruiser (the type of vessel)
+- Tan canopy (distinctive detail)
+- Fender (the blue fenders)
+- Rope (maybe the rope on the dock, but is that visible? The image shows the dock with ropes, maybe)
+- Watercraft (general term)
+- Nautical (related to the context)
+- Sailing (the background boats have masts, so sailing)
+- Boating (the activity)
 
-Wait, need to check if all these are visible. Life jacket: yes, the Vortex sailor has one. Mast: both have masts. Sailor: visible. Sky: yes, blue sky with clouds. Trees: background. Water: yes. Estuary: the water looks like a river or estuary, but the hints say Estuary, so include. River: also possible. Let's make sure it's 10-18. Let's count: 1. Boat, 2. Boating, 3. Catamaran, 4. Clouds, 5. Dinghy, 6. Estuary, 7. Laser dinghy, 8. Life jacket, 9. Man, 10. Mast, 11. Outdoor recreation, 12. River, 13. Sailboat, 14. Sailing, 15. Sailor, 16. Shoreline, 17. Sky, 18. Trees, 19. Water. Wait, but need 10-18, so maybe cut some. Let's pick the essential ones:
-
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water. That's 19. Let's adjust: 10-18.
-
-Wait, the context has "
+Wait, let's check the context: "Authoritative context" has GPS coordinates, but we can't include that as a keyword. The keywords need to be from the descriptive
 </think>
 
-Title: Sailors Steering Vortex & Laser Dinghies on Calm Water
-
-Description: Two sailors steer Vortex (1067) and Laser dinghy (GBR 188572) across calm river waters, with dense woodland backdrop and blue sky under sunny conditions.
-
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Title: Blue Cabin Cruiser at Marina  
+Description: A blue and light blue cabin cruiser named "EVENHAZE" with tan canopy moored at a marina dock under early evening light, reflecting on calm water alongside sailboats and leisure boats.  
+Keywords: Boat, Dock, Marina, Calm Water, Reflection, Mooring, Sailboat, Motorboat, Cabin cruiser, Tan canopy, Fender, Rope, Watercraft, Nautical, Sailing, Boating
 ```
 
 </details>
@@ -1286,26 +1163,26 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.97s
-- *Generation time:* 39.82s
-- *Total time:* 42.88s
-- *Prompt preparation time:* 1.07
-- *First-token latency:* 37.1
-- *Cleanup time:* 0.145
-- *Prompt tokens:* 16,549
-- *Generation tokens:* 128
-- *Total tokens:* 16,677
-- *Prompt throughput (raw):* 446 tok/s
-- *Generation throughput (raw):* 73.3 tok/s
+- *Model load time:* 1.87s
+- *Generation time:* 39.81s
+- *Total time:* 42.73s
+- *Prompt preparation time:* 1.04
+- *First-token latency:* 36.9
+- *Cleanup time:* 0.128
+- *Prompt tokens:* 16,554
+- *Generation tokens:* 168
+- *Total tokens:* 16,722
+- *Prompt throughput (raw):* 449 tok/s
+- *Generation throughput (raw):* 83.7 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 2.3
+- *Cache memory (GB):* 2.4
 - *Model-load active memory (GB):* 18.3
 - *Post-cleanup active memory (GB):* 0.00798
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1378
+- *Rendered prompt characters:* 1405
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1319,9 +1196,14 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two sailboats racing on calm water
-Description: Two sailors compete in a race on small dinghies—a Vortex catamaran (number 1067) and a Laser dinghy (number GBR 188572)—on calm water. The scene is set against a backdrop of a dense green forest under a partly cloudy sky.
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Title:
+Blue Cabin Cruiser Moored at Marina
+
+Description:
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a wooden dock in a marina, surrounded by other boats. The calm water reflects the vessel and surrounding boats under early evening light, captured at 2026-09-26 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W.
+
+Keywords:
+Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -1342,17 +1224,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 1.96s
-- *Generation time:* 72.17s
-- *Total time:* 75.17s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 62
-- *Cleanup time:* 0.159
-- *Prompt tokens:* 16,549
-- *Generation tokens:* 181
-- *Total tokens:* 16,730
-- *Prompt throughput (raw):* 267 tok/s
-- *Generation throughput (raw):* 19.6 tok/s
+- *Model load time:* 1.93s
+- *Generation time:* 71.57s
+- *Total time:* 74.51s
+- *Prompt preparation time:* 1
+- *First-token latency:* 61.6
+- *Cleanup time:* 0.139
+- *Prompt tokens:* 16,554
+- *Generation tokens:* 190
+- *Total tokens:* 16,744
+- *Prompt throughput (raw):* 269 tok/s
+- *Generation throughput (raw):* 21.0 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
@@ -1361,7 +1243,7 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1378
+- *Rendered prompt characters:* 1405
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1375,11 +1257,11 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailors in Vortex Catamaran and Laser Dinghy on Calm Water
+Title: Blue Cabin Cruiser Moored at Marina Dock
 
-Description: On 2026-09-19, two sailors navigate small dinghies on calm waters: a Vortex catamaran (sail number 1067) with an orange and grey sail, and a white Laser dinghy (sail number GBR 188572) with a red sun emblem, against a backdrop of dense green woodland under a partly cloudy sky.
+Description: A blue and light blue cabin cruiser named "EVENHAZE" with a tan canopy is moored at a wooden dock in a marina, surrounded by sailboats and leisure craft on calm water. The scene, captured on 2026-09-26 at 17:36:29 UTC+01:00 near 50.682100°N, 3.466600°W, features clear reflections in the water under early evening light, with blue fenders and a wooden trim accenting the vessel.
 
-Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR, 1067, 188572, Sailor, Water, River, Estuary, Forest, Trees, Shoreline, Sky, Clouds, Life jacket, Outdoor recreation, Mast, Boating, Boat
+Keywords: Cabin cruiser, Marina, Dock, Mooring, Sailboat, Motorboat, Watercraft, Yacht, Boat canopy, Boat fender, Calm water, Reflection, Water reflection, Nautical, Harbor, Rope, Mast, Early evening light
 </pre>
 
 </details>
@@ -1400,17 +1282,17 @@ Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
-- *Model load time:* 0.91s
-- *Generation time:* 38.93s
-- *Total time:* 40.87s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 36.5
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 16,549
-- *Generation tokens:* 104
-- *Total tokens:* 16,653
-- *Prompt throughput (raw):* 453 tok/s
-- *Generation throughput (raw):* 68.7 tok/s
+- *Model load time:* 0.87s
+- *Generation time:* 41.04s
+- *Total time:* 42.92s
+- *Prompt preparation time:* 1
+- *First-token latency:* 38.4
+- *Cleanup time:* 0.103
+- *Prompt tokens:* 16,554
+- *Generation tokens:* 120
+- *Total tokens:* 16,674
+- *Prompt throughput (raw):* 431 tok/s
+- *Generation throughput (raw):* 70.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
@@ -1419,7 +1301,7 @@ Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR,
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1378
+- *Rendered prompt characters:* 1405
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1433,11 +1315,11 @@ Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR,
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailors race dinghies on calm water
+Title: Blue Cabin Cruiser Moored at Sunset Marina
 
-Description: Two sailors navigate a Vortex catamaran and Laser dinghy across tranquil waters, framed by dense green forest under a partly cloudy sky. The scene captures active sailing with visible sail numbers and life jackets.
+Description: A blue and light blue cabin cruiser named 'Evenhaze' with tan canopy is moored at a marina dock during early evening light, casting clear reflections on calm water alongside other sailboats. The scene features wooden docks, white and blue sailboats, and a serene harbor atmosphere.
 
-Keywords: Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Shoreline, Sky, Clouds, Man, Sailor, Life jacket, Outdoor recreation, Estuary, Boat, Boating
+Keywords: cabin cruiser, boat canopy, fender, marina, dock, sailboat, motorboat, calm water, reflection, harbor, nautical, watercraft, yacht, mast, mooring, rope, sunset, early evening
 </pre>
 
 </details>
@@ -1458,26 +1340,26 @@ Keywords: Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Sho
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.71s
-- *Generation time:* 36.05s
-- *Total time:* 39.80s
-- *Prompt preparation time:* 1.03
-- *First-token latency:* 33.6
-- *Cleanup time:* 0.173
-- *Prompt tokens:* 16,565
-- *Generation tokens:* 111
-- *Total tokens:* 16,676
-- *Prompt throughput (raw):* 493 tok/s
-- *Generation throughput (raw):* 70.8 tok/s
+- *Model load time:* 2.47s
+- *Generation time:* 37.71s
+- *Total time:* 41.27s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 35.6
+- *Cleanup time:* 0.12
+- *Prompt tokens:* 16,569
+- *Generation tokens:* 123
+- *Total tokens:* 16,692
+- *Prompt throughput (raw):* 465 tok/s
+- *Generation throughput (raw):* 105 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.90
+- *Cache memory (GB):* 0.91
 - *Model-load active memory (GB):* 20.4
 - *Post-cleanup active memory (GB):* 0.00911
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1397
+- *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1490,11 +1372,11 @@ Keywords: Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Sho
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Vortex Catamaran and Laser Sailing on Water
+Title: Blue and tan motor cruiser moored at marina
 
-Description: Two sailors navigate a Vortex catamaran and a Laser dinghy on calm river waters on 19 September 2026. The scene is framed by dense green woodland along the shoreline under a partly cloudy sky.
+Description: This blue and tan motor cabin cruiser named 'Evenhaze' is moored at a wooden marina dock on calm water during late afternoon, casting a clear reflection in the golden light. Surrounding it are various sailboats with tall masts and protective canvas covers.
 
-Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline, dense green woodland, partly cloudy sky, outdoor recreation, sailing, man, mast, forest, Boating, sailboat, Water
+Keywords: Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -1515,17 +1397,17 @@ Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.69s
-- *Generation time:* 38.35s
-- *Total time:* 41.11s
-- *Prompt preparation time:* 1.07
-- *First-token latency:* 35.7
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 16,565
-- *Generation tokens:* 142
-- *Total tokens:* 16,707
-- *Prompt throughput (raw):* 463 tok/s
-- *Generation throughput (raw):* 85.3 tok/s
+- *Model load time:* 1.35s
+- *Generation time:* 39.89s
+- *Total time:* 42.30s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 37.7
+- *Cleanup time:* 0.115
+- *Prompt tokens:* 16,569
+- *Generation tokens:* 111
+- *Total tokens:* 16,680
+- *Prompt throughput (raw):* 439 tok/s
+- *Generation throughput (raw):* 90.6 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
@@ -1534,7 +1416,7 @@ Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline,
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1397
+- *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -1548,13 +1430,13 @@ Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline,
 
 <pre class="model-output-readable">
 Title:
-Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters
+Evenhaze Cabin Cruiser Moored at Marina Dock
 
 Description:
-Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters, with dense woodland lining the shore under an overcast sky.
+The blue and light blue cabin cruiser named Evenhaze, with a tan canvas canopy, is moored at a wooden dock in a calm marina, surrounded by sailboats and leisure craft under soft evening light that creates clear reflections on the water.
 
 Keywords:
-Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, Sky, Clouds, Outdoor recreation, Shoreline, Water, GBR, 1067, 188572
+Evenhaze, cabin cruiser, tan canopy, marina, dock, sailboats, leisure craft, evening light, water reflection, mooring, rope, fender, hull, cabin, nautical
 </pre>
 
 <details>
@@ -1562,13 +1444,13 @@ Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, 
 
 ```text
 Title:  
-Two Sailors Navigate Vortex Catamaran and Laser Dinghy on Calm Waters
+Evenhaze Cabin Cruiser Moored at Marina Dock
 
 Description:  
-Two sailors steer a Vortex catamaran (sail 1067) and a Laser dinghy (GBR 188572) across calm waters, with dense woodland lining the shore under an overcast sky.
+The blue and light blue cabin cruiser named Evenhaze, with a tan canvas canopy, is moored at a wooden dock in a calm marina, surrounded by sailboats and leisure craft under soft evening light that creates clear reflections on the water.
 
 Keywords:  
-Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, River, Estuary, Forest, Trees, Sky, Clouds, Outdoor recreation, Shoreline, Water, GBR, 1067, 188572
+Evenhaze, cabin cruiser, tan canopy, marina, dock, sailboats, leisure craft, evening light, water reflection, mooring, rope, fender, hull, cabin, nautical
 ```
 
 </details>
@@ -1591,17 +1473,17 @@ Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.03s
-- *Generation time:* 65.57s
-- *Total time:* 68.66s
-- *Prompt preparation time:* 1.05
-- *First-token latency:* 59.1
-- *Cleanup time:* 0.165
-- *Prompt tokens:* 16,565
-- *Generation tokens:* 144
-- *Total tokens:* 16,709
-- *Prompt throughput (raw):* 280 tok/s
-- *Generation throughput (raw):* 26.9 tok/s
+- *Model load time:* 1.98s
+- *Generation time:* 52.55s
+- *Total time:* 55.64s
+- *Prompt preparation time:* 1.1
+- *First-token latency:* 47.3
+- *Cleanup time:* 0.124
+- *Prompt tokens:* 16,569
+- *Generation tokens:* 128
+- *Total tokens:* 16,697
+- *Prompt throughput (raw):* 350 tok/s
+- *Generation throughput (raw):* 29.4 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1610,7 +1492,7 @@ Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1397
+- *Rendered prompt characters:* 1424
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -1624,129 +1506,13 @@ Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, 
 
 <pre class="model-output-readable">
 Title:
-Two sailors racing Vortex and Laser dinghies on calm waters
+Blue motor cruiser moored at a Cornish marina
 
 Description:
-A Vortex catamaran with sail number 1067 on the left and a Laser dinghy with sail number GBR 188572 on the right are sailed by individuals across a calm estuary. Both boats are set against a shoreline of dense green woodland under a bright, cloudy sky, with other moored vessels visible in the background.
+The "Evenhaze," a blue motor cabin cruiser with a tan cabin canopy, is moored alongside a weathered wooden dock in a busy harbour. The boat sits on calm water with clear reflections, surrounded by numerous moored sailboats under the golden light of late afternoon.
 
 Keywords:
-Vortex, Laser, catamaran, dinghy, sailing, sailors, estuary, woodland, boats, water, masts, GBR 188572, sail numbers, outdoor, sky
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.67s
-- *Generation time:* 1.74s
-- *Total time:* 3.19s
-- *Prompt preparation time:* 0.783
-- *First-token latency:* 0.382
-- *Cleanup time:* 0.103
-- *Prompt tokens:* 1,433
-- *Generation tokens:* 78
-- *Total tokens:* 1,511
-- *Prompt throughput (raw):* 3,756 tok/s
-- *Generation throughput (raw):* 126 tok/s
-- *Peak memory (GB):* 5.6
-- *Active memory (GB):* 4.5
-- *Cache memory (GB):* 0.35
-- *Model-load active memory (GB):* 4.5
-- *Post-cleanup active memory (GB):* 0.0104
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1338
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Title: Sailing on the River
-Description: Two sailors are sailing their boats across the river.
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-step-37-flash-oq3e"></a>
-
-### mlx-community/Step-3.7-Flash-oQ3e
-
-<details>
-<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 15.61s
-- *Generation time:* 29.36s
-- *Total time:* 45.94s
-- *Prompt preparation time:* 0.953
-- *First-token latency:* 24.2
-- *Cleanup time:* 0.366
-- *Prompt tokens:* 3,494
-- *Generation tokens:* 147
-- *Total tokens:* 3,641
-- *Prompt throughput (raw):* 144 tok/s
-- *Generation throughput (raw):* 47.7 tok/s
-- *Peak memory (GB):* 92
-- *Active memory (GB):* 85
-- *Cache memory (GB):* 0.41
-- *Model-load active memory (GB):* 85
-- *Post-cleanup active memory (GB):* 0.0106
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1384
-- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Two sailors on dinghies across calm waters
-
-Description:
-On 19 September 2026 at 17:12 UTC+1, two sailors steer small dinghies across calm coastal or river waters, with a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right, set against a backdrop of dense green woodland under a partly cloudy sky.
-
-Keywords:
-Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boating, Water, River, Estuary, Shoreline, Forest, Trees, Mast, Life jacket, Outdoor recreation
+Blue motor cruiser, Cornish harbour, Evenhaze, Marina, Moored boat, Tan canopy, Wooden dock, Sailboats, Nautical, Reflections, Boat fender, Watercraft, Coastal, Yacht, Water surface, Dockside
 </pre>
 
 </details>
@@ -1767,26 +1533,26 @@ Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boatin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.10s
-- *Generation time:* 2.77s
-- *Total time:* 4.86s
-- *Prompt preparation time:* 0.968
-- *First-token latency:* 0.747
-- *Cleanup time:* 0.126
-- *Prompt tokens:* 2,089
-- *Generation tokens:* 112
-- *Total tokens:* 2,201
-- *Prompt throughput (raw):* 2,795 tok/s
-- *Generation throughput (raw):* 98.7 tok/s
+- *Model load time:* 1.03s
+- *Generation time:* 3.04s
+- *Total time:* 5.07s
+- *Prompt preparation time:* 0.987
+- *First-token latency:* 0.729
+- *Cleanup time:* 0.0988
+- *Prompt tokens:* 2,098
+- *Generation tokens:* 143
+- *Total tokens:* 2,241
+- *Prompt throughput (raw):* 2,876 tok/s
+- *Generation throughput (raw):* 101 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
-- *Cache memory (GB):* 0.34
+- *Cache memory (GB):* 0.35
 - *Model-load active memory (GB):* 5.46
 - *Post-cleanup active memory (GB):* 0.0115
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 4244
+- *Rendered prompt characters:* 4271
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.aya_vision.processing_aya_vision.AyaVisionOutputProcessor
 - *Tokenizer:* transformers.models.cohere.tokenization_cohere.CohereTokenizer
@@ -1800,11 +1566,11 @@ Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boatin
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailing Adventure on the River
+Title: Blue Motorboat at Marina Dock
 
-Description: Two sailors navigate their boats across a serene river, with one in a Vortex catamaran and the other in a Laser dinghy, both wearing life jackets and skillfully steering their vessels against the backdrop of dense green woodland. The scene captures a peaceful moment of outdoor recreation under a partly cloudy sky.
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light. The boat's distinctive features include a blue hull, white trim, and a red-painted keel. The surrounding marina is bustling with activity, and the calm water reflects the boats and the nearby buildings.
 
-Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, Mast, Life jacket, Man, Outdoor recreation, Forest, Clouds, Estuary
+Keywords: Motorboat, Marina, Calm Water, Reflective Surface, Evening Light, Blue Hull, White Trim, Red Keel, Sailboats, Leisure Boats, Dock, Harbor, Nautical, Reflection, Watercraft, Yacht, Mooring
 </pre>
 
 </details>
@@ -1825,17 +1591,17 @@ Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.41s
-- *Generation time:* 3.07s
-- *Total time:* 7.15s
-- *Prompt preparation time:* 0.66
-- *First-token latency:* 0.332
-- *Cleanup time:* 0.14
-- *Prompt tokens:* 592
-- *Generation tokens:* 85
-- *Total tokens:* 677
-- *Prompt throughput (raw):* 1,784 tok/s
-- *Generation throughput (raw):* 44.0 tok/s
+- *Model load time:* 3.24s
+- *Generation time:* 2.72s
+- *Total time:* 6.65s
+- *Prompt preparation time:* 0.688
+- *First-token latency:* 0.424
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 597
+- *Generation tokens:* 81
+- *Total tokens:* 678
+- *Prompt throughput (raw):* 1,408 tok/s
+- *Generation throughput (raw):* 55.0 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -1844,7 +1610,7 @@ Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, M
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1332
+- *Rendered prompt characters:* 1359
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1858,21 +1624,21 @@ Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, M
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Sailors Sailing Dinghies on Calm Water
-Description: Two sailors steer a grey Vortex catamaran and a white Laser dinghy across calm waters against a dense woodland backdrop under a cloudy sky.
-Keywords: Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, River, Outdoor Recreation, Boating, Estuary, Sky, Clouds, Life jacket,
+Title: Blue and Light Blue Motor Cabin Cruiser Moored at Marina
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on calm water during the early evening.
+Keywords: Boat, cabin cruiser, motorboat,, marina, dock, harbor, reflection, water, nautical, mooring, fender, yacht, sailing, watercraft
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
 
-### mlx-community/gemma-3-27b-it-qat-4bit
+### mlx-community/gemma-4-12B-it-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* no concerns detected
@@ -1880,45 +1646,45 @@ Keywords: Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, Riv
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
 - *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.43s
-- *Generation time:* 7.34s
-- *Total time:* 10.39s
-- *Prompt preparation time:* 0.6
-- *First-token latency:* 0.948
-- *Cleanup time:* 0.147
-- *Prompt tokens:* 591
-- *Generation tokens:* 175
-- *Total tokens:* 766
-- *Prompt throughput (raw):* 623 tok/s
-- *Generation throughput (raw):* 30.0 tok/s
-- *Peak memory (GB):* 17
-- *Active memory (GB):* 16
-- *Cache memory (GB):* 0.44
-- *Model-load active memory (GB):* 16.1
-- *Post-cleanup active memory (GB):* 0.012
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
+- *Model load time:* 1.69s
+- *Generation time:* 2.85s
+- *Total time:* 5.25s
+- *Prompt preparation time:* 0.695
+- *First-token latency:* 0.357
+- *Cleanup time:* 0.104
+- *Prompt tokens:* 601
+- *Generation tokens:* 112
+- *Total tokens:* 713
+- *Prompt throughput (raw):* 1,683 tok/s
+- *Generation throughput (raw):* 61.2 tok/s
+- *Peak memory (GB):* 7.6
+- *Active memory (GB):* 6.8
+- *Cache memory (GB):* 0.33
+- *Model-load active memory (GB):* 6.76
+- *Post-cleanup active memory (GB):* 0.0131
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1361
+- *Rendered prompt characters:* 1387
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
+  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
 - *EOS token:* &lt;eos&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Sailing Dinghies on Calm Water, September 2026
+Title: Blue Motor Cabin Cruiser Moored at a Marina
 
-Description: Captured on 19th September 2026, this image shows a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) sailing on calm water, with dense woodland forming the backdrop. The scene is lit by bright daylight, revealing details of the boats, sailors, and shoreline.
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a dock, surrounded by other boats on calm water. The scene is captured in the evening light, creating clear reflections on the water's surface.
 
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Vortex, GBR 188572, 1067, Daylight, September, Woodland, Reflection
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -1939,17 +1705,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.50s
-- *Generation time:* 2.33s
-- *Total time:* 5.49s
-- *Prompt preparation time:* 0.645
-- *First-token latency:* 0.437
-- *Cleanup time:* 0.15
-- *Prompt tokens:* 596
-- *Generation tokens:* 130
-- *Total tokens:* 726
-- *Prompt throughput (raw):* 1,363 tok/s
-- *Generation throughput (raw):* 101 tok/s
+- *Model load time:* 2.38s
+- *Generation time:* 2.06s
+- *Total time:* 5.12s
+- *Prompt preparation time:* 0.663
+- *First-token latency:* 0.422
+- *Cleanup time:* 0.144
+- *Prompt tokens:* 601
+- *Generation tokens:* 106
+- *Total tokens:* 707
+- *Prompt throughput (raw):* 1,423 tok/s
+- *Generation throughput (raw):* 112 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -1958,7 +1724,7 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1360
+- *Rendered prompt characters:* 1387
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -1972,11 +1738,9 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two sailors steering small boats across calm water
-
-Description: Two sailors navigate small boats across calm waters against a backdrop of dense green woodland under a cloudy sky. On the left, a person in a blue life jacket steers a Vortex catamaran with sail number 1067, while on the right, another person steers a white Laser dinghy with sail number GBR 188572.
-
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Sky, Trees, Water
+Title: Blue motor cabin cruiser moored at a marina
+Description: A blue and light blue motor cabin cruiser with a tan canopy sits moored at a dock alongside various sailboats on calm water during the early evening. The scene features clear reflections on the water's surface under soft, late-afternoon light.
+Keywords: Blue motorboat, boat canopy, boat fender, boating, cabin cruiser, calm water, dock, harbour, marina, mast, mooring, nautical, reflection, sailboat, water reflection, watercraft, yacht
 </pre>
 
 </details>
@@ -1997,26 +1761,26 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.94s
-- *Generation time:* 5.99s
-- *Total time:* 9.58s
-- *Prompt preparation time:* 0.629
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.167
-- *Prompt tokens:* 596
-- *Generation tokens:* 89
-- *Total tokens:* 685
-- *Prompt throughput (raw):* 434 tok/s
-- *Generation throughput (raw):* 22.2 tok/s
+- *Model load time:* 2.91s
+- *Generation time:* 6.86s
+- *Total time:* 10.59s
+- *Prompt preparation time:* 0.8
+- *First-token latency:* 1.34
+- *Cleanup time:* 0.248
+- *Prompt tokens:* 601
+- *Generation tokens:* 113
+- *Total tokens:* 714
+- *Prompt throughput (raw):* 450 tok/s
+- *Generation throughput (raw):* 23.8 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
-- *Cache memory (GB):* 0.79
+- *Cache memory (GB):* 0.80
 - *Model-load active memory (GB):* 18.4
 - *Post-cleanup active memory (GB):* 0.0141
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1360
+- *Rendered prompt characters:* 1387
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -2030,65 +1794,9 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Sailors Steering Dinghies on Calm Water
-Description: A Vortex catamaran and a Laser dinghy sail across calm waters against a backdrop of dense green woodland under a cloudy sky.
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Trees, Water
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
-
-### mlx-community/gemma-4-e4b-it-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.80s
-- *Generation time:* 1.71s
-- *Total time:* 4.17s
-- *Prompt preparation time:* 0.646
-- *First-token latency:* 0.234
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 592
-- *Generation tokens:* 94
-- *Total tokens:* 686
-- *Prompt throughput (raw):* 2,532 tok/s
-- *Generation throughput (raw):* 111 tok/s
-- *Peak memory (GB):* 5.9
-- *Active memory (GB):* 5.2
-- *Cache memory (GB):* 0.08
-- *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0147
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1332
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Dinghies Sail on Calm Woodland Water
-Description: Two small dinghies navigate placid waters beneath a backdrop of dense green woodland under partly cloudy skies. The catamaran on the left and the Laser dinghy on the right feature distinctive sail numbers.
-Keywords: Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboat, Water, Outdoor, Recreation, Trees, Small Craft, Sky, Dinghy Racing
+Title: Blue Motor Cabin Cruiser Moored at a Marina
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 September 2026, casting clear reflections on the calm water. The vessel is positioned alongside various sailboats and leisure craft during the early evening light.
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Sailboat, Watercraft, Yacht
 </pre>
 
 </details>
@@ -2109,26 +1817,26 @@ Keywords: Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.62s
-- *Generation time:* 1.80s
-- *Total time:* 3.27s
-- *Prompt preparation time:* 0.856
-- *First-token latency:* 0.407
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 1,383
-- *Generation tokens:* 99
-- *Total tokens:* 1,482
-- *Prompt throughput (raw):* 3,398 tok/s
+- *Model load time:* 0.72s
+- *Generation time:* 1.96s
+- *Total time:* 3.76s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 0.462
+- *Cleanup time:* 0.113
+- *Prompt tokens:* 1,384
+- *Generation tokens:* 91
+- *Total tokens:* 1,475
+- *Prompt throughput (raw):* 2,998 tok/s
 - *Generation throughput (raw):* 169 tok/s
-- *Peak memory (GB):* 4.7
+- *Peak memory (GB):* 4.6
 - *Active memory (GB):* 3.0
-- *Cache memory (GB):* 0.22
+- *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 3.03
 - *Post-cleanup active memory (GB):* 0.0149
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1530
+- *Rendered prompt characters:* 1557
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite4_vision.processing_granite4_vision.Granite4VisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -2142,124 +1850,9 @@ Keywords: Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboa
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Sailors in Dinghies on a Calm Day"
-Description: Two sailors navigate their dinghies, a Vortex catamaran and a Laser dinghy, across a serene body of water with dense green woodland in the background.
-Keywords: Sailors, Dinghies, Vortex catamaran, Laser dinghy, Water, Trees, Coastline, Sailing, Life jacket, Man, Sail number, 1067, 188572
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### mlx-community/pixtral-12b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.84s
-- *Generation time:* 5.66s
-- *Total time:* 8.06s
-- *Prompt preparation time:* 0.557
-- *First-token latency:* 2.15
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 3,117
-- *Generation tokens:* 114
-- *Total tokens:* 3,231
-- *Prompt throughput (raw):* 1,449 tok/s
-- *Generation throughput (raw):* 38.4 tok/s
-- *Peak memory (GB):* 16
-- *Active memory (GB):* 13
-- *Cache memory (GB):* 0.59
-- *Model-load active memory (GB):* 13.5
-- *Post-cleanup active memory (GB):* 0.0163
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1306
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Sailors Navigate Calm Waters in Dinghies
-
-Description:
-Two sailors steer small dinghies—a Vortex catamaran and a Laser dinghy—across calm waters with dense green woodland in the background under a partly cloudy sky.
-
-Keywords:
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Woodland
-</pre>
-
-</details>
-
----
-
-<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
-
-### nativ-community/Mage-VL-OptiQ-4bit
-
-<details>
-<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* no concerns detected
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* none
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.86s
-- *Generation time:* 3.24s
-- *Total time:* 4.87s
-- *Prompt preparation time:* 0.769
-- *First-token latency:* 1.51
-- *Cleanup time:* 0.115
-- *Prompt tokens:* 4,212
-- *Generation tokens:* 130
-- *Total tokens:* 4,342
-- *Prompt throughput (raw):* 2,797 tok/s
-- *Generation throughput (raw):* 126 tok/s
-- *Peak memory (GB):* 5.4
-- *Active memory (GB):* 3.9
-- *Cache memory (GB):* 0.72
-- *Model-load active memory (GB):* 3.93
-- *Post-cleanup active memory (GB):* 0.0166
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Two Sailboats Glide Across Calm Waters Amidst Lush Forest
-Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) on a serene estuary, with dense green woodland in the background under a partly cloudy sky.
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Title: "Marina Calm: Blue Motor Cabin Cruiser"
+Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock, surrounded by other sailboats and leisure boats, reflecting the serene water under the evening light.
+Keywords: Motor cabin cruiser, Blue and light blue, Tan canopy, Marina, Sailboats, Leisure boats, Evening light, Water reflection, Mooring, Nautical setting.
 </pre>
 
 </details>
@@ -2280,17 +1873,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.24s
-- *Generation time:* 36.81s
-- *Total time:* 39.08s
-- *Prompt preparation time:* 1.02
-- *First-token latency:* 33.3
-- *Cleanup time:* 0.134
-- *Prompt tokens:* 16,562
-- *Generation tokens:* 220
-- *Total tokens:* 16,782
-- *Prompt throughput (raw):* 497 tok/s
-- *Generation throughput (raw):* 84.4 tok/s
+- *Model load time:* 1.28s
+- *Generation time:* 33.89s
+- *Total time:* 36.32s
+- *Prompt preparation time:* 1.13
+- *First-token latency:* 31.4
+- *Cleanup time:* 0.14
+- *Prompt tokens:* 16,566
+- *Generation tokens:* 123
+- *Total tokens:* 16,689
+- *Prompt throughput (raw):* 528 tok/s
+- *Generation throughput (raw):* 84.0 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
@@ -2299,7 +1892,7 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1392
+- *Rendered prompt characters:* 1419
 - *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Requested model revision:* not requested
@@ -2313,13 +1906,13 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 
 <pre class="model-output-readable">
 Title:
-Two Sailors Steering Vortex Catamaran and Laser Dinghy on Calm River
+Blue and Light Blue Canopy Cruiser Moored at Marina Dock
 
 Description:
-Two sailors steer small dinghies across calm, rippled river water: a white and orange Vortex catamaran with sail number 1067 on the left, and a white Laser dinghy with sail number GBR 188572 on the right, both set against a dense green woodland bank under a cloudy sky. The Vortex crewman wears a blue jacket and red life jacket while standing at the helm, while the Laser sailor is seated near the tiller; small moored dinghies, a yellow marker buoy, and reflections appear in the water.
+A blue and light blue motor cabin cruiser with a tan canvas canopy is moored alongside a wooden dock, framed by neighbouring sailboats and leisure craft on calm water; the late-afternoon light creates clear reflections and a warm tan accent on the tan canvas.
 
 Keywords:
-Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Sailors, Life jackets, Wooden river bank, Dense woodland, Cloudy sky, Rippled water, Moored dinghies, Yellow marker buoy, Outdoor recreation, British racing green
+motor cabin cruiser, blue hull, light blue paint, tan canvas canopy, marina dock, moored boat, calm water, reflections, sailing boats, leisure craft, wooden dock, early evening light, fenders, mooring lines, harbour
 </pre>
 
 </details>
@@ -2340,17 +1933,17 @@ Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 1885
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 2.01s
-- *Generation time:* 5.69s
-- *Total time:* 8.26s
-- *Prompt preparation time:* 0.552
-- *First-token latency:* 1.45
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 1,273
-- *Generation tokens:* 134
-- *Total tokens:* 1,407
-- *Prompt throughput (raw):* 880 tok/s
-- *Generation throughput (raw):* 36.1 tok/s
+- *Model load time:* 1.88s
+- *Generation time:* 5.97s
+- *Total time:* 8.51s
+- *Prompt preparation time:* 0.645
+- *First-token latency:* 1.44
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 1,281
+- *Generation tokens:* 144
+- *Total tokens:* 1,425
+- *Prompt throughput (raw):* 892 tok/s
+- *Generation throughput (raw):* 36.4 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
@@ -2359,7 +1952,7 @@ Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 1885
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1306
+- *Rendered prompt characters:* 1333
 - *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2373,13 +1966,13 @@ Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 1885
 
 <pre class="model-output-readable">
 Title:
-Sailors Navigate Calm Waters in Dinghies
+Blue Cabin Cruiser at Marina
 
 Description:
-Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572)—across calm waters on 19 September 2026, with dense green woodland in the background.
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock on 26 September 2026, alongside other sailboats and leisure boats, reflecting in calm water.
 
 Keywords:
-Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Trees, Water
+Boat, Cabin cruiser, Marina, Dock, Calm water, Reflection, Tan canopy, Sailboats, Leisure boats, Mooring, Early evening light, 2026-09-26, 50.682100°N, 3.466600°W, Nautical, Watercraft, Motorboat, Boating
 </pre>
 
 </details>
@@ -2401,26 +1994,26 @@ Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life ja
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.46s
-- *Generation time:* 6.89s
-- *Total time:* 9.99s
-- *Prompt preparation time:* 0.626
-- *First-token latency:* 5.21
-- *Cleanup time:* 0.144
-- *Prompt tokens:* 3,628
-- *Generation tokens:* 144
-- *Total tokens:* 3,772
-- *Prompt throughput (raw):* 697 tok/s
-- *Generation throughput (raw):* 131 tok/s
+- *Model load time:* 2.32s
+- *Generation time:* 6.56s
+- *Total time:* 9.54s
+- *Prompt preparation time:* 0.653
+- *First-token latency:* 5.1
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 3,636
+- *Generation tokens:* 120
+- *Total tokens:* 3,756
+- *Prompt throughput (raw):* 713 tok/s
+- *Generation throughput (raw):* 144 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.14
+- *Cache memory (GB):* 0.15
 - *Model-load active memory (GB):* 19.7
 - *Post-cleanup active memory (GB):* 0.0176
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1388
+- *Rendered prompt characters:* 1415
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.nemotron_h_nano_omni.processing_nemotron_h_nano_omni.NemotronHNanoOmniProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2436,11 +2029,248 @@ Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life ja
 
 <pre class="model-output-readable">
 
-Title: Two Sailors Compete in Dinghy Race
+Title: Evenhaze Motor Cruiser at Marina Dock
 
-Description: On a calm body of water under a partly cloudy sky, a sailor in a blue life jacket steers a Vortex catamaran with sail number 1067, while another sailor in a black jacket operates a Laser dinghy with sail number GBR 188572, both navigating near a forested shoreline.
+Description: A blue and light blue motor cabin cruiser named "Evenhaze," featuring a tan canopy, is moored at a wooden dock in a calm harbor, with its clear reflection visible in the water under early evening light, surrounded by other sailboats and leisure craft.
 
-Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+Keywords: Boat, Boat canopy, Boat fender, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Watercraft, Yacht
+</pre>
+
+</details>
+
+---
+
+<a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
+
+### LiquidAI/LFM2.5-VL-450M-MLX-bf16
+
+<details>
+<summary>Complete evidence: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: boat, reflection, sailboat; Repeats the
+  prompt's hint instead of describing the image: description
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
+- *Model load time:* 0.37s
+- *Generation time:* 0.83s
+- *Total time:* 2.14s
+- *Prompt preparation time:* 0.556
+- *First-token latency:* 0.108
+- *Cleanup time:* 0.0646
+- *Prompt tokens:* 2,123
+- *Generation tokens:* 96
+- *Total tokens:* 2,219
+- *Prompt throughput (raw):* 19,658 tok/s
+- *Generation throughput (raw):* 486 tok/s
+- *Peak memory (GB):* 1.9
+- *Active memory (GB):* 0.90
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 0.897
+- *Post-cleanup active memory (GB):* 0.000134
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1384
+- *Image placeholders:* 1
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* ed71acdae0799c98cb450787d049d1343b65cd52
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--LiquidAI--LFM2.5-VL-450M-MLX-bf16/snapshots/ed71acdae0799c98cb450787d049d1343b65cd52
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Boat Docking at a Marina
+
+Description:
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+
+Keywords:
+Boat, Boat, Cabin, Cruiser, Dock, Marina, Reflection, Sailboat, Sailing, Water, Reflection, Rope, Sailboat, Nautical
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+<details>
+<summary>Complete evidence: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
+- *Model load time:* 2.06s
+- *Generation time:* 7.43s
+- *Total time:* 10.05s
+- *Prompt preparation time:* 0.558
+- *First-token latency:* 2.92
+- *Cleanup time:* 0.0958
+- *Prompt tokens:* 2,402
+- *Generation tokens:* 119
+- *Total tokens:* 2,521
+- *Prompt throughput (raw):* 824 tok/s
+- *Generation throughput (raw):* 30.5 tok/s
+- *Peak memory (GB):* 23
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 0.47
+- *Model-load active memory (GB):* 18
+- *Post-cleanup active memory (GB):* 0.000396
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1333
+- *Processor:* mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Devstral-Small-2-24B-Instruct-2512-5bit/snapshots/0a970d20ad7da57b0e2accc35c5b8628f5d02063
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.15, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Blue and Light Blue Motor Cabin Cruiser at Marina
+
+Description:
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+
+Keywords:
+Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-4bit"></a>
+
+### mlx-community/GLM-4.6V-Flash-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
+- *Model load time:* 1.32s
+- *Generation time:* 6.71s
+- *Total time:* 8.62s
+- *Prompt preparation time:* 0.586
+- *First-token latency:* 5.09
+- *Cleanup time:* 0.0854
+- *Prompt tokens:* 6,393
+- *Generation tokens:* 83
+- *Total tokens:* 6,476
+- *Prompt throughput (raw):* 1,257 tok/s
+- *Generation throughput (raw):* 75.9 tok/s
+- *Peak memory (GB):* 8.7
+- *Active memory (GB):* 7.1
+- *Cache memory (GB):* 0.47
+- *Model-load active memory (GB):* 7.07
+- *Post-cleanup active memory (GB):* 0.00123
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1414
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-4bit/snapshots/bd7b20686e8cbf22ad221a3de8399cdc5a2a7e0e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue Motor Cabin Cruiser at Marina
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+Keywords: Boat, Cabin cruiser, Marina, Motorboat, Reflection, Tan canopy, Watercraft, Blue motorboat, Calm water
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
+- *Model load time:* 11.13s
+- *Generation time:* 21.03s
+- *Total time:* 32.92s
+- *Prompt preparation time:* 0.744
+- *First-token latency:* 16.6
+- *Cleanup time:* 0.293
+- *Prompt tokens:* 6,393
+- *Generation tokens:* 117
+- *Total tokens:* 6,510
+- *Prompt throughput (raw):* 386 tok/s
+- *Generation throughput (raw):* 41.8 tok/s
+- *Peak memory (GB):* 78
+- *Active memory (GB):* 62
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 61.9
+- *Post-cleanup active memory (GB):* 0.00154
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1414
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.8, "top_k": 2, "top_p": 0.6}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue and light blue motor cruiser with tan canopy at marina dock
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -2459,28 +2289,29 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: river
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.13s
-- *Generation time:* 6.77s
-- *Total time:* 9.68s
-- *Prompt preparation time:* 0.775
-- *First-token latency:* 1.16
-- *Cleanup time:* 0.132
-- *Prompt tokens:* 2,619
-- *Generation tokens:* 164
-- *Total tokens:* 2,783
-- *Prompt throughput (raw):* 2,253 tok/s
-- *Generation throughput (raw):* 33.8 tok/s
+- *Model load time:* 1.90s
+- *Generation time:* 4.45s
+- *Total time:* 7.12s
+- *Prompt preparation time:* 0.769
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 2,620
+- *Generation tokens:* 89
+- *Total tokens:* 2,709
+- *Prompt throughput (raw):* 2,402 tok/s
+- *Generation throughput (raw):* 34.3 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
 - *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.00182
+- *Post-cleanup active memory (GB):* 0.0018
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1343
+- *Rendered prompt characters:* 1370
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -2494,57 +2325,424 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 *Readable output:*
 
 <pre class="model-output-readable">
- Title: Laser and Vortex catamaran sailboats on a river with trees.
-
-Description: Two sailboats, a Laser dinghy with sail number GBR 188572 and a Vortex catamaran with sail number 1067, are sailing on a calm river. The Laser dinghy is on the right, and the Vortex catamaran is on the left. Both boats have their sails up and are being steered by their respective sailors. In the background, there is a dense green woodland. The sky is partly cloudy, and the lighting is natural daylight.
-
-Keywords: Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail number GBR 188572, sail number 1067, sailors, sail, river, natural daylight, partly cloudy sky.
+ Title: Blue and Light Blue Motor Cabin Cruiser at Marina Dock.
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+Keywords: blue, light blue, motor cabin cruiser, tan canopy, marina dock, sailboats, leisure boats, calm water, early evening light, reflections.
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-gemma-4-12b-it-4bit"></a>
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
 
-### mlx-community/gemma-4-12B-it-4bit
+### mlx-community/Phi-3.5-vision-instruct-bf16
 
 <details>
-<summary>Complete evidence: mlx-community/gemma-4-12B-it-4bit</summary>
+<summary>Complete evidence: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Duplicate keywords: sailing
-- *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
-- *Model load time:* 1.80s
-- *Generation time:* 2.78s
-- *Total time:* 5.25s
-- *Prompt preparation time:* 0.663
-- *First-token latency:* 0.361
-- *Cleanup time:* 0.138
-- *Prompt tokens:* 596
-- *Generation tokens:* 108
-- *Total tokens:* 704
-- *Prompt throughput (raw):* 1,652 tok/s
-- *Generation throughput (raw):* 60.0 tok/s
-- *Peak memory (GB):* 7.6
-- *Active memory (GB):* 6.8
-- *Cache memory (GB):* 0.32
-- *Model-load active memory (GB):* 6.76
-- *Post-cleanup active memory (GB):* 0.0131
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
+- *Model load time:* 0.88s
+- *Generation time:* 2.52s
+- *Total time:* 3.98s
+- *Prompt preparation time:* 0.572
+- *First-token latency:* 0.303
+- *Cleanup time:* 0.0913
+- *Prompt tokens:* 1,144
+- *Generation tokens:* 98
+- *Total tokens:* 1,242
+- *Prompt throughput (raw):* 3,777 tok/s
+- *Generation throughput (raw):* 58.6 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 8.3
+- *Cache memory (GB):* 0.52
+- *Model-load active memory (GB):* 8.3
+- *Post-cleanup active memory (GB):* 0.00705
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1360
+- *Rendered prompt characters:* 1354
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.gemma4_unified.processing_gemma4_unified.Gemma4UnifiedProcessor
+- *Processor:* mlx_vlm.models.phi3_v.processing_phi3_v.Phi3VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Phi-3.5-vision-instruct-bf16/snapshots/d8da684308c275a86659e2b36a9189b2f4aec8ea
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: "Evening Reflections on a Calm Harbor"
+
+Description: A blue and light blue motorboat with a tan canopy is moored at a marina dock, surrounded by other sailboats and leisure boats on calm water, reflecting the early evening light.
+
+Keywords: boat, motorboat, canopy, marina, dock, sailboat, calm water, reflection, early evening, nautical
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
+
+### mlx-community/Qwen2-VL-7B-Instruct-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
+- *Model load time:* 0.76s
+- *Generation time:* 46.21s
+- *Total time:* 47.93s
+- *Prompt preparation time:* 0.955
+- *First-token latency:* 44.1
+- *Cleanup time:* 0.0954
+- *Prompt tokens:* 16,565
+- *Generation tokens:* 107
+- *Total tokens:* 16,672
+- *Prompt throughput (raw):* 376 tok/s
+- *Generation throughput (raw):* 91.8 tok/s
+- *Peak memory (GB):* 9.3
+- *Active memory (GB):* 4.7
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 4.68
+- *Post-cleanup active memory (GB):* 0.00736
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1463
+- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue Motor Cabin Cruiser at Marina
+
+Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
+- *Model load time:* 0.60s
+- *Generation time:* 2.06s
+- *Total time:* 3.47s
+- *Prompt preparation time:* 0.796
+- *First-token latency:* 0.376
+- *Cleanup time:* 0.0857
+- *Prompt tokens:* 1,438
+- *Generation tokens:* 118
+- *Total tokens:* 1,556
+- *Prompt throughput (raw):* 3,823 tok/s
+- *Generation throughput (raw):* 129 tok/s
+- *Peak memory (GB):* 5.6
+- *Active memory (GB):* 4.5
+- *Cache memory (GB):* 0.40
+- *Model-load active memory (GB):* 4.5
+- *Post-cleanup active memory (GB):* 0.0104
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1365
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Title: Blue and Light Blue Motor Cabin Cruiser Moored at Marina
+Description: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Watercraft, Yacht
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-step-37-flash-oq3e"></a>
+
+### mlx-community/Step-3.7-Flash-oQ3e
+
+<details>
+<summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ3e</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
+- *Model load time:* 14.42s
+- *Generation time:* 23.89s
+- *Total time:* 39.24s
+- *Prompt preparation time:* 0.922
+- *First-token latency:* 20
+- *Cleanup time:* 0.354
+- *Prompt tokens:* 3,498
+- *Generation tokens:* 111
+- *Total tokens:* 3,609
+- *Prompt throughput (raw):* 175 tok/s
+- *Generation throughput (raw):* 51.3 tok/s
+- *Peak memory (GB):* 92
+- *Active memory (GB):* 85
+- *Cache memory (GB):* 0.41
+- *Model-load active memory (GB):* 85
+- *Post-cleanup active memory (GB):* 0.0106
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1411
+- *Processor:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Step-3.7-Flash-oQ3e/snapshots/41d17ee00e168a2918bb839e4a7b6e445c6f03f1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Blue cabin cruiser moored at marina dock
+
+Description:
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+
+Keywords:
+Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: harbor
+- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
+- *Model load time:* 1.14s
+- *Generation time:* 16.94s
+- *Total time:* 19.11s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 12.3
+- *Cleanup time:* 0.097
+- *Prompt tokens:* 16,565
+- *Generation tokens:* 215
+- *Total tokens:* 16,780
+- *Prompt throughput (raw):* 1,347 tok/s
+- *Generation throughput (raw):* 57.4 tok/s
+- *Peak memory (GB):* 14
+- *Active memory (GB):* 9.5
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 9.46
+- *Post-cleanup active memory (GB):* 0.0109
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1463
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title:
+Blue Cabin Cruiser at Marina Dock
+
+Description:
+A blue and light blue motor cabin cruiser named "Evenhaze" is moored at a marina dock, surrounded by sailboats and leisure boats, with calm water reflecting the scene under early evening light. The boat's tan canopy and fenders are clearly visible, emphasizing its well-maintained condition.
+
+Keywords:
+Blue cabin cruiser, Evenhaze, marina dock, sailboats, leisure boats, calm water, early evening light, tan canopy, fenders, motorboat, nautical, reflection, water, marina, harbor, boat, boat canopy, boat fender, boating, dock, harbor, mast, mooring, rope, sailboat, sailing, watercraft, yacht, GPS coordinates, capture date/time, 2026-09-26 17:36:29 UTC+01:00, 50.682100°N, 3.466600°W
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Title:
+Blue Cabin Cruiser at Marina Dock
+
+Description:
+A blue and light blue motor cabin cruiser named "Evenhaze" is moored at a marina dock, surrounded by sailboats and leisure boats, with calm water reflecting the scene under early evening light. The boat's tan canopy and fenders are clearly visible, emphasizing its well-maintained condition.
+
+Keywords: 
+Blue cabin cruiser, Evenhaze, marina dock, sailboats, leisure boats, calm water, early evening light, tan canopy, fenders, motorboat, nautical, reflection, water, marina, harbor, boat, boat canopy, boat fender, boating, dock, harbor, mast, mooring, rope, sailboat, sailing, watercraft, yacht, GPS coordinates, capture date/time, 2026-09-26 17:36:29 UTC+01:00, 50.682100°N, 3.466600°W
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Names a place the prompt did not supply: Plymouth Devon
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
+- *Model load time:* 2.27s
+- *Generation time:* 5.67s
+- *Total time:* 8.57s
+- *Prompt preparation time:* 0.617
+- *First-token latency:* 0.94
+- *Cleanup time:* 0.122
+- *Prompt tokens:* 596
+- *Generation tokens:* 127
+- *Total tokens:* 723
+- *Prompt throughput (raw):* 634 tok/s
+- *Generation throughput (raw):* 30.8 tok/s
+- *Peak memory (GB):* 17
+- *Active memory (GB):* 16
+- *Cache memory (GB):* 0.45
+- *Model-load active memory (GB):* 16.1
+- *Post-cleanup active memory (GB):* 0.012
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1388
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Requested model revision:* not requested
-- *Resolved model revision:* 73bcf09092aa277861d5a191b989b666f7f32e8f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_k": 64, "top_p": 0.95}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue Cabin Cruiser Moored at Plymouth Marina
+
+Description: A blue and light blue cabin cruiser with a tan canopy is moored at a marina dock in Plymouth, Devon, on 26 September 2026 at 17:36, alongside other vessels, with clear reflections on calm water under evening light. The boat features blue fenders and a dark red waterline.
+
+Keywords: Boat, Cabin cruiser, Motorboat, Mooring, Marina, Dock, Sailboat, Yacht, Watercraft, Reflection, Calm Water, Boat fender, Rope, Plymouth, Devon, Evening light, Water reflection, Blue hull
+</pre>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-4-e4b-it-4bit"></a>
+
+### mlx-community/gemma-4-e4b-it-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-e4b-it-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Duplicate keywords: motorboat
+- *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
+- *Model load time:* 2.24s
+- *Generation time:* 1.93s
+- *Total time:* 5.07s
+- *Prompt preparation time:* 0.886
+- *First-token latency:* 0.217
+- *Cleanup time:* 0.162
+- *Prompt tokens:* 597
+- *Generation tokens:* 93
+- *Total tokens:* 690
+- *Prompt throughput (raw):* 2,756 tok/s
+- *Generation throughput (raw):* 103 tok/s
+- *Peak memory (GB):* 5.9
+- *Active memory (GB):* 5.2
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 5.16
+- *Post-cleanup active memory (GB):* 0.0147
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1359
+- *Image placeholders:* 1
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 475b9088d29754a3379866cf5aeb6b41acd313c2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-e4b-it-4bit/snapshots/475b9088d29754a3379866cf5aeb6b41acd313c2
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 1.0, "top_k": 64, "top_p": 0.95}
 - *EOS token:* &lt;eos&gt;
@@ -2552,73 +2750,128 @@ Keywords: Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail numbe
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Sailors Steering Small Dinghies on Calm Water
-Description: Two sailors navigate a Vortex catamaran and a Laser dinghy across calm water against a backdrop of dense green woodland. The scene captures a moment of outdoor sailing with the boats positioned in front of a forested shoreline.
-Keywords: Boat, Boating, Catamaran, Sailing, Sailor, Laser dinghy, Water, River, Estuary, Forest, Trees, Shoreline, Sailboat, Life jacket, Outdoor recreation, Mast, Clouds, Sailing, Sailing_sport
+Title: Blue Motor Cabin Cruiser Moored at Calm Marina Dock
+Description: A blue and light blue motor cabin cruiser is gently moored alongside a marina dock, reflected clearly in the calm evening waters. Surrounding sailboats and leisure boats add to the peaceful harbor scene.
+Keywords: Motorboat, Cabin Cruiser, Marina, Dock, Mooring, Boat, Watercraft, Reflection, Sailboat, Yacht, Nautical, Harbor, Calm Water, Boat Canopy, Motorboat
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit
+### mlx-community/pixtral-12b-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit</summary>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
 
 - *Execution:* completed
-- *Mechanical checks:* major concerns
+- *Mechanical checks:* concerns detected
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Required labelled fields not detected: title, description, keywords;
-  Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.60s
-- *Generation time:* 5.77s
-- *Total time:* 8.05s
-- *Prompt preparation time:* 0.672
-- *First-token latency:* 0.764
-- *Cleanup time:* 0.112
-- *Prompt tokens:* 1,639
-- *Generation tokens:* 425
-- *Total tokens:* 2,064
-- *Prompt throughput (raw):* 2,146 tok/s
-- *Generation throughput (raw):* 97.4 tok/s
-- *Peak memory (GB):* 19
-- *Active memory (GB):* 17
-- *Cache memory (GB):* 0.29
-- *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000625
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
+- *Model load time:* 1.66s
+- *Generation time:* 5.65s
+- *Total time:* 7.91s
+- *Prompt preparation time:* 0.596
+- *First-token latency:* 2.05
+- *Cleanup time:* 0.122
+- *Prompt tokens:* 3,125
+- *Generation tokens:* 119
+- *Total tokens:* 3,244
+- *Prompt throughput (raw):* 1,523 tok/s
+- *Generation throughput (raw):* 39.5 tok/s
+- *Peak memory (GB):* 16
+- *Active memory (GB):* 13
+- *Cache memory (GB):* 0.59
+- *Model-load active memory (GB):* 13.5
+- *Post-cleanup active memory (GB):* 0.0163
 - *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
+- *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1496
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Rendered prompt characters:* 1333
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 846ea5576854468f25af3767d769b0805b1b08b6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-4bit/snapshots/846ea5576854468f25af3767d769b0805b1b08b6
-- *Generation settings:* {"enable_thinking": true, "max_tokens": 1000,
-  "prefill_step_size": 2048, "repetition_context_size": 20,
-  "repetition_penalty": 1.0, "seed": 0, "temperature": 0.6, "thinking_budget":
-  800, "thinking_end_token": "&lt;/think&gt;", "thinking_start_token":
-  "&lt;think&gt;", "top_p": 0.95}
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* &lt;/s&gt;
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Alright, let's get this done. I need to create some metadata for this image, and it's my job to be precise.
+Title:
+Blue Cabin Cruiser Moored at Marina Dock
 
-First, I need to figure out a good title. "Sailboats on the Water" is too generic. "Two Sailors on Dinghies" is better, but I want something more specific. "Sailors on Catamaran and Laser Dinghy" - that's it! Concise and accurate.
+Description:
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock, surrounded by sailboats and leisure boats on calm water, with clear reflections in the early evening light.
 
-Next, the description. I'll start with the basics: date, time, and location. Then I'll describe the scene. I'll mention the two boats, the sailors, and the setting. The hint about the boats is great. Let me work that in. Okay, I'm going to use the hint about the catamaran and laser. I'll refine that. "On a calm day, two sailors navigate a Vortex catamaran and a Laser dinghy on a lake in the UK." That's good, it's accurate, and it's a good length.
+Keywords:
+Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
+</pre>
 
-Finally, the keywords. I'll go through the hints and add in some keywords that are relevant. Let's see, "sailboat," "dinghy," "catamaran," "laser," "sailor," "boat," "water," "lake," "sky," "trees," "shoreline," "recreation," "sport," "vessel," "wind," "man," "life jacket," "hull," "rigging," "sail number," "1067," "GBR 188572," "green," "calm," "daytime," "September," "UK," "England," "solent," "estuary," "marina," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull number," "hull
+</details>
+
+---
+
+<a id="model-nativ-community-mage-vl-optiq-4bit"></a>
+
+### nativ-community/Mage-VL-OptiQ-4bit
+
+<details>
+<summary>Complete evidence: nativ-community/Mage-VL-OptiQ-4bit</summary>
+
+- *Execution:* completed
+- *Mechanical checks:* concerns detected
+- *Assessment:* General checks + metadata fields and duplicate keywords;
+  length limits and factual accuracy not assessed
+- *Maintainer status:* none
+- *Observations:* Repeats the prompt's hint instead of describing the image:
+  description
+- *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
+- *Model load time:* 0.84s
+- *Generation time:* 3.20s
+- *Total time:* 4.84s
+- *Prompt preparation time:* 0.797
+- *First-token latency:* 1.5
+- *Cleanup time:* 0.125
+- *Prompt tokens:* 4,217
+- *Generation tokens:* 118
+- *Total tokens:* 4,335
+- *Prompt throughput (raw):* 2,820 tok/s
+- *Generation throughput (raw):* 125 tok/s
+- *Peak memory (GB):* 5.4
+- *Active memory (GB):* 3.9
+- *Cache memory (GB):* 0.72
+- *Model-load active memory (GB):* 3.93
+- *Post-cleanup active memory (GB):* 0.0166
+- *Post-cleanup cache memory (GB):* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 1000
+- *Rendered prompt characters:* 1463
+- *Processor:* mlx_vlm.models.mage_vl.processing_mage_vl.MageVLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4f0a424370e54984ed783db8f8633a219c72db78
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--nativ-community--Mage-VL-OptiQ-4bit/snapshots/4f0a424370e54984ed783db8f8633a219c72db78
+- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
+  "seed": 0, "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Title: Blue and Light Blue Motor Cabin Cruiser with Tan Canopy Moored at Marina Dock
+
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -2641,26 +2894,26 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 0.63s
-- *Generation time:* 1.38s
-- *Total time:* 3.15s
-- *Prompt preparation time:* 1.14
+- *Model load time:* 0.56s
+- *Generation time:* 1.28s
+- *Total time:* 2.95s
+- *Prompt preparation time:* 1.1
 - *First-token latency:* 0.106
-- *Cleanup time:* 0.0954
-- *Prompt tokens:* 336
-- *Generation tokens:* 51
-- *Total tokens:* 387
-- *Prompt throughput (raw):* 3,178 tok/s
-- *Generation throughput (raw):* 297 tok/s
+- *Cleanup time:* 0.0943
+- *Prompt tokens:* 341
+- *Generation tokens:* 38
+- *Total tokens:* 379
+- *Prompt throughput (raw):* 3,219 tok/s
+- *Generation throughput (raw):* 359 tok/s
 - *Peak memory (GB):* 2.2
 - *Active memory (GB):* 1.2
-- *Cache memory (GB):* 0.02
+- *Cache memory (GB):* 0.03
 - *Model-load active memory (GB):* 1.25
-- *Post-cleanup active memory (GB):* 0.000936
+- *Post-cleanup active memory (GB):* 0.00092
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1401
+- *Rendered prompt characters:* 1428
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -2674,196 +2927,121 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
 *Readable output:*
 
 <pre class="model-output-readable">
-A serene scene of two sailors navigating calm waters in a Vortex catamaran and Laser dinghy, set against a backdrop of dense green woodland, under a clear sky, with a sailboat and a man in a life jacket in the distance.
+A serene marina scene featuring a blue and light blue motor cabin cruiser moored alongside other sailboats and leisure boats on calm water, with a clear reflection in the early evening light.
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-8bit"></a>
 
-### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### mlx-community/Kimi-VL-A3B-Thinking-2506-8bit
 
 <details>
-<summary>Complete evidence: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-8bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Response appears cut off at
-  the token limit; Duplicate keywords: adventure, learning, education,
-  training, practice, improvement, progress, success, achievement,
-  accomplishment, pride, satisfaction, happiness, joy, laughter, smiles,
-  gratitude, appreciation, wonder, awe, amazement, enthusiasm, excitement,
-  exploration, discovery
-- *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.74s
-- *Generation time:* 55.83s
-- *Total time:* 58.17s
-- *Prompt preparation time:* 0.592
-- *First-token latency:* 1.6
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 308
+- *Observations:* Response repeats the same text; Required labelled fields not
+  detected: title; Response appears cut off at the token limit; Internal
+  reasoning block appears incomplete; Duplicate keywords: dock, marina, calm
+  water, reflections, early evening, blue hull, tan canopy, blue and light
+  blue, marina dock, leisure boats, early evening light, blue and light blue
+  hull, other sailboats, correct conflicts, moored
+- *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
+- *Model load time:* 2.40s
+- *Generation time:* 17.25s
+- *Total time:* 20.29s
+- *Prompt preparation time:* 0.632
+- *First-token latency:* 0.702
+- *Cleanup time:* 0.118
+- *Prompt tokens:* 1,331
 - *Generation tokens:* 1,000
-- *Total tokens:* 1,308
-- *Prompt throughput (raw):* 192 tok/s
-- *Generation throughput (raw):* 18.6 tok/s
-- *Peak memory (GB):* 15
-- *Active memory (GB):* 11
-- *Cache memory (GB):* 0.40
-- *Model-load active memory (GB):* 11.3
-- *Post-cleanup active memory (GB):* 0.00389
+- *Total tokens:* 2,331
+- *Prompt throughput (raw):* 1,895 tok/s
+- *Generation throughput (raw):* 63.2 tok/s
+- *Peak memory (GB):* 20
+- *Active memory (GB):* 18
+- *Cache memory (GB):* 1.4
+- *Model-load active memory (GB):* 17.8
+- *Post-cleanup active memory (GB):* 0.00308
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1410
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
+- *Rendered prompt characters:* 1520
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 8451adc50203b50b8f4199e75e753fb9c06e2af6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Llama-3.2-11B-Vision-Instruct-8bit/snapshots/8451adc50203b50b8f4199e75e753fb9c06e2af6
+- *Resolved model revision:* e5abbe34cbfabd829fafd0362856e5b468d19f85
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-8bit/snapshots/e5abbe34cbfabd829fafd0362856e5b468d19f85
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|eot_id\|>
+  "seed": 0, "temperature": 0.6, "top_p": 1.0}
+- *EOS token:* [EOS]
 
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Two Sailors Navigate Calm Waters in a Forested Estuary
+◁think▷Okay, let's tackle this task step by step. First, I need to create a British-English catalogue metadata based on the provided context and image. The key points from the context are the capture date/time (2026-09-26 17:36:29 UTC+01:00) and GPS coordinates (50.682100°N, 3.466600°W). The descriptive hints mention a blue and light blue motor cabin cruiser with a tan canopy at a marina, with reflections, early evening light, calm water, and other boats in the background.
 
-Description: On a sunny day in September 2026, two sailors, one in a Vortex catamaran and the other in a Laser dinghy, navigate their boats across the calm waters of an estuary, surrounded by dense green woodland and a blue sky with clouds. The Vortex catamaran, with its distinctive orange and grey sail, is sail number 1067, while the Laser dinghy, with its white sail bearing the GBR 188572 number, is a British vessel.
+The image shows a blue and light blue motor cabin cruiser with a tan canopy, docked at a marina. There are other sailboats and leisure boats around, calm water with reflections, and the lighting suggests early evening. The boat has a tan canopy, blue hull, and is moored at a dock. The background includes other vessels and calm water reflections.
 
-Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser, GBR, 1067, 188572, Sail, Boat, Water, Trees, Clouds, Sky, Blue, Green, Woodland, Nature, Outdoor, Recreation, Sport, Activity, Adventure, Fun, Relaxation, Peaceful, Calm, Serene, Scenic, Breathtaking, Beautiful, Picturesque, Idyllic, Tranquil, Soothing, Uplifting, Inspiring, Motivational, Encouraging, Empowering, Confidence-Boosting, Self-Improvement, Personal-Growth, Development, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, Enthusiasm, Excitement, Adventure, Exploration, Discovery, Learning, Education, Training, Practice, Improvement, Progress, Success, Achievement, Accomplishment, Pride, Satisfaction, Happiness, Joy, Laughter, Smiles, Gratitude, Appreciation, Wonder, Awe, Amazement, En
+Now, for the title: needs to be 5-10 words. Maybe something like "Motor cabin cruiser moored at marina in early evening light."
+
+Description: Combine the context and visible details. Mention the boat type, location (marina), time of day (early evening), and distinctive features (tan canopy, blue hull, reflections). So, "A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light."
+
+Keywords: Need 10-18 unique, comma-separated. Include boat types (motor cabin cruiser, sailboat, leisure boat, dock, marina, calm water, reflections, early evening, blue hull, tan canopy, blue and light blue), plus the GPS and date/time. Wait, the user said to treat capture date/time and GPS as authoritative but not claim they are visible. So maybe exclude them from keywords. Focus on visible details. So keywords: Motor cabin cruiser, blue hull, light blue, tan canopy, marina dock, sailboats, leisure boats, calm water, reflections, early evening, blue and light blue, blue hull, tan canopy, marina, dock, other boats, water reflection.
+
+Wait, need to check if "blue and light blue" is redundant. Maybe combine. Also, "motor cabin cruiser" and "cruise" or "motorboat". Let's list the visible unique elements: blue and light blue hull, tan canopy, marina dock, other boats (sailboats, leisure boats), calm water, reflections, early evening light, blue hull, tan canopy, dock, marina. Maybe 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, blue hull, tan canopy, dock, marina, calm water, other boats. That's 13. Maybe add "moored" as a keyword? But the hint says "moored" is already in hints. Wait the keywords from hints include "Mooring" but the user said to retain details supported by the image, correct conflicts, omit uncertain. The image shows the boat moored, so "moored" is visible. But the hints include "Mooring" so maybe include that. Wait the user said to prefer image evidence over hints. The image shows the boat is moored, so include "moored". But the hints might have "Mooring" which is similar. Let's check the hints: the hints include "Mooring" so maybe include that. But the user says to prefer image evidence. The image shows the boat is moored, so "moored" is visible. So include "moored". But the hints have "Mooring" – perhaps the user wants to use the hint's terms. Wait, the instructions say "retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details." So if the image shows the boat is moored, then "moored" is a visible detail, so include it. But the hints have "Mooring" which is similar. Maybe use "moored" instead. Let's list keywords: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. Wait, need to make sure 10-18. Let's count: Motor cabin cruiser, blue and light blue hull, tan canopy, marina dock, other sailboats, leisure boats, calm water, reflections, early evening light, moored, blue hull, tan canopy, marina, dock, calm water, other boats. That's 14. Maybe combine "blue hull" and "blue and light
 </pre>
 
 </details>
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-4bit"></a>
+<a id="model-mlx-community-lfm25-vl-3b-optiq-4bit"></a>
 
-### mlx-community/MiniCPM-V-4.6-4bit
+### mlx-community/LFM2.5-VL-3B-OptiQ-4bit
 
 <details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-4bit</summary>
+<summary>Complete evidence: mlx-community/LFM2.5-VL-3B-OptiQ-4bit</summary>
 
 - *Execution:* completed
 - *Mechanical checks:* major concerns
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 0.91s
-- *Generation time:* 1.34s
-- *Total time:* 2.98s
-- *Prompt preparation time:* 0.711
-- *First-token latency:* 0.256
-- *Cleanup time:* 0.107
-- *Prompt tokens:* 934
-- *Generation tokens:* 84
-- *Total tokens:* 1,018
-- *Prompt throughput (raw):* 3,643 tok/s
-- *Generation throughput (raw):* 221 tok/s
-- *Peak memory (GB):* 3.3
-- *Active memory (GB):* 2.2
-- *Cache memory (GB):* 0.04
-- *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00439
+- *Maintainer status:* none
+- *Observations:* Required labelled fields not detected: keywords
+- *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
+- *Model load time:* 0.97s
+- *Generation time:* 1.82s
+- *Total time:* 3.56s
+- *Prompt preparation time:* 0.759
+- *First-token latency:* 0.484
+- *Cleanup time:* 0.0909
+- *Prompt tokens:* 2,115
+- *Generation tokens:* 122
+- *Total tokens:* 2,237
+- *Prompt throughput (raw):* 4,368 tok/s
+- *Generation throughput (raw):* 203 tok/s
+- *Peak memory (GB):* 4.0
+- *Active memory (GB):* 2.8
+- *Cache memory (GB):* 0.08
+- *Model-load active memory (GB):* 2.81
+- *Post-cleanup active memory (GB):* 0.00336
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1374
+- *Rendered prompt characters:* 1384
 - *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-4bit/snapshots/86cd463d33a946e4481b77e3c10fc63121b60a19
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "repetition_context_size": 20, "repetition_penalty": 1.0, "seed": 0,
-  "temperature": 0.7, "top_k": 0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;think&gt;
-Here's the response following the instructions:
-
-Title: Sailing vessels on calm waters
-
-Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest in the background.
-
-Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<think>
-Here's the response following the instructions:
-
-Title: Sailing vessels on calm waters
-
-Description: Two sailors are sailing small dinghies, a Vortex catamaran and a Laser dinghy, across calm water with green forest in the background.
-
-Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person, life jacket, outdoor, recreation
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-molmo2-8b-4bit"></a>
-
-### mlx-community/Molmo2-8B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Molmo2-8B-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Duplicate keywords: blue stripes, white boat, blue canopy, white
-  hull
-- *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.18s
-- *Generation time:* 4.58s
-- *Total time:* 6.47s
-- *Prompt preparation time:* 0.701
-- *First-token latency:* 0.752
-- *Cleanup time:* 0.106
-- *Prompt tokens:* 1,526
-- *Generation tokens:* 225
-- *Total tokens:* 1,751
-- *Prompt throughput (raw):* 2,029 tok/s
-- *Generation throughput (raw):* 71.0 tok/s
-- *Peak memory (GB):* 8.2
-- *Active memory (GB):* 6.5
-- *Cache memory (GB):* 1.8
-- *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00554
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1344
-- *Image placeholders:* 1
-- *Processor:* mlx_vlm.models.molmo2.processing.Molmo2Processor
+- *Processor:* transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
-- *Resolved model revision:* 4fcbe926577641af12aa5086cf5c292db9dd9730
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Molmo2-8B-4bit/snapshots/4fcbe926577641af12aa5086cf5c292db9dd9730
+- *Resolved model revision:* 7886c0b4a4b529265c226a45aa8763ea9ac46ebd
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--LFM2.5-VL-3B-OptiQ-4bit/snapshots/7886c0b4a4b529265c226a45aa8763ea9ac46ebd
 - *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
   "seed": 0, "temperature": 0.0, "top_p": 1.0}
 - *EOS token:* <\|im_end\|>
@@ -2871,11 +3049,8 @@ Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: Catamaran and Laser Dinghy Sail on Calm River
-
-Description: Two sailors navigate small dinghies across a tranquil river, with a Vortex catamaran on the left and a Laser dinghy on the right. The scene features calm waters, dense green woodland, and a clear blue sky with scattered clouds.
-
-Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water, Sail number, Vortex, Calm waters, Dense woodland, Clear sky, Scattered clouds, Small dinghies, Two sailors, White hulls, Blue life jackets, White sails, Orange stripes, White text, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull, Blue stripes, White boat, Blue canopy, White hull,
+Title: Blue and white motor cabin cruiser at marina dock
+Description: A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light. Keyword: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht.
 </pre>
 
 </details>
@@ -2896,20 +3071,19 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible; Names a
-  place the prompt did not supply: River That
+  at the token limit; Conversation-role control tokens remain visible
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.25s
-- *Generation time:* 54.69s
-- *Total time:* 58.65s
-- *Prompt preparation time:* 0.695
-- *First-token latency:* 9.65
-- *Cleanup time:* 0.17
-- *Prompt tokens:* 4,409
+- *Model load time:* 3.05s
+- *Generation time:* 49.65s
+- *Total time:* 53.48s
+- *Prompt preparation time:* 0.765
+- *First-token latency:* 7.44
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 4,410
 - *Generation tokens:* 1,000
-- *Total tokens:* 5,409
-- *Prompt throughput (raw):* 457 tok/s
-- *Generation throughput (raw):* 22.5 tok/s
+- *Total tokens:* 5,410
+- *Prompt throughput (raw):* 592 tok/s
+- *Generation throughput (raw):* 24.1 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
@@ -2918,7 +3092,7 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1544
+- *Rendered prompt characters:* 1571
 - *Processor:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Requested model revision:* not requested
@@ -2936,11 +3110,12 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+- GPS: 50.682100°N, 3.466600°W
 
 Descriptive hints:
-- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
-- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 
 Write:
 - a concrete 5-10-word title;
@@ -2952,37 +3127,43 @@ Title:
 Description:
 Keywords:
 
-Need British English.
+We need title 5-10 words. Concrete.
 
-Title: 5-10 words. Concrete. Maybe "Vortex Catamaran and Laser Dinghy Sailing on Water". That's 8 words? Vortex(1) Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 Water8. Good.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can include date/time in description? Probably yes as context. It says combining relevant context with main visible subject... Setting, action, lighting, distinctive details. Might include date. But not claim visible. Could say Captured on 2026-09-19... That's a fact. Probably acceptable.
+Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
 
-The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
+Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
+Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
 
-Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
+Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-We need British English spelling.
+Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
 
-Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
+Make sure British-English: moor, etc. Use British spelling.
 
-Should be 1-2 sentences. Let's do two sentences.
-
-Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
 
 Let's craft.
 
-Title:
-Vortex Catamaran and Laser Dinghy Sailing on River
+Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
 
-That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+That's 8 words.
 
-Description:
-Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
 
-That's
+That's two sentences. Good.
+
+Keywords: maybe 13-15 items.
+
+Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
+
+Need comma-separated. Unique.
+
+Ensure 10-18. Let's produce 15.
+
+Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
 </pre>
 
 <details>
@@ -2994,11 +3175,12 @@ That's
 Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
 
 Context: Authoritative context:
-- Capture date/time: 2026-09-19 17:12:46 UTC+01:00
+- Capture date/time: 2026-09-26 17:36:29 UTC+01:00
+- GPS: 50.682100°N, 3.466600°W
 
 Descriptive hints:
-- Description hint: Two sailors steer small dinghies—a Vortex catamaran (sail number 1067) on the left and a Laser dinghy (sail number GBR 188572) on the right—across calm coastal or river waters against a backdrop of dense green woodland.
-- Keyword hints: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, Man, Mast, Outdoor recreation, River, Sailboat, Sailing, Sailor, Shoreline, Sky, Trees, Water
+- Description hint: A blue and light blue motor cabin cruiser with a tan canopy moored at a marina dock alongside other sailboats and leisure boats on calm water, casting clear reflections in the early evening light.
+- Keyword hints: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 
 Write:
 - a concrete 5-10-word title;
@@ -3010,99 +3192,46 @@ Title:
 Description:
 Keywords:
 
-Need British English.
+We need title 5-10 words. Concrete.
 
-Title: 5-10 words. Concrete. Maybe "Vortex Catamaran and Laser Dinghy Sailing on Water". That's 8 words? Vortex(1) Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 Water8. Good.
+Description 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Include capture date/time? It says treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. So we can mention? Possibly include in description? Might be metadata. Probably include date/time? The description should combine relevant context with main visible subject... Could mention captured on 2026-09-26. Could include GPS? Maybe not necessary. Probably mention location? GPS is 50.682100°N, 3.466600°W. That's near... maybe Exmouth? That's Devon. Could just say at marina. Might be okay to include date.
 
-Description: 1-2 sentence factual description combining relevant context with main visible subject, setting, action, lighting, distinctive details. Need mention capture date/time? It says treat capture date/time as authoritative facts, but do not claim they are visible. So can include date/time in description? Probably yes as context. It says combining relevant context with main visible subject... Setting, action, lighting, distinctive details. Might include date. But not claim visible. Could say Captured on 2026-09-19... That's a fact. Probably acceptable.
+Do not claim they are visible. So we cannot say "the image shows date". We can say "captured on...". That's fine.
 
-The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
+Distinctive details: boat named EVENHAZE, blue hull with red boot stripe, light blue superstructure, tan bimini canopy, blue fenders, moored at wooden dock, sailboats behind, calm water reflection, late afternoon light.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
+Early evening light hint. Capture time 17:36:29 UTC+01:00 = 5:36pm, so late afternoon/early evening.
 
-Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
+Title: 5-10 words. Eg "Blue Cabin Cruiser Evenhaze Moored at Marina Dock". That's 7 words? Blue(1) Cabin(2) Cruiser(3) Evenhaze(4) Moored(5) at(6) Marina(7) Dock(8). Good.
 
-We need British English spelling.
+Description: 1-2 sentence. Should be factual. Include capture date/time and GPS? Might be relevant context. Could say "Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the motor cabin cruiser Evenhaze..." That might be okay. Not claiming visible.
 
-Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
+Make sure British-English: moor, etc. Use British spelling.
 
-Should be 1-2 sentences. Let's do two sentences.
-
-Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+Keywords: 10-18 unique comma-separated. Use hints but also add visible details: Evenhaze, blue hull, red boot stripe, tan canopy, etc. Use keywords list.
 
 Let's craft.
 
-Title:
-Vortex Catamaran and Laser Dinghy Sailing on River
+Title: Blue Cabin Cruiser Evenhaze Moored at Marina Dock
 
-That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+That's 8 words.
 
-Description:
-Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+Description: Captured on 2026-09-26 at 17:36:29 UTC+01:00 at 50.682100°N, 3.466600°W, the blue-hulled motor cabin cruiser Evenhaze with a tan sprayhood is moored alongside a wooden pontoon in a busy marina. It sits among sailboats and leisure craft on calm water in late afternoon light, with clear reflections and blue fenders visible along its hull.
 
-That's
+That's two sentences. Good.
+
+Keywords: maybe 13-15 items.
+
+Boat, Motor cabin cruiser, Evenhaze, Blue hull, Tan canopy, Marina, Dock, Mooring, Sailboat, Calm water, Reflection, Fenders, Pontoon, Nautical
+
+Need comma-separated. Unique.
+
+Ensure 10-18. Let's produce 15.
+
+Keywords: Cabin cruiser, Motorboat, Evenhaze, Blue hull, Red boot stripe, Tan sprayhood, Marina, Dock, Pontoon, Mooring, Sailboat, Calm water, Water
 ```
 
 </details>
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen2-vl-7b-instruct-4bit"></a>
-
-### mlx-community/Qwen2-VL-7B-Instruct-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/Qwen2-VL-7B-Instruct-4bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response repeats the same text; Generation was stopped early
-  after sustained repeated output; Duplicate keywords: trees, forest, mast,
-  life jacket, river, estuary, sky, shoreline, sail, boat, boating
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.85s
-- *Generation time:* 44.22s
-- *Total time:* 46.05s
-- *Prompt preparation time:* 0.971
-- *First-token latency:* 40.7
-- *Cleanup time:* 0.118
-- *Prompt tokens:* 16,560
-- *Generation tokens:* 225
-- *Total tokens:* 16,785
-- *Prompt throughput (raw):* 407 tok/s
-- *Generation throughput (raw):* 84.0 tok/s
-- *Peak memory (GB):* 9.3
-- *Active memory (GB):* 4.7
-- *Cache memory (GB):* 2.4
-- *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00736
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Processor:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Qwen2-VL-7B-Instruct-4bit/snapshots/1c638e970be36948e087e77d103b9147e1a9a1dd
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title: Sailing Adventure
-
-Description: Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across calm waters, with dense green woodland in the background.
-
-Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, Forest, Woodland, Adventure, Outdoor, Action, Sailboat, Mast, Life jacket, River, Estuary, Sky, Clouds, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat, Boating, Estuary, Forest, Life jacket, Mast, River, Sky, Trees, Shoreline, Sail, Boat,
-</pre>
 
 </details>
 
@@ -3123,17 +3252,17 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.31s
-- *Generation time:* 1.09s
+- *Model load time:* 0.29s
+- *Generation time:* 1.11s
 - *Total time:* 2.31s
-- *Prompt preparation time:* 0.915
-- *First-token latency:* 0.122
-- *Cleanup time:* 0.0913
-- *Prompt tokens:* 1,212
-- *Generation tokens:* 38
-- *Total tokens:* 1,250
-- *Prompt throughput (raw):* 9,964 tok/s
-- *Generation throughput (raw):* 308 tok/s
+- *Prompt preparation time:* 0.9
+- *First-token latency:* 0.187
+- *Cleanup time:* 0.0793
+- *Prompt tokens:* 1,217
+- *Generation tokens:* 39
+- *Total tokens:* 1,256
+- *Prompt throughput (raw):* 6,504 tok/s
+- *Generation throughput (raw):* 524 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
@@ -3142,7 +3271,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1338
+- *Rendered prompt characters:* 1365
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -3156,68 +3285,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 *Readable output:*
 
 <pre class="model-output-readable">
- A 5-10-word, 1-2-sentence, factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
-</pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Mechanical checks:* major concerns
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Generation was stopped early after sustained repeated
-  output; Duplicate keywords: blue and white forest, blue and white sky, blue
-  and white water, blue and white sail
-- *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.22s
-- *Generation time:* 19.36s
-- *Total time:* 22.07s
-- *Prompt preparation time:* 1.48
-- *First-token latency:* 13.9
-- *Cleanup time:* 0.12
-- *Prompt tokens:* 16,560
-- *Generation tokens:* 250
-- *Total tokens:* 16,810
-- *Prompt throughput (raw):* 1,189 tok/s
-- *Generation throughput (raw):* 55.4 tok/s
-- *Peak memory (GB):* 14
-- *Active memory (GB):* 9.5
-- *Cache memory (GB):* 2.4
-- *Model-load active memory (GB):* 9.46
-- *Post-cleanup active memory (GB):* 0.0109
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* repetition_abort
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1436
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 1000, "prefill_step_size": 2048,
-  "seed": 0, "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Title:
-Sailing Catamaran and Laser Dinghy on Calm Waters
-
-Description:
-Two sailors navigate a Vortex catamaran (sail number 1067) and a Laser dinghy (sail number GBR 188572) across tranquil waters, set against a backdrop of dense green woodland under a partly cloudy sky.
-
-Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 188572, Calm waters, Distant shoreline, Forest, Cloudy sky, Life jackets, Outdoor recreation, River, Shoreline, Trees, Water, Man, Mast, Sunburst logo, Blue and white sails, Orange and black sail, Blue and white catamaran, White Laser dinghy, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail, Blue and white forest, Blue and white sky, Blue and white water, Blue and white sail,
+ A 5-10-word, 1-2-sentence, factual description, combining relevant context with the main visible subject, setting, action, lighting, and distinctive details.
 </pre>
 
 </details>
@@ -3239,17 +3307,17 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.71s
-- *Generation time:* 3.68s
-- *Total time:* 5.99s
-- *Prompt preparation time:* 0.586
-- *First-token latency:* 0.32
-- *Cleanup time:* 0.13
-- *Prompt tokens:* 590
-- *Generation tokens:* 196
-- *Total tokens:* 786
-- *Prompt throughput (raw):* 1,846 tok/s
-- *Generation throughput (raw):* 70.0 tok/s
+- *Model load time:* 1.57s
+- *Generation time:* 2.25s
+- *Total time:* 4.46s
+- *Prompt preparation time:* 0.617
+- *First-token latency:* 0.313
+- *Cleanup time:* 0.107
+- *Prompt tokens:* 595
+- *Generation tokens:* 114
+- *Total tokens:* 709
+- *Prompt throughput (raw):* 1,899 tok/s
+- *Generation throughput (raw):* 85.0 tok/s
 - *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
@@ -3258,7 +3326,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1363
+- *Rendered prompt characters:* 1390
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
@@ -3272,7 +3340,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 *Readable output:*
 
 <pre class="model-output-readable">
-Two sailors are engaged in a sailing competition on a calm body of water, likely an estuary or a sheltered bay, surrounded by lush green vegetation. On the left, a vibrant orange and white catamaran, identified by the sail number 1067 and the name "VORTEX," is being steered by a person wearing a blue jacket and dark pants. The catamaran has a grey and orange striped sail with the sail number prominently displayed. On the right, a white and blue Laser dinghy, bearing the sail number GBR 188572, is being sailed by a person in a dark jacket and dark pants. The Laser has a white sail with a red logo and the British flag. Both boats are relatively close to each other, suggesting a close race. The water is calm, reflecting the boats and the surrounding greenery. The sky is partly cloudy, providing ample daylight for the sailing activity. The overall scene depicts a competitive yet serene sporting event.
+A blue and light blue motor cabin cruiser with a tan canopy is moored at a marina dock alongside other sailboats and motorboats on calm water, reflecting the warm light of the early evening sun. The boat is positioned in the foreground, with its reflection clearly visible on the water's surface. The dock is made of weathered wood and concrete, and the surrounding water is a deep blue. Other boats of various sizes and colors are visible in the background, adding to the marina setting. The overall scene is peaceful and serene, capturing a moment of calm in the harbor.
 </pre>
 
 </details>
@@ -3291,28 +3359,28 @@ Two sailors are engaged in a sailing competition on a calm body of water, likely
 - *Assessment:* General checks + metadata fields and duplicate keywords;
   length limits and factual accuracy not assessed
 - *Maintainer status:* none
-- *Observations:* Required labelled fields not detected: keywords
+- *Observations:* Required labelled fields not detected: description
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
 - *Model load time:* 0.42s
-- *Generation time:* 3.70s
-- *Total time:* 4.98s
-- *Prompt preparation time:* 0.853
-- *First-token latency:* 2.18
-- *Cleanup time:* 0.0952
-- *Prompt tokens:* 5,581
-- *Generation tokens:* 102
-- *Total tokens:* 5,683
-- *Prompt throughput (raw):* 2,563 tok/s
-- *Generation throughput (raw):* 145 tok/s
-- *Peak memory (GB):* 4.2
+- *Generation time:* 3.96s
+- *Total time:* 5.33s
+- *Prompt preparation time:* 0.944
+- *First-token latency:* 2.44
+- *Cleanup time:* 0.121
+- *Prompt tokens:* 5,666
+- *Generation tokens:* 82
+- *Total tokens:* 5,748
+- *Prompt throughput (raw):* 2,322 tok/s
+- *Generation throughput (raw):* 129 tok/s
+- *Peak memory (GB):* 4.4
 - *Active memory (GB):* 2.4
-- *Cache memory (GB):* 0.94
+- *Cache memory (GB):* 1.3
 - *Model-load active memory (GB):* 2.36
 - *Post-cleanup active memory (GB):* 0.015
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1483
+- *Rendered prompt characters:* 1510
 - *Image placeholders:* 1
 - *Processor:* mlx_vlm.models.granite_vision.processing_granite_vision.GraniteVisionProcessor
 - *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
@@ -3326,8 +3394,8 @@ Two sailors are engaged in a sailing competition on a calm body of water, likely
 *Readable output:*
 
 <pre class="model-output-readable">
-Title: "Harmony on the Water"
-Description: Two sailors navigate their small dinghies, a Vortex catamaran and a Laser dinghy, across calm waters, with a dense green woodland backdrop. The scene is set in an estuary, with a clear sky overhead. The sailors are equipped with life jackets, and the boats are moored in a serene, outdoor recreational setting.
+Title: "Tranquil Marina Reflections"
+Keywords: Boat, Boat canopy, Boat fender, Boating, Cabin cruiser, Calm Water, Dock, Harbor, Marina, Mast, Mooring, Motorboat, Nautical, Reflection, Rope, Sailboat, Sailing, Water reflection, Watercraft, Yacht
 </pre>
 
 </details>
@@ -3349,16 +3417,16 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.19s
-- *Generation time:* 1.66s
-- *Total time:* 3.57s
-- *Prompt preparation time:* 0.71
-- *First-token latency:* 0.839
-- *Cleanup time:* 0.179
-- *Prompt tokens:* 2,197
-- *Generation tokens:* 16
-- *Total tokens:* 2,213
-- *Prompt throughput (raw):* 2,619 tok/s
+- *Model load time:* 1.11s
+- *Generation time:* 1.70s
+- *Total time:* 3.56s
+- *Prompt preparation time:* 0.739
+- *First-token latency:* 0.833
+- *Cleanup time:* 0.171
+- *Prompt tokens:* 2,201
+- *Generation tokens:* 18
+- *Total tokens:* 2,219
+- *Prompt throughput (raw):* 2,643 tok/s
 - *Generation throughput (raw):* 107 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
@@ -3368,7 +3436,7 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1565
+- *Rendered prompt characters:* 1592
 - *Image placeholders:* 1
 - *Processor:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
@@ -3382,14 +3450,14 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 *Readable output:*
 
 <pre class="model-output-readable">
-&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows two small sailboats racing on a river.
+&lt;|channel|&gt; analysis&lt;|message|&gt; The image shows a blue and white boat with a tan colored canopy.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-<|channel|> analysis<|message|> The image shows two small sailboats racing on a river.
+<|channel|> analysis<|message|> The image shows a blue and white boat with a tan colored canopy.
 ```
 
 </details>
@@ -3414,26 +3482,26 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.50s
-- *Generation time:* 0.80s
+- *Model load time:* 0.48s
+- *Generation time:* 0.79s
 - *Total time:* 1.94s
-- *Prompt preparation time:* 0.64
-- *First-token latency:* 0.0884
-- *Cleanup time:* 0.111
-- *Prompt tokens:* 332
-- *Generation tokens:* 21
-- *Total tokens:* 353
-- *Prompt throughput (raw):* 3,755 tok/s
-- *Generation throughput (raw):* 196 tok/s
-- *Peak memory (GB):* 1.6
+- *Prompt preparation time:* 0.664
+- *First-token latency:* 0.0835
+- *Cleanup time:* 0.106
+- *Prompt tokens:* 337
+- *Generation tokens:* 23
+- *Total tokens:* 360
+- *Prompt throughput (raw):* 4,038 tok/s
+- *Generation throughput (raw):* 335 tok/s
+- *Peak memory (GB):* 1.8
 - *Active memory (GB):* 0.61
-- *Cache memory (GB):* 0.28
+- *Cache memory (GB):* 0.30
 - *Model-load active memory (GB):* 0.614
 - *Post-cleanup active memory (GB):* 0.016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* 1392
+- *Rendered prompt characters:* 1419
 - *Image placeholders:* 1
 - *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -3447,7 +3515,7 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 *Readable output:*
 
 <pre class="model-output-readable">
-"Boating in the Countryside: A Glimpse of Sailboats and Forests"
+"Boat in a Marina at a Dock with a Motorboat and Canopy in the Early Evening Light"
 </pre>
 
 </details>
