@@ -1108,7 +1108,8 @@ class TestHardwareFacts:
         assert info["MLX Device"] == "Apple M5 Max"
         assert info["GPU Architecture"] == "applegpu_g17s"
         assert info["RAM"] == "128.0 GB"
-        assert info["Recommended Working Set"] == "96 GB"
+        # Decimal GB like peak memory (96 GiB), while RAM keeps Apple's binary "128 GB".
+        assert info["Recommended Working Set"] == "103 GB"
         assert info["Fused Attention"] == "Available"
 
     @pytest.mark.parametrize(

@@ -68,7 +68,7 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Guidance |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~25,600 lines). Application logic lives here. | Primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~26,100 lines). Application logic lives here. | Primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |

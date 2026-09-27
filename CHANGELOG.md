@@ -6,6 +6,35 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Console log simplifications. Each per-model result opens with one readable
+  line (`[n/N] <model>: completed, unusable output; observations: …; next
+  step: …`) instead of wrapped `key=value` pairs; the DEBUG `REPRO` line
+  stays the grep-able record. The verbose "Output Observations" repeat of
+  the ⚠️ warnings is gone, with the helpers that built it. Metric trees pad
+  labels to their own longest label, so values line up, and the first-token
+  rows read "First token (upstream)" and "First token (measured)". A verbose
+  run's closing summary points to the version and system tables at the top
+  of the log instead of printing them again. The EXIF table keeps empty
+  tags and shows undecoded binary values (PrintImageMatching, maker notes)
+  in hex in verbose mode (first 256 bytes, with the total size) and as
+  `[binary data, N bytes]` otherwise.
+- The console comparison table's two-letter `E/U` column is replaced by a
+  one-word `Result` (usable, caveats, unusable, crashed, no verdict): the
+  old codes reused C and X with different meanings in each position, so
+  "completed, unusable output" (`C/X`) read as a crash. The recommended
+  working set is shown in decimal GB there and in the system facts, like
+  peak memory (it had read 108 GB against a 115 GB figure elsewhere).
+- The `--system-telemetry` help now lists everything it records (thermal
+  state, memory pressure, CPU speed limit, power source and energy mode) and
+  says when the default checks are taken (before load and after cleanup).
+  The per-model telemetry note says which readings a count comes from (both
+  checks, N of M checks, or readings every 2 s during the run) and what a
+  thermal level means for that model's timings; a warm but unthrottled
+  "fair" state is logged as information rather than a ⚠️ warning. The note
+  (`System state for <model>`) is now logged in the model's closing lines,
+  after its output and observations, instead of just before them, where it
+  read as a preamble to the next model; it states that a throttled model's
+  output is still recorded and assessed, and only its speed is left out.
 - System telemetry records macOS's thermal state (`NSProcessInfo.thermalState`,
   read through the Objective-C runtime with `ctypes`: no dependency, no
   subprocess, no privileges) with every probe: `thermal_samples`,
@@ -539,6 +568,18 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- System facts labelled "(run start)" (available memory, swap, power source
+  and mode) are taken once at the start of the run and reused by the reports
+  and the closing summary; both had re-read them at the end, so an unplugged
+  start read Battery at the top of the log and AC under the same label at
+  the bottom, and the retained results recorded end-of-run values.
+- The console log's per-model results open with a "Per-model results
+  (failures first, then fastest to slowest)" heading, so the last model's
+  closing notes no longer read as the first result's, and entries are
+  numbered `[n/N]` rather than `[RUN n/N]`, which implied run order.
+- The per-model timing tree no longer gives cleanup a share of the total:
+  cleanup runs after the total is taken, so the shares summed past 100%. It
+  is shown as "Cleanup (after total)".
 - Cache discovery skips a repo whose `config.json` is not a readable JSON
   object or has no `model_type` (cache-layout reason), as mlx-vlm's server
   listing does; upstream `load()` dispatches on `model_type`, so such a repo

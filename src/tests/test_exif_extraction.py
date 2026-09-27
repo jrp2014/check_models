@@ -494,3 +494,31 @@ def test_decode_iptc_keywords_normalises_bytes_and_strings(
     raw: object, expected: list[str]
 ) -> None:
     assert check_models._decode_iptc_keywords(raw) == expected
+
+
+def test_exif_table_keeps_empty_tags_and_shows_binary_as_hex_or_a_label() -> None:
+    """Empty tags stay; binary blobs are hex in verbose mode and a labelled size otherwise."""
+    blob = b"PrintIM0300\x00\x00\x03\x01\x02"
+    exif: check_models.ExifDict = {
+        "Make": "SONY",
+        "UserComment": "",
+        "ExifVersion": b"0232",
+        "PrintImageMatching": blob,
+    }
+
+    def values(*, binary_as_hex: bool) -> dict[str, str]:
+        return {
+            name: value
+            for name, value, _important in check_models.filter_and_format_tags(
+                exif, show_all=True, binary_as_hex=binary_as_hex
+            )
+        }
+
+    labelled = values(binary_as_hex=False)
+    assert labelled["UserComment"] == ""
+    assert labelled["ExifVersion"] == "0232"
+    assert labelled["PrintImageMatching"] == f"[binary data, {len(blob)} bytes]"
+    assert values(binary_as_hex=True)["PrintImageMatching"] == blob.hex(" ")
+    long_blob = bytes(range(256)) * 2
+    shown = check_models._format_exif_binary(long_blob, as_hex=True)
+    assert shown.endswith("(512 bytes; first 256 shown)")

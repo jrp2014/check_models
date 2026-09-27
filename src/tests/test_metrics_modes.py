@@ -6,8 +6,10 @@ import argparse
 import io
 import json
 import logging
+import re
 import time
 from contextlib import ExitStack
+from dataclasses import replace
 from typing import TYPE_CHECKING, Literal, cast
 from unittest.mock import patch
 
@@ -323,9 +325,17 @@ def test_verbose_metrics_show_phase_timings_and_stop_reason(
     print_model_result(res, verbose=True)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "Prompt prep:    0.15s" in messages
-    assert "first token:    0.30s" in messages
-    assert "Stop reason: timeout" in messages
+    assert re.search(r"Prompt prep:\s+0\.15s", messages)
+    assert re.search(r"First token \(upstream\):\s+0\.30s", messages)
+    assert re.search(r"Stop reason:\s+timeout", messages)
+    # Labels are padded to the tree's longest, so values share one column.
+    columns = {
+        line.index(value)
+        for line in messages.splitlines()
+        for value in ("0.15s", "0.30s")
+        if value in line and ("Prompt prep" in line or "First token (upstream)" in line)
+    }
+    assert len(columns) == 1
 
 
 def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
@@ -389,8 +399,8 @@ def test_metrics_mode_detailed_logs_runtime_phase_details(
     messages = "\n".join(record.message for record in caplog.records)
     assert "Validation:" in messages
     assert "Prompt prep:" in messages
-    assert "Cleanup:" in messages
-    assert "Upstream model prefill / first token:" in messages
+    assert "Cleanup (after total):" in messages
+    assert "First token (upstream):" in messages
     assert "Stop reason:" in messages
 
 
@@ -504,7 +514,7 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
         == (
             "#",
             "Model",
-            "E/U",
+            "Result",
             "Val",
             "Load",
             "Prep",
@@ -517,12 +527,24 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
         )
         for call in rich_table.call_args_list
     )
-    assert "execution C=completed" in messages
+    assert "Result: usable, caveats (usable with caveats) or unusable" in messages
     assert "completed" in messages
     assert "usable" in messages
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" in messages
     assert "Failure stage frequency:" in messages
+
+
+def test_comparison_result_label_never_reads_a_completed_run_as_a_crash() -> None:
+    """One word per model; the old C/X code let "completed, unusable" read as crashed."""
+    label = check_models._comparison_result_label
+    assessment = check_models.ResultAssessment
+    assert label(assessment("completed", "unusable", "none", ("missing_requested_sections",))) == (
+        "unusable"
+    )
+    assert label(assessment("completed", "usable", "none", ())) == "usable"
+    assert label(assessment("crashed", "not_evaluated", "actionable_failure", ())) == "crashed"
+    assert label(assessment("indeterminate", "not_evaluated", "none", ())) == "no verdict"
 
 
 def test_log_summary_contextualizes_comparison_and_average_peak_memory(
@@ -553,7 +575,7 @@ def test_log_summary_contextualizes_comparison_and_average_peak_memory(
         log_summary(results)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "Recommended working set: 1.86 GB" in messages
+    assert "Recommended working set: 2 GB" in messages
     assert "67.5% of 2 GB recommended working set" in messages
 
 
@@ -610,7 +632,7 @@ def test_log_summary_comparison_table_is_one_row_per_model_at_realistic_width(
     comparison = next(
         call
         for call in rich_table.call_args_list
-        if call.kwargs["headers"][0:3] == ("#", "Model", "E/U")
+        if call.kwargs["headers"][0:3] == ("#", "Model", "Result")
     )
     row = comparison.kwargs["rows"][0]
     assert "a-realistically-lo..." in row
@@ -900,19 +922,14 @@ def test_print_model_result_uses_neutral_cached_unusable_assessment(
 
     print_model_result(result, assessment=assessment, verbose=False)
 
-    summary_records = [
-        record
-        for record in caplog.records
-        if "SUMMARY" in record.message or "maintainer=" in record.message
-    ]
-    summary = " ".join(record.message for record in summary_records)
-    assert "execution=completed" in summary
-    assert "usability=unusable" in summary
-    assert "maintainer=observation_needs_reproduction" in summary
+    summary = " ".join(record.message for record in caplog.records)
+    assert "org/unusable: completed, unusable output" in summary
+    assert "next step: reproduce natively before reporting" in summary
     assert "status=OK" not in summary
     assert all(
         getattr(record, "style_hint", None) != check_models.LogStyles.SUCCESS
-        for record in summary_records
+        for record in caplog.records
+        if "org/unusable" in record.message
     )
 
 
@@ -948,10 +965,11 @@ def test_machine_summary_uses_observation_vocabulary() -> None:
         "observation_needs_reproduction",
         ("repeated_output", "token_cap_truncation"),
     )
-    parts = check_models._summary_parts(result, "caption-model", assessment)
+    sentence = check_models._summary_sentence(result, assessment)
 
-    assert "observations=repeated_output+token_cap_truncation" in parts
-    assert not any(part.startswith("quality=") for part in parts)
+    assert "completed, usable output with caveats" in sentence
+    assert "observations: repeated_output, token_cap_truncation" in sentence
+    assert "quality=" not in sentence
 
 
 def test_metrics_legend_names_only_retained_mechanical_warnings(
@@ -1173,8 +1191,8 @@ def test_finalize_execution_separates_each_model_result_block(
     )
 
     messages = [record.message for record in caplog.records]
-    first_summary = _message_index(messages, "[RUN 1/2] SUMMARY model=dummy/first")
-    second_summary = _message_index(messages, "[RUN 2/2] SUMMARY model=dummy/second")
+    first_summary = _message_index(messages, "[1/2] dummy/first:")
+    second_summary = _message_index(messages, "[2/2] dummy/second:")
     first_timing = next(
         index
         for index, message in enumerate(messages[first_summary:second_summary], first_summary)
@@ -1582,13 +1600,56 @@ class TestSystemTelemetry:
         )
         note = check_models._telemetry_degradation_note(record)
         assert note is not None
-        assert "thermal state reached serious for 2 sample(s)" in note
-        assert "timings are not compared" in note
+        assert "macOS thermal state serious" in note
+        assert "at 2 of 3 checks (before load and after cleanup)" in note
+        assert "speed is left out of timing comparisons" in note
+        assert "its output is still recorded and assessed" in note
+        assert check_models._telemetry_degrades_timings(record)
         fair = check_models._system_telemetry_record_from_probes(probes[:2], mode="snapshot")
         fair_note = check_models._telemetry_degradation_note(fair)
         assert fair_note is not None
-        assert "reached fair" in fair_note
-        assert "not compared" not in fair_note
+        assert (
+            "macOS thermal state fair (warm, fans working; macOS is not reducing "
+            "performance) at 1 of 2 checks" in fair_note
+        )
+        assert "left out" not in fair_note
+        # Fair heat is context, not degradation: logged as information.
+        assert not check_models._telemetry_degrades_timings(fair)
+        both = check_models._system_telemetry_record_from_probes(
+            [check_models._TelemetryProbe(100.0, 1, "ac", 0, 1)] * 2, mode="snapshot"
+        )
+        both_note = check_models._telemetry_degradation_note(both)
+        assert both_note is not None
+        assert "at both checks (before load and after cleanup)" in both_note
+        continuous = check_models._system_telemetry_record_from_probes(
+            probes, mode="continuous", interval_s=2.0
+        )
+        continuous_note = check_models._telemetry_degradation_note(continuous)
+        assert continuous_note is not None
+        assert "in 2 of 3 readings taken every 2 s during the run" in continuous_note
+
+    def test_system_state_note_is_logged_in_the_models_closing_block(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Warm-only notes are information; slowing states warn; both name the model."""
+        probe = check_models._TelemetryProbe
+        warm = check_models._system_telemetry_record_from_probes(
+            [probe(100.0, 1, "ac", 0, 1)] * 2, mode="snapshot"
+        )
+        hot = check_models._system_telemetry_record_from_probes(
+            [probe(100.0, 1, "ac", 0, 2)] * 2, mode="snapshot"
+        )
+        result = check_models.PerformanceResult(model_name="org/m", generation=None, success=False)
+        with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+            check_models._log_system_state_note(replace(result, system_telemetry=warm))
+            check_models._log_system_state_note(replace(result, system_telemetry=hot))
+            check_models._log_system_state_note(result)
+        records = [(r.levelno, r.getMessage()) for r in caplog.records]
+        assert records[0][0] == logging.INFO
+        assert records[0][1].startswith("System state for org/m: macOS thermal state fair")
+        assert records[1][0] == logging.WARNING
+        assert "System state for org/m: macOS thermal state serious" in records[1][1]
+        assert len(records) == 2
 
     def test_thermal_state_reader_degrades_to_unavailable(
         self, monkeypatch: pytest.MonkeyPatch
@@ -1881,3 +1942,27 @@ def test_wall_clock_gap_is_attached_only_beyond_the_threshold() -> None:
     assert "wall-clock gap 90s" in check_models._telemetry_status_line(enriched)
     assert check_models._telemetry_wall_clock_gap(enriched) == 90.0
     assert check_models._telemetry_wall_clock_gap(original) is None
+
+
+def test_run_start_system_facts_are_reused_not_re_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Facts labelled (run start) keep their run-start values in reports and the summary.
+
+    Regression: the final summary and the reports re-read the system facts at
+    the end of the sweep and labelled end-of-run values "(run start)" (power
+    read Battery at the top of the log and AC at the bottom).
+    """
+    args = argparse.Namespace()
+    check_models._set_run_system_info(args, {"Power Source (run start)": "Battery"})
+    monkeypatch.setattr(
+        check_models,
+        "get_system_characteristics",
+        lambda: {"Power Source (run start)": "AC"},
+    )
+    assert check_models._get_run_system_info(args) == {"Power Source (run start)": "Battery"}
+    # Without a kept snapshot (direct callers, tests) the facts are read now.
+    assert check_models._get_run_system_info(argparse.Namespace()) == {
+        "Power Source (run start)": "AC"
+    }
+    assert check_models._get_run_system_info(None) == {"Power Source (run start)": "AC"}

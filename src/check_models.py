@@ -5759,12 +5759,14 @@ def get_device_info() -> SystemProfilerDict | None:
         return None
 
 
-def print_version_info(versions: LibraryVersionDict) -> None:
+def print_version_info(
+    versions: LibraryVersionDict, system_info: Mapping[str, str] | None = None
+) -> None:
     """Print library versions and system / hardware info.
 
-    Uses get_system_characteristics() to provide consistent output across
-    CLI, HTML, and Markdown reports. Errors are swallowed so version
-    printing never fails.
+    ``system_info`` is the run-start snapshot when the caller has one, so the
+    closing summary repeats the facts the run started with; otherwise they are
+    read now. Errors are swallowed so version printing never fails.
     """
     logger.info("--- Library Versions ---")
     version_rows = [[name, ver or ""] for name, ver in sorted(versions.items())]
@@ -5778,7 +5780,8 @@ def print_version_info(versions: LibraryVersionDict) -> None:
 
     # --- System / hardware information block ---
     try:
-        system_info = get_system_characteristics()
+        if system_info is None:
+            system_info = get_system_characteristics()
         if system_info:
             logger.info("")  # spacer
             logger.info("--- System Information ---")
@@ -6625,12 +6628,56 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
     return processed_str
 
 
+_EXIF_HEX_PREVIEW_BYTES: Final[int] = 256
+_EXIF_TEXT_CONTROL_OK: Final[frozenset[int]] = frozenset({0x09, 0x0A, 0x0D})
+_ASCII_FIRST_PRINTABLE: Final[int] = 0x20
+_ASCII_DELETE: Final[int] = 0x7F
+
+
+def _exif_binary_payload(value: object) -> bytes | None:
+    """Return the raw bytes of an undecoded binary EXIF value, or None for text.
+
+    Maker notes and PrintImageMatching blocks arrive as bytes (or as text that
+    Pillow decoded byte for byte) full of control characters; trailing NUL
+    padding and ordinary whitespace do not make a value binary.
+    """
+    if isinstance(value, bytes | bytearray):
+        raw = bytes(value)
+    elif isinstance(value, str):
+        raw = value.encode("latin-1", errors="replace")
+    else:
+        return None
+    body = raw.rstrip(b"\x00")
+    if any(
+        (byte < _ASCII_FIRST_PRINTABLE and byte not in _EXIF_TEXT_CONTROL_OK)
+        or byte == _ASCII_DELETE
+        for byte in body
+    ):
+        return raw
+    return None
+
+
+def _format_exif_binary(raw: bytes, *, as_hex: bool) -> str:
+    """Show a binary EXIF value as hex (verbose) or as a labelled size."""
+    if not as_hex:
+        return f"[binary data, {len(raw):,} bytes]"
+    shown = raw[:_EXIF_HEX_PREVIEW_BYTES].hex(" ")
+    if len(raw) > _EXIF_HEX_PREVIEW_BYTES:
+        return f"{shown} … ({len(raw):,} bytes; first {_EXIF_HEX_PREVIEW_BYTES} shown)"
+    return shown
+
+
 def filter_and_format_tags(
     exif: ExifDict,
     *,
     show_all: bool = False,
+    binary_as_hex: bool = False,
 ) -> list[tuple[str, str, bool]]:
-    """Filter and format EXIF tags for pretty printing."""
+    """Filter and format EXIF tags for pretty printing.
+
+    Undecoded binary values are shown in hex when ``binary_as_hex`` (verbose
+    mode) and as a labelled size otherwise; empty tags are kept.
+    """
     tags: list[tuple[str, str, bool]] = []
     for tag, value in exif.items():
         tag_str: str = str(tag)
@@ -6642,7 +6689,12 @@ def filter_and_format_tags(
                 tag_str,
             )
             continue
-        value_str: str = exif_value_to_str(tag_str, value)
+        binary = _exif_binary_payload(value)
+        value_str: str = (
+            _format_exif_binary(binary, as_hex=binary_as_hex)
+            if binary is not None
+            else exif_value_to_str(tag_str, value)
+        )
         is_important: bool = tag_str in IMPORTANT_EXIF_TAGS
         if show_all or is_important:
             tags.append((tag_str, value_str, is_important))
@@ -6653,6 +6705,7 @@ def pretty_print_exif(
     exif: ExifDict,
     *,
     show_all: bool = True,
+    binary_as_hex: bool = False,
     title: str = "EXIF Metadata Summary",
 ) -> None:
     """Render selected EXIF tags in a Rich table.
@@ -6667,6 +6720,7 @@ def pretty_print_exif(
     tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(
         exif,
         show_all=show_all,
+        binary_as_hex=binary_as_hex,
     )
     if not tags_to_print:
         log_warning_note("No relevant EXIF tags found to display.")
@@ -11550,7 +11604,8 @@ def get_system_characteristics() -> dict[str, str]:
 
         recommended_working_set_bytes = device_info.get("max_recommended_working_set_size")
         if recommended_working_set_bytes is not None:
-            working_set_gb = recommended_working_set_bytes / (1024**3)
+            # Decimal GB, like peak memory; RAM above keeps Apple's binary "128 GB".
+            working_set_gb = recommended_working_set_bytes / DECIMAL_GB
             info["Recommended Working Set"] = f"{fmt_num(working_set_gb)} GB"
 
         fused_attention = _probe_fused_attention()
@@ -14984,6 +15039,8 @@ def _build_exception_process_result(
 
 _TELEMETRY_CPU_SPEED_RE: Final[re.Pattern[str]] = re.compile(r"CPU_Speed_Limit\s*=\s*(\d+)")
 _TELEMETRY_SAMPLE_INTERVAL_S: Final[float] = 2.0
+# Snapshot mode takes one probe before load and one after cleanup.
+_TELEMETRY_SNAPSHOT_PROBES: Final[int] = 2
 # kern.memorystatus_vm_pressure_level: 1 = normal, 2 = warning, 4 = critical.
 _MEMORY_PRESSURE_NORMAL_LEVEL: Final[int] = 1
 _MEMORY_PRESSURE_CRITICAL_LEVEL: Final[int] = 4
@@ -15247,31 +15304,63 @@ class _SystemTelemetrySampler:
         )
 
 
+def _telemetry_checks_phrase(telemetry: SystemTelemetryRecord, count: int, total: int) -> str:
+    """Say which readings a count refers to: the snapshot pair or the timed samples."""
+    mode = telemetry.get("mode")
+    if mode == "snapshot":
+        if count == total == _TELEMETRY_SNAPSHOT_PROBES:
+            return "at both checks (before load and after cleanup)"
+        return f"at {count} of {total} checks (before load and after cleanup)"
+    if mode == "continuous":
+        interval = telemetry.get("interval_s", _TELEMETRY_SAMPLE_INTERVAL_S)
+        return f"in {count} of {total} readings taken every {interval:g} s during the run"
+    return f"in {count} of {total} reading(s)"
+
+
 def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
-    """Describe throttling or memory pressure worth flagging, if any."""
+    """Describe throttling, memory pressure or heat worth flagging, if any.
+
+    Each count says which readings it comes from, and each level says what it
+    means for this model's timings.
+    """
     notes: list[str] = []
     min_limit = telemetry.get("cpu_speed_limit_min_pct")
     if min_limit is not None and min_limit < _CPU_SPEED_UNTHROTTLED_PCT:
         notes.append(
-            f"CPU speed limited to {min_limit:.0f}% for "
-            f"{telemetry.get('cpu_throttled_samples', 0)} sample(s)"
+            f"CPU speed limited to {min_limit:.0f}% "
+            + _telemetry_checks_phrase(
+                telemetry,
+                telemetry.get("cpu_throttled_samples", 0),
+                telemetry.get("cpu_samples", 0),
+            )
         )
     max_level = telemetry.get("memory_pressure_level_max")
     if max_level is not None and max_level > _MEMORY_PRESSURE_NORMAL_LEVEL:
         label = "critical" if max_level >= _MEMORY_PRESSURE_CRITICAL_LEVEL else "warning"
         notes.append(
-            f"memory pressure reached {label} for "
-            f"{telemetry.get('memory_pressure_elevated_samples', 0)} sample(s)"
+            f"memory pressure {label} "
+            + _telemetry_checks_phrase(
+                telemetry,
+                telemetry.get("memory_pressure_elevated_samples", 0),
+                telemetry.get("memory_samples", 0),
+            )
         )
     thermal_max = telemetry.get("thermal_state_max")
     if thermal_max is not None and thermal_max > 0:
-        note = (
-            f"macOS thermal state reached {_THERMAL_STATE_LABELS[thermal_max]} for "
-            f"{telemetry.get('thermal_elevated_samples', 0)} sample(s)"
+        meaning = (
+            "macOS reduces performance at this level, so this model's speed is left out of "
+            "timing comparisons; its output is still recorded and assessed"
+            if thermal_max >= _THERMAL_STATE_THROTTLED
+            else "warm, fans working; macOS is not reducing performance"
         )
-        if thermal_max >= _THERMAL_STATE_THROTTLED:
-            note += " (macOS reduces performance at this level; timings are not compared)"
-        notes.append(note)
+        notes.append(
+            f"macOS thermal state {_THERMAL_STATE_LABELS[thermal_max]} ({meaning}) "
+            + _telemetry_checks_phrase(
+                telemetry,
+                telemetry.get("thermal_elevated_samples", 0),
+                telemetry.get("thermal_samples", 0),
+            )
+        )
     gap = telemetry.get("wall_clock_gap_s")
     if gap is not None:
         notes.append(
@@ -15279,6 +15368,19 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
             "suspend mid-model); every timing for this model is untrustworthy"
         )
     return "; ".join(notes) if notes else None
+
+
+def _telemetry_degrades_timings(telemetry: SystemTelemetryRecord) -> bool:
+    """Whether the recorded state could have slowed the model (fair heat alone does not)."""
+    min_limit = telemetry.get("cpu_speed_limit_min_pct")
+    memory = telemetry.get("memory_pressure_level_max")
+    thermal = telemetry.get("thermal_state_max")
+    return (
+        (min_limit is not None and min_limit < _CPU_SPEED_UNTHROTTLED_PCT)
+        or (memory is not None and memory > _MEMORY_PRESSURE_NORMAL_LEVEL)
+        or (thermal is not None and thermal >= _THERMAL_STATE_THROTTLED)
+        or telemetry.get("wall_clock_gap_s") is not None
+    )
 
 
 def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
@@ -15383,17 +15485,31 @@ def _attach_system_telemetry(
     telemetry: SystemTelemetryRecord | None,
     model_identifier: str,
 ) -> PerformanceResult:
-    """Attach captured telemetry to the result, warning on degradation."""
+    """Attach captured telemetry to the result.
+
+    The note is logged with the model's closing lines
+    (:func:`_log_system_state_note`), after its output, so it reads as part
+    of that model's block rather than a preamble to the next one.
+    """
+    del model_identifier  # kept for the call signature; the result names the model
     if telemetry is None:
         return result
-    degradation = _telemetry_degradation_note(telemetry)
-    if degradation is not None:
-        logger.warning(
-            "⚠\ufe0f  System pressure during %s: %s",
-            model_identifier,
-            degradation,
-        )
     return replace(result, system_telemetry=telemetry)
+
+
+def _log_system_state_note(result: PerformanceResult) -> None:
+    """Log the model's system-state note in its closing block, warning only when it slowed.
+
+    Warm-but-unthrottled heat is context for the timings, not a warning.
+    """
+    telemetry = result.system_telemetry
+    note = _telemetry_degradation_note(telemetry) if telemetry else None
+    if telemetry is None or note is None:
+        return
+    if _telemetry_degrades_timings(telemetry):
+        logger.warning("⚠\ufe0f  System state for %s: %s", result.model_name, note)
+    else:
+        logger.info("System state for %s: %s", result.model_name, note)
 
 
 # =============================================================================
@@ -16171,11 +16287,11 @@ def _log_rich_table(
 type MetricTreeRow = tuple[str, str]
 
 
-def _metric_tree_label(label: str, value: str) -> Text:
-    """Build one Rich tree node for a key/value metric row."""
+def _metric_tree_label(label: str, value: str, *, width: int = 12) -> Text:
+    """Build one Rich tree node for a key/value metric row, label padded to ``width``."""
     text = Text()
     if label:
-        text.append(_display_align(label, 12, alignment="left"), style="bold")
+        text.append(_display_align(label, width, alignment="left"), style="bold")
         text.append(" ")
     text.append(value)
     return text
@@ -16193,39 +16309,49 @@ def _log_metric_tree(
         return
     title_text = Text(f"{emoji} {title}" if emoji else title, style="bold white")
     tree = Tree(title_text, guide_style="dim")
+    # Pad to this tree's longest label so every value lines up.
+    width = max([12, *(len(label) for label, _value in rows)])
     for label, value in rows:
-        tree.add(_metric_tree_label(label, value))
+        tree.add(_metric_tree_label(label, value, width=width))
     _log_rich_renderable(tree, indent=indent)
 
 
-def _summary_parts(
-    res: PerformanceResult,
-    model_short: str,
-    assessment: ResultAssessment,
-) -> list[str]:
-    """Assemble key=value summary segments for per-run triage."""
-    parts: list[str] = [
-        f"model={model_short}",
-        f"execution={assessment.execution}",
-        f"usability={assessment.usability}",
-        f"maintainer={assessment.maintainer_status}",
-    ]
-    parts.append(
-        f"observations={'+'.join(assessment.observations)}"
-        if assessment.observations
-        else "observations=none"
-    )
-    if res.error_stage:
-        parts.append(f"stage={res.error_stage}")
-    if res.failure_phase:
-        parts.append(f"phase={res.failure_phase}")
-    if res.error_code:
-        parts.append(f"code={res.error_code}")
-    if res.error_package:
-        parts.append(f"package={res.error_package}")
-    if res.error_type:
-        parts.append(f"type={res.error_type}")
-    return parts
+_SUMMARY_USABILITY_WORDS: Final[dict[str, str]] = {
+    "usable": "usable output",
+    "usable_with_caveats": "usable output with caveats",
+    "unusable": "unusable output",
+    "not_evaluated": "output not rated",
+}
+_SUMMARY_MAINTAINER_ACTIONS: Final[dict[str, str]] = {
+    "actionable_failure": "triage it, ruling out the checkpoint before filing",
+    "observation_needs_reproduction": "reproduce natively before reporting",
+}
+
+
+def _summary_sentence(res: PerformanceResult, assessment: ResultAssessment) -> str:
+    """One readable line per model: outcome, observations, and any maintainer action.
+
+    Replaces a row of key=value pairs (execution=, usability=, maintainer=,
+    observations=) that wrapped unevenly; the grep-able record per model is
+    the DEBUG ``REPRO`` line.
+    """
+    if assessment.execution == "crashed":
+        outcome = "crashed"
+        if res.failure_phase:
+            outcome += f" during {res.failure_phase}"
+        details = [value for value in (res.error_code, res.error_type) if value]
+        if details:
+            outcome += f" ({', '.join(details)})"
+    elif assessment.execution == "indeterminate":
+        outcome = "no verdict (a download or connection failure stopped it)"
+    else:
+        outcome = "completed, " + _SUMMARY_USABILITY_WORDS[assessment.usability]
+    line = f"{res.model_name}: {outcome}"
+    if assessment.observations:
+        line += f"; observations: {', '.join(assessment.observations)}"
+    if action := _SUMMARY_MAINTAINER_ACTIONS.get(assessment.maintainer_status):
+        line += f"; next step: {action}"
+    return line
 
 
 def _quality_warning_messages(
@@ -16337,7 +16463,6 @@ def _log_verbose_success_details(
     log_blank()
     _log_perf_block(res)
     log_blank()
-    _log_additional_diagnostics(res, gen_text)
 
 
 def _log_token_summary(res: PerformanceResult) -> None:
@@ -16416,19 +16541,22 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
             value=runtime.prompt_prep_time_s,
             field_name="total_time",
         )
+        # Cleanup runs after the total is taken (load + prep + generation sum
+        # to it), so a share of the total would push the percentages past 100.
         _append_phase_entry(
-            label="Cleanup:",
+            label="Cleanup (after total):",
             value=runtime.cleanup_time_s,
             field_name="total_time",
+            include_pct=False,
         )
         _append_phase_entry(
-            label="Upstream model prefill / first token:",
+            label="First token (upstream):",
             value=runtime.first_token_latency_s,
             field_name="total_time",
             include_pct=False,
         )
         _append_phase_entry(
-            label="Time to first token (measured):",
+            label="First token (measured):",
             value=runtime.time_to_first_token_s,
             field_name="total_time",
             include_pct=False,
@@ -16475,22 +16603,6 @@ def _log_perf_block(res: PerformanceResult) -> None:
     _append_mem("Cache Δ:", "cache_memory", cached_mem)
     _append_mem("Peak:", "peak_memory", peak_mem)
     _log_metric_tree("Memory:", entries, emoji="💾")
-
-
-def _log_additional_diagnostics(
-    res: PerformanceResult,
-    gen_text: str,
-) -> None:
-    """Log retained mechanical output observations in detailed mode."""
-    if not gen_text:
-        return
-    analysis = _quality_analysis_for_result(res)
-    if analysis is not None:
-        _log_metric_tree(
-            "Output Observations:",
-            (("Mechanical:", _format_quality_analysis_for_log(analysis)),),
-            emoji="🔍",
-        )
 
 
 def log_metrics_legend() -> None:
@@ -16549,12 +16661,9 @@ def print_model_result(
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     resolved_assessment = assessment or _assess_result(result)
-    run_prefix = "" if run_index is None else f"[RUN {run_index}/{total_runs}] "
-    summary = (
-        run_prefix
-        + "SUMMARY "
-        + " ".join(_summary_parts(result, result.model_name, resolved_assessment))
-    )
+    # Position in the sorted results, not the run order (hence no "RUN").
+    run_prefix = "" if run_index is None else f"[{run_index}/{total_runs}] "
+    summary = run_prefix + _summary_sentence(result, resolved_assessment)
     # Wrap summary to terminal width for readability
     width = get_terminal_width(max_width=100)
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
@@ -16743,8 +16852,12 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         for issue in preflight_issues:
             logger.warning("  - %s", issue)
 
+    # Taken once, here: "(run start)" facts must mean the start of the run
+    # wherever they are reported later.
+    system_info = get_system_characteristics()
+    _set_run_system_info(args, system_info)
     if args.verbose:
-        print_version_info(library_versions)
+        print_version_info(library_versions, system_info)
 
     if args.trust_remote_code:
         print_cli_separator()
@@ -16752,6 +16865,27 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         log_warning_note("This allows execution of remote code and may pose security risks.")
 
     return library_versions
+
+
+_RUN_SYSTEM_INFO_ARG_ATTR: Final[str] = "_check_models_run_start_system_info"
+
+
+def _set_run_system_info(args: argparse.Namespace, system_info: Mapping[str, str]) -> None:
+    """Keep the run-start system facts so every later surface reports the same snapshot."""
+    setattr(args, _RUN_SYSTEM_INFO_ARG_ATTR, dict(system_info))
+
+
+def _get_run_system_info(args: argparse.Namespace | None) -> dict[str, str]:
+    """Return the run-start system facts, taking them now only if none were kept.
+
+    Several facts are labelled "(run start)" (available memory, swap, power
+    source and mode); re-reading them at the end of a sweep reported end-of-run
+    values under those labels, in the final summary and the retained reports.
+    """
+    stored = getattr(args, _RUN_SYSTEM_INFO_ARG_ATTR, None) if args is not None else None
+    if isinstance(stored, dict):
+        return dict(stored)
+    return get_system_characteristics()
 
 
 def _set_run_preflight_issues(args: argparse.Namespace, issues: Sequence[str]) -> None:
@@ -16880,7 +17014,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     if args.verbose:
         # Reuse already-extracted EXIF data (no second image open)
         if exif_data:
-            pretty_print_exif(exif_data, show_all=True)
+            pretty_print_exif(exif_data, show_all=True, binary_as_hex=True)
         else:
             logger.info("No detailed EXIF data available.")
     return metadata
@@ -18279,29 +18413,6 @@ def process_models(
     return results
 
 
-def _format_quality_log_flag(
-    label: str,
-    enabled: bool,
-    *,
-    detail: str | None = None,
-) -> str | None:
-    """Return a compact log flag when a quality condition is active."""
-    if not enabled:
-        return None
-    if detail is None:
-        return f"{label}=True"
-    return f"{label}=True ({detail})"
-
-
-def _format_repetitive_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the repetitive-output log segment when present."""
-    return _format_quality_log_flag(
-        "repetitive",
-        analysis.is_repetitive,
-        detail=(f"token={analysis.repeated_token}" if analysis.repeated_token else None),
-    )
-
-
 def _assess_and_log_model_outcome(
     result: PerformanceResult,
     *,
@@ -18325,6 +18436,7 @@ def _assess_and_log_model_outcome(
                 result.model_name,
                 ", ".join(assessment.observations),
             )
+    _log_system_state_note(result)
     # One grep-able line per model with what a rerun needs, so the file log
     # is a self-contained timeline rather than a replay of the reports.
     logger.debug(
@@ -18360,40 +18472,6 @@ def _reproduction_log_line(result: PerformanceResult, *, requested_revision: str
         f" observations={','.join(assessment.observations) or 'none'}"
         f" kwargs={kwargs}"
     )
-
-
-def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str:
-    """Serialize retained mechanical facts into a compact terminal log line."""
-    thinking_marker = (
-        analysis.thinking_trace_markers[0] if analysis.thinking_trace_markers else "marker"
-    )
-    parts_raw: tuple[str | None, ...] = (
-        _format_repetitive_quality_log_part(analysis),
-        (
-            f"missing_sections={'+'.join(analysis.missing_sections)}"
-            if analysis.missing_sections
-            else None
-        ),
-        _format_quality_log_flag(
-            "thinking_trace",
-            analysis.has_thinking_trace,
-            detail=thinking_marker,
-        ),
-        _format_quality_log_flag(
-            "thinking_incomplete",
-            analysis.thinking_trace_incomplete,
-        ),
-        _format_quality_log_flag("likely_capped", analysis.likely_capped),
-        _format_quality_log_flag(
-            "unexpected_special_token",
-            bool(analysis.unexpected_special_tokens),
-            detail=",".join(analysis.unexpected_special_tokens[:2]),
-        ),
-    )
-    parts = [part for part in parts_raw if part is not None]
-    parts.append(f"words={analysis.word_count}")
-
-    return ", ".join(parts) if parts else "no issues detected"
 
 
 def _truncate_text_preview(text: str, *, max_chars: int) -> str:
@@ -18650,6 +18728,24 @@ def _model_comparison_sort_key(
     )
 
 
+def _comparison_result_label(assessment: ResultAssessment) -> str:
+    """One unambiguous word per model: the usability of a completed run, or why it has none.
+
+    A two-letter execution/usability code reused C and X with different
+    meanings in each position, so "completed, unusable" read as a crash.
+    """
+    if assessment.execution == "crashed":
+        return "crashed"
+    if assessment.execution == "indeterminate":
+        return "no verdict"
+    return {
+        "usable": "usable",
+        "usable_with_caveats": "caveats",
+        "unusable": "unusable",
+        "not_evaluated": "not rated",
+    }[assessment.usability]
+
+
 def _model_comparison_row(
     index: int,
     result: PerformanceResult,
@@ -18664,17 +18760,10 @@ def _model_comparison_row(
         if runtime is not None and runtime.model_load_time_s is not None
         else result.model_load_time
     )
-    execution_code = {"completed": "C", "crashed": "X", "indeterminate": "I"}[assessment.execution]
-    usability_code = {
-        "usable": "U",
-        "usable_with_caveats": "C",
-        "unusable": "X",
-        "not_evaluated": "-",
-    }[assessment.usability]
     return (
         str(index),
         _short_model_label(result.model_name, max_len=21),
-        f"{execution_code}/{usability_code}",
+        _comparison_result_label(assessment),
         _format_float_or_dash(runtime.input_validation_time_s if runtime is not None else None),
         _format_float_or_dash(model_load_time),
         _format_float_or_dash(runtime.prompt_prep_time_s if runtime is not None else None),
@@ -18745,18 +18834,21 @@ def _log_model_comparison_table_and_charts(
 
     logger.info("📋 Model Comparison (current run):")
     if recommended_working_set_bytes is not None:
+        # Decimal GB, like the GB column and every other memory figure.
         logger.info(
             "   Recommended working set: %s GB",
-            fmt_num(recommended_working_set_bytes / (1024**3)),
+            fmt_num(recommended_working_set_bytes / DECIMAL_GB),
         )
-    logger.info("   E/U: execution C=completed, X=crashed, I=indeterminate")
-    logger.info("        usability U=usable, C=caveated, X=unusable, -=not evaluated")
+    logger.info(
+        "   Result: usable, caveats (usable with caveats) or unusable for a completed "
+        "run; crashed; no verdict (a download or connection failure stopped it)"
+    )
     logger.info("   First=prefill/first token; Remain=input preparation + decode")
     _log_rich_table(
         headers=(
             "#",
             "Model",
-            "E/U",
+            "Result",
             "Val",
             "Load",
             "Prep",
@@ -18768,7 +18860,7 @@ def _log_model_comparison_table_and_charts(
             "GB",
         ),
         rows=comparison.rows,
-        max_widths=(2, 21, 3, 5, 5, 5, 5, 6, 5, 6, 5, 5),
+        max_widths=(2, 21, 10, 5, 5, 5, 5, 6, 5, 6, 5, 5),
     )
 
     if comparison.tps_entries:
@@ -25112,8 +25204,9 @@ def finalize_execution(
     if results:
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
 
-        # Gather system characteristics for reports
-        system_info = get_system_characteristics()
+        # The run-start snapshot, not a fresh read: several facts are labelled
+        # "(run start)" and the comparison relies on them.
+        system_info = _get_run_system_info(args)
         recommended_working_set_bytes = _get_recommended_working_set_bytes()
         runtime_fingerprint = collect_runtime_fingerprint()
         requested_revision = (
@@ -25147,6 +25240,10 @@ def finalize_execution(
         results = list(report_context.result_set.results)
         _validate_report_render_context(report_context)
         assessments = dict(report_context.assessments)
+        # A heading closes the last model's run block, so its closing notes
+        # are not read as the first result's; the order is the report's, not
+        # the run's.
+        print_cli_section("Per-model results (failures first, then fastest to slowest)")
         for index, result in enumerate(results, start=1):
             if index > 1:
                 print_cli_separator()
@@ -25243,7 +25340,14 @@ def finalize_execution(
         format_overall_runtime(time.time() - overall_start_time),
         extra={"style_hint": LogStyles.METRIC_LABEL},
     )
-    print_version_info(library_versions)
+    if getattr(args, "verbose", False):
+        # Already printed at the top of this run from the same snapshot.
+        logger.info(
+            "Library versions and run-start system facts: see the top of this log "
+            "(full package list in environment.log)."
+        )
+    else:
+        print_version_info(library_versions, _get_run_system_info(args))
 
 
 # =============================================================================
@@ -25847,13 +25951,18 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         action=argparse.BooleanOptionalAction,
         default=None,
         help=(
-            "macOS thermal CPU speed limit and memory-pressure telemetry via read-only "
-            "probes (pmset -g / sysctl -n; no system settings are changed; darwin only, "
-            "sudo-free). Default: one snapshot probe pair per model, taken outside timed "
-            "inference. --system-telemetry opts into continuous background sampling "
-            "(its subprocesses overlap timed inference); --no-system-telemetry disables "
-            "telemetry entirely. Aggregates are recorded per model in results.jsonl and "
-            "surfaced in diagnostics."
+            "macOS system-state telemetry per model: thermal state (nominal, fair, "
+            "serious, critical; from serious up macOS reduces performance, so that "
+            "model's speed is left out of timing comparisons while its output is still "
+            "recorded and assessed), memory pressure, CPU speed limit, "
+            "power source and energy mode. Read-only and sudo-free (NSProcessInfo, "
+            "pmset -g, sysctl -n; no system settings are changed; macOS only). Default: "
+            "two checks per model, one before load and one after cleanup, both outside "
+            "timed inference. --system-telemetry adds background readings every 2 s "
+            "during each run, which catch heat that builds and fades mid-model; their "
+            "pmset/sysctl subprocesses overlap timed inference. --no-system-telemetry "
+            "turns it off. Results are recorded per model in results.jsonl and shown in "
+            "diagnostics."
         ),
     )
     runtime_group.add_argument(
