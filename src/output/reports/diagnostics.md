@@ -20,17 +20,16 @@ Outcome counts
 
 | Outcome             | Count |
 |---------------------|-------|
-| Attempted           | 51    |
-| Conclusive outcomes | 51    |
+| Attempted           | 50    |
+| Conclusive outcomes | 50    |
 | Completed           | 50    |
-| Crashed             | 1     |
+| Crashed             | 0     |
 | Indeterminate       | 0     |
 
 Maintainer status counts
 
 | Maintainer status              | Count |
 |--------------------------------|-------|
-| actionable failure             | 1     |
 | none                           | 42    |
 | observation needs reproduction | 8     |
 
@@ -38,7 +37,6 @@ Mechanical-check counts
 
 | Mechanical checks    | Count |
 |----------------------|-------|
-| not assessed         | 1     |
 | major concerns       | 13    |
 | no concerns detected | 35    |
 | concerns detected    | 2     |
@@ -55,133 +53,24 @@ Observation counts
 | Internal reasoning block appears incomplete                  | 2     |
 | Conversation-role control tokens remain visible              | 1     |
 | Repeated keyword entries                                     | 6     |
+| Names a place the prompt did not supply                      | 1     |
 
 ## Triage
 
-| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                      |
-|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|---------------------------------------------------------------------------------------------------|
-| [mlx-community/InternVL3_5-1B-4bit](#diagnostic-mlx-community-internvl35-1b-4bit)                               | crashed   | not assessed      | actionable_failure             | none                                                                                              |
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation_needs_reproduction | repeated text; cut off at token limit; duplicate keywords                                         |
-| [mlx-community/Qwen2-VL-7B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-7b-instruct-4bit)                  | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
-| [mlx-community/Molmo2-8B-4bit](#diagnostic-mlx-community-molmo2-8b-4bit)                                        | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                      |
-| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                      |
-| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected                                              |
-| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                                 | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                         |
+| Model                                                                                                           | Execution | Mechanical checks | Maintainer status              | Observations                                                                                                             |
+|-----------------------------------------------------------------------------------------------------------------|-----------|-------------------|--------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed | major concerns    | observation_needs_reproduction | repeated text; cut off at token limit; duplicate keywords                                                                |
+| [mlx-community/Qwen2-VL-7B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-7b-instruct-4bit)                  | completed | major concerns    | observation_needs_reproduction | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
+| [mlx-community/Molmo2-8B-4bit](#diagnostic-mlx-community-molmo2-8b-4bit)                                        | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                                             |
+| [mlx-community/X-Reasoner-7B-8bit](#diagnostic-mlx-community-x-reasoner-7b-8bit)                                | completed | major concerns    | observation_needs_reproduction | stopped early: repeating; duplicate keywords                                                                             |
+| [mlx-community/llm-jp-4-vl-9b-mlx-4bit](#diagnostic-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected                                                                     |
+| [mlx-community/Muse-Glimmer-30B-OptiQ-4bit](#diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit)              | completed | major concerns    | observation_needs_reproduction | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [mlx-community/MiniCPM-V-4.6-4bit](#diagnostic-mlx-community-minicpm-v-46-4bit)                                 | completed | major concerns    | observation_needs_reproduction | incomplete thinking block                                                                                                |
 
 ## Crashes requiring action
 
-<a id="diagnostic-mlx-community-internvl35-1b-4bit"></a>
-
-### mlx-community/InternVL3_5-1B-4bit
-
-#### Root exception and chain
-
-```text
-builtins.ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-builtins.ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-```
-
-#### Execution and provenance
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Arch supported by installed mlx-vlm:* no (model_type internvl)
-- *Phase:* model_load
-- *Stage:* Unsupported Arch
-- *Package:* mlx-vlm
-- *Error type:* ValueError
-- *Error message:* Model loading failed: Model type internvl not supported.
-  Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-- *Root error type:* ValueError
-- *Root error message:* Model type internvl not supported. Error: No module
-  named 'mlx_vlm.speculative.drafters.internvl'
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.00242746
-- *Post-cleanup cache memory (GB):* 0.0
-- *Checkpoint weights (GB):* 1.08
-- *Parameter count:* 1.00B (name-estimate)
-- *Quantization:* 4-bit, group 32, affine
-- *Declared context length:* 40,960 (text_config.max_position_embeddings)
-- *System pressure snapshots (before/after; cannot rule out transient pressure during inference):* CPU
-  speed limit min 100% over 2 sample(s); memory pressure max level 1 over 2
-  sample(s); power: AC over 2 sample(s); mode snapshot
-
-<details>
-<summary>Complete traceback</summary>
-
-```text
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14636, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13511, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 841, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 965, in load_model
-    model_class, _ = get_model_and_args(config=config, model_path=model_path)
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 785, in get_model_and_args
-    raise ValueError(msg)
-ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15758, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14651, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-
-```
-
-</details>
-
-#### Captured stdout/stderr
-
-```text
-=== STDERR ===
-[23:44:38] INFO     Loading model weights and processor...
-Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3143.31it/s]
-ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:44:38] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
-```
+None.
 
 ## Completed Runs with Observations
 
@@ -215,11 +104,11 @@ ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.sp
 - *Processor class:* mlx_vlm.models.mllama.processing_mllama.MllamaProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.22813458298333
-- *Peak memory at first token (GB):* 14.979442932
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 2.1661522499925923
+- *Peak memory at first token (GB):* 14.979459316
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0038693
+- *Post-cleanup active memory (GB):* 0.003885684
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 308
 - *Prompt composition:* 308 = 307 text/template + 1 image tokens (0%; exact,
@@ -274,11 +163,11 @@ Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser,
 - *Processor class:* mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 39.57629966599052
-- *Peak memory at first token (GB):* 9.283143748
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 41.53652204197715
+- *Peak memory at first token (GB):* 9.283160132
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.007342878
+- *Post-cleanup active memory (GB):* 0.007359262
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16560
 - *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
@@ -332,14 +221,14 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
 - *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.3818794999970123
-- *Peak memory at first token (GB):* 18.798060089
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4070924170082435
+- *Peak memory at first token (GB):* 18.798076473
 - *Checkpoint-declared sampling (generation_config.json):* temperature 0.6;
   top_p 0.95; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: default; min_p: default; repetition_penalty:
   generation_config
-- *Post-cleanup active memory (GB):* 0.000608798
+- *Post-cleanup active memory (GB):* 0.000625182
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1639
 - *Prompt composition:* 1,639 = 392 text/template + 1,247 image tokens (76%;
@@ -398,11 +287,11 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
 - *Processor class:* mlx_vlm.models.molmo2.processing.Molmo2Processor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.420688334008446
-- *Peak memory at first token (GB):* 8.05654611
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.402567250013817
+- *Peak memory at first token (GB):* 8.183413476
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.0055241
+- *Post-cleanup active memory (GB):* 0.005540484
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1526
 - *Prompt composition:* 1,526 = 324 text/template (tokenizer-exact) + 1,202
@@ -456,11 +345,11 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Processor class:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* repetition_abort
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 15.82564604197978
-- *Peak memory at first token (GB):* 14.28609107
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 14.845471542008454
+- *Peak memory at first token (GB):* 14.286107454
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.010931016
+- *Post-cleanup active memory (GB):* 0.0109474
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 16560
 - *Prompt composition:* 16,560 = 336 text/template + 16,224 image tokens (98%;
@@ -514,11 +403,11 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* transformers_modules._9c056d48b1e611dc586139a5deb927ae363cfe6f.0e62407644efd7c3.processing_llmjpvl.LLMjpVLProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.4987384580017533
-- *Peak memory at first token (GB):* 6.729345598
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 1.505170916003408
+- *Peak memory at first token (GB):* 6.729361982
 - *Sampling settings source:* temperature: default; top_p: default; top_k:
   default; min_p: default; repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.015371154
+- *Post-cleanup active memory (GB):* 0.015387538
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2197
 - *Prompt composition:* 2,197 = 405 text/template + 1,792 image tokens (82%;
@@ -545,7 +434,7 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 <a id="diagnostic-mlx-community-muse-glimmer-30b-optiq-4bit"></a>
 
 <details>
-<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — unusable — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible</summary>
+<summary>mlx-community/Muse-Glimmer-30B-OptiQ-4bit — unusable — control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name</summary>
 
 ### mlx-community/Muse-Glimmer-30B-OptiQ-4bit
 
@@ -557,12 +446,13 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
   length limits and factual accuracy not assessed
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections, token_cap_truncation,
-  unexpected_special_token, role_boundary_token_present
+  unexpected_special_token, role_boundary_token_present, unverified_place_name
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
 - *Family README in installed mlx-vlm:* none
 - *Labelled fields not detected:* ["title", "description"]
 - *Unexpected special tokens:* ["&lt;|message|&gt;"]
 - *Role-boundary tokens in output:* ["&lt;|message|&gt;"]
+- *Place names the prompt did not supply:* ["River That"]
 - *Title word count:* 0
 - *Keyword count:* 1
 - *Token-cap degradation evidence:* ["missing_sections"]
@@ -571,14 +461,14 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Processor class:* mlx_vlm.models.muse_glimmer.processing_muse_glimmer.MuseGlimmerProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 9.1569578750059
-- *Peak memory at first token (GB):* 25.464290278
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 10.289382999995723
+- *Peak memory at first token (GB):* 25.464306662
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 1.0; top_p 0.95; top_k 64
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: default
-- *Post-cleanup active memory (GB):* 0.005933838
+- *Post-cleanup active memory (GB):* 0.005950222
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4409
 - *Prompt composition:* 4,409 = 353 text/template + 4,056 image tokens (92%;
@@ -629,15 +519,29 @@ Description: 1-2 sentence factual description combining relevant context with ma
 
 The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with "VORTEX" and 1067. It appears to be a small trimaran? Or a catamaran? Hints say catamaran. Might keep as small sailing dinghy. Could say Vortex dinghy. Might be safe to say Vortex sailing dinghy. But hint says catamaran. Image shows what looks like a small boat with maybe two hulls? Actually it's a single hull with a small outrigger? Hmm looks like a Vortex class dinghy which is a monohull? Let's keep description as Vortex sailing boat. Might follow hint but image evidence shows it's a single hull with maybe a cat? I think Vortex is a dinghy, not catamaran. Could note as Vortex dinghy. Might be conflict. Prefer image evidence. I'd say Vortex dinghy (sail number 1067). Might keep catamaran? Safer to say small sailing dinghy.
+Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
 
-Laser dinghy sail number 188572 GBR. The sail number on sail is 188572, GBR. Good.
+Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
 
-Lighting: daylight, partly cloudy.
+We need British English spelling.
 
-Provide keywords 10-18 unique comma-separated.
+Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
 
-Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water under a partly cloudy sky. On the left a white and orange Vortex dinghy numbered 1067 with a grey and orange sail is underway with a sailor standing in a blue jacket and life jacket; on the right a white Laser dinghy numbered GBR 188572 with a white and blue sail is underway with a sailor seated in a black life jacket. Both are on calm water with wooded shoreline
+Should be 1-2 sentences. Let's do two sentences.
+
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+
+Let's craft.
+
+Title:
+Vortex Catamaran and Laser Dinghy Sailing on River
+
+That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+
+Description:
+Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+
+That's
 ```
 
 </details>
@@ -667,14 +571,14 @@ Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the w
 - *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9384349579922855
-- *Peak memory at first token (GB):* 3.226142344
+- *Time to first token (s; measured: input preparation, prefill, first decode step):* 0.9595268330012914
+- *Peak memory at first token (GB):* 3.257993288
 - *Checkpoint-declared sampling (generation_config.json):* do_sample True;
   temperature 0.7; top_p 1.0; top_k 0; repetition_penalty 1.0
 - *Sampling settings source:* temperature: generation_config; top_p:
   generation_config; top_k: generation_config; min_p: default;
   repetition_penalty: generation_config
-- *Post-cleanup active memory (GB):* 0.004377216
+- *Post-cleanup active memory (GB):* 0.0043936
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 934
 - *Prompt composition:* 934 = 345 text/template (tokenizer-exact) + 589
@@ -732,41 +636,41 @@ is in the model gallery.
 
 | Model                                                       | Runtime identity                                             | Performance                                           |
 |-------------------------------------------------------------|--------------------------------------------------------------|-------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2119 prompt / 141 generated; 469 tok/s; 1.9 GB peak   |
-| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2089 prompt / 112 generated; 102 tok/s; 6.5 GB peak   |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit       | rev 0a970d20ad7d; Mistral3Processor; stop completed          | 2394 prompt / 123 generated; 29.4 tok/s; 23 GB peak   |
-| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 592 prompt / 85 generated; 46.6 tok/s; 28 GB peak     |
-| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 591 prompt / 175 generated; 21.4 tok/s; 17 GB peak    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 596 prompt / 130 generated; 92.1 tok/s; 16 GB peak    |
-| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 596 prompt / 89 generated; 24.9 tok/s; 20 GB peak     |
-| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 592 prompt / 94 generated; 123 tok/s; 5.9 GB peak     |
-| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6454 prompt / 139 generated; 72.3 tok/s; 8.7 GB peak  |
-| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6454 prompt / 142 generated; 36.3 tok/s; 78 GB peak   |
-| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1383 prompt / 99 generated; 174 tok/s; 4.7 GB peak    |
-| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2115 prompt / 116 generated; 52.8 tok/s; 10 GB peak   |
-| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2115 prompt / 103 generated; 34.4 tok/s; 17 GB peak   |
-| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1331 prompt / 729 generated; 56.2 tok/s; 20 GB peak   |
-| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 2111 prompt / 110 generated; 199 tok/s; 4.0 GB peak   |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                            | rev ed71acdae079; Lfm2VlProcessor; stop completed            | 2119 prompt / 141 generated; 478 tok/s; 1.9 GB peak   |
+| mlx-community/aya-vision-8b-4bit                            | rev 3e679b3e08f0; AyaVisionOutputProcessor; stop completed   | 2089 prompt / 112 generated; 98.7 tok/s; 6.5 GB peak  |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit       | rev 0a970d20ad7d; Mistral3Processor; stop completed          | 2394 prompt / 123 generated; 29.3 tok/s; 23 GB peak   |
+| mlx-community/diffusiongemma-26B-A4B-it-mxfp8               | rev ded389e478f8; DiffusionGemma4Processor; stop completed   | 592 prompt / 85 generated; 44.0 tok/s; 28 GB peak     |
+| mlx-community/gemma-3-27b-it-qat-4bit                       | rev fc4e000f32af; Gemma3Processor; stop completed            | 591 prompt / 175 generated; 30.0 tok/s; 17 GB peak    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                       | rev 0d77464eeb23; Gemma4Processor; stop completed            | 596 prompt / 130 generated; 101 tok/s; 16 GB peak     |
+| mlx-community/gemma-4-31b-it-4bit                           | rev 696d436c4047; Gemma4Processor; stop completed            | 596 prompt / 89 generated; 22.2 tok/s; 20 GB peak     |
+| mlx-community/gemma-4-e4b-it-4bit                           | rev 475b9088d297; Gemma4Processor; stop completed            | 592 prompt / 94 generated; 111 tok/s; 5.9 GB peak     |
+| mlx-community/GLM-4.6V-Flash-4bit                           | rev bd7b20686e8c; Glm46VProcessor; stop completed            | 6454 prompt / 139 generated; 73.9 tok/s; 8.7 GB peak  |
+| mlx-community/GLM-4.6V-nvfp4                                | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed         | 6454 prompt / 142 generated; 39.9 tok/s; 78 GB peak   |
+| mlx-community/granite-4.0-3b-vision-4bit                    | rev 70fe1d89f42c; Granite4VisionProcessor; stop completed    | 1383 prompt / 99 generated; 169 tok/s; 4.7 GB peak    |
+| mlx-community/InternVL3-14B-4bit                            | rev 26328eaab82c; InternVLChatProcessor; stop completed      | 2115 prompt / 116 generated; 54.1 tok/s; 10 GB peak   |
+| mlx-community/InternVL3-8B-bf16                             | rev e0df3dd79263; InternVLChatProcessor; stop completed      | 2115 prompt / 103 generated; 33.9 tok/s; 17 GB peak   |
+| mlx-community/Kimi-VL-A3B-Thinking-2506-8bit                | rev e5abbe34cbfa; KimiVLProcessor; stop completed            | 1331 prompt / 729 generated; 60.9 tok/s; 20 GB peak   |
+| mlx-community/LFM2.5-VL-3B-OptiQ-4bit                       | rev 7886c0b4a4b5; Lfm2VlProcessor; stop completed            | 2111 prompt / 110 generated; 205 tok/s; 4.0 GB peak   |
 | mlx-community/MiniCPM-o-4_5-4bit                            | rev 592c09d85e7b; MiniCPMOProcessor; stop completed          | 393 prompt / 114 generated; 104 tok/s; 7.0 GB peak    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2927 prompt / 160 generated; 65.0 tok/s; 13 GB peak   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2926 prompt / 152 generated; 183 tok/s; 7.8 GB peak   |
-| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4085 prompt / 112 generated; 159 tok/s; 3.9 GB peak   |
-| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1291 prompt / 151 generated; 73.0 tok/s; 24 GB peak   |
-| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1141 prompt / 136 generated; 56.5 tok/s; 9.3 GB peak  |
-| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3117 prompt / 114 generated; 37.8 tok/s; 16 GB peak   |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16551 prompt / 918 generated; 86.9 tok/s; 8.4 GB peak |
-| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16549 prompt / 128 generated; 73.4 tok/s; 23 GB peak  |
-| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16549 prompt / 181 generated; 20.9 tok/s; 26 GB peak  |
-| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16549 prompt / 104 generated; 68.9 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16565 prompt / 111 generated; 69.7 tok/s; 25 GB peak  |
-| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16565 prompt / 142 generated; 89.4 tok/s; 11 GB peak  |
-| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16565 prompt / 144 generated; 28.9 tok/s; 21 GB peak  |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx                    | rev 844516024a1c; SmolVLMProcessor; stop completed           | 1433 prompt / 78 generated; 128 tok/s; 5.6 GB peak    |
-| mlx-community/Step-3.7-Flash-oQ3e                           | rev 41d17ee00e16; Step3VLProcessor; stop completed           | 3494 prompt / 147 generated; 47.9 tok/s; 92 GB peak   |
-| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4212 prompt / 130 generated; 125 tok/s; 5.4 GB peak   |
-| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16562 prompt / 220 generated; 83.4 tok/s; 11 GB peak  |
-| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1273 prompt / 134 generated; 35.4 tok/s; 18 GB peak   |
-| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3628 prompt / 144 generated; 114 tok/s; 23 GB peak    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4           | rev 7c992876448f; Mistral3Processor; stop completed          | 2927 prompt / 160 generated; 65.3 tok/s; 13 GB peak   |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit             | rev a962dcb09eee; Mistral3Processor; stop completed          | 2926 prompt / 152 generated; 187 tok/s; 7.8 GB peak   |
+| mlx-community/North-Micro-Vision-Instruct-4bit              | rev 87466363e6c5; CohereCompassProcessor; stop completed     | 4085 prompt / 112 generated; 156 tok/s; 3.9 GB peak   |
+| mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit                 | rev 4620fdbbd1e7; Qwen3VLProcessor; stop completed           | 1291 prompt / 151 generated; 72.8 tok/s; 24 GB peak   |
+| mlx-community/Phi-3.5-vision-instruct-bf16                  | rev d8da684308c2; Phi3VProcessor; stop completed             | 1141 prompt / 136 generated; 52.1 tok/s; 9.3 GB peak  |
+| mlx-community/pixtral-12b-8bit                              | rev 79e24b66302d; PixtralProcessor; stop completed           | 3117 prompt / 114 generated; 38.4 tok/s; 16 GB peak   |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16                     | rev c325e5ea14c2; Qwen3VLProcessor; stop completed           | 16551 prompt / 918 generated; 82.8 tok/s; 8.4 GB peak |
+| mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit                | rev 0555d34cb1ed; Qwen3VLProcessor; stop completed           | 16549 prompt / 128 generated; 73.3 tok/s; 23 GB peak  |
+| mlx-community/Qwen3-VL-32B-Instruct-4bit                    | rev 6e5644d3ea4b; Qwen3VLProcessor; stop completed           | 16549 prompt / 181 generated; 19.6 tok/s; 26 GB peak  |
+| mlx-community/Qwen3-VL-8B-Instruct-4bit                     | rev defcdea7cc7a; Qwen3VLProcessor; stop completed           | 16549 prompt / 104 generated; 68.7 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                          | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed           | 16565 prompt / 111 generated; 70.8 tok/s; 25 GB peak  |
+| mlx-community/Qwen3.5-9B-MLX-4bit                           | rev 938d8919941c; Qwen3VLProcessor; stop completed           | 16565 prompt / 142 generated; 85.3 tok/s; 11 GB peak  |
+| mlx-community/Qwen3.8-27B-nvfp4                             | rev 5ff8ef173ad0; Qwen3VLProcessor; stop completed           | 16565 prompt / 144 generated; 26.9 tok/s; 21 GB peak  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx                    | rev 844516024a1c; SmolVLMProcessor; stop completed           | 1433 prompt / 78 generated; 126 tok/s; 5.6 GB peak    |
+| mlx-community/Step-3.7-Flash-oQ3e                           | rev 41d17ee00e16; Step3VLProcessor; stop completed           | 3494 prompt / 147 generated; 47.7 tok/s; 92 GB peak   |
+| nativ-community/Mage-VL-OptiQ-4bit                          | rev 4f0a424370e5; MageVLProcessor; stop completed            | 4212 prompt / 130 generated; 126 tok/s; 5.4 GB peak   |
+| nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit          | rev 3ea706a5e7b8; Qwen3VLProcessor; stop completed           | 16562 prompt / 220 generated; 84.4 tok/s; 11 GB peak  |
+| nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit    | rev bdbeb0d8c89e; Mistral3Processor; stop completed          | 1273 prompt / 134 generated; 36.1 tok/s; 18 GB peak   |
+| nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit | rev 75c89904e1c2; NemotronHNanoOmniProcessor; stop completed | 3628 prompt / 144 generated; 131 tok/s; 23 GB peak    |
 
 </details>
 
@@ -858,7 +762,6 @@ these models, append the flags recorded in their diagnostics blocks:
 
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
-| mlx-community/InternVL3_5-1B-4bit                | f9d179a8be8ac53e96c6ee5cce8493856d4b8f09 |
 | mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
 | mlx-community/Qwen2-VL-7B-Instruct-4bit          | 1c638e970be36948e087e77d103b9147e1a9a1dd |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit | 846ea5576854468f25af3767d769b0805b1b08b6 |
@@ -873,7 +776,7 @@ these models, append the flags recorded in their diagnostics blocks:
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.7.3                                                                                                                                           |
-| mlx-vlm source revision    | 3a653e7c636ec8a637c7675b63390ed4b4e46ce9                                                                                                        |
+| mlx-vlm source revision    | e6bf06faa0dda2598df9cd5fb6f2f204c4415b4f                                                                                                        |
 | mlx                        | 0.32.3.dev20260926+a2a09fd56                                                                                                                    |
 | mlx source revision        | a2a09fd56                                                                                                                                       |
 | mlx-audio                  | 0.5.6                                                                                                                                           |

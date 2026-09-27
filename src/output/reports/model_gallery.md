@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-09-26 23:57:05 BST
+Generated on: 2026-09-27 01:01:54 BST
 
 - *Evaluation lane:* assisted
 - *Prompt hints:* the image's description and keyword hints were included in the prompt, so field content may be copied from them rather than seen
@@ -26,64 +26,63 @@ Mechanical observations and captured resource facts for this run only. No concer
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                      |
-|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|---------------------------------------------------------------------------------------------------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.38s   | 469 tok/s  | 0.64            | 1.9     | 2,119      | 141     | none                                                                                              |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | 10.61s  | 29.4 tok/s | 3.59            | 23      | 2,394      | 123     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 10.08s  | 72.3 tok/s | 6.10            | 8.7     | 6,454      | 139     | none                                                                                              |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | 28.37s  | 36.3 tok/s | 15.82           | 78      | 6,454      | 142     | none                                                                                              |
-| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.43s   | 52.8 tok/s | 2.30            | 10      | 2,115      | 116     | none                                                                                              |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 7.05s   | 34.4 tok/s | 1.52            | 17      | 2,115      | 103     | none                                                                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 17.46s  | 56.2 tok/s | 1.43            | 20      | 1,331      | 729     | none                                                                                              |
-| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | 4.00s   | 199 tok/s  | 1.18            | 4.0     | 2,111      | 110     | none                                                                                              |
-| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.42s   | 104 tok/s  | 0.74            | 7.0     | 393        | 114     | none                                                                                              |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.85s   | 65.0 tok/s | 3.23            | 13      | 2,927      | 160     | none                                                                                              |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 4.12s   | 183 tok/s  | 1.57            | 7.8     | 2,926      | 152     | none                                                                                              |
-| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.28s   | 159 tok/s  | 2.70            | 3.9     | 4,085      | 112     | none                                                                                              |
-| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.70s   | 73.0 tok/s | 1.28            | 24      | 1,291      | 151     | none                                                                                              |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 4.69s   | 56.5 tok/s | 0.80            | 9.3     | 1,141      | 136     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 27.76s  | 86.9 tok/s | 15.43           | 8.4     | 16,551     | 918     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 37.55s  | 73.4 tok/s | 32.89           | 23      | 16,549     | 128     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 69.67s  | 20.9 tok/s | 58.04           | 26      | 16,549     | 181     | none                                                                                              |
-| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 37.66s  | 68.9 tok/s | 34.23           | 11      | 16,549     | 104     | none                                                                                              |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 34.90s  | 69.7 tok/s | 29.54           | 25      | 16,565     | 111     | none                                                                                              |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 37.10s  | 89.4 tok/s | 32.91           | 11      | 16,565     | 142     | none                                                                                              |
-| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 57.04s  | 28.9 tok/s | 48.95           | 21      | 16,565     | 144     | none                                                                                              |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | 3.13s   | 128 tok/s  | 1.11            | 5.6     | 1,433      | 78      | none                                                                                              |
-| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | 44.52s  | 47.9 tok/s | 26.29           | 92      | 3,494      | 147     | none                                                                                              |
-| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 4.76s   | 102 tok/s  | 1.59            | 6.5     | 2,089      | 112     | none                                                                                              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 6.97s   | 46.6 tok/s | 2.95            | 28      | 592        | 85      | none                                                                                              |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 13.34s  | 21.4 tok/s | 1.91            | 17      | 591        | 175     | none                                                                                              |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.86s   | 92.1 tok/s | 1.10            | 16      | 596        | 130     | none                                                                                              |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 8.82s   | 24.9 tok/s | 1.92            | 20      | 596        | 89      | none                                                                                              |
-| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | 3.87s   | 123 tok/s  | 0.77            | 5.9     | 592        | 94      | none                                                                                              |
-| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.22s   | 174 tok/s  | 1.18            | 4.7     | 1,383      | 99      | none                                                                                              |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 7.64s   | 37.8 tok/s | 2.22            | 16      | 3,117      | 114     | none                                                                                              |
-| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 5.10s   | 125 tok/s  | 2.49            | 5.4     | 4,212      | 130     | none                                                                                              |
-| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 38.17s  | 83.4 tok/s | 33.28           | 11      | 16,562     | 220     | none                                                                                              |
-| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.33s   | 35.4 tok/s | 1.99            | 18      | 1,273      | 134     | none                                                                                              |
-| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 10.27s  | 114 tok/s  | 5.76            | 23      | 3,628      | 144     | none                                                                                              |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 10.22s  | 32.2 tok/s | 2.02            | 18      | 2,619      | 164     | duplicate keywords                                                                                |
-| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`    | 5.69s   | 52.0 tok/s | 1.12            | 7.6     | 596        | 108     | duplicate keywords                                                                                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns`       | 8.26s   | 93.9 tok/s | 1.38            | 19      | 1,639      | 425     | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.55s   | 310 tok/s  | 1.18            | 2.2     | 336        | 51      | labelled fields not detected                                                                      |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 57.48s  | 19.0 tok/s | 2.23            | 15      | 308        | 1,000   | repeated text; cut off at token limit; duplicate keywords                                         |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | 3.11s   | 223 tok/s  | 0.94            | 3.2     | 934        | 84      | incomplete thinking block                                                                         |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `major concerns`       | 6.46s   | 71.4 tok/s | 1.42            | 8.1     | 1,526      | 225     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 54.11s  | 24.4 tok/s | 9.16            | 25      | 4,409      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `major concerns`       | 44.05s  | 85.7 tok/s | 39.58           | 9.3     | 16,560     | 225     | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.30s   | 295 tok/s  | 0.97            | 1.1     | 1,212      | 38      | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 22.63s  | 57.5 tok/s | 15.83           | 14      | 16,560     | 250     | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 6.12s   | 70.1 tok/s | 0.85            | 7.2     | 590        | 196     | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 4.48s   | 148 tok/s  | 2.53            | 4.2     | 5,581      | 102     | labelled fields not detected                                                                      |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.56s   | 82.3 tok/s | 1.50            | 6.7     | 2,197      | 16      | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 2.12s   | 140 tok/s  | 0.73            | 1.6     | 332        | 21      | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `not assessed`         | 0.46s   | -          | -               | -       | -          | -       | none                                                                                              |
+| Model                                                                                                                               | Mechanical checks      | Total s | Gen TPS    | Prefill/first s | Peak GB | Prompt tok | Gen tok | Observations                                                                                                             |
+|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|---------|------------|-----------------|---------|------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                                        | `no concerns detected` | 2.17s   | 478 tok/s  | 0.62            | 1.9     | 2,119      | 141     | none                                                                                                                     |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit)             | `no concerns detected` | 10.72s  | 29.3 tok/s | 3.69            | 23      | 2,394      | 123     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-4bit`](#model-mlx-community-glm-46v-flash-4bit)                                                      | `no concerns detected` | 9.63s   | 73.9 tok/s | 5.72            | 8.7     | 6,454      | 139     | none                                                                                                                     |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                                | `no concerns detected` | 36.86s  | 39.9 tok/s | 19.85           | 78      | 6,454      | 142     | none                                                                                                                     |
+| [`mlx-community/InternVL3-14B-4bit`](#model-mlx-community-internvl3-14b-4bit)                                                       | `no concerns detected` | 6.24s   | 54.1 tok/s | 2.22            | 10      | 2,115      | 116     | none                                                                                                                     |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                                         | `no concerns detected` | 7.03s   | 33.9 tok/s | 1.61            | 17      | 2,115      | 103     | none                                                                                                                     |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-2506-8bit)                               | `no concerns detected` | 16.43s  | 60.9 tok/s | 1.41            | 20      | 1,331      | 729     | none                                                                                                                     |
+| [`mlx-community/LFM2.5-VL-3B-OptiQ-4bit`](#model-mlx-community-lfm25-vl-3b-optiq-4bit)                                              | `no concerns detected` | 3.59s   | 205 tok/s  | 1.15            | 4.0     | 2,111      | 110     | none                                                                                                                     |
+| [`mlx-community/MiniCPM-o-4_5-4bit`](#model-mlx-community-minicpm-o-45-4bit)                                                        | `no concerns detected` | 3.49s   | 104 tok/s  | 0.74            | 7.0     | 393        | 114     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)                     | `no concerns detected` | 7.31s   | 65.3 tok/s | 2.66            | 13      | 2,927      | 160     | none                                                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)                         | `no concerns detected` | 4.10s   | 187 tok/s  | 1.58            | 7.8     | 2,926      | 152     | none                                                                                                                     |
+| [`mlx-community/North-Micro-Vision-Instruct-4bit`](#model-mlx-community-north-micro-vision-instruct-4bit)                           | `no concerns detected` | 5.61s   | 156 tok/s  | 2.89            | 3.9     | 4,085      | 112     | none                                                                                                                     |
+| [`mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit`](#model-mlx-community-ornith-15-35b-a3b-optiq-4bit)                                  | `no concerns detected` | 6.89s   | 72.8 tok/s | 1.34            | 24      | 1,291      | 151     | none                                                                                                                     |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                                    | `no concerns detected` | 5.02s   | 52.1 tok/s | 0.87            | 9.3     | 1,141      | 136     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                                         | `no concerns detected` | 30.62s  | 82.8 tok/s | 17.73           | 8.4     | 16,551     | 918     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-30B-A3B-Instruct-4bit`](#model-mlx-community-qwen3-vl-30b-a3b-instruct-4bit)                               | `no concerns detected` | 42.88s  | 73.3 tok/s | 38.07           | 23      | 16,549     | 128     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-32B-Instruct-4bit`](#model-mlx-community-qwen3-vl-32b-instruct-4bit)                                       | `no concerns detected` | 75.17s  | 19.6 tok/s | 62.94           | 26      | 16,549     | 181     | none                                                                                                                     |
+| [`mlx-community/Qwen3-VL-8B-Instruct-4bit`](#model-mlx-community-qwen3-vl-8b-instruct-4bit)                                         | `no concerns detected` | 40.87s  | 68.7 tok/s | 37.41           | 11      | 16,549     | 104     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                                    | `no concerns detected` | 39.80s  | 70.8 tok/s | 34.48           | 25      | 16,565     | 111     | none                                                                                                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                                      | `no concerns detected` | 41.11s  | 85.3 tok/s | 36.68           | 11      | 16,565     | 142     | none                                                                                                                     |
+| [`mlx-community/Qwen3.8-27B-nvfp4`](#model-mlx-community-qwen38-27b-nvfp4)                                                          | `no concerns detected` | 68.66s  | 26.9 tok/s | 60.20           | 21      | 16,565     | 144     | none                                                                                                                     |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                                        | `no concerns detected` | 3.19s   | 126 tok/s  | 1.11            | 5.6     | 1,433      | 78      | none                                                                                                                     |
+| [`mlx-community/Step-3.7-Flash-oQ3e`](#model-mlx-community-step-37-flash-oq3e)                                                      | `no concerns detected` | 45.94s  | 47.7 tok/s | 26.28           | 92      | 3,494      | 147     | none                                                                                                                     |
+| [`mlx-community/aya-vision-8b-4bit`](#model-mlx-community-aya-vision-8b-4bit)                                                       | `no concerns detected` | 4.86s   | 98.7 tok/s | 1.63            | 6.5     | 2,089      | 112     | none                                                                                                                     |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                             | `no concerns detected` | 7.15s   | 44.0 tok/s | 3.06            | 28      | 592        | 85      | none                                                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                             | `no concerns detected` | 10.39s  | 30.0 tok/s | 1.51            | 17      | 591        | 175     | none                                                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                             | `no concerns detected` | 5.49s   | 101 tok/s  | 1.04            | 16      | 596        | 130     | none                                                                                                                     |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                                     | `no concerns detected` | 9.58s   | 22.2 tok/s | 1.97            | 20      | 596        | 89      | none                                                                                                                     |
+| [`mlx-community/gemma-4-e4b-it-4bit`](#model-mlx-community-gemma-4-e4b-it-4bit)                                                     | `no concerns detected` | 4.17s   | 111 tok/s  | 0.85            | 5.9     | 592        | 94      | none                                                                                                                     |
+| [`mlx-community/granite-4.0-3b-vision-4bit`](#model-mlx-community-granite-40-3b-vision-4bit)                                        | `no concerns detected` | 3.27s   | 169 tok/s  | 1.21            | 4.7     | 1,383      | 99      | none                                                                                                                     |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                                           | `no concerns detected` | 8.06s   | 38.4 tok/s | 2.68            | 16      | 3,117      | 114     | none                                                                                                                     |
+| [`nativ-community/Mage-VL-OptiQ-4bit`](#model-nativ-community-mage-vl-optiq-4bit)                                                   | `no concerns detected` | 4.87s   | 126 tok/s  | 2.20            | 5.4     | 4,212      | 130     | none                                                                                                                     |
+| [`nativ-community/MiMo-V2.6-Distill-Qwen-9B-MLX-4bit`](#model-nativ-community-mimo-v26-distill-qwen-9b-mlx-4bit)                    | `no concerns detected` | 39.08s  | 84.4 tok/s | 34.20           | 11      | 16,562     | 220     | none                                                                                                                     |
+| [`nativ-community/Mistral-Small-3.2-24B-Instruct-2506-4bit`](#model-nativ-community-mistral-small-32-24b-instruct-2506-4bit)        | `no concerns detected` | 8.26s   | 36.1 tok/s | 1.97            | 18      | 1,273      | 134     | none                                                                                                                     |
+| [`nativ-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-4bit`](#model-nativ-community-nemotron-3-nano-omni-30b-a3b-reasoning-4bit) | `no concerns detected` | 9.99s   | 131 tok/s  | 5.79            | 23      | 3,628      | 144     | none                                                                                                                     |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                             | `concerns detected`    | 9.68s   | 33.8 tok/s | 1.91            | 18      | 2,619      | 164     | duplicate keywords                                                                                                       |
+| [`mlx-community/gemma-4-12B-it-4bit`](#model-mlx-community-gemma-4-12b-it-4bit)                                                     | `concerns detected`    | 5.25s   | 60.0 tok/s | 0.97            | 7.6     | 596        | 108     | duplicate keywords                                                                                                       |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit)                        | `major concerns`       | 8.05s   | 97.4 tok/s | 1.41            | 19      | 1,639      | 425     | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                                          | `major concerns`       | 3.15s   | 297 tok/s  | 1.21            | 2.2     | 336        | 51      | labelled fields not detected                                                                                             |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)                        | `major concerns`       | 58.17s  | 18.6 tok/s | 2.17            | 15      | 308        | 1,000   | repeated text; cut off at token limit; duplicate keywords                                                                |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                                        | `major concerns`       | 2.98s   | 221 tok/s  | 0.96            | 3.3     | 934        | 84      | incomplete thinking block                                                                                                |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                                               | `major concerns`       | 6.47s   | 71.0 tok/s | 1.40            | 8.2     | 1,526      | 225     | stopped early: repeating; duplicate keywords                                                                             |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)                                     | `major concerns`       | 58.65s  | 22.5 tok/s | 10.29           | 25      | 4,409      | 1,000   | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                                         | `major concerns`       | 46.05s  | 84.0 tok/s | 41.54           | 9.3     | 16,560     | 225     | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                                       | `major concerns`       | 2.31s   | 308 tok/s  | 0.96            | 1.1     | 1,212      | 38      | labelled fields not detected                                                                                             |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                                       | `major concerns`       | 22.07s  | 55.4 tok/s | 14.85           | 14      | 16,560     | 250     | stopped early: repeating; duplicate keywords                                                                             |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                                                   | `major concerns`       | 5.99s   | 70.0 tok/s | 0.88            | 7.2     | 590        | 196     | labelled fields not detected                                                                                             |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | 4.98s   | 145 tok/s  | 2.99            | 4.2     | 5,581      | 102     | labelled fields not detected                                                                                             |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | 3.57s   | 107 tok/s  | 1.51            | 6.7     | 2,197      | 16      | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | 1.94s   | 196 tok/s  | 0.69            | 1.6     | 332        | 21      | labelled fields not detected                                                                                             |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Resource Highlights
 
-Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.38s
+Quickest completion without detected concerns (end-to-end, including model load): `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 2.17s
 
 Lowest peak memory among completions without detected concerns: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 1.9 GB
 
@@ -93,22 +92,21 @@ Decode tok/s stays per model in the chooser and is not averaged across models: t
 
 <!-- markdownlint-disable MD034 MD037 MD049 -->
 
-| Model                                                                                                        | Mechanical checks | Observations                                                                                      |
-|--------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------|
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | `major concerns`  | stopped early: repeating; labelled fields not detected; incomplete thinking block                 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                         |
-| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                         |
-| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                        | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible |
-| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                  | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                       |
-| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | stopped early: repeating; duplicate keywords                                                      |
-| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                              |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | labelled fields not detected                                                                      |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                               | `not assessed`    | none                                                                                              |
+| Model                                                                                                        | Mechanical checks | Observations                                                                                                             |
+|--------------------------------------------------------------------------------------------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-4bit`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-4bit) | `major concerns`  | stopped early: repeating; labelled fields not detected; incomplete thinking block                                        |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                   | `major concerns`  | labelled fields not detected                                                                                             |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit) | `major concerns`  | repeated text; cut off at token limit; duplicate keywords                                                                |
+| [`mlx-community/MiniCPM-V-4.6-4bit`](#model-mlx-community-minicpm-v-46-4bit)                                 | `major concerns`  | incomplete thinking block                                                                                                |
+| [`mlx-community/Molmo2-8B-4bit`](#model-mlx-community-molmo2-8b-4bit)                                        | `major concerns`  | stopped early: repeating; duplicate keywords                                                                             |
+| [`mlx-community/Muse-Glimmer-30B-OptiQ-4bit`](#model-mlx-community-muse-glimmer-30b-optiq-4bit)              | `major concerns`  | control tokens visible; labelled fields not detected; cut off at token limit; role tokens visible; unsupplied place name |
+| [`mlx-community/Qwen2-VL-7B-Instruct-4bit`](#model-mlx-community-qwen2-vl-7b-instruct-4bit)                  | `major concerns`  | repeated text; stopped early: repeating; duplicate keywords                                                              |
+| [`mlx-community/SmolVLM-256M-Instruct-4bit`](#model-mlx-community-smolvlm-256m-instruct-4bit)                | `major concerns`  | labelled fields not detected                                                                                             |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                | `major concerns`  | stopped early: repeating; duplicate keywords                                                                             |
+| [`mlx-community/gemma-3n-E4B-it-4bit`](#model-mlx-community-gemma-3n-e4b-it-4bit)                            | `major concerns`  | labelled fields not detected                                                                                             |
+| [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)               | `major concerns`  | labelled fields not detected                                                                                             |
+| [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                      | `major concerns`  | control tokens visible; labelled fields not detected                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                 | `major concerns`  | labelled fields not detected                                                                                             |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Output at a Glance
@@ -169,7 +167,6 @@ A compact preview of each model's final answer (or failure evidence for crashes)
 | [`mlx-community/granite-vision-3.2-2b-nvfp4`](#model-mlx-community-granite-vision-32-2b-nvfp4)                                      | `major concerns`       | Title: "Harmony on the Water" \| Description: Two sailors navigate their small dinghies, a Vortex catamaran and a Laser dinghy, across calm waters, with a dense green woodland backdrop. The scene is set in an estuary, with a clear sky overhead. The sailors are equ... \| Keywords: (not detected)                                                                                   |
 | [`mlx-community/llm-jp-4-vl-9b-mlx-4bit`](#model-mlx-community-llm-jp-4-vl-9b-mlx-4bit)                                             | `major concerns`       | <\|channel\|> analysis<\|message\|> The image shows two small sailboats racing on a river.                                                                                                                                                                                                                                                                                                |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                                        | `major concerns`       | "Boating in the Countryside: A Glimpse of Sailboats and Forests"                                                                                                                                                                                                                                                                                                                          |
-| [`mlx-community/InternVL3_5-1B-4bit`](#model-mlx-community-internvl35-1b-4bit)                                                      | `not assessed`         | Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'                                                                                                                                                                                                                                                                   |
 <!-- markdownlint-enable MD034 MD037 MD049 -->
 
 ## Run Stamps
@@ -262,22 +259,22 @@ Complete generated or crash evidence for every attempted model.
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2-vl via lfm2_vl)
-- *Model load time:* 0.57s
-- *Generation time:* 0.95s
-- *Total time:* 2.38s
-- *Prompt preparation time:* 0.514
-- *First-token latency:* 0.12
-- *Cleanup time:* 0.0748
+- *Model load time:* 0.35s
+- *Generation time:* 0.92s
+- *Total time:* 2.17s
+- *Prompt preparation time:* 0.546
+- *First-token latency:* 0.116
+- *Cleanup time:* 0.0729
 - *Prompt tokens:* 2,119
 - *Generation tokens:* 141
 - *Total tokens:* 2,260
-- *Prompt throughput (raw):* 17,650 tok/s
-- *Generation throughput (raw):* 469 tok/s
+- *Prompt throughput (raw):* 18,299 tok/s
+- *Generation throughput (raw):* 478 tok/s
 - *Peak memory (GB):* 1.9
 - *Active memory (GB):* 0.90
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 0.897
-- *Post-cleanup active memory (GB):* 0.000134
+- *Post-cleanup active memory (GB):* 0.00015
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -324,21 +321,21 @@ Boat, Boating, Catamaran, Sailboat, Sailing, Life jacket, Man, Sail, Sails, Wate
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
 - *Model load time:* 2.29s
-- *Generation time:* 7.79s
-- *Total time:* 10.61s
-- *Prompt preparation time:* 0.531
-- *First-token latency:* 3.01
-- *Cleanup time:* 0.113
+- *Generation time:* 7.89s
+- *Total time:* 10.72s
+- *Prompt preparation time:* 0.533
+- *First-token latency:* 3.07
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 2,394
 - *Generation tokens:* 123
 - *Total tokens:* 2,517
-- *Prompt throughput (raw):* 794 tok/s
-- *Generation throughput (raw):* 29.4 tok/s
+- *Prompt throughput (raw):* 779 tok/s
+- *Generation throughput (raw):* 29.3 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 18
-- *Post-cleanup active memory (GB):* 0.000396
+- *Post-cleanup active memory (GB):* 0.000412
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -383,22 +380,22 @@ Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life ja
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v)
-- *Model load time:* 1.46s
-- *Generation time:* 8.03s
-- *Total time:* 10.08s
-- *Prompt preparation time:* 0.576
-- *First-token latency:* 5.57
-- *Cleanup time:* 0.104
+- *Model load time:* 1.45s
+- *Generation time:* 7.60s
+- *Total time:* 9.63s
+- *Prompt preparation time:* 0.575
+- *First-token latency:* 5.19
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 6,454
 - *Generation tokens:* 139
 - *Total tokens:* 6,593
-- *Prompt throughput (raw):* 1,158 tok/s
-- *Generation throughput (raw):* 72.3 tok/s
+- *Prompt throughput (raw):* 1,244 tok/s
+- *Generation throughput (raw):* 73.9 tok/s
 - *Peak memory (GB):* 8.7
 - *Active memory (GB):* 7.1
 - *Cache memory (GB):* 0.47
 - *Model-load active memory (GB):* 7.07
-- *Post-cleanup active memory (GB):* 0.00123
+- *Post-cleanup active memory (GB):* 0.00125
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -439,22 +436,22 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type glm4v_moe)
-- *Model load time:* 8.02s
-- *Generation time:* 19.73s
-- *Total time:* 28.37s
-- *Prompt preparation time:* 0.607
-- *First-token latency:* 14.4
-- *Cleanup time:* 0.294
+- *Model load time:* 12.66s
+- *Generation time:* 23.42s
+- *Total time:* 36.86s
+- *Prompt preparation time:* 0.782
+- *First-token latency:* 17.5
+- *Cleanup time:* 0.292
 - *Prompt tokens:* 6,454
 - *Generation tokens:* 142
 - *Total tokens:* 6,596
-- *Prompt throughput (raw):* 449 tok/s
-- *Generation throughput (raw):* 36.3 tok/s
+- *Prompt throughput (raw):* 368 tok/s
+- *Generation throughput (raw):* 39.9 tok/s
 - *Peak memory (GB):* 78
 - *Active memory (GB):* 62
 - *Cache memory (GB):* 1.4
 - *Model-load active memory (GB):* 61.9
-- *Post-cleanup active memory (GB):* 0.00154
+- *Post-cleanup active memory (GB):* 0.00156
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -498,21 +495,21 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
 - *Model load time:* 1.18s
-- *Generation time:* 4.51s
-- *Total time:* 6.43s
-- *Prompt preparation time:* 0.737
-- *First-token latency:* 1.59
-- *Cleanup time:* 0.112
+- *Generation time:* 4.37s
+- *Total time:* 6.24s
+- *Prompt preparation time:* 0.686
+- *First-token latency:* 1.53
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 2,115
 - *Generation tokens:* 116
 - *Total tokens:* 2,231
-- *Prompt throughput (raw):* 1,330 tok/s
-- *Generation throughput (raw):* 52.8 tok/s
+- *Prompt throughput (raw):* 1,381 tok/s
+- *Generation throughput (raw):* 54.1 tok/s
 - *Peak memory (GB):* 10
 - *Active memory (GB):* 8.9
 - *Cache memory (GB):* 0.51
 - *Model-load active memory (GB):* 8.94
-- *Post-cleanup active memory (GB):* 0.00212
+- *Post-cleanup active memory (GB):* 0.00213
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -555,22 +552,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type internvl_chat)
-- *Model load time:* 1.84s
-- *Generation time:* 4.52s
-- *Total time:* 7.05s
-- *Prompt preparation time:* 0.677
-- *First-token latency:* 0.862
-- *Cleanup time:* 0.116
+- *Model load time:* 1.65s
+- *Generation time:* 4.65s
+- *Total time:* 7.03s
+- *Prompt preparation time:* 0.731
+- *First-token latency:* 0.909
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 2,115
 - *Generation tokens:* 103
 - *Total tokens:* 2,218
-- *Prompt throughput (raw):* 2,454 tok/s
-- *Generation throughput (raw):* 34.4 tok/s
+- *Prompt throughput (raw):* 2,328 tok/s
+- *Generation throughput (raw):* 33.9 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.17
 - *Model-load active memory (GB):* 15.9
-- *Post-cleanup active memory (GB):* 0.00243
+- *Post-cleanup active memory (GB):* 0.00244
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -613,22 +610,22 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, GBR, 188572, 1067, Dinghy, L
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type kimi_vl)
-- *Model load time:* 2.44s
-- *Generation time:* 14.40s
-- *Total time:* 17.46s
-- *Prompt preparation time:* 0.612
-- *First-token latency:* 0.738
-- *Cleanup time:* 0.15
+- *Model load time:* 2.41s
+- *Generation time:* 13.39s
+- *Total time:* 16.43s
+- *Prompt preparation time:* 0.618
+- *First-token latency:* 0.715
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 1,331
 - *Generation tokens:* 729
 - *Total tokens:* 2,060
-- *Prompt throughput (raw):* 1,804 tok/s
-- *Generation throughput (raw):* 56.2 tok/s
+- *Prompt throughput (raw):* 1,862 tok/s
+- *Generation throughput (raw):* 60.9 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 1.5
 - *Model-load active memory (GB):* 17.8
-- *Post-cleanup active memory (GB):* 0.00308
+- *Post-cleanup active memory (GB):* 0.0031
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -773,22 +770,22 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type lfm2_vl)
-- *Model load time:* 1.53s
-- *Generation time:* 1.74s
-- *Total time:* 4.00s
-- *Prompt preparation time:* 0.724
-- *First-token latency:* 0.482
-- *Cleanup time:* 0.0912
+- *Model load time:* 1.18s
+- *Generation time:* 1.69s
+- *Total time:* 3.59s
+- *Prompt preparation time:* 0.711
+- *First-token latency:* 0.468
+- *Cleanup time:* 0.0976
 - *Prompt tokens:* 2,111
 - *Generation tokens:* 110
 - *Total tokens:* 2,221
-- *Prompt throughput (raw):* 4,377 tok/s
-- *Generation throughput (raw):* 199 tok/s
+- *Prompt throughput (raw):* 4,509 tok/s
+- *Generation throughput (raw):* 205 tok/s
 - *Peak memory (GB):* 4.0
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 2.81
-- *Post-cleanup active memory (GB):* 0.00334
+- *Post-cleanup active memory (GB):* 0.00336
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -829,22 +826,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmo)
-- *Model load time:* 1.04s
-- *Generation time:* 1.84s
-- *Total time:* 3.42s
-- *Prompt preparation time:* 0.533
-- *First-token latency:* 0.236
-- *Cleanup time:* 0.111
+- *Model load time:* 1.08s
+- *Generation time:* 1.85s
+- *Total time:* 3.49s
+- *Prompt preparation time:* 0.549
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 393
 - *Generation tokens:* 114
 - *Total tokens:* 507
-- *Prompt throughput (raw):* 1,667 tok/s
+- *Prompt throughput (raw):* 1,641 tok/s
 - *Generation throughput (raw):* 104 tok/s
 - *Peak memory (GB):* 7.0
 - *Active memory (GB):* 6.1
 - *Cache memory (GB):* 0.09
 - *Model-load active memory (GB):* 6.15
-- *Post-cleanup active memory (GB):* 0.00469
+- *Post-cleanup active memory (GB):* 0.0047
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -887,22 +884,22 @@ Keywords: Sailboat, Dinghy, Sailor, Vortex catamaran, Laser dinghy, Sail number 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.57s
-- *Generation time:* 5.70s
-- *Total time:* 7.85s
-- *Prompt preparation time:* 0.575
-- *First-token latency:* 2.69
-- *Cleanup time:* 0.108
+- *Model load time:* 1.60s
+- *Generation time:* 5.11s
+- *Total time:* 7.31s
+- *Prompt preparation time:* 0.591
+- *First-token latency:* 2.12
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 2,927
 - *Generation tokens:* 160
 - *Total tokens:* 3,087
-- *Prompt throughput (raw):* 1,087 tok/s
-- *Generation throughput (raw):* 65.0 tok/s
+- *Prompt throughput (raw):* 1,378 tok/s
+- *Generation throughput (raw):* 65.3 tok/s
 - *Peak memory (GB):* 13
 - *Active memory (GB):* 8.0
 - *Cache memory (GB):* 0.60
 - *Model-load active memory (GB):* 8.01
-- *Post-cleanup active memory (GB):* 0.00495
+- *Post-cleanup active memory (GB):* 0.00497
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -947,22 +944,22 @@ Boating, coastal waters, dinghy sailing, Laser dinghy, life jackets, manoeuvring
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.14s
+- *Model load time:* 1.13s
 - *Generation time:* 2.40s
-- *Total time:* 4.12s
-- *Prompt preparation time:* 0.568
-- *First-token latency:* 1.03
-- *Cleanup time:* 0.0957
+- *Total time:* 4.10s
+- *Prompt preparation time:* 0.566
+- *First-token latency:* 1.04
+- *Cleanup time:* 0.0955
 - *Prompt tokens:* 2,926
 - *Generation tokens:* 152
 - *Total tokens:* 3,078
-- *Prompt throughput (raw):* 2,846 tok/s
-- *Generation throughput (raw):* 183 tok/s
+- *Prompt throughput (raw):* 2,816 tok/s
+- *Generation throughput (raw):* 187 tok/s
 - *Peak memory (GB):* 7.8
 - *Active memory (GB):* 2.8
 - *Cache memory (GB):* 0.41
 - *Model-load active memory (GB):* 2.75
-- *Post-cleanup active memory (GB):* 0.00521
+- *Post-cleanup active memory (GB):* 0.00523
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1007,22 +1004,22 @@ Catamaran, Coastal waters, Dinghy, Estuary, Forest, Laser dinghy, Life jacket, M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type cohere_compass)
-- *Model load time:* 1.07s
-- *Generation time:* 3.41s
-- *Total time:* 5.28s
-- *Prompt preparation time:* 0.793
-- *First-token latency:* 1.95
-- *Cleanup time:* 0.103
+- *Model load time:* 1.17s
+- *Generation time:* 3.62s
+- *Total time:* 5.61s
+- *Prompt preparation time:* 0.813
+- *First-token latency:* 2.13
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 4,085
 - *Generation tokens:* 112
 - *Total tokens:* 4,197
-- *Prompt throughput (raw):* 2,090 tok/s
-- *Generation throughput (raw):* 159 tok/s
+- *Prompt throughput (raw):* 1,917 tok/s
+- *Generation throughput (raw):* 156 tok/s
 - *Peak memory (GB):* 3.9
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.65
 - *Model-load active memory (GB):* 2.18
-- *Post-cleanup active memory (GB):* 0.00646
+- *Post-cleanup active memory (GB):* 0.00647
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1064,22 +1061,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.65s
-- *Generation time:* 3.35s
-- *Total time:* 6.70s
-- *Prompt preparation time:* 0.682
-- *First-token latency:* 0.661
-- *Cleanup time:* 0.14
+- *Model load time:* 2.75s
+- *Generation time:* 3.42s
+- *Total time:* 6.89s
+- *Prompt preparation time:* 0.707
+- *First-token latency:* 0.689
+- *Cleanup time:* 0.153
 - *Prompt tokens:* 1,291
 - *Generation tokens:* 151
 - *Total tokens:* 1,442
-- *Prompt throughput (raw):* 1,954 tok/s
-- *Generation throughput (raw):* 73.0 tok/s
+- *Prompt throughput (raw):* 1,874 tok/s
+- *Generation throughput (raw):* 72.8 tok/s
 - *Peak memory (GB):* 24
 - *Active memory (GB):* 23
 - *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 23.1
-- *Post-cleanup active memory (GB):* 0.00697
+- *Post-cleanup active memory (GB):* 0.00698
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1124,22 +1121,22 @@ Sailing, Sailboat, Catamaran, Dinghy, Laser, Man, Sailor, Life jacket, Mast, Boa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type phi3_v)
-- *Model load time:* 0.94s
-- *Generation time:* 3.21s
-- *Total time:* 4.69s
-- *Prompt preparation time:* 0.531
-- *First-token latency:* 0.301
-- *Cleanup time:* 0.0991
+- *Model load time:* 0.98s
+- *Generation time:* 3.48s
+- *Total time:* 5.02s
+- *Prompt preparation time:* 0.556
+- *First-token latency:* 0.322
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 1,141
 - *Generation tokens:* 136
 - *Total tokens:* 1,277
-- *Prompt throughput (raw):* 3,794 tok/s
-- *Generation throughput (raw):* 56.5 tok/s
+- *Prompt throughput (raw):* 3,546 tok/s
+- *Generation throughput (raw):* 52.1 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 8.3
 - *Cache memory (GB):* 0.52
 - *Model-load active memory (GB):* 8.3
-- *Post-cleanup active memory (GB):* 0.00703
+- *Post-cleanup active memory (GB):* 0.00705
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1183,21 +1180,21 @@ Keywords: Sailors, Dinghies, Vortex, Laser, Coastal Waters, Forest, Sailing, Tre
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.77s
-- *Generation time:* 26.00s
-- *Total time:* 27.76s
-- *Prompt preparation time:* 0.981
-- *First-token latency:* 14.5
-- *Cleanup time:* 0.103
+- *Generation time:* 28.82s
+- *Total time:* 30.62s
+- *Prompt preparation time:* 1.01
+- *First-token latency:* 16.8
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 16,551
 - *Generation tokens:* 918
 - *Total tokens:* 17,469
-- *Prompt throughput (raw):* 1,139 tok/s
-- *Generation throughput (raw):* 86.9 tok/s
+- *Prompt throughput (raw):* 985 tok/s
+- *Generation throughput (raw):* 82.8 tok/s
 - *Peak memory (GB):* 8.4
 - *Active memory (GB):* 4.3
 - *Cache memory (GB):* 2.7
 - *Model-load active memory (GB):* 4.26
-- *Post-cleanup active memory (GB):* 0.00765
+- *Post-cleanup active memory (GB):* 0.00767
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1289,22 +1286,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Laser dinghy, Life 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl_moe)
-- *Model load time:* 1.91s
-- *Generation time:* 34.64s
-- *Total time:* 37.55s
-- *Prompt preparation time:* 0.991
-- *First-token latency:* 32
-- *Cleanup time:* 0.138
+- *Model load time:* 1.97s
+- *Generation time:* 39.82s
+- *Total time:* 42.88s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 37.1
+- *Cleanup time:* 0.145
 - *Prompt tokens:* 16,549
 - *Generation tokens:* 128
 - *Total tokens:* 16,677
-- *Prompt throughput (raw):* 517 tok/s
-- *Generation throughput (raw):* 73.4 tok/s
+- *Prompt throughput (raw):* 446 tok/s
+- *Generation throughput (raw):* 73.3 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 2.3
 - *Model-load active memory (GB):* 18.3
-- *Post-cleanup active memory (GB):* 0.00797
+- *Post-cleanup active memory (GB):* 0.00798
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1346,21 +1343,21 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 1.96s
-- *Generation time:* 66.71s
-- *Total time:* 69.67s
-- *Prompt preparation time:* 0.99
-- *First-token latency:* 57.1
-- *Cleanup time:* 0.142
+- *Generation time:* 72.17s
+- *Total time:* 75.17s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 62
+- *Cleanup time:* 0.159
 - *Prompt tokens:* 16,549
 - *Generation tokens:* 181
 - *Total tokens:* 16,730
-- *Prompt throughput (raw):* 290 tok/s
-- *Generation throughput (raw):* 20.9 tok/s
+- *Prompt throughput (raw):* 267 tok/s
+- *Generation throughput (raw):* 19.6 tok/s
 - *Peak memory (GB):* 26
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 5.5
 - *Model-load active memory (GB):* 19.6
-- *Post-cleanup active memory (GB):* 0.00828
+- *Post-cleanup active memory (GB):* 0.00829
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1404,21 +1401,21 @@ Keywords: Sailboat, Sailing, Dinghy, Catamaran, Vortex, Laser, Sail number, GBR,
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_vl)
 - *Model load time:* 0.91s
-- *Generation time:* 35.74s
-- *Total time:* 37.66s
-- *Prompt preparation time:* 1
-- *First-token latency:* 33.3
-- *Cleanup time:* 0.114
+- *Generation time:* 38.93s
+- *Total time:* 40.87s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 36.5
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 16,549
 - *Generation tokens:* 104
 - *Total tokens:* 16,653
-- *Prompt throughput (raw):* 496 tok/s
-- *Generation throughput (raw):* 68.9 tok/s
+- *Prompt throughput (raw):* 453 tok/s
+- *Generation throughput (raw):* 68.7 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 3.4
 - *Model-load active memory (GB):* 5.77
-- *Post-cleanup active memory (GB):* 0.00859
+- *Post-cleanup active memory (GB):* 0.0086
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1461,22 +1458,22 @@ Keywords: Sailboat, Dinghy, Catamaran, Laser, Sailing, Water, Forest, Trees, Sho
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5_moe)
-- *Model load time:* 2.75s
-- *Generation time:* 31.13s
-- *Total time:* 34.90s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 28.7
-- *Cleanup time:* 0.159
+- *Model load time:* 2.71s
+- *Generation time:* 36.05s
+- *Total time:* 39.80s
+- *Prompt preparation time:* 1.03
+- *First-token latency:* 33.6
+- *Cleanup time:* 0.173
 - *Prompt tokens:* 16,565
 - *Generation tokens:* 111
 - *Total tokens:* 16,676
-- *Prompt throughput (raw):* 578 tok/s
-- *Generation throughput (raw):* 69.7 tok/s
+- *Prompt throughput (raw):* 493 tok/s
+- *Generation throughput (raw):* 70.8 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 20
 - *Cache memory (GB):* 0.90
 - *Model-load active memory (GB):* 20.4
-- *Post-cleanup active memory (GB):* 0.0091
+- *Post-cleanup active memory (GB):* 0.00911
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1518,22 +1515,22 @@ Keywords: Vortex catamaran, Laser dinghy, sailors, calm water, river, shoreline,
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.58s
-- *Generation time:* 34.50s
-- *Total time:* 37.10s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 32
-- *Cleanup time:* 0.113
+- *Model load time:* 1.69s
+- *Generation time:* 38.35s
+- *Total time:* 41.11s
+- *Prompt preparation time:* 1.07
+- *First-token latency:* 35.7
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 16,565
 - *Generation tokens:* 142
 - *Total tokens:* 16,707
-- *Prompt throughput (raw):* 518 tok/s
-- *Generation throughput (raw):* 89.4 tok/s
+- *Prompt throughput (raw):* 463 tok/s
+- *Generation throughput (raw):* 85.3 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
 - *Model-load active memory (GB):* 5.96
-- *Post-cleanup active memory (GB):* 0.00962
+- *Post-cleanup active memory (GB):* 0.00964
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -1594,17 +1591,17 @@ Sailing, Dinghy, Catamaran, Vortex, Laser, Sailboat, Sailor, Life jacket, Mast, 
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 2.09s
-- *Generation time:* 53.93s
-- *Total time:* 57.04s
-- *Prompt preparation time:* 1.01
-- *First-token latency:* 48.1
-- *Cleanup time:* 0.157
+- *Model load time:* 2.03s
+- *Generation time:* 65.57s
+- *Total time:* 68.66s
+- *Prompt preparation time:* 1.05
+- *First-token latency:* 59.1
+- *Cleanup time:* 0.165
 - *Prompt tokens:* 16,565
 - *Generation tokens:* 144
 - *Total tokens:* 16,709
-- *Prompt throughput (raw):* 345 tok/s
-- *Generation throughput (raw):* 28.9 tok/s
+- *Prompt throughput (raw):* 280 tok/s
+- *Generation throughput (raw):* 26.9 tok/s
 - *Peak memory (GB):* 21
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 1.9
@@ -1654,17 +1651,17 @@ Vortex, Laser, catamaran, dinghy, sailing, sailors, estuary, woodland, boats, wa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type smolvlm)
-- *Model load time:* 0.64s
-- *Generation time:* 1.72s
-- *Total time:* 3.13s
-- *Prompt preparation time:* 0.767
-- *First-token latency:* 0.38
-- *Cleanup time:* 0.0854
+- *Model load time:* 0.67s
+- *Generation time:* 1.74s
+- *Total time:* 3.19s
+- *Prompt preparation time:* 0.783
+- *First-token latency:* 0.382
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 1,433
 - *Generation tokens:* 78
 - *Total tokens:* 1,511
-- *Prompt throughput (raw):* 3,770 tok/s
-- *Generation throughput (raw):* 128 tok/s
+- *Prompt throughput (raw):* 3,756 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory (GB):* 5.6
 - *Active memory (GB):* 4.5
 - *Cache memory (GB):* 0.35
@@ -1710,17 +1707,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type step3p7)
-- *Model load time:* 14.19s
-- *Generation time:* 29.37s
-- *Total time:* 44.52s
-- *Prompt preparation time:* 0.951
-- *First-token latency:* 23.5
-- *Cleanup time:* 0.393
+- *Model load time:* 15.61s
+- *Generation time:* 29.36s
+- *Total time:* 45.94s
+- *Prompt preparation time:* 0.953
+- *First-token latency:* 24.2
+- *Cleanup time:* 0.366
 - *Prompt tokens:* 3,494
 - *Generation tokens:* 147
 - *Total tokens:* 3,641
-- *Prompt throughput (raw):* 149 tok/s
-- *Generation throughput (raw):* 47.9 tok/s
+- *Prompt throughput (raw):* 144 tok/s
+- *Generation throughput (raw):* 47.7 tok/s
 - *Peak memory (GB):* 92
 - *Active memory (GB):* 85
 - *Cache memory (GB):* 0.41
@@ -1770,17 +1767,17 @@ Sailboat, Sailing, Sailor, Dinghy, Catamaran, Laser dinghy, Vortex, Boat, Boatin
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type aya_vision)
-- *Model load time:* 1.09s
-- *Generation time:* 2.70s
-- *Total time:* 4.76s
-- *Prompt preparation time:* 0.962
-- *First-token latency:* 0.728
-- *Cleanup time:* 0.119
+- *Model load time:* 1.10s
+- *Generation time:* 2.77s
+- *Total time:* 4.86s
+- *Prompt preparation time:* 0.968
+- *First-token latency:* 0.747
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 2,089
 - *Generation tokens:* 112
 - *Total tokens:* 2,201
-- *Prompt throughput (raw):* 2,870 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 2,795 tok/s
+- *Generation throughput (raw):* 98.7 tok/s
 - *Peak memory (GB):* 6.5
 - *Active memory (GB):* 5.5
 - *Cache memory (GB):* 0.34
@@ -1828,17 +1825,17 @@ Keywords: Catamaran, Dinghy, River, Sailing, Trees, Water, Sky, Boat, Boating, M
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type diffusion_gemma)
-- *Model load time:* 3.36s
-- *Generation time:* 2.96s
-- *Total time:* 6.97s
-- *Prompt preparation time:* 0.639
+- *Model load time:* 3.41s
+- *Generation time:* 3.07s
+- *Total time:* 7.15s
+- *Prompt preparation time:* 0.66
 - *First-token latency:* 0.332
-- *Cleanup time:* 0.176
+- *Cleanup time:* 0.14
 - *Prompt tokens:* 592
 - *Generation tokens:* 85
 - *Total tokens:* 677
-- *Prompt throughput (raw):* 1,783 tok/s
-- *Generation throughput (raw):* 46.6 tok/s
+- *Prompt throughput (raw):* 1,784 tok/s
+- *Generation throughput (raw):* 44.0 tok/s
 - *Peak memory (GB):* 28
 - *Active memory (GB):* 27
 - *Cache memory (GB):* 0.01
@@ -1884,17 +1881,17 @@ Keywords: Sailing, Sailboat, Catamaran, Dinghy, Sailor, Mast, Water, Forest, Riv
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3)
-- *Model load time:* 2.65s
-- *Generation time:* 10.08s
-- *Total time:* 13.34s
-- *Prompt preparation time:* 0.595
-- *First-token latency:* 1.31
-- *Cleanup time:* 0.146
+- *Model load time:* 2.43s
+- *Generation time:* 7.34s
+- *Total time:* 10.39s
+- *Prompt preparation time:* 0.6
+- *First-token latency:* 0.948
+- *Cleanup time:* 0.147
 - *Prompt tokens:* 591
 - *Generation tokens:* 175
 - *Total tokens:* 766
-- *Prompt throughput (raw):* 450 tok/s
-- *Generation throughput (raw):* 21.4 tok/s
+- *Prompt throughput (raw):* 623 tok/s
+- *Generation throughput (raw):* 30.0 tok/s
 - *Peak memory (GB):* 17
 - *Active memory (GB):* 16
 - *Cache memory (GB):* 0.44
@@ -1942,17 +1939,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.68s
-- *Generation time:* 2.52s
-- *Total time:* 5.86s
-- *Prompt preparation time:* 0.65
-- *First-token latency:* 0.464
-- *Cleanup time:* 0.143
+- *Model load time:* 2.50s
+- *Generation time:* 2.33s
+- *Total time:* 5.49s
+- *Prompt preparation time:* 0.645
+- *First-token latency:* 0.437
+- *Cleanup time:* 0.15
 - *Prompt tokens:* 596
 - *Generation tokens:* 130
 - *Total tokens:* 726
-- *Prompt throughput (raw):* 1,285 tok/s
-- *Generation throughput (raw):* 92.1 tok/s
+- *Prompt throughput (raw):* 1,363 tok/s
+- *Generation throughput (raw):* 101 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.22
@@ -2000,17 +1997,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Forest, Laser dinghy, Life j
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 2.69s
-- *Generation time:* 5.50s
-- *Total time:* 8.82s
-- *Prompt preparation time:* 0.62
-- *First-token latency:* 1.25
-- *Cleanup time:* 0.162
+- *Model load time:* 2.94s
+- *Generation time:* 5.99s
+- *Total time:* 9.58s
+- *Prompt preparation time:* 0.629
+- *First-token latency:* 1.37
+- *Cleanup time:* 0.167
 - *Prompt tokens:* 596
 - *Generation tokens:* 89
 - *Total tokens:* 685
-- *Prompt throughput (raw):* 476 tok/s
-- *Generation throughput (raw):* 24.9 tok/s
+- *Prompt throughput (raw):* 434 tok/s
+- *Generation throughput (raw):* 22.2 tok/s
 - *Peak memory (GB):* 20
 - *Active memory (GB):* 18
 - *Cache memory (GB):* 0.79
@@ -2056,22 +2053,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4)
-- *Model load time:* 1.70s
-- *Generation time:* 1.54s
-- *Total time:* 3.87s
-- *Prompt preparation time:* 0.624
-- *First-token latency:* 0.184
-- *Cleanup time:* 0.115
+- *Model load time:* 1.80s
+- *Generation time:* 1.71s
+- *Total time:* 4.17s
+- *Prompt preparation time:* 0.646
+- *First-token latency:* 0.234
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 592
 - *Generation tokens:* 94
 - *Total tokens:* 686
-- *Prompt throughput (raw):* 3,211 tok/s
-- *Generation throughput (raw):* 123 tok/s
+- *Prompt throughput (raw):* 2,532 tok/s
+- *Generation throughput (raw):* 111 tok/s
 - *Peak memory (GB):* 5.9
 - *Active memory (GB):* 5.2
 - *Cache memory (GB):* 0.08
 - *Model-load active memory (GB):* 5.16
-- *Post-cleanup active memory (GB):* 0.0146
+- *Post-cleanup active memory (GB):* 0.0147
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2112,22 +2109,22 @@ Keywords: Catamaran, Dinghy, Laser, Sailing, Boating, Woodland, Estuary, Sailboa
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type granite4_vision)
-- *Model load time:* 0.61s
-- *Generation time:* 1.76s
-- *Total time:* 3.22s
-- *Prompt preparation time:* 0.843
-- *First-token latency:* 0.394
-- *Cleanup time:* 0.0942
+- *Model load time:* 0.62s
+- *Generation time:* 1.80s
+- *Total time:* 3.27s
+- *Prompt preparation time:* 0.856
+- *First-token latency:* 0.407
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 1,383
 - *Generation tokens:* 99
 - *Total tokens:* 1,482
-- *Prompt throughput (raw):* 3,508 tok/s
-- *Generation throughput (raw):* 174 tok/s
+- *Prompt throughput (raw):* 3,398 tok/s
+- *Generation throughput (raw):* 169 tok/s
 - *Peak memory (GB):* 4.7
 - *Active memory (GB):* 3.0
 - *Cache memory (GB):* 0.22
 - *Model-load active memory (GB):* 3.03
-- *Post-cleanup active memory (GB):* 0.0148
+- *Post-cleanup active memory (GB):* 0.0149
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2168,17 +2165,17 @@ Keywords: Sailors, Dinghies, Vortex catamaran, Laser dinghy, Water, Trees, Coast
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type pixtral)
-- *Model load time:* 1.83s
-- *Generation time:* 5.24s
-- *Total time:* 7.64s
-- *Prompt preparation time:* 0.558
-- *First-token latency:* 1.68
-- *Cleanup time:* 0.115
+- *Model load time:* 1.84s
+- *Generation time:* 5.66s
+- *Total time:* 8.06s
+- *Prompt preparation time:* 0.557
+- *First-token latency:* 2.15
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 3,117
 - *Generation tokens:* 114
 - *Total tokens:* 3,231
-- *Prompt throughput (raw):* 1,852 tok/s
-- *Generation throughput (raw):* 37.8 tok/s
+- *Prompt throughput (raw):* 1,449 tok/s
+- *Generation throughput (raw):* 38.4 tok/s
 - *Peak memory (GB):* 16
 - *Active memory (GB):* 13
 - *Cache memory (GB):* 0.59
@@ -2228,17 +2225,17 @@ Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life ja
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mage_vl)
-- *Model load time:* 0.81s
-- *Generation time:* 3.54s
-- *Total time:* 5.10s
-- *Prompt preparation time:* 0.743
-- *First-token latency:* 1.78
-- *Cleanup time:* 0.111
+- *Model load time:* 0.86s
+- *Generation time:* 3.24s
+- *Total time:* 4.87s
+- *Prompt preparation time:* 0.769
+- *First-token latency:* 1.51
+- *Cleanup time:* 0.115
 - *Prompt tokens:* 4,212
 - *Generation tokens:* 130
 - *Total tokens:* 4,342
-- *Prompt throughput (raw):* 2,367 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 2,797 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory (GB):* 5.4
 - *Active memory (GB):* 3.9
 - *Cache memory (GB):* 0.72
@@ -2283,17 +2280,17 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen3_5)
-- *Model load time:* 1.25s
-- *Generation time:* 35.92s
-- *Total time:* 38.17s
-- *Prompt preparation time:* 0.988
-- *First-token latency:* 32.4
-- *Cleanup time:* 0.121
+- *Model load time:* 1.24s
+- *Generation time:* 36.81s
+- *Total time:* 39.08s
+- *Prompt preparation time:* 1.02
+- *First-token latency:* 33.3
+- *Cleanup time:* 0.134
 - *Prompt tokens:* 16,562
 - *Generation tokens:* 220
 - *Total tokens:* 16,782
-- *Prompt throughput (raw):* 511 tok/s
-- *Generation throughput (raw):* 83.4 tok/s
+- *Prompt throughput (raw):* 497 tok/s
+- *Generation throughput (raw):* 84.4 tok/s
 - *Peak memory (GB):* 11
 - *Active memory (GB):* 6.0
 - *Cache memory (GB):* 1.2
@@ -2343,22 +2340,22 @@ Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail number GBR 1885
 - *Maintainer status:* none
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type mistral3)
-- *Model load time:* 1.99s
-- *Generation time:* 5.78s
-- *Total time:* 8.33s
-- *Prompt preparation time:* 0.556
-- *First-token latency:* 1.46
-- *Cleanup time:* 0.142
+- *Model load time:* 2.01s
+- *Generation time:* 5.69s
+- *Total time:* 8.26s
+- *Prompt preparation time:* 0.552
+- *First-token latency:* 1.45
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 1,273
 - *Generation tokens:* 134
 - *Total tokens:* 1,407
-- *Prompt throughput (raw):* 873 tok/s
-- *Generation throughput (raw):* 35.4 tok/s
+- *Prompt throughput (raw):* 880 tok/s
+- *Generation throughput (raw):* 36.1 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 15
 - *Cache memory (GB):* 0.28
 - *Model-load active memory (GB):* 15.1
-- *Post-cleanup active memory (GB):* 0.0173
+- *Post-cleanup active memory (GB):* 0.0174
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2404,20 +2401,20 @@ Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dinghy, Life ja
 - *Observations:* none
 - *Arch supported by installed mlx-vlm:* yes (model_type
   nemotronh_nano_omni_reasoning_v3 via nemotron_h_nano_omni)
-- *Model load time:* 2.63s
-- *Generation time:* 7.02s
-- *Total time:* 10.27s
-- *Prompt preparation time:* 0.613
-- *First-token latency:* 5.19
-- *Cleanup time:* 0.136
+- *Model load time:* 2.46s
+- *Generation time:* 6.89s
+- *Total time:* 9.99s
+- *Prompt preparation time:* 0.626
+- *First-token latency:* 5.21
+- *Cleanup time:* 0.144
 - *Prompt tokens:* 3,628
 - *Generation tokens:* 144
 - *Total tokens:* 3,772
-- *Prompt throughput (raw):* 699 tok/s
-- *Generation throughput (raw):* 114 tok/s
+- *Prompt throughput (raw):* 697 tok/s
+- *Generation throughput (raw):* 131 tok/s
 - *Peak memory (GB):* 23
 - *Active memory (GB):* 20
-- *Cache memory (GB):* 0.15
+- *Cache memory (GB):* 0.14
 - *Model-load active memory (GB):* 19.7
 - *Post-cleanup active memory (GB):* 0.0176
 - *Post-cleanup cache memory (GB):* 0.0
@@ -2464,22 +2461,22 @@ Keywords: Boat, Boating, Catamaran, Clouds, Dinghy, Estuary, Forest, Laser dingh
 - *Maintainer status:* none
 - *Observations:* Duplicate keywords: river
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 2.28s
-- *Generation time:* 7.12s
-- *Total time:* 10.22s
-- *Prompt preparation time:* 0.814
-- *First-token latency:* 1.22
-- *Cleanup time:* 0.135
+- *Model load time:* 2.13s
+- *Generation time:* 6.77s
+- *Total time:* 9.68s
+- *Prompt preparation time:* 0.775
+- *First-token latency:* 1.16
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 2,619
 - *Generation tokens:* 164
 - *Total tokens:* 2,783
-- *Prompt throughput (raw):* 2,154 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
+- *Prompt throughput (raw):* 2,253 tok/s
+- *Generation throughput (raw):* 33.8 tok/s
 - *Peak memory (GB):* 18
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.43
 - *Model-load active memory (GB):* 16.9
-- *Post-cleanup active memory (GB):* 0.0018
+- *Post-cleanup active memory (GB):* 0.00182
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2523,16 +2520,16 @@ Keywords: Laser dinghy, Vortex catamaran, sailboats, river, woodland, sail numbe
 - *Observations:* Duplicate keywords: sailing
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma4_unified)
 - *Model load time:* 1.80s
-- *Generation time:* 3.20s
-- *Total time:* 5.69s
-- *Prompt preparation time:* 0.669
-- *First-token latency:* 0.456
-- *Cleanup time:* 0.139
+- *Generation time:* 2.78s
+- *Total time:* 5.25s
+- *Prompt preparation time:* 0.663
+- *First-token latency:* 0.361
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 596
 - *Generation tokens:* 108
 - *Total tokens:* 704
-- *Prompt throughput (raw):* 1,308 tok/s
-- *Generation throughput (raw):* 52.0 tok/s
+- *Prompt throughput (raw):* 1,652 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
 - *Peak memory (GB):* 7.6
 - *Active memory (GB):* 6.8
 - *Cache memory (GB):* 0.32
@@ -2580,22 +2577,22 @@ Keywords: Boat, Boating, Catamaran, Sailing, Sailor, Laser dinghy, Water, River,
   output; Required labelled fields not detected: title, description, keywords;
   Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type ernie4_5_moe_vl)
-- *Model load time:* 1.66s
-- *Generation time:* 5.91s
-- *Total time:* 8.26s
-- *Prompt preparation time:* 0.691
-- *First-token latency:* 0.756
-- *Cleanup time:* 0.107
+- *Model load time:* 1.60s
+- *Generation time:* 5.77s
+- *Total time:* 8.05s
+- *Prompt preparation time:* 0.672
+- *First-token latency:* 0.764
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 1,639
 - *Generation tokens:* 425
 - *Total tokens:* 2,064
-- *Prompt throughput (raw):* 2,167 tok/s
-- *Generation throughput (raw):* 93.9 tok/s
+- *Prompt throughput (raw):* 2,146 tok/s
+- *Generation throughput (raw):* 97.4 tok/s
 - *Peak memory (GB):* 19
 - *Active memory (GB):* 17
 - *Cache memory (GB):* 0.29
 - *Model-load active memory (GB):* 17.4
-- *Post-cleanup active memory (GB):* 0.000609
+- *Post-cleanup active memory (GB):* 0.000625
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2644,22 +2641,22 @@ Finally, the keywords. I'll go through the hints and add in some keywords that a
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava_qwen2 via
   fastvlm)
-- *Model load time:* 1.07s
-- *Generation time:* 1.35s
-- *Total time:* 3.55s
-- *Prompt preparation time:* 1.13
-- *First-token latency:* 0.108
-- *Cleanup time:* 0.0886
+- *Model load time:* 0.63s
+- *Generation time:* 1.38s
+- *Total time:* 3.15s
+- *Prompt preparation time:* 1.14
+- *First-token latency:* 0.106
+- *Cleanup time:* 0.0954
 - *Prompt tokens:* 336
 - *Generation tokens:* 51
 - *Total tokens:* 387
-- *Prompt throughput (raw):* 3,120 tok/s
-- *Generation throughput (raw):* 310 tok/s
+- *Prompt throughput (raw):* 3,178 tok/s
+- *Generation throughput (raw):* 297 tok/s
 - *Peak memory (GB):* 2.2
 - *Active memory (GB):* 1.2
 - *Cache memory (GB):* 0.02
 - *Model-load active memory (GB):* 1.25
-- *Post-cleanup active memory (GB):* 0.00092
+- *Post-cleanup active memory (GB):* 0.000936
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2703,22 +2700,22 @@ A serene scene of two sailors navigating calm waters in a Vortex catamaran and L
   gratitude, appreciation, wonder, awe, amazement, enthusiasm, excitement,
   exploration, discovery
 - *Arch supported by installed mlx-vlm:* yes (model_type mllama)
-- *Model load time:* 1.93s
-- *Generation time:* 54.91s
-- *Total time:* 57.48s
-- *Prompt preparation time:* 0.631
-- *First-token latency:* 1.67
-- *Cleanup time:* 0.105
+- *Model load time:* 1.74s
+- *Generation time:* 55.83s
+- *Total time:* 58.17s
+- *Prompt preparation time:* 0.592
+- *First-token latency:* 1.6
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 308
 - *Generation tokens:* 1,000
 - *Total tokens:* 1,308
-- *Prompt throughput (raw):* 185 tok/s
-- *Generation throughput (raw):* 19.0 tok/s
+- *Prompt throughput (raw):* 192 tok/s
+- *Generation throughput (raw):* 18.6 tok/s
 - *Peak memory (GB):* 15
 - *Active memory (GB):* 11
 - *Cache memory (GB):* 0.40
 - *Model-load active memory (GB):* 11.3
-- *Post-cleanup active memory (GB):* 0.00387
+- *Post-cleanup active memory (GB):* 0.00389
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2761,22 +2758,22 @@ Keywords: Sailboat, Catamaran, Estuary, Forest, Sailing, Sailors, Vortex, Laser,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Internal reasoning block appears incomplete
 - *Arch supported by installed mlx-vlm:* yes (model_type minicpmv4_6)
-- *Model load time:* 1.07s
-- *Generation time:* 1.32s
-- *Total time:* 3.11s
-- *Prompt preparation time:* 0.712
-- *First-token latency:* 0.253
-- *Cleanup time:* 0.116
+- *Model load time:* 0.91s
+- *Generation time:* 1.34s
+- *Total time:* 2.98s
+- *Prompt preparation time:* 0.711
+- *First-token latency:* 0.256
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 934
 - *Generation tokens:* 84
 - *Total tokens:* 1,018
-- *Prompt throughput (raw):* 3,687 tok/s
-- *Generation throughput (raw):* 223 tok/s
-- *Peak memory (GB):* 3.2
+- *Prompt throughput (raw):* 3,643 tok/s
+- *Generation throughput (raw):* 221 tok/s
+- *Peak memory (GB):* 3.3
 - *Active memory (GB):* 2.2
 - *Cache memory (GB):* 0.04
 - *Model-load active memory (GB):* 2.16
-- *Post-cleanup active memory (GB):* 0.00438
+- *Post-cleanup active memory (GB):* 0.00439
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -2841,22 +2838,22 @@ Keywords: boats, sailing, dinghy, catamaran, water, nature, forest, sail, person
   output; Duplicate keywords: blue stripes, white boat, blue canopy, white
   hull
 - *Arch supported by installed mlx-vlm:* yes (model_type molmo2)
-- *Model load time:* 1.17s
+- *Model load time:* 1.18s
 - *Generation time:* 4.58s
-- *Total time:* 6.46s
-- *Prompt preparation time:* 0.695
-- *First-token latency:* 0.765
-- *Cleanup time:* 0.099
+- *Total time:* 6.47s
+- *Prompt preparation time:* 0.701
+- *First-token latency:* 0.752
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 1,526
 - *Generation tokens:* 225
 - *Total tokens:* 1,751
-- *Prompt throughput (raw):* 1,995 tok/s
-- *Generation throughput (raw):* 71.4 tok/s
-- *Peak memory (GB):* 8.1
+- *Prompt throughput (raw):* 2,029 tok/s
+- *Generation throughput (raw):* 71.0 tok/s
+- *Peak memory (GB):* 8.2
 - *Active memory (GB):* 6.5
 - *Cache memory (GB):* 1.8
 - *Model-load active memory (GB):* 6.45
-- *Post-cleanup active memory (GB):* 0.00552
+- *Post-cleanup active memory (GB):* 0.00554
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -2899,24 +2896,25 @@ Keywords: Boat, Boating, Catamaran, Dinghy, Estuary, Forest, Laser dinghy, Life 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description; Response appears cut off
-  at the token limit; Conversation-role control tokens remain visible
+  at the token limit; Conversation-role control tokens remain visible; Names a
+  place the prompt did not supply: River That
 - *Arch supported by installed mlx-vlm:* yes (model_type muse_glimmer)
-- *Model load time:* 3.24s
-- *Generation time:* 50.17s
-- *Total time:* 54.11s
-- *Prompt preparation time:* 0.694
-- *First-token latency:* 8.51
-- *Cleanup time:* 0.14
+- *Model load time:* 3.25s
+- *Generation time:* 54.69s
+- *Total time:* 58.65s
+- *Prompt preparation time:* 0.695
+- *First-token latency:* 9.65
+- *Cleanup time:* 0.17
 - *Prompt tokens:* 4,409
 - *Generation tokens:* 1,000
 - *Total tokens:* 5,409
-- *Prompt throughput (raw):* 518 tok/s
-- *Generation throughput (raw):* 24.4 tok/s
+- *Prompt throughput (raw):* 457 tok/s
+- *Generation throughput (raw):* 22.5 tok/s
 - *Peak memory (GB):* 25
 - *Active memory (GB):* 24
 - *Cache memory (GB):* 0.23
 - *Model-load active memory (GB):* 23.9
-- *Post-cleanup active memory (GB):* 0.00593
+- *Post-cleanup active memory (GB):* 0.00595
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* max_tokens
 - *Requested maximum tokens:* 1000
@@ -2962,15 +2960,29 @@ Description: 1-2 sentence factual description combining relevant context with ma
 
 The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with "VORTEX" and 1067. It appears to be a small trimaran? Or a catamaran? Hints say catamaran. Might keep as small sailing dinghy. Could say Vortex dinghy. Might be safe to say Vortex sailing dinghy. But hint says catamaran. Image shows what looks like a small boat with maybe two hulls? Actually it's a single hull with a small outrigger? Hmm looks like a Vortex class dinghy which is a monohull? Let's keep description as Vortex sailing boat. Might follow hint but image evidence shows it's a single hull with maybe a cat? I think Vortex is a dinghy, not catamaran. Could note as Vortex dinghy. Might be conflict. Prefer image evidence. I'd say Vortex dinghy (sail number 1067). Might keep catamaran? Safer to say small sailing dinghy.
+Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
 
-Laser dinghy sail number 188572 GBR. The sail number on sail is 188572, GBR. Good.
+Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
 
-Lighting: daylight, partly cloudy.
+We need British English spelling.
 
-Provide keywords 10-18 unique comma-separated.
+Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
 
-Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water under a partly cloudy sky. On the left a white and orange Vortex dinghy numbered 1067 with a grey and orange sail is underway with a sailor standing in a blue jacket and life jacket; on the right a white Laser dinghy numbered GBR 188572 with a white and blue sail is underway with a sailor seated in a black life jacket. Both are on calm water with wooded shoreline
+Should be 1-2 sentences. Let's do two sentences.
+
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+
+Let's craft.
+
+Title:
+Vortex Catamaran and Laser Dinghy Sailing on River
+
+That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+
+Description:
+Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+
+That's
 </pre>
 
 <details>
@@ -3006,15 +3018,29 @@ Description: 1-2 sentence factual description combining relevant context with ma
 
 The image shows two sailors: left Vortex catamaran sail number 1067 with grey sail with orange stripes, orange hull, sailor in blue jacket red life jacket standing. Right Laser dinghy sail number 188572 GBR white sail with blue corners red sun logo, sailor in black life jacket sitting. Background dense green woodland, shoreline grass, calm water, partly cloudy sky. In background a white motorboat with blue cover and a small white boat with blue trim and buoy.
 
-Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with "VORTEX" and 1067. It appears to be a small trimaran? Or a catamaran? Hints say catamaran. Might keep as small sailing dinghy. Could say Vortex dinghy. Might be safe to say Vortex sailing dinghy. But hint says catamaran. Image shows what looks like a small boat with maybe two hulls? Actually it's a single hull with a small outrigger? Hmm looks like a Vortex class dinghy which is a monohull? Let's keep description as Vortex sailing boat. Might follow hint but image evidence shows it's a single hull with maybe a cat? I think Vortex is a dinghy, not catamaran. Could note as Vortex dinghy. Might be conflict. Prefer image evidence. I'd say Vortex dinghy (sail number 1067). Might keep catamaran? Safer to say small sailing dinghy.
+Need correct conflicts: description hint says Vortex catamaran. Actually Vortex is a single hull? Looks like a small catamaran? Might be a Vortex dinghy? Actually Vortex is a 1-person cat? The boat looks like a small catamaran? The hull looks like a single hull with maybe a small platform? Could be a Vortex 1-person dinghy? Might be a Vortex? Let's assume image evidence: the boat on left has a hull with orange stripe and "VORTEX". It looks like a small catamaran? Actually the boat appears to be a single hull with a tramp? Hmm maybe it's a Vortex catamaran indeed. Keep as hint.
 
-Laser dinghy sail number 188572 GBR. The sail number on sail is 188572, GBR. Good.
+Laser sail number is 188572. The hint says GBR 188572. Image shows 188572. Good.
 
-Lighting: daylight, partly cloudy.
+We need British English spelling.
 
-Provide keywords 10-18 unique comma-separated.
+Description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water... etc.
 
-Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the water under a partly cloudy sky. On the left a white and orange Vortex dinghy numbered 1067 with a grey and orange sail is underway with a sailor standing in a blue jacket and life jacket; on the right a white Laser dinghy numbered GBR 188572 with a white and blue sail is underway with a sailor seated in a black life jacket. Both are on calm water with wooded shoreline
+Should be 1-2 sentences. Let's do two sentences.
+
+Keywords: 10-18 unique comma-separated. Should cover relevant context and visible details. Use keyword hints but add important visible details. Possibly: sailboat, dinghy, Laser, Vortex, catamaran, sailor, life jacket, water, river, estuary, shoreline, trees, forest, sky, clouds, mast, sailing, outdoor recreation. Need 10-18.
+
+Let's craft.
+
+Title:
+Vortex Catamaran and Laser Dinghy Sailing on River
+
+That's 8 words? Vortex1 Catamaran2 and3 Laser4 Dinghy5 Sailing6 on7 River8. Good.
+
+Description:
+Captured on 2026-09-19 17:12:46 UTC+01:00, a sailor in a blue jacket and red life jacket stands on a white and orange Vortex 1067 on the left while another sailor in a black life jacket sits in a white Laser dinghy GBR 188572 on the right, both moving across calm water beneath a partly cloudy sky with dense woodland and shoreline in the background.
+
+That's
 ```
 
 </details>
@@ -3039,22 +3065,22 @@ Let's craft description: On 2026-09-19 at 17:12:46 BST, two sailors are on the w
   after sustained repeated output; Duplicate keywords: trees, forest, mast,
   life jacket, river, estuary, sky, shoreline, sail, boat, boating
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_vl)
-- *Model load time:* 0.91s
-- *Generation time:* 42.21s
-- *Total time:* 44.05s
-- *Prompt preparation time:* 0.927
-- *First-token latency:* 38.7
+- *Model load time:* 0.85s
+- *Generation time:* 44.22s
+- *Total time:* 46.05s
+- *Prompt preparation time:* 0.971
+- *First-token latency:* 40.7
 - *Cleanup time:* 0.118
 - *Prompt tokens:* 16,560
 - *Generation tokens:* 225
 - *Total tokens:* 16,785
-- *Prompt throughput (raw):* 428 tok/s
-- *Generation throughput (raw):* 85.7 tok/s
+- *Prompt throughput (raw):* 407 tok/s
+- *Generation throughput (raw):* 84.0 tok/s
 - *Peak memory (GB):* 9.3
 - *Active memory (GB):* 4.7
 - *Cache memory (GB):* 2.4
 - *Model-load active memory (GB):* 4.68
-- *Post-cleanup active memory (GB):* 0.00734
+- *Post-cleanup active memory (GB):* 0.00736
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* repetition_abort
 - *Requested maximum tokens:* 1000
@@ -3097,22 +3123,22 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type idefics3)
-- *Model load time:* 0.28s
-- *Generation time:* 1.10s
-- *Total time:* 2.30s
-- *Prompt preparation time:* 0.906
-- *First-token latency:* 0.127
-- *Cleanup time:* 0.0891
+- *Model load time:* 0.31s
+- *Generation time:* 1.09s
+- *Total time:* 2.31s
+- *Prompt preparation time:* 0.915
+- *First-token latency:* 0.122
+- *Cleanup time:* 0.0913
 - *Prompt tokens:* 1,212
 - *Generation tokens:* 38
 - *Total tokens:* 1,250
-- *Prompt throughput (raw):* 9,522 tok/s
-- *Generation throughput (raw):* 295 tok/s
+- *Prompt throughput (raw):* 9,964 tok/s
+- *Generation throughput (raw):* 308 tok/s
 - *Peak memory (GB):* 1.1
 - *Active memory (GB):* 0.16
 - *Cache memory (GB):* 0.10
 - *Model-load active memory (GB):* 0.16
-- *Post-cleanup active memory (GB):* 0.0102
+- *Post-cleanup active memory (GB):* 0.0103
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3153,17 +3179,17 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number, Water, Trees, F
   output; Duplicate keywords: blue and white forest, blue and white sky, blue
   and white water, blue and white sail
 - *Arch supported by installed mlx-vlm:* yes (model_type qwen2_5_vl)
-- *Model load time:* 1.21s
-- *Generation time:* 20.17s
-- *Total time:* 22.63s
-- *Prompt preparation time:* 1.24
-- *First-token latency:* 15
-- *Cleanup time:* 0.112
+- *Model load time:* 1.22s
+- *Generation time:* 19.36s
+- *Total time:* 22.07s
+- *Prompt preparation time:* 1.48
+- *First-token latency:* 13.9
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 16,560
 - *Generation tokens:* 250
 - *Total tokens:* 16,810
-- *Prompt throughput (raw):* 1,105 tok/s
-- *Generation throughput (raw):* 57.5 tok/s
+- *Prompt throughput (raw):* 1,189 tok/s
+- *Generation throughput (raw):* 55.4 tok/s
 - *Peak memory (GB):* 14
 - *Active memory (GB):* 9.5
 - *Cache memory (GB):* 2.4
@@ -3213,22 +3239,22 @@ Keywords: Sailing, Catamaran, Laser dinghy, Vortex, Sail number 1067, Sail numbe
 - *Observations:* Required labelled fields not detected: title, description,
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type gemma3n)
-- *Model load time:* 1.88s
-- *Generation time:* 3.65s
-- *Total time:* 6.12s
-- *Prompt preparation time:* 0.568
-- *First-token latency:* 0.308
-- *Cleanup time:* 0.121
+- *Model load time:* 1.71s
+- *Generation time:* 3.68s
+- *Total time:* 5.99s
+- *Prompt preparation time:* 0.586
+- *First-token latency:* 0.32
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 590
 - *Generation tokens:* 196
 - *Total tokens:* 786
-- *Prompt throughput (raw):* 1,916 tok/s
-- *Generation throughput (raw):* 70.1 tok/s
+- *Prompt throughput (raw):* 1,846 tok/s
+- *Generation throughput (raw):* 70.0 tok/s
 - *Peak memory (GB):* 7.2
 - *Active memory (GB):* 5.8
 - *Cache memory (GB):* 0.05
 - *Model-load active memory (GB):* 5.83
-- *Post-cleanup active memory (GB):* 0.0125
+- *Post-cleanup active memory (GB):* 0.0126
 - *Post-cleanup cache memory (GB):* 0.0
 - *Stop reason:* completed
 - *Requested maximum tokens:* 1000
@@ -3268,16 +3294,16 @@ Two sailors are engaged in a sailing competition on a calm body of water, likely
 - *Observations:* Required labelled fields not detected: keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type granite_vision)
 - *Model load time:* 0.42s
-- *Generation time:* 3.23s
-- *Total time:* 4.48s
-- *Prompt preparation time:* 0.828
-- *First-token latency:* 1.74
-- *Cleanup time:* 0.0957
+- *Generation time:* 3.70s
+- *Total time:* 4.98s
+- *Prompt preparation time:* 0.853
+- *First-token latency:* 2.18
+- *Cleanup time:* 0.0952
 - *Prompt tokens:* 5,581
 - *Generation tokens:* 102
 - *Total tokens:* 5,683
-- *Prompt throughput (raw):* 3,205 tok/s
-- *Generation throughput (raw):* 148 tok/s
+- *Prompt throughput (raw):* 2,563 tok/s
+- *Generation throughput (raw):* 145 tok/s
 - *Peak memory (GB):* 4.2
 - *Active memory (GB):* 2.4
 - *Cache memory (GB):* 0.94
@@ -3323,17 +3349,17 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 - *Observations:* Unrecognised model control tokens remain visible; Required
   labelled fields not detected: title, description, keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llmjpvl)
-- *Model load time:* 1.16s
-- *Generation time:* 1.71s
-- *Total time:* 3.56s
-- *Prompt preparation time:* 0.695
-- *First-token latency:* 0.835
-- *Cleanup time:* 0.228
+- *Model load time:* 1.19s
+- *Generation time:* 1.66s
+- *Total time:* 3.57s
+- *Prompt preparation time:* 0.71
+- *First-token latency:* 0.839
+- *Cleanup time:* 0.179
 - *Prompt tokens:* 2,197
 - *Generation tokens:* 16
 - *Total tokens:* 2,213
-- *Prompt throughput (raw):* 2,631 tok/s
-- *Generation throughput (raw):* 82.3 tok/s
+- *Prompt throughput (raw):* 2,619 tok/s
+- *Generation throughput (raw):* 107 tok/s
 - *Peak memory (GB):* 6.7
 - *Active memory (GB):* 5.7
 - *Cache memory (GB):* 0.35
@@ -3388,17 +3414,17 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
   keywords
 - *Arch supported by installed mlx-vlm:* yes (model_type llava-qwen2 via
   llava_bunny)
-- *Model load time:* 0.55s
-- *Generation time:* 0.88s
-- *Total time:* 2.12s
-- *Prompt preparation time:* 0.686
-- *First-token latency:* 0.0985
-- *Cleanup time:* 0.162
+- *Model load time:* 0.50s
+- *Generation time:* 0.80s
+- *Total time:* 1.94s
+- *Prompt preparation time:* 0.64
+- *First-token latency:* 0.0884
+- *Cleanup time:* 0.111
 - *Prompt tokens:* 332
 - *Generation tokens:* 21
 - *Total tokens:* 353
-- *Prompt throughput (raw):* 3,371 tok/s
-- *Generation throughput (raw):* 140 tok/s
+- *Prompt throughput (raw):* 3,755 tok/s
+- *Generation throughput (raw):* 196 tok/s
 - *Peak memory (GB):* 1.6
 - *Active memory (GB):* 0.61
 - *Cache memory (GB):* 0.28
@@ -3423,130 +3449,6 @@ Description: Two sailors navigate their small dinghies, a Vortex catamaran and a
 <pre class="model-output-readable">
 "Boating in the Countryside: A Glimpse of Sailboats and Forests"
 </pre>
-
-</details>
-
----
-
-<a id="model-mlx-community-internvl35-1b-4bit"></a>
-
-### mlx-community/InternVL3_5-1B-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/InternVL3_5-1B-4bit</summary>
-
-- *Execution:* crashed
-- *Mechanical checks:* not assessed
-- *Assessment:* General checks + metadata fields and duplicate keywords;
-  length limits and factual accuracy not assessed
-- *Maintainer status:* actionable_failure
-- *Observations:* none
-- *Failure phase:* model_load
-- *Error stage:* Unsupported Arch
-- *Error code:* MLX_VLM_MODEL_LOAD_UNSUPPORTED_ARCH
-- *Error type:* ValueError
-- *Error package:* mlx-vlm
-- *Error message:* Model loading failed: Model type internvl not supported.
-  Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-- *Root exception type:* ValueError
-- *Root exception module:* builtins
-- *Root exception message:* Model type internvl not supported. Error: No
-  module named 'mlx_vlm.speculative.drafters.internvl'
-- *Arch supported by installed mlx-vlm:* no (model_type internvl)
-- *Model load time:* 0.46s
-- *Generation time:* -
-- *Total time:* 0.46s
-- *Prompt preparation time:* -
-- *First-token latency:* -
-- *Cleanup time:* 0.085
-- *Prompt tokens:* -
-- *Generation tokens:* -
-- *Total tokens:* -
-- *Prompt throughput (raw):* -
-- *Generation throughput (raw):* -
-- *Peak memory (GB):* -
-- *Active memory (GB):* -
-- *Cache memory (GB):* -
-- *Model-load active memory (GB):* -
-- *Post-cleanup active memory (GB):* 0.00243
-- *Post-cleanup cache memory (GB):* 0.0
-- *Stop reason:* exception
-- *Requested maximum tokens:* 1000
-- *Rendered prompt characters:* not captured
-- *Processor:* not captured
-- *Tokenizer:* not captured
-- *Requested model revision:* not requested
-- *Resolved model revision:* f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--InternVL3_5-1B-4bit/snapshots/f9d179a8be8ac53e96c6ee5cce8493856d4b8f09
-- *Generation settings:* not captured
-- *EOS token:* not captured
-
-#### Complete traceback
-
-```python
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14636, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 13511, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 841, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1307, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 965, in load_model
-    model_class, _ = get_model_and_args(config=config, model_path=model_path)
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 785, in get_model_and_args
-    raise ValueError(msg)
-ValueError: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 15758, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 14651, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-
-```
-
-#### Captured upstream output
-
-```text
-=== STDERR ===
-[23:44:38] INFO     Loading model weights and processor...
-Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]
-Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3143.31it/s]
-ERROR:root:Model type internvl not supported. Error: No module named 'mlx_vlm.speculative.drafters.internvl'
-[23:44:38] DEBUG    HF Cache Info for mlx-community/InternVL3_5-1B-4bit: size=1046.5 MB, files=16
-```
 
 </details>
 
