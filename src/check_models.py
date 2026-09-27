@@ -1204,6 +1204,9 @@ class JsonlMetadataRecord(TypedDict, total=False):
     metadata_exposed_to_prompt: bool
     component_provenance: dict[str, ComponentProvenanceRecord]
     execution_mode: Literal["in_process", "isolated"]
+    # Start-up environment warnings (version drift, API drift, one package at
+    # two versions), carried so the reports surface them, not only the log.
+    preflight_issues: NotRequired[list[str]]
 
 
 class ModelProvenanceRecord(TypedDict):
@@ -1290,6 +1293,7 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     description_sentence_range: list[int]
     keyword_count: int
     keyword_count_range: list[int]
+    keywords_from_hints: int
     duplicate_keywords: list[str]
     token_cap_reasons: list[str]
     unchanged_draft_fields: list[str]
@@ -3030,7 +3034,7 @@ def _gallery_model_facts(
         ("Execution", assessment.execution),
         ("Mechanical checks", _human_status_label(row.usability)),
         ("Assessment", _assessment_scope(result.assessment_profile)),
-        ("Maintainer status", assessment.maintainer_status),
+        ("Maintainer status", assessment.maintainer_status.replace("_", " ")),
         (
             "Observations",
             _human_observation_labels(
@@ -4287,6 +4291,25 @@ _PROMPT_HINT_RE: Final[re.Pattern[str]] = re.compile(
     r"(?im)^[ \t]*[-*][ \t]*(title|description)[ \t]+hint[ \t]*:[ \t]*(.+)$"
 )
 _HINT_ECHO_RUN_WORDS: Final[int] = 4
+_PROMPT_KEYWORD_HINTS_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^[ \t]*[-*][ \t]*keyword[ \t]+hints[ \t]*:[ \t]*(.+)$"
+)
+
+
+def _keywords_from_hints(sections: Mapping[str, str], prompt: str | None) -> int | None:
+    """Count the answer's distinct keywords that appear verbatim in the prompt's keyword hints.
+
+    None when the answer has no Keywords field or the prompt carried no
+    keyword hints (a custom ``--prompt`` usually has neither). A count, not a verdict:
+    reusing a supplied keyword can be right, but a list taken wholesale from
+    the hints says nothing about what the model saw.
+    """
+    match = _PROMPT_KEYWORD_HINTS_RE.search(prompt or "")
+    if match is None or "keywords" not in sections:
+        return None
+    hints = set(filter(None, map(_normalize_phrase_for_matching, match.group(1).split(","))))
+    keywords = _split_catalog_keywords(sections["keywords"])
+    return len(set(filter(None, map(_normalize_phrase_for_matching, keywords))) & hints)
 
 
 def _match_words(text: str) -> list[str]:
@@ -4521,6 +4544,7 @@ class GenerationQualityAnalysis:
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
     keyword_count: int | None = None
+    keywords_from_hints: int | None = None
     duplicate_keywords: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     # The final answer appears twice, verbatim after whitespace collapsing;
@@ -4772,6 +4796,7 @@ def analyze_generation_text(  # noqa: PLR0913, PLR0917 - one analysis pass over 
         if "title" in sections
         else None,
         keyword_count=len(keywords) if "keywords" in sections else None,
+        keywords_from_hints=_keywords_from_hints(sections, prompt),
         duplicate_keywords=[word for word, count in keyword_counts.items() if count > 1],
         unexpected_special_tokens=unexpected_special_tokens,
         duplicated_answer_separator=_detect_duplicated_answer(
@@ -4889,7 +4914,12 @@ _console_shows_level: bool = False
 
 
 def _console_total_width(max_width: int = 120) -> int:
-    """Return the full console width: --width / MLX_VLM_WIDTH, else the clamped terminal."""
+    """Return the full console width: --width / MLX_VLM_WIDTH, else the clamped terminal.
+
+    Without a terminal (output piped or redirected, as in a background sweep)
+    there is no screen to fit, so the width is ``max_width``: a narrower
+    fallback folded the persisted log's comparison table into unreadable cells.
+    """
     env_width = os.getenv("MLX_VLM_WIDTH")
     if env_width:
         try:
@@ -4897,9 +4927,9 @@ def _console_total_width(max_width: int = 120) -> int:
         except ValueError:
             pass
     try:
-        width = shutil.get_terminal_size(fallback=(FORMATTING.generation_wrap_width, 24)).columns
+        width = shutil.get_terminal_size(fallback=(max_width, 24)).columns
     except OSError:
-        width = FORMATTING.generation_wrap_width
+        width = max_width
     return min(width, max_width)
 
 
@@ -5648,11 +5678,34 @@ def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
     return tuple(dict.fromkeys(issues))
 
 
+def _detect_distribution_version_conflicts() -> list[str]:
+    """Name every package installed at more than one version on the import path.
+
+    An editable install is found twice at one version (its site-packages
+    dist-info and its checkout on ``sys.path``), which is harmless; two
+    versions of one name mean the import order decides which code runs.
+    """
+    versions: dict[str, set[str]] = {}
+    for dist in distributions():
+        meta = dist.metadata
+        name = meta.get("Name") if meta is not None else None
+        version = meta.get("Version") if meta is not None else None
+        if name and version:
+            versions.setdefault(re.sub(r"[-_.]+", "-", name).lower(), set()).add(version)
+    return [
+        f"{name} is installed at {len(found)} versions ({', '.join(sorted(found))}); "
+        "which one is imported depends on sys.path order"
+        for name, found in sorted(versions.items())
+        if len(found) > 1
+    ]
+
+
 def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]:
     """Collect actionable dependency/runtime issues before model execution."""
     issues = _detect_upstream_version_issues(versions)
 
     issues.extend(_detect_runtime_api_drift_issues())
+    issues.extend(_detect_distribution_version_conflicts())
 
     return issues
 
@@ -9108,6 +9161,8 @@ def _catalog_constraint_observation_details(
         details["title_word_count"] = analysis.title_word_count
     if analysis.keyword_count is not None:
         details["keyword_count"] = analysis.keyword_count
+    if analysis.keywords_from_hints is not None:
+        details["keywords_from_hints"] = analysis.keywords_from_hints
     if analysis.duplicate_keywords:
         details["duplicate_keywords"] = list(analysis.duplicate_keywords)
     return details
@@ -9861,7 +9916,11 @@ def _diagnostics_fact(value: object | None) -> str:
         return str(value).lower()
     if isinstance(value, str):
         return _home_relative_report_text(value)
-    if isinstance(value, int | float):
+    if isinstance(value, float):
+        # Measured seconds and GB: milliseconds / megabytes are the useful
+        # resolution; 2.0602244159963448 s was timer noise, not evidence.
+        return str(round(value, 3))
+    if isinstance(value, int):
         return str(value)
     return _home_relative_report_text(json.dumps(_jsonify_cli_value(value), sort_keys=True))
 
@@ -9907,6 +9966,7 @@ _OBSERVATION_DETAIL_LABELS: Final[dict[str, str]] = {
     "description_sentence_range": "Requested description sentence range",
     "keyword_count": "Keyword count",
     "keyword_count_range": "Requested keyword count range",
+    "keywords_from_hints": "Keywords taken verbatim from the prompt's keyword hints",
     "duplicate_keywords": "Duplicate keywords",
     "token_cap_reasons": "Token-cap degradation evidence",
     "unchanged_draft_fields": "Draft fields returned unchanged",
@@ -9940,7 +10000,7 @@ def _diagnostics_result_facts(
         ("Execution", assessment.execution),
         ("Mechanical checks", _human_status_label(assessment.usability)),
         ("Assessment", _assessment_scope(result.assessment_profile)),
-        ("Maintainer status", assessment.maintainer_status),
+        ("Maintainer status", assessment.maintainer_status.replace("_", " ")),
         ("Observations", ", ".join(assessment.observations) or "none"),
     ]
     arch_summary = _arch_precheck_summary(result.model_name)
@@ -10369,7 +10429,7 @@ def _diagnostics_partition_blocks(
             else:
                 detail = "indeterminate: connectivity failure"
             entry = ReportDetails(
-                f"{result.model_name} — {assessment.usability} — {detail}",
+                f"{result.model_name} — {_human_status_label(assessment.usability)} — {detail}",
                 (ReportSection(result.model_name, evidence, level=3),),
             )
         blocks.extend((anchor_block, entry))
@@ -10414,7 +10474,7 @@ def _diagnostics_evidence_blocks(
             ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
             assessments[result.model_name].execution,
             _human_status_label(assessments[result.model_name].usability),
-            assessments[result.model_name].maintainer_status,
+            assessments[result.model_name].maintainer_status.replace("_", " "),
             _gallery_observation_labels(assessments[result.model_name].observations),
         )
         for result in highlighted
@@ -16742,9 +16802,12 @@ def _dump_environment_to_log(output_path: Path) -> bool:
                     meta.get("Version") or "<unknown>",
                 )
 
+            # An editable install is found twice (its site-packages dist-info
+            # and its checkout on sys.path); identical pairs are one package,
+            # while differing versions of one name stay listed as a conflict.
             dists = sorted(
-                (_get_name_version(d) for d in distributions()),
-                key=lambda name_version: name_version[0].lower(),
+                {_get_name_version(d) for d in distributions()},
+                key=lambda name_version: (name_version[0].lower(), name_version[1]),
             )
             env_lines.extend(
                 [
@@ -16848,7 +16911,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     preflight_issues = _collect_preflight_package_issues(library_versions)
     _set_run_preflight_issues(args, preflight_issues)
     if preflight_issues:
-        logger.warning("Detected upstream package compatibility risks:")
+        logger.warning(
+            "Environment warnings from start-up checks (they can change which code runs):"
+        )
         for issue in preflight_issues:
             logger.warning("  - %s", issue)
 
@@ -19667,6 +19732,8 @@ def _build_retained_run(  # noqa: PLR0913 - one assembly point for the whole ret
         started_at=started_at,
     )
     header["phase_totals_s"] = _run_phase_totals(results, total_runtime_seconds)
+    if report_context.preflight_issues:
+        header["preflight_issues"] = list(report_context.preflight_issues)
     records: list[JsonlResultRecord] = []
     for original_result in results:
         result = cached_results.get(original_result.model_name, original_result)
@@ -21516,6 +21583,7 @@ class _ComparisonView:
     membership_items: tuple[str, ...]
     change_rows: tuple[tuple[str, str, str, str], ...]
     flag_rows: tuple[tuple[str, str, str, str, str], ...]
+    flag_lead: str | None
     memory_rows: tuple[tuple[str, str, str, str], ...]
     continuity_rows: tuple[tuple[str, str], ...] = ()
     continuity_note: str | None = None
@@ -21693,12 +21761,32 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
         membership_items=membership_items,
         change_rows=change_rows,
         flag_rows=flag_rows,
+        flag_lead=_throughput_flag_lead(comparison) if flag_rows else None,
         memory_rows=memory_rows,
         continuity_rows=tuple(
             (entry.model, _CRASH_CONTINUITY_LABELS.get(entry.status, entry.status))
             for entry in comparison.crash_continuity
         ),
         continuity_note=_continuity_note(comparison),
+    )
+
+
+def _throughput_flag_lead(comparison: RunComparison) -> str:
+    """Name the throughput table, and say when an mlx change makes first-run timings slow."""
+    lead = (
+        f"Generation tok/s outside the expected band for "
+        f"{_pluralized_count(len(comparison.throughput_flags), 'model')}:"
+    )
+    mlx_change = next(
+        (change for change in comparison.component_changes if change.name == "mlx"), None
+    )
+    if mlx_change is None:
+        return lead
+    return (
+        f"mlx changed since the baseline ({mlx_change.baseline_revision}.."
+        f"{mlx_change.current_revision}). A new mlx build compiles each Metal shader the "
+        "first time it is used, so the first run after a rebuild reads slow, most of all "
+        "for small, fast models; rerun before reading these as regressions. " + lead
     )
 
 
@@ -21770,6 +21858,8 @@ def _run_issue_summary_comparison_section(comparison: RunComparison) -> ReportSe
                 "No execution, usability, or observation-set changes against the baseline."
             )
         )
+    if view.flag_lead is not None:
+        blocks.append(ReportParagraph(view.flag_lead))
     if view.flag_rows:
         blocks.append(
             ReportTable(
@@ -21869,6 +21959,8 @@ def _log_run_comparison(comparison: RunComparison | None) -> None:
         logger.info("  %s: %s", model, continuity)
     if view.continuity_note is not None:
         logger.info("%s", view.continuity_note)
+    if view.flag_lead is not None:
+        logger.info("%s", view.flag_lead)
     for model, baseline_tps, now_tps, ratio, band in view.flag_rows:
         logger.info(
             "  %s: %s -> %s tok/s (x%s) outside band %s", model, baseline_tps, now_tps, ratio, band
@@ -22982,7 +23074,6 @@ def _run_issue_summary_constraint_breakdown(
     title_by_range: dict[tuple[int, int], list[int]] = {}
     description_by_range: dict[tuple[int, int], list[int]] = {}
     keyword_by_range: dict[tuple[int, int], list[int]] = {}
-    duplicate_models = 0
 
     def _record_outside_range(
         groups: dict[tuple[int, int], list[int]],
@@ -23016,9 +23107,7 @@ def _run_issue_summary_constraint_breakdown(
         _record_outside_range(
             keyword_by_range, details.get("keyword_count"), details.get("keyword_count_range")
         )
-        if details.get("duplicate_keywords"):
-            duplicate_models += 1
-    if not (title_by_range or description_by_range or keyword_by_range or duplicate_models):
+    if not (title_by_range or description_by_range or keyword_by_range):
         return None
 
     def _range_line(label: str, observed: list[int], bounds: tuple[int, int], unit: str) -> str:
@@ -23036,15 +23125,13 @@ def _run_issue_summary_constraint_breakdown(
         lines.append(_range_line("Description length", observed, bounds, " sentences"))
     for bounds, observed in sorted(keyword_by_range.items()):
         lines.append(_range_line("Keyword count", observed, bounds, ""))
-    if duplicate_models:
-        lines.append(f"Duplicate keywords: {duplicate_models} model(s)")
+    # Duplicate keywords already show per model in the quality table.
+    if not lines:
+        return None
     return ReportSection(
         "Constraint-failure breakdown",
         (
-            ReportParagraph(
-                "How the fleet failed the catalogue constraints — a skew toward one "
-                "constraint suggests prompt difficulty rather than individual model faults."
-            ),
+            ReportParagraph("Models outside the prompt's requested counts, by field."),
             ReportBulletList(tuple(lines)),
         ),
     )
@@ -23083,7 +23170,8 @@ def _run_issue_summary_observation_cluster_section(
         key = _run_issue_observation_cluster_key(result)
         if key:
             counts[key] += 1
-    if not counts:
+    # A table of one-model signatures repeats the review table below it.
+    if not any(count > 1 for count in counts.values()):
         return None
     rows = tuple(
         (
@@ -23141,6 +23229,26 @@ def _run_issue_summary_quality_cells(result: JsonlResultRecord) -> tuple[str, st
         else "-"
     )
     return total_cell, tps_cell, peak_cell
+
+
+def _run_issue_summary_keyword_cell(result: JsonlResultRecord) -> str:
+    """Keyword count, with how many were taken verbatim from the prompt's hints."""
+    details = result["assessment"].get("details") or {}
+    count = details.get("keyword_count")
+    if not isinstance(count, int) or isinstance(count, bool):
+        return "-"
+    from_hints = details.get("keywords_from_hints")
+    if isinstance(from_hints, int) and not isinstance(from_hints, bool):
+        return f"{count} ({from_hints} from hints)"
+    return str(count)
+
+
+def _run_issue_summary_prompt_tokens_cell(result: JsonlResultRecord) -> str:
+    """Rendered prompt tokens (image tokens included), which drive prefill time."""
+    prompt_tokens = (result.get("metrics") or {}).get("prompt_tokens")
+    if isinstance(prompt_tokens, int) and not isinstance(prompt_tokens, bool):
+        return f"{prompt_tokens:,}"
+    return "-"
 
 
 def _run_issue_summary_quality_observed(result: JsonlResultRecord) -> str:
@@ -23201,6 +23309,11 @@ def _run_issue_summary_quality_section(
             result["model"].lower(),
         ),
     )
+    # A custom --prompt (general profile) has no Keywords field to count.
+    show_keywords = any(_run_issue_summary_keyword_cell(result) != "-" for result in results)
+    show_hint_reuse = any(
+        "keywords_from_hints" in (result["assessment"].get("details") or {}) for result in results
+    )
     rows: list[tuple[ReportCell, ...]] = []
     for result in ordered:
         total_cell, tps_cell, peak_cell = _run_issue_summary_quality_cells(result)
@@ -23211,37 +23324,47 @@ def _run_issue_summary_quality_section(
                 total_cell,
                 tps_cell,
                 peak_cell,
+                _run_issue_summary_prompt_tokens_cell(result),
+                *((_run_issue_summary_keyword_cell(result),) if show_keywords else ()),
                 _run_issue_summary_quality_observed(result),
             )
         )
+    intro = (
+        "Every attempted model, ordered by its mechanical checks, with counted facts. "
+        '"No concerns detected" is not an accuracy verdict: read the final answers in the '
+        "gallery. Prompt tokens include the image tokens, which drive prefill time."
+    )
+    if show_keywords:
+        intro += " Keywords are counted from the answer's Keywords field" + (
+            ", with how many appear verbatim in the prompt's keyword hints."
+            if show_hint_reuse
+            else "."
+        )
+    headers = (
+        "Model",
+        "Mechanical checks",
+        "Total",
+        "Gen tok/s",
+        "Peak GB",
+        "Prompt tok",
+        *(("Keywords",) if show_keywords else ()),
+        "Observed",
+    )
     return ReportSection(
         "Model quality at a glance",
-        (
-            ReportParagraph(
-                "Every attempted model ranked by mechanical observations, with captured "
-                "resource facts. No concerns detected is not a task-compliance or accuracy "
-                "verdict. Consult the assessment scope above and inspect the final answers. "
-                "Crashes and integration signals have expanded maintainer evidence. A "
-                "major-concerns row whose observations are format failures only (for "
-                "example labelled fields not detected) is a chooser verdict, not a "
-                "maintainer signal, so it is not repeated under attempts requiring "
-                "review; that list holds results whose observations may point at "
-                "mlx-vlm rather than at the model."
-            ),
-            ReportTable(
-                (
-                    "Model",
-                    "Mechanical checks",
-                    "Total",
-                    "Gen tok/s",
-                    "Peak GB",
-                    "Observed",
-                ),
-                tuple(rows),
-                compact=True,
-            ),
-        ),
+        (ReportParagraph(intro), ReportTable(headers, tuple(rows), compact=True)),
     )
+
+
+def _since_baseline_status(model: str, comparison: RunComparison | None) -> str | None:
+    """Whether a model's execution, usability and observations moved since the baseline."""
+    if comparison is None or not comparison.comparable:
+        return None
+    if model in comparison.models_added:
+        return "new"
+    if any(change.model == model for change in comparison.changes):
+        return "changed"
+    return "unchanged"
 
 
 def _run_issue_summary_surfaced_sections(
@@ -23249,6 +23372,7 @@ def _run_issue_summary_surfaced_sections(
     *,
     output_paths: ReportOutputPaths,
     summary_path: Path,
+    comparison: RunComparison | None = None,
 ) -> tuple[ReportSection, ...]:
     """Build one compact review table for each non-actionable execution status."""
     heading_by_execution: dict[ExecutionStatus, str] = {
@@ -23274,10 +23398,12 @@ def _run_issue_summary_surfaced_sections(
             assessment = result["assessment"]
             if assessment["execution"] != execution:
                 continue
+            since = _since_baseline_status(result["model"], comparison)
             rows.append(
                 (
                     result["model"],
                     _human_status_label(assessment["usability"]),
+                    *(() if since is None else (since,)),
                     _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
                         summary_path=summary_path,
@@ -23288,17 +23414,15 @@ def _run_issue_summary_surfaced_sections(
                 )
             )
         if rows:
+            headers = (
+                "Model",
+                "Mechanical checks",
+                *(("Since baseline",) if comparison is not None and comparison.comparable else ()),
+                "Observed result",
+                "Evidence",
+            )
             sections.append(
-                ReportSection(
-                    heading,
-                    (
-                        ReportTable(
-                            ("Model", "Mechanical checks", "Observed result", "Evidence"),
-                            tuple(rows),
-                            compact=True,
-                        ),
-                    ),
-                )
+                ReportSection(heading, (ReportTable(headers, tuple(rows), compact=True),))
             )
     return tuple(sections)
 
@@ -23457,15 +23581,8 @@ def _run_issue_summary_clean_completions_section(
         and bool(result["assessment"]["observations"])
         for result in results
     )
-    clean_models = sorted(
-        result["model"]
-        for result in results
-        if result["assessment"]["execution"] == "completed"
-        and not result["assessment"]["observations"]
-    )
+    # The quality table above already names them.
     clean_phrase = _pluralized_count(clean_count, "completion") + " without detected concerns"
-    if clean_models:
-        clean_phrase += " (" + ", ".join(f"`{model}`" for model in clean_models) + ")"
     clean_sentence = f"{clean_phrase}."
     if compliance_only_count:
         clean_sentence = (
@@ -23488,6 +23605,44 @@ def _run_issue_summary_clean_completions_section(
             ),
         ),
     )
+
+
+def _token_limit_summary(results: Sequence[JsonlResultRecord]) -> str:
+    """How many runs hit max_tokens, and how many of those left the answer incomplete."""
+    reached = _count_stop_reason(results, "max_tokens")
+    incomplete = _count_observation(results, "token_cap_truncation")
+    return f"{reached} ({incomplete} with incomplete output)" if reached else "0"
+
+
+def _run_issue_summary_maintainer_verdict(
+    actionable: Sequence[JsonlResultRecord],
+    other: Sequence[JsonlResultRecord],
+    comparison: RunComparison | None,
+) -> str:
+    """One line a maintainer can stop at: what, if anything, needs their attention."""
+    lead = "**For mlx-vlm maintainers:** "
+    if not actionable and not other:
+        return lead + "nothing to act on: no crashes, and no result points at mlx-vlm."
+    crash_part = (
+        f"{_pluralized_count(len(actionable), 'crash', 'crashes')} "
+        f"{'needs' if len(actionable) == 1 else 'need'} action "
+        "(see *Crashes requiring action*)"
+        if actionable
+        else "no crashes need action"
+    )
+    if not other:
+        return lead + crash_part + "."
+    other_part = (
+        f"{_pluralized_count(len(other), 'other result')} "
+        f"{'needs' if len(other) == 1 else 'need'} reproducing with mlx-vlm alone "
+        "before anything is reported"
+    )
+    statuses = [_since_baseline_status(result["model"], comparison) for result in other]
+    unchanged = statuses.count("unchanged")
+    if None not in statuses:
+        shown = f"all {unchanged}" if unchanged == len(other) else f"{unchanged} of {len(other)}"
+        other_part += f" ({shown} unchanged since the baseline)"
+    return lead + f"{crash_part}; {other_part}."
 
 
 def generate_run_issue_summary_report(
@@ -23520,64 +23675,65 @@ def generate_run_issue_summary_report(
     )
     eval_mode = str(source.metadata.get("eval_mode", "unknown"))
     blocks: list[ReportBlock] = [
-        ReportParagraph(
-            "**What this run measures.** "
-            + _run_objective_statement(eval_mode)
-            + " check_models gave every locally cached MLX vision-language "
-            "model the same image and the same prompt (reproduced below), "
-            "through mlx-vlm's generation pipeline, and recorded mechanical "
-            "facts about each attempt: whether it ran, what the selected "
-            "assessment profile checked (stated under *Assessment* below), and "
-            "its speed and memory. There is no semantic quality scoring; every "
-            "observation is a reproducible mechanical fact from this one image "
-            "and prompt."
-        ),
-        ReportSection(
-            "Run summary",
+        ReportParagraph(_run_issue_summary_maintainer_verdict(actionable, other, comparison)),
+    ]
+    if preflight_issues := source.metadata.get("preflight_issues"):
+        blocks.extend(
             (
-                ReportKeyValues(
-                    (
-                        *_run_issue_summary_timing_rows(source.metadata),
-                        *_run_input_summary_rows(
-                            source.image,
-                            eval_mode,
-                            source.metadata.get("assessment_profile"),
-                            metadata_exposed_to_prompt=source.metadata.get(
-                                "metadata_exposed_to_prompt"
-                            ),
-                        ),
-                        ("Models attempted", str(len(source.results))),
-                        ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
-                        ("Completed", str(counts["completed"])),
-                        ("Crashed", str(counts["crashed"])),
-                        ("Indeterminate", str(counts["indeterminate"])),
-                        ("Crashes requiring action", str(len(actionable))),
-                        ("Other results requiring review", str(len(other))),
-                        (
-                            "Reached token limit",
-                            str(_count_stop_reason(source.results, "max_tokens")),
-                        ),
-                        (
-                            "Incomplete output at token limit",
-                            str(_count_observation(source.results, "token_cap_truncation")),
-                        ),
-                        (
-                            "Stopped early for repetition",
-                            str(_count_observation(source.results, "repetition_abort")),
-                        ),
-                    )
-                ),
                 ReportParagraph(
-                    "Observations are mechanical facts from one image, not general model-quality "
-                    "judgements."
+                    "**Environment warnings** (from start-up checks; they can change which "
+                    "code ran):"
                 ),
-                ReportDetails(
-                    "Exact prompt sent to every model",
-                    (ReportCodeBlock(source.metadata["prompt"]),),
+                ReportBulletList(tuple(preflight_issues)),
+            )
+        )
+    blocks.extend(
+        (
+            ReportParagraph(
+                "**What this run measures.** "
+                + _run_objective_statement(eval_mode)
+                + " Every locally cached MLX vision-language model got the same image and "
+                "prompt (reproduced below) through mlx-vlm's generation pipeline."
+            ),
+            ReportSection(
+                "Run summary",
+                (
+                    ReportKeyValues(
+                        (
+                            *_run_issue_summary_timing_rows(source.metadata),
+                            *_run_input_summary_rows(
+                                source.image,
+                                eval_mode,
+                                source.metadata.get("assessment_profile"),
+                                metadata_exposed_to_prompt=source.metadata.get(
+                                    "metadata_exposed_to_prompt"
+                                ),
+                            ),
+                            ("Models attempted", str(len(source.results))),
+                            ("Sampling settings", _run_issue_summary_sampling_note(source.results)),
+                            ("Completed", str(counts["completed"])),
+                            ("Crashed", str(counts["crashed"])),
+                            ("Indeterminate", str(counts["indeterminate"])),
+                            ("Crashes requiring action", str(len(actionable))),
+                            ("Other results requiring review", str(len(other))),
+                            (
+                                "Reached token limit",
+                                _token_limit_summary(source.results),
+                            ),
+                            (
+                                "Stopped early for repetition",
+                                str(_count_observation(source.results, "repetition_abort")),
+                            ),
+                        )
+                    ),
+                    ReportDetails(
+                        "Exact prompt sent to every model",
+                        (ReportCodeBlock(source.metadata["prompt"]),),
+                    ),
                 ),
             ),
-        ),
-    ]
+        )
+    )
     if comparison is not None:
         blocks.append(_run_issue_summary_comparison_section(comparison))
     blocks.append(_run_issue_summary_quality_section(source.results))
@@ -23607,6 +23763,7 @@ def generate_run_issue_summary_report(
                 other,
                 output_paths=output_paths,
                 summary_path=summary_path,
+                comparison=comparison,
             )
         )
 

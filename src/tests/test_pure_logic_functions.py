@@ -651,6 +651,19 @@ class TestConsoleContentWidth:
         assert mod.get_terminal_width(max_width=100) == 89
         assert mod.get_terminal_width(min_width=95, max_width=100) == 95
 
+    def test_headless_runs_use_the_full_width_not_a_narrow_fallback(
+        self, mod: types.ModuleType, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Regression: background sweeps fell back to 100 columns and folded the comparison table."""
+        monkeypatch.delenv("MLX_VLM_WIDTH", raising=False)
+        monkeypatch.delenv("COLUMNS", raising=False)
+
+        def _no_terminal(*, fallback: tuple[int, int]) -> os.terminal_size:
+            return os.terminal_size(fallback)
+
+        monkeypatch.setattr(mod.shutil, "get_terminal_size", _no_terminal)
+        assert mod._console_total_width(max_width=120) == 120
+
 
 class TestDisplayWidthUtilities:
     """Tests for display-width-aware terminal helpers."""

@@ -1966,3 +1966,43 @@ def test_run_start_system_facts_are_reused_not_re_read(
         "Power Source (run start)": "AC"
     }
     assert check_models._get_run_system_info(None) == {"Power Source (run start)": "AC"}
+
+
+def test_environment_dump_lists_an_editable_install_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression: editable installs (dist-info plus checkout on sys.path) were listed twice."""
+
+    class _Dist:
+        def __init__(self, name: str, version: str) -> None:
+            self.metadata = {"Name": name, "Version": version}
+
+    found = [_Dist("mlx", "0.32.3"), _Dist("mlx", "0.32.3"), _Dist("rich", "15.0.0")]
+    found += [_Dist("tokenizers", "1.0"), _Dist("tokenizers", "0.9")]
+    monkeypatch.setattr(check_models, "distributions", lambda: found)
+    path = tmp_path / "environment.log"
+    assert check_models._dump_environment_to_log(path)
+    lines = check_models._read_text_file(path).splitlines()
+    packages = [line for line in lines if "==" in line and not line.startswith("=")]
+    assert packages == ["mlx==0.32.3", "rich==15.0.0", "tokenizers==0.9", "tokenizers==1.0"]
+    assert "Total packages: 4" in lines
+
+
+def test_one_package_at_two_versions_is_an_environment_warning(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Two versions of one name decide which code runs; the same version twice does not."""
+
+    class _Dist:
+        def __init__(self, name: str, version: str) -> None:
+            self.metadata = {"Name": name, "Version": version}
+
+    found = [_Dist("mlx", "0.32.3"), _Dist("mlx", "0.32.3"), _Dist("Mlx_VLM", "0.7.3")]
+    found.append(_Dist("mlx-vlm", "0.6.0"))
+    monkeypatch.setattr(check_models, "distributions", lambda: found)
+    assert check_models._detect_distribution_version_conflicts() == [
+        (
+            "mlx-vlm is installed at 2 versions (0.6.0, 0.7.3); which one is imported "
+            "depends on sys.path order"
+        )
+    ]

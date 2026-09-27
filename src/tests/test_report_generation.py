@@ -421,7 +421,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         "# mlx-vlm compatibility findings across 5 cached vision-language models\n"
     )
     assert "## Run summary" in content
-    assert "mechanical facts from one image" in content
+    assert "**For mlx-vlm maintainers:** 1 crash needs action" in content
     assert "## Crashes requiring action" in content
     assert "### org/crash" in content
     assert "processor_load" in content
@@ -440,11 +440,9 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "## Indeterminate attempts requiring review" in content
     assert content.count("| Model | Mechanical checks | Observed result | Evidence |") == 3
     assert "| Model | Execution / usability | Observations | Full evidence |" not in content
-    assert "## Observation clusters" in content
-    # Clusters group by observation codes only (no per-model detail expansion).
-    assert (
-        "| Response repeats the same text; Required labelled fields not detected | 1 |"
-    ) in content
+    # Every signature here belongs to one model, so a cluster table would only
+    # repeat the review tables.
+    assert "## Observation clusters" not in content
     assert (
         "| org/observed | major concerns | Response repeats the same text; "
         "Required labelled fields not detected: title, keywords |"
@@ -463,10 +461,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         f"{check_models._github_blob_ref()}/src/output/"
     )
     assert all(target.startswith(blob_prefix) for target in link_targets)
-    assert (
-        "1 completion without detected concerns (`org/clean`). See the [full model gallery]"
-        in content
-    )
+    assert "1 completion without detected concerns. See the [full model gallery]" in content
     assert "Trust remote code" in content
     assert "check_models" in content
     assert "0.8.9" in content
@@ -480,7 +475,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         assert "mutable" in content
     # Clean models appear only in the at-a-glance table and the named clean
     # completions, never in the review sections.
-    review_sections = content[content.index("## Observation clusters") :]
+    review_sections = content[content.index("## Completed attempts requiring review") :]
     review_sections = review_sections[
         : review_sections.index("## Completions without detected concerns")
     ]
@@ -1401,13 +1396,11 @@ def test_run_issue_summary_written_for_clean_run(tmp_path: Path) -> None:
     assert "do not establish fitness for other tasks" in " ".join(content.split())
     assert "Exact prompt sent to every model" in content
     assert "full prompt that must not be copied" in content
-    assert "No concerns detected is not a task-compliance or accuracy verdict" in " ".join(
-        content.split()
-    )
+    assert '"No concerns detected" is not an accuracy verdict' in " ".join(content.split())
     assert "## Model quality at a glance" in content
     assert "org/clean" in content
     assert "## Crashes requiring action" not in content
-    assert "`org/clean`" in content  # clean completions are named
+    assert "| org/clean | no concerns detected |" in content  # named in the quality table
 
 
 def test_run_issue_summary_quality_table_ranks_all_models(tmp_path: Path) -> None:
@@ -3354,8 +3347,9 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
     assert content.index(headings[1]) < content.index(headings[2])
     assert content.index(headings[2]) < content.index(headings[3])
     assert content.index(headings[-1]) < content.index("## Shared Reproduction and Provenance")
-    assert "actionable_failure" in content
-    assert "observation_needs_reproduction" in content
+    assert "actionable failure" in content
+    assert "observation needs reproduction" in content
+    assert "actionable_failure" not in content
     assert "indeterminate" in content
 
 
@@ -3869,7 +3863,7 @@ def test_successful_anomaly_and_indeterminate_attempt_create_no_issue_draft(
     )
 
     content = diagnostics.read_text(encoding="utf-8")
-    assert "observation_needs_reproduction" in content
+    assert "observation needs reproduction" in content
     assert complete_output in content
     assert "suspected owner" not in content.casefold()
     assert "owner confidence" not in content.casefold()
@@ -4339,7 +4333,8 @@ class TestHtmlReportEdgeCases:
                 f"*Mechanical checks:* {check_models._human_status_label(assessment.usability)}"
                 in gallery_entry
             )
-            assert f"*Maintainer status:* {assessment.maintainer_status}" in gallery_entry
+            status_label = assessment.maintainer_status.replace("_", " ")
+            assert f"*Maintainer status:* {status_label}" in gallery_entry
             escaped_model = html.escape(model, quote=True)
             row_pattern = (
                 rf'data-model="{re.escape(escaped_model)}"[^>]*'
@@ -4355,7 +4350,7 @@ class TestHtmlReportEdgeCases:
                     f"*Mechanical checks:* {check_models._human_status_label(assessment.usability)}"
                     in diagnostics_entry
                 )
-                assert f"*Maintainer status:* {assessment.maintainer_status}" in diagnostics_entry
+                assert f"*Maintainer status:* {status_label}" in diagnostics_entry
 
     def test_standalone_html_does_not_build_legacy_semantic_context(
         self,
@@ -6629,8 +6624,7 @@ def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(
     summary = check_models.generate_run_issue_summary_report(output_paths)
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
-    assert "- *Reached token limit:* 2" in content
-    assert "- *Incomplete output at token limit:* 1" in content
+    assert "- *Reached token limit:* 2 (1 with incomplete output)" in content
     assert "Hit the token cap" not in content
     assert "- *Stopped early for repetition:* 1" in content
     assert "## Constraint-failure breakdown" in content
@@ -6644,7 +6638,8 @@ def test_run_summary_counts_cap_hits_and_renders_constraint_breakdown(
         "Keyword count: 2 model(s) outside 10-18 (0 below, 2 above; median observed 210)"
         in normalized
     )
-    assert "Duplicate keywords: 1 model(s)" in normalized
+    # Duplicate keywords show per model in the quality table, not as a count here.
+    assert "Duplicate keywords: 1 model(s)" not in normalized
 
 
 def test_constraint_breakdown_keeps_each_declared_range() -> None:
@@ -8063,3 +8058,135 @@ def test_crash_drafts_open_with_the_checkpoint_checks_the_evidence_calls_for(
     assert "Reproduce with the native command below" in plain
     for absent in ("support request", "lacks files", "family README", "while loading"):
         assert absent not in plain
+
+
+def _bare_comparison(**overrides: object) -> check_models.RunComparison:
+    """A comparable baseline diff with nothing moved, for rendering tests."""
+    base = check_models.RunComparison(
+        baseline_label="b",
+        baseline_timestamp=None,
+        baseline_components=(),
+        compared_models=3,
+        models_added=(),
+        models_removed=(),
+        changes=(),
+        identical_text_models=0,
+        text_compared_models=0,
+        tps_ratio_median=None,
+        tps_ratio_min=None,
+        tps_ratio_max=None,
+        tps_compared_models=0,
+        throughput_flags=(),
+        memory_changes=(),
+        history_runs_used=0,
+    )
+    return replace(base, **cast("dict[str, Any]", overrides))
+
+
+def test_maintainer_verdict_says_what_needs_attention_and_what_is_unchanged() -> None:
+    """The first line of the run summary answers "is there anything for mlx-vlm?"."""
+    crash = cast(
+        "check_models.JsonlResultRecord",
+        _issue_summary_result("org/crash", execution="crashed", usability="not_evaluated"),
+    )
+    seen = cast("check_models.JsonlResultRecord", _issue_summary_result("org/seen"))
+    moved = cast("check_models.JsonlResultRecord", _issue_summary_result("org/moved"))
+    verdict = check_models._run_issue_summary_maintainer_verdict
+    assert verdict((), (), None) == (
+        "**For mlx-vlm maintainers:** nothing to act on: no crashes, and no result "
+        "points at mlx-vlm."
+    )
+    assert verdict((crash,), (), None).endswith(
+        "1 crash needs action (see *Crashes requiring action*)."
+    )
+    change = check_models.RunComparisonModelChange(
+        "org/moved", "completed", "completed", "usable", "unusable", ("repeated_output",), ()
+    )
+    comparison = _bare_comparison(changes=(change,))
+    line = verdict((), (seen, moved), comparison)
+    assert "no crashes need action; 2 other results need reproducing with mlx-vlm alone" in line
+    assert line.endswith("(1 of 2 unchanged since the baseline).")
+    assert verdict((), (seen,), comparison).endswith("(all 1 unchanged since the baseline).")
+    # Without a comparable baseline nothing is claimed about continuity.
+    assert "baseline" not in verdict((), (seen,), None)
+    assert (
+        check_models._since_baseline_status("org/new", _bare_comparison(models_added=("org/new",)))
+        == "new"
+    )
+
+
+def test_throughput_flags_are_named_and_an_mlx_rebuild_is_called_out() -> None:
+    """A bare table of slow models invited reading a cold shader cache as a regression."""
+    flag = check_models.RunComparisonThroughputFlag(
+        "org/a", 300.0, 200.0, 0.67, 255.0, 345.0, "fallback", 0
+    )
+    lead = check_models._throughput_flag_lead(_bare_comparison(throughput_flags=(flag,)))
+    assert lead == "Generation tok/s outside the expected band for 1 model:"
+    rebuilt = _bare_comparison(
+        throughput_flags=(flag,),
+        component_changes=(
+            check_models.ComponentChange("mlx", "09e67c686", "02ce1fb6a", 1, ("x",)),
+        ),
+    )
+    lead = check_models._throughput_flag_lead(rebuilt)
+    assert lead.startswith("mlx changed since the baseline (09e67c686..02ce1fb6a).")
+    assert "rerun before reading these as regressions" in lead
+    assert check_models._comparison_view(rebuilt).flag_lead == lead
+    assert check_models._comparison_view(_bare_comparison()).flag_lead is None
+
+
+def test_keywords_from_hints_counts_verbatim_reuse_only() -> None:
+    """A count of hint keywords reused, not a judgement of whether reuse was right."""
+    prompt = "Context:\n- Keyword hints: Boat, Calm Water, Marina, Yacht\n"
+    count = check_models._keywords_from_hints
+    assert count({"keywords": "boat, calm water, Harbour, Boat"}, prompt) == 2
+    assert count({"keywords": "boat"}, "Describe the image.") is None
+    assert count({}, prompt) is None  # no Keywords field in the answer
+
+
+def test_run_summary_surfaces_environment_warnings_and_counted_keyword_facts(
+    tmp_path: Path,
+) -> None:
+    """Start-up warnings reach the report, and the quality table carries counted facts."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/a", details={"keyword_count": 36, "keywords_from_hints": 20}
+    )
+    _write_issue_summary_fixture(output_paths, results=(result,))
+    rows = check_models._read_text_file(output_paths.jsonl).splitlines()
+    metadata = json.loads(rows[0])
+    metadata["preflight_issues"] = ["mlx is installed at 2 versions (0.31.0, 0.32.3)"]
+    check_models._write_text_file(
+        output_paths.jsonl, "\n".join([json.dumps(metadata), *rows[1:]]) + "\n"
+    )
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    content = check_models._read_text_file(summary)
+    assert "**Environment warnings**" in content
+    assert "- mlx is installed at 2 versions (0.31.0, 0.32.3)" in content
+    assert content.index("**Environment warnings**") < content.index("## Run summary")
+    assert "| Prompt tok | Keywords |" in content
+    assert "| 36 (20 from hints) |" in content
+
+    # A custom --prompt has no Keywords field: no column, no keyword wording.
+    _write_issue_summary_fixture(output_paths, results=(_issue_summary_result("org/a"),))
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+    assert summary is not None
+    content = check_models._read_text_file(summary)
+    assert "| Prompt tok | Observed |" in content
+    assert "Keywords are counted" not in content
+
+
+def test_observation_clusters_render_only_for_shared_signatures() -> None:
+    """One-model signatures repeat the review table; shared ones are worth a line."""
+    one = cast(
+        "check_models.JsonlResultRecord",
+        _issue_summary_result("org/a", observations=["repeated_output"]),
+    )
+    two = cast(
+        "check_models.JsonlResultRecord",
+        _issue_summary_result("org/b", observations=["repeated_output"]),
+    )
+    section = check_models._run_issue_summary_observation_cluster_section
+    assert section((one,)) is None
+    assert section((one, two)) is not None

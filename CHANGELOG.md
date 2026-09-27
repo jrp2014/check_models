@@ -6,6 +6,29 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `run_summary.md` opens with a one-line verdict for mlx-vlm maintainers
+  (crashes needing action, other results needing reproduction, and how many
+  of those are unchanged since the baseline); the review table gains a
+  "Since baseline" column (unchanged / changed / new). Start-up environment
+  warnings (upstream version drift, API drift, and now one package installed
+  at two versions) are carried in `results.jsonl` and listed under the
+  verdict; before, they reached only the log.
+- The baseline throughput table is introduced by a sentence naming it, and,
+  when mlx changed since the baseline, by a note that the first run after an
+  mlx build compiles Metal shaders on first use and reads slow.
+- The quality table adds counted facts: prompt tokens (image tokens
+  included) and, when the answer has a Keywords field, the keyword count with
+  how many appear verbatim in the prompt's keyword hints (recorded as
+  `keywords_from_hints`). Counts only; no verdicts are derived from them, and
+  a custom `--prompt` without those fields shows neither.
+- Report trimming: the scope disclaimer is stated once per report; "Reached
+  token limit" and "Incomplete output at token limit" are one row; the
+  observation-cluster table appears only when a signature is shared by two or
+  more models; the constraint breakdown no longer repeats the per-model
+  duplicate-keyword flag; clean completions are no longer listed again by
+  name. Diagnostics round measured floats to three decimals and show
+  maintainer status and usability as words (`observation needs
+  reproduction`, `usable with caveats`) rather than identifiers.
 - Console log simplifications. Each per-model result opens with one readable
   line (`[n/N] <model>: completed, unusable output; observations: …; next
   step: …`) instead of wrapped `key=value` pairs; the DEBUG `REPRO` line
@@ -568,6 +591,14 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `environment.log` lists each editable install (mlx, mlx-vlm, mlx-lm,
+  check_models) once; importlib found each twice, through its site-packages
+  dist-info and its checkout on `sys.path`. Two different versions of one
+  name are still both listed.
+- A run without a terminal (output piped or redirected, as in a background
+  sweep) now logs at the full 120-column width instead of a 100-column
+  fallback, which had folded the closing comparison table into cells three
+  or four characters wide in `check_models.log`.
 - System facts labelled "(run start)" (available memory, swap, power source
   and mode) are taken once at the start of the run and reused by the reports
   and the closing summary; both had re-read them at the end, so an unplugged
