@@ -6685,6 +6685,9 @@ _EXIF_HEX_PREVIEW_BYTES: Final[int] = 256
 _EXIF_TEXT_CONTROL_OK: Final[frozenset[int]] = frozenset({0x09, 0x0A, 0x0D})
 _ASCII_FIRST_PRINTABLE: Final[int] = 0x20
 _ASCII_DELETE: Final[int] = 0x7F
+# UserComment's 8-byte character-code headers: text that _decode_exif_string
+# reads, even though the header (and UNICODE text) carries NUL bytes.
+_EXIF_TEXT_ENCODING_HEADERS: Final[tuple[bytes, ...]] = (b"ASCII\x00", b"UNICODE\x00", b"JIS\x00")
 
 
 def _exif_binary_payload(value: object) -> bytes | None:
@@ -6699,6 +6702,8 @@ def _exif_binary_payload(value: object) -> bytes | None:
     elif isinstance(value, str):
         raw = value.encode("latin-1", errors="replace")
     else:
+        return None
+    if raw.startswith(_EXIF_TEXT_ENCODING_HEADERS):
         return None
     body = raw.rstrip(b"\x00")
     if any(
@@ -13857,6 +13862,12 @@ def _raise_preflight_error(message: str, *, phase: FailurePhaseName) -> NoReturn
     raise _tag_exception_failure_phase(ValueError(message), phase)
 
 
+# Snapshot-note prefixes, shared with _checkpoint_checks_section so each kind
+# of recorded gap gets its own check rather than one blanket explanation.
+_SNAPSHOT_NOTE_TOKENIZER: Final[str] = "tokenizer artifacts missing from snapshot"
+_SNAPSHOT_NOTE_PROCESSOR: Final[str] = "processor config missing from snapshot"
+
+
 def _validate_model_artifact_layout(
     *,
     model_identifier: str,
@@ -13888,13 +13899,11 @@ def _validate_model_artifact_layout(
             "vocab.json",
         )
         if not any((snapshot_path / name).exists() for name in tokenizer_candidates):
-            notes.append(
-                f"tokenizer artifacts missing from snapshot ({', '.join(tokenizer_candidates)})"
-            )
+            notes.append(f"{_SNAPSHOT_NOTE_TOKENIZER} ({', '.join(tokenizer_candidates)})")
 
     processor_candidates = ("preprocessor_config.json", "processor_config.json")
     if not any((snapshot_path / name).exists() for name in processor_candidates):
-        notes.append(f"processor config missing from snapshot ({', '.join(processor_candidates)})")
+        notes.append(f"{_SNAPSHOT_NOTE_PROCESSOR} ({', '.join(processor_candidates)})")
 
     shard_status = _weight_shard_status(snapshot_path)
     if shard_status is not None:
@@ -15397,8 +15406,10 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
     max_level = telemetry.get("memory_pressure_level_max")
     if max_level is not None and max_level > _MEMORY_PRESSURE_NORMAL_LEVEL:
         label = "critical" if max_level >= _MEMORY_PRESSURE_CRITICAL_LEVEL else "warning"
+        # The level is the worst reading; the count covers every reading above
+        # normal, which may include lesser levels.
         notes.append(
-            f"memory pressure {label} "
+            f"memory pressure reached {label}; above normal "
             + _telemetry_checks_phrase(
                 telemetry,
                 telemetry.get("memory_pressure_elevated_samples", 0),
@@ -15413,8 +15424,11 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
             if thermal_max >= _THERMAL_STATE_THROTTLED
             else "warm, fans working; macOS is not reducing performance"
         )
+        # As for memory: the worst level, then how many readings were above
+        # nominal at any level (a fair check and a serious one count as two).
         notes.append(
-            f"macOS thermal state {_THERMAL_STATE_LABELS[thermal_max]} ({meaning}) "
+            f"macOS thermal state reached {_THERMAL_STATE_LABELS[thermal_max]} ({meaning}); "
+            "above nominal "
             + _telemetry_checks_phrase(
                 telemetry,
                 telemetry.get("thermal_elevated_samples", 0),
@@ -21772,21 +21786,23 @@ def _comparison_view(comparison: RunComparison) -> _ComparisonView:
 
 
 def _throughput_flag_lead(comparison: RunComparison) -> str:
-    """Name the throughput table, and say when an mlx change makes first-run timings slow."""
+    """Name the throughput table, and say when mlx itself changed between the runs.
+
+    Only the recorded fact: a warm rerun on 2026-09-27 left the same models
+    slow, so no cause (shader compilation or otherwise) is suggested.
+    """
     lead = (
         f"Generation tok/s outside the expected band for "
-        f"{_pluralized_count(len(comparison.throughput_flags), 'model')}:"
+        f"{_pluralized_count(len(comparison.throughput_flags), 'model')}"
     )
     mlx_change = next(
         (change for change in comparison.component_changes if change.name == "mlx"), None
     )
     if mlx_change is None:
-        return lead
+        return lead + ":"
     return (
-        f"mlx changed since the baseline ({mlx_change.baseline_revision}.."
-        f"{mlx_change.current_revision}). A new mlx build compiles each Metal shader the "
-        "first time it is used, so the first run after a rebuild reads slow, most of all "
-        "for small, fast models; rerun before reading these as regressions. " + lead
+        f"{lead} (mlx changed since the baseline: {mlx_change.baseline_revision}.."
+        f"{mlx_change.current_revision}):"
     )
 
 
@@ -24287,6 +24303,36 @@ def _diagnostics_shared_context_blocks(
     )
 
 
+def _snapshot_note_checks(snapshot_notes: Sequence[str]) -> list[str]:
+    """One check per kind of recorded snapshot gap, quoting what was recorded.
+
+    The notes are file-layout facts. They say what the snapshot lacked, not
+    which fallback the processor took or what caused the crash, so no item
+    states a cause.
+    """
+    processor = [note for note in snapshot_notes if note.startswith(_SNAPSHOT_NOTE_PROCESSOR)]
+    tokenizer = [note for note in snapshot_notes if note.startswith(_SNAPSHOT_NOTE_TOKENIZER)]
+    weights = [note for note in snapshot_notes if note not in {*processor, *tokenizer}]
+    items: list[str] = []
+    if weights:
+        items.append(
+            "Recorded: " + "; ".join(weights) + ". Check the snapshot is complete (download "
+            "it again) before anything else; a partial download is not an mlx-vlm fault."
+        )
+    if tokenizer:
+        items.append(
+            "Recorded: " + "; ".join(tokenizer) + ". Check whether another conversion of the "
+            "same model ships the tokenizer files."
+        )
+    if processor:
+        items.append(
+            "Recorded: " + "; ".join(processor) + ". The processor may have fallen back to "
+            "defaults; whether that caused this crash is not established. Check whether "
+            "another conversion of the same model ships the file."
+        )
+    return items
+
+
 def _checkpoint_checks_section(
     *,
     model: str,
@@ -24312,13 +24358,7 @@ def _checkpoint_checks_section(
             "That is a support request, not a defect: look for an existing "
             "request before opening one, and do not file it as a bug."
         )
-    if snapshot_notes:
-        items.append(
-            "The checkpoint snapshot lacks files the processor expects ("
-            + "; ".join(snapshot_notes)
-            + "), so the processor used its defaults. Try a conversion of the "
-            "same model that ships them before filing."
-        )
+    items.extend(_snapshot_note_checks(snapshot_notes))
     readme = _family_readme_summary(model)
     if readme is not None and readme != "none":
         path = readme.split(" (", 1)[0]

@@ -11,12 +11,16 @@ hub reads the way ``check_models`` will judge it once cached:
 3. **Chat template shape**: whether the template iterates message content
    parts (multimodal) or concatenates content as a string (text-only), which
    fails at prefill for vision families that send list-content messages.
-4. **Memory**: the safetensors weights alone against this Mac's unified
-   memory (blocked when larger: they cannot be held) and Metal's recommended
-   working set (a warning when larger: expect paging or a load failure).
+4. **Memory**: the safetensors weights mlx-vlm would load (the shards the
+   ``model.safetensors.index.json`` names, else the root-level
+   ``*.safetensors``) against this Mac's unified memory (blocked when larger:
+   they cannot be held) and Metal's recommended working set (a warning when
+   larger: expect paging or a load failure). Runtime allocations come on
+   top, so fitting weights is necessary, not sufficient.
 
-Only ``config.json`` and the chat template are fetched, over HTTPS, without
-touching the local Hugging Face cache. Verdicts are hints, never proof.
+Only ``config.json``, the chat template and the safetensors index are
+fetched, over HTTPS, without touching the local Hugging Face cache. Verdicts
+are hints, never proof.
 
 Usage::
 
@@ -66,6 +70,36 @@ def template_shape(template: str | None) -> TemplateShape:
     return "unknown"
 
 
+def selected_weight_files(files: Iterable[str], index_text: str | None) -> tuple[str, ...]:
+    """The safetensors files mlx-vlm's loader would read, by its static rules.
+
+    Mirrors ``mlx_vlm.utils.load_model``: the shards named by the index's
+    ``weight_map`` that exist, else every root-level ``*.safetensors`` except
+    ``consolidated.safetensors``. Nested files (alternate checkpoints such as
+    ``original/``) are never loaded, so they never count.
+    """
+    names = set(files)
+    if index_text is not None:
+        try:
+            payload = json.loads(index_text)
+        except json.JSONDecodeError:
+            payload = None
+        weight_map = payload.get("weight_map") if isinstance(payload, dict) else None
+        if isinstance(weight_map, dict):
+            shards = sorted({str(shard) for shard in weight_map.values() if shard} & names)
+            if shards:
+                return tuple(shards)
+    return tuple(
+        sorted(
+            name
+            for name in names
+            if "/" not in name
+            and name.endswith(".safetensors")
+            and not name.endswith("consolidated.safetensors")
+        )
+    )
+
+
 def layout_missing(files: Iterable[str]) -> list[str]:
     """Return what the server-style cache-layout rule would find missing."""
     names = set(files)
@@ -92,6 +126,9 @@ class HubCandidate:
     weights_gb: float | None = None
     memory_gb: float | None = None
     working_set_gb: float | None = None
+    # The hub listed no size for at least one selected weight file, so the
+    # memory fit is unknown rather than assumed.
+    weights_size_unknown: bool = False
 
     def verdict(self) -> tuple[str, list[str]]:
         """Return ("OK" | "WARN" | "BLOCKED", reasons)."""
@@ -125,6 +162,11 @@ class HubCandidate:
             warnings.append(
                 f"weights ({self.weights_gb:.1f} GB) exceed Metal's recommended working set "
                 f"({self.working_set_gb:.1f} GB); expect paging or a load failure"
+            )
+        if self.weights_size_unknown:
+            warnings.append(
+                "the hub lists no size for some weight files the loader would read; "
+                "memory fit not assessed"
             )
         if self.template == "string-only":
             blocked.append(
@@ -219,15 +261,20 @@ def fetch_candidate(
     except Exception as error:  # noqa: BLE001 - any hub failure is the verdict
         return HubCandidate(repo_id, (), None, None, None, None, "absent", error=str(error))
     files = tuple(sorted(sibling.rfilename for sibling in info.siblings or ()))
+    # The whole repository's size is shown for information only; the memory
+    # verdict uses the weights the loader would select.
     sizes = [sibling.size for sibling in info.siblings or () if sibling.size]
     size_gb = round(sum(sizes) / 1e9, 1) if sizes else None
-    weight_sizes = [
-        sibling.size
-        for sibling in info.siblings or ()
-        if sibling.size and sibling.rfilename.endswith(".safetensors")
-    ]
+    size_by_name = {sibling.rfilename: sibling.size for sibling in info.siblings or ()}
     memory_bytes, working_set_bytes = (memory_check or _default_memory_check)()
     headers = build_hf_headers()
+    index_text = (
+        _fetch_text(hf_hub_url(repo_id, "model.safetensors.index.json"), headers)
+        if "model.safetensors.index.json" in size_by_name
+        else None
+    )
+    weight_sizes = [size_by_name.get(name) for name in selected_weight_files(files, index_text)]
+    weights_known = bool(weight_sizes) and all(weight_sizes)
     config_text = _fetch_text(hf_hub_url(repo_id, "config.json"), headers)
     model_type_raw: object = None
     if config_text is not None:
@@ -251,9 +298,10 @@ def fetch_candidate(
         resolved_model_type=resolved,
         arch_supported=supported,
         template=template_shape(template),
-        weights_gb=_gigabytes(sum(weight_sizes)) if weight_sizes else None,
+        weights_gb=_gigabytes(sum(size or 0 for size in weight_sizes)) if weights_known else None,
         memory_gb=_gigabytes(memory_bytes),
         working_set_gb=_gigabytes(working_set_bytes),
+        weights_size_unknown=bool(weight_sizes) and not weights_known,
     )
 
 

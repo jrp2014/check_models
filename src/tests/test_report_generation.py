@@ -8035,9 +8035,41 @@ def test_crash_drafts_open_with_the_checkpoint_checks_the_evidence_calls_for(
         arch_supported=True,
         snapshot_notes=("processor config missing from snapshot (preprocessor_config.json)",),
     )
-    assert "lacks files the processor expects" in mage
+    assert "Recorded: processor config missing from snapshot (preprocessor_config.json)" in mage
+    assert "may have fallen back to defaults" in mage
+    assert "not established" in mage
     assert "`mlx_vlm/models/mage_vl/README.md`" in mage
     assert "support request" not in mage
+
+    # Each recorded gap keeps its fact and gets its own check; none asserts a cause.
+    notes = {
+        "processor": "processor config missing from snapshot (preprocessor_config.json)",
+        "tokenizer": "tokenizer artifacts missing from snapshot (tokenizer.json)",
+        "index": "unreadable safetensors index (bad json) — incomplete or corrupt download",
+        "shards": "1 of 2 weight shards missing from snapshot (e.g. w-2.safetensors) "
+        "— incomplete download",
+    }
+    for kind, note in notes.items():
+        text = rendered(
+            model="org/other",
+            phase="generation_before_first_token",
+            model_type="qwen2_vl",
+            arch_supported=True,
+            snapshot_notes=(note,),
+        )
+        assert note in text
+        assert "so the processor used its defaults" not in text
+        assert ("may have fallen back to defaults" in text) is (kind == "processor")
+        assert ("Check the snapshot is complete" in text) is (kind in {"index", "shards"})
+        assert ("ships the tokenizer files" in text) is (kind == "tokenizer")
+    mixed = rendered(
+        model="org/other",
+        phase="generation_before_first_token",
+        model_type="qwen2_vl",
+        arch_supported=True,
+        snapshot_notes=(notes["shards"], notes["processor"]),
+    )
+    assert mixed.index("Check the snapshot is complete") < mixed.index("may have fallen back")
 
     load = rendered(
         model="org/other",
@@ -8116,7 +8148,7 @@ def test_maintainer_verdict_says_what_needs_attention_and_what_is_unchanged() ->
 
 
 def test_throughput_flags_are_named_and_an_mlx_rebuild_is_called_out() -> None:
-    """A bare table of slow models invited reading a cold shader cache as a regression."""
+    """The slow-model table is named, and an mlx change between the runs is stated."""
     flag = check_models.RunComparisonThroughputFlag(
         "org/a", 300.0, 200.0, 0.67, 255.0, 345.0, "fallback", 0
     )
@@ -8129,8 +8161,11 @@ def test_throughput_flags_are_named_and_an_mlx_rebuild_is_called_out() -> None:
         ),
     )
     lead = check_models._throughput_flag_lead(rebuilt)
-    assert lead.startswith("mlx changed since the baseline (09e67c686..02ce1fb6a).")
-    assert "rerun before reading these as regressions" in lead
+    assert lead == (
+        "Generation tok/s outside the expected band for 1 model "
+        "(mlx changed since the baseline: 09e67c686..02ce1fb6a):"
+    )
+    assert "shader" not in lead  # a fact, not a suggested cause
     assert check_models._comparison_view(rebuilt).flag_lead == lead
     assert check_models._comparison_view(_bare_comparison()).flag_lead is None
 

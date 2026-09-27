@@ -2451,6 +2451,86 @@ def test_hub_precheck_memory_verdict_uses_weights_against_memory_facts() -> None
     assert hub_precheck._gigabytes(None) is None
 
 
+def _fetch_with_siblings(
+    monkeypatch: pytest.MonkeyPatch,
+    siblings: dict[str, int | None],
+    fetched: dict[str, str] | None = None,
+) -> hub_precheck.HubCandidate:
+    """Run fetch_candidate against a mocked hub listing (16 GB memory, 12 GB working set)."""
+    import huggingface_hub  # noqa: PLC0415 - patched for this call only
+    import huggingface_hub.utils  # noqa: PLC0415 - as above
+
+    class _Sibling:
+        def __init__(self, name: str, size: int | None) -> None:
+            self.rfilename = name
+            self.size = size
+
+    class _Api:
+        def model_info(self, _repo_id: str, **_kwargs: object) -> object:
+            return type("Info", (), {"siblings": [_Sibling(n, s) for n, s in siblings.items()]})()
+
+    texts = {"config.json": '{"model_type": "qwen3_vl"}', **(fetched or {})}
+    monkeypatch.setattr(huggingface_hub, "HfApi", _Api)
+    monkeypatch.setattr(huggingface_hub, "hf_hub_url", lambda _repo, name: name)
+    monkeypatch.setattr(huggingface_hub.utils, "build_hf_headers", dict)
+    monkeypatch.setattr(hub_precheck, "_fetch_text", lambda url, _headers: texts.get(url))
+    return hub_precheck.fetch_candidate(
+        "org/repo",
+        arch_check=lambda raw: (str(raw), str(raw), True),
+        memory_check=lambda: (16_000_000_000, 12_000_000_000),
+    )
+
+
+def test_hub_precheck_memory_counts_only_the_weights_the_loader_selects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: a nested alternate checkpoint was added in, turning a 6 GB model BLOCKED."""
+    base = {"config.json": 100, "tokenizer_config.json": 100}
+    nested = _fetch_with_siblings(
+        monkeypatch,
+        {**base, "model.safetensors": 6_000_000_000, "original/model.safetensors": 20_000_000_000},
+    )
+    assert nested.weights_gb == 6.0
+    assert nested.size_gb == 26.0  # the whole repository stays a separate figure
+    assert "unified memory" not in " ".join(nested.verdict()[1])
+
+    index = json.dumps({"weight_map": {"a": "model-1.safetensors", "b": "model-2.safetensors"}})
+    indexed = _fetch_with_siblings(
+        monkeypatch,
+        {
+            **base,
+            "model.safetensors.index.json": 100,
+            "model-1.safetensors": 4_000_000_000,
+            "model-2.safetensors": 4_000_000_000,
+            "extra.safetensors": 30_000_000_000,
+        },
+        {"model.safetensors.index.json": index},
+    )
+    assert indexed.weights_gb == 8.0
+
+    unsized = _fetch_with_siblings(
+        monkeypatch, {**base, "model-1.safetensors": 4_000_000_000, "model-2.safetensors": None}
+    )
+    assert unsized.weights_gb is None
+    status, reasons = unsized.verdict()
+    assert status == "WARN"
+    assert any("memory fit not assessed" in reason for reason in reasons)
+
+
+def test_hub_precheck_weight_selection_mirrors_the_loader() -> None:
+    """Index shards that exist win; else root-level files, never consolidated or nested ones."""
+    select = hub_precheck.selected_weight_files
+    files = ["a.safetensors", "consolidated.safetensors", "sub/b.safetensors", "s1.safetensors"]
+    assert select(files, None) == ("a.safetensors", "s1.safetensors")
+    assert select(files, json.dumps({"weight_map": {"x": "s1.safetensors"}})) == ("s1.safetensors",)
+    # An index none of whose shards exist, or a broken one, falls back like the loader.
+    assert select(files, json.dumps({"weight_map": {"x": "gone.safetensors"}})) == (
+        "a.safetensors",
+        "s1.safetensors",
+    )
+    assert select(files, "{not json") == ("a.safetensors", "s1.safetensors")
+
+
 def test_hub_precheck_verdicts_block_layout_architecture_and_text_only_templates() -> None:
     assert _candidate().verdict() == ("OK", [])
     status, reasons = _candidate(template="string-only").verdict()

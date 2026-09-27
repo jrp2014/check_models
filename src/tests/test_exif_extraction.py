@@ -522,3 +522,29 @@ def test_exif_table_keeps_empty_tags_and_shows_binary_as_hex_or_a_label() -> Non
     long_blob = bytes(range(256)) * 2
     shown = check_models._format_exif_binary(long_blob, as_hex=True)
     assert shown.endswith("(512 bytes; first 256 shown)")
+
+
+@pytest.mark.parametrize("binary_as_hex", [False, True])
+def test_exif_table_decodes_encoded_user_comments_instead_of_calling_them_binary(
+    *, binary_as_hex: bool
+) -> None:
+    """Regression: a UserComment's character-code header (NUL bytes) made it "binary data"."""
+    exif: check_models.ExifDict = {
+        "UserComment": b"ASCII\x00\x00\x00My comment",
+        "ImageDescription": b"UNICODE\x00" + "Harbour at dusk".encode("utf-16-le"),
+        "MakerNote": b"SONY DSC \x00\x00\x00\x1c\x00\x01\x02",
+    }
+    shown = {
+        name: value
+        for name, value, _important in check_models.filter_and_format_tags(
+            exif, show_all=True, binary_as_hex=binary_as_hex
+        )
+    }
+    assert shown["UserComment"] == "My comment"
+    assert shown["ImageDescription"] == "Harbour at dusk"
+    # Genuinely opaque data keeps its label or hex preview.
+    maker = exif["MakerNote"]
+    assert isinstance(maker, bytes)
+    assert shown["MakerNote"] == (
+        maker.hex(" ") if binary_as_hex else f"[binary data, {len(maker)} bytes]"
+    )

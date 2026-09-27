@@ -13,9 +13,10 @@ Notable changes to this project will be documented in this file.
   warnings (upstream version drift, API drift, and now one package installed
   at two versions) are carried in `results.jsonl` and listed under the
   verdict; before, they reached only the log.
-- The baseline throughput table is introduced by a sentence naming it, and,
-  when mlx changed since the baseline, by a note that the first run after an
-  mlx build compiles Metal shaders on first use and reads slow.
+- The baseline throughput table is introduced by a sentence naming it and,
+  when mlx changed since the baseline, the two mlx revisions. No cause is
+  suggested: a first-run shader-compilation note was tried and withdrawn when
+  a warm rerun left the same models slow.
 - The quality table adds counted facts: prompt tokens (image tokens
   included) and, when the answer has a Keywords field, the keyword count with
   how many appear verbatim in the prompt's keyword hints (recorded as
@@ -591,6 +592,22 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `tools.hub_precheck` sizes the memory verdict from the weights mlx-vlm's
+  loader would read (index shards that exist, else root-level
+  `*.safetensors` except `consolidated.safetensors`); a nested alternate
+  checkpoint had been added in and could turn a fitting model BLOCKED. When
+  the hub lists no size for a selected file, the fit is reported as not
+  assessed. The repository total stays a separate figure.
+- EXIF UserComment values with an `ASCII`/`UNICODE`/`JIS` character-code
+  header are decoded as text again instead of being labelled binary (the
+  header's NUL bytes had tripped the binary check).
+- Crash drafts' checkpoint checks quote each recorded snapshot gap and give
+  it its own check (weights: confirm the download; tokenizer or processor
+  files: try another conversion) instead of asserting that "the processor
+  used its defaults" for every note, including missing weight shards.
+- System-state notes give the worst level and the above-normal count
+  separately ("thermal state reached serious; above nominal at both
+  checks"); a fair check and a serious one had read as "serious at both".
 - `environment.log` lists each editable install (mlx, mlx-vlm, mlx-lm,
   check_models) once; importlib found each twice, through its site-packages
   dist-info and its checkout on `sys.path`. Two different versions of one

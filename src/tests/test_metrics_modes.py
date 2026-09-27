@@ -1600,8 +1600,8 @@ class TestSystemTelemetry:
         )
         note = check_models._telemetry_degradation_note(record)
         assert note is not None
-        assert "macOS thermal state serious" in note
-        assert "at 2 of 3 checks (before load and after cleanup)" in note
+        assert "macOS thermal state reached serious" in note
+        assert "; above nominal at 2 of 3 checks (before load and after cleanup)" in note
         assert "speed is left out of timing comparisons" in note
         assert "its output is still recorded and assessed" in note
         assert check_models._telemetry_degrades_timings(record)
@@ -1609,8 +1609,8 @@ class TestSystemTelemetry:
         fair_note = check_models._telemetry_degradation_note(fair)
         assert fair_note is not None
         assert (
-            "macOS thermal state fair (warm, fans working; macOS is not reducing "
-            "performance) at 1 of 2 checks" in fair_note
+            "macOS thermal state reached fair (warm, fans working; macOS is not reducing "
+            "performance); above nominal at 1 of 2 checks" in fair_note
         )
         assert "left out" not in fair_note
         # Fair heat is context, not degradation: logged as information.
@@ -1627,6 +1627,42 @@ class TestSystemTelemetry:
         continuous_note = check_models._telemetry_degradation_note(continuous)
         assert continuous_note is not None
         assert "in 2 of 3 readings taken every 2 s during the run" in continuous_note
+
+    @pytest.mark.parametrize(
+        ("states", "worst", "above"),
+        [
+            ((1, 2), "serious", "at both checks"),
+            ((0, 2), "serious", "at 1 of 2 checks"),
+            ((2, 3), "critical", "at both checks"),
+        ],
+    )
+    def test_worst_thermal_level_is_not_attached_to_the_elevated_count(
+        self, states: tuple[int, int], worst: str, above: str
+    ) -> None:
+        """Regression: fair-then-serious read as "serious ... at both checks"."""
+        probes = [check_models._TelemetryProbe(100.0, 1, "ac", 0, state) for state in states]
+        record = check_models._system_telemetry_record_from_probes(probes, mode="snapshot")
+        note = check_models._telemetry_degradation_note(record)
+        assert note is not None
+        assert f"macOS thermal state reached {worst} (" in note
+        assert f"); above nominal {above} (before load and after cleanup)" in note
+        assert f"{worst} ({worst}" not in note
+        continuous = check_models._system_telemetry_record_from_probes(
+            [*probes, probes[0]], mode="continuous", interval_s=2.0
+        )
+        continuous_note = check_models._telemetry_degradation_note(continuous)
+        assert continuous_note is not None
+        assert f"reached {worst} (" in continuous_note
+        assert "above nominal in " in continuous_note
+        assert "readings taken every 2 s during the run" in continuous_note
+
+    def test_worst_memory_pressure_is_not_attached_to_the_elevated_count(self) -> None:
+        """A warning check and a critical check read as "reached critical; above normal at both"."""
+        probes = [check_models._TelemetryProbe(100.0, level) for level in (2, 4)]
+        record = check_models._system_telemetry_record_from_probes(probes, mode="snapshot")
+        note = check_models._telemetry_degradation_note(record)
+        assert note is not None
+        assert "memory pressure reached critical; above normal at both checks" in note
 
     def test_system_state_note_is_logged_in_the_models_closing_block(
         self, caplog: pytest.LogCaptureFixture
@@ -1646,9 +1682,9 @@ class TestSystemTelemetry:
             check_models._log_system_state_note(result)
         records = [(r.levelno, r.getMessage()) for r in caplog.records]
         assert records[0][0] == logging.INFO
-        assert records[0][1].startswith("System state for org/m: macOS thermal state fair")
+        assert records[0][1].startswith("System state for org/m: macOS thermal state reached fair")
         assert records[1][0] == logging.WARNING
-        assert "System state for org/m: macOS thermal state serious" in records[1][1]
+        assert "System state for org/m: macOS thermal state reached serious" in records[1][1]
         assert len(records) == 2
 
     def test_thermal_state_reader_degrades_to_unavailable(
