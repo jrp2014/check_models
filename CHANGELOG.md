@@ -6,6 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- System telemetry records macOS's thermal state (`NSProcessInfo.thermalState`,
+  read through the Objective-C runtime with `ctypes`: no dependency, no
+  subprocess, no privileges) with every probe: `thermal_samples`,
+  `thermal_state_max`, `thermal_elevated_samples`, plus `thermal_state_max`
+  per model in the history. The existing `pmset -g therm` CPU speed limit
+  reads unthrottled on Apple Silicon even under GPU heat. From "serious" up,
+  where macOS reduces performance, a model's timings are left out of noise
+  bands and throughput ratios and named in the comparison, like a sleep gap;
+  "fair" is recorded and noted but still compared.
 - Crash issue drafts and the run summary's crash sections open with "Before
   filing: rule out the checkpoint", listing only the checks the run's own
   evidence calls for: no loader for the model type (a support request, not a

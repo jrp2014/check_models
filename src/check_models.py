@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import ast
 import base64
+import ctypes
 import functools
 import gc
 import hashlib
@@ -988,6 +989,10 @@ class HistoryModelResultRecord(GenerationFactsRecord):
     # Seconds the wall clock outran the process clock (sleep/suspend mid-model);
     # such rows never shape a throughput noise band.
     wall_clock_gap_s: NotRequired[float | None]
+    # Worst macOS thermal state probed around the model (NSProcessInfo:
+    # 0 nominal, 1 fair, 2 serious, 3 critical); from serious up macOS
+    # reduces performance, so such rows never shape a noise band either.
+    thermal_state_max: NotRequired[int | None]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -1062,6 +1067,12 @@ class SystemTelemetryRecord(TypedDict, total=False):
     # model (macOS perf_counter stops during sleep): a system sleep or
     # suspend mid-model, so every timing for it is untrustworthy.
     wall_clock_gap_s: float
+    # macOS thermal state per probe (NSProcessInfo.thermalState, the signal
+    # the OS itself throttles on; covers GPU heat that the pmset CPU speed
+    # limit above never reports on Apple Silicon).
+    thermal_samples: int
+    thermal_state_max: int
+    thermal_elevated_samples: int
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -15030,21 +15041,73 @@ def _sample_power_state() -> tuple[str | None, int | None]:
     return source, mode
 
 
+_THERMAL_STATE_LABELS: Final[tuple[str, ...]] = ("nominal", "fair", "serious", "critical")
+# From "serious" up macOS reduces performance to shed heat.
+_THERMAL_STATE_THROTTLED: Final[int] = 2
+
+
+@functools.cache
+def _thermal_state_reader() -> Callable[[], int] | None:
+    """Bind NSProcessInfo.thermalState through the Objective-C runtime, once.
+
+    Pure ctypes: no PyObjC dependency and no subprocess, so a probe costs one
+    message send. None off macOS or when the runtime cannot be loaded.
+    """
+    if sys.platform != "darwin":
+        return None
+    try:
+        objc = ctypes.cdll.LoadLibrary("/usr/lib/libobjc.A.dylib")
+        ctypes.cdll.LoadLibrary("/System/Library/Frameworks/Foundation.framework/Foundation")
+    except OSError:
+        return None
+    objc.objc_getClass.restype = ctypes.c_void_p
+    objc.objc_getClass.argtypes = [ctypes.c_char_p]
+    objc.sel_registerName.restype = ctypes.c_void_p
+    objc.sel_registerName.argtypes = [ctypes.c_char_p]
+    process_info_class = objc.objc_getClass(b"NSProcessInfo")
+    if not process_info_class:
+        return None
+    send_object = ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)(
+        ("objc_msgSend", objc)
+    )
+    send_long = ctypes.CFUNCTYPE(ctypes.c_long, ctypes.c_void_p, ctypes.c_void_p)(
+        ("objc_msgSend", objc)
+    )
+    process_info = send_object(process_info_class, objc.sel_registerName(b"processInfo"))
+    if not process_info:
+        return None
+    selector = objc.sel_registerName(b"thermalState")
+    return lambda: int(send_long(process_info, selector))
+
+
+def _sample_thermal_state() -> int | None:
+    """Read macOS's thermal state (0 nominal, 1 fair, 2 serious, 3 critical)."""
+    reader = _thermal_state_reader()
+    if reader is None:
+        return None
+    try:
+        state = reader()
+    except (OSError, ValueError):
+        return None
+    return state if 0 <= state < len(_THERMAL_STATE_LABELS) else None
+
+
 class _TelemetryProbe(NamedTuple):
-    """One telemetry sample; the power fields default to unavailable."""
+    """One telemetry sample; the power and thermal fields default to unavailable."""
 
     cpu_speed_limit_pct: float | None
     memory_pressure_level: int | None
     power_source: str | None = None
     power_mode: int | None = None
+    thermal_state: int | None = None
 
 
 def _system_telemetry_probe() -> _TelemetryProbe:
-    """Take one probe: thermal CPU limit, memory pressure, power source and mode."""
+    """Take one probe: thermal CPU limit, memory pressure, power, thermal state."""
     cpu_limit = _sample_thermal_cpu_speed_limit_pct()
     pressure = _sample_memory_pressure_level()
     source, mode = _sample_power_state()
-    return _TelemetryProbe(cpu_limit, pressure, source, mode)
+    return _TelemetryProbe(cpu_limit, pressure, source, mode, _sample_thermal_state())
 
 
 def _system_telemetry_record_from_probes(
@@ -15065,6 +15128,7 @@ def _system_telemetry_record_from_probes(
     ]
     sources = [p.power_source for p in probes if p.power_source is not None]
     modes = [p.power_mode for p in probes if p.power_mode is not None]
+    thermal = [p.thermal_state for p in probes if p.thermal_state is not None]
     record: SystemTelemetryRecord = {
         "mode": mode,
         "cpu_samples": len(cpu_limits),
@@ -15087,6 +15151,10 @@ def _system_telemetry_record_from_probes(
         record["on_battery_samples"] = sum(source == "battery" for source in sources)
     if modes:
         record["low_power_samples"] = sum(mode == _PMSET_LOW_POWER_MODE for mode in modes)
+    record["thermal_samples"] = len(thermal)
+    if thermal:
+        record["thermal_state_max"] = max(thermal)
+        record["thermal_elevated_samples"] = sum(state > 0 for state in thermal)
     return record
 
 
@@ -15160,7 +15228,13 @@ class _SystemTelemetrySampler:
                 return
             source, mode = _sample_power_state()
             self._probes.append(
-                _TelemetryProbe(cpu_limit, _sample_memory_pressure_level(), source, mode)
+                _TelemetryProbe(
+                    cpu_limit,
+                    _sample_memory_pressure_level(),
+                    source,
+                    mode,
+                    _sample_thermal_state(),
+                )
             )
             self._stop_event.wait(self._interval_s)
 
@@ -15189,6 +15263,15 @@ def _telemetry_degradation_note(telemetry: SystemTelemetryRecord) -> str | None:
             f"memory pressure reached {label} for "
             f"{telemetry.get('memory_pressure_elevated_samples', 0)} sample(s)"
         )
+    thermal_max = telemetry.get("thermal_state_max")
+    if thermal_max is not None and thermal_max > 0:
+        note = (
+            f"macOS thermal state reached {_THERMAL_STATE_LABELS[thermal_max]} for "
+            f"{telemetry.get('thermal_elevated_samples', 0)} sample(s)"
+        )
+        if thermal_max >= _THERMAL_STATE_THROTTLED:
+            note += " (macOS reduces performance at this level; timings are not compared)"
+        notes.append(note)
     gap = telemetry.get("wall_clock_gap_s")
     if gap is not None:
         notes.append(
@@ -15225,6 +15308,15 @@ def _telemetry_status_line(telemetry: SystemTelemetryRecord) -> str:
             parts.append(f"low power mode for {low_power} of {power_samples} sample(s)")
     else:
         parts.append("power probe unavailable")
+    thermal_samples = telemetry.get("thermal_samples", 0)
+    if thermal_samples:
+        thermal_max = telemetry.get("thermal_state_max", 0)
+        parts.append(
+            f"thermal state max {_THERMAL_STATE_LABELS[thermal_max]} over "
+            f"{thermal_samples} sample(s)"
+        )
+    else:
+        parts.append("thermal-state probe unavailable")
     if (gap := telemetry.get("wall_clock_gap_s")) is not None:
         parts.append(f"wall-clock gap {gap:.0f}s (sleep/suspend; timings untrustworthy)")
     parts.append(f"mode {telemetry.get('mode', 'unknown')}")
@@ -19095,6 +19187,8 @@ def _history_model_result_from_result(
     gap = _telemetry_wall_clock_gap(result.system_telemetry)
     if gap is not None:
         record["wall_clock_gap_s"] = gap
+    if result.system_telemetry and "thermal_state_max" in result.system_telemetry:
+        record["thermal_state_max"] = result.system_telemetry["thermal_state_max"]
     return record
 
 
@@ -20078,13 +20172,17 @@ def _resolve_comparison_baseline(
 def _history_band_tps_sample(facts: object) -> float | None:
     """Return one usable throughput sample from a history facts dict.
 
-    Aborted generations carry rates over truncated sequences, and a model the
-    machine slept through carries a rate over a stopped clock; neither may
-    shape the noise band.
+    Aborted generations carry rates over truncated sequences, a model the
+    machine slept through carries a rate over a stopped clock, and one run
+    while macOS was shedding heat carries a throttled rate; none may shape
+    the noise band.
     """
     if not isinstance(facts, dict) or facts.get("stop_reason") == "repetition_abort":
         return None
     if facts.get("wall_clock_gap_s") is not None:
+        return None
+    thermal = facts.get("thermal_state_max")
+    if isinstance(thermal, int) and thermal >= _THERMAL_STATE_THROTTLED:
         return None
     tps = facts.get("generation_tps")
     if isinstance(tps, (int, float)) and tps > 0:
@@ -20355,7 +20453,7 @@ def _prefill_tps_ratios(
 
 def _prefill_tps_ratio(now: JsonlResultRecord, before: JsonlResultRecord) -> float | None:
     """Prefill tok/s now/baseline for one model, or None when either side lacks a clean rate."""
-    if _record_wall_clock_gap(now) or _record_wall_clock_gap(before):
+    if _record_timing_untrusted(now) or _record_timing_untrusted(before):
         return None
     rates = [(record.get("metrics") or {}).get("prompt_tps") for record in (now, before)]
     if not all(isinstance(rate, int | float) and rate > 0 for rate in rates):
@@ -20367,6 +20465,18 @@ def _record_wall_clock_gap(record: JsonlResultRecord) -> bool:
     """Return whether a sleep/suspend gap was recorded around this model."""
     telemetry = record.get("system_telemetry")
     return _telemetry_wall_clock_gap(telemetry if isinstance(telemetry, dict) else None) is not None
+
+
+def _record_thermal_throttled(record: JsonlResultRecord) -> bool:
+    """Return whether macOS reached a performance-reducing thermal state around this model."""
+    telemetry = record.get("system_telemetry")
+    state = telemetry.get("thermal_state_max") if isinstance(telemetry, dict) else None
+    return isinstance(state, int) and state >= _THERMAL_STATE_THROTTLED
+
+
+def _record_timing_untrusted(record: JsonlResultRecord) -> bool:
+    """Timings recorded across a sleep or while macOS throttled are not compared."""
+    return _record_wall_clock_gap(record) or _record_thermal_throttled(record)
 
 
 def _record_on_battery(record: JsonlResultRecord) -> bool:
@@ -20416,6 +20526,13 @@ def _run_environment_notes(label: str, records: Sequence[JsonlResultRecord]) -> 
         notes.append(
             f"{label} run slept or was suspended during {len(gaps)} model(s) "
             f"({', '.join(gaps)}); those are excluded from throughput comparison"
+        )
+    throttled = [record["model"] for record in records if _record_thermal_throttled(record)]
+    if throttled:
+        notes.append(
+            f"{label} run reached a performance-reducing macOS thermal state during "
+            f"{len(throttled)} model(s) ({', '.join(throttled)}); those are excluded "
+            "from throughput comparison"
         )
     return notes
 
@@ -20532,7 +20649,7 @@ def _compare_model_performance(
     # A sleep or suspend mid-model in either run stops the process clock, so
     # its rate is recorded but not comparable; peak memory is unaffected and
     # still compared below.
-    slept = _record_wall_clock_gap(now) or _record_wall_clock_gap(before)
+    slept = _record_timing_untrusted(now) or _record_timing_untrusted(before)
     now_tps, before_tps = _result_generation_tps(now), _result_generation_tps(before)
     if not slept and now_tps is not None and before_tps is not None:
         ratios.append(now_tps / before_tps)

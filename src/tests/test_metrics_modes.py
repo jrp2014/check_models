@@ -8,7 +8,7 @@ import json
 import logging
 import time
 from contextlib import ExitStack
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 from unittest.mock import patch
 
 import pytest
@@ -1558,11 +1558,75 @@ class TestSystemTelemetry:
             "cpu_samples": 0,
             "memory_samples": 0,
             "power_samples": 0,
+            "thermal_samples": 0,
         }
         status = check_models._telemetry_status_line(record)
         assert "thermal probe unavailable" in status
+        assert "thermal-state probe unavailable" in status
         assert "memory-pressure probe unavailable" in status
         assert "power probe unavailable" in status
+
+    def test_thermal_state_is_aggregated_named_and_marks_throttled_timings(self) -> None:
+        """NSProcessInfo thermal state: the worst level and elevated count are kept.
+
+        The pmset CPU speed limit reads unthrottled on Apple Silicon even under
+        GPU heat, so the OS thermal state is the throttling signal.
+        """
+        probes = [check_models._TelemetryProbe(100.0, 1, "ac", 0, state) for state in (0, 1, 2)]
+        record = check_models._system_telemetry_record_from_probes(probes, mode="snapshot")
+        assert record["thermal_samples"] == 3
+        assert record["thermal_state_max"] == 2
+        assert record["thermal_elevated_samples"] == 2
+        assert "thermal state max serious over 3 sample(s)" in (
+            check_models._telemetry_status_line(record)
+        )
+        note = check_models._telemetry_degradation_note(record)
+        assert note is not None
+        assert "thermal state reached serious for 2 sample(s)" in note
+        assert "timings are not compared" in note
+        fair = check_models._system_telemetry_record_from_probes(probes[:2], mode="snapshot")
+        fair_note = check_models._telemetry_degradation_note(fair)
+        assert fair_note is not None
+        assert "reached fair" in fair_note
+        assert "not compared" not in fair_note
+
+    def test_thermal_state_reader_degrades_to_unavailable(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """No runtime, a failing call or an unknown level all read as unavailable."""
+        monkeypatch.setattr(check_models, "_thermal_state_reader", lambda: None)
+        assert check_models._sample_thermal_state() is None
+        monkeypatch.setattr(check_models, "_thermal_state_reader", lambda: lambda: 7)
+        assert check_models._sample_thermal_state() is None
+        monkeypatch.setattr(check_models, "_thermal_state_reader", lambda: lambda: 1)
+        assert check_models._sample_thermal_state() == 1
+
+    def test_throttled_models_never_shape_bands_or_ratios(self) -> None:
+        """Serious-or-worse thermal rows are excluded like sleep gaps; fair rows are not."""
+        assert check_models._history_band_tps_sample({"generation_tps": 50.0}) == 50.0
+        assert (
+            check_models._history_band_tps_sample({"generation_tps": 50.0, "thermal_state_max": 1})
+            == 50.0
+        )
+        assert (
+            check_models._history_band_tps_sample({"generation_tps": 50.0, "thermal_state_max": 2})
+            is None
+        )
+
+        def row(state: int) -> check_models.JsonlResultRecord:
+            return cast(
+                "check_models.JsonlResultRecord",
+                {
+                    "model": f"org/m{state}",
+                    "metrics": {"prompt_tps": 100.0, "generation_tps": 50.0},
+                    "system_telemetry": {"thermal_state_max": state},
+                },
+            )
+
+        assert check_models._prefill_tps_ratio(row(0), row(1)) == 1.0
+        assert check_models._prefill_tps_ratio(row(2), row(0)) is None
+        notes = check_models._run_environment_notes("current", [row(0), row(3)])
+        assert any("thermal state during 1 model(s) (org/m3)" in note for note in notes)
 
     def test_record_aggregates_min_max_and_per_probe_counts(self) -> None:
         """Aggregates keep the throttling floor, pressure ceiling, and counts."""
@@ -1586,6 +1650,7 @@ class TestSystemTelemetry:
             "memory_pressure_level_max": 2,
             "memory_pressure_elevated_samples": 1,
             "power_samples": 0,
+            "thermal_samples": 0,
         }
 
     def test_partial_probe_failure_stays_visible(self) -> None:
